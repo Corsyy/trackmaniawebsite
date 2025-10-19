@@ -380,93 +380,119 @@
     }
 
     // Render schedule + hero + past events
-    function renderFromData(events){
-      const now=Date.now();
-      const upcoming=events.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
-      const past=events.filter(e=>new Date(e.end_iso)<=now).sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso)).slice(0,6);
+function renderFromData(events){
+  const now = Date.now();
 
-      const grid=document.getElementById('events-grid');
-      grid.innerHTML='';
-      upcoming.forEach(e=>{
-        const el=document.createElement('article');
-        el.className='event reveal';
-        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
+  // normalize + sort
+  const upcoming = (events || [])
+    .filter(e => new Date(e.end_iso) > now)
+    .sort((a,b) => new Date(a.start_iso) - new Date(b.start_iso));
+
+  const past = (events || [])
+    .filter(e => new Date(e.end_iso) <= now)
+    .sort((a,b) => new Date(b.end_iso) - new Date(a.end_iso))
+    .slice(0, 6);
+
+  // ===== Upcoming grid =====
+  const grid = document.getElementById('events-grid');
+  if (grid){
+    grid.innerHTML = '';
+    if (upcoming.length === 0){
+      grid.innerHTML = '<article class="event"><div class="meta">No upcoming events yet.</div></article>';
+    } else {
+      upcoming.forEach(e => {
+        const el = document.createElement('article');
+        el.className = 'event reveal';
+        el.innerHTML = `
+          <span class="tag">${e.tag || 'Event'}</span>
           <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
           <h4>${e.title}</h4>
-          <div class="meta">${e.description||''}</div>`;
-
-        // if the event has an image, give the card a matching background
-        if (e.image) {
+          <div class="meta">${e.description || ''}</div>
+        `;
+        if (e.image){
           el.classList.add('with-bg');
           el.style.setProperty('--event-img', `url("${e.image}")`);
         }
         grid.appendChild(el);
       });
+    }
+  }
 
-      // Inject Past Events
-      let pastWrap=document.getElementById('past-events');
-      if(!pastWrap){
-        pastWrap=document.createElement('div');
-        pastWrap.id='past-events';
-        pastWrap.innerHTML='<h3 class="title" style="margin-top:2rem">Past Events</h3><div class="grid" id="past-grid"></div>';
-        document.querySelector('#schedule .container').appendChild(pastWrap);
-      }
-      const pastGrid=document.getElementById('past-grid');
-      pastGrid.innerHTML='';
-      past.forEach(e=>{
-        const el=document.createElement('article');
-        el.className='event reveal';
-        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
+  // ===== Past grid =====
+  let pastWrap = document.getElementById('past-events');
+  if (!pastWrap){
+    pastWrap = document.createElement('div');
+    pastWrap.id = 'past-events';
+    pastWrap.innerHTML = '<h3 class="title" style="margin-top:2rem">Past Events</h3><div class="grid" id="past-grid"></div>';
+    document.querySelector('#schedule .container')?.appendChild(pastWrap);
+  }
+  const pastGrid = document.getElementById('past-grid');
+  if (pastGrid){
+    pastGrid.innerHTML = '';
+    if (past.length === 0){
+      pastGrid.innerHTML = '<article class="event"><div class="meta">No past events yet.</div></article>';
+    } else {
+      past.forEach(e => {
+        const el = document.createElement('article');
+        el.className = 'event reveal';
+        el.innerHTML = `
+          <span class="tag">${e.tag || 'Event'}</span>
           <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
           <h4>${e.title}</h4>
-          <div class="meta">${e.location||''}</div>`;
-        if (e.image) {
+          <div class="meta">${e.location || ''}</div>
+        `;
+        if (e.image){
           el.classList.add('with-bg');
           el.style.setProperty('--event-img', `url("${e.image}")`);
         }
         pastGrid.appendChild(el);
       });
-
-      // Hero + countdown + dynamic backgrounds
-      const next=upcoming[0];
-      const chip=document.getElementById('hero-chip');
-      const pills=document.getElementById('hero-pills');
-      const header=document.getElementById('countdown-title');
-      const scheduleSection = document.getElementById('schedule');
-      const cdCard = document.getElementById('countdown-card');
-
-      if(next){
-        chip.textContent=`Next Event • ${next.title}`;
-        pills.innerHTML=`<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-          <div class="pill">📍 ${next.location||'Online'}</div>
-          <div class="pill">🏁 ${next.description||''}</div>`;
-        startCountdown(next.start_iso, header);
-
-        // Set section + countdown backgrounds from next.image (if provided)
-        if (next.image) {
-          scheduleSection?.style.setProperty('--section-img', `url("${next.image}")`);
-          cdCard?.style.setProperty('--cd-img', `url("${next.image}")`);
-        } else {
-          scheduleSection?.style.removeProperty('--section-img');
-          cdCard?.style.removeProperty('--cd-bg');
-        }
-      }else{
-        chip.textContent='No upcoming event';
-        pills.innerHTML='<div class="pill">Check back soon</div>';
-        header.textContent='Countdown'; setCountdown(0,0,0,0);
-        scheduleSection?.style.removeProperty('--section-img');
-        cdCard?.style.removeProperty('--cd-bg');
-      }
-
-      // Update JSON-LD for SEO
-      updateJSONLD(next||null);
-
-      // Reveal
-      attachReveals();
-
-      // Cache events for Add-to-Calendar
-      window.__eventsCache = events;
     }
+  }
+
+  // ===== Hero + countdown + dynamic backgrounds =====
+  const next = upcoming[0];
+  const chip = document.getElementById('hero-chip');
+  const pills = document.getElementById('hero-pills');
+  const header = document.getElementById('countdown-title');
+  const scheduleSection = document.getElementById('schedule');
+  const cdCard = document.getElementById('countdown-card');
+
+  if (next){
+    if (chip) chip.textContent = `Next Event • ${next.title}`;
+    if (pills) pills.innerHTML = `
+      <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+      <div class="pill">📍 ${next.location || 'Online'}</div>
+      <div class="pill">🏁 ${next.description || ''}</div>
+    `;
+    startCountdown(next.start_iso, header);
+
+    // backgrounds from next.image
+    if (next.image){
+      scheduleSection?.style.setProperty('--section-img', `url("${next.image}")`);
+      cdCard?.style.setProperty('--cd-img', `url("${next.image}")`);
+    } else {
+      scheduleSection?.style.removeProperty('--section-img');
+      cdCard?.style.removeProperty('--cd-img');
+    }
+  } else {
+    if (chip) chip.textContent = 'No upcoming event';
+    if (pills) pills.innerHTML = '<div class="pill">Check back soon</div>';
+    if (header) header.textContent = 'Countdown';
+    setCountdown(0,0,0,0);
+    scheduleSection?.style.removeProperty('--section-img');
+    cdCard?.style.removeProperty('--cd-img');
+  }
+
+  // JSON-LD for SEO
+  updateJSONLD(next || null);
+
+  // Reveal animations on new nodes
+  attachReveals();
+
+  // Cache for .ics
+  window.__eventsCache = events || [];
+}
 
     // JSON-LD updater
     function updateJSONLD(next){
