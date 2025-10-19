@@ -398,11 +398,6 @@ function renderFromData(events) {
       el.classList.add('with-bg');
       el.style.setProperty('--event-img', `url("${e.image}")`);
     }
-
-    // optional custom fit or pos via JSON
-    if (e.image_fit) el.style.setProperty('--event-size', e.image_fit);
-    if (e.image_pos) el.style.setProperty('--event-pos', e.image_pos);
-
     grid.appendChild(el);
   });
 
@@ -459,8 +454,6 @@ if (heroImg) {
 } else {
   cdCard?.style.removeProperty('--cd-img');
 }
-
-
       }else{
         chip.textContent='No upcoming event';
         pills.innerHTML='<div class="pill">Check back soon</div>';
