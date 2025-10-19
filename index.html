@@ -133,11 +133,10 @@
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
   overflow: hidden;
-
   background-image:
     linear-gradient(180deg, rgba(10, 15, 26, .68), rgba(10, 15, 26, .44)),
     var(--cd-img, none);
-  background-size: cover, cover; /* 👈 fills the box for all */
+  background-size: cover, cover;         /* fills the box */
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
 }
@@ -147,10 +146,9 @@
   background-image:
     linear-gradient(180deg, rgba(15, 21, 36, .72), rgba(15, 21, 36, .45)),
     var(--event-img);
-  background-size: cover, cover;  /* 👈 same here — fill the card */
+  background-size: cover, cover;          /* fills the card for ALL cards */
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
-
   min-height: 180px;
   border-radius: 16px;
 }
@@ -175,6 +173,8 @@
       .grid, .cards{grid-template-columns:1fr}
       .countdown{flex-wrap:wrap}
     }
+    #schedule { --section-img: none !important; }
+    #schedule::before { background: none !important; }
   </style>
 </head>
 <body>
@@ -403,15 +403,6 @@ function renderFromData(events) {
     if (e.image_fit) el.style.setProperty('--event-size', e.image_fit);
     if (e.image_pos) el.style.setProperty('--event-pos', e.image_pos);
 
-    // Title-based tuning
-    if (/map together/i.test(e.title)) {
-      el.style.setProperty('--event-size', '90% auto'); // fit whole image
-      el.style.setProperty('--event-pos', 'center');
-    } else {
-      el.style.removeProperty('--event-size'); // default cover
-      el.style.removeProperty('--event-pos');
-    }
-
     grid.appendChild(el);
   });
 
@@ -443,16 +434,6 @@ function renderFromData(events) {
       el.classList.add('with-bg');
       el.style.setProperty('--event-img', `url("${e.image}")`);
     }
-
-    if (/map together/i.test(e.title)) {
-      el.style.setProperty('--event-size', '90% auto');
-      el.style.setProperty('--event-pos', 'center');
-    } else {
-      el.style.removeProperty('--event-size');
-      el.style.removeProperty('--event-pos');
-    }
-
-    pastGrid.appendChild(el);
   });
 
       // Hero + countdown + dynamic backgrounds
@@ -475,12 +456,10 @@ function renderFromData(events) {
 const heroImg = next?.hero_image || next?.image;
 if (heroImg) {
   cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
-  cdCard?.style.setProperty('--cd-size', 'contain'); // ← make the image fit fully
 } else {
-  scheduleSection?.style.removeProperty('--section-img');
   cdCard?.style.removeProperty('--cd-img');
-  cdCard?.style.removeProperty('--cd-size');
 }
+
 
       }else{
         chip.textContent='No upcoming event';
