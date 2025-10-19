@@ -148,19 +148,20 @@
     var(--event-img);
 }
 
-/* Countdown background accepts overrides too */
 #countdown-card{
-  background:
-    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
-    var(--cd-img, none);
-  background-size: var(--cd-size, cover);
-  background-position: var(--cd-pos, center);
-  background-repeat: no-repeat;
   border:1px solid rgba(109,251,255,.18);
   border-radius:18px;
   box-shadow:0 10px 30px rgba(0,0,0,.35);
   overflow:hidden;
+
+  background-image:
+    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
+    var(--cd-img, none);
+  background-size: cover, var(--cd-size, contain);  /* ← contain fits full image */
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
 }
+
 
 
     /* ====== RESPONSIVE ====== */
@@ -471,13 +472,15 @@ function renderFromData(events) {
 
         // Set section + countdown backgrounds from next.image (if provided)
         // AFTER
-const heroImg = next?.hero_image || next?.image; // prefer hero_image, fall back to image
+const heroImg = next?.hero_image || next?.image;
 if (heroImg) {
-  cdCard?.style.setProperty('--cd-img', `url("${next.image}")`);
+  scheduleSection?.style.setProperty('--section-img', `url("${heroImg}")`);
   cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+  cdCard?.style.setProperty('--cd-size', 'contain'); // ← make the image fit fully
 } else {
   scheduleSection?.style.removeProperty('--section-img');
-  cdCard?.style.removeProperty('--cd-img'); // correct var name
+  cdCard?.style.removeProperty('--cd-img');
+  cdCard?.style.removeProperty('--cd-size');
 }
 
       }else{
