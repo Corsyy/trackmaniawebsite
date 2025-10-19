@@ -6,9 +6,7 @@
   <title>Kacky Finishes — Trackmania Events</title>
   <meta name="description" content="Upload and view Trackmania Kacky finish clips. Community submissions, moderated for quality." />
   <style>
-    :root{
-      --bg:#0a0f1a;--panel:#0f1524;--ink:#e6ecff;--muted:#9fb3ff;--brand:#6dfbff;--ring:rgba(109,251,255,.35)
-    }
+    :root{ --bg:#0a0f1a; --panel:#0f1524; --ink:#e6ecff; --muted:#9fb3ff; --brand:#6dfbff; --ring:rgba(109,251,255,.35) }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:#0a0f1a;color:var(--ink)}
     header{background:#0f1524;padding:1rem 0;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(109,251,255,.2)}
@@ -22,11 +20,13 @@
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
     .card{background:linear-gradient(180deg,rgba(10,15,26,.85),rgba(10,15,26,.6));border:1px solid rgba(109,251,255,.15);border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.6rem;min-height:180px}
     .card .slot{opacity:.8;font-size:.9rem}
+    .badge{display:inline-block;font-size:.75rem;padding:.25rem .5rem;border:1px solid rgba(255,255,255,.2);border-radius:.5rem;background:rgba(255,255,255,.06)}
     .card iframe{width:100%;height:220px;border:0;border-radius:10px}
     .row{display:flex;gap:.6rem;flex-wrap:wrap}
     .btn{padding:.55rem .9rem;border:none;border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;transition:.2s}
     .btn:hover{transform:translateY(-1px)}
     .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(109,251,255,.25)}
+    .btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
 
     /* Modal */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100}
@@ -53,7 +53,7 @@
 
   <div class="container">
     <h1>Kacky Finishes</h1>
-    <p class="hint">Click a slot to upload your clip for that Kacky map. Click “View / Fullscreen” on any approved clip to watch it larger.</p>
+    <p class="hint">Exactly one submission per slot. If a slot already has a submission (approved or pending), its upload button is disabled.</p>
     <div id="clipsGrid" class="grid"></div>
   </div>
 
@@ -102,6 +102,7 @@
     // ===== Config =====
     const SUPABASE_URL = "https://lertzsobphopkoyaxrwk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
+    const H = { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } };
 
     // ===== Helpers =====
     function twitchParents(){
@@ -154,22 +155,26 @@
 
     async function loadClips(){
       try{
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?approved=eq.true&select=id,slot,title,url,map,date,thumb`, {
-          headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
-        });
-        const clips = await res.json();
-        render(clips);
+        const [approvedRes, allRes] = await Promise.all([
+          fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?approved=eq.true&select=id,slot,title,url,map,date,thumb`, H),
+          fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?select=slot`, H)
+        ]);
+        const approved = await approvedRes.json();
+        const all = await allRes.json();
+        const occupied = new Set(all.map(r => Number(r.slot)));
+        render(approved, occupied);
       }catch(err){
         console.error(err);
         document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
       }
     }
 
-    function render(clips){
+    function render(clips, occupied){
       const grid = document.getElementById('clipsGrid');
       grid.innerHTML = '';
       for(let i=1;i<=75;i++){
         const clip = clips.find(c => Number(c.slot)===i);
+        const isOccupied = occupied.has(i);
         const card = document.createElement('div');
         card.className = 'card';
 
@@ -181,7 +186,15 @@
             <iframe src="${src}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             <div class="row">
               <button class='btn openPlayer' data-url='${encodeURIComponent(src)}'>View / Fullscreen</button>
-              <button class='btn ghost upload' data-slot='${i}'>Submit another for this slot</button>
+              <span class="badge">Locked (filled)</span>
+            </div>`;
+        } else if(isOccupied){
+          card.innerHTML = `
+            <div class="slot">Slot ${i}</div>
+            <em>Submission pending review</em>
+            <div class="row">
+              <button class='btn' disabled>Upload disabled</button>
+              <span class="badge">1 per slot</span>
             </div>`;
         } else {
           card.innerHTML = `
@@ -206,43 +219,18 @@
     const slotField = document.getElementById('slotField');
     const playerFrame = document.getElementById('playerFrame');
 
-    function openSubmit(slot){
-      if(slot){ slotField.value = slot; }
-      submitModal.classList.add('open');
-      submitModal.setAttribute('aria-hidden','false');
-    }
-    function closeSubmit(){
-      submitModal.classList.remove('open');
-      submitModal.setAttribute('aria-hidden','true');
-    }
-    function openPlayer(url){
-      playerFrame.src = decodeURIComponent(url);
-      playerModal.classList.add('open');
-      playerModal.setAttribute('aria-hidden','false');
-    }
-    function closePlayer(){
-      playerFrame.src = '';
-      playerModal.classList.remove('open');
-      playerModal.setAttribute('aria-hidden','true');
-    }
+    function openSubmit(slot){ if(slot){ slotField.value = slot; } submitModal.classList.add('open'); submitModal.setAttribute('aria-hidden','false'); }
+    function closeSubmit(){ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true'); }
+    function openPlayer(url){ playerFrame.src = decodeURIComponent(url); playerModal.classList.add('open'); playerModal.setAttribute('aria-hidden','false'); }
+    function closePlayer(){ playerFrame.src = ''; playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true'); }
 
     document.addEventListener('click', (e)=>{
       const t = e.target;
-      if(t.matches('.upload')){
-        const slot = t.getAttribute('data-slot');
-        openSubmit(slot);
-      }
+      if(t.matches('.upload')){ const slot = t.getAttribute('data-slot'); openSubmit(slot); }
       if(t.matches('[data-close-submit]')) closeSubmit();
       if(t.matches('[data-close-player]')) closePlayer();
-      if(t.matches('.openPlayer')){
-        const url = t.getAttribute('data-url');
-        openPlayer(url);
-      }
-      // backdrop click to close
-      if(t.classList.contains('modal')){
-        if(t.id==='submit-modal') closeSubmit();
-        if(t.id==='player-modal') closePlayer();
-      }
+      if(t.matches('.openPlayer')){ const url = t.getAttribute('data-url'); openPlayer(url); }
+      if(t.classList.contains('modal')){ if(t.id==='submit-modal') closeSubmit(); if(t.id==='player-modal') closePlayer(); }
     });
 
     // ===== Submission handling =====
@@ -250,15 +238,12 @@
       const form=document.getElementById('submitForm');
       const status=document.getElementById('submitStatus');
 
-      function isValidClipUrl(u){
-        try{ const h=new URL(u).hostname; return /twitch\.tv|youtube\.com|youtu\.be/i.test(h); }
-        catch{ return false; }
-      }
+      function isValidClipUrl(u){ try{ const h=new URL(u).hostname; return /twitch\.tv|youtube\.com|youtu\.be/i.test(h); } catch{ return false; } }
       function clampSlot(n){ n=Number(n||0); return Math.min(75, Math.max(1, n)); }
 
       form?.addEventListener('submit', async e => {
         e.preventDefault();
-        status.textContent='Sending…';
+        status.textContent='Checking slot…';
 
         const fd = new FormData(form);
         const dateRaw = (fd.get('date')||'').toString().trim();
@@ -272,25 +257,26 @@
           approved: false
         };
 
-        if(!isValidClipUrl(payload.url)){
-          status.textContent = 'Please enter a Twitch or YouTube URL.';
-          return;
-        }
+        if(!isValidClipUrl(payload.url)){ status.textContent='Please enter a Twitch or YouTube URL.'; return; }
 
+        // Live pre-check: block if any row already exists for this slot (approved or not)
+        try{
+          const existsRes = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?slot=eq.${encodeURIComponent(payload.slot)}&select=slot`, H);
+          const exists = await existsRes.json();
+          if(Array.isArray(exists) && exists.length){ status.textContent='❌ This slot already has a submission.'; return; }
+        }catch{}
+
+        status.textContent='Sending…';
         try{
           const res = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-              Prefer: 'return=minimal'
-            },
+            headers: { 'Content-Type': 'application/json', ...H.headers, Prefer:'return=minimal' },
             body: JSON.stringify(payload)
           });
 
           if(!res.ok){
             const txt = await res.text();
+            if(res.status===409){ status.textContent='❌ Slot already taken.'; return; }
             status.textContent = `⚠️ ${res.status} ${txt || 'Submission failed'}`;
             console.error('Supabase insert error:', res.status, txt);
             return;
@@ -299,10 +285,7 @@
           status.textContent='✅ Submitted! Awaiting approval.';
           form.reset();
           setTimeout(()=>{ closeSubmit(); status.textContent=''; loadClips(); }, 1000);
-        }catch(err){
-          console.error(err);
-          status.textContent='⚠️ Network error. Please try again later.';
-        }
+        }catch(err){ console.error(err); status.textContent='⚠️ Network error. Please try again later.'; }
       });
     })();
 
