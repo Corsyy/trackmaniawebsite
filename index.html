@@ -11,6 +11,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://trackmaniaevents.com/" />
   <meta name="twitter:card" content="summary_large_image" />
+  <script id="event-jsonld" type="application/ld+json">{}</script>
   <style>
     :root{
       --bg: #0a0f1a;
@@ -40,6 +41,9 @@
     .navlinks{display:flex; gap:1.25rem}
     .nav a{opacity:.85}
     .nav a:hover,.nav a:focus{opacity:1}
+    .nav a.active{opacity:1; position:relative}
+    .nav a.active::after{content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); border-radius:2px}
+    html{scroll-behavior:smooth}
     .cta{display:flex; gap:.6rem}
     .btn{padding:.6rem .95rem; border:1px solid rgba(109,251,255,.25); border-radius:12px; background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6)); color:var(--text); font-weight:700; transition:transform .15s ease, box-shadow .15s ease}
     .btn.primary{border-color:transparent; background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#001220; box-shadow: var(--accent-glow)}
@@ -101,6 +105,13 @@
     .tm-stripes::before, .tm-stripes::after{content:""; position:absolute; inset:0; background: repeating-linear-gradient( 115deg, transparent 0 18px, rgba(58,160,255,.18) 18px 26px, transparent 26px 50px ); filter: drop-shadow(0 0 22px rgba(61,165,255,.35))}
     .tm-stripes::after{transform: translateY(20px)}
 
+    /* ====== REVEAL + BACK TO TOP ====== */
+    .reveal{opacity:0; transform:translateY(10px); transition:opacity .4s ease, transform .4s ease}
+    .reveal.show{opacity:1; transform:none}
+    #toTop{position:fixed; right:18px; bottom:18px; padding:.6rem .8rem; border-radius:12px; border:1px solid rgba(109,251,255,.25);
+      background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6)); cursor:pointer; opacity:0; pointer-events:none; transition:opacity .2s}
+    #toTop.show{opacity:1; pointer-events:auto}
+
     /* ====== RESPONSIVE ====== */
     @media (max-width: 960px){
       .hero-grid{grid-template-columns:1fr}
@@ -136,12 +147,12 @@
   </header>
 
   <!-- HERO / NEXT EVENT -->
-  <section class="hero">
+  <section class="hero" id="home">
     <div class="container hero-grid">
       <div>
         <span class="chip" id="hero-chip">Next Event</span>
         <h1 class="h1">Live Trackmania events and community races</h1>
-        <p class="lead">Your central hub for upcoming events, live streams, and highlights </p>
+        <p class="lead">Your central hub for upcoming events, live streams, and highlights — updated automatically from a simple events.json file.</p>
 
         <div class="keyfacts" id="hero-pills">
           <div class="pill">🗓️ TBA</div>
@@ -160,12 +171,15 @@
               <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
               <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
             </div>
+            <div style="margin-top:.9rem">
+              <button class="btn" id="addCal">Add to Calendar</button>
+            </div>
           </div>
         </div>
       </div>
 
       <div id="live" class="live">
-        <div class="card">
+        <div class="card reveal">
           <div class="card-header"><strong>Live on Twitch</strong></div>
           <div class="card-body">
             <div id="twitch-embed"></div>
@@ -184,6 +198,7 @@
       <div class="grid" id="events-grid">
         <article class="event"><div class="meta">Loading schedule…</div></article>
       </div>
+      <!-- Past events will be injected here -->
     </div>
   </section>
 
@@ -192,15 +207,15 @@
     <div class="container">
       <h2 class="title">Highlights</h2>
       <div class="cards">
-        <article class="shot">
+        <article class="shot reveal">
           <div class="media">Clip / Screenshot</div>
           <div class="text"><strong>PB on Kacky 9</strong><div class="meta">Insane reactor flight save</div></div>
         </article>
-        <article class="shot">
+        <article class="shot reveal">
           <div class="media">Clip / Screenshot</div>
           <div class="text"><strong>0.01 WR Miss</strong><div class="meta">FullSpeed edge of glory</div></div>
         </article>
-        <article class="shot">
+        <article class="shot reveal">
           <div class="media">Clip / Screenshot</div>
           <div class="text"><strong>Grass Tech Lines</strong><div class="meta">Cleanest exits on Stadium</div></div>
         </article>
@@ -212,7 +227,7 @@
   <section id="about" class="section">
     <div class="container">
       <h2 class="title">About</h2>
-      <div class="card">
+      <div class="card reveal">
         <div class="card-body">
           <p>I'm a Trackmania streamer focusing on Stadium tech, FS, and Kacky challenges. This site is a streamlined hub for events, VODs, and live viewer races.</p>
           <div class="keyfacts" style="margin-top:1rem">
@@ -228,7 +243,7 @@
     <div class="container">
       <h2 class="title">Contact</h2>
       <div class="grid" style="grid-template-columns:2fr 1fr">
-        <form action="https://formspree.io/f/xblzbdbq" method="POST" class="card form" id="contact-form">
+        <form action="https://formspree.io/f/xblzbdbq" method="POST" class="card form reveal" id="contact-form">
           <div class="card-body">
             <div class="twocol">
               <div class="field">
@@ -258,7 +273,7 @@
             </div>
           </div>
         </form>
-        <aside class="card">
+        <aside class="card reveal">
           <div class="card-body">
             <strong>Discord</strong>
             <div class="meta"><a href="https://discord.gg/9bDcTTbTGJ" target="_blank" rel="noreferrer">Join the server</a></div>
@@ -267,145 +282,218 @@
       </div>
     </div>
   </section>
+  <button id="toTop" aria-label="Back to top">↑ Top</button>
 
   <footer>
     <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap">
       <div>© <span id="year"></span> Trackmania Events</div>
-      <div><a href="#">Privacy</a> • <a href="#">Terms</a> • <a href="#contact">Contact</a></div>
-    </div>
+      <div><a href="/privacy.html">Privacy</a> • <a href="/terms.html">Terms</a> • <a href="#contact">Contact</a></div>
+
   </footer>
 
   <script>
-    // === Configuration you still control in code ===
-    const TTV_CHANNEL = "C0rsy"; // your Twitch name
+    const TTV_CHANNEL = "C0rsy";
 
-    // DOM refs
+    // Countdown helpers
     const d = document.getElementById('d');
     const h = document.getElementById('h');
     const m = document.getElementById('m');
     const s = document.getElementById('s');
 
-    // Helpers
     const fmtDate = (iso) => {
       const dt = new Date(iso);
-      return dt.toLocaleString(undefined, {
-        month: 'short', day: '2-digit', year: 'numeric',
-        hour: 'numeric', minute: '2-digit'
-      });
+      return dt.toLocaleString(undefined, {month:'short', day:'2-digit', year:'numeric', hour:'numeric', minute:'2-digit'});
     };
 
-    function setCountdown(dd, hh, mm, ss){
-      d.textContent = dd; h.textContent = hh; m.textContent = mm; s.textContent = ss;
-    }
+    function setCountdown(dd, hh, mm, ss){ d.textContent=dd; h.textContent=hh; m.textContent=mm; s.textContent=ss; }
 
     function startCountdown(iso, titleEl){
       function tick(){
-        const now = new Date();
-        const then = new Date(iso);
-        let diff = then - now;
-        if (diff <= 0){
-          setCountdown(0,0,0,0);
-          if (titleEl) titleEl.textContent = 'Live now!';
-          return;
-        }
-        const days = Math.floor(diff/86400000); diff%=86400000;
-        const hrs  = Math.floor(diff/3600000);  diff%=3600000;
-        const mins = Math.floor(diff/60000);    diff%=60000;
-        const secs = Math.floor(diff/1000);
-        setCountdown(days, hrs, mins, secs);
+        const now=new Date(); const then=new Date(iso); let diff=then-now;
+        if(diff<=0){ setCountdown(0,0,0,0); if(titleEl) titleEl.textContent='Live now!'; return; }
+        const days=Math.floor(diff/86400000); diff%=86400000;
+        const hrs=Math.floor(diff/3600000); diff%=3600000;
+        const mins=Math.floor(diff/60000); diff%=60000;
+        const secs=Math.floor(diff/1000);
+        setCountdown(days,hrs,mins,secs);
       }
-      tick();
-      setInterval(tick, 1000);
+      tick(); setInterval(tick,1000);
     }
 
     function pickNext(events){
-      const now = Date.now();
-      const upcoming = events.filter(e => new Date(e.end_iso).getTime() > now)
-                             .sort((a,b) => new Date(a.start_iso) - new Date(b.start_iso));
-      return upcoming[0] || null;
+      const now=Date.now();
+      const upcoming=events.filter(e=>new Date(e.end_iso).getTime()>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
+      return upcoming[0]||null;
     }
 
+    // Render schedule + hero + past events
     function renderFromData(events){
-      // Schedule grid
-      const grid = document.getElementById('events-grid');
-      grid.innerHTML = '';
-      events.sort((a,b) => new Date(a.start_iso) - new Date(b.start_iso))
-        .forEach(e => {
-          const el = document.createElement('article');
-          el.className = 'event';
-          el.innerHTML = `
-            <span class="tag">${e.tag || 'Event'}</span>
-            <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-            <h4>${e.title}</h4>
-            <div class="meta">${e.description || ''}</div>
-          `;
-          grid.appendChild(el);
-        });
+      const now=Date.now();
+      const upcoming=events.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
+      const past=events.filter(e=>new Date(e.end_iso)<=now).sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso)).slice(0,6);
 
-      // Hero fields
-      const next = pickNext(events);
-      const chip = document.getElementById('hero-chip');
-      const pills = document.getElementById('hero-pills');
-      const header = document.getElementById('countdown-title');
+      const grid=document.getElementById('events-grid');
+      grid.innerHTML='';
+      upcoming.forEach(e=>{
+        const el=document.createElement('article');
+        el.className='event reveal';
+        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
+          <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+          <h4>${e.title}</h4>
+          <div class="meta">${e.description||''}</div>`;
+        grid.appendChild(el);
+      });
 
-      if (next){
-        chip.textContent = `Next Event • ${next.title}`;
-        pills.innerHTML = `
-          <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-          <div class="pill">📍 ${next.location || 'Online'}</div>
-          <div class="pill">🏁 ${next.description || ''}</div>
-        `;
-        startCountdown(next.start_iso, header);
-      } else {
-        chip.textContent = 'No upcoming event';
-        pills.innerHTML = `<div class="pill">Check back soon</div>`;
-        header.textContent = 'Countdown';
-        setCountdown(0,0,0,0);
+      // Inject Past Events
+      let pastWrap=document.getElementById('past-events');
+      if(!pastWrap){
+        pastWrap=document.createElement('div');
+        pastWrap.id='past-events';
+        pastWrap.innerHTML='<h3 class="title" style="margin-top:2rem">Past Events</h3><div class="grid" id="past-grid"></div>';
+        document.querySelector('#schedule .container').appendChild(pastWrap);
       }
+      const pastGrid=document.getElementById('past-grid');
+      pastGrid.innerHTML='';
+      past.forEach(e=>{
+        const el=document.createElement('article');
+        el.className='event reveal';
+        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
+          <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+          <h4>${e.title}</h4>
+          <div class="meta">${e.location||''}</div>`;
+        pastGrid.appendChild(el);
+      });
+
+      // Hero + countdown
+      const next=upcoming[0];
+      const chip=document.getElementById('hero-chip');
+      const pills=document.getElementById('hero-pills');
+      const header=document.getElementById('countdown-title');
+      if(next){
+        chip.textContent=`Next Event • ${next.title}`;
+        pills.innerHTML=`<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+          <div class="pill">📍 ${next.location||'Online'}</div>
+          <div class="pill">🏁 ${next.description||''}</div>`;
+        startCountdown(next.start_iso, header);
+      }else{
+        chip.textContent='No upcoming event';
+        pills.innerHTML='<div class="pill">Check back soon</div>';
+        header.textContent='Countdown'; setCountdown(0,0,0,0);
+      }
+
+      // Update JSON-LD for SEO
+      updateJSONLD(next||null);
+
+      // Attach reveal animations to any new nodes
+      attachReveals();
+
+      // Cache events for Add-to-Calendar
+      window.__eventsCache = events;
+    }
+
+    // JSON-LD updater
+    function updateJSONLD(next){
+      const el=document.getElementById('event-jsonld');
+      if(!next){ el.textContent='{}'; return; }
+      el.textContent=JSON.stringify({
+        "@context":"https://schema.org",
+        "@type":"Event",
+        name: next.title,
+        startDate: next.start_iso,
+        endDate: next.end_iso,
+        eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+        eventStatus: "https://schema.org/EventScheduled",
+        location:{"@type":"VirtualLocation","url":"https://trackmaniaevents.com"},
+        description: next.description||"",
+        organizer:{"@type":"Organization","name":"Trackmania Events","url":"https://trackmaniaevents.com"}
+      });
     }
 
     async function loadEvents(){
       try{
-        const res = await fetch('/events.json?cb=' + Date.now());
+        const res=await fetch('/events.json?cb='+Date.now());
         if(!res.ok) throw new Error('Failed to fetch events.json');
-        const data = await res.json();
-        renderFromData(Array.isArray(data) ? data : []);
+        const data=await res.json();
+        renderFromData(Array.isArray(data)?data:[]);
       }catch(err){
         console.error(err);
-        const grid = document.getElementById('events-grid');
-        grid.innerHTML = '<article class="event"><div class="meta">Could not load events.</div></article>';
-        document.getElementById('countdown-title').textContent = 'Countdown';
+        const grid=document.getElementById('events-grid');
+        grid.innerHTML='<article class="event"><div class="meta">Could not load events.</div></article>';
+        document.getElementById('countdown-title').textContent='Countdown';
         setCountdown(0,0,0,0);
       }
     }
 
-    // Inject Twitch player with both parents so it works on root and www
+    // Twitch embed (both parents)
     (function(){
-      const parents = ['trackmaniaevents.com','www.trackmaniaevents.com'];
-      const embed = document.getElementById('twitch-embed');
-      const iframe = document.createElement('iframe');
-      iframe.className = 'player';
-      iframe.allowFullscreen = true;
-      iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-      iframe.src = `https://player.twitch.tv/?channel=${encodeURIComponent('C0rsy')}` +
-                   parents.map(p => `&parent=${encodeURIComponent(p)}`).join('') +
-                   `&muted=true`;
+      const parents=['trackmaniaevents.com','www.trackmaniaevents.com'];
+      const embed=document.getElementById('twitch-embed');
+      const iframe=document.createElement('iframe');
+      iframe.className='player'; iframe.allowFullscreen=true; iframe.allow='autoplay; encrypted-media; picture-in-picture';
+      iframe.src=`https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}`+
+        parents.map(p=>`&parent=${encodeURIComponent(p)}`).join('')+`&muted=true`;
       embed.appendChild(iframe);
     })();
 
-    // Form: set redirect to #thanks on same origin so Formspree returns to page
+    // Scrollspy for nav
     (function(){
-      const redir = document.getElementById('redirect-field');
-      if (redir) redir.value = location.origin + '/#thanks';
-      const status = document.getElementById('form-status');
-      if (location.hash === '#thanks' && status){
-        status.textContent = 'Thanks — your message was sent.';
+      const sections=[...document.querySelectorAll('section[id]')];
+      const links=[...document.querySelectorAll('.navlinks a')];
+      const byId=id=>links.find(a=>a.getAttribute('href')===`#${id}`);
+      const io=new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); const a=byId(e.target.id); if(a) a.classList.add('active'); } });
+      },{rootMargin:'-40% 0px -55% 0px', threshold:0});
+      sections.forEach(s=>io.observe(s));
+    })();
+
+    // Reveal on scroll
+    function attachReveals(){
+      const reveals=document.querySelectorAll('.reveal:not(.show)');
+      const io2=new IntersectionObserver((entries,obs)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); obs.unobserve(e.target); } });
+      },{threshold:0.12});
+      reveals.forEach(el=>io2.observe(el));
+    }
+    attachReveals();
+
+    // Back to top
+    (function(){
+      const btn=document.getElementById('toTop');
+      addEventListener('scroll',()=> btn.classList.toggle('show', scrollY>600));
+      btn.onclick=()=> window.scrollTo({top:0, behavior:'smooth'});
+    })();
+
+    // Form redirect helper
+    (function(){
+      const redir=document.getElementById('redirect-field');
+      if(redir) redir.value=location.origin+'/#thanks';
+      const status=document.getElementById('form-status');
+      if(location.hash==='#thanks' && status){ status.textContent='Thanks — your message was sent.'; }
+    })();
+
+    // Add to Calendar
+    (function(){
+      const btn=document.getElementById('addCal');
+      function icsEscape(s){return (s||'').replace(/[\\,;]/g,m=>"\\"+m).replace(/\n/g,"\\n");}
+      function dt(iso){ return iso.replace(/[-:]/g,"").replace(/\.\d{3}Z$/,'Z'); }
+      function downloadICS(ev){
+        const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TrackmaniaEvents//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
+          'DTSTART:'+dt(ev.start_iso),'DTEND:'+dt(ev.end_iso),'SUMMARY:'+icsEscape(ev.title),
+          ev.location?'LOCATION:'+icsEscape(ev.location):'', ev.description?'DESCRIPTION:'+icsEscape(ev.description):'',
+          'END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');
+        const blob=new Blob([ics],{type:'text/calendar'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(ev.title||'event')+'.ics'; a.click(); URL.revokeObjectURL(a.href);
       }
+      btn?.addEventListener('click',()=>{
+        const evts=window.__eventsCache||[];
+        const next=(function(evs){ const now=Date.now(); return evs.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso))[0]; })(evts);
+        if(next) downloadICS(next);
+      });
     })();
 
     // Kick off
     loadEvents();
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('year').textContent=new Date().getFullYear();
   </script>
 </body>
 </html>
