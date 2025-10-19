@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — Trackmania Events</title>
+  <meta name="description" content="Privacy Policy for trackmaniaevents.com" />
+  <meta name="theme-color" content="#0a0f1a" />
+  <style>
+    :root{ --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff; --accent:#3aa0ff; --accent-2:#6dfbff; --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2) }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;background:radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.12), transparent),radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.10), transparent),var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(960px, 92vw); margin:0 auto}
+
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));backdrop-filter: blur(8px);border-bottom:1px solid rgba(109,251,255,.12)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .brand{display:flex;align-items:center;gap:.6rem;font-weight:800}
+    .brand-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow)}
+    .navlinks{display:flex;gap:1.1rem}
+    .btn{padding:.55rem .9rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));font-weight:700}
+
+    main{padding: clamp(1.5rem, 4vw, 2.5rem) 0 3rem}
+    .title{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:900;margin:0 0 .6rem}
+    .card{border:1px solid rgba(109,251,255,.15);background:linear-gradient(180deg, rgba(10,15,26,.8), rgba(10,15,26,.55));border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card-body{padding:1.1rem 1.1rem}
+    p{line-height:1.65}
+    ul{margin:.3rem 0 .8rem 1.1rem}
+    li{margin:.25rem 0}
+
+    footer{border-top:1px solid rgba(109,251,255,.12);padding:1.5rem 0;font-size:.95rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/">
+        <span class="brand-badge">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
+      <nav class="navlinks">
+        <a href="/">Home</a>
+        <a href="/index.html#schedule">Events</a>
+        <a href="/index.html#live">Live</a>
+        <a href="/index.html#contact" class="btn">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1 class="title">Privacy Policy</h1>
+      <div class="card"><div class="card-body">
+        <p><strong>Last updated:</strong> <span id="updated"></span></p>
+        <p>This website collects only the information you submit via the contact form — your name, email, and message — for the sole purpose of responding to your inquiry.</p>
+
+        <h3>What we collect</h3>
+        <ul>
+          <li>Contact form fields: name, email address, and message</li>
+          <li>Basic, anonymous site usage metrics (via GitHub Pages/CDN logs)</li>
+        </ul>
+
+        <h3>How we use your info</h3>
+        <ul>
+          <li>To reply to your message</li>
+          <li>To maintain site reliability and prevent abuse</li>
+        </ul>
+
+        <h3>Third parties</h3>
+        <p>We use <strong>Formspree</strong> to process contact form submissions. Your message is transmitted to Formspree and delivered to our inbox. Refer to Formspree’s privacy policy for details on their processing.</p>
+
+        <h3>Data retention & deletion</h3>
+        <p>We keep your messages only as long as needed to handle your request. You can request deletion at any time by emailing <a href="mailto:contact@trackmaniaevents.com">contact@trackmaniaevents.com</a>.</p>
+
+        <h3>Security</h3>
+        <p>This site is served over HTTPS. While no method of transmission is 100% secure, we take reasonable steps to protect your information.</p>
+
+        <h3>Contact</h3>
+        <p>Questions? Email <a href="mailto:contact@trackmaniaevents.com">contact@trackmaniaevents.com</a>.</p>
+      </div></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div><a href="/privacy.html">Privacy</a> • <a href="/terms.html">Terms</a></div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('updated').textContent = new Date().toLocaleDateString(undefined, {year:'numeric', month:'long', day:'2-digit'});
+  </script>
+</body>
+</html>
