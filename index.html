@@ -113,16 +113,18 @@
     #toTop.show{opacity:1; pointer-events:auto}
 
     /* --- Dynamic section background (Upcoming Events) --- */
-#schedule { position: relative; }
-#schedule > .container { position: relative; z-index: 1; }
-#schedule::before{
-  content:"";
-  position:absolute; inset:0;
+#schedule::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-image: var(--section-img, none); /* set via JS */
-  background-size: cover; background-position: center;
-  opacity:.22; /* was .12 — more visible */
+  background-size: contain;   /* 👈 fits full image instead of cropping */
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: .22;
   filter: saturate(1.05) brightness(1.1);
-  pointer-events:none; z-index:0;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Event cards — 2 layers: gradient + image */
