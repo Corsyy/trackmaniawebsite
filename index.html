@@ -125,38 +125,39 @@
   pointer-events:none; z-index:0;
 }
 
-/* --- Countdown card can carry an image behind the gradient --- */
-#countdown-card{
-  background:
-    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
-    var(--cd-img, none);
-  background-size: cover;
-  background-position: center;
-  border:1px solid rgba(109,251,255,.18);
-  border-radius:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-  overflow:hidden;
-}
-
-/* --- Event cards with background images (fit image inside card) --- */
+/* Event cards — 2 layers: gradient + image */
 .event.with-bg{
-  /* two layers: 1) gradient, 2) the image */
   background-image:
     linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
     var(--event-img);
 
-  /* keep gradient full-bleed; let the image fit fully inside */
-  background-size: cover, var(--event-size, contain);
+  /* Default: image behaves like "cover" (fills the card).
+     You can override per-card with --event-size and --event-pos from JS. */
+  background-size: cover, var(--event-size, cover);
   background-position: center, var(--event-pos, center);
   background-repeat: no-repeat, no-repeat;
 
-  min-height: 180px;      /* your existing card height */
+  min-height: 180px;
   border-radius: 16px;
 }
 .event.with-bg:hover{
   background-image:
     linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)),
     var(--event-img);
+}
+
+/* Countdown background accepts overrides too */
+#countdown-card{
+  background:
+    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
+    var(--cd-img, none);
+  background-size: var(--cd-size, cover);
+  background-position: var(--cd-pos, center);
+  background-repeat: no-repeat;
+  border:1px solid rgba(109,251,255,.18);
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  overflow:hidden;
 }
 
 
@@ -365,55 +366,91 @@
       tick(); setInterval(tick,1000);
     }
 
-    // Render schedule + hero + past events
-    function renderFromData(events){
-      const now=Date.now();
-      const upcoming=events.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
-      const past=events.filter(e=>new Date(e.end_iso)<=now).sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso)).slice(0,6);
+ // Render schedule + hero + past events
+function renderFromData(events) {
+  const now = Date.now();
+  const upcoming = events
+    .filter(e => new Date(e.end_iso) > now)
+    .sort((a, b) => new Date(a.start_iso) - new Date(b.start_iso));
+  const past = events
+    .filter(e => new Date(e.end_iso) <= now)
+    .sort((a, b) => new Date(b.end_iso) - new Date(a.end_iso))
+    .slice(0, 6);
 
-      const grid=document.getElementById('events-grid');
-      grid.innerHTML='';
-      upcoming.forEach(e=>{
-        const el=document.createElement('article');
-        el.className='event reveal';
-        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
-          <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-          <h4>${e.title}</h4>
-          <div class="meta">${e.description||''}</div>`;
+  // === UPCOMING EVENTS ===
+  const grid = document.getElementById('events-grid');
+  grid.innerHTML = '';
+  upcoming.forEach(e => {
+    const el = document.createElement('article');
+    el.className = 'event reveal';
+    el.innerHTML = `
+      <span class="tag">${e.tag || 'Event'}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${e.description || ''}</div>
+    `;
 
-        // if the event has an image, give the card a matching background
-        if (e.image) {
-          el.classList.add('with-bg');
-          el.style.setProperty('--event-img', `url("${e.image}")`);
-        }
-        if (e.image_fit) el.style.setProperty('--event-size', e.image_fit);      // e.g. "contain"
-        if (e.image_pos) el.style.setProperty('--event-pos', e.image_pos);       // e.g. "center top" (optional)
-        grid.appendChild(el);
-      });
+    // if the event has an image, give the card a matching background
+    if (e.image) {
+      el.classList.add('with-bg');
+      el.style.setProperty('--event-img', `url("${e.image}")`);
+    }
 
-      // Inject Past Events
-      let pastWrap=document.getElementById('past-events');
-      if(!pastWrap){
-        pastWrap=document.createElement('div');
-        pastWrap.id='past-events';
-        pastWrap.innerHTML='<h3 class="title" style="margin-top:2rem">Past Events</h3><div class="grid" id="past-grid"></div>';
-        document.querySelector('#schedule .container').appendChild(pastWrap);
-      }
-      const pastGrid=document.getElementById('past-grid');
-      pastGrid.innerHTML='';
-      past.forEach(e=>{
-        const el=document.createElement('article');
-        el.className='event reveal';
-        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
-          <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-          <h4>${e.title}</h4>
-          <div class="meta">${e.location||''}</div>`;
-        if (e.image) {
-          el.classList.add('with-bg');
-          el.style.setProperty('--event-img', `url("${e.image}")`);
-        }
-        pastGrid.appendChild(el);
-      });
+    // optional custom fit or pos via JSON
+    if (e.image_fit) el.style.setProperty('--event-size', e.image_fit);
+    if (e.image_pos) el.style.setProperty('--event-pos', e.image_pos);
+
+    // Title-based tuning
+    if (/map together/i.test(e.title)) {
+      el.style.setProperty('--event-size', '90% auto'); // fit whole image
+      el.style.setProperty('--event-pos', 'center');
+    } else {
+      el.style.removeProperty('--event-size'); // default cover
+      el.style.removeProperty('--event-pos');
+    }
+
+    grid.appendChild(el);
+  });
+
+  // === PAST EVENTS ===
+  let pastWrap = document.getElementById('past-events');
+  if (!pastWrap) {
+    pastWrap = document.createElement('div');
+    pastWrap.id = 'past-events';
+    pastWrap.innerHTML = `
+      <h3 class="title" style="margin-top:2rem">Past Events</h3>
+      <div class="grid" id="past-grid"></div>
+    `;
+    document.querySelector('#schedule .container').appendChild(pastWrap);
+  }
+
+  const pastGrid = document.getElementById('past-grid');
+  pastGrid.innerHTML = '';
+  past.forEach(e => {
+    const el = document.createElement('article');
+    el.className = 'event reveal';
+    el.innerHTML = `
+      <span class="tag">${e.tag || 'Event'}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${e.location || ''}</div>
+    `;
+
+    if (e.image) {
+      el.classList.add('with-bg');
+      el.style.setProperty('--event-img', `url("${e.image}")`);
+    }
+
+    if (/map together/i.test(e.title)) {
+      el.style.setProperty('--event-size', '90% auto');
+      el.style.setProperty('--event-pos', 'center');
+    } else {
+      el.style.removeProperty('--event-size');
+      el.style.removeProperty('--event-pos');
+    }
+
+    pastGrid.appendChild(el);
+  });
 
       // Hero + countdown + dynamic backgrounds
       const next=upcoming[0];
