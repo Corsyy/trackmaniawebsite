@@ -209,15 +209,15 @@
       <h2 class="title">Highlights</h2>
       <div class="cards">
         <article class="shot reveal">
-          <div class="media">Clip</div>
+          <div class="media">Clip / Screenshot</div>
           <div class="text"><strong></strong><div class="meta">Insane reactor flight save</div></div>
         </article>
         <article class="shot reveal">
-          <div class="media">Clip</div>
+          <div class="media">Clip / Screenshot</div>
           <div class="text"><strong></strong><div class="meta">FullSpeed edge of glory</div></div>
         </article>
         <article class="shot reveal">
-          <div class="media">Clip</div>
+          <div class="media">Clip / Screenshot</div>
           <div class="text"><strong></strong><div class="meta">Cleanest exits on Stadium</div></div>
         </article>
       </div>
@@ -288,215 +288,145 @@
   </footer>
 
   <script>
-  const TTV_CHANNEL = "C0rsy";
+    const TTV_CHANNEL = "C0rsy";
 
-  // ===== Local time formatter (robust) =====
-  function makeLocalFormatter() {
-    try {
-      const f = new Intl.DateTimeFormat(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZoneName: "short"
-      });
-      f.format(new Date());
-      return (d) => f.format(d);
-    } catch {
-      return (d) => d.toLocaleString([], {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    }
-  }
-  const __fmtLocal = makeLocalFormatter();
-  const fmtDate = (iso) => __fmtLocal(new Date(iso));
+    // Countdown helpers
+    const d = document.getElementById('d');
+    const h = document.getElementById('h');
+    const m = document.getElementById('m');
+    const s = document.getElementById('s');
 
-  // ===== Countdown helpers =====
-  const dEl = document.getElementById('d');
-  const hEl = document.getElementById('h');
-  const mEl = document.getElementById('m');
-  const sEl = document.getElementById('s');
-  function setCountdown(dd, hh, mm, ss){ if(dEl){dEl.textContent=dd} if(hEl){hEl.textContent=hh} if(mEl){mEl.textContent=mm} if(sEl){sEl.textContent=ss} }
-
-  function startCountdown(iso, titleEl){
-    function tick(){
-      const now=new Date(); const then=new Date(iso); let diff=then-now;
-      if(!isFinite(then.getTime())){ return; }
-      if(diff<=0){ setCountdown(0,0,0,0); if(titleEl) titleEl.textContent='Live now!'; return; }
-      const days=Math.floor(diff/86400000); diff%=86400000;
-      const hrs=Math.floor(diff/3600000); diff%=3600000;
-      const mins=Math.floor(diff/60000); diff%=60000;
-      const secs=Math.floor(diff/1000);
-      setCountdown(days,hrs,mins,secs);
-    }
-    tick(); setInterval(tick,1000);
-  }
-
-  // ===== Event normalizer (accept multiple shapes) =====
-  function toIso(x){
-    if(x == null) return null;
-    if (typeof x === 'number') return new Date(x).toISOString();
-    const d = new Date(String(x));
-    return isFinite(d.getTime()) ? d.toISOString() : null;
-  }
-  function normalizeEvent(e){
-    // Try several common property names
-    const start = e.start_iso || e.startISO || e.startUtc || e.startUTC || e.start || e?.time?.start;
-    const end   = e.end_iso   || e.endISO   || e.endUtc   || e.endUTC   || e.end   || e?.time?.end;
-    return {
-      title: e.title || "Event",
-      description: e.description || "",
-      location: e.location || e.venue || "Online",
-      tag: e.tag || e.type || "Event",
-      start_iso: toIso(start),
-      end_iso: toIso(end)
+    const fmtDate = (iso) => {
+      const dt = new Date(iso);
+      return dt.toLocaleString(undefined, {month:'short', day:'2-digit', year:'numeric', hour:'numeric', minute:'2-digit'});
     };
-  }
 
-  // ===== Render schedule + hero + past events =====
-  function renderFromData(eventsRaw){
-    const events = (Array.isArray(eventsRaw) ? eventsRaw : []).map(normalizeEvent)
-      .filter(ev => ev.start_iso && ev.end_iso);
+    function setCountdown(dd, hh, mm, ss){ d.textContent=dd; h.textContent=hh; m.textContent=mm; s.textContent=ss; }
 
-    const now=Date.now();
-    const upcoming=events.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
-    const past=events.filter(e=>new Date(e.end_iso)<=now).sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso)).slice(0,6);
+    function startCountdown(iso, titleEl){
+      function tick(){
+        const now=new Date(); const then=new Date(iso); let diff=then-now;
+        if(diff<=0){ setCountdown(0,0,0,0); if(titleEl) titleEl.textContent='Live now!'; return; }
+        const days=Math.floor(diff/86400000); diff%=86400000;
+        const hrs=Math.floor(diff/3600000); diff%=3600000;
+        const mins=Math.floor(diff/60000); diff%=60000;
+        const secs=Math.floor(diff/1000);
+        setCountdown(days,hrs,mins,secs);
+      }
+      tick(); setInterval(tick,1000);
+    }
 
-    const grid=document.getElementById('events-grid');
-    if(grid){
+    // Render schedule + hero + past events
+    function renderFromData(events){
+      const now=Date.now();
+      const upcoming=events.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
+      const past=events.filter(e=>new Date(e.end_iso)<=now).sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso)).slice(0,6);
+
+      const grid=document.getElementById('events-grid');
       grid.innerHTML='';
-      if(upcoming.length===0){
-        grid.innerHTML = '<article class="event"><div class="meta">No upcoming events yet.</div></article>';
-      } else {
-        upcoming.forEach(e=>{
-          const el=document.createElement('article');
-          el.className='event reveal';
-          el.innerHTML=`<span class="tag">${e.tag}</span>
-            <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-            <h4>${e.title}</h4>
-            <div class="meta">${e.description||''}</div>`;
-          grid.appendChild(el);
-        });
-      }
-    }
+      upcoming.forEach(e=>{
+        const el=document.createElement('article');
+        el.className='event reveal';
+        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
+          <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+          <h4>${e.title}</h4>
+          <div class="meta">${e.description||''}</div>`;
+        grid.appendChild(el);
+      });
 
-    // Past Events
-    let pastWrap=document.getElementById('past-events');
-    if(!pastWrap){
-      pastWrap=document.createElement('div');
-      pastWrap.id='past-events';
-      pastWrap.innerHTML='<h3 class="title" style="margin-top:2rem">Past Events</h3><div class="grid" id="past-grid"></div>';
-      const host = document.querySelector('#schedule .container');
-      if(host) host.appendChild(pastWrap);
-    }
-    const pastGrid=document.getElementById('past-grid');
-    if(pastGrid){
+      // Inject Past Events
+      let pastWrap=document.getElementById('past-events');
+      if(!pastWrap){
+        pastWrap=document.createElement('div');
+        pastWrap.id='past-events';
+        pastWrap.innerHTML='<h3 class="title" style="margin-top:2rem">Past Events</h3><div class="grid" id="past-grid"></div>';
+        document.querySelector('#schedule .container').appendChild(pastWrap);
+      }
+      const pastGrid=document.getElementById('past-grid');
       pastGrid.innerHTML='';
-      if(past.length===0){
-        pastGrid.innerHTML='<article class="event"><div class="meta">No past events yet.</div></article>';
-      } else {
-        past.forEach(e=>{
-          const el=document.createElement('article');
-          el.className='event reveal';
-          el.innerHTML=`<span class="tag">${e.tag}</span>
-            <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-            <h4>${e.title}</h4>
-            <div class="meta">${e.location||''}</div>`;
-          pastGrid.appendChild(el);
-        });
+      past.forEach(e=>{
+        const el=document.createElement('article');
+        el.className='event reveal';
+        el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
+          <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+          <h4>${e.title}</h4>
+          <div class="meta">${e.location||''}</div>`;
+        pastGrid.appendChild(el);
+      });
+
+      // Hero + countdown
+      const next=upcoming[0];
+      const chip=document.getElementById('hero-chip');
+      const pills=document.getElementById('hero-pills');
+      const header=document.getElementById('countdown-title');
+      if(next){
+        chip.textContent=`Next Event • ${next.title}`;
+        pills.innerHTML=`<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+          <div class="pill">📍 ${next.location||'Online'}</div>
+          <div class="pill">🏁 ${next.description||''}</div>`;
+        startCountdown(next.start_iso, header);
+      }else{
+        chip.textContent='No upcoming event';
+        pills.innerHTML='<div class="pill">Check back soon</div>';
+        header.textContent='Countdown'; setCountdown(0,0,0,0);
       }
+
+      // Update JSON-LD for SEO
+      updateJSONLD(next||null);
+
+      // Attach reveal animations to any new nodes
+      attachReveals();
+
+      // Cache events for Add-to-Calendar
+      window.__eventsCache = events;
     }
 
-    // Hero + countdown
-    const next=upcoming[0];
-    const chip=document.getElementById('hero-chip');
-    const pills=document.getElementById('hero-pills');
-    const header=document.getElementById('countdown-title');
-    if(next){
-      if(chip) chip.textContent=`Next Event • ${next.title}`;
-      if(pills) pills.innerHTML=`<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-        <div class="pill">📍 ${next.location||'Online'}</div>
-        <div class="pill">🏁 ${next.description||''}</div>`;
-      startCountdown(next.start_iso, header);
-    }else{
-      if(chip) chip.textContent='No upcoming event';
-      if(pills) pills.innerHTML='<div class="pill">Check back soon</div>';
-      if(header) header.textContent='Countdown'; setCountdown(0,0,0,0);
+    // JSON-LD updater
+    function updateJSONLD(next){
+      const el=document.getElementById('event-jsonld');
+      if(!next){ el.textContent='{}'; return; }
+      el.textContent=JSON.stringify({
+        "@context":"https://schema.org",
+        "@type":"Event",
+        name: next.title,
+        startDate: next.start_iso,
+        endDate: next.end_iso,
+        eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+        eventStatus: "https://schema.org/EventScheduled",
+        location:{"@type":"VirtualLocation","url":"https://trackmaniaevents.com"},
+        description: next.description||"",
+        organizer:{"@type":"Organization","name":"Trackmania Events","url":"https://trackmaniaevents.com"}
+      });
     }
 
-    // JSON-LD for SEO
-    updateJSONLD(next||null);
-
-    // Reveal animations
-    attachReveals();
-
-    // Cache for .ics
-    window.__eventsCache = events;
-  }
-
-  // ===== JSON-LD updater =====
-  function updateJSONLD(next){
-    const el=document.getElementById('event-jsonld');
-    if(!el) return;
-    if(!next){ el.textContent='{}'; return; }
-    el.textContent=JSON.stringify({
-      "@context":"https://schema.org",
-      "@type":"Event",
-      name: next.title,
-      startDate: next.start_iso,
-      endDate: next.end_iso,
-      eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
-      eventStatus: "https://schema.org/EventScheduled",
-      location:{"@type":"VirtualLocation","url":"https://trackmaniaevents.com"},
-      description: next.description||"",
-      organizer:{"@type":"Organization","name":"Trackmania Events","url":"https://trackmaniaevents.com"}
-    });
-  }
-
-  // ===== Load events (robust path + logging) =====
-  async function loadEvents(){
-    const paths = ['/events.json', './events.json'];
-    for (const p of paths) {
+    async function loadEvents(){
       try{
-        const res = await fetch(p + '?cb=' + Date.now());
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        renderFromData(data);
-        return;
+        const res=await fetch('/events.json?cb='+Date.now());
+        if(!res.ok) throw new Error('Failed to fetch events.json');
+        const data=await res.json();
+        renderFromData(Array.isArray(data)?data:[]);
       }catch(err){
-        console.warn('Failed to fetch', p, err);
+        console.error(err);
+        const grid=document.getElementById('events-grid');
+        grid.innerHTML='<article class="event"><div class="meta">Could not load events.</div></article>';
+        document.getElementById('countdown-title').textContent='Countdown';
+        setCountdown(0,0,0,0);
       }
     }
-    // All attempts failed — show fallback
-    const grid=document.getElementById('events-grid');
-    if(grid) grid.innerHTML='<article class="event"><div class="meta">Could not load events.</div></article>';
-    const header=document.getElementById('countdown-title');
-    if(header) header.textContent='Countdown';
-    setCountdown(0,0,0,0);
-  }
 
-  // ===== Twitch embed =====
-  (function(){
-    try{
-      const parents=['trackmaniaevents.com','www.trackmaniaevents.com', location.hostname].filter(Boolean);
+    // Twitch embed (both parents)
+    (function(){
+      const parents=['trackmaniaevents.com','www.trackmaniaevents.com'];
       const embed=document.getElementById('twitch-embed');
-      if(embed){
-        const iframe=document.createElement('iframe');
-        iframe.className='player';
-        iframe.allowFullscreen=true;
-        iframe.allow='autoplay; encrypted-media; picture-in-picture';
-        iframe.src=`https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}`+
-          parents.map(p=>`&parent=${encodeURIComponent(p)}`).join('')+`&muted=true`;
-        embed.appendChild(iframe);
-      }
-    }catch(e){ console.warn('Twitch embed init failed:', e); }
-  })();
+      const iframe=document.createElement('iframe');
+      iframe.className='player'; iframe.allowFullscreen=true; iframe.allow='autoplay; encrypted-media; picture-in-picture';
+      iframe.src=`https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}`+
+        parents.map(p=>`&parent=${encodeURIComponent(p)}`).join('')+`&muted=true`;
+      embed.appendChild(iframe);
+    })();
 
-  // ===== Scrollspy =====
-  (function(){
-    try{
+    // Scrollspy for nav
+    (function(){
       const sections=[...document.querySelectorAll('section[id]')];
       const links=[...document.querySelectorAll('.navlinks a')];
       const byId=id=>links.find(a=>a.getAttribute('href')===`#${id}`);
@@ -504,88 +434,86 @@
         entries.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); const a=byId(e.target.id); if(a) a.classList.add('active'); } });
       },{rootMargin:'-40% 0px -55% 0px', threshold:0});
       sections.forEach(s=>io.observe(s));
-    }catch(e){ /* non-blocking */ }
-  })();
+    })();
 
-  // ===== Reveal on scroll =====
-  function attachReveals(){
-    const reveals=document.querySelectorAll('.reveal:not(.show)');
-    const io2=new IntersectionObserver((entries,obs)=>{
-      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); obs.unobserve(e.target); } });
-    },{threshold:0.12});
-    reveals.forEach(el=>io2.observe(el));
-  }
-  attachReveals();
-
-  // ===== Back to top =====
-  (function(){
-    const btn=document.getElementById('toTop');
-    if(!btn) return;
-    addEventListener('scroll',()=> btn.classList.toggle('show', scrollY>600));
-    btn.onclick=()=> window.scrollTo({top:0, behavior:'smooth'});
-  })();
-
-  // ===== Add to Calendar =====
-  (function(){
-    const btn=document.getElementById('addCal');
-    function icsEscape(s){return (s||'').replace(/[\\,;]/g,m=>"\\"+m).replace(/\n/g,"\\n");}
-    function dt(iso){ return String(iso||'').replace(/[-:]/g,"").replace(/\.\d{3}Z$/,'Z'); }
-    function downloadICS(ev){
-      const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TrackmaniaEvents//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
-        'DTSTART:'+dt(ev.start_iso),'DTEND:'+dt(ev.end_iso),'SUMMARY:'+icsEscape(ev.title),
-        ev.location?'LOCATION:'+icsEscape(ev.location):'', ev.description?'DESCRIPTION:'+icsEscape(ev.description):'',
-        'END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');
-      const blob=new Blob([ics],{type:'text/calendar'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(ev.title||'event')+'.ics'; a.click(); URL.revokeObjectURL(a.href);
+    // Reveal on scroll
+    function attachReveals(){
+      const reveals=document.querySelectorAll('.reveal:not(.show)');
+      const io2=new IntersectionObserver((entries,obs)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); obs.unobserve(e.target); } });
+      },{threshold:0.12});
+      reveals.forEach(el=>io2.observe(el));
     }
-    btn?.addEventListener('click',()=>{
-      const evts=window.__eventsCache||[];
-      const next=(function(evs){ const now=Date.now(); return evs.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso))[0]; })(evts);
-      if(next) downloadICS(next);
-    });
-  })();
+    attachReveals();
 
-  // ===== Kick off =====
-  loadEvents();
-  const y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();
-</script>
+    // Back to top
+    (function(){
+      const btn=document.getElementById('toTop');
+      addEventListener('scroll',()=> btn.classList.toggle('show', scrollY>600));
+      btn.onclick=()=> window.scrollTo({top:0, behavior:'smooth'});
+    })();
 
-
-<!-- AJAX contact form (no redirect) -->
-<script>
-  (function(){
-    const form = document.getElementById("contact-form");
-    const status = document.getElementById("formStatus");
-    if(!form) return;
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      status.textContent = "Sending…";
-      const btn = form.querySelector('button[type="submit"]');
-      btn?.setAttribute('disabled','disabled');
-
-      try {
-        const response = await fetch(form.action, {
-          method: form.method,
-          body: new FormData(form),
-          headers: { Accept: "application/json" },
-        });
-
-        if (response.ok) {
-          status.textContent = "✅ Message sent successfully!";
-          form.reset();
-          setTimeout(() => (status.textContent = ""), 4000);
-        } else {
-          const data = await response.json().catch(()=>({}));
-          status.textContent = (data && data.errors && data.errors[0] && data.errors[0].message) || "⚠️ Something went wrong. Please try again.";
-        }
-      } catch {
-        status.textContent = "⚠️ Network error. Please try again later.";
-      } finally {
-        btn?.removeAttribute('disabled');
+    // Add to Calendar
+    (function(){
+      const btn=document.getElementById('addCal');
+      function icsEscape(s){return (s||'').replace(/[\\,;]/g,m=>"\\"+m).replace(/\n/g,"\\n");}
+      function dt(iso){ return iso.replace(/[-:]/g,"").replace(/\.\d{3}Z$/,'Z'); }
+      function downloadICS(ev){
+        const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TrackmaniaEvents//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
+          'DTSTART:'+dt(ev.start_iso),'DTEND:'+dt(ev.end_iso),'SUMMARY:'+icsEscape(ev.title),
+          ev.location?'LOCATION:'+icsEscape(ev.location):'', ev.description?'DESCRIPTION:'+icsEscape(ev.description):'',
+          'END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');
+        const blob=new Blob([ics],{type:'text/calendar'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(ev.title||'event')+'.ics'; a.click(); URL.revokeObjectURL(a.href);
       }
-    });
-  })();
-</script>
+      btn?.addEventListener('click',()=>{
+        const evts=window.__eventsCache||[];
+        const next=(function(evs){ const now=Date.now(); return evs.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso))[0]; })(evts);
+        if(next) downloadICS(next);
+      });
+    })();
+
+    // Kick off
+    loadEvents();
+    document.getElementById('year').textContent=new Date().getFullYear();
+  </script>
+
+  <!-- AJAX contact form (no redirect) -->
+  <script>
+    (function(){
+      const form = document.getElementById("contact-form");
+      const status = document.getElementById("formStatus");
+      if(!form) return;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // stay on the same page
+        status.textContent = "Sending…";
+
+        const btn = form.querySelector('button[type="submit"]');
+        btn?.setAttribute('disabled','disabled');
+
+        try {
+          const response = await fetch(form.action, {
+            method: form.method,
+            body: new FormData(form),
+            headers: { Accept: "application/json" }, // prevents redirect; returns JSON
+          });
+
+          if (response.ok) {
+            status.textContent = "✅ Message sent successfully!";
+            form.reset();
+            setTimeout(() => (status.textContent = ""), 4000);
+          } else {
+            const data = await response.json().catch(()=>({}));
+            status.textContent = (data && data.errors && data.errors[0] && data.errors[0].message) || "⚠️ Something went wrong. Please try again.";
+          }
+        } catch {
+          status.textContent = "⚠️ Network error. Please try again later.";
+        } finally {
+          btn?.removeAttribute('disabled');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
