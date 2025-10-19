@@ -138,21 +138,27 @@
   overflow:hidden;
 }
 
-/* --- Event cards with background images --- */
+/* --- Event cards with background images (fit image inside card) --- */
 .event.with-bg{
+  /* two layers: 1) gradient, 2) the image */
   background-image:
     linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
     var(--event-img);
-  background-size: var(--event-size, cover);     /* default stays cover */
-  background-position: var(--event-pos, center); /* optional override */
-  background-repeat: no-repeat;
-  min-height: 180px;
+
+  /* keep gradient full-bleed; let the image fit fully inside */
+  background-size: cover, var(--event-size, contain);
+  background-position: center, var(--event-pos, center);
+  background-repeat: no-repeat, no-repeat;
+
+  min-height: 180px;      /* your existing card height */
+  border-radius: 16px;
 }
 .event.with-bg:hover{
   background-image:
     linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)),
     var(--event-img);
 }
+
 
     /* ====== RESPONSIVE ====== */
     @media (max-width: 960px){
