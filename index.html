@@ -113,39 +113,45 @@
     #toTop.show{opacity:1; pointer-events:auto}
 
     /* --- Dynamic section background (Upcoming Events) --- */
-    #schedule { position: relative; }
-    #schedule > .container { position: relative; z-index: 1; }
-    #schedule::before{
-      content:"";
-      position:absolute; inset:0;
-      background-image: var(--section-img, none); /* set via JS */
-      background-size: cover; background-position: center;
-      opacity:.12; filter: saturate(1.05) brightness(1.08);
-      pointer-events:none; z-index:0;
-    }
+#schedule { position: relative; }
+#schedule > .container { position: relative; z-index: 1; }
+#schedule::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image: var(--section-img, none); /* set via JS */
+  background-size: cover; background-position: center;
+  opacity:.22; /* was .12 — more visible */
+  filter: saturate(1.05) brightness(1.1);
+  pointer-events:none; z-index:0;
+}
 
-    /* --- Countdown card can carry an image behind the gradient --- */
-    #countdown-card{
-      background:
-        var(--cd-bg,
-          linear-gradient(180deg, rgba(10,15,26,.8), rgba(10,15,26,.55))
-        );
-      background-size: cover;
-      background-position: center;
-      border:1px solid rgba(109,251,255,.18);
-      border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);
-      overflow:hidden;
-    }
+/* --- Countdown card can carry an image behind the gradient --- */
+#countdown-card{
+  background:
+    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
+    var(--cd-img, none);
+  background-size: cover;
+  background-position: center;
+  border:1px solid rgba(109,251,255,.18);
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  overflow:hidden;
+}
 
-    /* --- Event cards with background images --- */
-    .event.with-bg{
-      background-image:
-        linear-gradient(180deg, rgba(15,21,36,.82), rgba(15,21,36,.55)),
-        var(--event-img);
-      background-size: cover;
-      background-position: center;
-    }
+/* --- Event cards with background images --- */
+.event.with-bg{
+  background-image:
+    linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
+    var(--event-img);
+  background-size: cover;
+  background-position: center;
+  min-height: 180px;
+}
+.event.with-bg:hover{
+  background-image:
+    linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)),
+    var(--event-img);
+}
 
     /* ====== RESPONSIVE ====== */
     @media (max-width: 960px){
@@ -418,9 +424,7 @@
         // Set section + countdown backgrounds from next.image (if provided)
         if (next.image) {
           scheduleSection?.style.setProperty('--section-img', `url("${next.image}")`);
-          cdCard?.style.setProperty('--cd-bg',
-            `linear-gradient(180deg, rgba(10,15,26,.82), rgba(10,15,26,.55)), url("${next.image}")`
-          );
+          cdCard?.style.setProperty('--cd-img', `url("${next.image}")`);
         } else {
           scheduleSection?.style.removeProperty('--section-img');
           cdCard?.style.removeProperty('--cd-bg');
