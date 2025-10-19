@@ -7,7 +7,9 @@
     "location": "Stadium — collaborative build",
     "image": "/img/maptogether-card.png",
     "hero_image": "/img/maptogether-hero.png",
-    "description": "Build a 'totd' style map together!"
+    "description": "Build a 'totd' style map together!",
+    "image_fit": "contain",
+  "image_pos": "center"
   },
 
   {
@@ -17,6 +19,8 @@
     "end_iso": "2025-11-30T14:00:00-05:00",
     "description": "Daily runs & PB tracking — how many finishes can you get?",
     "image": "/img/kacky6-card.png",       
-    "hero_image": "/img/kacky6-hero.png"   
+    "hero_image": "/img/kacky6-hero.png",
+    "image_fit": "contain",
+  "image_pos": "center"  
   }
 ]
