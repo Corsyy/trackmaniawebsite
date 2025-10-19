@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kacky Finishes — Trackmania Events</title>
+  <meta name="description" content="Watch up to 75 Kacky finishes clips — Twitch or YouTube embeds." />
+  <meta name="theme-color" content="#0a0f1a" />
+  <style>
+    :root{ --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff; --accent:#3aa0ff; --accent-2:#6dfbff; --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2) }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;background:radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.12), transparent),radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.10), transparent),var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px,92vw);margin:0 auto}
+
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));backdrop-filter: blur(8px);border-bottom:1px solid rgba(109,251,255,.12)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .brand{display:flex;align-items:center;gap:.6rem;font-weight:800}
+    .brand-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow)}
+    .navlinks{display:flex;gap:1.1rem}
+    .btn{padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));font-weight:700}
+    .btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001220;box-shadow:var(--accent-glow)}
+
+    main{padding: clamp(1.6rem,4vw,2.2rem) 0 2.5rem}
+    .title{font-size:clamp(1.9rem,3.4vw,2.4rem);font-weight:900;margin:0 0 .4rem}
+    .muted{color:var(--muted)}
+
+    /* Controls */
+    .controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0 1.2rem}
+    .input{padding:.6rem .8rem;border-radius:10px;border:1px solid rgba(109,251,255,.22);background:#0c1224;color:var(--text)}
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .card{border:1px solid rgba(109,251,255,.15);background:linear-gradient(180deg, rgba(10,15,26,.8), rgba(10,15,26,.55));border-radius:16px;overflow:hidden}
+    .thumb{aspect-ratio:16/9;display:grid;place-items:center}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumb.fallback{color:var(--muted)}
+    .body{padding:.8rem}
+    .title-sm{font-weight:800;margin:0 0 .15rem}
+    .meta{font-size:.9rem;color:var(--muted)}
+
+    .empty{border:1px dashed rgba(109,251,255,.25);background:linear-gradient(180deg, rgba(12,16,32,.6), rgba(12,16,32,.35))}
+    .empty .thumb{background:repeating-linear-gradient(135deg, rgba(58,160,255,.08) 0 24px, transparent 24px 48px)}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal.open{display:flex}
+    .player{width:min(1080px,92vw);aspect-ratio:16/9;border:0;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+
+    footer{border-top:1px solid rgba(109,251,255,.12);padding:1.5rem 0;font-size:.95rem;color:var(--muted);margin-top:2rem}
+
+    @media (max-width: 960px){ .grid{grid-template-columns:1fr 1fr} }
+    @media (max-width: 640px){ .grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/">
+        <span class="brand-badge">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
+      <nav class="navlinks">
+        <a href="/">Home</a>
+        <a href="/index.html#schedule">Events</a>
+        <a href="/index.html#live">Live</a>
+        <a class="btn" href="/index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1 class="title">Kacky Finishes</h1>
+      <div class="muted">Up to <strong>75 clips</strong>. Add your Twitch or YouTube links in <code>clips.json</code> — this page updates automatically.</div>
+
+      <div class="controls">
+        <input id="q" class="input" placeholder="Search by title or map…" />
+        <div class="muted" id="count"></div>
+      </div>
+
+      <div id="grid" class="grid">
+        <!-- Cards injected by JS -->
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Clip player">
+    <iframe id="player" class="player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+  </div>
+
+  <footer>
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div><a href="/privacy.html">Privacy</a> • <a href="/terms.html">Terms</a></div>
+    </div>
+  </footer>
+
+  <script>
+    const PARENTS=['trackmaniaevents.com','www.trackmaniaevents.com'];
+
+    function parsePlatform(url){
+      try{const u=new URL(url);
+        if(u.hostname.includes('twitch.tv')) return 'twitch';
+        if(u.hostname.includes('youtu.be')||u.hostname.includes('youtube.com')) return 'youtube';
+      }catch(e){}
+      return 'unknown';
+    }
+    function twitchClipId(url){
+      try{const u=new URL(url);
+        const p=u.pathname.split('/').filter(Boolean);
+        // accepted forms: /clips/<id> or /<channel>/clip/<slug>
+        if(p[0]==='clips' && p[1]) return p[1];
+        const idx=p.indexOf('clip'); if(idx>=0 && p[idx+1]) return p[idx+1];
+      }catch(e){}
+      return '';
+    }
+    function ytId(url){
+      try{const u=new URL(url);
+        if(u.hostname==='youtu.be') return u.pathname.slice(1);
+        const id=u.searchParams.get('v'); if(id) return id;
+        const p=u.pathname.split('/'); const i=p.indexOf('embed'); if(i>=0 && p[i+1]) return p[i+1];
+      }catch(e){}
+      return '';
+    }
+    function embedUrl(url){
+      const plat=parsePlatform(url);
+      if(plat==='twitch'){
+        const id=twitchClipId(url);
+        if(!id) return '';
+        return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(id)}${PARENTS.map(p=>`&parent=${encodeURIComponent(p)}`).join('')}&autoplay=true`;
+      }
+      if(plat==='youtube'){
+        const id=ytId(url); if(!id) return '';
+        return `https://www.youtube.com/embed/${encodeURIComponent(id)}?autoplay=1`;
+      }
+      return '';
+    }
+
+    function cardHtml(item, index){
+      const filled=!!item && !!item.url;
+      if(!filled){
+        return `<article class="card empty" data-empty="1"><div class="thumb"></div><div class="body"><div class="title-sm">Slot #${index+1}</div><div class="meta">Coming soon</div></div></article>`;
+      }
+      const thumb = item.thumb ? `<img alt="${item.title||'Clip'}" src="${item.thumb}">` : '';
+      const thumbClass = item.thumb ? '' : 'fallback';
+      return `<article class="card" data-url="${item.url}" data-title="${(item.title||'').replace(/"/g,'&quot;')}" data-map="${(item.map||'').replace(/"/g,'&quot;')}">
+        <div class="thumb ${thumbClass}">${thumb || (parsePlatform(item.url)==='twitch'?'Twitch Clip':'YouTube')}</div>
+        <div class="body">
+          <div class="title-sm">${item.title||'Untitled clip'}</div>
+          <div class="meta">${item.map?('Map: '+item.map):''} ${item.date?('• '+new Date(item.date).toLocaleDateString()):''}</div>
+        </div>
+      </article>`;
+    }
+
+    async function loadClips(){
+      try{
+        const res=await fetch('/clips.json?cb='+Date.now());
+        const data=await res.json();
+        const clips=Array.isArray(data)?data:[];
+        render(clips);
+      }catch(e){
+        console.error(e);
+        render([]);
+      }
+    }
+
+    function render(clips){
+      const grid=document.getElementById('grid');
+      const limit=75;
+      const filled=clips.slice(0,limit);
+      const empties = Array.from({length: Math.max(0, limit - filled.length)}, (_,i)=>null);
+      const all=[...filled, ...empties];
+
+      grid.innerHTML=all.map((c,i)=>cardHtml(c,i)).join('');
+      document.getElementById('count').textContent=`${filled.length}/${limit} filled`;
+
+      // hook up clicks
+      grid.querySelectorAll('.card').forEach(card=>{
+        if(card.dataset.empty) return;
+        card.addEventListener('click',()=>openModal(card.dataset.url));
+      });
+    }
+
+    function openModal(url){
+      const src=embedUrl(url);
+      if(!src) return;
+      const modal=document.getElementById('modal');
+      const iframe=document.getElementById('player');
+      iframe.src=src;
+      modal.classList.add('open');
+    }
+    function closeModal(){
+      const modal=document.getElementById('modal');
+      const iframe=document.getElementById('player');
+      iframe.src='';
+      modal.classList.remove('open');
+    }
+
+    // Search
+    (function(){
+      const q=document.getElementById('q');
+      q.addEventListener('input',()=>{
+        const term=q.value.toLowerCase();
+        document.querySelectorAll('#grid .card').forEach(card=>{
+          if(card.dataset.empty) return;
+          const t=(card.dataset.title||'').toLowerCase();
+          const m=(card.dataset.map||'').toLowerCase();
+          card.style.display = (t.includes(term)||m.includes(term))? 'block':'none';
+        });
+      });
+    })();
+
+    // Modal handlers
+    (function(){
+      const modal=document.getElementById('modal');
+      modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+      addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+    })();
+
+    // Init
+    document.getElementById('year').textContent=new Date().getFullYear();
+    loadClips();
+  </script>
+</body>
+</html>
