@@ -112,21 +112,6 @@
       background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6)); cursor:pointer; opacity:0; pointer-events:none; transition:opacity .2s}
     #toTop.show{opacity:1; pointer-events:auto}
 
-    /* --- Dynamic section background (Upcoming Events) --- */
-#schedule::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: var(--section-img, none); /* set via JS */
-  background-size: contain;   /* 👈 fits full image instead of cropping */
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: .22;
-  filter: saturate(1.05) brightness(1.1);
-  pointer-events: none;
-  z-index: 0;
-}
-
 /* Countdown card — all images fill (cover) */
 #countdown-card {
   border: 1px solid rgba(109, 251, 255, .18);
@@ -416,27 +401,26 @@ function renderFromData(events) {
   const pastGrid = document.getElementById('past-grid');
   pastGrid.innerHTML = '';
   past.forEach(e => {
-    const el = document.createElement('article');
-    el.className = 'event reveal';
-    el.innerHTML = `
-      <span class="tag">${e.tag || 'Event'}</span>
-      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-      <h4>${e.title}</h4>
-      <div class="meta">${e.location || ''}</div>
-    `;
-
-    if (e.image) {
-      el.classList.add('with-bg');
-      el.style.setProperty('--event-img', `url("${e.image}")`);
-    }
-  });
+  const el = document.createElement('article');
+  el.className = 'event reveal';
+  el.innerHTML = `
+    <span class="tag">${e.tag || 'Event'}</span>
+    <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+    <h4>${e.title}</h4>
+    <div class="meta">${e.location || ''}</div>
+  `;
+  if (e.image) {
+    el.classList.add('with-bg');
+    el.style.setProperty('--event-img', `url("${e.image}")`);
+  }
+  pastGrid.appendChild(el); 
+});
 
       // Hero + countdown + dynamic backgrounds
       const next=upcoming[0];
       const chip=document.getElementById('hero-chip');
       const pills=document.getElementById('hero-pills');
       const header=document.getElementById('countdown-title');
-      const scheduleSection = document.getElementById('schedule');
       const cdCard = document.getElementById('countdown-card');
 
       if(next){
