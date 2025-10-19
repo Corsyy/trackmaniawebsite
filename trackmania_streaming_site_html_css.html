@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trackmania Events — YourBrand</title>
+  <meta name="description" content="Trackmania-themed streaming site with events, Twitch embed, and highlights." />
+  <style>
+    :root{
+      --bg: #0a0f1a;
+      --panel: #0f1524;
+      --panel-2: #0c1020;
+      --text: #e6ecff;
+      --muted: #9bb0ff;
+      --accent: #3aa0ff;
+      --accent-2: #6dfbff;
+      --accent-glow: 0 0 24px rgba(61, 165, 255, .55), 0 0 48px rgba(61, 165, 255, .35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.12), transparent), radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.10), transparent), var(--bg); color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 92vw); margin:0 auto}
+
+    /* ====== NAV ====== */
+    header{position:sticky; top:0; z-index:50; background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0)); backdrop-filter: blur(8px); border-bottom:1px solid rgba(109,251,255,.12)}
+    .nav{display:flex; align-items:center; justify-content:space-between; padding:.9rem 0}
+    .brand{display:flex; align-items:center; gap:.6rem; font-weight:800; letter-spacing:.2px}
+    .brand-badge{width:34px; height:34px; border-radius:9px; display:grid; place-items:center; background:linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--accent-glow)}
+    .navlinks{display:flex; gap:1.1rem}
+    .nav a{opacity:.9}
+    .nav a:hover{opacity:1}
+    .cta{display:flex; gap:.6rem}
+    .btn{padding:.6rem .95rem; border:1px solid rgba(109,251,255,.25); border-radius:12px; background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6)); color:var(--text); font-weight:700}
+    .btn.primary{border-color:transparent; background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#001220; box-shadow: var(--accent-glow)}
+
+    /* ====== HERO / EVENT ====== */
+    .hero{position:relative; padding: clamp(2rem, 5vw, 4rem) 0 2rem}
+    .hero-grid{display:grid; grid-template-columns:1.2fr .8fr; gap:2rem}
+    .chip{display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .65rem; border-radius:999px; font-size:.8rem; color:#001220; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--accent-glow)}
+    .h1{font-size: clamp(2rem, 3.8vw, 3.5rem); line-height:1.1; margin:.8rem 0 0; font-weight:900; letter-spacing:.2px}
+    .lead{color:var(--muted); max-width:55ch; margin-top: .75rem}
+    .keyfacts{display:flex; flex-wrap:wrap; gap:1rem; margin:1.2rem 0}
+    .pill{padding:.5rem .75rem; border-radius:999px; border:1px solid rgba(109,251,255,.25); background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.4))}
+
+    .card{border:1px solid rgba(109,251,255,.15); background:linear-gradient(180deg, rgba(10,15,26,.8), rgba(10,15,26,.55)); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card-header{padding:1rem 1rem .5rem; border-bottom:1px dashed rgba(109,251,255,.2)}
+    .card-body{padding:1rem}
+
+    .countdown{display:flex; gap:1rem; justify-content:space-between}
+    .timebox{flex:1; padding:1rem; border-radius:14px; text-align:center; background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.55)); border:1px solid rgba(109,251,255,.18)}
+    .timebox strong{display:block; font-size:1.8rem}
+    .timebox span{color:var(--muted); font-size:.85rem}
+
+    /* ====== TWITCH ====== */
+    .live{margin-top:1.2rem}
+    .live .player{aspect-ratio:16/9; width:100%; border:0; border-radius:16px; overflow:hidden; box-shadow: var(--accent-glow)}
+    .live .note{font-size:.85rem; color:var(--muted); margin-top:.5rem}
+
+    /* ====== SCHEDULE ====== */
+    .section{padding:3rem 0}
+    .title{font-size:1.8rem; font-weight:900; margin:0 0 1rem}
+    .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem}
+    .event{position:relative; padding:1rem; border-radius:16px; background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6)); border:1px solid rgba(109,251,255,.18)}
+    .event h4{margin:.3rem 0 .2rem}
+    .event .meta{color:var(--muted); font-size:.9rem}
+    .event .tag{position:absolute; top:10px; right:10px; font-size:.7rem; padding:.25rem .5rem; border-radius:999px; border:1px solid rgba(109,251,255,.25)}
+
+    /* ====== SHOWCASE ====== */
+    .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem}
+    .shot{overflow:hidden; border-radius:18px; border:1px solid rgba(109,251,255,.16); background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.45))}
+    .shot .media{aspect-ratio:4/3; display:grid; place-items:center; color:var(--muted)}
+    .shot .text{padding:1rem}
+
+    /* ====== FOOTER ====== */
+    footer{border-top:1px solid rgba(109,251,255,.12); padding:1.5rem 0; font-size:.95rem; color:var(--muted)}
+
+    /* ====== ANGLED TRACK STRIPES ====== */
+    .tm-stripes{position:absolute; inset:auto 0 0 0; height:180px; pointer-events:none; opacity:.25}
+    .tm-stripes::before, .tm-stripes::after{content:""; position:absolute; inset:0; background: repeating-linear-gradient( 115deg, transparent 0 18px, rgba(58,160,255,.18) 18px 26px, transparent 26px 50px ); filter: drop-shadow(0 0 22px rgba(61,165,255,.35))}
+    .tm-stripes::after{transform: translateY(20px)}
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 960px){
+      .hero-grid{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr 1fr}
+      .cards{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 640px){
+      .navlinks{display:none}
+      .grid, .cards{grid-template-columns:1fr}
+      .countdown{flex-wrap:wrap}
+    }
+
+    /* fun hover */
+    .btn.primary:hover{transform: translateY(-1px); box-shadow: 0 12px 30px rgba(61,165,255,.35)}
+    .event:hover{transform: translateY(-2px)}
+  </style>
+</head>
+<body>
+  <!--
+    ===========================
+    QUICK SETUP
+    1) Replace BRAND, links, and social URLs.
+    2) Set your Twitch channel below (TTV_CHANNEL).
+    3) Edit the schedule cards.
+    4) Upload to your host. Twitch requires the exact domain in the iframe "parent" parameter.
+       For testing locally, it will use your current hostname automatically.
+    ===========================
+  -->
+
+  <!-- NAV -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#">
+        <span class="brand-badge">🎮</span>
+        <span>Trackmania Live</span>
+      </a>
+      <nav class="navlinks">
+        <a href="#schedule">Events</a>
+        <a href="#live">Live</a>
+        <a href="#showcase">Highlights</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="cta">
+        <a class="btn" href="#contact">Contact</a>
+        <a class="btn primary" href="#live">Watch Live</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO / NEXT EVENT -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="chip">Next Event • Trackmania Cup Qualifiers</span>
+        <h1 class="h1">Clean, pro-grade Trackmania streaming hub.</h1>
+        <p class="lead">Home page doubles as your events hub. Neon accents, slick motion (no frameworks), and a built-in Twitch player so your community can jump in fast.</p>
+
+        <div class="keyfacts">
+          <div class="pill">🗓️ Saturday • 8:00 PM ET</div>
+          <div class="pill">📍 Stadium — Tech / FullSpeed</div>
+          <div class="pill">🏁 Prizes & viewer races</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <strong>Countdown to green light</strong>
+          </div>
+          <div class="card-body">
+            <div class="countdown" id="countdown">
+              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="live" class="live">
+        <div class="card">
+          <div class="card-header"><strong>Live on Twitch</strong></div>
+          <div class="card-body">
+            <!-- Twitch player will be injected here by JS so the parent domain matches automatically -->
+            <div id="twitch-embed"></div>
+            <div class="note">If the player doesn't load on your domain, add that domain to the <code>parent</code> parameter below.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tm-stripes"></div>
+  </section>
+
+  <!-- SCHEDULE / EVENTS -->
+  <section id="schedule" class="section">
+    <div class="container">
+      <h2 class="title">Upcoming Events</h2>
+      <div class="grid">
+        <article class="event">
+          <span class="tag">Qualifier</span>
+          <div class="meta">Oct 26, 2025 • 8:00 PM ET</div>
+          <h4>Stadium Tech Sprint #12</h4>
+          <div class="meta">Format: 3 maps • KO rounds • Viewer picks</div>
+        </article>
+        <article class="event">
+          <span class="tag">Showmatch</span>
+          <div class="meta">Nov 02, 2025 • 7:30 PM ET</div>
+          <h4>FS vs Tech — Crossover Clash</h4>
+          <div class="meta">Team captains • Best-of-5</div>
+        </article>
+        <article class="event">
+          <span class="tag">Community</span>
+          <div class="meta">Nov 09, 2025 • 8:00 PM ET</div>
+          <h4>Viewer Maps Night</h4>
+          <div class="meta">Submit your maps • Prize spins</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHTS -->
+  <section id="showcase" class="section">
+    <div class="container">
+      <h2 class="title">Highlights</h2>
+      <div class="cards">
+        <article class="shot">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong>PB on Kacky 9</strong><div class="meta">Insane reactor flight save</div></div>
+        </article>
+        <article class="shot">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong>0.01 WR Miss</strong><div class="meta">FullSpeed edge of glory</div></div>
+        </article>
+        <article class="shot">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong>Grass Tech Lines</strong><div class="meta">Cleanest exits on Stadium</div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT / CONTACT -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="title">About</h2>
+      <div class="card">
+        <div class="card-body">
+          <p>I'm a Trackmania streamer focusing on Stadium tech, FS, and Kacky challenges. This site is a simple hub for events, VODs, and live races. Want to collaborate, sponsor, or submit a map? Hit me up.</p>
+          <div class="keyfacts" style="margin-top:1rem">
+            <a class="btn" href="https://twitch.tv/YOUR_CHANNEL" target="_blank" rel="noreferrer">Follow on Twitch</a>
+            <a class="btn" href="#contact">Business / Collabs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <div class="container">
+      <h2 class="title">Contact</h2>
+      <div class="grid" style="grid-template-columns:2fr 1fr">
+        <form class="card" onsubmit="event.preventDefault(); alert('Form demo. Wire to your backend/service.');">
+          <div class="card-body">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:.8rem">
+              <div>
+                <label>Name</label>
+                <input required placeholder="Your name" style="width:100%; margin-top:.35rem; padding:.65rem .8rem; border-radius:10px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)" />
+              </div>
+              <div>
+                <label>Email</label>
+                <input type="email" required placeholder="name@example.com" style="width:100%; margin-top:.35rem; padding:.65rem .8rem; border-radius:10px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)" />
+              </div>
+            </div>
+            <div style="margin-top:.8rem">
+              <label>Message</label>
+              <textarea required placeholder="How can we help?" rows="5" style="width:100%; margin-top:.35rem; padding:.75rem .8rem; border-radius:12px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)"></textarea>
+            </div>
+            <div style="margin-top:1rem; display:flex; gap:.6rem">
+              <button class="btn primary" type="submit">Send</button>
+              <a class="btn" href="mailto:contact@yoursite.com">Email</a>
+            </div>
+          </div>
+        </form>
+        <aside class="card">
+          <div class="card-body">
+            <strong>Business</strong>
+            <div class="meta">sponsorships@yoursite.com</div>
+            <div class="meta">media@yoursite.com</div>
+            <div class="meta" style="margin-top:.6rem">Discord: yourserver.gg/invite</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap">
+      <div>© <span id="year"></span> YourBrand • Built for Trackmania fans</div>
+      <div>Privacy • Terms • Contact</div>
+    </div>
+  </footer>
+
+  <script>
+    // === EDIT THIS ===
+    const TTV_CHANNEL = "YOUR_CHANNEL"; // <-- put your Twitch channel name here
+    const NEXT_EVENT_ISO = "2025-10-26T20:00:00-04:00"; // Example: Oct 26, 2025 8:00 PM ET
+
+    // === Countdown ===
+    const d = document.getElementById('d');
+    const h = document.getElementById('h');
+    const m = document.getElementById('m');
+    const s = document.getElementById('s');
+    function tick(){
+      const now = new Date();
+      const then = new Date(NEXT_EVENT_ISO);
+      const diff = Math.max(0, then - now);
+      const dd = Math.floor(diff/86400000);
+      const hh = Math.floor((diff%86400000)/3600000);
+      const mm = Math.floor((diff%3600000)/60000);
+      const ss = Math.floor((diff%60000)/1000);
+      d.textContent = dd; h.textContent = hh; m.textContent = mm; s.textContent = ss;
+    }
+    tick(); setInterval(tick, 1000);
+
+    // === Inject Twitch Player with correct parent ===
+    (function(){
+      const parent = location.hostname || 'localhost';
+      const embed = document.getElementById('twitch-embed');
+      const iframe = document.createElement('iframe');
+      iframe.className = 'player';
+      iframe.allowFullscreen = true;
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+      iframe.src = `https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&parent=${encodeURIComponent(parent)}&muted=true`;
+      embed.appendChild(iframe);
+    })();
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
