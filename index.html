@@ -125,33 +125,54 @@
   pointer-events:none; z-index:0;
 }
 
-/* --- Countdown card can carry an image behind the gradient --- */
-#countdown-card{
-  background:
-    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
-    var(--cd-img, none);
-  background-size: cover;
-  background-position: center;
-  border:1px solid rgba(109,251,255,.18);
-  border-radius:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-  overflow:hidden;
+/* --- Countdown card with perfectly fitted background --- */
+#countdown-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(109,251,255,.18);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  color: var(--text);
+  text-shadow: 0 1px 3px rgba(0,0,0,.8);
+  backdrop-filter: blur(4px);
 }
 
-/* --- Event cards with background images --- */
-.event.with-bg{
-  background-image:
-    linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
-    var(--event-img);
+/* actual image background layer */
+#countdown-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--cd-img, none);
   background-size: cover;
   background-position: center;
-  min-height: 180px;
+  background-repeat: no-repeat;
+  filter: brightness(0.85) saturate(1.1);
+  z-index: 0;
+  transition: filter .3s ease, transform .3s ease;
 }
-.event.with-bg:hover{
-  background-image:
-    linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)),
-    var(--event-img);
+
+/* gradient overlay for text readability */
+#countdown-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10,15,26,.65), rgba(10,15,26,.5));
+  z-index: 1;
 }
+
+/* bring countdown text above everything */
+#countdown-card * {
+  position: relative;
+  z-index: 2;
+}
+
+/* hover brighten / parallax effect */
+#countdown-card:hover::before {
+  filter: brightness(1) saturate(1.2);
+  transform: scale(1.04);
+}
+
+
 
     /* ====== RESPONSIVE ====== */
     @media (max-width: 960px){
