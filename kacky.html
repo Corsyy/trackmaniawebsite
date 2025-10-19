@@ -6,122 +6,155 @@
   <title>Kacky Finishes — Trackmania Events</title>
   <meta name="description" content="Upload and view Trackmania Kacky finish clips. Community submissions, moderated for quality." />
   <style>
-    body{margin:0;font-family:system-ui;background:#0a0f1a;color:#e6ecff;}
-    header{background:#0f1524;padding:1rem 0;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(109,251,255,.2);}
-    .nav-container{width:min(1200px,92vw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
-    .brand{font-weight:800;font-size:1.2rem;letter-spacing:.3px;display:flex;align-items:center;gap:.4rem;color:#6dfbff;}
-    .btn-nav{padding:.5rem 1rem;border:1px solid rgba(109,251,255,.3);border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s;}
-    .btn-nav:hover{transform:translateY(-1px);}
+    :root{
+      --bg:#0a0f1a;--panel:#0f1524;--ink:#e6ecff;--muted:#9fb3ff;--brand:#6dfbff;--ring:rgba(109,251,255,.35)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:#0a0f1a;color:var(--ink)}
+    header{background:#0f1524;padding:1rem 0;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(109,251,255,.2)}
+    .nav-container{width:min(1200px,92vw);margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+    .brand{font-weight:800;font-size:1.2rem;letter-spacing:.3px;display:flex;align-items:center;gap:.4rem;color:#6dfbff}
+    .btn-nav{padding:.5rem 1rem;border:1px solid rgba(109,251,255,.3);border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s}
+    .btn-nav:hover{transform:translateY(-1px)}
 
-    .container{width:min(1200px,92vw);margin:0 auto;padding:2rem 0;}
-    h1{font-size:2.2rem;margin-bottom:1rem;}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
-    .card{background:linear-gradient(180deg,rgba(10,15,26,.85),rgba(10,15,26,.6));border:1px solid rgba(109,251,255,.15);border-radius:14px;padding:1rem;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:180px;}
-    .card iframe{width:100%;border-radius:10px;}
-    .btn{padding:.6rem 1rem;border:none;border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;transition:.2s;}
-    .btn:hover{transform:translateY(-1px);}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:100;}
-    .modal.open{display:flex;}
-    .modal-content{background:#0f1524;padding:2rem;border-radius:12px;width:min(700px,90vw);}
-    .input{width:100%;padding:.7rem .9rem;margin:.4rem 0;border-radius:10px;border:1px solid rgba(109,251,255,.25);background:#0c1224;color:#e6ecff;}
+    .container{width:min(1200px,92vw);margin:0 auto;padding:1.4rem 0 2.2rem}
+    h1{font-size:2rem;margin:.2rem 0 1rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+    .card{background:linear-gradient(180deg,rgba(10,15,26,.85),rgba(10,15,26,.6));border:1px solid rgba(109,251,255,.15);border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.6rem;min-height:180px}
+    .card .slot{opacity:.8;font-size:.9rem}
+    .card iframe{width:100%;height:220px;border:0;border-radius:10px}
+    .row{display:flex;gap:.6rem;flex-wrap:wrap}
+    .btn{padding:.55rem .9rem;border:none;border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;transition:.2s}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(109,251,255,.25)}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100}
+    .modal.open{display:flex}
+    .modal-card{background:#0f1524;border:1px solid rgba(109,251,255,.2);border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,.55);width:min(950px,94vw);max-height:90vh;overflow:auto}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.08)}
+    .modal-body{padding:1rem}
+
+    /* Fullscreen/Lightbox Player */
+    .player-frame{aspect-ratio:16/9;width:100%;border:0;border-radius:12px;background:#000}
+
+    .input{width:100%;padding:.7rem .9rem;margin:.4rem 0;border-radius:10px;border:1px solid rgba(109,251,255,.25);background:#0c1224;color:#e6ecff;outline:none}
+    .input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--ring)}
+    .hint{font-size:.9rem;color:var(--muted)}
   </style>
 </head>
 <body>
   <header>
     <div class="nav-container">
       <div class="brand">🏎️ Kacky Finishes</div>
-      <a href="/" class="btn-nav">Home</a>
+      <a href="/" class="btn-nav">🏠 Home</a>
     </div>
   </header>
 
   <div class="container">
     <h1>Kacky Finishes</h1>
-    <p>Upload your Kacky finish clips below! Approved clips will appear automatically once reviewed.</p>
-    <button class="btn" id="openSubmit">Submit a Clip</button>
+    <p class="hint">Click a slot to upload your clip for that Kacky map. Click “View / Fullscreen” on any approved clip to watch it larger.</p>
     <div id="clipsGrid" class="grid"></div>
   </div>
 
-  <div class="modal" id="submit-modal">
-    <div class="modal-content">
-      <h2>Submit Your Kacky Clip</h2>
-      <form id="submitForm">
-        <input class="input" name="title" placeholder="Title" required />
-        <input class="input" name="slot" type="number" min="1" max="75" placeholder="Slot # (1–75)" required />
-        <input class="input" name="url" placeholder="Twitch or YouTube URL" required />
-        <input class="input" name="map" placeholder="Map (optional)" />
-        <input class="input" name="thumb" placeholder="Thumbnail URL (optional)" />
-        <input class="input" name="date" type="datetime-local" />
-        <div style="display:flex;gap:.6rem;margin-top:.6rem;align-items:center;">
-          <button class="btn" type="submit">Send</button>
-          <button class="btn" type="button" id="closeSubmit">Cancel</button>
-          <span id="submitStatus" style="margin-left:.6rem;font-size:.9rem;"></span>
-        </div>
-      </form>
+  <!-- Submit modal (per-slot) -->
+  <div class="modal" id="submit-modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <strong>Submit Kacky Clip</strong>
+        <button class="btn ghost" data-close-submit>Close</button>
+      </div>
+      <div class="modal-body">
+        <form id="submitForm">
+          <div class="row">
+            <input class="input" name="slot" id="slotField" type="number" min="1" max="75" placeholder="Slot # (1–75)" required />
+            <input class="input" name="title" placeholder="Title" required />
+          </div>
+          <input class="input" name="url" placeholder="Twitch or YouTube URL" required />
+          <div class="row">
+            <input class="input" name="map" placeholder="Map (optional)" />
+            <input class="input" name="thumb" placeholder="Thumbnail URL (optional)" />
+          </div>
+          <input class="input" name="date" type="datetime-local" />
+          <div class="row" style="align-items:center">
+            <button class="btn" type="submit">Send</button>
+            <span id="submitStatus" class="hint"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player lightbox -->
+  <div class="modal" id="player-modal" aria-hidden="true">
+    <div class="modal-card" style="width:min(1280px,96vw)">
+      <div class="modal-head">
+        <strong>Player</strong>
+        <button class="btn ghost" data-close-player>Close</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="playerFrame" class="player-frame" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
     </div>
   </div>
 
   <script>
+    // ===== Config =====
     const SUPABASE_URL = "https://lertzsobphopkoyaxrwk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
 
-    // Build a safe embed URL for Twitch/YouTube with correct parameters
+    // ===== Helpers =====
+    function twitchParents(){
+      const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
+      return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
+    }
+
     function buildEmbedURL(raw){
       try{
         const u = new URL(raw);
         const host = u.hostname.replace(/^www\./,'');
-        const parent = location.hostname || 'trackmaniaevents.com';
 
-        // --- YouTube ---
+        // YouTube
         if (host === 'youtube.com' || host === 'm.youtube.com') {
-          // watch?v=ID
           const id = u.searchParams.get('v');
-          if (id) return `https://www.youtube.com/embed/${encodeURIComponent(id)}`;
-          // shorts
+          if (id) return `https://www.youtube.com/embed/${encodeURIComponent(id)}?modestbranding=1&rel=0&playsinline=1`;
           const parts = u.pathname.split('/').filter(Boolean);
           if (parts[0] === 'shorts' && parts[1]) {
-            return `https://www.youtube.com/embed/${encodeURIComponent(parts[1])}`;
+            return `https://www.youtube.com/embed/${encodeURIComponent(parts[1])}?modestbranding=1&rel=0&playsinline=1`;
           }
         }
         if (host === 'youtu.be') {
           const id = u.pathname.replace('/','');
-          if (id) return `https://www.youtube.com/embed/${encodeURIComponent(id)}`;
+          if (id) return `https://www.youtube.com/embed/${encodeURIComponent(id)}?modestbranding=1&rel=0&playsinline=1`;
         }
 
-        // --- Twitch ---
+        // Twitch
         if (host === 'clips.twitch.tv') {
-          // https://clips.twitch.tv/Slug
           const slug = u.pathname.split('/').filter(Boolean)[0];
-          if (slug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&parent=${encodeURIComponent(parent)}&autoplay=false`;
+          if (slug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&${twitchParents()}&autoplay=false`;
         }
         if (host.endsWith('twitch.tv')) {
           const parts = u.pathname.split('/').filter(Boolean);
-          // /<channel>/clip/<slug>
           const clipIdx = parts.indexOf('clip');
           if (clipIdx >= 0 && parts[clipIdx+1]) {
             const slug = parts[clipIdx+1];
-            return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&parent=${encodeURIComponent(parent)}&autoplay=false`;
+            return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&${twitchParents()}&autoplay=false`;
           }
-          // /videos/<id>
           const vIdx = parts.indexOf('videos');
           if (vIdx >= 0 && parts[vIdx+1]) {
-            return `https://player.twitch.tv/?video=${encodeURIComponent(parts[vIdx+1])}&parent=${encodeURIComponent(parent)}&autoplay=false`;
+            return `https://player.twitch.tv/?video=${encodeURIComponent(parts[vIdx+1])}&${twitchParents()}&autoplay=false`;
           }
-          // channel live embed
           if (parts[0]) {
-            return `https://player.twitch.tv/?channel=${encodeURIComponent(parts[0])}&parent=${encodeURIComponent(parent)}&autoplay=false`;
+            return `https://player.twitch.tv/?channel=${encodeURIComponent(parts[0])}&${twitchParents()}&autoplay=false`;
           }
         }
-
-        // Fallback to raw URL if nothing matched
         return raw;
-      }catch(e){
-        return raw;
-      }
+      }catch(e){ return raw; }
     }
 
     async function loadClips(){
       try{
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?approved=eq.true&select=slot,title,url,map,date,thumb`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?approved=eq.true&select=id,slot,title,url,map,date,thumb`, {
           headers:{apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}`}
         });
         const clips = await res.json();
@@ -136,36 +169,90 @@
       const grid = document.getElementById('clipsGrid');
       grid.innerHTML = '';
       for(let i=1;i<=75;i++){
-        const clip = clips.find(c => c.slot===i);
-        const div = document.createElement('div');
-        div.className = 'card';
+        const clip = clips.find(c => Number(c.slot)===i);
+        const card = document.createElement('div');
+        card.className = 'card';
+
         if(clip){
           const src = buildEmbedURL(clip.url);
-          div.innerHTML = `<strong>${clip.title}</strong><br>
-                           <iframe width="100%" height="160" src="${src}" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+          card.innerHTML = `
+            <div class="slot">Slot ${i}${clip.map?` · ${escapeHtml(clip.map)}`:''}</div>
+            <strong>${escapeHtml(clip.title||'Kacky Finish')}</strong>
+            <iframe src="${src}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="row">
+              <button class='btn openPlayer' data-url='${encodeURIComponent(src)}'>View / Fullscreen</button>
+              <button class='btn ghost upload' data-slot='${i}'>Submit another for this slot</button>
+            </div>`;
         } else {
-          div.innerHTML = `<em>Slot ${i}</em><br><button class='btn upload' data-slot='${i}'>Upload</button>`;
+          card.innerHTML = `
+            <div class="slot">Slot ${i}</div>
+            <em>No clip yet</em>
+            <div class="row">
+              <button class='btn upload' data-slot='${i}'>Upload for Slot ${i}</button>
+            </div>`;
         }
-        grid.appendChild(div);
+        grid.appendChild(card);
       }
     }
 
-    // Modal open/close
-    const openBtn=document.getElementById('openSubmit');
-    const modal=document.getElementById('submit-modal');
-    const closeBtn=document.getElementById('closeSubmit');
-    openBtn.onclick=()=>modal.classList.add('open');
-    closeBtn.onclick=()=>modal.classList.remove('open');
-    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open');});
+    // Simple HTML escaper for titles/maps
+    function escapeHtml(s){
+      return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+    }
 
-    // Form submission (with helpful error)
+    // ===== Modal wiring =====
+    const submitModal = document.getElementById('submit-modal');
+    const playerModal = document.getElementById('player-modal');
+    const slotField = document.getElementById('slotField');
+    const playerFrame = document.getElementById('playerFrame');
+
+    function openSubmit(slot){
+      if(slot){ slotField.value = slot; }
+      submitModal.classList.add('open');
+      submitModal.setAttribute('aria-hidden','false');
+    }
+    function closeSubmit(){
+      submitModal.classList.remove('open');
+      submitModal.setAttribute('aria-hidden','true');
+    }
+    function openPlayer(url){
+      playerFrame.src = decodeURIComponent(url);
+      playerModal.classList.add('open');
+      playerModal.setAttribute('aria-hidden','false');
+    }
+    function closePlayer(){
+      playerFrame.src = '';
+      playerModal.classList.remove('open');
+      playerModal.setAttribute('aria-hidden','true');
+    }
+
+    document.addEventListener('click', (e)=>{
+      const t = e.target;
+      if(t.matches('.upload')){
+        const slot = t.getAttribute('data-slot');
+        openSubmit(slot);
+      }
+      if(t.matches('[data-close-submit]')) closeSubmit();
+      if(t.matches('[data-close-player]')) closePlayer();
+      if(t.matches('.openPlayer')){
+        const url = t.getAttribute('data-url');
+        openPlayer(url);
+      }
+      // backdrop click to close
+      if(t.classList.contains('modal')){
+        if(t.id==='submit-modal') closeSubmit();
+        if(t.id==='player-modal') closePlayer();
+      }
+    });
+
+    // ===== Submission handling =====
     (function(){
       const form=document.getElementById('submitForm');
       const status=document.getElementById('submitStatus');
 
       function isValidClipUrl(u){
         try{ const h=new URL(u).hostname; return /twitch\.tv|youtube\.com|youtu\.be/i.test(h); }
-        catch{return false;}
+        catch{ return false; }
       }
       function clampSlot(n){ n=Number(n||0); return Math.min(75, Math.max(1, n)); }
 
@@ -211,7 +298,7 @@
 
           status.textContent='✅ Submitted! Awaiting approval.';
           form.reset();
-          setTimeout(()=>{ modal.classList.remove('open'); status.textContent=''; },1200);
+          setTimeout(()=>{ closeSubmit(); status.textContent=''; loadClips(); }, 1000);
         }catch(err){
           console.error(err);
           status.textContent='⚠️ Network error. Please try again later.';
@@ -219,6 +306,7 @@
       });
     })();
 
+    // Initial load
     loadClips();
   </script>
 </body>
