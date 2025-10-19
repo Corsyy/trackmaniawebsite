@@ -290,13 +290,28 @@
   <script>
   const TTV_CHANNEL = "C0rsy";
 
-  // ===== Local time formatter =====
-  const dtfLong = new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZoneName: "short"
-  });
-  const fmtDate = (iso) => dtfLong.format(new Date(iso));
+  // ===== Local time formatter (robust) =====
+  function makeLocalFormatter() {
+    try {
+      const f = new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZoneName: "short"
+      });
+      f.format(new Date());
+      return (d) => f.format(d);
+    } catch {
+      return (d) => d.toLocaleString([], {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+  }
+  const __fmtLocal = makeLocalFormatter();
+  const fmtDate = (iso) => __fmtLocal(new Date(iso));
 
   // ===== Countdown helpers =====
   const dEl = document.getElementById('d');
@@ -534,6 +549,7 @@
   loadEvents();
   const y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();
 </script>
+
 
 <!-- AJAX contact form (no redirect) -->
 <script>
