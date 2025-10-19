@@ -243,30 +243,31 @@
     <div class="container">
       <h2 class="title">Contact</h2>
       <div class="grid" style="grid-template-columns:2fr 1fr">
+        <!-- IMPORTANT: form id is contact-form to match JS below -->
         <form action="https://formspree.io/f/xjkazybj" method="POST" class="card form reveal" id="contact-form">
           <div class="card-body">
-    <div class="twocol">
-      <div class="field">
-        <label for="name">Name</label>
-        <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
-      </div>
-    </div>
+            <div class="twocol">
+              <div class="field">
+                <label for="name">Name</label>
+                <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
+              </div>
+            </div>
 
-    <div class="field" style="margin-top:.8rem">
-      <label for="message">Message</label>
-      <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?" required></textarea>
-    </div>
+            <div class="field" style="margin-top:.8rem">
+              <label for="message">Message</label>
+              <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?" required></textarea>
+            </div>
 
-    <div style="margin-top:1rem; display:flex; gap:.6rem">
-      <button class="btn primary" type="submit">Send</button>
-      <span id="formStatus" style="margin-left:0.8rem; font-size:0.9rem;"></span>
-    </div>
-  </div>
-</form>
+            <div style="margin-top:1rem; display:flex; gap:.6rem; align-items:center">
+              <button class="btn primary" type="submit">Send</button>
+              <span id="formStatus" style="font-size:0.9rem;" aria-live="polite"></span>
+            </div>
+          </div>
+        </form>
         <aside class="card reveal">
           <div class="card-body">
             <strong>Discord</strong>
@@ -282,7 +283,7 @@
     <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap">
       <div>© <span id="year"></span> Trackmania Events</div>
       <div><a href="/privacy.html">Privacy</a> • <a href="/terms.html">Terms</a> • <a href="#contact">Contact</a></div>
-
+    </div>
   </footer>
 
   <script>
@@ -312,12 +313,6 @@
         setCountdown(days,hrs,mins,secs);
       }
       tick(); setInterval(tick,1000);
-    }
-
-    function pickNext(events){
-      const now=Date.now();
-      const upcoming=events.filter(e=>new Date(e.end_iso).getTime()>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
-      return upcoming[0]||null;
     }
 
     // Render schedule + hero + past events
@@ -457,14 +452,6 @@
       btn.onclick=()=> window.scrollTo({top:0, behavior:'smooth'});
     })();
 
-    // Form redirect helper
-    (function(){
-      const redir=document.getElementById('redirect-field');
-      if(redir) redir.value=location.origin+'/#thanks';
-      const status=document.getElementById('form-status');
-      if(location.hash==='#thanks' && status){ status.textContent='Thanks — your message was sent.'; }
-    })();
-
     // Add to Calendar
     (function(){
       const btn=document.getElementById('addCal');
@@ -489,34 +476,43 @@
     loadEvents();
     document.getElementById('year').textContent=new Date().getFullYear();
   </script>
+
+  <!-- AJAX contact form (no redirect) -->
   <script>
-const form = document.getElementById("contactForm");
-const status = document.getElementById("formStatus");
+    (function(){
+      const form = document.getElementById("contact-form");
+      const status = document.getElementById("formStatus");
+      if(!form) return;
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault(); // stop page reload
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // stay on the same page
+        status.textContent = "Sending…";
 
-  const data = new FormData(form);
-  status.textContent = "Sending...";
+        const btn = form.querySelector('button[type="submit"]');
+        btn?.setAttribute('disabled','disabled');
 
-  try {
-    const response = await fetch(form.action, {
-      method: form.method,
-      body: data,
-      headers: { Accept: "application/json" },
-    });
+        try {
+          const response = await fetch(form.action, {
+            method: form.method,
+            body: new FormData(form),
+            headers: { Accept: "application/json" }, // prevents redirect; returns JSON
+          });
 
-    if (response.ok) {
-      status.textContent = "✅ Message sent successfully!";
-      form.reset();
-      setTimeout(() => (status.textContent = ""), 4000); // clears message after 4s
-    } else {
-      status.textContent = "⚠️ Something went wrong. Please try again.";
-    }
-  } catch (error) {
-    status.textContent = "⚠️ Network error. Please try again later.";
-  }
-});
-</script>
+          if (response.ok) {
+            status.textContent = "✅ Message sent successfully!";
+            form.reset();
+            setTimeout(() => (status.textContent = ""), 4000);
+          } else {
+            const data = await response.json().catch(()=>({}));
+            status.textContent = (data && data.errors && data.errors[0] && data.errors[0].message) || "⚠️ Something went wrong. Please try again.";
+          }
+        } catch {
+          status.textContent = "⚠️ Network error. Please try again later.";
+        } finally {
+          btn?.removeAttribute('disabled');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
