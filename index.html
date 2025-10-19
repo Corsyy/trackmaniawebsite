@@ -118,7 +118,7 @@
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
   overflow: hidden;
-  background-clip: border-box, border-box;
+  background-clip: padding-box, padding-box;
   background-image:
     linear-gradient(180deg, rgba(10, 15, 26, .68), rgba(10, 15, 26, .44)),
     var(--cd-img, none);
@@ -135,6 +135,8 @@
   background-size: cover, cover;          /* fills the card for ALL cards */
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
+  overflow: hidden;                          
+  background-clip: padding-box, padding-box;
   min-height: 180px;
   border-radius: 16px;
 }
