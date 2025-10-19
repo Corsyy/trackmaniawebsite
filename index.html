@@ -143,8 +143,9 @@
   background-image:
     linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
     var(--event-img);
-  background-size: cover;
-  background-position: center;
+  background-size: var(--event-size, cover);     /* default stays cover */
+  background-position: var(--event-pos, center); /* optional override */
+  background-repeat: no-repeat;
   min-height: 180px;
 }
 .event.with-bg:hover{
@@ -379,6 +380,8 @@
           el.classList.add('with-bg');
           el.style.setProperty('--event-img', `url("${e.image}")`);
         }
+        if (e.image_fit) el.style.setProperty('--event-size', e.image_fit);      // e.g. "contain"
+        if (e.image_pos) el.style.setProperty('--event-pos', e.image_pos);       // e.g. "center top" (optional)
         grid.appendChild(el);
       });
 
