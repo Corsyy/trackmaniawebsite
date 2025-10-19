@@ -127,40 +127,40 @@
   z-index: 0;
 }
 
-/* Event cards — 2 layers: gradient + image */
-.event.with-bg{
-  background-image:
-    linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
-    var(--event-img);
+/* Countdown card — all images fill (cover) */
+#countdown-card {
+  border: 1px solid rgba(109, 251, 255, .18);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  overflow: hidden;
 
-  /* Default: image behaves like "cover" (fills the card).
-     You can override per-card with --event-size and --event-pos from JS. */
-  background-size: cover, var(--event-size, cover);
-  background-position: center, var(--event-pos, center);
+  background-image:
+    linear-gradient(180deg, rgba(10, 15, 26, .68), rgba(10, 15, 26, .44)),
+    var(--cd-img, none);
+  background-size: cover, cover; /* 👈 fills the box for all */
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+}
+
+/* Event cards — all images fill (cover) */
+.event.with-bg {
+  background-image:
+    linear-gradient(180deg, rgba(15, 21, 36, .72), rgba(15, 21, 36, .45)),
+    var(--event-img);
+  background-size: cover, cover;  /* 👈 same here — fill the card */
+  background-position: center, center;
   background-repeat: no-repeat, no-repeat;
 
   min-height: 180px;
   border-radius: 16px;
 }
-.event.with-bg:hover{
+
+.event.with-bg:hover {
   background-image:
-    linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)),
+    linear-gradient(180deg, rgba(15, 21, 36, .64), rgba(15, 21, 36, .40)),
     var(--event-img);
 }
 
-#countdown-card{
-  border:1px solid rgba(109,251,255,.18);
-  border-radius:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-  overflow:hidden;
-
-  background-image:
-    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
-    var(--cd-img, none);
-  background-size: cover, var(--cd-size, contain);  /* ← contain fits full image */
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
-}
 
 
 
