@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Trackmania Events — YourBrand</title>
+  <title>Trackmania Events</title>
   <meta name="description" content="Trackmania Events" />
   <style>
     :root{
@@ -58,12 +58,12 @@
     .live .note{font-size:.85rem; color:var(--muted); margin-top:.5rem}
 
     /* ====== FORM (clean styles) ====== */
-.form .field{display:flex; flex-direction:column; gap:.35rem}
-.form .twocol{display:grid; grid-template-columns:1fr 1fr; gap:.8rem}
-.input, .textarea{width:100%; padding:.7rem .85rem; border-radius:12px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)}
-.input::placeholder, .textarea::placeholder{color:rgba(155,176,255,.8)}
-.help{font-size:.85rem; color:var(--muted)}
-@media (max-width: 640px){ .form .twocol{grid-template-columns:1fr} }
+    .form .field{display:flex; flex-direction:column; gap:.35rem}
+    .form .twocol{display:grid; grid-template-columns:1fr 1fr; gap:.8rem}
+    .input, .textarea{width:100%; padding:.7rem .85rem; border-radius:12px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)}
+    .input::placeholder, .textarea::placeholder{color:rgba(155,176,255,.8)}
+    .help{font-size:.85rem; color:var(--muted)}
+    @media (max-width: 640px){ .form .twocol{grid-template-columns:1fr} }
 
     /* ====== SCHEDULE ====== */
     .section{padding:3rem 0}
@@ -106,17 +106,6 @@
   </style>
 </head>
 <body>
-  <!--
-    ===========================
-    QUICK SETUP
-    1) Replace BRAND, links, and social URLs.
-    2) Set your Twitch channel below (TTV_CHANNEL).
-    3) Edit the schedule cards.
-    4) Upload to your host. Twitch requires the exact domain in the iframe "parent" parameter.
-       For testing locally, it will use your current hostname automatically.
-    ===========================
-  -->
-
   <!-- NAV -->
   <header>
     <div class="container nav">
@@ -141,19 +130,19 @@
   <section class="hero">
     <div class="container hero-grid">
       <div>
-        <span class="chip">Next Event • Map together</span>
-        <h1 class="h1">Come check out the most recent trackmania events</h1>
-        <p class="lead">If you have any ideas for any other trackmania events scroll down below and contact me or join the discord!</p>
+        <span class="chip" id="hero-chip">Next Event</span>
+        <h1 class="h1">Come check out the most recent Trackmania events</h1>
+        <p class="lead">If you have any ideas for events, scroll down and contact me or join the Discord!</p>
 
-        <div class="keyfacts">
-          <div class="pill">🗓️ October 25th • 6:00 PM ET</div>
-          <div class="pill">📍 Map together</div>
-          <div class="pill">🏁 Build a "totd" style map together</div>
+        <div class="keyfacts" id="hero-pills">
+          <div class="pill">🗓️ TBA</div>
+          <div class="pill">📍 Online</div>
+          <div class="pill">🏁 Community races</div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <strong>Countdown to green light</strong>
+            <strong id="countdown-title">Countdown to green light</strong>
           </div>
           <div class="card-body">
             <div class="countdown" id="countdown">
@@ -170,9 +159,8 @@
         <div class="card">
           <div class="card-header"><strong>Live on Twitch</strong></div>
           <div class="card-body">
-            <!-- Twitch player will be injected here by JS so the parent domain matches automatically -->
             <div id="twitch-embed"></div>
-            <div class="note">If the player doesn't load on your domain, add that domain to the <code>parent</code> parameter below.</div>
+            <div class="note">If the player doesn't load, make sure <code>parent</code> includes your domain.</div>
           </div>
         </div>
       </div>
@@ -184,26 +172,7 @@
   <section id="schedule" class="section">
     <div class="container">
       <h2 class="title">Upcoming Events</h2>
-      <div class="grid">
-        <article class="event">
-          <span class="tag">Build</span>
-          <div class="meta">Oct 25, 2025 • 3:00 PM ET</div>
-          <h4>Map together</h4>
-          <div class="meta">Build a "totd" style map together!</div>
-        </article>
-        <article class="event">
-          <span class="tag">Kacky</span>
-          <div class="meta">Nov 11, 2025 • 3:00 PM ET</div>
-          <h4>Kacky Reloaded 6</h4>
-          <div class="meta">How many finishes can you get?</div>
-        </article>
-        <article class="event">
-          <span class="tag">N/A</span>
-          <div class="meta">N/A</div>
-          <h4>N/A</h4>
-          <div class="meta">N/A</div>
-        </article>
-      </div>
+      <div class="grid"></div>
     </div>
   </section>
 
@@ -248,42 +217,38 @@
     <div class="container">
       <h2 class="title">Contact</h2>
       <div class="grid" style="grid-template-columns:2fr 1fr">
-       <form action="https://formspree.io/f/xblzbdbq" method="POST" class="card form">
-  <div class="card-body">
-    <div class="twocol">
-      <div class="field">
-        <label for="name">Name</label>
-        <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
-      </div>
-    </div>
+        <form action="https://formspree.io/f/xblzbdbq" method="POST" class="card form">
+          <div class="card-body">
+            <div class="twocol">
+              <div class="field">
+                <label for="name">Name</label>
+                <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
+              </div>
+            </div>
 
-    <div class="field" style="margin-top:.8rem">
-      <label for="message">Message</label>
-      <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?" required></textarea>
-      <div class="help">We’ll reply to you at the email you provide.</div>
-    </div>
+            <div class="field" style="margin-top:.8rem">
+              <label for="message">Message</label>
+              <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?" required></textarea>
+              <div class="help">We’ll reply to you at the email you provide.</div>
+            </div>
 
-    <!-- Optional metadata -->
-    <input type="hidden" name="_subject" value="New message from TrackmaniaEvents.com" />
-    <!-- Honeypot anti-spam -->
-    <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+            <input type="hidden" name="_subject" value="New message from TrackmaniaEvents.com" />
+            <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
 
-    <div style="margin-top:1rem; display:flex; gap:.6rem">
-      <button class="btn primary" type="submit">Send</button>
-      <a class="btn" href="mailto:contact@trackmaniaevents.com?subject=Contact%20from%20TrackmaniaEvents.com">Email instead</a>
-    </div>
-  </div>
-</form>
+            <div style="margin-top:1rem; display:flex; gap:.6rem">
+              <button class="btn primary" type="submit">Send</button>
+              <a class="btn" href="mailto:contact@trackmaniaevents.com?subject=Contact%20from%20TrackmaniaEvents.com">Email instead</a>
+            </div>
+          </div>
+        </form>
         <aside class="card">
           <div class="card-body">
-            <strong></strong>
-            <div class="meta"></div>
-            <div class="meta"></div>
-            <div class="meta" style="margin-top:.6rem">Discord: https://discord.gg/9bDcTTbTGJ</div>
+            <strong>Discord</strong>
+            <div class="meta"><a href="https://discord.gg/9bDcTTbTGJ" target="_blank" rel="noreferrer">Join the server</a></div>
           </div>
         </aside>
       </div>
@@ -298,40 +263,125 @@
   </footer>
 
   <script>
-    // === EDIT THIS ===
-    const TTV_CHANNEL = "C0rsy"; // <-- put your Twitch channel name here
-    const NEXT_EVENT_ISO = "2025-10-25T18:00:00-04:00"; // Example: Oct 26, 2025 8:00 PM ET
+    // === Configuration you still control in code ===
+    const TTV_CHANNEL = "C0rsy"; // your Twitch name
 
-    // === Countdown ===
+    // DOM refs
     const d = document.getElementById('d');
     const h = document.getElementById('h');
     const m = document.getElementById('m');
     const s = document.getElementById('s');
-    function tick(){
-      const now = new Date();
-      const then = new Date(NEXT_EVENT_ISO);
-      const diff = Math.max(0, then - now);
-      const dd = Math.floor(diff/86400000);
-      const hh = Math.floor((diff%86400000)/3600000);
-      const mm = Math.floor((diff%3600000)/60000);
-      const ss = Math.floor((diff%60000)/1000);
+
+    // Helpers
+    const fmtDate = (iso) => {
+      const dt = new Date(iso);
+      return dt.toLocaleString(undefined, {
+        month: 'short', day: '2-digit', year: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+    };
+
+    function setCountdown(dd, hh, mm, ss){
       d.textContent = dd; h.textContent = hh; m.textContent = mm; s.textContent = ss;
     }
-    tick(); setInterval(tick, 1000);
 
-    // === Inject Twitch Player with correct parent ===
+    function startCountdown(iso, titleEl){
+      function tick(){
+        const now = new Date();
+        const then = new Date(iso);
+        let diff = then - now;
+        if (diff <= 0){
+          setCountdown(0,0,0,0);
+          if (titleEl) titleEl.textContent = 'Live now!';
+          return;
+        }
+        const days = Math.floor(diff/86400000); diff%=86400000;
+        const hrs  = Math.floor(diff/3600000);  diff%=3600000;
+        const mins = Math.floor(diff/60000);    diff%=60000;
+        const secs = Math.floor(diff/1000);
+        setCountdown(days, hrs, mins, secs);
+      }
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    function pickNext(events){
+      const now = Date.now();
+      const upcoming = events.filter(e => new Date(e.end_iso).getTime() > now)
+                             .sort((a,b) => new Date(a.start_iso) - new Date(b.start_iso));
+      return upcoming[0] || null;
+    }
+
+    function renderFromData(events){
+      // Schedule grid
+      const grid = document.querySelector('#schedule .grid');
+      grid.innerHTML = '';
+      events.sort((a,b) => new Date(a.start_iso) - new Date(b.start_iso))
+        .forEach(e => {
+          const el = document.createElement('article');
+          el.className = 'event';
+          el.innerHTML = `
+            <span class="tag">${e.tag || 'Event'}</span>
+            <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+            <h4>${e.title}</h4>
+            <div class="meta">${e.description || ''}</div>
+          `;
+          grid.appendChild(el);
+        });
+
+      // Hero fields
+      const next = pickNext(events);
+      const chip = document.getElementById('hero-chip');
+      const pills = document.getElementById('hero-pills');
+      const header = document.getElementById('countdown-title');
+
+      if (next){
+        chip.textContent = `Next Event • ${next.title}`;
+        pills.innerHTML = `
+          <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+          <div class="pill">📍 ${next.location || 'Online'}</div>
+          <div class="pill">🏁 ${next.description || ''}</div>
+        `;
+        startCountdown(next.start_iso, header);
+      } else {
+        chip.textContent = 'No upcoming event';
+        pills.innerHTML = `<div class="pill">Check back soon</div>`;
+        header.textContent = 'Countdown';
+        setCountdown(0,0,0,0);
+      }
+    }
+
+    async function loadEvents(){
+      try{
+        const res = await fetch('/events.json?cb=' + Date.now());
+        if(!res.ok) throw new Error('Failed to fetch events.json');
+        const data = await res.json();
+        renderFromData(Array.isArray(data) ? data : []);
+      }catch(err){
+        console.error(err);
+        const grid = document.querySelector('#schedule .grid');
+        grid.innerHTML = '<div class="meta">Could not load events.</div>';
+        document.getElementById('countdown-title').textContent = 'Countdown';
+        setCountdown(0,0,0,0);
+      }
+    }
+
+    // Inject Twitch player with both parents so it works on root and www
     (function(){
-      const parent = location.hostname || 'localhost';
+      const parents = ['trackmaniaevents.com','www.trackmaniaevents.com'];
       const embed = document.getElementById('twitch-embed');
       const iframe = document.createElement('iframe');
       iframe.className = 'player';
       iframe.allowFullscreen = true;
       iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-      iframe.src = `https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&parent=${encodeURIComponent(parent)}&muted=true`;
+      iframe.src = `https://player.twitch.tv/?channel=${encodeURIComponent('C0rsy')}` +
+                   parents.map(p => `&parent=${encodeURIComponent(p)}`).join('') +
+                   `&muted=true`;
       embed.appendChild(iframe);
     })();
 
-    // Year
+    // Kick off
+    loadEvents();
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
