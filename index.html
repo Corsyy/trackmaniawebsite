@@ -474,7 +474,6 @@ function renderFromData(events) {
         // AFTER
 const heroImg = next?.hero_image || next?.image;
 if (heroImg) {
-  scheduleSection?.style.setProperty('--section-img', `url("${heroImg}")`);
   cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
   cdCard?.style.setProperty('--cd-size', 'contain'); // ← make the image fit fully
 } else {
