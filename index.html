@@ -290,16 +290,20 @@
   <script>
     const TTV_CHANNEL = "C0rsy";
 
+    // ===== Local time formatter (per-visitor timezone) =====
+    // Use dateStyle/timeStyle/timeZoneName so visitors see their own local time + tz label.
+    const dtfLong = new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZoneName: "short"
+    });
+    const fmtDate = (iso) => dtfLong.format(new Date(iso));
+
     // Countdown helpers
     const d = document.getElementById('d');
     const h = document.getElementById('h');
     const m = document.getElementById('m');
     const s = document.getElementById('s');
-
-    const fmtDate = (iso) => {
-      const dt = new Date(iso);
-      return dt.toLocaleString(undefined, {month:'short', day:'2-digit', year:'numeric', hour:'numeric', minute:'2-digit'});
-    };
 
     function setCountdown(dd, hh, mm, ss){ d.textContent=dd; h.textContent=hh; m.textContent=mm; s.textContent=ss; }
 
@@ -404,6 +408,7 @@
         const res=await fetch('/events.json?cb='+Date.now());
         if(!res.ok) throw new Error('Failed to fetch events.json');
         const data=await res.json();
+        // Expect start_iso/end_iso in UTC ISO format (e.g., 2025-10-20T00:00:00Z)
         renderFromData(Array.isArray(data)?data:[]);
       }catch(err){
         console.error(err);
