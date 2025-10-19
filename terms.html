@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Terms of Use — Trackmania Events</title>
+  <meta name="description" content="Terms of Use for trackmaniaevents.com" />
+  <meta name="theme-color" content="#0a0f1a" />
+  <style>
+    :root{ --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff; --accent:#3aa0ff; --accent-2:#6dfbff; --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2) }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;background:radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.12), transparent),radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.10), transparent),var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(960px, 92vw); margin:0 auto}
+
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));backdrop-filter: blur(8px);border-bottom:1px solid rgba(109,251,255,.12)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .brand{display:flex;align-items:center;gap:.6rem;font-weight:800}
+    .brand-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow)}
+    .navlinks{display:flex;gap:1.1rem}
+    .btn{padding:.55rem .9rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));font-weight:700}
+
+    main{padding: clamp(1.5rem, 4vw, 2.5rem) 0 3rem}
+    .title{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:900;margin:0 0 .6rem}
+    .card{border:1px solid rgba(109,251,255,.15);background:linear-gradient(180deg, rgba(10,15,26,.8), rgba(10,15,26,.55));border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card-body{padding:1.1rem 1.1rem}
+    p{line-height:1.65}
+    ul{margin:.3rem 0 .8rem 1.1rem}
+    li{margin:.25rem 0}
+
+    footer{border-top:1px solid rgba(109,251,255,.12);padding:1.5rem 0;font-size:.95rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/">
+        <span class="brand-badge">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
+      <nav class="navlinks">
+        <a href="/">Home</a>
+        <a href="/index.html#schedule">Events</a>
+        <a href="/index.html#live">Live</a>
+        <a href="/index.html#contact" class="btn">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1 class="title">Terms of Use</h1>
+      <div class="card"><div class="card-body">
+        <p><strong>Last updated:</strong> <span id="updated"></span></p>
+        <h3>1. Acceptance</h3>
+        <p>By accessing or using this site, you agree to these Terms of Use.</p>
+        <h3>2. Purpose</h3>
+        <p>This site provides information about Trackmania events, live streams, and community activities. It’s provided on an “as is” basis.</p>
+        <h3>3. User conduct</h3>
+        <ul>
+          <li>Don’t attempt to disrupt the site or other users.</li>
+          <li>Don’t submit unlawful, abusive, or infringing content through forms.</li>
+        </ul>
+        <h3>4. Intellectual property</h3>
+        <p>All trademarks, logos, and game assets are the property of their respective owners. Original site design and content © Trackmania Events.</p>
+        <h3>5. Links & third parties</h3>
+        <p>We may link to external services (e.g., Twitch, Discord, Formspree). We don’t control third-party content and aren’t responsible for their policies.</p>
+        <h3>6. Changes</h3>
+        <p>We may update these terms at any time by posting a new version here. Continued use of the site means you accept the updated terms.</p>
+        <h3>7. Contact</h3>
+        <p>Questions? Email <a href="mailto:contact@trackmaniaevents.com">contact@trackmaniaevents.com</a>.</p>
+      </div></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div><a href="/privacy.html">Privacy</a> • <a href="/terms.html">Terms</a></div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('updated').textContent = new Date().toLocaleDateString(undefined, {year:'numeric', month:'long', day:'2-digit'});
+  </script>
+</body>
+</html>
