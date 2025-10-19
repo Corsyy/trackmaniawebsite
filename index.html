@@ -172,6 +172,42 @@
   transform: scale(1.04);
 }
 
+/* --- Event cards with auto-fitted background image --- */
+.event.with-bg {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1rem;
+  color: var(--text);
+  text-shadow: 0 1px 3px rgba(0,0,0,.8);
+}
+
+/* actual image layer */
+.event.with-bg::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image: var(--event-img);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.85) saturate(1.1);
+  z-index:0;
+}
+
+/* overlay for readability */
+.event.with-bg::after{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(180deg, rgba(15,21,36,.65), rgba(15,21,36,.55));
+  z-index:1;
+}
+
+/* keep text above image/overlay */
+.event.with-bg *{ position:relative; z-index:2; }
 
 
     /* ====== RESPONSIVE ====== */
