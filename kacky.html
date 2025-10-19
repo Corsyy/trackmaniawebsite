@@ -7,6 +7,12 @@
   <meta name="description" content="Upload and view Trackmania Kacky finish clips. Community submissions, moderated for quality." />
   <style>
     body{margin:0;font-family:system-ui;background:#0a0f1a;color:#e6ecff;}
+    header{background:#0f1524;padding:1rem 0;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(109,251,255,.2);}
+    .nav-container{width:min(1200px,92vw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+    .brand{font-weight:800;font-size:1.2rem;letter-spacing:.3px;display:flex;align-items:center;gap:.4rem;color:#6dfbff;}
+    .btn-nav{padding:.5rem 1rem;border:1px solid rgba(109,251,255,.3);border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s;}
+    .btn-nav:hover{transform:translateY(-1px);}
+
     .container{width:min(1200px,92vw);margin:0 auto;padding:2rem 0;}
     h1{font-size:2.2rem;margin-bottom:1rem;}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
@@ -21,6 +27,13 @@
   </style>
 </head>
 <body>
+  <header>
+    <div class="nav-container">
+      <div class="brand">🏎️ Kacky Finishes</div>
+      <a href="/" class="btn-nav">🏠 Home</a>
+    </div>
+  </header>
+
   <div class="container">
     <h1>Kacky Finishes</h1>
     <p>Upload your Kacky finish clips below! Approved clips will appear automatically once reviewed.</p>
@@ -89,30 +102,66 @@
     modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open');});
 
     // Form submission
-    const form=document.getElementById('submitForm');
-    const status=document.getElementById('submitStatus');
-    form.addEventListener('submit',async e=>{
-      e.preventDefault();
-      status.textContent='Sending…';
-      const data=new FormData(form);
-      const payload=Object.fromEntries(data.entries());
-      payload.slot = Math.max(1, Math.min(75, Number(payload.slot)));
-      payload.approved = false;
-      try{
-        const res=await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips`,{
-          method:'POST',
-          headers:{'Content-Type':'application/json',apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,'Prefer':'return=minimal'},
-          body:JSON.stringify(payload)
-        });
-        if(!res.ok) throw new Error('Error');
-        status.textContent='✅ Submitted! Awaiting approval.';
-        form.reset();
-        setTimeout(()=>{modal.classList.remove('open');status.textContent='';},1500);
-      }catch(err){
-        console.error(err);
-        status.textContent='⚠️ Failed to submit.';
+    (function(){
+      const form=document.getElementById('submitForm');
+      const status=document.getElementById('submitStatus');
+      const modal=document.getElementById('submit-modal');
+
+      function isValidClipUrl(u){
+        try{ const h=new URL(u).hostname; return /twitch\.tv|youtube\.com|youtu\.be/i.test(h); }
+        catch{return false;}
       }
-    });
+      function clampSlot(n){ n=Number(n||0); return Math.min(75, Math.max(1, n)); }
+
+      form?.addEventListener('submit', async e => {
+        e.preventDefault();
+        status.textContent='Sending…';
+
+        const fd = new FormData(form);
+        const dateRaw = (fd.get('date')||'').toString().trim();
+        const payload = {
+          title: (fd.get('title')||'').toString().trim(),
+          url:   (fd.get('url')||'').toString().trim(),
+          slot:  clampSlot(fd.get('slot')),
+          map:   (fd.get('map')||'').toString().trim() || null,
+          thumb: (fd.get('thumb')||'').toString().trim() || null,
+          date:  dateRaw ? new Date(dateRaw).toISOString() : null,
+          approved: false
+        };
+
+        if(!isValidClipUrl(payload.url)){
+          status.textContent = 'Please enter a Twitch or YouTube URL.';
+          return;
+        }
+
+        try{
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              Prefer: 'return=minimal'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if(!res.ok){
+            const txt = await res.text();
+            status.textContent = `⚠️ ${res.status} ${txt || 'Submission failed'}`;
+            console.error('Supabase insert error:', res.status, txt);
+            return;
+          }
+
+          status.textContent='✅ Submitted! Awaiting approval.';
+          form.reset();
+          setTimeout(()=>{ modal.classList.remove('open'); status.textContent=''; },1200);
+        }catch(err){
+          console.error(err);
+          status.textContent='⚠️ Network error. Please try again later.';
+        }
+      });
+    })();
 
     loadClips();
   </script>
