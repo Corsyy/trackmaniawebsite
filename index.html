@@ -133,9 +133,9 @@
   <section class="hero">
     <div class="container hero-grid">
       <div>
-        <span class="chip">Next Event • Trackmania Cup Qualifiers</span>
-        <h1 class="h1">Clean, pro-grade Trackmania streaming hub.</h1>
-        <p class="lead">Home page doubles as your events hub. Neon accents, slick motion (no frameworks), and a built-in Twitch player so your community can jump in fast.</p>
+        <span class="chip">Next Event • Map together</span>
+        <h1 class="h1">Come check out the most recent trackmania events</h1>
+        <p class="lead">If you have any ideas for any other trackmania events scroll down below and contact me or join the discord!</p>
 
         <div class="keyfacts">
           <div class="pill">🗓️ October 25th • 6:00 PM ET</div>
@@ -240,34 +240,27 @@
     <div class="container">
       <h2 class="title">Contact</h2>
       <div class="grid" style="grid-template-columns:2fr 1fr">
-        <form class="card" onsubmit="event.preventDefault(); alert('Form demo. Wire to your backend/service.');">
-          <div class="card-body">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:.8rem">
-              <div>
-                <label>Name</label>
-                <input required placeholder="Your name" style="width:100%; margin-top:.35rem; padding:.65rem .8rem; border-radius:10px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)" />
-              </div>
-              <div>
-                <label>Email</label>
-                <input type="email" required placeholder="name@example.com" style="width:100%; margin-top:.35rem; padding:.65rem .8rem; border-radius:10px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)" />
-              </div>
-            </div>
-            <div style="margin-top:.8rem">
-              <label>Message</label>
-              <textarea required placeholder="How can we help?" rows="5" style="width:100%; margin-top:.35rem; padding:.75rem .8rem; border-radius:12px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)"></textarea>
-            </div>
-            <div style="margin-top:1rem; display:flex; gap:.6rem">
-              <button class="btn primary" type="submit">Send</button>
-              <a class="btn" href="mailto:contact@yoursite.com">Email</a>
-            </div>
-          </div>
-        </form>
+        <form
+  action="https://formspree.io/f/xblzbdbq"
+  method="POST"
+>
+  <label>
+    Your email:
+    <input type="email" name="email">
+  </label>
+  <label>
+    Your message:
+    <textarea name="message"></textarea>
+  </label>
+  <!-- your other form fields go here -->
+  <button type="submit">Send</button>
+</form>
         <aside class="card">
           <div class="card-body">
-            <strong>Business</strong>
-            <div class="meta">sponsorships@yoursite.com</div>
-            <div class="meta">media@yoursite.com</div>
-            <div class="meta" style="margin-top:.6rem">Discord: yourserver.gg/invite</div>
+            <strong></strong>
+            <div class="meta"></div>
+            <div class="meta"></div>
+            <div class="meta" style="margin-top:.6rem">Discord: https://discord.gg/9bDcTTbTGJ</div>
           </div>
         </aside>
       </div>
