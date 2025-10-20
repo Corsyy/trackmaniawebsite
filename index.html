@@ -72,7 +72,7 @@
     .hero-row{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:start;margin-top:1rem}
     .hero-row > div:first-child {margin-top:5.0rem}
 
-    #countdown-card{border:1px solid rgba(109,251,255,.18);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden;background-clip:padding-box,padding-box;background-image:linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)), var(--cd-img, none);background-size:cover,cover;background-position:center,center;background-repeat:no-repeat,no-repeat}
+    #countdown-card{border:1px solid rgba(109,251,255,.18);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.35);overflow:hidden;background-clip:padding-box,padding-box;background-image:linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)), var(--cd-img, none);background-size:contain,cover;background-position:center,center;background-repeat:no-repeat,no-repeat}
 
     .live{margin-top:0}
     .live .player{aspect-ratio:16/9;width:100%;border:0;border-radius:16px;overflow:hidden;box-shadow:var(--accent-glow)}
@@ -102,7 +102,7 @@
     #toTop{position:fixed;right:18px;bottom:18px;padding:.6rem .8rem;border-radius:12px;border:1px solid rgba(109,251,255,.25);background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s}
     #toTop.show{opacity:1;pointer-events:auto}
 
-    .event.with-bg{background-image:linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)), var(--event-img);background-size:cover,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;overflow:hidden;background-clip:padding-box,padding-box;min-height:180px;border-radius:16px}
+    .event.with-bg{background-image:linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)), var(--event-img);background-size:contain,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;overflow:hidden;background-clip:padding-box,padding-box;min-height:180px;border-radius:16px}
     .event.with-bg:hover{background-image:linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)), var(--event-img)}
 
     .nav-toggle{display:none}
