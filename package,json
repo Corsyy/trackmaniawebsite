@@ -1,5 +1,9 @@
 {
-  "name": "trackmaniaevents",
+  "name": "trackmaniaevents-site",
   "private": true,
-  "type": "module"
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "cotd": "node scripts/cotd-fetcher.js"
+  }
 }
