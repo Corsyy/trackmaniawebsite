@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
   schedule:
     - cron: "10 3 * * *"  # run once per day at 03:10 UTC
-    # or use "*/30 * * * *" if you really want every 30 minutes
+    # or use "*/30 * * * *" if you want every 30 minutes
 
 permissions:
   contents: write
@@ -13,41 +13,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 🟢 Add this step right here
-      - name: Ensure data dir exists
+      - name: Ensure data directory exists
         run: mkdir -p data/totd
 
-      - name: Debug tree
-        run: |
-          pwd
-          ls -la
-          [ -d scripts ] && ls -la scripts || echo "No scripts dir found"
-
-      # current month (writes data/totd/YYYY-MM.json)
-      - name: Run fetcher (current month)
+      - name: Run fetcher for current month
         run: node scripts/cotd-fetcher.js
 
-      # optional: also refresh previous month in case of late updates
-      - name: Run fetcher (previous month)
+      - name: Run fetcher for previous month (handles late updates)
         run: |
           PREV=$(date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)
-          echo "Refreshing $PREV"
+          echo "Refreshing previous month: $PREV"
           node scripts/cotd-fetcher.js "$PREV"
 
-      - name: Commit & push if changed
+      - name: Show generated files (debug)
+        run: |
+          echo "==== Repository root ===="
+          ls -la
+          echo "==== data/totd directory ===="
+          [ -d data/totd ] && ls -la data/totd || echo "No data/totd directory found"
+
+      - name: Commit & push if changes exist
         run: |
           if [[ -n "$(git status --porcelain -- data/totd/)" ]]; then
-            git config user.name  "github-actions[bot]"
+            git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add data/totd/
             git commit -m "Update monthly COTD JSON [skip ci]"
@@ -55,3 +53,6 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
+      - name: Ensure .nojekyll for GitHub Pages
+        run: touch .nojekyll
