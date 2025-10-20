@@ -5,20 +5,54 @@ const MONTH = (process.argv[2] || new Date().toISOString().slice(0, 7)); // "YYY
 const OUTDIR = path.join("data", "totd");
 const OUTFILE = path.join(OUTDIR, `${MONTH}.json`);
 
+const BROWSER_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+  "Accept": "application/json, text/plain, */*",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Referer": "https://trackmania.io/",
+  "Origin": "https://trackmania.io",
+  "Cache-Control": "no-cache",
+  "Pragma": "no-cache",
+};
+
+async function getJson(url, purpose = "generic", maxRetries = 4) {
+  let lastErr;
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      const r = await fetch(url, { headers: BROWSER_HEADERS });
+      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+      // Some bot edges return HTML — guard against accidental HTML
+      const text = await r.text();
+      // Try JSON parse; if fails, log a snippet
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        if (i === maxRetries) {
+          console.error(`[${purpose}] Non-JSON response from tm.io. First 200 chars:`, text.slice(0, 200));
+        } else {
+          await new Promise(res => setTimeout(res, 500 * (i + 1)));
+          continue;
+        }
+      }
+    } catch (err) {
+      lastErr = err;
+      // Backoff and retry
+      await new Promise(res => setTimeout(res, 700 * (i + 1)));
+    }
+  }
+  throw new Error(`[${purpose}] Failed ${url}: ${lastErr?.message || lastErr}`);
+}
+
 function cleanTM(str = "") {
   return String(str).replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "").trim();
-}
-async function getJson(url, ua = "trackmaniaevents.com (cotd-fetcher)") {
-  const r = await fetch(url, { headers: { "User-Agent": ua } });
-  if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
-  return r.json();
 }
 function ymDiffIndex(targetYM) {
   const [ty, tm] = targetYM.split("-").map(Number);
   const now = new Date();
   const cy = now.getUTCFullYear();
   const cm = now.getUTCMonth() + 1;
-  return (cy - ty) * 12 + (cm - tm); // 0 = current month
+  return (cy - ty) * 12 + (cm - tm); // 0 = current
 }
 function toISO(dateLike) {
   if (!dateLike) return null;
@@ -31,16 +65,13 @@ function toISO(dateLike) {
   const t = Date.parse(String(dateLike));
   return Number.isNaN(t) ? null : new Date(t).toISOString().slice(0, 10);
 }
-function isoMonth(dateISO) { return (dateISO || "").slice(0, 7); }
+const isoMonth = (iso) => (iso || "").slice(0, 7);
 
-/* ---------- map enrichment via tm.io (author + thumbnail) ---------- */
+/* -------- map enrichment via tm.io (author + thumbnail) -------- */
 async function enrichMap(uid) {
   if (!uid) return { author: "", thumbnail: "" };
   try {
-    const m = await getJson(
-      `https://trackmania.io/api/map/${encodeURIComponent(uid)}`,
-      "trackmaniaevents.com (cotd-enrich)"
-    );
+    const m = await getJson(`https://trackmania.io/api/map/${encodeURIComponent(uid)}`, "map");
     const author = m?.authorplayer?.name || m?.authorname || m?.author || "";
     const thumbnail = m?.thumbnail || m?.thumbnailUrl || m?.thumbnailURL || "";
     return { author: cleanTM(author || ""), thumbnail: thumbnail || "" };
@@ -49,12 +80,7 @@ async function enrichMap(uid) {
   }
 }
 
-/* ---------- winners (tm.io best-effort) ---------- */
-async function getJsonTmio(url) {
-  const r = await fetch(url, { headers: { "User-Agent": "trackmaniaevents.com (cotd-winners)" } });
-  if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
-  return r.json();
-}
+/* -------- winners (tm.io best-effort) -------- */
 async function getCotdWinnersFromTmio(dateISO) {
   const tryUrls = [
     `https://trackmania.io/api/cotd/${dateISO}`,
@@ -62,7 +88,7 @@ async function getCotdWinnersFromTmio(dateISO) {
   ];
   for (const url of tryUrls) {
     try {
-      const data = await getJsonTmio(url);
+      const data = await getJson(url, "winners");
       const divisions = data?.divisions || data;
       if (!Array.isArray(divisions)) continue;
       const winners = [];
@@ -81,14 +107,16 @@ async function getCotdWinnersFromTmio(dateISO) {
         }
       }
       if (winners.length) return winners.sort((a, b) => a.division - b.division);
-    } catch { /* try next */ }
+    } catch {
+      // keep trying alt shapes
+    }
   }
-  // Per-division fallback 1..60; stop after 3 misses
+  // per-division fallback with short cap
   let misses = 0;
   const winners = [];
   for (let div = 1; div <= 60; div++) {
     try {
-      const data = await getJsonTmio(`https://trackmania.io/api/cotd/${dateISO}/divisions/${div}`);
+      const data = await getJson(`https://trackmania.io/api/cotd/${dateISO}/divisions/${div}`, "winners-div");
       const top =
         data?.winner ||
         (Array.isArray(data?.results) && data.results[0]) ||
@@ -109,20 +137,19 @@ async function getCotdWinnersFromTmio(dateISO) {
   return winners;
 }
 
-/* ---------- Strategy A: month-index endpoint ---------- */
+/* -------- Strategy A: month-index -------- */
 async function fetchByMonthIndex(targetYM) {
   const index = ymDiffIndex(targetYM);
   const url = `https://trackmania.io/api/totd/${index}`;
-  const data = await getJson(url, "trackmaniaevents.com (cotd-month-index)");
+  const data = await getJson(url, "month-index");
   const days = Array.isArray(data?.days) ? data.days : [];
+
+  // If tm.io gave nothing, return quickly (debug)
   if (!days.length) return { days: [], debug: { strategy: "index", url, got: 0 } };
 
-  // Accept as-is (tm.io should already give the exact month for this index),
-  // but guard by verifying the first/last items’ month.
   const normalized = [];
   for (const d of days) {
-    const date =
-      toISO(d?.day) || toISO(d?.date) || toISO(d?.start) || toISO(d?.end);
+    const date = toISO(d?.day) || toISO(d?.date) || toISO(d?.start) || toISO(d?.end);
     if (!date) continue;
     normalized.push({ raw: d, date });
   }
@@ -137,32 +164,27 @@ async function fetchByMonthIndex(targetYM) {
   };
 }
 
-/* ---------- Strategy B: page-walk (0..N) ---------- */
+/* -------- Strategy B: page-walk -------- */
 async function fetchByPageWalk(targetYM) {
   const collected = [];
   let page = 0;
   let crossedOlder = false;
 
-  while (page < 30 && !crossedOlder) {
+  while (page < 40 && !crossedOlder) {
     const url = `https://trackmania.io/api/totd/${page}`;
-    const data = await getJson(url, "trackmaniaevents.com (cotd-page-walk)");
+    const data = await getJson(url, `page-${page}`);
     const list = Array.isArray(data?.days) ? data.days : [];
+
     if (!list.length) break;
 
-    // Track month bounds on this page
     let pageOldest = null;
-
     for (const d of list) {
-      const date =
-        toISO(d?.day) || toISO(d?.date) || toISO(d?.start) || toISO(d?.end);
+      const date = toISO(d?.day) || toISO(d?.date) || toISO(d?.start) || toISO(d?.end);
       if (!date) continue;
       if (!pageOldest || date < pageOldest) pageOldest = date;
-      if (isoMonth(date) === targetYM) {
-        collected.push({ raw: d, date });
-      }
+      if (isoMonth(date) === targetYM) collected.push({ raw: d, date });
     }
 
-    // Once the oldest item on this page is older than target month, we can stop
     if (pageOldest && isoMonth(pageOldest) < targetYM && collected.length) {
       crossedOlder = true;
     } else {
@@ -174,13 +196,14 @@ async function fetchByPageWalk(targetYM) {
   return { days: collected, debug: { strategy: "pages", pagesScanned: page + 1, got: collected.length } };
 }
 
-/* ---------- main ---------- */
+/* -------- main -------- */
 async function main() {
   console.log(`Fetching TOTDs for ${MONTH} from trackmania.io ...`);
   let result = await fetchByMonthIndex(MONTH);
 
   if (!result.days.length) {
-    console.log(`Index path found 0 or mismatched month, falling back to page-walk...`, result.debug);
+    console.log(`Index path returned 0/mismatch. Debug:`, result.debug);
+    console.log(`Falling back to page-walk…`);
     result = await fetchByPageWalk(MONTH);
   }
 
