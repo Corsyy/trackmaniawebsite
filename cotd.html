@@ -4,19 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Track of the Day — Trackmania Events</title>
-  <meta name="description" content="Latest Track of the Day and Cup of the Day results for Trackmania. View maps, authors, and top winners." />
+  <meta name="description" content="Track of the Day and Cup of the Day results for Trackmania. View maps, authors, and winners by month." />
   <link rel="icon" type="image/png" href="/logo.png" />
   <style>
     :root{
-      --bg:#0a0f1a;
-      --panel:#0f1524;
-      --text:#e6ecff;
-      --muted:#9bb0ff;
-      --accent:#3aa0ff;
-      --accent-2:#6dfbff;
-      --accent-glow:0 0 24px rgba(61,165,255,.35);
-      --border: rgba(109,251,255,.15);
-      --border-2: rgba(109,251,255,.2);
+      --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff;
+      --accent:#3aa0ff; --accent-2:#6dfbff; --border: rgba(109,251,255,.15); --border-2: rgba(109,251,255,.2);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; background:var(--bg); color:var(--text)}
@@ -26,7 +19,12 @@
     .brand{font-weight:800;letter-spacing:.3px;display:flex;align-items:center;gap:.4rem;}
     .nav a{color:var(--muted);text-decoration:none;margin-left:1rem;}
     .nav a:hover{color:var(--accent-2);}
-    .title{font-size:1.9rem;font-weight:900;margin:2rem 0 1rem;}
+    .title{font-size:1.9rem;font-weight:900;margin:2rem 0 0.5rem;}
+    .sub{color:var(--muted);margin-bottom:1rem}
+    .controls{display:flex;align-items:center;gap:.6rem;margin:0.75rem 0 1.25rem;}
+    .btn{border:1px solid var(--border);background:var(--panel);color:var(--text);padding:.5rem .8rem;border-radius:10px;cursor:pointer}
+    .btn:hover{border-color:var(--accent-2)}
+    .month-pill{border:1px solid var(--border);padding:.45rem .8rem;border-radius:999px;color:var(--muted);background:linear-gradient(180deg,rgba(15,21,36,.9),rgba(15,21,36,.6))}
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr);}}
     @media(max-width:640px){.grid{grid-template-columns:1fr;}}
@@ -39,6 +37,7 @@
     .cotd-title{font-weight:800;font-size:1.1rem;margin:0 0 .4rem;}
     .cotd-meta{color:var(--muted);font-size:.9rem;margin-top:.25rem;}
     footer{border-top:1px solid rgba(109,251,255,.12);padding:1.2rem 0;text-align:center;color:var(--muted);margin-top:3rem;}
+    .empty{border:1px dashed var(--border-2);border-radius:12px;padding:1rem;text-align:center;color:var(--muted);}
   </style>
 </head>
 <body>
@@ -54,9 +53,16 @@
   </header>
 
   <main class="container">
-    <h1 class="title">Track of the Day (Last 10)</h1>
+    <h1 class="title">Track of the Day</h1>
+    <div class="sub">Browse by month. Authors, thumbnails, and COTD winners are included when available.</div>
+    <div class="controls">
+      <button id="prev" class="btn">← Prev</button>
+      <div id="month-pill" class="month-pill">—</div>
+      <button id="next" class="btn">Next →</button>
+    </div>
+
     <div class="grid" id="cotd-grid">
-      <article class="cotd-card"><div class="cotd-body">Loading tracks…</div></article>
+      <article class="cotd-card"><div class="cotd-body">Loading month…</div></article>
     </div>
   </main>
 
@@ -67,37 +73,53 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function ymOf(d){ return d.getUTCFullYear() + "-" + pad2(d.getUTCMonth()+1); }
     function cleanTM(str = "") {
       return String(str).replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "").trim();
     }
-    function looksLikeUUID(s = "") {
-      return /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s);
-    }
 
-    (async function loadCOTD(){
-      const grid = document.getElementById('cotd-grid');
-      const showMsg = (msg) => { grid.innerHTML = `<article class="cotd-card"><div class="cotd-body">${msg}</div></article>`; };
+    // Start on current month
+    let current = new Date();
+    let currentYM = ymOf(current);
 
-      try {
-        const res = await fetch('/cotd.json?cb=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) return showMsg(`Couldn't load cotd.json (HTTP ${res.status}).`);
+    const grid = document.getElementById('cotd-grid');
+    const pill = document.getElementById('month-pill');
 
-        let data;
-        try { data = await res.json(); } catch { return showMsg('cotd.json is not valid JSON.'); }
+    async function loadMonth(ym){
+      pill.textContent = ym;
+      grid.innerHTML = `<article class="cotd-card"><div class="cotd-body">Loading ${ym}…</div></article>`;
 
-        const all = Array.isArray(data) ? data : (data.tracks || []);
-        if (!all.length) return showMsg('No tracks found yet.');
+      try{
+        const res = await fetch(`/data/totd/${ym}.json?cb=${Date.now()}`, {cache: 'no-store'});
+        if(!res.ok){
+          grid.innerHTML = `<div class="empty">No data file for ${ym}. It will appear after your GitHub Action runs.</div>`;
+          return;
+        }
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : (data.tracks || []);
+        if(!items.length){
+          grid.innerHTML = `<div class="empty">No tracks found for ${ym}.</div>`;
+          return;
+        }
 
-        const items = all.slice(-10).reverse();
         grid.innerHTML = '';
+        for(const item of items){
+          const img = item.image || item.thumbnail || '';
+          const name = cleanTM(item.map_name || item.name || 'Track of the Day');
+          const date = item.date || item.day || '';
+          const author = cleanTM(item.author || item.author_name || 'Unknown');
 
-        for (const item of items) {
-          const img    = item.image || item.thumbnail || '';
-          const name   = cleanTM(item.map_name || item.name || 'Track of the Day');
-          const date   = item.date || item.day || '';
-          const rawAuthor = item.author_name || item.author || 'Unknown';
-          const author = looksLikeUUID(rawAuthor) ? 'Unknown' : cleanTM(rawAuthor);
-          const winner = cleanTM(item.cotd_winner || item.ctd_winner || item.winner || '—');
+          // winners: array of { division, displayName }
+          let winnersText = '—';
+          if (Array.isArray(item.winners) && item.winners.length){
+            // Show up to first 3 divisions, then “+N more”
+            const first = item.winners.slice(0,3).map(w => `Div ${w.division}: ${cleanTM(w.displayName || '—')}`);
+            winnersText = first.join(' • ');
+            if (item.winners.length > 3) winnersText += ` • +${item.winners.length - 3} more`;
+          } else if (item.cotd_winner) {
+            winnersText = cleanTM(item.cotd_winner);
+          }
 
           const card = document.createElement('article');
           card.className = 'cotd-card';
@@ -107,16 +129,30 @@
               <div class="cotd-title">${name}</div>
               ${date ? `<div class="cotd-meta">${date}</div>` : ''}
               <div class="cotd-meta">Author: ${author}</div>
-              <div class="cotd-meta">COTD Winner: ${winner}</div>
+              <div class="cotd-meta">COTD Winners: ${winnersText}</div>
             </div>
           `;
           grid.appendChild(card);
         }
-      } catch (e) {
+      }catch(e){
         console.error(e);
-        showMsg('Failed to load tracks (network or CORS).');
+        grid.innerHTML = `<div class="empty">Failed to load ${ym} (network or CORS).</div>`;
       }
-    })();
+    }
+
+    // Month navigation
+    function shiftMonth(delta){
+      const y = Number(currentYM.slice(0,4));
+      const m = Number(currentYM.slice(5)) - 1; // 0-11
+      const d = new Date(Date.UTC(y, m + delta, 1));
+      currentYM = ymOf(d);
+      loadMonth(currentYM);
+    }
+    document.getElementById('prev').addEventListener('click', () => shiftMonth(-1));
+    document.getElementById('next').addEventListener('click', () => shiftMonth(+1));
+
+    // Initial load (current month)
+    loadMonth(currentYM);
   </script>
 </body>
 </html>
