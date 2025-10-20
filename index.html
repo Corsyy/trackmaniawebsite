@@ -54,28 +54,55 @@
     .btn.primary:hover{transform: translateY(-1px)}
 
     /* ====== HERO / EVENT ====== */
-.hero{ position:relative; padding: clamp(2rem, 5vw, 4rem) 0 2.5rem; }
-
-/* 2-column hero */
-.hero-grid{
-  display:grid;
-  grid-template-columns: 1.15fr .85fr;   /* left / right */
-  gap:2rem;
-  align-items:start;
+.hero {
+  position: relative;
+  padding: clamp(2rem, 5vw, 4rem) 0 2.5rem;
 }
 
-/* left column spacing */
-.hero-left{
-  display:flex;
-  flex-direction:column;
-  gap:1.25rem;
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr; /* Left: event info, Right: Twitch */
+  gap: 2rem;
+  align-items: flex-start;
 }
 
-/* right column stacks Twitch then countdown */
-.hero-right{
-  display:flex;
-  flex-direction:column;
-  gap:1rem;
+/* LEFT COLUMN (info + countdown) */
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* RIGHT COLUMN (Twitch) */
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Countdown card sizing */
+#countdown-card {
+  width: 100%;
+  max-width: 640px;
+  align-self: flex-start;
+}
+
+/* Twitch player styling */
+.live .player {
+  aspect-ratio: 16/9;
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--accent-glow);
+}
+
+.live { margin-top: 0; }
+
+/* Responsive stacking */
+@media (max-width: 960px) {
+  .hero-grid {grid-template-columns: 1fr;}
+  .hero-right {margin-top: 2rem;}
 }
 
 /* keep your chip override */
@@ -258,29 +285,16 @@
   <!-- HERO / NEXT EVENT -->
   <section class="hero" id="home">
   <div class="container hero-grid">
-    <!-- LEFT: title + lead + pills -->
+    <!-- LEFT SIDE: all event info + countdown -->
     <div class="hero-left">
-      <span class="chip" id="hero-chip">Next Event</span>
+      <span class="chip" id="hero-chip">Next Event • Map together</span>
       <h1 class="h1">Live Trackmania events and community races</h1>
       <p class="lead">Your central hub for upcoming events, live streams, and highlights.</p>
 
       <div class="keyfacts" id="hero-pills">
-        <div class="pill">🗓️ TBA</div>
-        <div class="pill">📍 Online</div>
-        <div class="pill">🏁 Community races</div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Twitch on top, countdown below -->
-    <div class="hero-right">
-      <div id="live" class="live">
-        <div class="card reveal">
-          <div class="card-header"><strong>Live on Twitch</strong></div>
-          <div class="card-body">
-            <div id="twitch-embed"></div>
-            <div class="note"></div>
-          </div>
-        </div>
+        <div class="pill">🗓️ Oct 25, 2025, 6:00 PM</div>
+        <div class="pill">📍 Stadium — collaborative build</div>
+        <div class="pill">🏁 Build a 'totd' style map together!</div>
       </div>
 
       <div class="card" id="countdown-card" aria-live="polite">
@@ -300,9 +314,23 @@
         </div>
       </div>
     </div>
+
+    <!-- RIGHT SIDE: Twitch -->
+    <div class="hero-right">
+      <div id="live" class="live">
+        <div class="card reveal">
+          <div class="card-header"><strong>Live on Twitch</strong></div>
+          <div class="card-body">
+            <div id="twitch-embed"></div>
+            <div class="note"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="tm-stripes"></div>
 </section>
+
 
   <section id="live-events" class="section">
   <div class="container">
