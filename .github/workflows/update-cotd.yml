@@ -4,7 +4,6 @@ on:
   workflow_dispatch: {}
   schedule:
     - cron: "10 3 * * *"  # run once per day at 03:10 UTC
-    # or use "*/30 * * * *" if you want every 30 minutes
 
 permissions:
   contents: write
@@ -27,23 +26,20 @@ jobs:
       - name: Ensure data directory exists
         run: mkdir -p data/totd
 
-      - name: Run fetcher for current month
-        run: |
-          echo "=== Running COTD fetcher for current month ==="
-          node scripts/cotd-fetcher.js || echo "Fetcher finished with warnings (continuing)"
+      # Current month/season (index 0)
+      - name: Run fetcher (current season)
+        run: node scripts/cotd-fetcher.js 0 || echo "current season wrote nothing (continuing)"
 
-      - name: Run fetcher for previous month (handles late updates)
-        run: |
-          PREV=$(date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)
-          echo "=== Running COTD fetcher for previous month: $PREV ==="
-          node scripts/cotd-fetcher.js "$PREV" || echo "Previous-month fetcher finished with warnings (continuing)"
+      # Previous month/season (index 1) to catch late updates
+      - name: Run fetcher (previous season)
+        run: node scripts/cotd-fetcher.js prev || echo "previous season wrote nothing (continuing)"
 
       - name: Show generated files (debug)
         run: |
-          echo "==== Repository root ===="
-          ls -la
           echo "==== data/totd directory ===="
           [ -d data/totd ] && ls -la data/totd || echo "No data/totd directory found"
+          echo "---- recent JSON heads ----"
+          ls -1t data/totd/*.json | head -n 6 | xargs -I {} sh -c 'echo ">>> {}"; head -n 20 "{}"'
 
       - name: Commit & push if changes exist
         run: |
