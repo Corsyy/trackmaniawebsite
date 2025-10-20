@@ -18,23 +18,20 @@ function ymDiffIndex(targetYM) {
   const now = new Date();
   const cy = now.getUTCFullYear();
   const cm = now.getUTCMonth() + 1;
-  // index 0 = current month; +1 per month going back
-  return (cy - ty) * 12 + (cm - tm);
+  return (cy - ty) * 12 + (cm - tm); // 0 = current month
 }
 function toISO(dateLike) {
-  // try "YYYY-MM-DD" or epoch seconds or ms
   if (!dateLike) return null;
   if (typeof dateLike === "number") {
     const ms = dateLike < 2e10 ? dateLike * 1000 : dateLike;
     const d = new Date(ms);
-    if (!isNaN(d)) return d.toISOString().slice(0, 10);
-    return null;
+    return isNaN(d) ? null : d.toISOString().slice(0, 10);
   }
   if (/^\d{4}-\d{2}-\d{2}/.test(String(dateLike))) return String(dateLike).slice(0, 10);
   const t = Date.parse(String(dateLike));
-  if (Number.isNaN(t)) return null;
-  return new Date(t).toISOString().slice(0, 10);
+  return Number.isNaN(t) ? null : new Date(t).toISOString().slice(0, 10);
 }
+function isoMonth(dateISO) { return (dateISO || "").slice(0, 7); }
 
 /* ---------- map enrichment via tm.io (author + thumbnail) ---------- */
 async function enrichMap(uid) {
@@ -52,7 +49,7 @@ async function enrichMap(uid) {
   }
 }
 
-/* ---------- winners (tm.io best-effort, tolerant to shape changes) ---------- */
+/* ---------- winners (tm.io best-effort) ---------- */
 async function getJsonTmio(url) {
   const r = await fetch(url, { headers: { "User-Agent": "trackmaniaevents.com (cotd-winners)" } });
   if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
@@ -112,42 +109,88 @@ async function getCotdWinnersFromTmio(dateISO) {
   return winners;
 }
 
-/* ---------- fetch target month via tm.io MONTH INDEX ---------- */
-async function fetchMonthByIndex(targetYM) {
+/* ---------- Strategy A: month-index endpoint ---------- */
+async function fetchByMonthIndex(targetYM) {
   const index = ymDiffIndex(targetYM);
-  const data = await getJson(
-    `https://trackmania.io/api/totd/${index}`,
-    "trackmaniaevents.com (cotd-month)"
-  );
-
+  const url = `https://trackmania.io/api/totd/${index}`;
+  const data = await getJson(url, "trackmaniaevents.com (cotd-month-index)");
   const days = Array.isArray(data?.days) ? data.days : [];
-  // Filter to exactly the requested month (tm.io should already give the right month)
-  const filtered = [];
+  if (!days.length) return { days: [], debug: { strategy: "index", url, got: 0 } };
+
+  // Accept as-is (tm.io should already give the exact month for this index),
+  // but guard by verifying the first/last items’ month.
+  const normalized = [];
   for (const d of days) {
     const date =
       toISO(d?.day) || toISO(d?.date) || toISO(d?.start) || toISO(d?.end);
     if (!date) continue;
-    if (date.slice(0, 7) === targetYM) {
-      filtered.push({ raw: d, date });
+    normalized.push({ raw: d, date });
+  }
+  normalized.sort((a, b) => a.date.localeCompare(b.date));
+  const ymFirst = isoMonth(normalized[0]?.date || "");
+  const ymLast  = isoMonth(normalized[normalized.length - 1]?.date || "");
+  const looksRight = (ymFirst === targetYM) || (ymLast === targetYM);
+
+  return {
+    days: looksRight ? normalized : [],
+    debug: { strategy: "index", url, got: normalized.length, ymFirst, ymLast }
+  };
+}
+
+/* ---------- Strategy B: page-walk (0..N) ---------- */
+async function fetchByPageWalk(targetYM) {
+  const collected = [];
+  let page = 0;
+  let crossedOlder = false;
+
+  while (page < 30 && !crossedOlder) {
+    const url = `https://trackmania.io/api/totd/${page}`;
+    const data = await getJson(url, "trackmaniaevents.com (cotd-page-walk)");
+    const list = Array.isArray(data?.days) ? data.days : [];
+    if (!list.length) break;
+
+    // Track month bounds on this page
+    let pageOldest = null;
+
+    for (const d of list) {
+      const date =
+        toISO(d?.day) || toISO(d?.date) || toISO(d?.start) || toISO(d?.end);
+      if (!date) continue;
+      if (!pageOldest || date < pageOldest) pageOldest = date;
+      if (isoMonth(date) === targetYM) {
+        collected.push({ raw: d, date });
+      }
+    }
+
+    // Once the oldest item on this page is older than target month, we can stop
+    if (pageOldest && isoMonth(pageOldest) < targetYM && collected.length) {
+      crossedOlder = true;
+    } else {
+      page++;
     }
   }
-  // Sort chronological
-  filtered.sort((a, b) => a.date.localeCompare(b.date));
-  return filtered;
+
+  collected.sort((a, b) => a.date.localeCompare(b.date));
+  return { days: collected, debug: { strategy: "pages", pagesScanned: page + 1, got: collected.length } };
 }
 
 /* ---------- main ---------- */
 async function main() {
-  console.log(`Fetching TOTDs for ${MONTH} from trackmania.io (index=${ymDiffIndex(MONTH)}) ...`);
-  const monthDays = await fetchMonthByIndex(MONTH);
+  console.log(`Fetching TOTDs for ${MONTH} from trackmania.io ...`);
+  let result = await fetchByMonthIndex(MONTH);
 
-  if (!monthDays.length) {
-    console.error(`No TOTDs found for ${MONTH}`);
+  if (!result.days.length) {
+    console.log(`Index path found 0 or mismatched month, falling back to page-walk...`, result.debug);
+    result = await fetchByPageWalk(MONTH);
+  }
+
+  if (!result.days.length) {
+    console.error(`No TOTDs found for ${MONTH}. Debug:`, result.debug);
     process.exit(1);
   }
 
   const out = [];
-  for (const item of monthDays) {
+  for (const item of result.days) {
     const d = item.raw;
     const date = item.date;
     const mapUid = d?.mapUid || d?.map?.uid || "";
@@ -184,7 +227,7 @@ async function main() {
     OUTFILE,
     JSON.stringify({ month: MONTH, updated: new Date().toISOString(), tracks: out }, null, 2)
   );
-  console.log(`✅ Wrote ${OUTFILE} (${out.length} days).`);
+  console.log(`✅ Wrote ${OUTFILE} (${out.length} days) -> ${OUTFILE}`);
 }
 
 main().catch(err => {
