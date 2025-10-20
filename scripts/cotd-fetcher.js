@@ -1,3 +1,9 @@
+// scripts/cotd-fetcher.js
+// Full-month Track of the Day from trackmania.io (no tokens).
+// Writes: data/totd/YYYY-MM.json
+// Usage: node scripts/cotd-fetcher.js           -> current month (auto-rolls)
+//        node scripts/cotd-fetcher.js 2025-09   -> specific month (optional)
+
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -40,20 +46,17 @@ const isoMonth = (iso) => (iso || "").slice(0, 7);
 async function enrichByMapUid(uid) {
   if (!uid) return {};
   try {
-    // trackmania.io map lookup (public). If this changes, enrichment silently fails.
     const m = await getJson(`https://trackmania.io/api/map/${encodeURIComponent(uid)}`);
     const authorName =
       m?.authorplayer?.name ||
       m?.authorname ||
       m?.author ||
       "";
-
     const thumbnail =
       m?.thumbnail ||
       m?.thumbnailUrl ||
       m?.thumbnailURL ||
       "";
-
     return {
       author_name: authorName ? cleanTM(authorName) : "",
       thumbnail: thumbnail || "",
@@ -74,7 +77,6 @@ async function getCotdWinners(dateISO) {
       const data = await getJson(url);
       const divisions = data?.divisions || data;
       if (!Array.isArray(divisions)) continue;
-
       const winners = [];
       for (const div of divisions) {
         const top =
@@ -121,32 +123,39 @@ async function getCotdWinners(dateISO) {
 
 async function main() {
   try {
-    // Get the latest app feed (the one your original script used successfully)
+    // Use the same feed you know works
     const totd = await getJson("https://trackmania.io/api/totd/0");
     const days = Array.isArray(totd?.days) ? totd.days : [];
     if (!days.length) throw new Error("tm.io returned no days");
 
-    // Decide target month:
-    // - If ARG_MONTH provided, use it.
-    // - Else, use the month of the newest item in /totd/0 (auto-rolls when tm.io flips).
-    const newestISO = days
-      .map(d => toISO(d?.day || d?.date || d?.start || d?.end))
-      .filter(Boolean)
-      .sort((a,b)=>b.localeCompare(a))[0];
-    const fallbackYM = isoMonth(newestISO) || new Date().toISOString().slice(0,7);
-    const TARGET_YM = ARG_MONTH || fallbackYM;
-
-    // Keep ONLY items from TARGET_YM
-    const monthItems = days
+    // Parse all dates in the feed
+    const parsed = days
       .map(d => {
         const date = toISO(d?.day || d?.date || d?.start || d?.end);
         return date ? { d, date } : null;
       })
-      .filter(Boolean)
-      .filter(x => isoMonth(x.date) === TARGET_YM)
-      .sort((a,b)=>a.date.localeCompare(b.date));
+      .filter(Boolean);
 
-    if (!monthItems.length) throw new Error(`No TOTDs found for ${TARGET_YM}`);
+    // Figure out target month
+    const newestISO = parsed.map(x => x.date).sort((a,b)=>b.localeCompare(a))[0];
+    const visibleYM = isoMonth(newestISO) || new Date().toISOString().slice(0,7);
+    const TARGET_YM = ARG_MONTH || visibleYM;
+
+    // Try strict month filter first
+    let monthItems = parsed.filter(x => isoMonth(x.date) === TARGET_YM);
+
+    // 🔥 If strict filter yields 0 (edge case: site hasn’t flipped month yet),
+    // just use EVERYTHING the feed returned and derive the month from newest.
+    if (!monthItems.length) {
+      console.warn(`No items for ${TARGET_YM} in /totd/0; using visible month ${visibleYM} from feed.`);
+      monthItems = parsed; // keep all — they belong to the visible month
+    }
+
+    // Sort chronologically
+    monthItems.sort((a,b)=>a.date.localeCompare(b.date));
+
+    // Derive final month from data (so we write the correct filename)
+    const finalYM = isoMonth(monthItems[0]?.date || TARGET_YM);
 
     const out = [];
     for (const { d, date } of monthItems) {
@@ -170,12 +179,8 @@ async function main() {
       // Enrich if the author looks like a UUID or there’s no thumbnail
       if (!base.thumbnail || looksLikeUUID(base.author)) {
         const extra = await enrichByMapUid(mapUid);
-        if (extra.author_name && !looksLikeUUID(extra.author_name)) {
-          base.author = extra.author_name;
-        }
-        if (extra.thumbnail && !base.thumbnail) {
-          base.thumbnail = extra.thumbnail;
-        }
+        if (extra.author_name && !looksLikeUUID(extra.author_name)) base.author = extra.author_name;
+        if (extra.thumbnail && !base.thumbnail) base.thumbnail = extra.thumbnail;
       }
 
       // Winners (don’t break if missing)
@@ -194,8 +199,8 @@ async function main() {
     }
 
     await mkdir(OUTDIR, { recursive: true });
-    const outfile = path.join(OUTDIR, `${TARGET_YM}.json`);
-    await writeFile(outfile, JSON.stringify({ month: TARGET_YM, updated: new Date().toISOString(), tracks: out }, null, 2));
+    const outfile = path.join(OUTDIR, `${finalYM}.json`);
+    await writeFile(outfile, JSON.stringify({ month: finalYM, updated: new Date().toISOString(), tracks: out }, null, 2));
     console.log(`✅ Wrote ${outfile} (${out.length} days).`);
   } catch (err) {
     console.error("COTD fetch failed:", err);
