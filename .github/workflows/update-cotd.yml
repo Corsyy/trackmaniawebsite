@@ -1,56 +1,19 @@
-name: Update COTD (tm.io, monthly JSON)
+- name: Run fetcher (current month)
+  run: node scripts/cotd-fetcher.js
 
-on:
-  workflow_dispatch: {}
-  schedule:
-    # Run at 03:10 UTC daily (adjust if you want). Your */30 was a bit spammy.
-    - cron: "10 3 * * *"
+- name: Run fetcher (previous month)
+  run: |
+    PREV=$(TZ=UTC date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)
+    node scripts/cotd-fetcher.js "$PREV"
 
-permissions:
-  contents: write
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Show tree (debug)
-        run: |
-          ls -la
-          [ -d scripts ] && ls -la scripts || echo "No /scripts dir yet"
-
-      # Current month (default). The script writes data/totd/YYYY-MM.json
-      - name: Run fetcher (current month)
-        run: node scripts/cotd-fetcher.js
-
-      # Optional: also refresh previous month in case tm.io posts late/edits
-      - name: Run fetcher (previous month)
-        run: |
-          PREV=$(TZ=UTC date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)
-          echo "Refreshing previous month: $PREV"
-          node scripts/cotd-fetcher.js "$PREV"
-
-      - name: Show diff (debug)
-        run: git status --porcelain && git diff --stat || true
-
-      - name: Commit & push if changed
-        run: |
-          # Stage any changes under data/totd/
-          if [[ -n "$(git status --porcelain -- data/totd/)" ]]; then
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/totd/
-            git commit -m "Update monthly COTD JSON [skip ci]"
-            git push
-          else
-            echo "No changes to commit."
-          fi
+- name: Commit & push if changed
+  run: |
+    if [[ -n "$(git status --porcelain -- data/totd/)" ]]; then
+      git config user.name  "github-actions[bot]"
+      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      git add data/totd/
+      git commit -m "Update monthly COTD JSON [skip ci]"
+      git push
+    else
+      echo "No changes to commit."
+    fi
