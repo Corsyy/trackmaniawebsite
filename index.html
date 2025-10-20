@@ -149,43 +149,79 @@
 
 
 
-
+   .nav-toggle { display:none; }
     /* ====== RESPONSIVE ====== */
-    @media (max-width: 960px){
-      .hero-grid{grid-template-columns:1fr}
-      .grid{grid-template-columns:1fr 1fr}
-      .cards{grid-template-columns:1fr 1fr}
-    }
-    @media (max-width: 640px){
-      .navlinks{display:none}
-      .grid, .cards{grid-template-columns:1fr}
-      .countdown{flex-wrap:wrap}
-    }
-    #schedule { --section-img: none !important; }
-    #schedule::before { background: none !important; }
+@media (max-width: 960px){
+  .hero-grid{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr 1fr}
+  .cards{grid-template-columns:1fr 1fr}
+}
+
+/* Mobile menu + small layout */
+@media (max-width: 640px){
+  .nav-toggle{
+    display:block;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));
+    color:var(--text);
+    border-radius:10px;
+    padding:.4rem .6rem;
+  }
+  .navlinks{
+    display:none; /* collapsed by default */
+    position:absolute;
+    top:58px; left:0; right:0;
+    padding:.75rem;
+    background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid rgba(109,251,255,.12);
+    flex-direction:column;
+    gap:.6rem;
+  }
+  .navlinks.show{ display:flex; }
+
+  .grid, .cards{grid-template-columns:1fr}
+  .countdown{flex-wrap:wrap}
+}
+
+#schedule { --section-img: none !important; }
+#schedule::before { background: none !important; }
+
   </style>
 </head>
 <body>
   <!-- NAV -->
-  <header>
-    <div class="container nav">
-      <a class="brand" href="#" aria-label="Trackmania Events Home">
-        <span class="brand-badge" aria-hidden="true">🎮</span>
-        <span>Trackmania Events</span>
-      </a>
-      <nav class="navlinks" aria-label="Primary">
-        <a href="#schedule">Events</a>
-        <a href="#live">Live</a>
-        <a href="/kacky">Kacky Finishes</a>
-        <a href="#showcase">Highlights</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <div class="cta">
-        <a class="btn" href="#schedule">View Schedule</a>
-        <a class="btn primary" href="#live">Watch Live</a>
-      </div>
+<header>
+  <div class="container nav">
+    <a class="brand" href="#" aria-label="Trackmania Events Home">
+      <span class="brand-badge" aria-hidden="true">🎮</span>
+      <span>Trackmania Events</span>
+    </a>
+
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <!-- links... -->
+    </nav>
+
+    <div class="cta">
+      <a class="btn" href="#schedule">View Schedule</a>
+      <a class="btn primary" href="#live">Watch Live</a>
     </div>
-  </header>
+  </div>
+</header>
+
+<script>
+  (function(){
+    const btn = document.getElementById('navToggle');
+    const nav = document.getElementById('primary-nav');
+    if(!btn || !nav) return;
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('show');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  })();
+</script>
 
   <!-- HERO / NEXT EVENT -->
   <section class="hero" id="home">
