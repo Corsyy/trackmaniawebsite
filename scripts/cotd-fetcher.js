@@ -5,21 +5,35 @@ const MONTH = (process.argv[2] || new Date().toISOString().slice(0, 7)); // "YYY
 const OUTDIR = path.join("data", "totd");
 const OUTFILE = path.join(OUTDIR, `${MONTH}.json`);
 
-// -------------- helpers --------------
 function cleanTM(str = "") {
-  // Strip Trackmania color/style codes like $fff, $i, etc.
-  return String(str)
-    .replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "")
-    .trim();
+  return String(str).replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "").trim();
 }
-
 async function getJson(url, ua = "trackmaniaevents.com (cotd-fetcher)") {
   const r = await fetch(url, { headers: { "User-Agent": ua } });
   if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
   return r.json();
 }
+function ymd(input) {
+  // Accept "YYYY-MM-DD", ISO strings, or numbers (epoch seconds/ms)
+  if (!input) return null;
+  let d;
+  if (typeof input === "number") {
+    d = new Date(input * (input < 2e10 ? 1000 : 1));
+  } else if (/^\d{4}-\d{2}-\d{2}/.test(String(input))) {
+    d = new Date(String(input));
+  } else {
+    const t = Date.parse(String(input));
+    if (Number.isNaN(t)) return null;
+    d = new Date(t);
+  }
+  if (isNaN(d)) return null;
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return { y, m, day, ym: `${y}-${m}`, ymd: `${y}-${m}-${day}` };
+}
 
-// Map enrichment via tm.io (author + thumbnail)
+// ---------- map enrichment via tm.io (author + thumbnail) ----------
 async function enrichMap(uid) {
   if (!uid) return { author: "", thumbnail: "" };
   try {
@@ -27,67 +41,30 @@ async function enrichMap(uid) {
       `https://trackmania.io/api/map/${encodeURIComponent(uid)}`,
       "trackmaniaevents.com (cotd-enrich)"
     );
-    const author =
-      m?.authorplayer?.name || m?.authorname || m?.author || "";
-    const thumbnail =
-      m?.thumbnail || m?.thumbnailUrl || m?.thumbnailURL || "";
+    const author = m?.authorplayer?.name || m?.authorname || m?.author || "";
+    const thumbnail = m?.thumbnail || m?.thumbnailUrl || m?.thumbnailURL || "";
     return { author: cleanTM(author || ""), thumbnail: thumbnail || "" };
   } catch {
     return { author: "", thumbnail: "" };
   }
 }
 
-// Walk /api/totd/{page} until we have the whole month.
-async function fetchMonthDays(monthStr) {
-  const days = [];
-  let page = 0;
-  while (page < 30) {
-    const data = await getJson(
-      `https://trackmania.io/api/totd/${page}`,
-      "trackmaniaevents.com (cotd-month)"
-    );
-    const list = Array.isArray(data?.days) ? data.days : [];
-    if (!list.length) break;
-
-    // Keep only items within the target month
-    for (const d of list) {
-      const date = d?.day || d?.date || "";
-      if (date.startsWith(monthStr)) days.push(d);
-    }
-
-    // If this page includes anything older than the target month, and we already have some,
-    // we can stop (we've collected the month).
-    const crossedOlder = list.some(d => (d?.day || "").localeCompare(monthStr) < 0);
-    if (days.length && crossedOlder) break;
-
-    page++;
-  }
-  return days;
-}
-
-// -------------- winners (tm.io best-effort) --------------
+// ---------- winners (tm.io best-effort, tolerant to shape changes) ----------
 async function getJsonTmio(url) {
   const r = await fetch(url, { headers: { "User-Agent": "trackmaniaevents.com (cotd-winners)" } });
   if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
   return r.json();
 }
-
-/**
- * Try to fetch Cup-of-the-Day winners from tm.io for a given ISO date (YYYY-MM-DD).
- * Returns: [{ division: number, displayName: string, accountId?: string }] or [].
- */
 async function getCotdWinnersFromTmio(dateISO) {
   const tryUrls = [
     `https://trackmania.io/api/cotd/${dateISO}`,
     `https://trackmania.io/api/cotd/${dateISO}/divisions`,
   ];
-
   for (const url of tryUrls) {
     try {
       const data = await getJsonTmio(url);
       const divisions = data?.divisions || data;
       if (!Array.isArray(divisions)) continue;
-
       const winners = [];
       for (const div of divisions) {
         const top =
@@ -103,16 +80,10 @@ async function getCotdWinnersFromTmio(dateISO) {
           });
         }
       }
-      if (winners.length) {
-        winners.sort((a, b) => a.division - b.division);
-        return winners;
-      }
-    } catch {
-      // try next format
-    }
+      if (winners.length) return winners.sort((a, b) => a.division - b.division);
+    } catch { /* try next */ }
   }
-
-  // Fallback: query per-division endpoints 1..60; stop after 3 misses in a row
+  // Per-division fallback 1..60; stop after 3 misses
   let misses = 0;
   const winners = [];
   for (let div = 1; div <= 60; div++) {
@@ -131,14 +102,52 @@ async function getCotdWinnersFromTmio(dateISO) {
         });
         misses = 0;
       } else if (++misses >= 3) break;
-    } catch {
-      if (++misses >= 3) break;
-    }
+    } catch { if (++misses >= 3) break; }
   }
   return winners;
 }
 
-// -------------- main --------------
+// ---------- fetch month (robust date parsing; no brittle startsWith) ----------
+async function fetchMonthDays(targetYM) {
+  const days = [];
+  let page = 0;
+  // walk pages until we’ve clearly passed the target month
+  while (page < 40) {
+    const data = await getJson(
+      `https://trackmania.io/api/totd/${page}`,
+      "trackmaniaevents.com (cotd-month)"
+    );
+    const list = Array.isArray(data?.days) ? data.days : [];
+    if (!list.length) break;
+
+    for (const d of list) {
+      // pick the best date field we can find
+      const candidates = [d?.day, d?.date, d?.start, d?.end];
+      let got = null;
+      for (const c of candidates) {
+        const p = ymd(c);
+        if (p) { got = p; break; }
+      }
+      if (!got) continue;
+      if (got.ym === targetYM) days.push({ raw: d, ymd: got.ymd });
+    }
+
+    // decide if we can stop: if the OLDEST item on this page is before the month
+    const sorted = list
+      .map(x => ymd(x?.day || x?.date || x?.start || x?.end))
+      .filter(Boolean)
+      .sort((a, b) => a.ymd.localeCompare(b.ymd));
+    if (sorted.length) {
+      const oldest = sorted[0];
+      if (oldest.ym < targetYM && days.length) break;
+    }
+
+    page++;
+  }
+  return days;
+}
+
+// ---------- main ----------
 async function main() {
   console.log(`Fetching TOTDs for ${MONTH} from trackmania.io ...`);
   const monthDays = await fetchMonthDays(MONTH);
@@ -148,35 +157,30 @@ async function main() {
     process.exit(1);
   }
 
-  // Sort chronologically
-  monthDays.sort((a, b) => (a?.day || "").localeCompare(b?.day || ""));
+  // ensure chronological order
+  monthDays.sort((a, b) => a.ymd.localeCompare(b.ymd));
 
   const out = [];
-  for (const d of monthDays) {
-    const date = d?.day || d?.date || "";
+  for (const item of monthDays) {
+    const d = item.raw;
+    const date = item.ymd;
     const mapUid = d?.mapUid || d?.map?.uid || "";
     const name = cleanTM(d?.name || d?.map?.name || "Track of the Day");
 
-    // author/thumbnail (inline if present)
-    let author = cleanTM(
-      d?.map?.authorplayer?.name || d?.map?.authorname || d?.map?.author || ""
-    );
+    // inline author/thumbnail if present
+    let author = cleanTM(d?.map?.authorplayer?.name || d?.map?.authorname || d?.map?.author || "");
     let thumbnail = d?.map?.thumbnail || "";
 
-    // fallback enrichment if needed
+    // fallback enrich
     if (!author || !thumbnail) {
       const extra = await enrichMap(mapUid);
       if (!author && extra.author) author = extra.author;
       if (!thumbnail && extra.thumbnail) thumbnail = extra.thumbnail;
     }
 
-    // winners (best-effort; skips quietly if not available)
+    // winners best-effort
     let winners = [];
-    try {
-      winners = await getCotdWinnersFromTmio(date);
-    } catch {
-      winners = [];
-    }
+    try { winners = await getCotdWinnersFromTmio(date); } catch {}
 
     out.push({
       date,
@@ -185,7 +189,7 @@ async function main() {
       mapUid,
       thumbnail: thumbnail || "",
       image: thumbnail || "",
-      winners, // array of { division, displayName, accountId? }
+      winners
     });
   }
 
