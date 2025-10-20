@@ -15,8 +15,11 @@
       --accent:#3aa0ff;
       --accent-2:#6dfbff;
       --accent-glow:0 0 24px rgba(61,165,255,.35);
+      --border: rgba(109,251,255,.15);
+      --border-2: rgba(109,251,255,.2);
     }
-    body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; background:var(--bg); color:var(--text)}
     .container{width:min(1200px,92vw);margin:0 auto;}
     header{background:#0f1524;border-bottom:1px solid rgba(109,251,255,.12);padding:1rem 0;position:sticky;top:0;z-index:10;}
     .nav{display:flex;align-items:center;justify-content:space-between;}
@@ -27,12 +30,14 @@
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr);}}
     @media(max-width:640px){.grid{grid-template-columns:1fr;}}
-    .cotd-card{border:1px solid rgba(109,251,255,.15);border-radius:16px;background:linear-gradient(180deg,rgba(15,21,36,.9),rgba(15,21,36,.6));overflow:hidden;transition:transform .15s ease;}
+    .cotd-card{border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,rgba(15,21,36,.9),rgba(15,21,36,.6));overflow:hidden;transition:transform .15s ease;}
     .cotd-card:hover{transform:translateY(-3px);box-shadow:0 0 25px rgba(61,165,255,.25);}
-    .cotd-thumb{aspect-ratio:16/9;background-size:cover;background-position:center;border-bottom:1px dashed rgba(109,251,255,.2);}
+    .cotd-thumb{aspect-ratio:16/9;background-size:cover;background-position:center;border-bottom:1px dashed var(--border-2);position:relative;}
+    .cotd-thumb.empty{background-image:linear-gradient(135deg, rgba(58,160,255,.12), rgba(109,251,255,.08));}
+    .cotd-thumb.empty::after{content:"No preview"; position:absolute; inset:0; display:grid; place-items:center; color:var(--muted); font-size:.9rem;}
     .cotd-body{padding:1rem;}
     .cotd-title{font-weight:800;font-size:1.1rem;margin:0 0 .4rem;}
-    .cotd-meta{color:var(--muted);font-size:.9rem;margin-top:.2rem;}
+    .cotd-meta{color:var(--muted);font-size:.9rem;margin-top:.25rem;}
     footer{border-top:1px solid rgba(109,251,255,.12);padding:1.2rem 0;text-align:center;color:var(--muted);margin-top:3rem;}
   </style>
 </head>
@@ -60,70 +65,58 @@
   </footer>
 
   <script>
-  // footer year
-  document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-  (async function loadCOTD() {
-    const grid = document.getElementById('cotd-grid');
-    if (!grid) return;
-
-    // helper for showing a simple error card
-    const showMsg = (msg) => {
-      grid.innerHTML =
-        `<article class="cotd-card"><div class="cotd-body">${msg}</div></article>`;
-    };
-
-    try {
-      const res = await fetch('/cotd.json?cb=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) {
-        showMsg(`Couldn't load cotd.json (HTTP ${res.status}).`);
-        return;
-      }
-
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        showMsg('cotd.json is not valid JSON.');
-        return;
-      }
-
-      // Support either an array or { tracks: [...] }
-      const all = Array.isArray(data) ? data : (data.tracks || []);
-      if (!Array.isArray(all) || all.length === 0) {
-        showMsg('No tracks found yet.');
-        return;
-      }
-
-      // last 10 (newest first)
-      const items = all.slice(-10).reverse();
-
-      grid.innerHTML = '';
-      items.forEach(item => {
-        const img   = item.image || '';
-        const name  = item.map_name || item.name || 'Track of the Day';
-        const date  = item.date || item.day || '';
-        const author= item.author || 'Unknown';
-        const winner= item.cotd_winner || item.ctd_winner || item.winner || '—';
-
-        const el = document.createElement('article');
-        el.className = 'cotd-card';
-        el.innerHTML = `
-          <div class="cotd-thumb" style="background-image:url('${img}')"></div>
-          <div class="cotd-body">
-            <div class="cotd-title">${name}</div>
-            <div class="cotd-meta">${date}</div>
-            <div class="cotd-meta">Author: ${author}</div>
-            <div class="cotd-meta">COTD Winner: ${winner}</div>
-          </div>
-        `;
-        grid.appendChild(el);
-      });
-    } catch (err) {
-      console.error(err);
-      showMsg('Failed to load tracks (network or CORS).');
+    function cleanTM(str = "") {
+      return String(str).replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "").trim();
     }
-  })();
-</script>
+    function looksLikeUUID(s = "") {
+      return /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s);
+    }
+
+    (async function loadCOTD(){
+      const grid = document.getElementById('cotd-grid');
+      const showMsg = (msg) => { grid.innerHTML = `<article class="cotd-card"><div class="cotd-body">${msg}</div></article>`; };
+
+      try {
+        const res = await fetch('/cotd.json?cb=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return showMsg(`Couldn't load cotd.json (HTTP ${res.status}).`);
+
+        let data;
+        try { data = await res.json(); } catch { return showMsg('cotd.json is not valid JSON.'); }
+
+        const all = Array.isArray(data) ? data : (data.tracks || []);
+        if (!all.length) return showMsg('No tracks found yet.');
+
+        const items = all.slice(-10).reverse();
+        grid.innerHTML = '';
+
+        for (const item of items) {
+          const img    = item.image || item.thumbnail || '';
+          const name   = cleanTM(item.map_name || item.name || 'Track of the Day');
+          const date   = item.date || item.day || '';
+          const rawAuthor = item.author_name || item.author || 'Unknown';
+          const author = looksLikeUUID(rawAuthor) ? 'Unknown' : cleanTM(rawAuthor);
+          const winner = cleanTM(item.cotd_winner || item.ctd_winner || item.winner || '—');
+
+          const card = document.createElement('article');
+          card.className = 'cotd-card';
+          card.innerHTML = `
+            <div class="cotd-thumb ${img ? '' : 'empty'}" style="${img ? `background-image:url('${img}')` : ''}"></div>
+            <div class="cotd-body">
+              <div class="cotd-title">${name}</div>
+              ${date ? `<div class="cotd-meta">${date}</div>` : ''}
+              <div class="cotd-meta">Author: ${author}</div>
+              <div class="cotd-meta">COTD Winner: ${winner}</div>
+            </div>
+          `;
+          grid.appendChild(card);
+        }
+      } catch (e) {
+        console.error(e);
+        showMsg('Failed to load tracks (network or CORS).');
+      }
+    })();
+  </script>
 </body>
 </html>
