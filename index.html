@@ -122,6 +122,22 @@
 
     #schedule{--section-img:none !important}
     #schedule::before{background:none !important}
+
+.form .field{display:flex;flex-direction:column;gap:.35rem}
+.form .twocol{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.input,.textarea{
+  width:100%;
+  padding:.7rem .85rem;
+  border-radius:12px;
+  border:1px solid rgba(109,251,255,.22);
+  background:#0c1224;
+  color:var(--text);
+}
+.input::placeholder,.textarea::placeholder{color:rgba(155,176,255,.8)}
+.help{font-size:.85rem;color:var(--muted)}
+@media (max-width:640px){ .form .twocol{grid-template-columns:1fr} }
+
+
   </style>
 </head>
 <body>
