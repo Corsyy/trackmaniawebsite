@@ -73,70 +73,100 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    // ----- helpers -----
     function pad2(n){ return String(n).padStart(2,'0'); }
     function ymOf(d){ return d.getUTCFullYear() + "-" + pad2(d.getUTCMonth()+1); }
+    function namedSlugOf(d){
+      const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      return `${names[d.getUTCMonth()]}-${d.getUTCFullYear()}`; // e.g. October-2025
+    }
     function cleanTM(str = "") {
       return String(str).replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "").trim();
     }
 
-    // Start on current month
-    let current = new Date();
+    // current month we try to show (UTC)
+    let current = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1));
     let currentYM = ymOf(current);
 
     const grid = document.getElementById('cotd-grid');
     const pill = document.getElementById('month-pill');
 
+    async function fetchJsonMaybe(url){
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`${url} -> ${res.status}`);
+      const data = await res.json();
+      if (!data || !Array.isArray(data.tracks)) throw new Error(`bad JSON shape for ${url}`);
+      if (!data.tracks.length) throw new Error(`empty tracks in ${url}`);
+      return { url, data };
+    }
+
     async function loadMonth(ym){
+      const d = new Date(Date.UTC(Number(ym.slice(0,4)), Number(ym.slice(5))-1, 1));
+      const slug = namedSlugOf(d);
+
       pill.textContent = ym;
       grid.innerHTML = `<article class="cotd-card"><div class="cotd-body">Loading ${ym}…</div></article>`;
 
-      try{
-        const res = await fetch(`/data/totd/${ym}.json?cb=${Date.now()}`, {cache: 'no-store'});
-        if(!res.ok){
-          grid.innerHTML = `<div class="empty">No data file for ${ym}. It will appear after your GitHub Action runs.</div>`;
+      // IMPORTANT: use relative paths so it also works on GitHub Pages subpaths
+      const tries = [
+        `data/totd/${ym}.json?cb=${Date.now()}`,   // numeric file (YYYY-MM.json)
+        `data/totd/${slug}.json?cb=${Date.now()}`, // named file (October-2025.json)
+      ];
+
+      let loaded = null;
+      for (const url of tries) {
+        try { loaded = await fetchJsonMaybe(url); break; } catch (e) { console.warn(e.message); }
+      }
+
+      // If still nothing, fallback to previous month’s numeric file
+      if (!loaded) {
+        const prev = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)); prev.setUTCDate(0);
+        const prevYM = ymOf(prev);
+        try {
+          loaded = await fetchJsonMaybe(`data/totd/${prevYM}.json?cb=${Date.now()}`);
+          // reflect fallback month in the pill
+          pill.textContent = prevYM;
+        } catch (e) {
+          console.error('No data for current or previous month', e);
+          grid.innerHTML = `<div class="empty">No month data found yet. Check your GitHub Action output under <code>data/totd/</code>.</div>`;
           return;
         }
-        const data = await res.json();
-        const items = Array.isArray(data) ? data : (data.tracks || []);
-        if(!items.length){
-          grid.innerHTML = `<div class="empty">No tracks found for ${ym}.</div>`;
-          return;
+      }
+
+      const { url, data } = loaded;
+      const items = data.tracks || [];
+      // show which month we actually loaded (prefer server-provided label)
+      pill.textContent = data.month || data.month_numeric || (url.match(/(\d{4}-\d{2}|[A-Za-z]+-\d{4})/)?.[1]) || ym;
+
+      grid.innerHTML = '';
+      for(const item of items){
+        const img = item.image || item.thumbnail || '';
+        const name = cleanTM(item.map_name || item.name || 'Track of the Day');
+        const date = item.date || item.day || '';
+        const author = cleanTM(item.author || item.author_name || 'Unknown');
+
+        // winners: array of { division, displayName }
+        let winnersText = '—';
+        if (Array.isArray(item.winners) && item.winners.length){
+          const first = item.winners.slice(0,3).map(w => `Div ${w.division}: ${cleanTM(w.displayName || '—')}`);
+          winnersText = first.join(' • ');
+          if (item.winners.length > 3) winnersText += ` • +${item.winners.length - 3} more`;
+        } else if (item.cotd_winner) {
+          winnersText = cleanTM(item.cotd_winner);
         }
 
-        grid.innerHTML = '';
-        for(const item of items){
-          const img = item.image || item.thumbnail || '';
-          const name = cleanTM(item.map_name || item.name || 'Track of the Day');
-          const date = item.date || item.day || '';
-          const author = cleanTM(item.author || item.author_name || 'Unknown');
-
-          // winners: array of { division, displayName }
-          let winnersText = '—';
-          if (Array.isArray(item.winners) && item.winners.length){
-            // Show up to first 3 divisions, then “+N more”
-            const first = item.winners.slice(0,3).map(w => `Div ${w.division}: ${cleanTM(w.displayName || '—')}`);
-            winnersText = first.join(' • ');
-            if (item.winners.length > 3) winnersText += ` • +${item.winners.length - 3} more`;
-          } else if (item.cotd_winner) {
-            winnersText = cleanTM(item.cotd_winner);
-          }
-
-          const card = document.createElement('article');
-          card.className = 'cotd-card';
-          card.innerHTML = `
-            <div class="cotd-thumb ${img ? '' : 'empty'}" style="${img ? `background-image:url('${img}')` : ''}"></div>
-            <div class="cotd-body">
-              <div class="cotd-title">${name}</div>
-              ${date ? `<div class="cotd-meta">${date}</div>` : ''}
-              <div class="cotd-meta">Author: ${author}</div>
-              <div class="cotd-meta">COTD Winners: ${winnersText}</div>
-            </div>
-          `;
-          grid.appendChild(card);
-        }
-      }catch(e){
-        console.error(e);
-        grid.innerHTML = `<div class="empty">Failed to load ${ym} (network or CORS).</div>`;
+        const card = document.createElement('article');
+        card.className = 'cotd-card';
+        card.innerHTML = `
+          <div class="cotd-thumb ${img ? '' : 'empty'}" style="${img ? `background-image:url('${img}')` : ''}"></div>
+          <div class="cotd-body">
+            <div class="cotd-title">${name}</div>
+            ${date ? `<div class="cotd-meta">${date}</div>` : ''}
+            <div class="cotd-meta">Author: ${author}</div>
+            <div class="cotd-meta">COTD Winners: ${winnersText}</div>
+          </div>
+        `;
+        grid.appendChild(card);
       }
     }
 
