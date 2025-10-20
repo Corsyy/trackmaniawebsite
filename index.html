@@ -14,7 +14,7 @@
   <script id="event-jsonld" type="application/ld+json">{}</script>
   <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
-  <link rel="shortcut icon" href="/logo.png">
+<link rel="shortcut icon" href="/logo.png">
   <style>
     :root{
       --bg: #0a0f1a;
@@ -54,78 +54,40 @@
     .btn.primary:hover{transform: translateY(-1px)}
 
     /* ====== HERO / EVENT ====== */
-.hero {
-  position: relative;
-  padding: clamp(2rem, 5vw, 4rem) 0 2.5rem;
+    .hero{position:relative; padding: clamp(2rem, 5vw, 4rem) 0 2.5rem}
+    .hero-grid{display:flex; align-items:flex-start;justify-content:space-between; gap:2rem}
+    .chip{display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .65rem; border-radius:999px; font-size:.8rem; color:#001220; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--accent-glow)}
+    #hero-chip, #live-chip {display: inline-block;width: auto;max-width: fit-content;padding: .4rem .9rem;border-radius: 999px;background: linear-gradient(90deg, var(--accent), var(--accent-2));color: #001220;font-weight: 800;box-shadow: var(--accent-glow);}
+    .h1{font-size: clamp(2.1rem, 3.8vw, 3.6rem); line-height:1.1; margin:.8rem 0 0; font-weight:900; letter-spacing:.2px}
+    .lead{color:var(--muted); max-width:60ch; margin-top:.85rem}
+    .keyfacts{display:flex; flex-wrap:wrap; gap:.6rem; margin:1.2rem 0}
+    .pill{padding:.5rem .75rem; border-radius:999px; border:1px solid rgba(109,251,255,.25); background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.45))}
+
+    .card{border:1px solid rgba(109,251,255,.15); background:linear-gradient(180deg, rgba(10,15,26,.8), rgba(10,15,26,.55)); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card-header{padding:1rem 1rem .6rem; border-bottom:1px dashed rgba(109,251,255,.2)}
+    .card-body{padding:1rem}
+
+    .countdown{display:flex; gap:1rem; justify-content:space-between}
+    .timebox{flex:1; padding:1rem; border-radius:14px; text-align:center; background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.55)); border:1px solid rgba(109,251,255,.18)}
+    .timebox strong{display:block; font-size:1.8rem}
+    .timebox span{color:var(--muted); font-size:.85rem}
+
+    .hero-grid > div:first-child {display: flex;flex-direction: column;gap: 1.25rem;flex:1}
+
+@media (min-width: 960px) {
+  #countdown-card {
+    width: 100%;
+    max-width: 560px;        /* adjust 520–600px to your liking */
+    align-self: flex-start;  /* or center if you prefer */
+  }
 }
-
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr; /* Left: event info, Right: Twitch */
-  gap: 2rem;
-  align-items: flex-start;
-}
-
-/* LEFT COLUMN (info + countdown) */
-.hero-left {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* RIGHT COLUMN (Twitch) */
-.hero-right {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-/* Countdown card sizing */
-#countdown-card {
-  width: 100%;
-  max-width: 640px;
-  align-self: flex-start;
-}
-
-/* Twitch player styling */
-.live .player {
-  aspect-ratio: 16/9;
-  width: 100%;
-  border: 0;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--accent-glow);
-}
-
-.live { margin-top: 0; }
-
-/* Responsive stacking */
-@media (max-width: 960px) {
-  .hero-grid {grid-template-columns: 1fr;}
-  .hero-right {margin-top: 2rem;}
-}
-
-/* keep your chip override */
-#hero-chip, #live-chip{
-  display:inline-block; width:auto; max-width:fit-content;
-  padding:.4rem .9rem; border-radius:999px;
-  background:linear-gradient(90deg, var(--accent), var(--accent-2));
-  color:#001220; font-weight:800; box-shadow:var(--accent-glow);
-}
-
-/* countdown sizing inside right column */
-@media (min-width:960px){
-  #countdown-card{ width:100%; max-width:100%; align-self:stretch; }
-}
-
-/* ====== TWITCH ====== */
-.live{ margin-top:0; } /* no gap when side-by-side */
-.live .player{ aspect-ratio:16/9; width:100%; border:0; border-radius:16px; overflow:hidden; box-shadow: var(--accent-glow); }
-
-/* stack hero on smaller screens */
-@media (max-width:960px){
-  .hero-grid{ grid-template-columns:1fr; }
-  .live{ margin-top:1.2rem; } /* <-- fix the comma typo here */
+    /* ====== TWITCH ====== */
+    .live{margin-top:0rem}
+    .live .player{aspect-ratio:16/9; width:100%; border:0; border-radius:16px; overflow:hidden; box-shadow: var(--accent-glow)}
+    .live .note{font-size:.85rem; color:var(--muted); margin-top:.5rem}
+    #live{flex:1;max-width:520px}
+    @media (max-width:960px){.hero-grid{flex-direction:column;}
+    .live{margin-top:1,2rem;}
 }
 
     /* ====== FORM (clean styles) ====== */
@@ -284,39 +246,37 @@
 
   <!-- HERO / NEXT EVENT -->
   <section class="hero" id="home">
-  <div class="container hero-grid">
-    <!-- LEFT SIDE: all event info + countdown -->
-    <div class="hero-left">
-      <span class="chip" id="hero-chip">Next Event • Map together</span>
-      <h1 class="h1">Live Trackmania events and community races</h1>
-      <p class="lead">Your central hub for upcoming events, live streams, and highlights.</p>
+    <div class="container hero-grid">
+      <div>
+        <span class="chip" id="hero-chip">Next Event</span>
+        <h1 class="h1">Live Trackmania events and community races</h1>
+        <p class="lead">Your central hub for upcoming events, live streams, and highlights.</p>
 
-      <div class="keyfacts" id="hero-pills">
-        <div class="pill">🗓️ Oct 25, 2025, 6:00 PM</div>
-        <div class="pill">📍 Stadium — collaborative build</div>
-        <div class="pill">🏁 Build a 'totd' style map together!</div>
+        <div class="keyfacts" id="hero-pills">
+          <div class="pill">🗓️ TBA</div>
+          <div class="pill">📍 Online</div>
+          <div class="pill">🏁 Community races</div>
+        </div>
+
+        <!-- added id for dynamic background -->
+        <div class="card" id="countdown-card" aria-live="polite">
+          <div class="card-header">
+            <strong id="countdown-title">Countdown to green light</strong>
+          </div>
+          <div class="card-body">
+            <div class="countdown" id="countdown">
+              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+            </div>
+            <div style="margin-top:.9rem">
+              <button class="btn" id="addCal">Add to Calendar</button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="card" id="countdown-card" aria-live="polite">
-        <div class="card-header">
-          <strong id="countdown-title">Countdown to green light</strong>
-        </div>
-        <div class="card-body">
-          <div class="countdown" id="countdown">
-            <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
-            <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
-            <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
-            <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
-          </div>
-          <div style="margin-top:.9rem">
-            <button class="btn" id="addCal">Add to Calendar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT SIDE: Twitch -->
-    <div class="hero-right">
       <div id="live" class="live">
         <div class="card reveal">
           <div class="card-header"><strong>Live on Twitch</strong></div>
@@ -327,10 +287,8 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="tm-stripes"></div>
-</section>
-
+    <div class="tm-stripes"></div>
+  </section>
 
   <section id="live-events" class="section">
   <div class="container">
