@@ -64,6 +64,7 @@
 
     async function loadCOTD(){
       const grid = document.getElementById('cotd-grid');
+      const data = await res.json();
       try{
         const res = await fetch('/cotd.json?cb='+Date.now());
         if(!res.ok) throw new Error('Failed to fetch cotd.json');
