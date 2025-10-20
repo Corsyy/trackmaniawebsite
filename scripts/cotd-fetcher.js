@@ -13,27 +13,30 @@ async function getJson(url, ua = "trackmaniaevents.com (cotd-fetcher)") {
   if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
   return r.json();
 }
-function ymd(input) {
-  // Accept "YYYY-MM-DD", ISO strings, or numbers (epoch seconds/ms)
-  if (!input) return null;
-  let d;
-  if (typeof input === "number") {
-    d = new Date(input * (input < 2e10 ? 1000 : 1));
-  } else if (/^\d{4}-\d{2}-\d{2}/.test(String(input))) {
-    d = new Date(String(input));
-  } else {
-    const t = Date.parse(String(input));
-    if (Number.isNaN(t)) return null;
-    d = new Date(t);
+function ymDiffIndex(targetYM) {
+  const [ty, tm] = targetYM.split("-").map(Number);
+  const now = new Date();
+  const cy = now.getUTCFullYear();
+  const cm = now.getUTCMonth() + 1;
+  // index 0 = current month; +1 per month going back
+  return (cy - ty) * 12 + (cm - tm);
+}
+function toISO(dateLike) {
+  // try "YYYY-MM-DD" or epoch seconds or ms
+  if (!dateLike) return null;
+  if (typeof dateLike === "number") {
+    const ms = dateLike < 2e10 ? dateLike * 1000 : dateLike;
+    const d = new Date(ms);
+    if (!isNaN(d)) return d.toISOString().slice(0, 10);
+    return null;
   }
-  if (isNaN(d)) return null;
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  return { y, m, day, ym: `${y}-${m}`, ymd: `${y}-${m}-${day}` };
+  if (/^\d{4}-\d{2}-\d{2}/.test(String(dateLike))) return String(dateLike).slice(0, 10);
+  const t = Date.parse(String(dateLike));
+  if (Number.isNaN(t)) return null;
+  return new Date(t).toISOString().slice(0, 10);
 }
 
-// ---------- map enrichment via tm.io (author + thumbnail) ----------
+/* ---------- map enrichment via tm.io (author + thumbnail) ---------- */
 async function enrichMap(uid) {
   if (!uid) return { author: "", thumbnail: "" };
   try {
@@ -49,7 +52,7 @@ async function enrichMap(uid) {
   }
 }
 
-// ---------- winners (tm.io best-effort, tolerant to shape changes) ----------
+/* ---------- winners (tm.io best-effort, tolerant to shape changes) ---------- */
 async function getJsonTmio(url) {
   const r = await fetch(url, { headers: { "User-Agent": "trackmaniaevents.com (cotd-winners)" } });
   if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
@@ -102,83 +105,66 @@ async function getCotdWinnersFromTmio(dateISO) {
         });
         misses = 0;
       } else if (++misses >= 3) break;
-    } catch { if (++misses >= 3) break; }
+    } catch {
+      if (++misses >= 3) break;
+    }
   }
   return winners;
 }
 
-// ---------- fetch month (robust date parsing; no brittle startsWith) ----------
-async function fetchMonthDays(targetYM) {
-  const days = [];
-  let page = 0;
-  // walk pages until we’ve clearly passed the target month
-  while (page < 40) {
-    const data = await getJson(
-      `https://trackmania.io/api/totd/${page}`,
-      "trackmaniaevents.com (cotd-month)"
-    );
-    const list = Array.isArray(data?.days) ? data.days : [];
-    if (!list.length) break;
+/* ---------- fetch target month via tm.io MONTH INDEX ---------- */
+async function fetchMonthByIndex(targetYM) {
+  const index = ymDiffIndex(targetYM);
+  const data = await getJson(
+    `https://trackmania.io/api/totd/${index}`,
+    "trackmaniaevents.com (cotd-month)"
+  );
 
-    for (const d of list) {
-      // pick the best date field we can find
-      const candidates = [d?.day, d?.date, d?.start, d?.end];
-      let got = null;
-      for (const c of candidates) {
-        const p = ymd(c);
-        if (p) { got = p; break; }
-      }
-      if (!got) continue;
-      if (got.ym === targetYM) days.push({ raw: d, ymd: got.ymd });
+  const days = Array.isArray(data?.days) ? data.days : [];
+  // Filter to exactly the requested month (tm.io should already give the right month)
+  const filtered = [];
+  for (const d of days) {
+    const date =
+      toISO(d?.day) || toISO(d?.date) || toISO(d?.start) || toISO(d?.end);
+    if (!date) continue;
+    if (date.slice(0, 7) === targetYM) {
+      filtered.push({ raw: d, date });
     }
-
-    // decide if we can stop: if the OLDEST item on this page is before the month
-    const sorted = list
-      .map(x => ymd(x?.day || x?.date || x?.start || x?.end))
-      .filter(Boolean)
-      .sort((a, b) => a.ymd.localeCompare(b.ymd));
-    if (sorted.length) {
-      const oldest = sorted[0];
-      if (oldest.ym < targetYM && days.length) break;
-    }
-
-    page++;
   }
-  return days;
+  // Sort chronological
+  filtered.sort((a, b) => a.date.localeCompare(b.date));
+  return filtered;
 }
 
-// ---------- main ----------
+/* ---------- main ---------- */
 async function main() {
-  console.log(`Fetching TOTDs for ${MONTH} from trackmania.io ...`);
-  const monthDays = await fetchMonthDays(MONTH);
+  console.log(`Fetching TOTDs for ${MONTH} from trackmania.io (index=${ymDiffIndex(MONTH)}) ...`);
+  const monthDays = await fetchMonthByIndex(MONTH);
 
   if (!monthDays.length) {
     console.error(`No TOTDs found for ${MONTH}`);
     process.exit(1);
   }
 
-  // ensure chronological order
-  monthDays.sort((a, b) => a.ymd.localeCompare(b.ymd));
-
   const out = [];
   for (const item of monthDays) {
     const d = item.raw;
-    const date = item.ymd;
+    const date = item.date;
     const mapUid = d?.mapUid || d?.map?.uid || "";
     const name = cleanTM(d?.name || d?.map?.name || "Track of the Day");
 
-    // inline author/thumbnail if present
+    // Inline author/thumbnail if present
     let author = cleanTM(d?.map?.authorplayer?.name || d?.map?.authorname || d?.map?.author || "");
     let thumbnail = d?.map?.thumbnail || "";
 
-    // fallback enrich
+    // Fallback enrich
     if (!author || !thumbnail) {
       const extra = await enrichMap(mapUid);
       if (!author && extra.author) author = extra.author;
       if (!thumbnail && extra.thumbnail) thumbnail = extra.thumbnail;
     }
 
-    // winners best-effort
+    // Winners best-effort
     let winners = [];
     try { winners = await getCotdWinnersFromTmio(date); } catch {}
 
