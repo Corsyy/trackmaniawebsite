@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Track of the Day — Trackmania Events</title>
+  <meta name="description" content="Latest Track of the Day and Cup of the Day results for Trackmania. View maps, authors, and top winners." />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <style>
+    :root{
+      --bg:#0a0f1a;
+      --panel:#0f1524;
+      --text:#e6ecff;
+      --muted:#9bb0ff;
+      --accent:#3aa0ff;
+      --accent-2:#6dfbff;
+      --accent-glow:0 0 24px rgba(61,165,255,.35);
+    }
+    body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+    .container{width:min(1200px,92vw);margin:0 auto;}
+    header{background:#0f1524;border-bottom:1px solid rgba(109,251,255,.12);padding:1rem 0;position:sticky;top:0;z-index:10;}
+    .nav{display:flex;align-items:center;justify-content:space-between;}
+    .brand{font-weight:800;letter-spacing:.3px;display:flex;align-items:center;gap:.4rem;}
+    .nav a{color:var(--muted);text-decoration:none;margin-left:1rem;}
+    .nav a:hover{color:var(--accent-2);}
+    .title{font-size:1.9rem;font-weight:900;margin:2rem 0 1rem;}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+    .cotd-card{border:1px solid rgba(109,251,255,.15);border-radius:16px;background:linear-gradient(180deg,rgba(15,21,36,.9),rgba(15,21,36,.6));overflow:hidden;transition:transform .15s ease;}
+    .cotd-card:hover{transform:translateY(-3px);box-shadow:0 0 25px rgba(61,165,255,.25);}
+    .cotd-thumb{aspect-ratio:16/9;background-size:cover;background-position:center;border-bottom:1px dashed rgba(109,251,255,.2);}
+    .cotd-body{padding:1rem;}
+    .cotd-title{font-weight:800;font-size:1.1rem;margin:0 0 .4rem;}
+    .cotd-meta{color:var(--muted);font-size:.9rem;margin-top:.2rem;}
+    footer{border-top:1px solid rgba(109,251,255,.12);padding:1.2rem 0;text-align:center;color:var(--muted);margin-top:3rem;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="/" class="brand">← Back to Events</a>
+      <div>
+        <a href="/">Home</a>
+        <a href="/kacky">Kacky Finishes</a>
+        <a href="/cotd.html">Track of the Day</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="title">Track of the Day (Last 10)</h1>
+    <div class="grid" id="cotd-grid">
+      <article class="cotd-card"><div class="cotd-body">Loading tracks…</div></article>
+    </div>
+  </main>
+
+  <footer>
+    © <span id="year"></span> Trackmania Events
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    async function loadCOTD(){
+      const grid = document.getElementById('cotd-grid');
+      try{
+        const res = await fetch('/cotd.json?cb='+Date.now());
+        if(!res.ok) throw new Error('Failed to fetch cotd.json');
+        const data = await res.json();
+
+        grid.innerHTML = '';
+        data.slice(0,10).forEach(item=>{
+          const el=document.createElement('article');
+          el.className='cotd-card';
+          el.innerHTML=`
+            <div class="cotd-thumb" style="background-image:url('${item.image||''}')"></div>
+            <div class="cotd-body">
+              <div class="cotd-title">${item.map_name||'Track of the Day'}</div>
+              <div class="cotd-meta">${item.date||''}</div>
+              <div class="cotd-meta">Author: ${item.author||'Unknown'}</div>
+              <div class="cotd-meta">COTD Winner: ${item.ctd_winner||'—'}</div>
+            </div>
+          `;
+          grid.appendChild(el);
+        });
+      }catch(err){
+        console.error(err);
+        grid.innerHTML='<article class="cotd-card"><div class="cotd-body">Could not load data.</div></article>';
+      }
+    }
+    loadCOTD();
+  </script>
+</body>
+</html>
