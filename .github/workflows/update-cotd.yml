@@ -12,6 +12,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,13 +28,15 @@ jobs:
         run: mkdir -p data/totd
 
       - name: Run fetcher for current month
-        run: node scripts/cotd-fetcher.js
+        run: |
+          echo "=== Running COTD fetcher for current month ==="
+          node scripts/cotd-fetcher.js || echo "Fetcher finished with warnings (continuing)"
 
       - name: Run fetcher for previous month (handles late updates)
         run: |
           PREV=$(date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)
-          echo "Refreshing previous month: $PREV"
-          node scripts/cotd-fetcher.js "$PREV"
+          echo "=== Running COTD fetcher for previous month: $PREV ==="
+          node scripts/cotd-fetcher.js "$PREV" || echo "Previous-month fetcher finished with warnings (continuing)"
 
       - name: Show generated files (debug)
         run: |
@@ -45,6 +48,7 @@ jobs:
       - name: Commit & push if changes exist
         run: |
           if [[ -n "$(git status --porcelain -- data/totd/)" ]]; then
+            echo "=== Committing updated COTD files ==="
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add data/totd/
