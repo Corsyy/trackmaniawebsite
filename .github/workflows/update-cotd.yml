@@ -3,10 +3,10 @@ name: Update COTD
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
+    - cron: "*/30 * * * *"
 
 permissions:
-  contents: write            # allow committing cotd.json
+  contents: write
 
 jobs:
   build:
@@ -22,8 +22,13 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install deps (ok if none)
-        run: npm ci || npm i
+      - name: Install dependencies (ok if none)
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          else
+            echo "No package.json at repo root – skipping npm install"
+          fi
 
       - name: Show tree (debug)
         run: ls -la && ls -la scripts
