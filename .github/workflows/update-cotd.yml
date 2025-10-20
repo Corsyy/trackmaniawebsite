@@ -3,7 +3,8 @@ name: Update COTD (tm.io, monthly JSON)
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "10 3 * * *"  # daily at 03:10 UTC
+    - cron: "10 3 * * *"  # run once per day at 03:10 UTC
+    # or use "*/30 * * * *" if you really want every 30 minutes
 
 permissions:
   contents: write
@@ -22,17 +23,21 @@ jobs:
         with:
           node-version: 20
 
+      # 🟢 Add this step right here
+      - name: Ensure data dir exists
+        run: mkdir -p data/totd
+
       - name: Debug tree
         run: |
           pwd
           ls -la
-          [ -d scripts ] && ls -la scripts || echo "No scripts dir"
+          [ -d scripts ] && ls -la scripts || echo "No scripts dir found"
 
-      # Current month (writes data/totd/YYYY-MM.json)
+      # current month (writes data/totd/YYYY-MM.json)
       - name: Run fetcher (current month)
         run: node scripts/cotd-fetcher.js
 
-      # Also refresh previous month (handles late updates)
+      # optional: also refresh previous month in case of late updates
       - name: Run fetcher (previous month)
         run: |
           PREV=$(date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)
