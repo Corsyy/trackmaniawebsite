@@ -1,160 +1,203 @@
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
-const MONTH = (process.argv[2] || new Date().toISOString().slice(0,7)); // "YYYY-MM"
+const MONTH = (process.argv[2] || new Date().toISOString().slice(0, 7)); // "YYYY-MM"
 const OUTDIR = path.join("data", "totd");
 const OUTFILE = path.join(OUTDIR, `${MONTH}.json`);
 
-const nadeoToken = process.env.NADEO_TOKEN || ""; // Live API (required for reliable month feed)
-const tmApiToken = process.env.TM_API_TOKEN || ""; // Optional: display-names
-
-// --- helpers ---------------------------------------------------------------
-
+// -------------- helpers --------------
 function cleanTM(str = "") {
-  return String(str).replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "").trim();
+  // Strip Trackmania color/style codes like $fff, $i, etc.
+  return String(str)
+    .replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "")
+    .trim();
 }
-function looksLikeUUID(s = "") {
-  return /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s);
-}
-async function j(url, opt={}) {
-  const r = await fetch(url, opt);
-  if (!r.ok) throw new Error(`${r.status} ${r.statusText} @ ${url}`);
+
+async function getJson(url, ua = "trackmaniaevents.com (cotd-fetcher)") {
+  const r = await fetch(url, { headers: { "User-Agent": ua } });
+  if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
   return r.json();
 }
 
-// Try both documented Live endpoints in case one alias changes
-async function fetchMonthFromLive(offset) {
-  const headers = { Authorization: nadeoToken };
-  // Primary (Openplanet docs): /campaigns/totds
+// Map enrichment via tm.io (author + thumbnail)
+async function enrichMap(uid) {
+  if (!uid) return { author: "", thumbnail: "" };
   try {
-    const url = `https://live-services.trackmania.nadeo.live/api/token/campaigns/totds?offset=${offset}&length=1`;
-    const data = await j(url, { headers });
-    return data?.monthList?.[0] || data?.monthList || null;
-  } catch (_) {}
-  // Fallback (older alias): /campaign/month
-  const url2 = `https://live-services.trackmania.nadeo.live/api/token/campaign/month?offset=${offset}&length=1`;
-  const data2 = await j(url2, { headers });
-  return data2?.monthList?.[0] || data2?.monthList || null;
-}
-
-// Get map info (thumbnail + author accountId)
-async function getMapInfos(uids) {
-  const headers = { Authorization: nadeoToken };
-  const out = {};
-  for (let i = 0; i < uids.length; i += 20) {
-    const chunk = uids.slice(i, i + 20);
-    await Promise.all(chunk.map(async uid => {
-      try {
-        const info = await j(`https://live-services.trackmania.nadeo.live/api/token/map/${encodeURIComponent(uid)}`, { headers });
-        out[uid] = info || {};
-      } catch (e) {
-        // ignore; we’ll try tm.io enrichment later
-      }
-    }));
+    const m = await getJson(
+      `https://trackmania.io/api/map/${encodeURIComponent(uid)}`,
+      "trackmaniaevents.com (cotd-enrich)"
+    );
+    const author =
+      m?.authorplayer?.name || m?.authorname || m?.author || "";
+    const thumbnail =
+      m?.thumbnail || m?.thumbnailUrl || m?.thumbnailURL || "";
+    return { author: cleanTM(author || ""), thumbnail: thumbnail || "" };
+  } catch {
+    return { author: "", thumbnail: "" };
   }
-  return out;
 }
 
-// Optional: convert accountIds -> display names (TM Public API)
-async function idToDisplayNames(accountIds) {
-  if (!tmApiToken || !accountIds.length) return {};
-  const names = {};
-  for (let i = 0; i < accountIds.length; i += 50) {
-    const qs = accountIds.slice(i, i + 50).map(id => `accountId[]=${encodeURIComponent(id)}`).join("&");
-    const url = `https://api.trackmania.com/api/display-names?${qs}`;
+// Walk /api/totd/{page} until we have the whole month.
+async function fetchMonthDays(monthStr) {
+  const days = [];
+  let page = 0;
+  while (page < 30) {
+    const data = await getJson(
+      `https://trackmania.io/api/totd/${page}`,
+      "trackmaniaevents.com (cotd-month)"
+    );
+    const list = Array.isArray(data?.days) ? data.days : [];
+    if (!list.length) break;
+
+    // Keep only items within the target month
+    for (const d of list) {
+      const date = d?.day || d?.date || "";
+      if (date.startsWith(monthStr)) days.push(d);
+    }
+
+    // If this page includes anything older than the target month, and we already have some,
+    // we can stop (we've collected the month).
+    const crossedOlder = list.some(d => (d?.day || "").localeCompare(monthStr) < 0);
+    if (days.length && crossedOlder) break;
+
+    page++;
+  }
+  return days;
+}
+
+// -------------- winners (tm.io best-effort) --------------
+async function getJsonTmio(url) {
+  const r = await fetch(url, { headers: { "User-Agent": "trackmaniaevents.com (cotd-winners)" } });
+  if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+/**
+ * Try to fetch Cup-of-the-Day winners from tm.io for a given ISO date (YYYY-MM-DD).
+ * Returns: [{ division: number, displayName: string, accountId?: string }] or [].
+ */
+async function getCotdWinnersFromTmio(dateISO) {
+  const tryUrls = [
+    `https://trackmania.io/api/cotd/${dateISO}`,
+    `https://trackmania.io/api/cotd/${dateISO}/divisions`,
+  ];
+
+  for (const url of tryUrls) {
     try {
-      const obj = await j(url, { headers: { Authorization: tmApiToken } });
-      Object.assign(names, obj);
-    } catch (_) {}
+      const data = await getJsonTmio(url);
+      const divisions = data?.divisions || data;
+      if (!Array.isArray(divisions)) continue;
+
+      const winners = [];
+      for (const div of divisions) {
+        const top =
+          div?.winner ||
+          (Array.isArray(div?.results) && div.results[0]) ||
+          (Array.isArray(div?.rankings) && div.rankings[0]) ||
+          null;
+        if (top) {
+          winners.push({
+            division: Number(div?.division ?? div?.index ?? winners.length + 1),
+            displayName: (top.displayName || top.name || top.player || "Unknown").toString(),
+            accountId: top.accountId || top.playerId || undefined,
+          });
+        }
+      }
+      if (winners.length) {
+        winners.sort((a, b) => a.division - b.division);
+        return winners;
+      }
+    } catch {
+      // try next format
+    }
   }
-  return names;
-}
 
-// Public fallback enrichment via trackmania.io (no auth)
-async function enrichViaTmio(uid) {
-  try {
-    const m = await j(`https://trackmania.io/api/map/${encodeURIComponent(uid)}`, {
-      headers: { "User-Agent": "trackmaniaevents.com (cotd-fetcher)" }
-    });
-    const authorName = m?.authorplayer?.name || m?.authorname || m?.author || "";
-    const thumbnail = m?.thumbnail || m?.thumbnailUrl || m?.thumbnailURL || "";
-    return {
-      authorName: authorName ? cleanTM(authorName) : "",
-      thumbnail: thumbnail || ""
-    };
-  } catch (_) {
-    return { authorName: "", thumbnail: "" };
+  // Fallback: query per-division endpoints 1..60; stop after 3 misses in a row
+  let misses = 0;
+  const winners = [];
+  for (let div = 1; div <= 60; div++) {
+    try {
+      const data = await getJsonTmio(`https://trackmania.io/api/cotd/${dateISO}/divisions/${div}`);
+      const top =
+        data?.winner ||
+        (Array.isArray(data?.results) && data.results[0]) ||
+        (Array.isArray(data?.rankings) && data.rankings[0]) ||
+        null;
+      if (top) {
+        winners.push({
+          division: div,
+          displayName: (top.displayName || top.name || top.player || "Unknown").toString(),
+          accountId: top.accountId || top.playerId || undefined,
+        });
+        misses = 0;
+      } else if (++misses >= 3) break;
+    } catch {
+      if (++misses >= 3) break;
+    }
   }
+  return winners;
 }
 
-// Compute month offset from current UTC month
-function monthOffset(targetYYYYMM) {
-  const [Y, M] = targetYYYYMM.split("-").map(Number);
-  const now = new Date();
-  const diff = (now.getUTCFullYear() - Y) * 12 + (now.getUTCMonth() + 1 - M);
-  return diff; // how many months back from current
-}
-
-// --- main ------------------------------------------------------------------
-
+// -------------- main --------------
 async function main() {
-  if (!nadeoToken) {
-    console.error("❌ Missing NADEO_TOKEN. This script uses the official Live API to get months reliably.");
+  console.log(`Fetching TOTDs for ${MONTH} from trackmania.io ...`);
+  const monthDays = await fetchMonthDays(MONTH);
+
+  if (!monthDays.length) {
+    console.error(`No TOTDs found for ${MONTH}`);
     process.exit(1);
   }
 
-  const offset = monthOffset(MONTH);
-  const monthData = await fetchMonthFromLive(offset);
-  if (!monthData || !monthData.days) throw new Error(`Month not found for ${MONTH}`);
-
-  const yyyy = monthData.year;
-  const mm = String(monthData.month).padStart(2, "0");
-
-  // Sort and map days → uids
-  const days = (monthData.days || []).slice().sort((a, b) => (a.day ?? a.monthDay) - (b.day ?? b.monthDay));
-  const uids = [...new Set(days.map(d => d.mapUid).filter(Boolean))];
-
-  // Live map info first (best source for thumbnail & author accountId)
-  const infoByUid = await getMapInfos(uids);
-  const authorIds = [...new Set(Object.values(infoByUid).map(x => x?.author).filter(Boolean))];
-  const nameById = await idToDisplayNames(authorIds);
+  // Sort chronologically
+  monthDays.sort((a, b) => (a?.day || "").localeCompare(b?.day || ""));
 
   const out = [];
-  for (const d of days) {
-    const dd = String(d.monthDay ?? d.day).padStart(2, "0");
-    const date = `${yyyy}-${mm}-${dd}`;
-    const uid = d.mapUid || "";
-    const live = infoByUid[uid] || {};
+  for (const d of monthDays) {
+    const date = d?.day || d?.date || "";
+    const mapUid = d?.mapUid || d?.map?.uid || "";
+    const name = cleanTM(d?.name || d?.map?.name || "Track of the Day");
 
-    let authorName = live?.author ? (nameById[live.author] || live.author) : "";
-    let thumbnail = live?.thumbnailUrl || "";
+    // author/thumbnail (inline if present)
+    let author = cleanTM(
+      d?.map?.authorplayer?.name || d?.map?.authorname || d?.map?.author || ""
+    );
+    let thumbnail = d?.map?.thumbnail || "";
 
-    // Fallback to tm.io if we still lack a human display name or thumbnail
-    if (!thumbnail || !authorName || looksLikeUUID(authorName)) {
-      const extra = await enrichViaTmio(uid);
-      if (!thumbnail) thumbnail = extra.thumbnail || "";
-      if ((!authorName || looksLikeUUID(authorName)) && extra.authorName) authorName = extra.authorName;
+    // fallback enrichment if needed
+    if (!author || !thumbnail) {
+      const extra = await enrichMap(mapUid);
+      if (!author && extra.author) author = extra.author;
+      if (!thumbnail && extra.thumbnail) thumbnail = extra.thumbnail;
+    }
+
+    // winners (best-effort; skips quietly if not available)
+    let winners = [];
+    try {
+      winners = await getCotdWinnersFromTmio(date);
+    } catch {
+      winners = [];
     }
 
     out.push({
       date,
-      mapUid: uid,
-      name: cleanTM(live?.name || d?.name || "Track of the Day"),
-      author: authorName ? cleanTM(authorName) : "Unknown",
+      name,
+      author: author || "Unknown",
+      mapUid,
       thumbnail: thumbnail || "",
       image: thumbnail || "",
-      start: d.startTimestamp ?? null,
-      end: d.endTimestamp ?? null,
-      winners: [] // ← hook for later (COTD winners integration)
+      winners, // array of { division, displayName, accountId? }
     });
   }
 
   await mkdir(OUTDIR, { recursive: true });
-  await writeFile(OUTFILE, JSON.stringify({ month: MONTH, updated: new Date().toISOString(), tracks: out }, null, 2));
-  console.log(`Wrote ${OUTFILE} with ${out.length} days.`);
+  await writeFile(
+    OUTFILE,
+    JSON.stringify({ month: MONTH, updated: new Date().toISOString(), tracks: out }, null, 2)
+  );
+  console.log(`✅ Wrote ${OUTFILE} (${out.length} days).`);
 }
 
 main().catch(err => {
-  console.error("COTD month fetch failed:", err);
+  console.error("COTD fetch failed:", err);
   process.exit(1);
 });
