@@ -68,11 +68,8 @@
     .timebox strong{display:block; font-size:1.8rem}
     .timebox span{color:var(--muted); font-size:.85rem}
 
-    .hero-grid > div:first-child {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+    .hero-grid > div:first-child {display: flex;flex-direction: column;gap: 1rem}
+
 @media (min-width: 960px) {
   #countdown-card {
     width: 100%;
@@ -296,6 +293,13 @@
     </div>
   </section>
 
+  <section id="live-events" class="section">
+  <div class="container">
+    <h2 class="title">Live Now</h2>
+    <div class="grid" id="live-events-grid"></div>
+  </div>
+</section>
+
   <!-- HIGHLIGHTS -->
   <section id="showcase" class="section">
     <div class="container">
@@ -412,6 +416,9 @@
  // Render schedule + hero + past events
 function renderFromData(events) {
   const now = Date.now();
+   const live = events
+    .filter(e => new Date(e.start_iso) <= now && now <= new Date(e.end_iso))
+    .sort((a,b) => new Date(a.start_iso) - new Date(b.start_iso));
   const upcoming = events
     .filter(e => new Date(e.end_iso) > now)
     .sort((a, b) => new Date(a.start_iso) - new Date(b.start_iso));
@@ -420,7 +427,33 @@ function renderFromData(events) {
     .sort((a, b) => new Date(b.end_iso) - new Date(a.end_iso))
     .slice(0, 6);
 
-  // === UPCOMING EVENTS ===
+   // === LIVE NOW ===
+  const liveSection = document.getElementById('live-events');
+  const liveGrid = document.getElementById('live-events-grid');
+  if (live.length) {
+    liveSection.style.display = '';
+    liveGrid.innerHTML = '';
+    live.forEach(e => {
+      const el = document.createElement('article');
+      el.className = 'event reveal';
+      el.innerHTML = `
+        <span class="tag">LIVE NOW</span>
+        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+        <h4>${e.title}</h4>
+        <div class="meta">${e.description || ''}</div>
+      `;
+      if (e.image) {
+        el.classList.add('with-bg');
+        el.style.setProperty('--event-img', `url("${e.image}")`);
+      }
+      liveGrid.appendChild(el);
+    });
+  } else {
+    // hide the whole section if nothing is live
+    liveSection.style.display = 'none';
+  }
+
+  // === UPCOMING ===
   const grid = document.getElementById('events-grid');
   grid.innerHTML = '';
   upcoming.forEach(e => {
@@ -432,8 +465,6 @@ function renderFromData(events) {
       <h4>${e.title}</h4>
       <div class="meta">${e.description || ''}</div>
     `;
-
-    // if the event has an image, give the card a matching background
     if (e.image) {
       el.classList.add('with-bg');
       el.style.setProperty('--event-img', `url("${e.image}")`);
@@ -441,7 +472,7 @@ function renderFromData(events) {
     grid.appendChild(el);
   });
 
-  // === PAST EVENTS ===
+  // === PAST ===
   let pastWrap = document.getElementById('past-events');
   if (!pastWrap) {
     pastWrap = document.createElement('div');
@@ -452,64 +483,66 @@ function renderFromData(events) {
     `;
     document.querySelector('#schedule .container').appendChild(pastWrap);
   }
-
   const pastGrid = document.getElementById('past-grid');
   pastGrid.innerHTML = '';
   past.forEach(e => {
-  const el = document.createElement('article');
-  el.className = 'event reveal';
-  el.innerHTML = `
-    <span class="tag">${e.tag || 'Event'}</span>
-    <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-    <h4>${e.title}</h4>
-    <div class="meta">${e.location || ''}</div>
-  `;
-  if (e.image) {
-    el.classList.add('with-bg');
-    el.style.setProperty('--event-img', `url("${e.image}")`);
-  }
-  pastGrid.appendChild(el); 
-});
-
-      // Hero + countdown + dynamic backgrounds
-      const next=upcoming[0];
-      const chip=document.getElementById('hero-chip');
-      const pills=document.getElementById('hero-pills');
-      const header=document.getElementById('countdown-title');
-      const cdCard = document.getElementById('countdown-card');
-
-      if(next){
-        chip.textContent=`Next Event • ${next.title}`;
-        pills.innerHTML=`<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-          <div class="pill">📍 ${next.location||'Online'}</div>
-          <div class="pill">🏁 ${next.description||''}</div>`;
-        startCountdown(next.start_iso, header);
-
-        // Set section + countdown backgrounds from next.image (if provided)
-        // AFTER
-const heroImg = next?.hero_image || next?.image;
-if (heroImg) {
-  cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
-} else {
-  cdCard?.style.removeProperty('--cd-img');
-}
-      }else{
-        chip.textContent='No upcoming event';
-        pills.innerHTML='<div class="pill">Check back soon</div>';
-        header.textContent='Countdown'; setCountdown(0,0,0,0);
-        scheduleSection?.style.removeProperty('--section-img');
-        cdCard?.style.removeProperty('--cd-bg');
-      }
-
-      // Update JSON-LD for SEO
-      updateJSONLD(next||null);
-
-      // Reveal
-      attachReveals();
-
-      // Cache events for Add-to-Calendar
-      window.__eventsCache = events;
+    const el = document.createElement('article');
+    el.className = 'event reveal';
+    el.innerHTML = `
+      <span class="tag">${e.tag || 'Event'}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${e.location || ''}</div>
+    `;
+    if (e.image) {
+      el.classList.add('with-bg');
+      el.style.setProperty('--event-img', `url("${e.image}")`);
     }
+    pastGrid.appendChild(el);
+  });
+
+  // === HERO / COUNTDOWN ===
+  const next = upcoming[0];               // first future event only (live removed)
+  const chip = document.getElementById('hero-chip');
+  const pills = document.getElementById('hero-pills');
+  const header = document.getElementById('countdown-title');
+  const cdCard = document.getElementById('countdown-card');
+
+  if (live.length) {
+    // If something is live, show it in the hero and stop the countdown
+    const cur = live[0];
+    chip.textContent = `Live now • ${cur.title}`;
+    pills.innerHTML = `
+      <div class="pill">🟢 Live</div>
+      <div class="pill">📍 ${cur.location || 'Online'}</div>
+      <div class="pill">🏁 ${cur.description || ''}</div>`;
+    header.textContent = 'Live now!';
+    setCountdown(0,0,0,0);
+    const heroImg = cur?.hero_image || cur?.image;
+    if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+    else cdCard?.style.removeProperty('--cd-img');
+  } else if (next) {
+    chip.textContent = `Next Event • ${next.title}`;
+    pills.innerHTML = `
+      <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+      <div class="pill">📍 ${next.location || 'Online'}</div>
+      <div class="pill">🏁 ${next.description || ''}</div>`;
+    startCountdown(next.start_iso, header);
+    const heroImg = next?.hero_image || next?.image;
+    if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+    else cdCard?.style.removeProperty('--cd-img');
+  } else {
+    chip.textContent = 'No upcoming event';
+    pills.innerHTML = '<div class="pill">Check back soon</div>';
+    header.textContent = 'Countdown';
+    setCountdown(0,0,0,0);
+    cdCard?.style.removeProperty('--cd-img');
+  }
+
+  updateJSONLD(live[0] || next || null);
+  attachReveals();
+  window.__eventsCache = events;
+}
 
     // JSON-LD updater
     function updateJSONLD(next){
