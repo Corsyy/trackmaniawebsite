@@ -60,37 +60,70 @@
   </footer>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+  // footer year
+  document.getElementById('year').textContent = new Date().getFullYear();
 
-    async function loadCOTD(){
-      const grid = document.getElementById('cotd-grid');
-      const data = await res.json();
-      try{
-        const res = await fetch('/cotd.json?cb='+Date.now());
-        if(!res.ok) throw new Error('Failed to fetch cotd.json');
-        const data = await res.json();
+  (async function loadCOTD() {
+    const grid = document.getElementById('cotd-grid');
+    if (!grid) return;
 
-        grid.innerHTML = '';
-        data.slice(0,10).forEach(item=>{
-          const el=document.createElement('article');
-          el.className='cotd-card';
-          el.innerHTML=`
-            <div class="cotd-thumb" style="background-image:url('${item.image||''}')"></div>
-            <div class="cotd-body">
-              <div class="cotd-title">${item.map_name||'Track of the Day'}</div>
-              <div class="cotd-meta">${item.date||''}</div>
-              <div class="cotd-meta">Author: ${item.author||'Unknown'}</div>
-              <div class="cotd-meta">COTD Winner: ${item.ctd_winner||'—'}</div>
-            </div>
-          `;
-          grid.appendChild(el);
-        });
-      }catch(err){
-        console.error(err);
-        grid.innerHTML='<article class="cotd-card"><div class="cotd-body">Could not load data.</div></article>';
+    // helper for showing a simple error card
+    const showMsg = (msg) => {
+      grid.innerHTML =
+        `<article class="cotd-card"><div class="cotd-body">${msg}</div></article>`;
+    };
+
+    try {
+      const res = await fetch('/cotd.json?cb=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) {
+        showMsg(`Couldn't load cotd.json (HTTP ${res.status}).`);
+        return;
       }
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        showMsg('cotd.json is not valid JSON.');
+        return;
+      }
+
+      // Support either an array or { tracks: [...] }
+      const all = Array.isArray(data) ? data : (data.tracks || []);
+      if (!Array.isArray(all) || all.length === 0) {
+        showMsg('No tracks found yet.');
+        return;
+      }
+
+      // last 10 (newest first)
+      const items = all.slice(-10).reverse();
+
+      grid.innerHTML = '';
+      items.forEach(item => {
+        const img   = item.image || '';
+        const name  = item.map_name || item.name || 'Track of the Day';
+        const date  = item.date || item.day || '';
+        const author= item.author || 'Unknown';
+        const winner= item.cotd_winner || item.ctd_winner || item.winner || '—';
+
+        const el = document.createElement('article');
+        el.className = 'cotd-card';
+        el.innerHTML = `
+          <div class="cotd-thumb" style="background-image:url('${img}')"></div>
+          <div class="cotd-body">
+            <div class="cotd-title">${name}</div>
+            <div class="cotd-meta">${date}</div>
+            <div class="cotd-meta">Author: ${author}</div>
+            <div class="cotd-meta">COTD Winner: ${winner}</div>
+          </div>
+        `;
+        grid.appendChild(el);
+      });
+    } catch (err) {
+      console.error(err);
+      showMsg('Failed to load tracks (network or CORS).');
     }
-    loadCOTD();
-  </script>
+  })();
+</script>
 </body>
 </html>
