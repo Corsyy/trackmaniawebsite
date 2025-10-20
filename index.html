@@ -155,6 +155,7 @@
       <a href="/kacky">Kacky Finishes</a>
       <a href="#showcase">Highlights</a>
       <a href="#contact">Contact</a>
+      <a href="/cotd">Track of the Day</a>
     </nav>
     <div class="cta">
       <a class="btn" href="#schedule">View Schedule</a>
@@ -174,6 +175,45 @@
     });
   })();
 </script>
+<script>
+async function loadCOTD(){
+  const grid = document.getElementById('cotd-grid');
+  try{
+    const res = await fetch('/cotd.json?cb=' + Date.now());
+    if(!res.ok) throw new Error('Failed to fetch cotd.json');
+    const items = await res.json();
+
+    grid.innerHTML = '';
+    items.slice(0, 10).forEach(item => {
+      const el = document.createElement('article');
+      el.className = 'event reveal';
+
+      el.innerHTML = `
+        <span class="tag">COTD</span>
+        <div class="meta">${item.date}</div>
+        <h4>${item.map_name}</h4>
+        <div class="meta">Author: ${item.author || 'Unknown'}</div>
+        <div class="meta">Winner: ${item.ctd_winner || '—'}</div>
+      `;
+
+      if (item.image) {
+        el.classList.add('with-bg');
+        el.style.setProperty('--event-img', `url("${item.image}")`);
+      }
+
+      grid.appendChild(el);
+    });
+
+  } catch (err){
+    console.error(err);
+    grid.innerHTML = '<article class="event"><div class="meta">Could not load Track of the Day.</div></article>';
+  }
+}
+
+// Call it on page load (where you already call loadEvents)
+loadCOTD();
+</script>
+
 
 <section class="hero" id="home">
   <div class="container hero-grid">
@@ -223,6 +263,15 @@
 
   </div>
   <div class="tm-stripes"></div>
+</section>
+
+<section id="cotd" class="section">
+  <div class="container">
+    <h2 class="title">Track of the Day (Last 10)</h2>
+    <div class="grid" id="cotd-grid">
+      <article class="event"><div class="meta">Loading…</div></article>
+    </div>
+  </div>
 </section>
 
 <section id="live-events" class="section">
