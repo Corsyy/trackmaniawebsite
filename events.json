@@ -1,48 +1,685 @@
-[
-   {
-    "tag": "Build",
-    "title": "Map together",
-    "start_iso": "2025-10-20T11:15:00-04:00",
-    "end_iso": "2025-10-20T11:20:00-04:00",
-    "location": "Stadium — collaborative build",
-    "image": "/img/maptogether-card.png",
-    "hero_image": "/img/maptogether-hero.png",
-    "description": "Build a 'totd' style map together!",
-    "image_fit": "contain",
-  "image_pos": "center"
-  },
-  {
-    "tag": "Build",
-    "title": "Map together",
-    "start_iso": "2025-10-25T18:00:00-04:00",
-    "end_iso": "2025-10-25T21:00:00-04:00",
-    "location": "Stadium — collaborative build",
-    "image": "/img/maptogether-card.png",
-    "hero_image": "/img/maptogether-hero.png",
-    "description": "Build a 'totd' style map together!",
-    "image_fit": "contain",
-  "image_pos": "center"
-  },
-{
-    "tag": "Trackmania World Cup 2025",
-    "title": "Trackmania World Cup",
-    "start_iso": "2025-11-01T04:30:00-04:00",
-    "end_iso": "2025-11-01T10:00:00-04:00",
-    "description": "Who do you think will be the champion?",
-    "image": "/img/worldtour-card.png",       
-    "hero_image": "/img/worldtour-hero.png",
-    "image_fit": "contain",
-  "image_pos": "center"  
-  },
-  {
-    "tag": "Kacky",
-    "title": "Kacky Reloaded 6",
-    "start_iso": "2025-11-01T15:00:00-04:00",
-    "end_iso": "2025-11-30T14:00:00-04:00",
-    "description": "Daily runs & PB tracking — how many finishes can you get?",
-    "image": "/img/kacky6-card.png",       
-    "hero_image": "/img/kacky6-hero.png",
-    "image_fit": "contain",
-  "image_pos": "center"  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trackmania Events — Official Site</title>
+  <meta name="description" content="Live Trackmania events, schedule, and stream hub. Watch live on Twitch, see upcoming events, and get in touch." />
+  <meta name="theme-color" content="#0a0f1a" />
+  <meta property="og:title" content="Trackmania Events — Official Site" />
+  <meta property="og:description" content="Live Trackmania events, schedule, and stream hub." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://trackmaniaevents.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script id="event-jsonld" type="application/ld+json">{}</script>
+  <style>
+    :root{
+      --bg: #0a0f1a;
+      --panel: #0f1524;
+      --panel-2: #0c1020;
+      --text: #e6ecff;
+      --muted: #9bb0ff;
+      --accent: #3aa0ff;
+      --accent-2: #6dfbff;
+      --ok: #29d98f;
+      --warn: #ffb02e;
+      --ring: 0 0 0 3px rgba(61,165,255,.25);
+      --accent-glow: 0 0 24px rgba(61, 165, 255, .35), 0 0 48px rgba(61, 165, 255, .2);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; background:radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.12), transparent), radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.10), transparent), var(--bg); color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1200px, 92vw); margin:0 auto}
+
+    /* ====== NAV ====== */
+    header{position:sticky; top:0; z-index:50; background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0)); backdrop-filter: blur(8px); border-bottom:1px solid rgba(109,251,255,.12)}
+    .nav{display:flex; align-items:center; justify-content:space-between; padding:.9rem 0}
+    .brand{display:flex; align-items:center; gap:.6rem; font-weight:800; letter-spacing:.2px}
+    .brand-badge{width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--accent-glow)}
+    .brand span:last-child{opacity:.95}
+    .navlinks{display:flex; gap:1.25rem}
+    .nav a{opacity:.85}
+    .nav a:hover,.nav a:focus{opacity:1}
+    .nav a.active{opacity:1; position:relative}
+    .nav a.active::after{content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); border-radius:2px}
+    html{scroll-behavior:smooth}
+    .cta{display:flex; gap:.6rem}
+    .btn{padding:.6rem .95rem; border:1px solid rgba(109,251,255,.25); border-radius:12px; background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6)); color:var(--text); font-weight:700; transition:transform .15s ease, box-shadow .15s ease}
+    .btn.primary{border-color:transparent; background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#001220; box-shadow: var(--accent-glow)}
+    .btn:focus{outline:none; box-shadow: var(--ring)}
+    .btn.primary:hover{transform: translateY(-1px)}
+
+    /* ====== HERO / EVENT ====== */
+    .hero{position:relative; padding: clamp(2rem, 5vw, 4rem) 0 2.5rem}
+    .hero-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:2rem}
+    .chip{display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .65rem; border-radius:999px; font-size:.8rem; color:#001220; font-weight:800; background:linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--accent-glow)}
+    #hero-chip, #live-chip {display: inline-block;width: auto;max-width: fit-content;padding: .4rem .9rem;border-radius: 999px;background: linear-gradient(90deg, var(--accent), var(--accent-2));color: #001220;font-weight: 800;box-shadow: var(--accent-glow)}
+    .h1{font-size: clamp(2.1rem, 3.8vw, 3.6rem); line-height:1.1; margin:.8rem 0 0; font-weight:900; letter-spacing:.2px}
+    .lead{color:var(--muted); max-width:60ch; margin-top:.85rem}
+    .keyfacts{display:flex; flex-wrap:wrap; gap:.6rem; margin:1.2rem 0}
+    .pill{padding:.5rem .75rem; border-radius:999px; border:1px solid rgba(109,251,255,.25); background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.45))}
+
+    .card{border:1px solid rgba(109,251,255,.15); background:linear-gradient(180deg, rgba(10,15,26,.8), rgba(10,15,26,.55)); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card-header{padding:1rem 1rem .6rem; border-bottom:1px dashed rgba(109,251,255,.2)}
+    .card-body{padding:1rem}
+
+    .countdown{display:flex; gap:1rem; justify-content:space-between}
+    .timebox{flex:1; padding:1rem; border-radius:14px; text-align:center; background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.55)); border:1px solid rgba(109,251,255,.18)}
+    .timebox strong{display:block; font-size:1.8rem}
+    .timebox span{color:var(--muted); font-size:.85rem}
+
+    .hero-grid > div:first-child {display: flex;flex-direction: column;gap: 1rem}
+
+@media (min-width: 960px) {
+  #countdown-card {
+    width: 100%;
+    max-width: 560px;        /* adjust 520–600px to your liking */
+    align-self: flex-start;  /* or center if you prefer */
   }
-]
+}
+    /* ====== TWITCH ====== */
+    .live{margin-top:1.2rem}
+    .live .player{aspect-ratio:16/9; width:100%; border:0; border-radius:16px; overflow:hidden; box-shadow: var(--accent-glow)}
+    .live .note{font-size:.85rem; color:var(--muted); margin-top:.5rem}
+
+    /* ====== FORM (clean styles) ====== */
+    .form .field{display:flex; flex-direction:column; gap:.35rem}
+    .form .twocol{display:grid; grid-template-columns:1fr 1fr; gap:.8rem}
+    .input, .textarea{width:100%; padding:.7rem .85rem; border-radius:12px; border:1px solid rgba(109,251,255,.22); background:#0c1224; color:var(--text)}
+    .input::placeholder, .textarea::placeholder{color:rgba(155,176,255,.8)}
+    .help{font-size:.85rem; color:var(--muted)}
+    @media (max-width: 640px){ .form .twocol{grid-template-columns:1fr} }
+
+    /* ====== SCHEDULE ====== */
+    .section{padding:3rem 0}
+    .title{font-size:1.8rem; font-weight:900; margin:0 0 1rem}
+    .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem}
+    .event{position:relative; padding:1rem; border-radius:16px;  overflow: hidden; background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6)); border:1px solid rgba(109,251,255,.18); transition:transform .15s ease}
+    .event:hover{transform: translateY(-2px)}
+    .event h4{margin:.35rem 0 .25rem}
+    .event .meta{color:var(--muted); font-size:.9rem}
+    .event .tag{position:absolute; top:10px; right:10px; font-size:.7rem; padding:.25rem .5rem; border-radius:999px; border:1px solid rgba(109,251,255,.25)}
+
+    /* ====== SHOWCASE ====== */
+    .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem}
+    .shot{overflow:hidden; border-radius:18px; border:1px solid rgba(109,251,255,.16); background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.45))}
+    .shot .media{aspect-ratio:4/3; display:grid; place-items:center; color:var(--muted)}
+    .shot .text{padding:1rem}
+
+    /* ====== FOOTER ====== */
+    footer{border-top:1px solid rgba(109,251,255,.12); padding:1.5rem 0; font-size:.95rem; color:var(--muted)}
+
+    /* ====== ANGLED TRACK STRIPES ====== */
+    .tm-stripes{position:absolute; inset:auto 0 0 0; height:180px; pointer-events:none; opacity:.25}
+    .tm-stripes::before, .tm-stripes::after{content:""; position:absolute; inset:0; background: repeating-linear-gradient( 115deg, transparent 0 18px, rgba(58,160,255,.18) 18px 26px, transparent 26px 50px ); filter: drop-shadow(0 0 22px rgba(61,165,255,.35))}
+    .tm-stripes::after{transform: translateY(20px)}
+
+    /* ====== REVEAL + BACK TO TOP ====== */
+    .reveal{opacity:0; transform:translateY(10px); transition:opacity .4s ease, transform .4s ease}
+    .reveal.show{opacity:1; transform:none}
+    #toTop{position:fixed; right:18px; bottom:18px; padding:.6rem .8rem; border-radius:12px; border:1px solid rgba(109,251,255,.25);
+      background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6)); cursor:pointer; opacity:0; pointer-events:none; transition:opacity .2s}
+    #toTop.show{opacity:1; pointer-events:auto}
+
+/* Countdown card — all images fill (cover) */
+#countdown-card {
+  border: 1px solid rgba(109, 251, 255, .18);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  overflow: hidden;
+  background-clip: padding-box, padding-box;
+  background-image:
+    linear-gradient(180deg, rgba(10, 15, 26, .68), rgba(10, 15, 26, .44)),
+    var(--cd-img, none);
+  background-size: cover, cover;         /* fills the box */
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+}
+
+/* Event cards — all images fill (cover) */
+.event.with-bg {
+  background-image:
+    linear-gradient(180deg, rgba(15, 21, 36, .72), rgba(15, 21, 36, .45)),
+    var(--event-img);
+  background-size: cover, cover;          /* fills the card for ALL cards */
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  overflow: hidden;                          
+  background-clip: padding-box, padding-box;
+  min-height: 180px;
+  border-radius: 16px;
+}
+
+.event.with-bg:hover {
+  background-image:
+    linear-gradient(180deg, rgba(15, 21, 36, .64), rgba(15, 21, 36, .40)),
+    var(--event-img);
+}
+
+
+
+   .nav-toggle { display:none; }
+    /* ====== RESPONSIVE ====== */
+@media (max-width: 960px){
+  .hero-grid{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr 1fr}
+  .cards{grid-template-columns:1fr 1fr}
+}
+
+/* Mobile menu + small layout */
+@media (max-width: 640px){
+  .nav-toggle{
+    display:block;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));
+    color:var(--text);
+    border-radius:10px;
+    padding:.4rem .6rem;
+  }
+  .navlinks{
+    display:none; /* collapsed by default */
+    position:absolute;
+    top:58px; left:0; right:0;
+    padding:.75rem;
+    background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid rgba(109,251,255,.12);
+    flex-direction:column;
+    gap:.6rem;
+  }
+  .navlinks.show{ display:flex; }
+
+  .grid, .cards{grid-template-columns:1fr}
+  .countdown{flex-wrap:wrap}
+}
+
+#schedule { --section-img: none !important; }
+#schedule::before { background: none !important; }
+
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+<header>
+  <div class="container nav">
+    <a class="brand" href="#" aria-label="Trackmania Events Home">
+      <span class="brand-badge" aria-hidden="true">🎮</span>
+      <span>Trackmania Events</span>
+    </a>
+
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="#schedule">Events</a>
+      <a href="#live">Live</a>
+      <a href="/kacky">Kacky Finishes</a>
+      <a href="#showcase">Highlights</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="cta">
+      <a class="btn" href="#schedule">View Schedule</a>
+      <a class="btn primary" href="#live">Watch Live</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  (function(){
+    const btn = document.getElementById('navToggle');
+    const nav = document.getElementById('primary-nav');
+    if(!btn || !nav) return;
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('show');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  })();
+</script>
+
+  <!-- HERO / NEXT EVENT -->
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div>
+        <span class="chip" id="hero-chip">Next Event</span>
+        <h1 class="h1">Live Trackmania events and community races</h1>
+        <p class="lead">Your central hub for upcoming events, live streams, and highlights.</p>
+
+        <div class="keyfacts" id="hero-pills">
+          <div class="pill">🗓️ TBA</div>
+          <div class="pill">📍 Online</div>
+          <div class="pill">🏁 Community races</div>
+        </div>
+
+        <!-- added id for dynamic background -->
+        <div class="card" id="countdown-card" aria-live="polite">
+          <div class="card-header">
+            <strong id="countdown-title">Countdown to green light</strong>
+          </div>
+          <div class="card-body">
+            <div class="countdown" id="countdown">
+              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+            </div>
+            <div style="margin-top:.9rem">
+              <button class="btn" id="addCal">Add to Calendar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="live" class="live">
+        <div class="card reveal">
+          <div class="card-header"><strong>Live on Twitch</strong></div>
+          <div class="card-body">
+            <div id="twitch-embed"></div>
+            <div class="note"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tm-stripes"></div>
+  </section>
+
+  <section id="live-events" class="section">
+  <div class="container">
+    <h2 class="title">Live Now</h2>
+    <div class="grid" id="live-events-grid"></div>
+  </div>
+</section>
+
+
+  <!-- SCHEDULE / EVENTS -->
+  <section id="schedule" class="section">
+    <div class="container">
+      <h2 class="title">Upcoming Events</h2>
+      <div class="grid" id="events-grid">
+        <article class="event"><div class="meta">Loading schedule…</div></article>
+      </div>
+      <!-- Past events will be injected here -->
+    </div>
+  </section>
+
+  <!-- HIGHLIGHTS -->
+  <section id="showcase" class="section">
+    <div class="container">
+      <h2 class="title">Highlights</h2>
+      <div class="cards">
+        <article class="shot reveal">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong></strong><div class="meta">N/A</div></div>
+        </article>
+        <article class="shot reveal">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong></strong><div class="meta">N/A</div></div>
+        </article>
+        <article class="shot reveal">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong></strong><div class="meta">N/A</div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT / CONTACT -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="title">About</h2>
+      <div class="card reveal">
+        <div class="card-body">
+          <p>I'm a Trackmania streamer focusing on Stadium tech, FS, and Kacky challenges. This site is a streamlined hub for events, VODs, and live viewer races.</p>
+          <div class="keyfacts" style="margin-top:1rem">
+            <a class="btn" href="https://twitch.tv/C0rsy" target="_blank" rel="noreferrer">Follow on Twitch</a>
+            <a class="btn" href="#contact">Business / Collabs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <div class="container">
+      <h2 class="title">Contact</h2>
+      <div class="grid" style="grid-template-columns:2fr 1fr">
+        <!-- IMPORTANT: form id is contact-form to match JS below -->
+        <form action="https://formspree.io/f/xjkazybj" method="POST" class="card form reveal" id="contact-form">
+          <div class="card-body">
+            <div class="twocol">
+              <div class="field">
+                <label for="name">Name</label>
+                <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
+              </div>
+            </div>
+
+            <div class="field" style="margin-top:.8rem">
+              <label for="message">Message</label>
+              <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?" required></textarea>
+            </div>
+
+            <div style="margin-top:1rem; display:flex; gap:.6rem; align-items:center">
+              <button class="btn primary" type="submit">Send</button>
+              <span id="formStatus" style="font-size:0.9rem;" aria-live="polite"></span>
+            </div>
+          </div>
+        </form>
+        <aside class="card reveal">
+          <div class="card-body">
+            <strong>Discord</strong>
+            <div class="meta"><a href="https://discord.gg/9bDcTTbTGJ" target="_blank" rel="noreferrer">Join the server</a></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <button id="toTop" aria-label="Back to top">↑ Top</button>
+
+  <footer>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a> • <a href="#contact">Contact</a></div>
+    </div>
+  </footer>
+
+  <script>
+    const TTV_CHANNEL = "C0rsy";
+
+    // Countdown helpers
+    const d = document.getElementById('d');
+    const h = document.getElementById('h');
+    const m = document.getElementById('m');
+    const s = document.getElementById('s');
+
+    const fmtDate = (iso) => {
+      const dt = new Date(iso);
+      return dt.toLocaleString(undefined, {month:'short', day:'2-digit', year:'numeric', hour:'numeric', minute:'2-digit'});
+    };
+
+    function setCountdown(dd, hh, mm, ss){ d.textContent=dd; h.textContent=hh; m.textContent=mm; s.textContent=ss; }
+
+    function startCountdown(iso, titleEl){
+      function tick(){
+        const now=new Date(); const then=new Date(iso); let diff=then-now;
+        if(diff<=0){ setCountdown(0,0,0,0); if(titleEl) titleEl.textContent='Live now!'; return; }
+        const days=Math.floor(diff/86400000); diff%=86400000;
+        const hrs=Math.floor(diff/3600000); diff%=3600000;
+        const mins=Math.floor(diff/60000); diff%=60000;
+        const secs=Math.floor(diff/1000);
+        setCountdown(days,hrs,mins,secs);
+      }
+      tick(); setInterval(tick,1000);
+    }
+
+ // Render schedule + hero + past events
+function renderFromData(events) {
+  const now = Date.now();
+   const live = events
+    .filter(e => new Date(e.start_iso) <= now && now <= new Date(e.end_iso))
+    .sort((a,b) => new Date(a.start_iso) - new Date(b.start_iso));
+  const upcoming = events
+    .filter(e => new Date(e.end_iso) > now)
+    .sort((a, b) => new Date(a.start_iso) - new Date(b.start_iso));
+  const past = events
+    .filter(e => new Date(e.end_iso) <= now)
+    .sort((a, b) => new Date(b.end_iso) - new Date(a.end_iso))
+    .slice(0, 6);
+
+   // === LIVE NOW ===
+  const liveSection = document.getElementById('live-events');
+  const liveGrid = document.getElementById('live-events-grid');
+  if (live.length) {
+    liveSection.style.display = '';
+    liveGrid.innerHTML = '';
+    live.forEach(e => {
+      const el = document.createElement('article');
+      el.className = 'event reveal';
+      el.innerHTML = `
+        <span class="tag">LIVE NOW</span>
+        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+        <h4>${e.title}</h4>
+        <div class="meta">${e.description || ''}</div>
+      `;
+      if (e.image) {
+        el.classList.add('with-bg');
+        el.style.setProperty('--event-img', `url("${e.image}")`);
+      }
+      liveGrid.appendChild(el);
+    });
+  } else {
+    // hide the whole section if nothing is live
+    liveSection.style.display = 'none';
+  }
+
+  // === UPCOMING ===
+  const grid = document.getElementById('events-grid');
+  grid.innerHTML = '';
+  upcoming.forEach(e => {
+    const el = document.createElement('article');
+    el.className = 'event reveal';
+    el.innerHTML = `
+      <span class="tag">${e.tag || 'Event'}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${e.description || ''}</div>
+    `;
+    if (e.image) {
+      el.classList.add('with-bg');
+      el.style.setProperty('--event-img', `url("${e.image}")`);
+    }
+    grid.appendChild(el);
+  });
+
+  // === PAST ===
+  let pastWrap = document.getElementById('past-events');
+  if (!pastWrap) {
+    pastWrap = document.createElement('div');
+    pastWrap.id = 'past-events';
+    pastWrap.innerHTML = `
+      <h3 class="title" style="margin-top:2rem">Past Events</h3>
+      <div class="grid" id="past-grid"></div>
+    `;
+    document.querySelector('#schedule .container').appendChild(pastWrap);
+  }
+  const pastGrid = document.getElementById('past-grid');
+  pastGrid.innerHTML = '';
+  past.forEach(e => {
+    const el = document.createElement('article');
+    el.className = 'event reveal';
+    el.innerHTML = `
+      <span class="tag">${e.tag || 'Event'}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${e.location || ''}</div>
+    `;
+    if (e.image) {
+      el.classList.add('with-bg');
+      el.style.setProperty('--event-img', `url("${e.image}")`);
+    }
+    pastGrid.appendChild(el);
+  });
+
+  // === HERO / COUNTDOWN ===
+  const next = upcoming[0];               // first future event only (live removed)
+  const chip = document.getElementById('hero-chip');
+  const pills = document.getElementById('hero-pills');
+  const header = document.getElementById('countdown-title');
+  const cdCard = document.getElementById('countdown-card');
+
+  if (live.length) {
+    // If something is live, show it in the hero and stop the countdown
+    const cur = live[0];
+    chip.textContent = `Live now • ${cur.title}`;
+    pills.innerHTML = `
+      <div class="pill">🟢 Live</div>
+      <div class="pill">📍 ${cur.location || 'Online'}</div>
+      <div class="pill">🏁 ${cur.description || ''}</div>`;
+    header.textContent = 'Live now!';
+    setCountdown(0,0,0,0);
+    const heroImg = cur?.hero_image || cur?.image;
+    if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+    else cdCard?.style.removeProperty('--cd-img');
+  } else if (next) {
+    chip.textContent = `Next Event • ${next.title}`;
+    pills.innerHTML = `
+      <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+      <div class="pill">📍 ${next.location || 'Online'}</div>
+      <div class="pill">🏁 ${next.description || ''}</div>`;
+    startCountdown(next.start_iso, header);
+    const heroImg = next?.hero_image || next?.image;
+    if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+    else cdCard?.style.removeProperty('--cd-img');
+  } else {
+    chip.textContent = 'No upcoming event';
+    pills.innerHTML = '<div class="pill">Check back soon</div>';
+    header.textContent = 'Countdown';
+    setCountdown(0,0,0,0);
+    cdCard?.style.removeProperty('--cd-img');
+  }
+
+  updateJSONLD(live[0] || next || null);
+  attachReveals();
+  window.__eventsCache = events;
+}
+
+    // JSON-LD updater
+    function updateJSONLD(next){
+      const el=document.getElementById('event-jsonld');
+      if(!next){ el.textContent='{}'; return; }
+      el.textContent=JSON.stringify({
+        "@context":"https://schema.org",
+        "@type":"Event",
+        name: next.title,
+        startDate: next.start_iso,
+        endDate: next.end_iso,
+        eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+        eventStatus: "https://schema.org/EventScheduled",
+        location:{"@type":"VirtualLocation","url":"https://trackmaniaevents.com"},
+        description: next.description||"",
+        image: next.image || undefined,
+        organizer:{"@type":"Organization","name":"Trackmania Events","url":"https://trackmaniaevents.com"}
+      });
+    }
+
+    async function loadEvents(){
+      try{
+        const res=await fetch('/events.json?cb='+Date.now());
+        if(!res.ok) throw new Error('Failed to fetch events.json');
+        const data=await res.json();
+        renderFromData(Array.isArray(data)?data:[]);
+      }catch(err){
+        console.error(err);
+        const grid=document.getElementById('events-grid');
+        grid.innerHTML='<article class="event"><div class="meta">Could not load events.</div></article>';
+        document.getElementById('countdown-title').textContent='Countdown';
+        setCountdown(0,0,0,0);
+      }
+    }
+
+    // Twitch embed (with autoplay disabled)
+    (function(){
+      const parents=['trackmaniaevents.com','www.trackmaniaevents.com'];
+      const embed=document.getElementById('twitch-embed');
+      const iframe=document.createElement('iframe');
+      iframe.className='player'; iframe.allowFullscreen=true; iframe.allow='autoplay; encrypted-media; picture-in-picture';
+      iframe.src=`https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&autoplay=false`+
+        parents.map(p=>`&parent=${encodeURIComponent(p)}`).join('')+`&muted=true`;
+      embed.appendChild(iframe);
+    })();
+
+    // Scrollspy for nav
+    (function(){
+      const sections=[...document.querySelectorAll('section[id]')];
+      const links=[...document.querySelectorAll('.navlinks a')];
+      const byId=id=>links.find(a=>a.getAttribute('href')===`#${id}`);
+      const io=new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); const a=byId(e.target.id); if(a) a.classList.add('active'); } });
+      },{rootMargin:'-40% 0px -55% 0px', threshold:0});
+      sections.forEach(s=>io.observe(s));
+    })();
+
+    // Reveal on scroll
+    function attachReveals(){
+      const reveals=document.querySelectorAll('.reveal:not(.show)');
+      const io2=new IntersectionObserver((entries,obs)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); obs.unobserve(e.target); } });
+      },{threshold:0.12});
+      reveals.forEach(el=>io2.observe(el));
+    }
+    attachReveals();
+
+    // Back to top
+    (function(){
+      const btn=document.getElementById('toTop');
+      addEventListener('scroll',()=> btn.classList.toggle('show', scrollY>600));
+      btn.onclick=()=> window.scrollTo({top:0, behavior:'smooth'});
+    })();
+
+    // Add to Calendar
+    (function(){
+      const btn=document.getElementById('addCal');
+      function icsEscape(s){return (s||'').replace(/[\\,;]/g,m=>"\\"+m).replace(/\n/g,"\\n");}
+      function dt(iso){ return iso.replace(/[-:]/g,"").replace(/\.\d{3}Z$/,'Z'); }
+      function downloadICS(ev){
+        const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TrackmaniaEvents//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
+          'DTSTART:'+dt(ev.start_iso),'DTEND:'+dt(ev.end_iso),'SUMMARY:'+icsEscape(ev.title),
+          ev.location?'LOCATION:'+icsEscape(ev.location):'', ev.description?'DESCRIPTION:'+icsEscape(ev.description):'',
+          'END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');
+        const blob=new Blob([ics],{type:'text/calendar'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(ev.title||'event')+'.ics'; a.click(); URL.revokeObjectURL(a.href);
+      }
+      btn?.addEventListener('click',()=>{
+        const evts=window.__eventsCache||[];
+        const next=(function(evs){ const now=Date.now(); return evs.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso))[0]; })(evts);
+        if(next) downloadICS(next);
+      });
+    })();
+
+    // Kick off
+    loadEvents();
+    document.getElementById('year').textContent=new Date().getFullYear();
+  </script>
+
+  <!-- AJAX contact form (no redirect) -->
+  <script>
+    (function(){
+      const form = document.getElementById("contact-form");
+      const status = document.getElementById("formStatus");
+      if(!form) return;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // stay on the same page
+        status.textContent = "Sending…";
+
+        const btn = form.querySelector('button[type="submit"]');
+        btn?.setAttribute('disabled','disabled');
+
+        try {
+          const response = await fetch(form.action, {
+            method: form.method,
+            body: new FormData(form),
+            headers: { Accept: "application/json" }, // prevents redirect; returns JSON
+          });
+
+          if (response.ok) {
+            status.textContent = "✅ Message sent successfully!";
+            form.reset();
+            setTimeout(() => (status.textContent = ""), 4000);
+          } else {
+            const data = await response.json().catch(()=>({}));
+            status.textContent = (data && data.errors && data.errors[0] && data.errors[0].message) || "⚠️ Something went wrong. Please try again.";
+          }
+        } catch {
+          status.textContent = "⚠️ Network error. Please try again later.";
+        } finally {
+          btn?.removeAttribute('disabled');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
