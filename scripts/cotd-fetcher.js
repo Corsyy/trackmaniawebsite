@@ -110,6 +110,18 @@ function stripTmFormatting(input) {
   return s.replace(new RegExp(DOLLAR_TOKEN, "g"), "$");
 }
 
+function toMs(dt) {
+  if (dt == null) return NaN;
+  let n = typeof dt === "string" ? Number(dt) : dt;
+  if (Number.isFinite(n)) {
+    // epoch seconds -> ms
+    if (n < 2e12) n *= 1000;
+    return n;
+  }
+  const p = Date.parse(dt);
+  return Number.isFinite(p) ? p : NaN;
+}
+
 async function fetchTmioMonth(index = 0) {
   const r = await fetchRetry(`${TMIO}/api/totd/${index}`, { headers: { "User-Agent": "tm-cotd" } });
   if (!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
@@ -191,23 +203,21 @@ async function listCompetitions(offset=0, length=100) {
 
 /** Find COTD for a given UTC date by start time within that day. */
 async function findCotdCompetitionByDate(y, m1, d) {
-  const dayStart = new Date(Date.UTC(y, m1 - 1, d, 0, 0, 0)).getTime();
-  const dayEnd   = new Date(Date.UTC(y, m1 - 1, d, 23, 59, 59, 999)).getTime();
+  const dayStart = Date.UTC(y, m1 - 1, d, 0, 0, 0);
+  const dayEnd   = Date.UTC(y, m1 - 1, d, 23, 59, 59, 999);
 
-  const MAX_PAGES = 80;
-  const PAGE_LEN  = 100;
-  let hits = [];
+  const MAX_PAGES = 80, PAGE_LEN = 100;
+  const hits = [];
 
   for (let page = 0; page < MAX_PAGES; page++) {
     const offset = page * PAGE_LEN;
     const data = await listCompetitions(offset, PAGE_LEN);
     const comps = data?.competitions || data?.items || [];
-    if (!Array.isArray(comps) || comps.length === 0) break;
+    if (!Array.isArray(comps) || !comps.length) break;
 
     for (const c of comps) {
       const dtRaw = c.startDate ?? c.beginDate ?? c.startTime ?? c.beginTime ?? c.date ?? null;
-      if (!dtRaw) continue;
-      const ts = Number.isFinite(dtRaw) ? dtRaw : Date.parse(dtRaw);
+      const ts = toMs(dtRaw);
       if (!Number.isFinite(ts)) continue;
       if (ts < dayStart || ts > dayEnd) continue;
       if (!looksLikeCotd(c)) continue;
@@ -220,18 +230,19 @@ async function findCotdCompetitionByDate(y, m1, d) {
 
   if (!hits.length) return null;
 
-  // prefer exact YYYY-MM-DD in name, else latest start time
-  const ymd = `${y}-${pad2(m1)}-${pad2(d)}`;
+  // Prefer exact YYYY-MM-DD in name (e.g. "COTD 2025-10-21 #2"), else pick earliest start (usually #1).
+  const ymd = `${y}-${String(m1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
   let pick = hits.find(c => String(c.name ?? "").includes(ymd));
   if (!pick) {
     pick = hits.reduce((best, cur) => {
-      const bt = Date.parse(best.startDate ?? best.beginDate ?? best.startTime ?? 0) || 0;
-      const ct = Date.parse(cur.startDate  ?? cur.beginDate  ?? cur.startTime  ?? 0) || 0;
-      return ct > bt ? cur : best;
+      const bt = toMs(best.startDate ?? best.beginDate ?? best.startTime ?? best.beginTime);
+      const ct = toMs(cur.startDate  ?? cur.beginDate  ?? cur.startTime  ?? cur.beginTime);
+      return (ct < bt ? cur : best); // earliest = "#1"
     }, hits[0]);
   }
   return pick;
 }
+
 
 async function getD1WinnerForCompetition(compId) {
   if (!compId) return null;
@@ -244,33 +255,50 @@ async function getD1WinnerForCompetition(compId) {
   const finalRound =
     rounds.find(r => String(r?.name ?? "").toLowerCase().includes("final")) ??
     rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
-
   if (!finalRound?.id) return null;
 
-  const matchesRes = await fetchRetry(`${MEET}/api/rounds/${finalRound.id}/matches?length=50&offset=0`, { headers: await nadeoHeaders() });
+  const matchesRes = await fetchRetry(`${MEET}/api/rounds/${finalRound.id}/matches?length=200&offset=0`, { headers: await nadeoHeaders() });
   if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
-  const matches = await matchesRes.json();
-  const match = matches?.matches?.[0] || matches?.[0];
-  if (!match?.id) return null;
+  const matches = matchesRes.json ? await matchesRes.json() : [];
+  const list = matches?.matches || matches || [];
+  if (!Array.isArray(list) || !list.length) return null;
 
-  const resultsRes = await fetchRetry(`${MEET}/api/matches/${match.id}/results?length=512&offset=0`, { headers: await nadeoHeaders() });
-  if (!resultsRes.ok) throw new Error(`results failed: ${resultsRes.status}`);
-  const results = await resultsRes.json();
+  let best = null; // { participant, rank, points }
+  for (const m of list) {
+    if (!m?.id) continue;
+    const resultsRes = await fetchRetry(`${MEET}/api/matches/${m.id}/results?length=512&offset=0`, { headers: await nadeoHeaders() });
+    if (!resultsRes.ok) continue;
+    const results = await resultsRes.json();
+    const arr = results?.results || results || [];
+    if (!Array.isArray(arr) || !arr.length) continue;
 
-  const arr = results?.results || results || [];
-  if (!Array.isArray(arr) || arr.length === 0) return null;
+    arr.sort((a, b) => {
+      const ar = a.rank ?? a.position ?? Infinity;
+      const br = b.rank ?? b.position ?? Infinity;
+      if (ar !== br) return ar - br;
+      const ap = (typeof a.points === "number" ? -a.points : 0);
+      const bp = (typeof b.points === "number" ? -b.points : 0);
+      return ap - bp;
+    });
 
-  arr.sort((a, b) => {
-    const ar = a.rank ?? a.position ?? Infinity;
-    const br = b.rank ?? b.position ?? Infinity;
-    if (ar !== br) return ar - br;
-    const ap = (typeof a.points === "number" ? -a.points : 0);
-    const bp = (typeof b.points === "number" ? -b.points : 0);
-    return ap - bp;
-  });
+    const top = arr[0];
+    if (!best) {
+      best = { participant: top.participant, rank: top.rank ?? top.position ?? Infinity, points: top.points ?? 0 };
+    } else {
+      const br = best.rank ?? Infinity;
+      const tr = top.rank ?? top.position ?? Infinity;
+      if (tr < br || (tr === br && (top.points ?? 0) > (best.points ?? 0))) {
+        best = { participant: top.participant, rank: tr, points: top.points ?? 0 };
+      }
+    }
 
-  return arr[0]?.participant ?? null;
+    // Early exit if we already saw a rank-1 (can’t beat that)
+    if ((best.rank ?? Infinity) === 1) break;
+  }
+
+  return best?.participant ?? null;
 }
+
 
 /* -------- display-name hydration via Core (bulk + tiny cache) -------- */
 const NAMES_CACHE_PATH = path.join(COTD_DIR, "_names-cache.json");
