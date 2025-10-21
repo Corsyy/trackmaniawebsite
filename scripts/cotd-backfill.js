@@ -2,7 +2,6 @@ import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
 
-// ---------- config ----------
 const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
 const COTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/cotd`;
 
@@ -11,6 +10,9 @@ const CORE  = "https://prod.trackmania.core.nadeo.online";
 
 const NADEO_REFRESH_TOKEN = process.env.NADEO_REFRESH_TOKEN || "";
 const WATCH_INTERVAL_MS   = parseInt(process.env.UPDATE_EVERY || "", 10) || 15 * 60 * 1000;
+
+const DEBUG = process.env.DEBUG === "1";
+const dlog = (...args) => { if (DEBUG) console.log("[COTD-DEBUG]", ...args); };
 
 // ---------- fs helpers ----------
 const ensureDir = (p) => mkdir(p, { recursive: true });
@@ -27,29 +29,21 @@ function* daysOfMonth(year, month1) {
   for (let d = 1; d <= days; d++) yield d;
 }
 function ymdFromDate(date) {
-  return {
-    y: date.getUTCFullYear(),
-    m1: date.getUTCMonth() + 1,
-    d: date.getUTCDate(),
-  };
-}
-function firstUTCOfMonth(y, m1) {
-  return new Date(Date.UTC(y, m1 - 1, 1, 0, 0, 0));
+  return { y: date.getUTCFullYear(), m1: date.getUTCMonth() + 1, d: date.getUTCDate() };
 }
 function clampToToday(y, m1, d) {
   const now = new Date();
-  const nowY = now.getUTCFullYear();
-  const nowM1 = now.getUTCMonth() + 1;
-  const nowD = now.getUTCDate();
-  if (y > nowY) return false;
-  if (y === nowY && m1 > nowM1) return false;
-  if (y === nowY && m1 === nowM1 && d > nowD) return false;
+  const ny = now.getUTCFullYear();
+  const nm1 = now.getUTCMonth() + 1;
+  const nd = now.getUTCDate();
+  if (y > ny) return false;
+  if (y === ny && m1 > nm1) return false;
+  if (y === ny && m1 === nm1 && d > nd) return false;
   return true;
 }
 
 // ---------- robust fetch with retries ----------
 async function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
 async function fetchRetry(url, opts={}, retries=5, baseDelay=500) {
   let lastErr;
   for (let i=0;i<=retries;i++){
@@ -79,9 +73,7 @@ let _cachedAccess = { token: null, expAt: 0 };
 
 async function nadeoAccess() {
   const now = Date.now();
-  if (_cachedAccess.token && now < _cachedAccess.expAt - 10_000) {
-    return _cachedAccess.token;
-  }
+  if (_cachedAccess.token && now < _cachedAccess.expAt - 10_000) return _cachedAccess.token;
   const r = await fetchRetry(`${CORE}/v2/authentication/token/refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `nadeo_v1 t=${NADEO_REFRESH_TOKEN}` },
@@ -90,81 +82,77 @@ async function nadeoAccess() {
   if (!r.ok) throw new Error(`refresh failed: ${r.status}`);
   const j = await r.json();
   const token = j.accessToken;
-  // Heuristic: default 9 minutes if no expiresIn given
   const expMs = (j.expiresIn ? j.expiresIn * 1000 : 9 * 60 * 1000);
   _cachedAccess = { token, expAt: Date.now() + expMs };
   return token;
 }
-const nadeoHeaders = async (extra={}) => ({
-  Authorization: `nadeo_v1 t=${await nadeoAccess()}`,
-  ...extra,
-});
+const nadeoHeaders = async (extra={}) => ({ Authorization: `nadeo_v1 t=${await nadeoAccess()}`, ...extra });
 
-// ---------- helpers: competitions ----------
+// ---------- competitions ----------
 function looksLikeCotd(c) {
   const name = String(c?.name || "").toLowerCase();
   return name.includes("cup of the day") || name.includes("cotd");
 }
-
 async function listCompetitions(offset = 0, length = 100) {
   const r = await fetchRetry(`${MEET}/api/competitions?offset=${offset}&length=${length}`, {
     headers: await nadeoHeaders()
   });
   if (!r.ok) throw new Error(`competitions list failed: ${r.status}`);
-  return r.json(); // { competitions, total, ... } (shape may vary)
+  return r.json();
 }
 
 /**
- * Find the COTD competition by date. Scans pages, preferring a strict YYYY-MM-DD
- * match in the name. Falls back to loose partials.
+ * Find COTD for a UTC date by verifying start time inside that day.
+ * Name is only a hint to avoid false positives.
  */
 async function findCotdCompetitionByDate(y, m1, d) {
-  const wanted = `${y}-${pad2(m1)}-${pad2(d)}`;
-  const MAX_PAGES = 60;
+  const dayStart = new Date(Date.UTC(y, m1 - 1, d, 0, 0, 0)).getTime();
+  const dayEnd   = new Date(Date.UTC(y, m1 - 1, d, 23, 59, 59, 999)).getTime();
+
+  const MAX_PAGES = 80;
   const PAGE_LEN  = 100;
+  let hits = [];
 
   for (let page = 0; page < MAX_PAGES; page++) {
     const offset = page * PAGE_LEN;
     const data = await listCompetitions(offset, PAGE_LEN);
     const comps = data?.competitions || data?.items || [];
-
     if (!Array.isArray(comps) || comps.length === 0) break;
 
-    // strict
-    let match = comps.find(c => looksLikeCotd(c) && String(c.name).includes(wanted));
-
-    // loose fallback
-    if (!match) {
-      const dayStr = ` ${d} `;
-      match = comps.find(c => looksLikeCotd(c) && String(c.name).toLowerCase().includes(`cotd`) && String(c.name).includes(dayStr));
+    for (const c of comps) {
+      const dtRaw = c.startDate ?? c.beginDate ?? c.startTime ?? c.beginTime ?? c.date ?? null;
+      if (!dtRaw) continue;
+      const ts = Number.isFinite(dtRaw) ? dtRaw : Date.parse(dtRaw);
+      if (!Number.isFinite(ts)) continue;
+      if (ts < dayStart || ts > dayEnd) continue;
+      if (!looksLikeCotd(c)) continue;
+      hits.push(c);
     }
-
-    if (!match) {
-      // try by start date if provided (some envs expose 'startDate'/'beginDate')
-      const alt = comps.find(c => {
-        const dt = c.startDate || c.beginDate || c.startTime;
-        if (!dt) return false;
-        try {
-          const cd = new Date(dt);
-          const cy = cd.getUTCFullYear();
-          const cm1 = cd.getUTCMonth() + 1;
-          const cdn = cd.getUTCDate();
-          return looksLikeCotd(c) && cy === y && cm1 === m1 && cdn === d;
-        } catch { return false; }
-      });
-      if (alt) match = alt;
-    }
-
-    if (match) return match;
 
     const total = data?.total ?? (offset + comps.length);
     if (offset + comps.length >= total) break;
   }
 
-  return null;
+  if (!hits.length) {
+    dlog(`No COTD hits on ${y}-${pad2(m1)}-${pad2(d)}.`);
+    return null;
+  }
+
+  const ymd = `${y}-${pad2(m1)}-${pad2(d)}`;
+  let pick = hits.find(c => String(c.name ?? "").includes(ymd));
+  if (!pick) {
+    pick = hits.reduce((best, cur) => {
+      const bt = Date.parse(best.startDate ?? best.beginDate ?? best.startTime ?? 0) || 0;
+      const ct = Date.parse(cur.startDate  ?? cur.beginDate  ?? cur.startTime  ?? 0) || 0;
+      return ct > bt ? cur : best;
+    }, hits[0]);
+  }
+
+  dlog(`Picked COTD:`, { id: pick.id || pick.liveId || pick.uid, name: pick.name });
+  return pick;
 }
 
-// ---------- helpers: winners ----------
+// ---------- winners ----------
 async function getD1WinnerForCompetition(compId) {
   if (!compId) return null;
 
@@ -207,21 +195,15 @@ async function getD1WinnerForCompetition(compId) {
 // ---------- display name hydration (bulk+cache) ----------
 const NAMES_CACHE_PATH = path.join(COTD_DIR, "_names-cache.json");
 
-async function loadNamesCache() {
-  return await loadJson(NAMES_CACHE_PATH, {});
-}
-async function saveNamesCache(cache) {
-  await ensureDir(COTD_DIR);
-  await writeJson(NAMES_CACHE_PATH, cache);
-}
+async function loadNamesCache() { return await loadJson(NAMES_CACHE_PATH, {}); }
+async function saveNamesCache(cache) { await ensureDir(COTD_DIR); await writeJson(NAMES_CACHE_PATH, cache); }
 
-/** Core: /accounts/displayNames?accountIdList=...  (bulk) */
+/** Core bulk endpoint */
 async function fetchDisplayNamesBulk(accountIds) {
   if (!accountIds.length) return {};
   const ids = [...new Set(accountIds)].filter(Boolean);
   if (!ids.length) return {};
 
-  // API tends to allow ~100 per call safely
   const chunks = [];
   for (let i=0;i<ids.length;i+=100) chunks.push(ids.slice(i, i+100));
 
@@ -238,7 +220,6 @@ async function fetchDisplayNamesBulk(accountIds) {
   }
   return out;
 }
-
 async function hydrateDisplayNames(ids) {
   const cache = await loadNamesCache();
   const missing = ids.filter(id => cache[id] === undefined);
@@ -247,7 +228,6 @@ async function hydrateDisplayNames(ids) {
     for (const id of missing) cache[id] = fetched[id] ?? null;
     await saveNamesCache(cache);
   }
-  // return a map for convenience
   const map = {};
   for (const id of ids) map[id] = cache[id] ?? null;
   return map;
@@ -261,7 +241,6 @@ async function upsertMonth(dir, key, dayKey, record) {
   data.days[dayKey] = record;
   await writeJson(p, data);
 
-  // rebuild months.json
   const items = await readdir(dir, { withFileTypes: true });
   const months = items
     .filter(e => e.isFile() && e.name.endsWith(".json") && e.name !== "months.json" && !e.name.startsWith("_"))
@@ -271,7 +250,7 @@ async function upsertMonth(dir, key, dayKey, record) {
   await writeJson(path.join(dir, "months.json"), { months });
 }
 
-// ---------- month backfill/update ----------
+// ---------- month update ----------
 async function updateMonth(year, month1) {
   const mKey = monthKey(year, month1);
   const monthPath = path.join(COTD_DIR, `${mKey}.json`);
@@ -279,31 +258,33 @@ async function updateMonth(year, month1) {
 
   console.log(`[COTD] Updating month ${mKey} …`);
 
-  // Collect changes & unresolved names
   const winnersToHydrate = new Set();
 
   for (const d of daysOfMonth(year, month1)) {
-    if (!clampToToday(year, month1, d)) break; // don't look into future days
+    if (!clampToToday(year, month1, d)) break;
 
     const dk = dateKey(year, month1, d);
     if (!monthData.days[dk]) monthData.days[dk] = { date: dk, cotd: null };
 
-    // If already has a winner, keep—but still hydrate name if missing
+    // already has winner id but no name -> hydrate later
     if (monthData.days[dk]?.cotd?.winnerAccountId && !monthData.days[dk]?.cotd?.winnerDisplayName) {
       winnersToHydrate.add(monthData.days[dk].cotd.winnerAccountId);
       continue;
     }
 
-    // Otherwise (no winner yet), try to find competition & winner now
+    // no winner yet -> try to find competition & winner
     try {
       const comp = await findCotdCompetitionByDate(year, month1, d);
       if (!comp) {
-        // leave as is; maybe not published yet or naming drift
+        dlog(`No competition found for ${dk}.`);
         continue;
       }
       const cid = comp.id || comp.liveId || comp.uid;
       const winnerId = await getD1WinnerForCompetition(cid);
-      if (!winnerId) continue;
+      if (!winnerId) {
+        dlog(`Winner not available yet for ${dk} (comp=${cid}).`);
+        continue;
+      }
 
       monthData.days[dk] = {
         date: dk,
@@ -316,7 +297,7 @@ async function updateMonth(year, month1) {
     }
   }
 
-  // Bulk-hydrate names for any IDs missing display names
+  // hydrate missing names
   if (winnersToHydrate.size) {
     const nameMap = await hydrateDisplayNames([...winnersToHydrate]);
     for (const dk of Object.keys(monthData.days)) {
@@ -327,7 +308,6 @@ async function updateMonth(year, month1) {
     }
   }
 
-  // Write updated month and months index
   await ensureDir(COTD_DIR);
   await writeJson(monthPath, monthData);
 
@@ -342,53 +322,35 @@ async function updateMonth(year, month1) {
   console.log(`[COTD] ${mKey} done.`);
 }
 
-// ---------- top-level routines ----------
+// ---------- top-level ----------
 async function updatePrevAndCurrent() {
   const now = new Date();
   const { y, m1 } = ymdFromDate(now);
   const prev = new Date(Date.UTC(y, m1 - 2, 1));
-
   await updateMonth(prev.getUTCFullYear(), prev.getUTCMonth() + 1);
   await updateMonth(y, m1);
 }
+async function updateSpecific(year, month1) { await updateMonth(year, month1); }
 
-async function updateSpecific(year, month1) {
-  await updateMonth(year, month1);
-}
-
-// ---------- CLI ----------
 async function main() {
   await ensureDir(COTD_DIR);
-
   const args = process.argv.slice(2).map(x => x.trim().toLowerCase());
 
   if (args.length === 2 && /^\d{4}$/.test(args[0]) && /^\d{1,2}$/.test(args[1])) {
-    const year = parseInt(args[0], 10);
-    const month1 = parseInt(args[1], 10);
-    if (!year || !month1) throw new Error("Usage: node scripts/cotd-backfill.js YYYY MM");
-    await updateSpecific(year, month1);
+    await updateSpecific(parseInt(args[0],10), parseInt(args[1],10));
     return;
   }
 
   if (args.includes("--watch")) {
     console.log(`[COTD] Watch mode on. Interval: ${WATCH_INTERVAL_MS}ms`);
-    // initial run
     await updatePrevAndCurrent();
-
-    // periodic updates
-    // covers: late-publishing winners, name hydration, and today's result once it's available
-    // Also re-checks yesterday in case results arrived late.
     setInterval(async () => {
-      try {
-        await updatePrevAndCurrent();
-      } catch (e) {
-        console.error("[COTD] periodic update error:", e);
-      }
+      try { await updatePrevAndCurrent(); }
+      catch (e) { console.error("[COTD] periodic update error:", e); }
     }, WATCH_INTERVAL_MS);
-    return; // keep process alive
+    return;
   }
 
-  // default one-off update for prev+current month
   await updatePrevAndCurrent();
 }
 
