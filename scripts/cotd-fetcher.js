@@ -1,5 +1,5 @@
-// scripts/cotd-fetcher.js  (Node 20+)
-import { mkdir, readFile, writeFile, access } from "node:fs/promises";
+// Node 20+ (native fetch)
+import { mkdir, writeFile, readFile, access } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
 
@@ -8,24 +8,45 @@ const MEET  = "https://meet.trackmania.nadeo.club";
 const CORE  = "https://prod.trackmania.core.nadeo.online";
 const OAUTH = "https://api.trackmania.com";
 
-// Secrets (GitHub Actions -> repo Secrets)
+/* ------------------- where to write files ------------------- */
+const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";          // <- set by workflow
+const COTD_DIR    = `${PUBLIC_DIR}/data/cotd`;
+const TOTD_DIR    = `${PUBLIC_DIR}/data/totd`;
+const COTD_LATEST = `${PUBLIC_DIR}/cotd.json`;
+const TOTD_LATEST = `${PUBLIC_DIR}/totd.json`;
+
+/* ------------------- secrets ------------------- */
 const NADEO_REFRESH_TOKEN = process.env.NADEO_REFRESH_TOKEN || "";
-const TM_CLIENT_ID     = process.env.TM_CLIENT_ID || "";
-const TM_CLIENT_SECRET = process.env.TM_CLIENT_SECRET || "";
+const TM_CLIENT_ID        = process.env.TM_CLIENT_ID || "";
+const TM_CLIENT_SECRET    = process.env.TM_CLIENT_SECRET || "";
 
-// Output roots (change in workflow if needed)
-const COTD_DIR  = process.env.COTD_DATA_DIR || "./data/cotd";
-const TOTD_DIR  = "./data/totd";
-const COTD_LATEST = "./cotd.json";
-const TOTD_LATEST = "./totd.json";
-
-/* ------------ small fs helpers ------------ */
-const clean = s => (typeof s === "string" ? s : "");
-const ensureDir = p => mkdir(p, { recursive: true });
-const exists = async p => { try { await access(p, FS.F_OK); return true; } catch { return false; } };
+/* ------------------- tiny fs helpers ------------------- */
+const ensureDir = (p) => mkdir(p, { recursive: true });
+const exists = async (p) => { try { await access(p, FS.F_OK); return true; } catch { return false; } };
 const loadJson = async (p, f) => (await exists(p)) ? JSON.parse(await readFile(p, "utf8")) : f;
+const writeJson = (p, obj) => writeFile(p, JSON.stringify(obj, null, 2), "utf8");
 
-/* ------------ Nadeo access via refresh token ------------ */
+/* ------------------- date helpers ------------------- */
+// Trackmania.io uses 0-based month; normalize to 1-based.
+function tmioMonthYear(resp) {
+  const year = resp?.month?.year ?? new Date().getUTCFullYear();
+  const month1 = (resp?.month?.month ?? new Date().getUTCMonth()) + 1; // +1 is important
+  return { year, month1 };
+}
+function tmioDayNumber(dayObj) {
+  return (
+    dayObj?.day ??
+    dayObj?.dayIndex ??
+    dayObj?.monthDay ??
+    dayObj?.dayInMonth ??
+    1
+  );
+}
+const dateKey = (y, m1, d) =>
+  `${y}-${String(m1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+const monthKey = (y, m1) => `${y}-${String(m1).padStart(2, "0")}`;
+
+/* ------------------- auth + display names ------------------- */
 async function nadeoAccess() {
   if (!NADEO_REFRESH_TOKEN) throw new Error("Missing NADEO_REFRESH_TOKEN");
   const r = await fetch(`${CORE}/v2/authentication/token/refresh`, {
@@ -39,7 +60,6 @@ async function nadeoAccess() {
 }
 const nadeoHeaders = async () => ({ Authorization: `nadeo_v1 t=${await nadeoAccess()}` });
 
-/* ------------ Display names (optional nicety) ------------ */
 async function tmOAuth() {
   if (!TM_CLIENT_ID || !TM_CLIENT_SECRET) return null;
   const body = new URLSearchParams({
@@ -48,79 +68,80 @@ async function tmOAuth() {
     client_secret: TM_CLIENT_SECRET,
     scope: "basic display-name"
   });
-  const r = await fetch(`${OAUTH}/oauth/token`, { method: "POST", headers:{ "Content-Type":"application/x-www-form-urlencoded" }, body });
+  const r = await fetch(`${OAUTH}/oauth/token`, {
+    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body
+  });
   if (!r.ok) return null;
-  return (await r.json()).access_token;
+  const j = await r.json();
+  return j.access_token;
 }
 async function resolveNames(ids) {
   if (!ids?.length) return {};
-  const tok = await tmOAuth(); if (!tok) return {};
+  const token = await tmOAuth(); if (!token) return {};
   const qs = ids.map(i => `accountId[]=${encodeURIComponent(i)}`).join("&");
-  const r = await fetch(`${OAUTH}/api/display-names/account-ids?${qs}`, { headers: { Authorization:`Bearer ${tok}` }});
+  const r = await fetch(`${OAUTH}/api/display-names/account-ids?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   return r.ok ? r.json() : {};
 }
 
-/* ------------ TOTD (trackmania.io, no auth) ------------ */
-function monthKey(y, m){ return `${y}-${String(m).padStart(2,"0")}`; }
-function dateKey(y,m,d){ return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`; }
-
-function pick(vals, fallback){ for (const v of vals){ if (v !== undefined && v !== null && v !== "") return v; } return fallback; }
-
-async function fetchTmioMonth(index=0){
-  const r = await fetch(`https://trackmania.io/api/totd/${index}`, { headers: { "User-Agent":"tm-cotd" }});
+/* ------------------- TOTD from trackmania.io (no auth) ------------------- */
+async function fetchTmioMonth(index = 0) {
+  const r = await fetch(`https://trackmania.io/api/totd/${index}`, {
+    headers: { "User-Agent": "tm-cotd" }
+  });
   if (!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
-
-function normalizeTmioDay(y, m, d){
-  const mobj = d.map || d;
-  const uid   = pick([mobj.mapUid, d.mapUid], null);
-  const name  = pick([mobj.name, mobj.mapName, d.name], "(unknown map)");
-  const thumb = pick([mobj.thumbnail, mobj.thumbnailUrl, d.thumbnail, d.thumbnailUrl], "");
-  const authorId = pick([
-    mobj.authorPlayer?.accountId, mobj.authorplayer?.accountid, mobj.author_accountid,
-    d.authorPlayer?.accountId, d.authorplayer?.accountid
-  ], null);
-  const authorName = pick([
-    mobj.authorPlayer?.name, mobj.authorplayer?.name, mobj.authorName, mobj.author,
-    d.authorPlayer?.name, d.authorplayer?.name
-  ], "(unknown)");
+function normTmioEntry(y, m1, entry) {
+  const m = entry.map || entry;
+  const uid   = m.mapUid ?? entry.mapUid ?? null;
+  const name  = m.name ?? m.mapName ?? entry.name ?? "(unknown map)";
+  const thumb = m.thumbnail ?? m.thumbnailUrl ?? entry.thumbnail ?? entry.thumbnailUrl ?? "";
+  const authorAccountId =
+    m.authorPlayer?.accountId ?? m.authorplayer?.accountid ??
+    entry.authorPlayer?.accountId ?? entry.authorplayer?.accountid ?? null;
+  const authorDisplayName =
+    m.authorPlayer?.name ?? m.authorplayer?.name ?? m.authorName ?? m.author ??
+    entry.authorPlayer?.name ?? entry.authorplayer?.name ?? "(unknown)";
+  const d = tmioDayNumber(entry);
   return {
-    uid, name,
-    authorAccountId: authorId,
-    authorDisplayName: authorName,
-    thumbnailUrl: thumb
+    date: dateKey(y, m1, d),
+    map: { uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb }
   };
 }
-
-async function writeTotdMonth(index=0){
+async function writeTotdMonth(index = 0) {
   const j = await fetchTmioMonth(index);
-  const y = j?.month?.year ?? new Date().getUTCFullYear();
-  const m = j?.month?.month ?? (new Date().getUTCMonth()+1);
-  const key = monthKey(y,m);
+  const { year, month1 } = tmioMonthYear(j);
+  const mKey = monthKey(year, month1);
 
-  const days = {};
-  for (const d of (j.days||[])){
-    const dk = dateKey(y,m,d.day);
-    days[dk] = { date: dk, map: normalizeTmioDay(y,m,d) };
+  const daysOut = {};
+  for (const entry of Array.isArray(j.days) ? j.days : []) {
+    const rec = normTmioEntry(year, month1, entry);
+    daysOut[rec.date] = rec;
   }
 
   await ensureDir(TOTD_DIR);
-  await writeFile(path.join(TOTD_DIR, `${key}.json`), JSON.stringify({ month:key, days }, null, 2));
+  await writeJson(path.join(TOTD_DIR, `${mKey}.json`), { month: mKey, days: daysOut });
+
   const idxPath = path.join(TOTD_DIR, "months.json");
   const idx = await loadJson(idxPath, { months: [] });
-  if (!idx.months.includes(key)){ idx.months.push(key); idx.months.sort().reverse(); await writeFile(idxPath, JSON.stringify(idx, null, 2)); }
-  return { key, days };
+  if (!idx.months.includes(mKey)) {
+    idx.months.push(mKey);
+    idx.months.sort().reverse();
+    await writeJson(idxPath, idx);
+  }
+  return { mKey, daysOut };
 }
 
-/* ------------ COTD winner (Meet; needs Nadeo token) ------------ */
+/* ------------------- COTD winner (Meet API) ------------------- */
 async function getCotdWinnerToday() {
-  try{
-    const cur = await fetch(`${MEET}/api/cup-of-the-day/current`, { headers: await nadeoHeaders() });
-    if (cur.status === 204) return null;
-    if (!cur.ok) throw new Error(`COTD current failed: ${cur.status}`);
-    const j = await cur.json();
-    const compId = j?.competition?.id ?? j?.competition?.liveId;
+  try {
+    const curRes = await fetch(`${MEET}/api/cup-of-the-day/current`, { headers: await nadeoHeaders() });
+    if (curRes.status === 204) return null;
+    if (!curRes.ok) throw new Error(`COTD current failed: ${curRes.status}`);
+    const cur = await curRes.json();
+    const compId = cur?.competition?.id ?? cur?.competition?.liveId;
     if (!compId) return null;
 
     const roundsRes = await fetch(`${MEET}/api/competitions/${compId}/rounds`, { headers: await nadeoHeaders() });
@@ -128,52 +149,69 @@ async function getCotdWinnerToday() {
     const rounds = await roundsRes.json();
     if (!Array.isArray(rounds) || !rounds.length) return null;
 
-    const final = rounds.find(r => String(r?.name??"").toUpperCase().includes("FINAL"))
-               ?? rounds.reduce((a,b)=>((a?.position??0)>(b?.position??0)?a:b));
-    if (!final?.id) return null;
+    const finalRound =
+      rounds.find(r => String(r?.name ?? "").toUpperCase().includes("FINAL")) ??
+      rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
 
-    const matches = await fetch(`${MEET}/api/rounds/${final.id}/matches?length=1&offset=0`, { headers: await nadeoHeaders() }).then(r=>r.json());
-    const match = matches?.matches?.[0]; if (!match?.id) return null;
+    if (!finalRound?.id) return null;
 
-    const results = await fetch(`${MEET}/api/matches/${match.id}/results?length=1`, { headers: await nadeoHeaders() }).then(r=>r.json());
+    const matchesRes = await fetch(`${MEET}/api/rounds/${finalRound.id}/matches?length=1&offset=0`, { headers: await nadeoHeaders() });
+    if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
+    const matches = await matchesRes.json();
+    const match = matches?.matches?.[0];
+    if (!match?.id) return null;
+
+    const resultsRes = await fetch(`${MEET}/api/matches/${match.id}/results?length=1`, { headers: await nadeoHeaders() });
+    if (!resultsRes.ok) throw new Error(`results failed: ${resultsRes.status}`);
+    const results = await resultsRes.json();
     return results?.results?.[0]?.participant ?? null;
-  }catch{ return null; }
+  } catch {
+    return null;
+  }
 }
 
-/* ------------ Writers (month + index + latest) ------------ */
-async function upsertMonth(dir, key, dk, record){
+/* ------------------- update month files + latest ------------------- */
+async function upsertMonth(dir, key, dayKey, record) {
   await ensureDir(dir);
   const p = path.join(dir, `${key}.json`);
-  const data = await loadJson(p, { month:key, days:{} });
-  data.days[dk] = record;
-  await writeFile(p, JSON.stringify(data, null, 2));
+  const data = await loadJson(p, { month: key, days: {} });
+  data.days[dayKey] = record;
+  await writeJson(p, data);
+
   const idxP = path.join(dir, "months.json");
   const idx = await loadJson(idxP, { months: [] });
-  if (!idx.months.includes(key)){ idx.months.push(key); idx.months.sort().reverse(); await writeFile(idxP, JSON.stringify(idx, null, 2)); }
+  if (!idx.months.includes(key)) {
+    idx.months.push(key);
+    idx.months.sort().reverse();
+    await writeJson(idxP, idx);
+  }
 }
 
-/* ------------ MAIN ------------ */
-async function main(){
-  // 1) TOTD: build/refresh current month from tm.io (author + map)
-  const { key: totdKey, days: totdDays } = await writeTotdMonth(0);
+/* ------------------- MAIN ------------------- */
+async function main() {
+  // 1) TOTD month from tm.io
+  const { mKey, daysOut } = await writeTotdMonth(0);
 
-  // 1a) Latest TOTD (today)
-  const today = new Date(); const dk = dateKey(today.getUTCFullYear(), today.getUTCMonth()+1, today.getUTCDate());
-  const todaysTotd = totdDays[dk] || Object.values(totdDays).at(-1);
-  await writeFile(TOTD_LATEST, JSON.stringify({ generatedAt:new Date().toISOString(), ...todaysTotd }, null, 2));
+  // 1a) write "today" for TOTD
+  const now = new Date();
+  const todayKey = dateKey(now.getUTCFullYear(), now.getUTCMonth()+1, now.getUTCDate());
+  const todayTotd = daysOut[todayKey] || Object.values(daysOut).at(-1);
+  if (todayTotd) {
+    await writeJson(TOTD_LATEST, { generatedAt: new Date().toISOString(), ...todayTotd });
+  }
 
-  // 2) COTD: just store winner for today (fills month over time). Winner needs Nadeo.
+  // 2) COTD: just the Division 1 winner for *today* (accumulates over time)
   const winnerId = await getCotdWinnerToday();
   const names = await resolveNames(winnerId ? [winnerId] : []);
-  const cotdRecord = {
-    date: dk,
+  const todayCotd = {
+    date: todayKey,
     cotd: {
       winnerAccountId: winnerId || null,
-      winnerDisplayName: (winnerId && names[winnerId]) || winnerId || null
+      winnerDisplayName: (winnerId && names[winnerId]) || winnerId || null,
     }
   };
-  await upsertMonth(COTD_DIR, totdKey, dk, cotdRecord);
-  await writeFile(COTD_LATEST, JSON.stringify({ generatedAt:new Date().toISOString(), ...cotdRecord }, null, 2));
+  await upsertMonth(COTD_DIR, mKey, todayKey, todayCotd);
+  await writeJson(COTD_LATEST, { generatedAt: new Date().toISOString(), ...todayCotd });
 }
 
-main().catch(e=>{ console.error(e); process.exit(1); });
+main().catch(err => { console.error(err); process.exit(1); });
