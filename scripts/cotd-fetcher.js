@@ -1,215 +1,164 @@
-// scripts/cotd-fetcher.js
-// Full-month Track of the Day from trackmania.io (no tokens).
-// Writes TWO files so the frontend can be flexible:
-//   data/totd/YYYY-MM.json
-//   data/totd/October-2025.json
-//
-// Usage:
-//   node scripts/cotd-fetcher.js          -> current month (/api/totd/0)
-//   node scripts/cotd-fetcher.js prev     -> previous month (/api/totd/1)
-//   node scripts/cotd-fetcher.js 0|1|2... -> explicit index (0=current, 1=prev, ...)
+// Node 20+ (native fetch). No external deps.
+import { writeFile } from "node:fs/promises";
 
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+const LIVE  = "https://live-services.trackmania.nadeo.live";
+const MEET  = "https://meet.trackmania.nadeo.club";
+const OAUTH = "https://api.trackmania.com";
 
-const ARG = process.argv[2] || "0";           // "prev" | "0" | "1" | "2"...
-const INDEX = ARG === "prev" ? 1 : Number.isFinite(Number(ARG)) ? Number(ARG) : 0;
-const OUTDIR = path.join("data", "totd");
+const NADEO_TOKEN      = process.env.NADEO_TOKEN;
+const TM_CLIENT_ID     = process.env.TM_CLIENT_ID || "";
+const TM_CLIENT_SECRET = process.env.TM_CLIENT_SECRET || "";
+const OUTPUT_PATH      = process.env.COTD_OUTPUT || "./cotd.json";
 
-// --- helpers ---------------------------------------------------------------
-function cleanTM(str = "") {
-  return String(str).replace(/\$[0-9a-fA-F]{3}|\$[a-zA-Z]|\$[0-9a-fA-F]/g, "").trim();
+if (!NADEO_TOKEN) {
+  console.error("Missing NADEO_TOKEN (add it as a repo secret).");
+  process.exit(1);
 }
-function looksLikeUUID(s = "") {
-  return /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s);
+
+function nadeoHeaders() {
+  return { Authorization: `nadeo_v1 t=${NADEO_TOKEN}` };
 }
-async function getJson(url) {
-  const r = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0 (Trackmania Events cotd-fetcher)" },
+
+async function getTmOAuthToken() {
+  if (!TM_CLIENT_ID || !TM_CLIENT_SECRET) return null;
+  const body = new URLSearchParams({
+    grant_type: "client_credentials",
+    client_id: TM_CLIENT_ID,
+    client_secret: TM_CLIENT_SECRET,
+    scope: "basic display-name"
   });
-  if (!r.ok) throw new Error(`${url} -> ${r.status} ${r.statusText}`);
-  return r.json();
-}
-function toISO(dateLike) {
-  if (!dateLike) return null;
-  if (typeof dateLike === "number") {
-    const ms = dateLike < 2e10 ? dateLike * 1000 : dateLike;
-    const d = new Date(ms);
-    return isNaN(d) ? null : d.toISOString().slice(0, 10);
+  const res = await fetch(`${OAUTH}/oauth/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body
+  });
+  if (!res.ok) {
+    console.warn(`TM OAuth token fetch failed: ${res.status}`);
+    return null;
   }
-  if (/^\d{4}-\d{2}-\d{2}/.test(String(dateLike))) return String(dateLike).slice(0, 10);
-  const t = Date.parse(String(dateLike));
-  return Number.isNaN(t) ? null : new Date(t).toISOString().slice(0, 10);
+  const j = await res.json();
+  return j?.access_token || null;
 }
-const isoMonth = (iso) => (iso || "").slice(0, 7);
-const slugMonth = (s) => String(s || "").trim().replace(/\s+/g, "-");
 
-// Enrich author + thumbnail via map endpoint
-async function enrichByMapUid(uid) {
-  if (!uid) return {};
-  try {
-    const m = await getJson(`https://trackmania.io/api/map/${encodeURIComponent(uid)}`);
-    const authorName = m?.authorplayer?.name || m?.authorname || m?.author || "";
-    const thumbnail = m?.thumbnail || m?.thumbnailUrl || m?.thumbnailURL || "";
-    return {
-      author_name: authorName ? cleanTM(authorName) : "",
-      thumbnail: thumbnail || "",
-    };
-  } catch {
+async function getTodaysTotdMapUid() {
+  const r = await fetch(`${LIVE}/api/token/campaign/month?length=1&offset=0`, {
+    headers: nadeoHeaders(),
+  });
+  if (!r.ok) throw new Error(`month campaign failed: ${r.status}`);
+  const data = await r.json();
+  const days = data?.monthList?.[0]?.days || [];
+  if (!days.length) throw new Error("No TOTD days in month list.");
+
+  const todayUTC = new Date().getUTCDate();
+  const entry = days.find(d => d?.day === todayUTC) ?? days.at(-1);
+  return entry?.mapUid ?? null;
+}
+
+async function getMapInfo(mapUid) {
+  const r = await fetch(`${LIVE}/api/token/map/${encodeURIComponent(mapUid)}`, {
+    headers: nadeoHeaders(),
+  });
+  if (!r.ok) throw new Error(`map fetch failed: ${r.status}`);
+  const j = await r.json();
+  return {
+    uid: j.uid,
+    name: j.name,
+    authorAccountId: j.author,
+    thumbnailUrl: j.thumbnailUrl,
+  };
+}
+
+// Winner of Division 1 in current COTD (if available)
+async function getCotdWinnerAccountId() {
+  const cur = await fetch(`${MEET}/api/cup-of-the-day/current`, {
+    headers: nadeoHeaders(),
+  });
+  if (cur.status === 204) return null; // no COTD right now
+  if (!cur.ok) throw new Error(`COTD current failed: ${cur.status}`);
+  const j = await cur.json();
+
+  const compId = j?.competition?.id ?? j?.competition?.liveId;
+  if (!compId) return null;
+
+  const roundsRes = await fetch(`${MEET}/api/competitions/${compId}/rounds`, {
+    headers: nadeoHeaders(),
+  });
+  if (!roundsRes.ok) throw new Error(`rounds failed: ${roundsRes.status}`);
+  const rounds = await roundsRes.json();
+  if (!Array.isArray(rounds) || !rounds.length) return null;
+
+  const finalRound =
+    rounds.find(r => String(r?.name ?? "").toUpperCase().includes("FINAL")) ??
+    rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
+
+  if (!finalRound?.id) return null;
+
+  const matchesRes = await fetch(
+    `${MEET}/api/rounds/${finalRound.id}/matches?length=1&offset=0`,
+    { headers: nadeoHeaders() }
+  );
+  if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
+  const matches = await matchesRes.json();
+  const match = matches?.matches?.[0];
+  if (!match?.id) return null;
+
+  const resultsRes = await fetch(
+    `${MEET}/api/matches/${match.id}/results?length=1`,
+    { headers: nadeoHeaders() }
+  );
+  if (!resultsRes.ok) throw new Error(`results failed: ${resultsRes.status}`);
+  const results = await resultsRes.json();
+  return results?.results?.[0]?.participant ?? null; // accountId
+}
+
+async function resolveDisplayNames(accountIds) {
+  if (!accountIds?.length) return {};
+  const token = await getTmOAuthToken();
+  if (!token) return {}; // fall back to IDs if we couldn't get a token
+
+  const qs = accountIds.map(id => `accountId[]=${encodeURIComponent(id)}`).join("&");
+  const r = await fetch(`${OAUTH}/api/display-names/account-ids?${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!r.ok) {
+    console.warn(`display-names failed: ${r.status} (showing raw IDs)`);
     return {};
   }
+  return await r.json(); // { [accountId]: "DisplayName" }
 }
 
-// Winners (best-effort; tolerant to shape changes; skip quietly if missing)
-async function getCotdWinners(dateISO) {
-  const tryUrls = [
-    `https://trackmania.io/api/cotd/${dateISO}`,
-    `https://trackmania.io/api/cotd/${dateISO}/divisions`,
-  ];
-  for (const url of tryUrls) {
-    try {
-      const data = await getJson(url);
-      const divisions = data?.divisions || data;
-      if (!Array.isArray(divisions)) continue;
+function clean(s) { return typeof s === "string" ? s : ""; }
 
-      const winners = [];
-      for (const div of divisions) {
-        const top =
-          div?.winner ||
-          (Array.isArray(div?.results) && div.results[0]) ||
-          (Array.isArray(div?.rankings) && div.rankings[0]) ||
-          null;
-        if (top) {
-          winners.push({
-            division: Number(div?.division ?? div?.index ?? winners.length + 1),
-            displayName: cleanTM(top.displayName || top.name || top.player || "Unknown"),
-          });
-        }
-      }
-      if (winners.length) return winners.sort((a, b) => a.division - b.division);
-    } catch { /* keep trying */ }
-  }
-  // per-division fallback with short-circuit after 3 misses
-  let misses = 0;
-  const winners = [];
-  for (let div = 1; div <= 60; div++) {
-    try {
-      const data = await getJson(`https://trackmania.io/api/cotd/${dateISO}/divisions/${div}`);
-      const top =
-        data?.winner ||
-        (Array.isArray(data?.results) && data.results[0]) ||
-        (Array.isArray(data?.rankings) && data.rankings[0]) ||
-        null;
-      if (top) {
-        winners.push({
-          division: div,
-          displayName: cleanTM(top.displayName || top.name || top.player || "Unknown"),
-        });
-        misses = 0;
-      } else if (++misses >= 3) break;
-    } catch {
-      if (++misses >= 3) break;
-    }
-  }
-  return winners;
-}
-
-// --- main ------------------------------------------------------------------
 async function main() {
-  try {
-    const url = `https://trackmania.io/api/totd/${INDEX}`;
-    const payload = await getJson(url);
+  const mapUid   = await getTodaysTotdMapUid();
+  if (!mapUid) throw new Error("Could not determine today's TOTD mapUid");
 
-    // tm.io exposes a human-readable "month" / season name (e.g., "October 2025")
-    const monthName = payload?.month || "";
-    const days = Array.isArray(payload?.days) ? payload.days : [];
-    if (!days.length) {
-      throw new Error(`tm.io returned no days for ${url}`);
-    }
+  const map      = await getMapInfo(mapUid);
+  const winnerId = await getCotdWinnerAccountId();
 
-    // Build full list for the season/month returned by /totd/{index}
-    const entries = [];
-    for (const d of days) {
-      const date = toISO(d?.day || d?.date || d?.start || d?.end);
-      const mapUid = d?.mapUid || d?.map?.uid || "";
-      const rawName = d?.name || d?.map?.name || "Track of the Day";
-      const rawAuthor =
-        d?.author ||
-        d?.map?.author ||
-        d?.map?.authorname ||
-        d?.map?.authorplayer?.name ||
-        "";
+  const toResolve = [map.authorAccountId, ...(winnerId ? [winnerId] : [])];
+  const names     = await resolveDisplayNames(toResolve);
 
-      let base = {
-        date: date || "",
-        name: cleanTM(rawName),
-        author: cleanTM(rawAuthor || ""),
-        mapUid,
-        thumbnail: d?.map?.thumbnail || "",
-      };
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    map: {
+      uid: map.uid,
+      name: clean(map.name),
+      authorAccountId: map.authorAccountId,
+      authorDisplayName: names[map.authorAccountId] || map.authorAccountId,
+      thumbnailUrl: map.thumbnailUrl,
+    },
+    cotd: {
+      winnerAccountId: winnerId || null,
+      winnerDisplayName: (winnerId && names[winnerId]) || winnerId || null,
+    },
+  };
 
-      // Enrich if author looks like a UUID or no thumbnail
-      if (!base.thumbnail || looksLikeUUID(base.author)) {
-        const extra = await enrichByMapUid(mapUid);
-        if (extra.author_name && !looksLikeUUID(extra.author_name)) {
-          base.author = extra.author_name;
-        }
-        if (extra.thumbnail && !base.thumbnail) {
-          base.thumbnail = extra.thumbnail;
-        }
-      }
-
-      // Winners (best-effort)
-      let winners = [];
-      try { if (base.date) winners = await getCotdWinners(base.date); } catch {}
-
-      entries.push({
-        date: base.date,
-        name: base.name,
-        author: base.author || "Unknown",
-        mapUid: base.mapUid,
-        image: base.thumbnail || "",
-        thumbnail: base.thumbnail || "",
-        winners, // array: [{ division, displayName }]
-      });
-    }
-
-    // Sort chronologically
-    entries.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
-
-    // Derive numeric month from the first dated entry for convenience
-    const firstISO = entries.find(e => e.date)?.date || "";
-    const numericYM = isoMonth(firstISO) || ""; // e.g., "2025-10"
-    const namedSlug = monthName ? slugMonth(monthName) : (numericYM || "unknown-month");
-
-    // Prepare output payload
-    const outPayload = {
-      month: monthName || numericYM || "Unknown",
-      month_numeric: numericYM || null,
-      updated: new Date().toISOString(),
-      tracks: entries,
-    };
-
-    await mkdir(OUTDIR, { recursive: true });
-
-    // Write BOTH files so frontend can read either style
-    if (numericYM) {
-      await writeFile(
-        path.join(OUTDIR, `${numericYM}.json`),
-        JSON.stringify(outPayload, null, 2)
-      );
-      console.log(`✅ Wrote data/totd/${numericYM}.json (${entries.length} days).`);
-    }
-
-    await writeFile(
-      path.join(OUTDIR, `${namedSlug}.json`),
-      JSON.stringify(outPayload, null, 2)
-    );
-    console.log(`✅ Wrote data/totd/${namedSlug}.json (${entries.length} days).`);
-  } catch (err) {
-    console.error("COTD fetch failed:", err);
-    process.exit(1);
-  }
+  await writeFile(OUTPUT_PATH, JSON.stringify(payload, null, 2), "utf8");
+  console.log(`Wrote ${OUTPUT_PATH}`);
 }
 
-main();
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
