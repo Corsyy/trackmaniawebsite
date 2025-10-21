@@ -1,0 +1,52 @@
+name: Backfill COTD
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Year (YYYY). Leave blank to backfill prev + current month."
+        required: false
+        default: ""
+      month:
+        description: "Month (MM, 1-12). If year is set, month is required."
+        required: false
+        default: ""
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      # If your site publishes from /docs, set this to "docs"
+      PUBLIC_DIR: .
+      NADEO_REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Backfill month
+        run: |
+          if [ -n "${{ github.event.inputs.year }}" ] && [ -n "${{ github.event.inputs.month }}" ]; then
+            echo "Backfilling ${{ github.event.inputs.year }} ${{ github.event.inputs.month }}"
+            node scripts/cotd-backfill.js ${{ github.event.inputs.year }} ${{ github.event.inputs.month }}
+          else
+            echo "Backfilling prev + current month"
+            node scripts/cotd-backfill.js
+          fi
+
+      - name: Commit JSON
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "data: COTD backfill"
+            git push
+          else
+            echo "No changes"
+          fi
