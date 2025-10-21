@@ -1,3 +1,5 @@
+// scripts/cotd-fetcher.js
+// Node 20+ (native fetch)
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
@@ -9,7 +11,7 @@ const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
 const COTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/cotd.json`;
 const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
 
-const LIVE  = "https://live-services.trackmania.nadeo.live"; // (not used directly here)
+const LIVE  = "https://live-services.trackmania.nadeo.live"; // not used directly here
 const MEET  = "https://meet.trackmania.nadeo.club";
 const CORE  = "https://prod.trackmania.core.nadeo.online";
 const TMIO  = "https://trackmania.io";
@@ -41,7 +43,7 @@ function clampToToday(y, m1, d) {
   return true;
 }
 
-/* ------------------- fetch w/ retry ------------------- */
+/* ------------------- fetch w/ retry (for tm.io) ------------------- */
 async function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 async function fetchRetry(url, opts={}, retries=5, baseDelay=500) {
   let lastErr;
@@ -63,7 +65,7 @@ async function fetchRetry(url, opts={}, retries=5, baseDelay=500) {
   throw lastErr || new Error(`fetch failed for ${url}`);
 }
 
-// ========= AUTH (multi-audience) =========
+/* ------------------- AUTH (multi-audience for Meet/Core) ------------------- */
 if (!NADEO_REFRESH_TOKEN) {
   console.error("ERROR: Missing NADEO_REFRESH_TOKEN env.");
   process.exit(1);
@@ -100,7 +102,6 @@ async function getToken(audience) {
 async function authedFetch(url, { audience, init = {}, retryOnAuth = true } = {}) {
   let token = await getToken(audience);
   let r = await fetch(url, { ...init, headers: { ...(init.headers || {}), Authorization: `nadeo_v1 t=${token}` } });
-
   if (retryOnAuth && (r.status === 401 || r.status === 403)) {
     token = await refreshForAudience(audience);
     r = await fetch(url, { ...init, headers: { ...(init.headers || {}), Authorization: `nadeo_v1 t=${token}` } });
@@ -124,7 +125,6 @@ async function rebuildMonthIndex(dir) {
 }
 
 /* ------------------- TOTD (trackmania.io) ------------------- */
-
 // Strip Trackmania/ManiaPlanet $-formatting from names ($f00, $o, $z, $$, etc.)
 function stripTmFormatting(input) {
   if (!input || typeof input !== "string") return input;
@@ -134,72 +134,41 @@ function stripTmFormatting(input) {
   return s.replace(new RegExp(DOLLAR_TOKEN, "g"), "$");
 }
 
-// --- normalize timestamps that can be ISO / seconds / milliseconds
+// normalize timestamps that can be ISO / seconds / milliseconds
 function toMs(dt) {
   if (dt == null) return NaN;
   let n = typeof dt === "string" ? Number(dt) : dt;
-  if (Number.isFinite(n)) {
-    if (n < 2e12) n *= 1000; // epoch seconds -> ms
-    return n;
-  }
-  const p = Date.parse(dt);
-  return Number.isFinite(p) ? p : NaN;
+  if (Number.isFinite(n)) { if (n < 2e12) n *= 1000; return n; }
+  const p = Date.parse(dt); return Number.isFinite(p) ? p : NaN;
 }
 
-// --- extract accountId / displayName from varied result shapes
+// extract accountId / displayName from varied result shapes
 function extractWinnerFields(result) {
-  // common fields
   const p = result?.participant ?? result?.player ?? null;
-  let accountId = null;
-  let displayName = null;
-
-  // If participant is a string, it's likely the accountId
+  let accountId = null, displayName = null;
   if (typeof p === "string") accountId = p;
-
-  // If object, check multiple likely shapes
   if (!accountId && p && typeof p === "object") {
-    accountId =
-      p.accountId ||
-      p.id ||
-      p.player?.accountId ||
-      p.player?.id ||
-      null;
-
-    displayName =
-      p.displayName ||
-      p.name ||
-      p.player?.displayName ||
-      p.player?.name ||
-      result?.displayName || // some APIs echo it here
-      result?.name ||
-      null;
+    accountId = p.accountId || p.id || p.player?.accountId || p.player?.id || null;
+    displayName = p.displayName || p.name || p.player?.displayName || p.player?.name ||
+                  result?.displayName || result?.name || null;
   }
-
-  // Some responses put winner’s name directly on result
-  if (!displayName) {
-    displayName = result?.playerName || result?.nickname || displayName || null;
-  }
-
+  if (!displayName) displayName = result?.playerName || result?.nickname || null;
   return { accountId: accountId || null, displayName: displayName || null };
 }
-
 
 async function fetchTmioMonth(index = 0) {
   const r = await fetchRetry(`${TMIO}/api/totd/${index}`, { headers: { "User-Agent": "tm-cotd" } });
   if (!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
-
 function tmioMonthYear(resp) {
   const y = resp?.month?.year ?? new Date().getUTCFullYear();
   const m1 = (resp?.month?.month ?? new Date().getUTCMonth()) + 1; // tm.io 0-based
   return { y, m1 };
 }
-
 function tmioDayNumber(dayObj, idx) {
   return dayObj?.day ?? dayObj?.dayIndex ?? dayObj?.monthDay ?? dayObj?.dayInMonth ?? (idx + 1);
 }
-
 function normTmioEntry(y, m1, entry, idx) {
   const m = entry.map || entry;
   const uid   = m.mapUid ?? entry.mapUid ?? null;
@@ -212,26 +181,20 @@ function normTmioEntry(y, m1, entry, idx) {
     m.authorPlayer?.accountId ?? m.authorplayer?.accountid ??
     entry.authorPlayer?.accountId ?? entry.authorplayer?.accountid ?? null;
   const d = tmioDayNumber(entry, idx);
-
-  // ✅ Strip TM color / style codes so it shows cleanly in browser
   name = stripTmFormatting(name);
   authorDisplayName = stripTmFormatting(authorDisplayName);
-
   return { date: dateKey(y, m1, d), map: { uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb } };
 }
-
 async function writeTotdMonth(index = 0) {
   const j = await fetchTmioMonth(index);
   const { y, m1 } = tmioMonthYear(j);
   const mKey = monthKey(y, m1);
   const daysOut = {};
   const daysArr = Array.isArray(j.days) ? j.days : [];
-
   daysArr.forEach((entry, i) => {
     const rec = normTmioEntry(y, m1, entry, i);
     daysOut[rec.date] = rec;
   });
-
   await ensureDir(TOTD_DIR);
   await writeJson(path.join(TOTD_DIR, `${mKey}.json`), { month: mKey, days: daysOut });
   await rebuildMonthIndex(TOTD_DIR);
@@ -245,7 +208,6 @@ async function writeTotdMonth(index = 0) {
   } else {
     dlog("TOTD: no days found for", mKey);
   }
-
   return { mKey, daysOut };
 }
 
@@ -261,10 +223,10 @@ async function listCompetitions(offset = 0, length = 100) {
   return r.json();
 }
 
-/** Find COTD for a given UTC date by start time within that day. */
+/** Find COTD for a given UTC date by start time within that day (±12h tolerance). */
 async function findCotdCompetitionByDate(y, m1, d) {
-  const dayStart = Date.UTC(y, m1 - 1, d, 0, 0, 0);
-  const dayEnd   = Date.UTC(y, m1 - 1, d, 23, 59, 59, 999);
+  const dayStart = Date.UTC(y, m1 - 1, d, 0, 0, 0) - 12 * 3600 * 1000;   // widen window
+  const dayEnd   = Date.UTC(y, m1 - 1, d, 23, 59, 59, 999) + 12 * 3600 * 1000;
 
   const MAX_PAGES = 80, PAGE_LEN = 100;
   const hits = [];
@@ -280,10 +242,7 @@ async function findCotdCompetitionByDate(y, m1, d) {
       const ts = toMs(dtRaw);
       if (!Number.isFinite(ts)) continue;
       if (ts < dayStart || ts > dayEnd) continue;
-
-      const name = String(c?.name || "").toLowerCase();
-      if (!name.includes("cup of the day") && !name.includes("cotd")) continue;
-
+      if (!looksLikeCotd(c)) continue;
       hits.push(c);
     }
 
@@ -294,25 +253,27 @@ async function findCotdCompetitionByDate(y, m1, d) {
   if (!hits.length) return null;
 
   const ymd = `${y}-${String(m1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-  // Prefer the one that literally contains the date in the name; else pick earliest start (usually "#1")
   let pick = hits.find(c => String(c.name ?? "").includes(ymd));
   if (!pick) {
     pick = hits.reduce((best, cur) => {
       const bt = toMs(best.startDate ?? best.beginDate ?? best.startTime ?? best.beginTime);
       const ct = toMs(cur.startDate  ?? cur.beginDate  ?? cur.startTime  ?? cur.beginTime);
-      return (ct < bt ? cur : best);
+      return (ct < bt ? cur : best); // earliest (usually #1)
     }, hits[0]);
+  }
+
+  if (DEBUG) {
+    const id = pick?.id || pick?.liveId || pick?.uid || "?";
+    console.log(`[COTD] FOUND comp for ${ymd}: id=${id} name="${pick?.name}"`);
   }
   return pick;
 }
-
-
 
 async function getD1WinnerForCompetition(compId) {
   if (!compId) return null;
 
   const roundsRes  = await fetchMeet(`${MEET}/api/competitions/${compId}/rounds`);
-  if (!roundsRes.ok) throw new Error(`rounds failed: ${roundsRes.status}`);
+  if (!roundsRes.ok) { console.log(`[COTD] rounds ${compId} -> ${roundsRes.status}`); throw new Error(`rounds failed: ${roundsRes.status}`); }
   const rounds = await roundsRes.json();
   if (!Array.isArray(rounds) || !rounds.length) return null;
 
@@ -321,9 +282,8 @@ async function getD1WinnerForCompetition(compId) {
     rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
   if (!finalRound?.id) return null;
 
-  // Pull ALL matches in the final round (D1 can be #1/#2/#3 depending on day)
   const matchesRes = await fetchMeet(`${MEET}/api/rounds/${finalRound.id}/matches?length=200&offset=0`);
-  if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
+  if (!matchesRes.ok) { console.log(`[COTD] matches ${finalRound.id} -> ${matchesRes.status}`); throw new Error(`matches failed: ${matchesRes.status}`); }
   const matchesJ = await matchesRes.json();
   const matches = matchesJ?.matches || matchesJ || [];
   if (!Array.isArray(matches) || !matches.length) return null;
@@ -333,12 +293,11 @@ async function getD1WinnerForCompetition(compId) {
   for (const m of matches) {
     if (!m?.id) continue;
     const resultsRes = await fetchMeet(`${MEET}/api/matches/${m.id}/results?length=512&offset=0`);
-    if (!resultsRes.ok) continue;
+    if (!resultsRes.ok) { console.log(`[COTD] results ${m.id} -> ${resultsRes.status}`); continue; }
     const results = await resultsRes.json();
     const arr = results?.results || results || [];
     if (!Array.isArray(arr) || !arr.length) continue;
 
-    // Sort “best first”
     arr.sort((a, b) => {
       const ar = a.rank ?? a.position ?? Infinity;
       const br = b.rank ?? b.position ?? Infinity;
@@ -353,19 +312,13 @@ async function getD1WinnerForCompetition(compId) {
     const rank = top.rank ?? top.position ?? Infinity;
     const points = top.points ?? 0;
 
-    if (!best) {
-      best = { accountId, displayName, rank, points };
-    } else if (rank < best.rank || (rank === best.rank && points > best.points)) {
+    if (!best || rank < best.rank || (rank === best.rank && points > best.points)) {
       best = { accountId, displayName, rank, points };
     }
-
-    if (best.rank === 1) break; // can’t beat rank 1
+    if (best.rank === 1) break; // can't beat rank 1
   }
-
-  return best; // may have displayName even if accountId missing
+  return best; // may have only displayName
 }
-
-
 
 /* -------- display-name hydration via Core (bulk + tiny cache) -------- */
 const NAMES_CACHE_PATH = path.join(COTD_DIR, "_names-cache.json");
@@ -430,39 +383,51 @@ async function updateCotdCurrentMonth() {
     if (!clampToToday(y, m1, d)) break;
 
     const dk = dateKey(y, m1, d);
-    if (!monthData.days[dk]) monthData.days[dk] = { date: dk, cotd: null };
 
-    // if we have winner id but no name, just hydrate later
+    // always ensure the shape exists
+    if (!monthData.days[dk]) {
+      monthData.days[dk] = {
+        date: dk,
+        cotd: { winnerAccountId: null, winnerDisplayName: null }
+      };
+    }
+
     const cur = monthData.days[dk]?.cotd;
     if (cur?.winnerAccountId && !cur?.winnerDisplayName) {
       toHydrate.add(cur.winnerAccountId);
       continue;
     }
 
-    // otherwise try to fetch the comp and winner
     try {
       const comp = await findCotdCompetitionByDate(y, m1, d);
-      if (!comp) { dlog("No COTD comp for", dk); continue; }
+      if (!comp) { console.log(`[COTD] ${dk} no competition found`); continue; }
       const cid = comp.id || comp.liveId || comp.uid;
-       const winner = await getD1WinnerForCompetition(cid);
-  if (!winner) { dlog("COTD winner not ready for", dk); continue; }
+      if (DEBUG) console.log(`[COTD] ${dk} comp id=${cid} name="${comp.name}"`);
 
-  monthData.days[dk] = {
-    date: dk,
-    cotd: {
-      winnerAccountId: winner.accountId || null,
-      winnerDisplayName: winner.displayName || null
+      const winner = await getD1WinnerForCompetition(cid);
+      if (!winner) {
+        dlog("COTD winner not ready for", dk);
+        // ensure JSON has the spot even if not ready
+        monthData.days[dk] = { date: dk, cotd: { winnerAccountId: null, winnerDisplayName: null } };
+        continue;
+      }
+
+      monthData.days[dk] = {
+        date: dk,
+        cotd: {
+          winnerAccountId: winner.accountId || null,
+          winnerDisplayName: winner.displayName || null
+        }
+      };
+
+      if (winner.accountId) toHydrate.add(winner.accountId);
+      console.log(`[COTD] ${dk} competition=${cid} winner=${winner.displayName || winner.accountId || "(unknown)"}`);
+    } catch (e) {
+      console.log(`[COTD] ${dk} error: ${e.message}`);
     }
-  };
-
-  if (winner.accountId) toHydrate.add(winner.accountId);
-  console.log(`[COTD] ${dk} competition=${cid} winner=${winner.displayName || winner.accountId || "(unknown)"}`);
-} catch (e) {
-  console.log(`[COTD] ${dk} error: ${e.message}`);
-}
   }
 
-  // hydrate names
+  // hydrate names we only had IDs for
   if (toHydrate.size) {
     const map = await hydrateDisplayNames([...toHydrate]);
     for (const dk of Object.keys(monthData.days)) {
@@ -479,7 +444,7 @@ async function updateCotdCurrentMonth() {
 
   // also write /cotd.json for "today"
   const todayKey = dateKey(y, m1, now.getUTCDate());
-  const todayRec  = monthData.days[todayKey] || { date: todayKey, cotd: null };
+  const todayRec  = monthData.days[todayKey] || { date: todayKey, cotd: { winnerAccountId: null, winnerDisplayName: null } };
   await writeJson(COTD_LATEST, { generatedAt: new Date().toISOString(), ...todayRec });
 }
 
@@ -496,5 +461,4 @@ async function main() {
 
   console.log("[DONE] TOTD + COTD updated.");
 }
-
 main().catch(err => { console.error(err); process.exit(1); });
