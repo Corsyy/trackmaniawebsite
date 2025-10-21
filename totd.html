@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Track of the Day</title>
+<style>
+:root{--bg:#0a0f1a;--panel:#0f1524;--text:#e6ecff;--muted:#9db1ff;--accent:#6dfbff;--border:rgba(109,251,255,.2)}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,Ubuntu,Helvetica Neue,sans-serif;background:var(--bg);color:var(--text)}
+header{background:var(--panel);border-bottom:1px solid var(--border)}.container{width:min(1100px,92vw);margin:0 auto;padding:1rem}
+h1{margin:0 0 .25rem}.nav a{color:var(--accent);text-decoration:none;margin-right:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.thumb{aspect-ratio:16/9;background:#08101c}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.meta{padding:.8rem}.date{opacity:.8;font-size:.9rem}.badge{border:1px solid var(--border);padding:.2rem .5rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.06)}
+.select{margin-top:.5rem}select{background:#0c1322;border:1px solid var(--border);color:var(--text);padding:.4rem .6rem;border-radius:10px}
+.hero{display:flex;gap:1rem;margin:1rem 0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1rem}
+.hero .thumb{width:320px;flex:0 0 auto}
+@media(max-width:800px){.hero{flex-direction:column}.hero .thumb{width:auto}}
+</style></head><body>
+<header><div class="container">
+  <h1>Track of the Day</h1>
+  <div class="nav"><a href="/">Home</a> <a href="./cotd.html">Cup of the Day</a></div>
+  <div class="select">Month: <select id="month"></select></div>
+</div></header>
+<main class="container">
+  <section id="today" class="hero">
+    <div class="thumb" id="t-thumb"></div>
+    <div>
+      <h2 id="t-name">(loading…)</h2>
+      <p>Author: <span class="badge" id="t-author">—</span></p>
+      <p id="t-date" class="date"></p>
+    </div>
+  </section>
+  <section class="grid" id="grid"></section>
+</main>
+<script>
+const BASE="./data/totd";
+async function j(u){const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error(u+" -> "+r.status);return r.json();}
+function label(k){const[a,b]=k.split("-").map(Number);return new Date(Date.UTC(a,b-1,1)).toLocaleString(undefined,{month:"long",year:"numeric"})}
+async function months(){try{const x=await j(`${BASE}/months.json`);return x.months||[]}catch{return[]}}
+async function monthData(key){const d=await j(`${BASE}/${key}.json`);return Object.values(d.days||{}).sort((a,b)=>a.date.localeCompare(b.date))}
+async function loadToday(){
+  try{const d=await j("./totd.json");
+    document.getElementById("t-name").textContent=d?.map?.name||"(unknown)";
+    document.getElementById("t-author").textContent=d?.map?.authorDisplayName||"—";
+    document.getElementById("t-date").textContent=d?.date||"";
+    const tt=document.getElementById("t-thumb"); tt.innerHTML="";
+    if(d?.map?.thumbnailUrl){const i=new Image();i.loading="lazy";i.referrerPolicy="no-referrer";i.src=d.map.thumbnailUrl;tt.appendChild(i);}
+  }catch{}
+}
+function render(list){
+  const g=document.getElementById("grid"); g.innerHTML="";
+  for(const d of list){
+    const el=document.createElement("article"); el.className="card";
+    el.innerHTML=`<div class="thumb">${d.map?.thumbnailUrl?`<img src="${d.map.thumbnailUrl}" loading="lazy" referrerpolicy="no-referrer">`:""}</div>
+    <div class="meta"><div class="date">${d.date}</div><h3>${d.map?.name||"(unknown)"}</h3>
+    <div>Author: <span class="badge">${d.map?.authorDisplayName||"—"}</span></div></div>`;
+    g.appendChild(el);
+  }
+}
+(async function init(){
+  await loadToday();
+  const mSel=document.getElementById("month");
+  const ms=await months();
+  if(!ms.length){mSel.innerHTML="<option>(no data yet)</option>";return;}
+  mSel.innerHTML=ms.map(m=>`<option value="${m}">${label(m)}</option>`).join("");
+  mSel.onchange=async ()=>render(await monthData(mSel.value));
+  render(await monthData(ms[0])); mSel.value=ms[0];
+})();
+</script></body></html>
