@@ -1,41 +1,40 @@
-name: Update COTD
+name: Update COTD/TOTD
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *" # hourly (keeps 'latest' fresh and adds to archive on new days)
+    - cron: "15 * * * *"  # run hourly at :15
 
 jobs:
-  update-cotd:
+  update:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
-      NADEO_TOKEN: ${{ secrets.NADEO_TOKEN }}
+      # CHANGE THIS if your site publishes from somewhere else
+      PUBLIC_DIR: ./docs
+
+      # Secrets (Settings → Secrets and variables → Actions)
+      NADEO_REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
       TM_CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
       TM_CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
-      COTD_OUTPUT: ./cotd.json
-      COTD_DATA_DIR: ./data/cotd
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
       - name: Run fetcher
         run: node scripts/cotd-fetcher.js
 
-      - name: Commit updated COTD data
+      - name: Commit JSON
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
-            git commit -m "chore: update COTD (latest + monthly archive)"
+            git commit -m "data: refresh COTD/TOTD"
             git push
           else
-            echo "No changes to commit."
+            echo "No changes"
           fi
