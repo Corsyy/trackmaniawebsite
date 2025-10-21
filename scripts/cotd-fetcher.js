@@ -213,18 +213,27 @@ async function main() {
     console.log("TOTD: no days found for month", mKey);
   }
 
-  // 2) COTD: just the Division 1 winner for *today* (accumulates over time)
-  const winnerId = await getCotdWinnerToday();
-  const names = await resolveNames(winnerId ? [winnerId] : []);
-  const todayCotd = {
-    date: todayKey,
-    cotd: {
-      winnerAccountId: winnerId || null,
-      winnerDisplayName: (winnerId && names[winnerId]) || winnerId || null,
-    }
-  };
-  await upsertMonth(COTD_DIR, mKey, todayKey, todayCotd);
-  await writeJson(COTD_LATEST, { generatedAt: new Date().toISOString(), ...todayCotd });
+// 2) COTD: just the Division 1 winner for *today* (accumulates over time)
+const now = new Date();
+const todayKey = dateKey(
+  now.getUTCFullYear(),
+  now.getUTCMonth() + 1,
+  now.getUTCDate()
+);
+
+const winnerId = await getCotdWinnerToday();
+console.log("[COTD-FETCHER] winner:", winnerId ? `ok ${winnerId}` : "none");
+const names = await resolveNames(winnerId ? [winnerId] : []);
+const todayCotd = {
+  date: todayKey,
+  cotd: {
+    winnerAccountId: winnerId || null,
+    winnerDisplayName: (winnerId && names[winnerId]) || winnerId || null,
+  }
+};
+await upsertMonth(COTD_DIR, mKey, todayKey, todayCotd);
+await writeJson(COTD_LATEST, { generatedAt: new Date().toISOString(), ...todayCotd });
+
 }
 
 main().catch(err => { console.error(err); process.exit(1); });
