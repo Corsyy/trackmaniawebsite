@@ -26,35 +26,84 @@ h1{margin:0 0 .25rem}.nav a{color:var(--accent);text-decoration:none;margin-righ
   <section class="grid" id="grid"></section>
 </main>
 <script>
-const BASE="./data/cotd";
-async function j(u){const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error(u+" -> "+r.status);return r.json();}
-function label(k){const[a,b]=k.split("-").map(Number);return new Date(Date.UTC(a,b-1,1)).toLocaleString(undefined,{month:"long",year:"numeric"})}
-async function months(){try{const x=await j(`${BASE}/months.json`);return x.months||[]}catch{return[]}}
-async function monthData(k){const d=await j(`${BASE}/${k}.json`);return Object.values(d.days||{}).sort((a,b)=>a.date.localeCompare(b.date))}
-async function loadToday(){
-  try{const d=await j("./cotd.json");
-    document.getElementById("w-name").textContent=d?.cotd?.winnerDisplayName||d?.cotd?.winnerAccountId||"—";
-    document.getElementById("w-date").textContent=d?.date||"";
-  }catch{}
-}
-function render(list){
-  const g=document.getElementById("grid"); g.innerHTML="";
-  for(const d of list){
-    const el=document.createElement("article"); el.className="card";
-    el.innerHTML=`<div class="meta">
-      <div class="date">${d.date}</div>
-      <div>Division 1 Winner: <span class="badge">${d.cotd?.winnerDisplayName||d.cotd?.winnerAccountId||"—"}</span></div>
-    </div>`;
-    g.appendChild(el);
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const bust = () => `?t=${Date.now()}`;
+  const labelFromKey = (key) => {
+    const [y, m] = key.split("-");
+    return `${MONTHS[parseInt(m, 10) - 1]} ${y}`;
+  };
+  const maxDateKey = (days) => Object.keys(days).sort().pop();
+
+  async function jget(url) {
+    const r = await fetch(url + bust());
+    if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
+    return r.json();
   }
-}
-(async function init(){
-  await loadToday();
-  const mSel=document.getElementById("month");
-  const ms=await months();
-  if(!ms.length){mSel.innerHTML="<option>(no data yet)</option>";return;}
-  mSel.innerHTML=ms.map(m=>`<option value="${m}">${label(m)}</option>`).join("");
-  mSel.onchange=async ()=>render(await monthData(mSel.value));
-  render(await monthData(ms[0])); mSel.value=ms[0];
-})();
-</script></body></html>
+
+  function renderToday(rec) {
+    // rec: { date, cotd: { winnerDisplayName, winnerAccountId } }
+    const todayDate = document.querySelector("#cotd-today-date") || document.querySelector(".cotd-today-date");
+    const todayWinner = document.querySelector("#cotd-today-winner") || document.querySelector(".cotd-today-winner");
+    if (todayDate) todayDate.textContent = rec?.date || "—";
+    const w = rec?.cotd?.winnerDisplayName || rec?.cotd?.winnerAccountId || "—";
+    if (todayWinner) todayWinner.textContent = w;
+  }
+
+  function renderMonth(days) {
+    const wrap = document.querySelector("#cotd-month") || document.querySelector(".cotd-month");
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    const keys = Object.keys(days).sort(); // oldest -> newest
+    for (const k of keys) {
+      const d = days[k];
+      const row = document.createElement("div");
+      row.className = "cotd-row";
+      row.innerHTML = `
+        <div class="date">${d.date}</div>
+        <div class="winner">${d.cotd?.winnerDisplayName || d.cotd?.winnerAccountId || "—"}</div>
+      `;
+      wrap.appendChild(row);
+    }
+  }
+
+  async function loadCotdMonth(key) {
+    const data = await jget(`data/cotd/${key}.json`);
+    // "today" panel: prefer cotd.json if it matches this month, else latest day in the file
+    let todayRec = null;
+    try {
+      const today = await jget(`cotd.json`);
+      if (today?.date && data.days[today.date]) todayRec = data.days[today.date];
+    } catch (_) {}
+    if (!todayRec) {
+      const latestKey = maxDateKey(data.days);
+      todayRec = data.days[latestKey];
+    }
+    renderToday(todayRec);
+    renderMonth(data.days);
+  }
+
+  async function initCotd() {
+    const sel = document.querySelector("#month-select") || document.querySelector("#month");
+    const monthsJ = await jget(`data/cotd/months.json`);
+    const months = Array.isArray(monthsJ.months) ? monthsJ.months.slice().sort().reverse() : [];
+    if (!months.length) {
+      if (sel) { sel.innerHTML = `<option>(no data yet)</option>`; }
+      return;
+    }
+    if (sel) {
+      sel.innerHTML = "";
+      for (const k of months) {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = labelFromKey(k);
+        sel.appendChild(opt);
+      }
+      sel.value = months[0]; // newest month
+      sel.onchange = () => loadCotdMonth(sel.value);
+    }
+    await loadCotdMonth(months[0]);
+  }
+
+  initCotd().catch(console.error);
+</script>
+</body></html>
