@@ -110,17 +110,55 @@ function stripTmFormatting(input) {
   return s.replace(new RegExp(DOLLAR_TOKEN, "g"), "$");
 }
 
+// --- normalize timestamps that can be ISO / seconds / milliseconds
 function toMs(dt) {
   if (dt == null) return NaN;
   let n = typeof dt === "string" ? Number(dt) : dt;
   if (Number.isFinite(n)) {
-    // epoch seconds -> ms
-    if (n < 2e12) n *= 1000;
+    if (n < 2e12) n *= 1000; // epoch seconds -> ms
     return n;
   }
   const p = Date.parse(dt);
   return Number.isFinite(p) ? p : NaN;
 }
+
+// --- extract accountId / displayName from varied result shapes
+function extractWinnerFields(result) {
+  // common fields
+  const p = result?.participant ?? result?.player ?? null;
+  let accountId = null;
+  let displayName = null;
+
+  // If participant is a string, it's likely the accountId
+  if (typeof p === "string") accountId = p;
+
+  // If object, check multiple likely shapes
+  if (!accountId && p && typeof p === "object") {
+    accountId =
+      p.accountId ||
+      p.id ||
+      p.player?.accountId ||
+      p.player?.id ||
+      null;
+
+    displayName =
+      p.displayName ||
+      p.name ||
+      p.player?.displayName ||
+      p.player?.name ||
+      result?.displayName || // some APIs echo it here
+      result?.name ||
+      null;
+  }
+
+  // Some responses put winner’s name directly on result
+  if (!displayName) {
+    displayName = result?.playerName || result?.nickname || displayName || null;
+  }
+
+  return { accountId: accountId || null, displayName: displayName || null };
+}
+
 
 async function fetchTmioMonth(index = 0) {
   const r = await fetchRetry(`${TMIO}/api/totd/${index}`, { headers: { "User-Agent": "tm-cotd" } });
@@ -220,7 +258,10 @@ async function findCotdCompetitionByDate(y, m1, d) {
       const ts = toMs(dtRaw);
       if (!Number.isFinite(ts)) continue;
       if (ts < dayStart || ts > dayEnd) continue;
-      if (!looksLikeCotd(c)) continue;
+
+      const name = String(c?.name || "").toLowerCase();
+      if (!name.includes("cup of the day") && !name.includes("cotd")) continue;
+
       hits.push(c);
     }
 
@@ -230,18 +271,19 @@ async function findCotdCompetitionByDate(y, m1, d) {
 
   if (!hits.length) return null;
 
-  // Prefer exact YYYY-MM-DD in name (e.g. "COTD 2025-10-21 #2"), else pick earliest start (usually #1).
   const ymd = `${y}-${String(m1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  // Prefer the one that literally contains the date in the name; else pick earliest start (usually "#1")
   let pick = hits.find(c => String(c.name ?? "").includes(ymd));
   if (!pick) {
     pick = hits.reduce((best, cur) => {
       const bt = toMs(best.startDate ?? best.beginDate ?? best.startTime ?? best.beginTime);
       const ct = toMs(cur.startDate  ?? cur.beginDate  ?? cur.startTime  ?? cur.beginTime);
-      return (ct < bt ? cur : best); // earliest = "#1"
+      return (ct < bt ? cur : best);
     }, hits[0]);
   }
   return pick;
 }
+
 
 
 async function getD1WinnerForCompetition(compId) {
@@ -257,14 +299,16 @@ async function getD1WinnerForCompetition(compId) {
     rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
   if (!finalRound?.id) return null;
 
+  // Pull ALL matches in the final round (D1 can be #1/#2/#3 depending on day)
   const matchesRes = await fetchRetry(`${MEET}/api/rounds/${finalRound.id}/matches?length=200&offset=0`, { headers: await nadeoHeaders() });
   if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
-  const matches = matchesRes.json ? await matchesRes.json() : [];
-  const list = matches?.matches || matches || [];
-  if (!Array.isArray(list) || !list.length) return null;
+  const matchesJ = await matchesRes.json();
+  const matches = matchesJ?.matches || matchesJ || [];
+  if (!Array.isArray(matches) || !matches.length) return null;
 
-  let best = null; // { participant, rank, points }
-  for (const m of list) {
+  let best = null; // { accountId, displayName, rank, points }
+
+  for (const m of matches) {
     if (!m?.id) continue;
     const resultsRes = await fetchRetry(`${MEET}/api/matches/${m.id}/results?length=512&offset=0`, { headers: await nadeoHeaders() });
     if (!resultsRes.ok) continue;
@@ -272,6 +316,7 @@ async function getD1WinnerForCompetition(compId) {
     const arr = results?.results || results || [];
     if (!Array.isArray(arr) || !arr.length) continue;
 
+    // Sort “best first”
     arr.sort((a, b) => {
       const ar = a.rank ?? a.position ?? Infinity;
       const br = b.rank ?? b.position ?? Infinity;
@@ -282,22 +327,22 @@ async function getD1WinnerForCompetition(compId) {
     });
 
     const top = arr[0];
+    const { accountId, displayName } = extractWinnerFields(top);
+    const rank = top.rank ?? top.position ?? Infinity;
+    const points = top.points ?? 0;
+
     if (!best) {
-      best = { participant: top.participant, rank: top.rank ?? top.position ?? Infinity, points: top.points ?? 0 };
-    } else {
-      const br = best.rank ?? Infinity;
-      const tr = top.rank ?? top.position ?? Infinity;
-      if (tr < br || (tr === br && (top.points ?? 0) > (best.points ?? 0))) {
-        best = { participant: top.participant, rank: tr, points: top.points ?? 0 };
-      }
+      best = { accountId, displayName, rank, points };
+    } else if (rank < best.rank || (rank === best.rank && points > best.points)) {
+      best = { accountId, displayName, rank, points };
     }
 
-    // Early exit if we already saw a rank-1 (can’t beat that)
-    if ((best.rank ?? Infinity) === 1) break;
+    if (best.rank === 1) break; // can’t beat rank 1
   }
 
-  return best?.participant ?? null;
+  return best; // may have displayName even if accountId missing
 }
+
 
 
 /* -------- display-name hydration via Core (bulk + tiny cache) -------- */
@@ -377,18 +422,22 @@ async function updateCotdCurrentMonth() {
       const comp = await findCotdCompetitionByDate(y, m1, d);
       if (!comp) { dlog("No COTD comp for", dk); continue; }
       const cid = comp.id || comp.liveId || comp.uid;
-      const winnerId = await getD1WinnerForCompetition(cid);
-      if (!winnerId) { dlog("COTD winner not ready for", dk); continue; }
+       const winner = await getD1WinnerForCompetition(cid);
+  if (!winner) { dlog("COTD winner not ready for", dk); continue; }
 
-      monthData.days[dk] = {
-        date: dk,
-        cotd: { winnerAccountId: winnerId, winnerDisplayName: null }
-      };
-      toHydrate.add(winnerId);
-      console.log(`[COTD] ${dk} competition=${cid} winner=${winnerId}`);
-    } catch (e) {
-      console.log(`[COTD] ${dk} error: ${e.message}`);
+  monthData.days[dk] = {
+    date: dk,
+    cotd: {
+      winnerAccountId: winner.accountId || null,
+      winnerDisplayName: winner.displayName || null
     }
+  };
+
+  if (winner.accountId) toHydrate.add(winner.accountId);
+  console.log(`[COTD] ${dk} competition=${cid} winner=${winner.displayName || winner.accountId || "(unknown)"}`);
+} catch (e) {
+  console.log(`[COTD] ${dk} error: ${e.message}`);
+}
   }
 
   // hydrate names
