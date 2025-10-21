@@ -63,29 +63,53 @@ async function fetchRetry(url, opts={}, retries=5, baseDelay=500) {
   throw lastErr || new Error(`fetch failed for ${url}`);
 }
 
-/* ------------------- auth ------------------- */
+// ========= AUTH (multi-audience) =========
 if (!NADEO_REFRESH_TOKEN) {
   console.error("ERROR: Missing NADEO_REFRESH_TOKEN env.");
   process.exit(1);
 }
-let _cachedAccess = { token: null, expAt: 0 };
 
-async function nadeoAccess() {
-  const now = Date.now();
-  if (_cachedAccess.token && now < _cachedAccess.expAt - 10_000) return _cachedAccess.token;
-  const r = await fetchRetry(`${CORE}/v2/authentication/token/refresh`, {
+const tokenCache = new Map(); // audience -> {token, expAt}
+
+async function refreshForAudience(audience) {
+  const r = await fetch(`${CORE}/v2/authentication/token/refresh`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `nadeo_v1 t=${NADEO_REFRESH_TOKEN}` },
-    body: JSON.stringify({ audience: "NadeoLiveServices" })
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `nadeo_v1 t=${NADEO_REFRESH_TOKEN}`
+    },
+    body: JSON.stringify({ audience })
   });
-  if (!r.ok) throw new Error(`refresh failed: ${r.status}`);
+  if (!r.ok) {
+    const txt = await r.text().catch(() => "");
+    throw new Error(`refresh(${audience}) failed: ${r.status} ${txt}`);
+  }
   const j = await r.json();
   const token = j.accessToken;
   const expMs = (j.expiresIn ? j.expiresIn * 1000 : 9 * 60 * 1000);
-  _cachedAccess = { token, expAt: Date.now() + expMs };
+  tokenCache.set(audience, { token, expAt: Date.now() + expMs });
   return token;
 }
-const nadeoHeaders = async (extra={}) => ({ Authorization: `nadeo_v1 t=${await nadeoAccess()}`, ...extra });
+
+async function getToken(audience) {
+  const entry = tokenCache.get(audience);
+  if (entry && Date.now() < entry.expAt - 10_000) return entry.token;
+  return refreshForAudience(audience);
+}
+
+async function authedFetch(url, { audience, init = {}, retryOnAuth = true } = {}) {
+  let token = await getToken(audience);
+  let r = await fetch(url, { ...init, headers: { ...(init.headers || {}), Authorization: `nadeo_v1 t=${token}` } });
+
+  if (retryOnAuth && (r.status === 401 || r.status === 403)) {
+    token = await refreshForAudience(audience);
+    r = await fetch(url, { ...init, headers: { ...(init.headers || {}), Authorization: `nadeo_v1 t=${token}` } });
+  }
+  return r;
+}
+
+const fetchMeet = (url, init = {}) => authedFetch(url, { audience: "NadeoClubServices", init });
+const fetchCore = (url, init = {}) => authedFetch(url, { audience: "NadeoLiveServices", init });
 
 /* ------------------- indexes ------------------- */
 async function rebuildMonthIndex(dir) {
@@ -231,12 +255,10 @@ function looksLikeCotd(c) {
   return name.includes("cup of the day") || name.includes("cotd");
 }
 
-async function listCompetitions(offset=0, length=100) {
-  const r = await fetchRetry(`${MEET}/api/competitions?offset=${offset}&length=${length}`, {
-    headers: await nadeoHeaders()
-  });
+async function listCompetitions(offset = 0, length = 100) {
+  const r = await fetchMeet(`${MEET}/api/competitions?offset=${offset}&length=${length}`);
   if (!r.ok) throw new Error(`competitions list failed: ${r.status}`);
-  return r.json(); // { competitions, total, ... }
+  return r.json();
 }
 
 /** Find COTD for a given UTC date by start time within that day. */
@@ -289,7 +311,7 @@ async function findCotdCompetitionByDate(y, m1, d) {
 async function getD1WinnerForCompetition(compId) {
   if (!compId) return null;
 
-  const roundsRes = await fetchRetry(`${MEET}/api/competitions/${compId}/rounds`, { headers: await nadeoHeaders() });
+  const roundsRes  = await fetchMeet(`${MEET}/api/competitions/${compId}/rounds`);
   if (!roundsRes.ok) throw new Error(`rounds failed: ${roundsRes.status}`);
   const rounds = await roundsRes.json();
   if (!Array.isArray(rounds) || !rounds.length) return null;
@@ -300,7 +322,7 @@ async function getD1WinnerForCompetition(compId) {
   if (!finalRound?.id) return null;
 
   // Pull ALL matches in the final round (D1 can be #1/#2/#3 depending on day)
-  const matchesRes = await fetchRetry(`${MEET}/api/rounds/${finalRound.id}/matches?length=200&offset=0`, { headers: await nadeoHeaders() });
+  const matchesRes = await fetchMeet(`${MEET}/api/rounds/${finalRound.id}/matches?length=200&offset=0`);
   if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
   const matchesJ = await matchesRes.json();
   const matches = matchesJ?.matches || matchesJ || [];
@@ -310,7 +332,7 @@ async function getD1WinnerForCompetition(compId) {
 
   for (const m of matches) {
     if (!m?.id) continue;
-    const resultsRes = await fetchRetry(`${MEET}/api/matches/${m.id}/results?length=512&offset=0`, { headers: await nadeoHeaders() });
+    const resultsRes = await fetchMeet(`${MEET}/api/matches/${m.id}/results?length=512&offset=0`);
     if (!resultsRes.ok) continue;
     const results = await resultsRes.json();
     const arr = results?.results || results || [];
@@ -361,7 +383,7 @@ async function fetchDisplayNamesBulk(ids) {
   for (const chunk of chunks) {
     const url = new URL(`${CORE}/accounts/displayNames`);
     url.searchParams.set("accountIdList", chunk.join(","));
-    const r = await fetchRetry(url.toString(), { headers: await nadeoHeaders() });
+    const r = await fetchCore(url.toString());
     if (!r.ok) throw new Error(`displayNames failed: ${r.status}`);
     const arr = await r.json();
     for (const it of arr || []) {
