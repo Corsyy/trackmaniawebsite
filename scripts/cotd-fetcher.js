@@ -33,13 +33,14 @@ function tmioMonthYear(resp) {
   const month1 = (resp?.month?.month ?? new Date().getUTCMonth()) + 1; // +1 is important
   return { year, month1 };
 }
-function tmioDayNumber(dayObj) {
+function tmioDayNumber(dayObj, idx) {
+  // Use explicit fields if present; otherwise fall back to the array index (1-based).
   return (
     dayObj?.day ??
     dayObj?.dayIndex ??
     dayObj?.monthDay ??
     dayObj?.dayInMonth ??
-    1
+    (typeof idx === "number" ? idx + 1 : 1)
   );
 }
 const dateKey = (y, m1, d) =>
@@ -106,7 +107,7 @@ async function fetchTmioMonth(index = 0) {
   if (!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
-function normTmioEntry(y, m1, entry) {
+function normTmioEntry(y, m1, entry,idx) {
   const m = entry.map || entry;
   const uid   = m.mapUid ?? entry.mapUid ?? null;
   const name  = m.name ?? m.mapName ?? entry.name ?? "(unknown map)";
@@ -117,7 +118,7 @@ function normTmioEntry(y, m1, entry) {
   const authorDisplayName =
     m.authorPlayer?.name ?? m.authorplayer?.name ?? m.authorName ?? m.author ??
     entry.authorPlayer?.name ?? entry.authorplayer?.name ?? "(unknown)";
-  const d = tmioDayNumber(entry);
+  const d = tmioDayNumber(entry, idx);
   return {
     date: dateKey(y, m1, d),
     map: { uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb }
@@ -129,10 +130,12 @@ async function writeTotdMonth(index = 0) {
   const mKey = monthKey(year, month1);
 
   const daysOut = {};
-  for (const entry of Array.isArray(j.days) ? j.days : []) {
-    const rec = normTmioEntry(year, month1, entry);
-    daysOut[rec.date] = rec;
-  }
+  const daysArr = Array.isArray(j.days) ? j.days : [];
+daysArr.forEach((entry, i) => {
+  const rec = normTmioEntry(year, month1, entry, i);
+  daysOut[rec.date] = rec;
+});
+
 
   await ensureDir(TOTD_DIR);
   await writeJson(path.join(TOTD_DIR, `${mKey}.json`), { month: mKey, days: daysOut });
