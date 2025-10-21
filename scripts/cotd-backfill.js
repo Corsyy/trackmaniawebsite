@@ -4,17 +4,13 @@ import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
 
-/* ------------------- env & dirs ------------------- */
 const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
 const COTD_DIR    = `${PUBLIC_DIR}/data/cotd`;
 
 const MEET  = "https://meet.trackmania.nadeo.club";
 const CORE  = "https://prod.trackmania.core.nadeo.online";
-const OAUTH = "https://api.trackmania.com";
 
 const NADEO_REFRESH_TOKEN = process.env.NADEO_REFRESH_TOKEN || "";
-const TM_CLIENT_ID        = process.env.TM_CLIENT_ID || "";
-const TM_CLIENT_SECRET    = process.env.TM_CLIENT_SECRET || "";
 
 /* ------------------- fs helpers ------------------- */
 const ensureDir = (p) => mkdir(p, { recursive: true });
@@ -26,9 +22,8 @@ const writeJson = (p, obj) => writeFile(p, JSON.stringify(obj, null, 2), "utf8")
 const pad2 = (n) => String(n).padStart(2, "0");
 const monthKey = (y, m1) => `${y}-${pad2(m1)}`;
 const dateKey  = (y, m1, d) => `${y}-${pad2(m1)}-${pad2(d)}`;
-
 function* daysOfMonth(year, month1) {
-  const days = new Date(Date.UTC(year, month1, 0)).getUTCDate(); // month1 is 1-based
+  const days = new Date(Date.UTC(year, month1, 0)).getUTCDate();
   for (let d = 1; d <= days; d++) yield d;
 }
 
@@ -37,10 +32,7 @@ async function nadeoAccess() {
   if (!NADEO_REFRESH_TOKEN) throw new Error("Missing NADEO_REFRESH_TOKEN");
   const r = await fetch(`${CORE}/v2/authentication/token/refresh`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `nadeo_v1 t=${NADEO_REFRESH_TOKEN}`
-    },
+    headers: { "Content-Type": "application/json", Authorization: `nadeo_v1 t=${NADEO_REFRESH_TOKEN}` },
     body: JSON.stringify({ audience: "NadeoLiveServices" })
   });
   if (!r.ok) throw new Error(`refresh failed: ${r.status}`);
@@ -49,133 +41,59 @@ async function nadeoAccess() {
 }
 const nadeoHeaders = async () => ({ Authorization: `nadeo_v1 t=${await nadeoAccess()}` });
 
-/* ----- optional: resolve display names via TM OAuth (best-effort) ----- */
-async function tmOAuth() {
-  if (!TM_CLIENT_ID || !TM_CLIENT_SECRET) return null;
-  const body = new URLSearchParams({
-    grant_type: "client_credentials",
-    client_id: TM_CLIENT_ID,
-    client_secret: TM_CLIENT_SECRET,
-    scope: "basic display-name"
+/* ------------------- competitions listing ------------------- */
+async function listCompetitions(offset = 0, length = 100) {
+  const r = await fetch(`${MEET}/api/competitions?offset=${offset}&length=${length}`, {
+    headers: await nadeoHeaders()
   });
-  const r = await fetch(`${OAUTH}/oauth/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body
-  });
-  if (!r.ok) return null;
-  const j = await r.json();
-  return j.access_token;
-}
-async function resolveNames(ids) {
-  if (!ids?.length) return {};
-  const token = await tmOAuth();
-  if (!token) return {};
-  const qs = ids.map(i => `accountId[]=${encodeURIComponent(i)}`).join("&");
-  const r = await fetch(`${OAUTH}/api/display-names/account-ids?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!r.ok) return {};
-  return r.json();
+  if (!r.ok) throw new Error(`competitions list failed: ${r.status}`);
+  return r.json(); // expect { competitions, total, ... } but shape can vary
 }
 
-/* ------------------- meet helpers ------------------- */
 function looksLikeCotd(c) {
   const name = String(c?.name || "").toLowerCase();
   return name.includes("cup of the day") || name.includes("cotd");
 }
 
-// pull competitions array regardless of shape
-function competitionsFromPage(page) {
-  if (Array.isArray(page)) return page;
-  if (Array.isArray(page?.competitions)) return page.competitions;
-  if (Array.isArray(page?.items)) return page.items;
-  return [];
-}
-
-// 18h tolerance to handle UTC midnight drift
-const TOL_MS = 18 * 60 * 60 * 1000;
-function isWithinUTCWindow(iso, y, m1, d, tolMs = TOL_MS) {
-  if (!iso) return false;
-  const t = new Date(iso).getTime();
-  const dayStart = Date.UTC(y, m1 - 1, d, 0, 0, 0);
-  const delta = Math.abs(t - dayStart);
-  return delta <= tolMs;
-}
-
-async function listCompetitions(offset = 0, length = 100) {
-  const url = `${MEET}/api/competitions?offset=${offset}&length=${length}`;
-  const r = await fetch(url, { headers: await nadeoHeaders() });
-  if (!r.ok) {
-    console.log("[BACKFILL] listCompetitions", url, "->", r.status);
-    throw new Error(`competitions list failed: ${r.status}`);
-  }
-  const j = await r.json();
-  return j;
-}
-
-/** Find the COTD competition that happened on this UTC date (y,m1,d). */
+/**
+ * Robust finder: scan up to MAX_PAGES and prefer a strict name match containing YYYY-MM-DD.
+ * No “early stop” based on timestamps (they’re fickle across environments).
+ */
 async function findCotdCompetitionByDate(y, m1, d) {
-  let offset = 0;
-  const length = 100;
-  const targetYYYYMMDD = `${y}-${pad2(m1)}-${pad2(d)}`;
-  console.log(`[BACKFILL] find COTD for ${targetYYYYMMDD}`);
+  const wanted = `${y}-${pad2(m1)}-${pad2(d)}`;
+  const MAX_PAGES = 50;
+  const PAGE_LEN  = 100;
 
-  while (true) {
-    const page = await listCompetitions(offset, length);
-    const comps = competitionsFromPage(page);
-    if (!comps.length) {
-      console.log("[BACKFILL] empty page, stop");
-      return null;
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const offset = page * PAGE_LEN;
+    const data = await listCompetitions(offset, PAGE_LEN);
+    const comps = data?.competitions || data?.items || [];
+
+    if (!Array.isArray(comps) || comps.length === 0) break;
+
+    // First pass: strict name pattern “YYYY-MM-DD”
+    let match = comps.find(c => looksLikeCotd(c) && String(c.name).includes(wanted));
+
+    // Second pass: looser name (“cotd” + day number) if strict fails
+    if (!match) {
+      const dayStr = ` ${d} `; // crude guard against substring noise
+      match = comps.find(c => looksLikeCotd(c) && String(c.name).toLowerCase().includes(`cotd`) && String(c.name).includes(dayStr));
     }
 
-    const candidates = comps.filter(looksLikeCotd);
-    const fields = ["startTime","startDate","created","creationTime","updated","updateTime"];
-
-    for (const c of candidates) {
-      const name = c?.name || "(no name)";
-      const id = c?.id || c?.liveId || c?.uid || "?";
-      // try all known date fields with tolerance
-      for (const f of fields) {
-        if (isWithinUTCWindow(c?.[f], y, m1, d)) {
-          console.log(`  -> match by ${f}:`, name, "id:", id, "at", c?.[f]);
-          return c;
-        }
-      }
-      // fallback: embedded date in name
-      if (String(name).includes(targetYYYYMMDD)) {
-        console.log(`  -> match by name:`, name, "id:", id);
-        return c;
-      }
+    if (match) {
+      console.log(`  -> match by name: ${match.name} id: ${match.id || match.liveId || match.uid || "?"}`);
+      return match;
     }
 
-    // pagination/stop conditions
-    const total = page?.total ?? (offset + comps.length + 1);
-    offset += length;
-
-    // If the oldest item on the page is far older than the target, stop scanning
-    const times = comps
-      .map(c => new Date(c?.startTime || c?.startDate || c?.created || c?.creationTime || 0).getTime())
-      .filter(Number.isFinite)
-      .sort((a,b) => a - b);
-
-    if (times.length) {
-      const oldest = times[0];
-      const target = Date.UTC(y, m1 - 1, d);
-      if (target - oldest > 5 * 86400000) {
-        console.log("[BACKFILL] paged past target window, stop");
-        return null;
-      }
-    }
-
-    if (offset >= total) {
-      console.log("[BACKFILL] reached end (offset >= total), stop");
-      return null;
-    }
+    // If API provided a total, stop when we reach the end
+    const total = data?.total ?? (offset + comps.length);
+    if (offset + comps.length >= total) break;
   }
+
+  return null;
 }
 
-/** Given a competition id, return the D1 winner account id (if any). */
+/* ------------------- pick D1 winner ------------------- */
 async function getD1WinnerForCompetition(compId) {
   if (!compId) return null;
 
@@ -184,27 +102,50 @@ async function getD1WinnerForCompetition(compId) {
   const rounds = await roundsRes.json();
   if (!Array.isArray(rounds) || !rounds.length) return null;
 
+  // Prefer a round named “Final”; else highest position
   const finalRound =
-    rounds.find(r => String(r?.name ?? "").toUpperCase().includes("FINAL")) ??
+    rounds.find(r => String(r?.name ?? "").toLowerCase().includes("final")) ??
     rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
 
   if (!finalRound?.id) return null;
 
-  const matchesRes = await fetch(`${MEET}/api/rounds/${finalRound.id}/matches?length=1&offset=0`, { headers: await nadeoHeaders() });
+  // Take the first match (there’s usually one)
+  const matchesRes = await fetch(`${MEET}/api/rounds/${finalRound.id}/matches?length=50&offset=0`, { headers: await nadeoHeaders() });
   if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
   const matches = await matchesRes.json();
-  const match = matches?.matches?.[0];
+  const match = matches?.matches?.[0] || matches?.[0];
   if (!match?.id) return null;
 
-  const resultsRes = await fetch(`${MEET}/api/matches/${match.id}/results?length=1`, { headers: await nadeoHeaders() });
+  // Pull all results, then choose best by rank/position/points
+  const resultsRes = await fetch(`${MEET}/api/matches/${match.id}/results?length=512&offset=0`, { headers: await nadeoHeaders() });
   if (!resultsRes.ok) throw new Error(`results failed: ${resultsRes.status}`);
   const results = await resultsRes.json();
-  return results?.results?.[0]?.participant ?? null;
+
+  const arr = results?.results || results || [];
+  if (!Array.isArray(arr) || arr.length === 0) return null;
+
+  // Sort: lowest rank first; fallback to position; then highest points
+  arr.sort((a, b) => {
+    const ar = a.rank ?? a.position ?? Infinity;
+    const br = b.rank ?? b.position ?? Infinity;
+    if (ar !== br) return ar - br;
+    const ap = (typeof a.points === "number" ? -a.points : 0);
+    const bp = (typeof b.points === "number" ? -b.points : 0);
+    return ap - bp;
+  });
+
+  return arr[0]?.participant ?? null;
 }
 
 /* ------------------- write month & index ------------------- */
-async function rebuildMonthIndex(dir) {
+async function upsertMonth(dir, key, dayKey, record) {
   await ensureDir(dir);
+  const p = path.join(dir, `${key}.json`);
+  const data = await loadJson(p, { month: key, days: {} });
+  data.days[dayKey] = record;
+  await writeJson(p, data);
+
+  // rebuild months.json
   const items = await readdir(dir, { withFileTypes: true });
   const months = items
     .filter(e => e.isFile() && e.name.endsWith(".json") && e.name !== "months.json")
@@ -214,22 +155,15 @@ async function rebuildMonthIndex(dir) {
   await writeJson(path.join(dir, "months.json"), { months });
 }
 
-async function upsertMonth(dir, key, dayKey, record) {
-  await ensureDir(dir);
-  const p = path.join(dir, `${key}.json`);
-  const data = await loadJson(p, { month: key, days: {} });
-  data.days[dayKey] = record;
-  await writeJson(p, data);
-  await rebuildMonthIndex(dir);
-}
-
-/* ------------------- backfill main ------------------- */
+/* ------------------- main backfill ------------------- */
 async function backfillMonth(year, month1) {
   const mKey = monthKey(year, month1);
-  console.log(`\n[BACKFILL] COTD winners for ${mKey} …`);
+  console.log(`[BACKFILL] COTD winners for ${mKey} …`);
 
   for (const d of daysOfMonth(year, month1)) {
     const dk = dateKey(year, month1, d);
+    console.log(`[BACKFILL] find COTD for ${dk}`);
+
     try {
       const comp = await findCotdCompetitionByDate(year, month1, d);
       if (!comp) {
@@ -237,26 +171,19 @@ async function backfillMonth(year, month1) {
         continue;
       }
 
-      const compId = comp.id || comp.liveId || comp.uid;
-      const winnerId = await getD1WinnerForCompetition(compId);
+      const cid = comp.id || comp.liveId || comp.uid;
+      const winnerId = await getD1WinnerForCompetition(cid);
       if (!winnerId) {
-        console.log(`  ${dk}  competition=${compId}  winner: none`);
+        console.log(`  ${dk}  competition=${cid}  winner: none`);
         continue;
       }
 
-      // Optional: resolve display name (best effort)
-      let winnerDisplayName = null;
-      try {
-        const names = await resolveNames([winnerId]);
-        winnerDisplayName = names?.[winnerId] || null;
-      } catch { /* ignore */ }
-
       await upsertMonth(COTD_DIR, mKey, dk, {
         date: dk,
-        cotd: { winnerAccountId: winnerId, winnerDisplayName }
+        cotd: { winnerAccountId: winnerId, winnerDisplayName: null }
       });
 
-      console.log(`  ${dk}  winner=${winnerDisplayName || winnerId}  (wrote -> ${mKey}.json)`);
+      console.log(`  ${dk}  competition=${cid}  winner=${winnerId}`);
     } catch (e) {
       console.log(`  ${dk}  error: ${e.message}`);
     }
@@ -272,7 +199,7 @@ async function main() {
     if (!year || !month1) throw new Error("Usage: node scripts/cotd-backfill.js YYYY MM");
     await backfillMonth(year, month1);
   } else {
-    // Default: previous month + current month
+    // Default: previous + current month
     const now = new Date();
     const y = now.getUTCFullYear();
     const m1 = now.getUTCMonth() + 1;
