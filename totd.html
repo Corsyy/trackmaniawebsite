@@ -32,37 +32,96 @@ h1{margin:0 0 .25rem}.nav a{color:var(--accent);text-decoration:none;margin-righ
   <section class="grid" id="grid"></section>
 </main>
 <script>
-const BASE="./data/totd";
-async function j(u){const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error(u+" -> "+r.status);return r.json();}
-function label(k){const[a,b]=k.split("-").map(Number);return new Date(Date.UTC(a,b-1,1)).toLocaleString(undefined,{month:"long",year:"numeric"})}
-async function months(){try{const x=await j(`${BASE}/months.json`);return x.months||[]}catch{return[]}}
-async function monthData(key){const d=await j(`${BASE}/${key}.json`);return Object.values(d.days||{}).sort((a,b)=>a.date.localeCompare(b.date))}
-async function loadToday(){
-  try{const d=await j("./totd.json");
-    document.getElementById("t-name").textContent=d?.map?.name||"(unknown)";
-    document.getElementById("t-author").textContent=d?.map?.authorDisplayName||"—";
-    document.getElementById("t-date").textContent=d?.date||"";
-    const tt=document.getElementById("t-thumb"); tt.innerHTML="";
-    if(d?.map?.thumbnailUrl){const i=new Image();i.loading="lazy";i.referrerPolicy="no-referrer";i.src=d.map.thumbnailUrl;tt.appendChild(i);}
-  }catch{}
-}
-function render(list){
-  const g=document.getElementById("grid"); g.innerHTML="";
-  for(const d of list){
-    const el=document.createElement("article"); el.className="card";
-    el.innerHTML=`<div class="thumb">${d.map?.thumbnailUrl?`<img src="${d.map.thumbnailUrl}" loading="lazy" referrerpolicy="no-referrer">`:""}</div>
-    <div class="meta"><div class="date">${d.date}</div><h3>${d.map?.name||"(unknown)"}</h3>
-    <div>Author: <span class="badge">${d.map?.authorDisplayName||"—"}</span></div></div>`;
-    g.appendChild(el);
+  // ------------ small utils ------------
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const bust = () => `?t=${Date.now()}`;
+  const labelFromKey = (key) => {
+    const [y, m] = key.split("-");
+    return `${MONTHS[parseInt(m, 10) - 1]} ${y}`;
+  };
+  const maxDateKey = (days) => Object.keys(days).sort().pop(); // "YYYY-MM-DD"
+
+  async function jget(url) {
+    const r = await fetch(url + bust());
+    if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
+    return r.json();
   }
-}
-(async function init(){
-  await loadToday();
-  const mSel=document.getElementById("month");
-  const ms=await months();
-  if(!ms.length){mSel.innerHTML="<option>(no data yet)</option>";return;}
-  mSel.innerHTML=ms.map(m=>`<option value="${m}">${label(m)}</option>`).join("");
-  mSel.onchange=async ()=>render(await monthData(mSel.value));
-  render(await monthData(ms[0])); mSel.value=ms[0];
-})();
-</script></body></html>
+
+  // ------------ renderers (adapt selectors to your DOM) ------------
+  function renderHero(rec) {
+    // rec: { date, map: { name, authorDisplayName, thumbnailUrl } }
+    const heroTitle = document.querySelector("#totd-hero-title") || document.querySelector(".totd-hero-title");
+    const heroAuthor = document.querySelector("#totd-hero-author") || document.querySelector(".totd-hero-author");
+    const heroImg = document.querySelector("#totd-hero-img") || document.querySelector(".totd-hero-img");
+    const heroDate = document.querySelector("#totd-hero-date") || document.querySelector(".totd-hero-date");
+    if (heroTitle) heroTitle.textContent = rec.map.name || "(unknown map)";
+    if (heroAuthor) heroAuthor.textContent = rec.map.authorDisplayName || "—";
+    if (heroImg && rec.map.thumbnailUrl) heroImg.src = rec.map.thumbnailUrl;
+    if (heroDate) heroDate.textContent = rec.date;
+  }
+
+  function renderGrid(days) {
+    // expects a container to append cards into; tweak to your markup
+    const grid = document.querySelector("#totd-grid") || document.querySelector(".totd-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    const keys = Object.keys(days).sort(); // oldest -> newest
+    for (const k of keys) {
+      const d = days[k];
+      const card = document.createElement("div");
+      card.className = "totd-card";
+      card.innerHTML = `
+        <div class="thumb-wrap"><img src="${d.map.thumbnailUrl || ""}" alt=""></div>
+        <div class="meta">
+          <div class="date">${d.date}</div>
+          <div class="name">${d.map.name || "(unknown map)"}</div>
+          <div class="author">${d.map.authorDisplayName || "—"}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+  }
+
+  // ------------ main page logic ------------
+  async function loadMonth(key) {
+    const data = await jget(`data/totd/${key}.json`);
+    // hero: prefer totd.json if it matches this month, else use latest day in month file
+    let hero = null;
+    try {
+      const today = await jget(`totd.json`);
+      if (today?.date && data.days[today.date]) hero = data.days[today.date];
+    } catch (_) {}
+    if (!hero) {
+      const latestKey = maxDateKey(data.days);
+      hero = data.days[latestKey];
+    }
+    renderHero(hero);
+    renderGrid(data.days);
+  }
+
+  async function init() {
+    const sel = document.querySelector("#month-select") || document.querySelector("#month");
+    const monthsJ = await jget(`data/totd/months.json`);
+    const months = Array.isArray(monthsJ.months) ? monthsJ.months.slice().sort().reverse() : [];
+    if (!months.length) {
+      if (sel) { sel.innerHTML = `<option>(no data yet)</option>`; }
+      return;
+    }
+    // build dropdown strictly from JSON (no current-date guessing)
+    if (sel) {
+      sel.innerHTML = "";
+      for (const k of months) {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = labelFromKey(k);
+        sel.appendChild(opt);
+      }
+      sel.value = months[0]; // newest by default
+      sel.onchange = () => loadMonth(sel.value);
+    }
+    await loadMonth(months[0]);
+  }
+
+  init().catch(console.error);
+</script>
+</body></html>
