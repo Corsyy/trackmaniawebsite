@@ -26,7 +26,7 @@ jobs:
           node-version: "20"
 
       - name: Run fetcher
-        run: node cotd-fetcher.js
+        run: node scripts/cotd-fetcher.js
 
       - name: Commit updated COTD JSON
         run: |
