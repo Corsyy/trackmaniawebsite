@@ -12,7 +12,7 @@ jobs:
       contents: write
     env:
       # CHANGE THIS if your site publishes from somewhere else
-      PUBLIC_DIR: ./docs
+      PUBLIC_DIR: .
 
       # Secrets (Settings → Secrets and variables → Actions)
       NADEO_REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
