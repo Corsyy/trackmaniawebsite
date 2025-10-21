@@ -3,7 +3,7 @@ name: Update COTD
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *" # hourly; change as you like
+    - cron: "0 * * * *" # hourly (keeps 'latest' fresh and adds to archive on new days)
 
 jobs:
   update-cotd:
@@ -14,8 +14,8 @@ jobs:
       NADEO_TOKEN: ${{ secrets.NADEO_TOKEN }}
       TM_CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
       TM_CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
-      # Optional: set to ./public/cotd.json if your site serves from /public
       COTD_OUTPUT: ./cotd.json
+      COTD_DATA_DIR: ./data/cotd
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,13 +28,13 @@ jobs:
       - name: Run fetcher
         run: node scripts/cotd-fetcher.js
 
-      - name: Commit updated COTD JSON
+      - name: Commit updated COTD data
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
-            git commit -m "chore: update COTD data"
+            git commit -m "chore: update COTD (latest + monthly archive)"
             git push
           else
             echo "No changes to commit."
