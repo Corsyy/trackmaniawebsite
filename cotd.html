@@ -3,26 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cup of the Day — Trackmania</title>
+  <title>Trackmania — COTD & TOTD</title>
   <meta name="color-scheme" content="dark light">
   <style>
-    :root{
-      --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9db1ff;
-      --accent:#6dfbff; --border:rgba(109,251,255,.2);
-    }
+    :root{ --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9db1ff; --accent:#6dfbff; --border:rgba(109,251,255,.2); }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--text)}
     header{background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
     .container{width:min(1100px,92vw);margin:0 auto;padding:1rem}
-    h1{margin:0;font-size:1.2rem;letter-spacing:.3px}
-    nav{margin-top:.25rem}
-    nav a{color:var(--accent);text-decoration:none;margin-right:.75rem}
-    .card{
-      margin:2rem auto;display:grid;grid-template-columns:280px 1fr;gap:1.25rem;
-      background:linear-gradient(160deg, rgba(109,251,255,.12), rgba(109,251,255,0) 35%), var(--panel);
-      border:1px solid var(--border); border-radius:18px; padding:1rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
+    h1{margin:0;font-size:1.25rem;letter-spacing:.3px}
+    nav a{color:var(--accent);text-decoration:none;margin-right:1rem}
+    .card{margin:1.5rem auto;display:grid;grid-template-columns:280px 1fr;gap:1.25rem;background:linear-gradient(160deg, rgba(109,251,255,.12), rgba(109,251,255,0) 35%), var(--panel);border:1px solid var(--border);border-radius:18px;padding:1rem;box-shadow:0 10px 30px rgba(0,0,0,.25)}
     .thumb{aspect-ratio:16/9;width:100%;background:#08101c;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
     .thumb img{width:100%;height:100%;object-fit:cover;display:block}
     .meta{display:grid;gap:.6rem}
@@ -30,86 +21,164 @@
     .label{color:var(--muted);font-size:.9rem}
     .badge{border:1px solid var(--border);padding:.25rem .55rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.06)}
     .name{font-size:1.25rem;font-weight:700}
-    footer{opacity:.7;margin:1.25rem 0;font-size:.9rem}
-    .skeleton{background:linear-gradient(90deg,#0c1624,#0f1a2b,#0c1624);background-size:200% 100%;animation:sh 1.5s infinite;border-radius:8px}
-    @keyframes sh{0%{background-position:0 0}100%{background-position:200% 0}}
-    .s1{height:160px}.s2{height:20px;width:60%}.s3{height:16px;width:40%}
     .src{font-size:.75rem;opacity:.8}
-    .src b{font-weight:700}
+    footer{opacity:.7;margin:.6rem 0 0;font-size:.9rem}
+    .tabs{display:flex;gap:.5rem;margin-top:1rem}
+    .tab{background:#0c1322;border:1px solid var(--border);color:var(--text);padding:.45rem .8rem;border-radius:10px;cursor:pointer}
+    .tab.active{background:rgba(109,251,255,.12)}
+    .bar{display:flex;gap:1rem;align-items:center;margin-top:.5rem}
+    select{background:#0c1322;border:1px solid var(--border);color:var(--text);padding:.4rem .6rem;border-radius:10px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:1rem}
+    .item{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .item .t{aspect-ratio:16/9;background:#08101c}
+    .item .t img{width:100%;height:100%;object-fit:cover;display:block}
+    .item .m{padding:.8rem}
+    .date{opacity:.8;font-size:.9rem}
     @media (max-width:800px){ .card{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
-      <h1>Cup of the Day — Live Snapshot</h1>
+      <h1>Trackmania — Cup of the Day & Track of the Day</h1>
       <nav>
-        <a href="./cotd-archive.html">COTD Archive</a>
+        <a href="/">Home</a>
       </nav>
     </div>
   </header>
 
   <main class="container">
-    <section class="card" id="cotd-card">
-      <div class="thumb" id="thumb"><div class="skeleton s1"></div></div>
+    <!-- TODAY -->
+    <section class="card" id="today">
+      <div class="thumb" id="thumb"></div>
       <div class="meta">
-        <div class="name" id="map-name"><span class="skeleton s2"></span></div>
-        <div class="row"><span class="label">Author</span><span class="badge" id="map-author"><span class="skeleton s3"></span></span></div>
-        <div class="row"><span class="label">Division 1 Winner</span><span class="badge" id="winner"><span class="skeleton s3"></span></span></div>
+        <div class="name" id="map-name">(loading…)</div>
+        <div class="row"><span class="label">Author</span><span class="badge" id="map-author">—</span></div>
+        <div class="row"><span class="label">Division 1 Winner</span><span class="badge" id="winner">—</span></div>
         <div class="src" id="src"></div>
         <footer id="timestamp"></footer>
       </div>
     </section>
+
+    <!-- MONTH -->
+    <section>
+      <div class="bar">
+        <div class="tabs">
+          <button class="tab active" data-tab="cotd">COTD (full month)</button>
+          <button class="tab" data-tab="totd">TOTD (full month)</button>
+        </div>
+        <label>Month:</label>
+        <select id="month"></select>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
   </main>
 
   <script>
-    async function load() {
-      try {
-        const res = await fetch("./cotd.json", { cache: "no-store" });
-        if (!res.ok) throw new Error("No cotd.json yet");
-        const data = await res.json();
+    const COTD_BASE = "./data/cotd";
+    const TOTD_BASE = "./data/totd";
+    const grid = document.getElementById("grid");
+    const monthSel = document.getElementById("month");
+    let activeTab = "cotd"; // "cotd" / "totd"
 
-        const thumb = document.getElementById("thumb");
-        const mapName = document.getElementById("map-name");
-        const mapAuthor = document.getElementById("map-author");
-        const winner = document.getElementById("winner");
-        const ts = document.getElementById("timestamp");
-        const src = document.getElementById("src");
+    async function fetchJSON(u){ const r=await fetch(u,{cache:"no-store"}); if(!r.ok) throw new Error(u+" -> "+r.status); return r.json(); }
 
-        thumb.innerHTML = "";
-        const img = document.createElement("img");
-        img.alt = "Map thumbnail";
-        img.loading = "lazy";
-        img.referrerPolicy = "no-referrer";
-        img.src = data?.map?.thumbnailUrl || "";
-        thumb.appendChild(img);
-
-        mapName.textContent = data?.map?.name || "(unknown map)";
-        mapAuthor.textContent = data?.map?.authorDisplayName || data?.map?.authorAccountId || "—";
-        winner.textContent = data?.cotd?.winnerDisplayName || data?.cotd?.winnerAccountId || "—";
-
-        // NEW: show where the data came from (helps debug tokens)
-        const srcTxt = data?.map?.source === "nadeo" ? "Nadeo Live" :
-                       data?.map?.source === "tmio" ? "trackmania.io" :
-                       "unknown";
-        src.innerHTML = `Data source: <b>${srcTxt}</b>`;
-
-        if (data?.generatedAt) {
-          const d = new Date(data.generatedAt);
-          ts.textContent = `Updated: ${d.toLocaleString()}`;
-        } else {
-          ts.textContent = "";
+    async function loadToday(){
+      try{
+        const data = await fetchJSON("./cotd.json");
+        // Thumbnail
+        const t = document.getElementById("thumb");
+        t.innerHTML = "";
+        if (data?.map?.thumbnailUrl){
+          const img = document.createElement("img");
+          img.alt = "Map thumbnail";
+          img.loading = "lazy";
+          img.referrerPolicy = "no-referrer";
+          img.src = data.map.thumbnailUrl;
+          t.appendChild(img);
         }
-      } catch (e) {
-        document.getElementById("map-name").textContent = "COTD data not available yet.";
-        document.getElementById("map-author").textContent = "—";
-        document.getElementById("winner").textContent = "—";
-        document.getElementById("thumb").innerHTML = "";
-        const src = document.getElementById("src");
-        if (src) src.textContent = "";
+        // Text
+        document.getElementById("map-name").textContent =
+          data?.map?.name || "(unknown map)";
+        document.getElementById("map-author").textContent =
+          data?.map?.authorDisplayName || data?.map?.authorAccountId || "(unknown)";
+        document.getElementById("winner").textContent =
+          data?.cotd?.winnerDisplayName || data?.cotd?.winnerAccountId || "—";
+        document.getElementById("src").textContent =
+          "Data source: " + (data?.map?.source==="nadeo" ? "Nadeo Live" :
+                              data?.map?.source==="tmio" ? "trackmania.io" : "unknown");
+        document.getElementById("timestamp").textContent =
+          data?.generatedAt ? ("Updated: " + new Date(data.generatedAt).toLocaleString()) : "";
+      }catch(e){
+        document.getElementById("map-name").textContent = "COTD data not available.";
       }
     }
-    load();
+
+    async function loadMonths(){
+      const base = (activeTab==="cotd") ? COTD_BASE : TOTD_BASE;
+      try{
+        const idx = await fetchJSON(`${base}/months.json`);
+        return Array.isArray(idx.months) ? idx.months : [];
+      }catch{ return []; }
+    }
+
+    function monthLabel(key){ const [y,m]=key.split("-").map(Number); const d=new Date(Date.UTC(y,m-1,1)); return d.toLocaleString(undefined,{month:"long",year:"numeric"}); }
+
+    async function loadMonthFile(key){
+      const base = (activeTab==="cotd") ? COTD_BASE : TOTD_BASE;
+      const data = await fetchJSON(`${base}/${key}.json`);
+      const days = Object.values(data.days||{}).sort((a,b)=>a.date.localeCompare(b.date));
+      return days;
+    }
+
+    function renderDays(days){
+      grid.innerHTML = "";
+      for(const d of days){
+        const el = document.createElement("article");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="t">${d.map?.thumbnailUrl ? `<img src="${d.map.thumbnailUrl}" alt="thumb" loading="lazy" referrerpolicy="no-referrer">`:""}</div>
+          <div class="m">
+            <div class="date">${d.date}</div>
+            <div class="name">${d.map?.name ?? "(unknown map)"}</div>
+            <div class="row"><span class="label">Author</span> <span class="badge">${d.map?.authorDisplayName ?? d.map?.authorAccountId ?? "—"}</span></div>
+            ${activeTab==="cotd" ? `<div class="row"><span class="label">Division 1 Winner</span> <span class="badge">${d.cotd?.winnerDisplayName ?? d.cotd?.winnerAccountId ?? "—"}</span></div>` : ""}
+          </div>`;
+        grid.appendChild(el);
+      }
+    }
+
+    async function refreshMonthUI(){
+      const months = await loadMonths();
+      if(!months.length){
+        monthSel.innerHTML = `<option>(No data yet)</option>`;
+        grid.innerHTML = "";
+        return;
+      }
+      // populate if empty or switching tabs
+      if (!monthSel.value || !months.includes(monthSel.value)){
+        monthSel.innerHTML = months.map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join("");
+      }
+      const days = await loadMonthFile(monthSel.value || months[0]);
+      renderDays(days);
+    }
+
+    // events
+    document.querySelectorAll(".tab").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        activeTab = btn.dataset.tab;
+        await refreshMonthUI();
+      });
+    });
+    monthSel.addEventListener("change", refreshMonthUI);
+
+    // init
+    (async function init(){
+      await loadToday();
+      await refreshMonthUI();
+    })();
   </script>
 </body>
 </html>
