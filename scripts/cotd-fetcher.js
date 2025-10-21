@@ -100,39 +100,59 @@ async function rebuildMonthIndex(dir) {
 }
 
 /* ------------------- TOTD (trackmania.io) ------------------- */
-async function fetchTmioMonth(index=0) {
+
+// Strip Trackmania/ManiaPlanet $-formatting from names ($f00, $o, $z, $$, etc.)
+function stripTmFormatting(input) {
+  if (!input || typeof input !== "string") return input;
+  const DOLLAR_TOKEN = "\uFFF0"; // preserve literal $$
+  let s = input.replace(/\$\$/g, DOLLAR_TOKEN);
+  s = s.replace(/\$[0-9a-fA-F]{1,3}|\$[a-zA-Z]|\$[<>\[\]\(\)]/g, "");
+  return s.replace(new RegExp(DOLLAR_TOKEN, "g"), "$");
+}
+
+async function fetchTmioMonth(index = 0) {
   const r = await fetchRetry(`${TMIO}/api/totd/${index}`, { headers: { "User-Agent": "tm-cotd" } });
   if (!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
+
 function tmioMonthYear(resp) {
   const y = resp?.month?.year ?? new Date().getUTCFullYear();
   const m1 = (resp?.month?.month ?? new Date().getUTCMonth()) + 1; // tm.io 0-based
   return { y, m1 };
 }
+
 function tmioDayNumber(dayObj, idx) {
   return dayObj?.day ?? dayObj?.dayIndex ?? dayObj?.monthDay ?? dayObj?.dayInMonth ?? (idx + 1);
 }
+
 function normTmioEntry(y, m1, entry, idx) {
   const m = entry.map || entry;
   const uid   = m.mapUid ?? entry.mapUid ?? null;
-  const name  = m.name ?? m.mapName ?? entry.name ?? "(unknown map)";
+  let name    = m.name ?? m.mapName ?? entry.name ?? "(unknown map)";
+  let authorDisplayName =
+    m.authorPlayer?.name ?? m.authorplayer?.name ?? m.authorName ?? m.author ??
+    entry.authorPlayer?.name ?? entry.authorplayer?.name ?? "(unknown)";
   const thumb = m.thumbnail ?? m.thumbnailUrl ?? entry.thumbnail ?? entry.thumbnailUrl ?? "";
   const authorAccountId =
     m.authorPlayer?.accountId ?? m.authorplayer?.accountid ??
     entry.authorPlayer?.accountId ?? entry.authorplayer?.accountid ?? null;
-  const authorDisplayName =
-    m.authorPlayer?.name ?? m.authorplayer?.name ?? m.authorName ?? m.author ??
-    entry.authorPlayer?.name ?? entry.authorplayer?.name ?? "(unknown)";
   const d = tmioDayNumber(entry, idx);
+
+  // ✅ Strip TM color / style codes so it shows cleanly in browser
+  name = stripTmFormatting(name);
+  authorDisplayName = stripTmFormatting(authorDisplayName);
+
   return { date: dateKey(y, m1, d), map: { uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb } };
 }
-async function writeTotdMonth(index=0) {
+
+async function writeTotdMonth(index = 0) {
   const j = await fetchTmioMonth(index);
   const { y, m1 } = tmioMonthYear(j);
   const mKey = monthKey(y, m1);
   const daysOut = {};
   const daysArr = Array.isArray(j.days) ? j.days : [];
+
   daysArr.forEach((entry, i) => {
     const rec = normTmioEntry(y, m1, entry, i);
     daysOut[rec.date] = rec;
@@ -142,7 +162,6 @@ async function writeTotdMonth(index=0) {
   await writeJson(path.join(TOTD_DIR, `${mKey}.json`), { month: mKey, days: daysOut });
   await rebuildMonthIndex(TOTD_DIR);
 
-  // latest (month’s most recent)
   const keys = Object.keys(daysOut).sort();
   const latestKey = keys[keys.length - 1] || null;
   if (latestKey) {
