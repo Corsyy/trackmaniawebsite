@@ -2,8 +2,22 @@ name: Update COTD/TOTD
 
 on:
   workflow_dispatch:
+    inputs:
+      year:
+        description: "Backfill year (YYYY). Leave blank to auto backfill prev+current month."
+        required: false
+        type: string
+      month:
+        description: "Backfill month (MM). Leave blank to auto backfill prev+current month."
+        required: false
+        type: string
   schedule:
-    - cron: "15 * * * *"  # run hourly at :15
+    # Hourly at :15 UTC (runs fetcher + backfill; backfill is idempotent)
+    - cron: "15 * * * *"
+
+concurrency:
+  group: cotd-totd
+  cancel-in-progress: true
 
 jobs:
   update:
@@ -11,22 +25,51 @@ jobs:
     permissions:
       contents: write
     env:
-      # CHANGE THIS if your site publishes from somewhere else
+      # Your site is served from the repo root
       PUBLIC_DIR: .
 
       # Secrets (Settings → Secrets and variables → Actions)
       NADEO_REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
       TM_CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
       TM_CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      # --- Generate today's data (maps + today's COTD winner if available) ---
       - name: Run fetcher
         run: node scripts/cotd-fetcher.js
 
+      # --- Backfill winners (safe to run every time; fills any missing days) ---
+      # Manual dispatch with inputs -> backfill that specific month
+      - name: Backfill specific month (manual)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.year != '' && inputs.month != '' }}
+        run: node scripts/cotd-backfill.js ${{ inputs.year }} ${{ inputs.month }}
+
+      # Otherwise -> default backfill prev+current month
+      - name: Backfill prev+current month (auto)
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.year != '' && inputs.month != '') }}
+        run: node scripts/cotd-backfill.js
+
+      # --- Quick verify in logs (helps debug paths/content) ---
+      - name: Verify generated files
+        run: |
+          echo "PUBLIC_DIR=$PUBLIC_DIR"
+          ls -la "$PUBLIC_DIR" || true
+          find "$PUBLIC_DIR/data" -maxdepth 2 -type f -name "*.json" | sort | sed 's/^/FILE: /'
+          echo "---- totd.json head ----"
+          test -f "$PUBLIC_DIR/totd.json" && head -n 25 "$PUBLIC_DIR/totd.json" || echo "totd.json missing"
+          echo "---- cotd.json head ----"
+          test -f "$PUBLIC_DIR/cotd.json" && head -n 25 "$PUBLIC_DIR/cotd.json" || echo "cotd.json missing"
+          echo "---- months ----"
+          test -f "$PUBLIC_DIR/data/totd/months.json" && cat "$PUBLIC_DIR/data/totd/months.json" || echo "totd months missing"
+          test -f "$PUBLIC_DIR/data/cotd/months.json" && cat "$PUBLIC_DIR/data/cotd/months.json" || echo "cotd months missing"
+
+      # --- Commit any changes ---
       - name: Commit JSON
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
