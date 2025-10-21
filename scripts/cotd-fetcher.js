@@ -146,37 +146,6 @@ daysArr.forEach((entry, i) => {
   return { mKey, daysOut };
 }
 
-/** Robust "today" from TM.io (fills name, author, thumbnail, and correct date). */
-async function getTodaysTotdFromTmio() {
-  const r = await fetch("https://trackmania.io/api/totd/0", {
-    headers: { "User-Agent": "tm-cotd-archiver" }
-  });
-  if (!r.ok) throw new Error(`tm.io totd failed: ${r.status}`);
-  const j = await r.json();
-
-  const { year, month1 } = tmioMonthYear(j);
-  const todayUTC = new Date().getUTCDate();
-  const days = Array.isArray(j.days) ? j.days : [];
-  const entry = days.find(d => tmioDayNumber(d) === todayUTC) || days.at(-1);
-  if (!entry) throw new Error("tm.io totd: no days");
-
-  const m = entry.map || entry;
-  const uid   = m.mapUid ?? entry.mapUid ?? null;
-  const name  = m.name ?? m.mapName ?? entry.name ?? "(unknown map)";
-  const thumb = m.thumbnail ?? m.thumbnailUrl ?? entry.thumbnail ?? entry.thumbnailUrl ?? "";
-  const authorAccountId =
-    m.authorPlayer?.accountId ?? m.authorplayer?.accountid ??
-    entry.authorPlayer?.accountId ?? entry.authorplayer?.accountid ?? null;
-  const authorDisplayName =
-    m.authorPlayer?.name ?? m.authorplayer?.name ?? m.authorName ?? m.author ??
-    entry.authorPlayer?.name ?? entry.authorplayer?.name ?? "(unknown)";
-
-  return {
-    date: dateKey(year, month1, tmioDayNumber(entry)),
-    map: { uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb }
-  };
-}
-
 /* ------------------- COTD winner (Meet API) ------------------- */
 async function getCotdWinnerToday() {
   try {
@@ -230,19 +199,18 @@ async function main() {
   // 1) TOTD month from tm.io
   const { mKey, daysOut } = await writeTotdMonth(0);
 
-  // 1a) write "today" for TOTD using a direct tm.io fetch (fallback to month file)
-  const now = new Date();
-  const todayKey = dateKey(now.getUTCFullYear(), now.getUTCMonth()+1, now.getUTCDate());
-
-  let todayTotd;
-  try {
-    todayTotd = await getTodaysTotdFromTmio();
-  } catch {
-    todayTotd = daysOut[todayKey] || Object.values(daysOut).at(-1) || null;
-  }
-  if (todayTotd) {
-    const payload = todayTotd.date ? todayTotd : { date: todayKey, ...todayTotd };
-    await writeJson(TOTD_LATEST, { generatedAt: new Date().toISOString(), ...payload });
+  // 1a) Write "latest available" for TOTD (never falls back to 10-01)
+  const keys = Object.keys(daysOut).sort();          // ascending YYYY-MM-DD
+  const latestKey = keys[keys.length - 1] || null;
+  if (latestKey) {
+    const latestTotd = daysOut[latestKey];
+    await writeJson(TOTD_LATEST, {
+      generatedAt: new Date().toISOString(),
+      ...latestTotd
+    });
+    console.log("TOTD latest:", latestTotd.date, latestTotd.map?.name);
+  } else {
+    console.log("TOTD: no days found for month", mKey);
   }
 
   // 2) COTD: just the Division 1 winner for *today* (accumulates over time)
