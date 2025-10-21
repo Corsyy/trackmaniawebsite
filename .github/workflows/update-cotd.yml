@@ -1,58 +1,41 @@
-name: Update COTD (tm.io, monthly JSON)
+name: Update COTD
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   schedule:
-    - cron: "10 3 * * *"  # run once per day at 03:10 UTC
-
-permissions:
-  contents: write
+    - cron: "0 * * * *" # hourly; change as you like
 
 jobs:
-  build:
+  update-cotd:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+    env:
+      NADEO_TOKEN: ${{ secrets.NADEO_TOKEN }}
+      TM_CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
+      TM_CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
+      # Optional: set to ./public/cotd.json if your site serves from /public
+      COTD_OUTPUT: ./cotd.json
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Node.js
+      - name: Use Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
-      - name: Ensure data directory exists
-        run: mkdir -p data/totd
+      - name: Run fetcher
+        run: node cotd-fetcher.js
 
-      # Current month/season (index 0)
-      - name: Run fetcher (current season)
-        run: node scripts/cotd-fetcher.js 0 || echo "current season wrote nothing (continuing)"
-
-      # Previous month/season (index 1) to catch late updates
-      - name: Run fetcher (previous season)
-        run: node scripts/cotd-fetcher.js prev || echo "previous season wrote nothing (continuing)"
-
-      - name: Show generated files (debug)
+      - name: Commit updated COTD JSON
         run: |
-          echo "==== data/totd directory ===="
-          [ -d data/totd ] && ls -la data/totd || echo "No data/totd directory found"
-          echo "---- recent JSON heads ----"
-          ls -1t data/totd/*.json | head -n 6 | xargs -I {} sh -c 'echo ">>> {}"; head -n 20 "{}"'
-
-      - name: Commit & push if changes exist
-        run: |
-          if [[ -n "$(git status --porcelain -- data/totd/)" ]]; then
-            echo "=== Committing updated COTD files ==="
+          if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/totd/
-            git commit -m "Update monthly COTD JSON [skip ci]"
+            git add -A
+            git commit -m "chore: update COTD data"
             git push
           else
             echo "No changes to commit."
           fi
-
-      - name: Ensure .nojekyll for GitHub Pages
-        run: touch .nojekyll
