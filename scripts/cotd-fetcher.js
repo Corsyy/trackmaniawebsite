@@ -1,5 +1,5 @@
 // Node 20+ (native fetch)
-import { mkdir, writeFile, readFile, access } from "node:fs/promises";
+import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
 
@@ -85,6 +85,19 @@ async function resolveNames(ids) {
   return r.ok ? r.json() : {};
 }
 
+/* ------------------- index helper ------------------- */
+/** Rebuild months.json from *.json files present in the dir (excludes months.json). */
+async function rebuildMonthIndex(dir) {
+  await ensureDir(dir);
+  const items = await readdir(dir, { withFileTypes: true });
+  const months = items
+    .filter(e => e.isFile() && e.name.endsWith(".json") && e.name !== "months.json")
+    .map(e => e.name.replace(/\.json$/,""))
+    .sort()
+    .reverse();
+  await writeJson(path.join(dir, "months.json"), { months });
+}
+
 /* ------------------- TOTD from trackmania.io (no auth) ------------------- */
 async function fetchTmioMonth(index = 0) {
   const r = await fetch(`https://trackmania.io/api/totd/${index}`, {
@@ -124,14 +137,41 @@ async function writeTotdMonth(index = 0) {
   await ensureDir(TOTD_DIR);
   await writeJson(path.join(TOTD_DIR, `${mKey}.json`), { month: mKey, days: daysOut });
 
-  const idxPath = path.join(TOTD_DIR, "months.json");
-  const idx = await loadJson(idxPath, { months: [] });
-  if (!idx.months.includes(mKey)) {
-    idx.months.push(mKey);
-    idx.months.sort().reverse();
-    await writeJson(idxPath, idx);
-  }
+  // Always rebuild months.json so stale months disappear
+  await rebuildMonthIndex(TOTD_DIR);
+
   return { mKey, daysOut };
+}
+
+/** Robust "today" from TM.io (fills name, author, thumbnail, and correct date). */
+async function getTodaysTotdFromTmio() {
+  const r = await fetch("https://trackmania.io/api/totd/0", {
+    headers: { "User-Agent": "tm-cotd-archiver" }
+  });
+  if (!r.ok) throw new Error(`tm.io totd failed: ${r.status}`);
+  const j = await r.json();
+
+  const { year, month1 } = tmioMonthYear(j);
+  const todayUTC = new Date().getUTCDate();
+  const days = Array.isArray(j.days) ? j.days : [];
+  const entry = days.find(d => tmioDayNumber(d) === todayUTC) || days.at(-1);
+  if (!entry) throw new Error("tm.io totd: no days");
+
+  const m = entry.map || entry;
+  const uid   = m.mapUid ?? entry.mapUid ?? null;
+  const name  = m.name ?? m.mapName ?? entry.name ?? "(unknown map)";
+  const thumb = m.thumbnail ?? m.thumbnailUrl ?? entry.thumbnail ?? entry.thumbnailUrl ?? "";
+  const authorAccountId =
+    m.authorPlayer?.accountId ?? m.authorplayer?.accountid ??
+    entry.authorPlayer?.accountId ?? entry.authorplayer?.accountid ?? null;
+  const authorDisplayName =
+    m.authorPlayer?.name ?? m.authorplayer?.name ?? m.authorName ?? m.author ??
+    entry.authorPlayer?.name ?? entry.authorplayer?.name ?? "(unknown)";
+
+  return {
+    date: dateKey(year, month1, tmioDayNumber(entry)),
+    map: { uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb }
+  };
 }
 
 /* ------------------- COTD winner (Meet API) ------------------- */
@@ -178,13 +218,8 @@ async function upsertMonth(dir, key, dayKey, record) {
   data.days[dayKey] = record;
   await writeJson(p, data);
 
-  const idxP = path.join(dir, "months.json");
-  const idx = await loadJson(idxP, { months: [] });
-  if (!idx.months.includes(key)) {
-    idx.months.push(key);
-    idx.months.sort().reverse();
-    await writeJson(idxP, idx);
-  }
+  // Rebuild months index to keep it accurate
+  await rebuildMonthIndex(dir);
 }
 
 /* ------------------- MAIN ------------------- */
@@ -192,12 +227,19 @@ async function main() {
   // 1) TOTD month from tm.io
   const { mKey, daysOut } = await writeTotdMonth(0);
 
-  // 1a) write "today" for TOTD
+  // 1a) write "today" for TOTD using a direct tm.io fetch (fallback to month file)
   const now = new Date();
   const todayKey = dateKey(now.getUTCFullYear(), now.getUTCMonth()+1, now.getUTCDate());
-  const todayTotd = daysOut[todayKey] || Object.values(daysOut).at(-1);
+
+  let todayTotd;
+  try {
+    todayTotd = await getTodaysTotdFromTmio();
+  } catch {
+    todayTotd = daysOut[todayKey] || Object.values(daysOut).at(-1) || null;
+  }
   if (todayTotd) {
-    await writeJson(TOTD_LATEST, { generatedAt: new Date().toISOString(), ...todayTotd });
+    const payload = todayTotd.date ? todayTotd : { date: todayKey, ...todayTotd };
+    await writeJson(TOTD_LATEST, { generatedAt: new Date().toISOString(), ...payload });
   }
 
   // 2) COTD: just the Division 1 winner for *today* (accumulates over time)
