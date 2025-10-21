@@ -1,54 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cup of the Day</title>
 <style>
 :root{--bg:#0a0f1a;--panel:#0f1524;--text:#e6ecff;--muted:#9db1ff;--accent:#6dfbff;--border:rgba(109,251,255,.2)}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Segoe UI,Roboto,Ubuntu,Helvetica Neue,sans-serif;background:var(--bg);color:var(--text)}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,Ubuntu,Helvetica Neue,sans-serif;background:var(--bg);color:var(--text)}
 header{background:var(--panel);border-bottom:1px solid var(--border)}
 .container{width:min(1100px,92vw);margin:0 auto;padding:1rem}
 h1{margin:0 0 .25rem}
-
-.nav{display:flex;gap:.75rem;align-items:center}
-.nav a{color:var(--accent);text-decoration:none}
-
-/* Gradient button like your Kacky page */
-.btn-grad{
-  display:inline-block;
-  padding:.55rem 1.1rem;
-  border-radius:12px;
-  background:linear-gradient(135deg,#29a8ff,#6dfbff);
-  color:#05121f; font-weight:600; text-decoration:none;
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:0 6px 18px rgba(45,200,255,.15);
-}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.nav a{color:var(--accent);text-decoration:none;margin-right:1rem}
 
 .select{margin-top:.5rem}
 select{background:#0c1322;border:1px solid var(--border);color:var(--text);padding:.4rem .6rem;border-radius:10px}
 
-/* Cards/list */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-.meta{padding:.9rem}
-.date{opacity:.85;font-size:.92rem;margin-bottom:.25rem}
+.hero{margin:1rem 0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1rem}
+.date{opacity:.8;font-size:.9rem}
 .badge{border:1px solid var(--border);padding:.2rem .5rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.06)}
 
-/* Today panel */
-.hero{margin:1rem 0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:1rem}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card .meta{padding:.8rem}
+
+/* Gradient Home button to match Kacky page */
+.home-btn{
+  background:linear-gradient(90deg,#3ae0ff,#4d9fff);
+  border:none;color:#000;font-weight:600;font-size:1rem;
+  padding:.45rem 1.1rem;border-radius:.6rem;cursor:pointer;
+  box-shadow:0 0 8px rgba(77,159,255,.5);transition:all .25s ease;
+  animation:pulseGlow 2.5s infinite ease-in-out
+}
+.home-btn:hover{transform:translateY(-2px);box-shadow:0 0 14px rgba(58,224,255,.8)}
+@keyframes pulseGlow{
+  0%{box-shadow:0 0 8px rgba(77,159,255,.5)}
+  50%{box-shadow:0 0 14px rgba(77,159,255,.9)}
+  100%{box-shadow:0 0 8px rgba(77,159,255,.5)}
+}
 </style>
-</head>
-<body>
-<header>
-  <div class="container">
-    <div class="nav" style="justify-content:flex-end">
-      <a class="btn-grad" href="/">Home</a>
-    </div>
+</head><body>
+<header><div class="container">
+  <div class="nav">
     <h1>Cup of the Day</h1>
-    <div class="select">Month: <select id="month"></select></div>
+    <a href="/"><button class="home-btn">Home</button></a>
   </div>
-</header>
+  <div class="nav" style="justify-content:flex-start;gap:1rem">
+    <a href="./totd">Track of the Day</a>
+  </div>
+  <div class="select">Month: <select id="month"></select></div>
+</div></header>
 
 <main class="container">
   <section class="hero" id="today">
@@ -62,61 +60,60 @@ select{background:#0c1322;border:1px solid var(--border);color:var(--text);paddi
 
 <script>
 (function(){
-  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const bust = () => `?t=${Date.now()}`;
-  const label = (ym) => { const [y,m]=ym.split("-"); return `${MONTHS[+m-1]} ${y}`; };
-  const maxKey = (obj) => Object.keys(obj||{}).sort().pop();
+  const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const bust=()=>`?t=${Date.now()}`;
+  const label=(ym)=>{const [y,m]=ym.split("-");return `${MONTHS[+m-1]} ${y}`;}
+  const maxKey=(obj)=>Object.keys(obj||{}).sort().pop();
 
   async function jget(url){
-    const r = await fetch(url + bust(), { cache: "no-store" });
+    const r=await fetch(url+bust(),{cache:"no-store"});
     if(!r.ok) throw new Error(`${url} -> ${r.status}`);
     return r.json();
   }
-  const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val ?? ""; };
+  const setText=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=val??"";}
 
-  function renderList(days){
-    const grid = document.getElementById("grid");
+  function renderGrid(days){
+    const grid=document.getElementById("grid");
     if(!grid) return;
-    grid.innerHTML = "";
-    const keys = Object.keys(days||{}).sort(); // oldest -> newest
+    grid.innerHTML="";
+    const keys=Object.keys(days).sort(); // oldest -> newest
     for(const k of keys){
-      const d = days[k];
-      const card = document.createElement("article");
-      card.className = "card";
-      card.innerHTML = `
+      const d=days[k];
+      const card=document.createElement("article");
+      card.className="card";
+      card.innerHTML=`
         <div class="meta">
           <div class="date">${d.date}</div>
-          <div>Division 1 Winner: <span class="badge">${d.cotd?.winnerDisplayName || d.cotd?.winnerAccountId || "—"}</span></div>
+          <h3 style="margin:.4rem 0 0">Division 1 Winner</h3>
+          <div> <span class="badge">${d.cotd?.winnerDisplayName || d.cotd?.winnerAccountId || "—"}</span></div>
         </div>`;
       grid.appendChild(card);
     }
   }
 
   async function loadMonth(ym){
-    const data = await jget(`data/cotd/${ym}.json`);
-    // show the latest day available in the file
-    const latestKey = maxKey(data.days);
-    const latest = data.days[latestKey];
+    const data=await jget(`data/cotd/${ym}.json`);
+    // "Today" panel: use the latest available day in the file
+    const latest=data.days[maxKey(data.days)];
     setText("w-date", latest?.date || "—");
     setText("w-name", latest?.cotd?.winnerDisplayName || latest?.cotd?.winnerAccountId || "—");
-    renderList(data.days);
+    renderGrid(data.days);
   }
 
   async function init(){
-    const sel = document.getElementById("month");
-    const monthsJ = await jget("data/cotd/months.json");
-    const months = (monthsJ?.months || []).slice().sort().reverse();
-    if(!months.length){ if(sel) sel.innerHTML = `<option>(no data yet)</option>`; return; }
+    const sel=document.getElementById("month");
+    const monthsJ=await jget("data/cotd/months.json");
+    const months=(monthsJ?.months||[]).slice().sort().reverse(); // newest first
+    if(!months.length){ if(sel) sel.innerHTML=`<option>(no data yet)</option>`; return; }
     if(sel){
-      sel.innerHTML = months.map(k => `<option value="${k}">${label(k)}</option>`).join("");
-      sel.value = months[0];
-      sel.onchange = () => loadMonth(sel.value);
+      sel.innerHTML=months.map(k=>`<option value="${k}">${label(k)}</option>`).join("");
+      sel.value=months[0];
+      sel.onchange=()=>loadMonth(sel.value);
     }
     await loadMonth(months[0]);
   }
 
-  init().catch(err => console.error("[COTD] init failed:", err));
+  init().catch(err=>console.error("[COTD] init failed:",err));
 })();
 </script>
-</body>
-</html>
+</body></html>
