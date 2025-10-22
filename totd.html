@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Track of the Day</title>
 <style>
@@ -32,7 +34,18 @@ h1{margin:0 0 .25rem}
   50%{box-shadow:0 0 14px rgba(77,159,255,.9)}
   100%{box-shadow:0 0 8px rgba(77,159,255,.5)}
 }
-</style></head><body>
+
+/* NEW: download button */
+.download-btn{
+  display:inline-block;
+  background:linear-gradient(90deg,#3ae0ff,#4d9fff);
+  color:#000;font-weight:600;padding:.35rem .75rem;border-radius:.5rem;
+  text-decoration:none;border:1px solid var(--border);
+}
+.download-btn:hover{ filter:brightness(1.06); }
+</style>
+</head>
+<body>
 <header><div class="container">
   <div class="nav">
     <h1>Track of the Day</h1>
@@ -51,6 +64,7 @@ h1{margin:0 0 .25rem}
       <h2 id="t-name">(loading…)</h2>
       <p>Author: <span class="badge" id="t-author">—</span></p>
       <p id="t-date" class="date"></p>
+      <!-- download button for Today gets injected here if available -->
     </div>
   </section>
   <section class="grid" id="grid"></section>
@@ -71,15 +85,34 @@ h1{margin:0 0 .25rem}
   const set=(id,html)=>{const el=document.getElementById(id); if(el) el.innerHTML=html;}
   const setText=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt??"";}
 
+  // UPDATED: hero now renders a download button if map.downloadUrl exists
   function renderHero(rec){
     if(!rec) return;
-    // put an <img> inside your #t-thumb div
-    set("t-thumb", rec.map?.thumbnailUrl ? `<img src="${rec.map.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">` : "");
+    const dl = rec.map?.downloadUrl || null;
+    set("t-thumb",
+      rec.map?.thumbnailUrl
+        ? `<img src="${rec.map.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">`
+        : ""
+    );
     setText("t-name",   rec.map?.name || "(unknown map)");
     setText("t-author", rec.map?.authorDisplayName || "—");
     setText("t-date",   rec.date || "");
+
+    const hero = document.getElementById("today");
+    // remove any old button
+    const old = hero.querySelector(".today-dl");
+    if (old) old.remove();
+    // add new if available
+    if (dl){
+      const div = document.createElement("div");
+      div.className = "today-dl";
+      div.style.marginTop = ".5rem";
+      div.innerHTML = `<a class="download-btn" href="${dl}" target="_blank" rel="noopener">⬇️ Download Today’s Map</a>`;
+      hero.appendChild(div);
+    }
   }
 
+  // UPDATED: cards also show the button if map.downloadUrl exists
   function renderGrid(days){
     const grid=document.getElementById("grid");
     if(!grid) return;
@@ -87,14 +120,19 @@ h1{margin:0 0 .25rem}
     const keys=Object.keys(days).sort(); // oldest -> newest
     for(const k of keys){
       const d=days[k];
+      const dl = d.map?.downloadUrl || null;
+
       const card=document.createElement("article");
       card.className="card";
       card.innerHTML=`
-        <div class="thumb">${d.map?.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${d.map.thumbnailUrl}">` : ""}</div>
+        <div class="thumb">
+          ${d.map?.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${d.map.thumbnailUrl}" alt="">` : ""}
+        </div>
         <div class="meta">
           <div class="date">${d.date}</div>
           <h3>${d.map?.name || "(unknown map)"}</h3>
           <div>Author: <span class="badge">${d.map?.authorDisplayName || "—"}</span></div>
+          ${dl ? `<div style="margin-top:.6rem"><a class="download-btn" href="${dl}" target="_blank" rel="noopener">⬇️ Download Map</a></div>` : ""}
         </div>`;
       grid.appendChild(card);
     }
@@ -126,4 +164,5 @@ h1{margin:0 0 .25rem}
   });
 })();
 </script>
-</body></html>
+</body>
+</html>
