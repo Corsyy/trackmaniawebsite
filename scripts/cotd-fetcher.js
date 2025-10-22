@@ -82,17 +82,30 @@ const coreFetch = (pathOrUrl, init) =>
 /* ============================== TOTD (simple) ================================ */
 // Low-friction: get today’s TOTD from trackmania.io (no auth needed).
 async function fetchTotdLatest() {
-  const r = await fetch(`${TMIO}/api/totd/0`);
-  if (!r.ok) throw new Error(`TOTD fetch failed: ${r.status}`);
-  const j = await r.json();
-  const last = Array.isArray(j.days) ? j.days[j.days.length - 1] : null;
-  const map = last?.map || last || {};
+  // Get the most recent month (requires Live access token; you already refresh this)
+  const res = await liveFetch('/api/token/campaign/month?length=1');
+  if (!res.ok) throw new Error(`Live month fetch failed: ${res.status} ${await res.text()}`);
+  const j = await res.json();
+
+  const month = j?.monthList?.[0];
+  if (!month || !Array.isArray(month.days) || !month.days.length) {
+    throw new Error('No month/days returned from Live API');
+  }
+
+  // pick the newest day that has a mapUid
+  const latestDay = [...month.days]
+    .sort((a, b) => (b.dayNumber ?? 0) - (a.dayNumber ?? 0))
+    .find(d => d.mapUid);
+
+  if (!latestDay) throw new Error('No TOTD day with a mapUid found');
+
+  // Live month payload doesn’t always include map name/author; we at least return mapUid & date.
   return {
     generatedAt: new Date().toISOString(),
-    date: last?.day ?? null,
-    name: map.name ?? null,
-    author: map.authorplayer?.name || map.authorPlayer?.name || null,
-    mapUid: map.mapUid ?? null
+    date: `${month.year}-${String(month.month).padStart(2,'0')}-${String(latestDay.dayNumber).padStart(2,'0')}`,
+    mapUid: latestDay.mapUid,
+    name: null,          // optional: can be enriched later if you want
+    author: null
   };
 }
 
