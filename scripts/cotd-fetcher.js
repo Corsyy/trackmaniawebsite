@@ -138,9 +138,14 @@ function stripTmFormatting(input) {
 function toMs(dt) {
   if (dt == null) return NaN;
   let n = typeof dt === "string" ? Number(dt) : dt;
-  if (Number.isFinite(n)) { if (n < 2e12) n *= 1000; return n; }
-  const p = Date.parse(dt); return Number.isFinite(p) ? p : NaN;
+  if (Number.isFinite(n)) {
+    if (n < 2e12) n *= 1000;
+    return n;
+  }
+  const p = Date.parse(dt);
+  return Number.isFinite(p) ? p : NaN;
 }
+
 
 // extract accountId / displayName from varied result shapes
 function extractWinnerFields(result) {
@@ -230,52 +235,63 @@ async function listCompetitions(offset = 0, length = 100) {
   return r.json();
 }
 
-/** Find COTD for a given UTC date by start time within that day (±12h tolerance). */
+/** Find COTD for a given UTC date by start time within that day. */
 async function findCotdCompetitionByDate(y, m1, d) {
-  const dayStart = Date.UTC(y, m1 - 1, d, 0, 0, 0) - 12 * 3600 * 1000;   // widen window
-  const dayEnd   = Date.UTC(y, m1 - 1, d, 23, 59, 59, 999) + 12 * 3600 * 1000;
+  const dayStart = Date.UTC(y, m1 - 1, d, 0, 0, 0);
+  const dayEnd   = Date.UTC(y, m1 - 1, d, 23, 59, 59, 999);
 
-  const MAX_PAGES = 80, PAGE_LEN = 100;
+  const PAGE_LEN = 100;
+  const MAX_PAGES = 80;
   const hits = [];
 
   for (let page = 0; page < MAX_PAGES; page++) {
     const offset = page * PAGE_LEN;
+
     const data = await listCompetitions(offset, PAGE_LEN);
-    const comps = data?.competitions || data?.items || [];
-    if (!Array.isArray(comps) || !comps.length) break;
+    // The Meet endpoint may return an array OR an object with { competitions, total }.
+    const comps = Array.isArray(data) ? data : (data?.competitions || data?.items || []);
+    if (!Array.isArray(comps) || comps.length === 0) break;
 
     for (const c of comps) {
-      const dtRaw = c.startDate ?? c.beginDate ?? c.startTime ?? c.beginTime ?? c.date ?? null;
+      const dtRaw =
+        c.startDate ?? c.beginDate ?? c.startTime ?? c.beginTime ?? c.date ?? null;
       const ts = toMs(dtRaw);
       if (!Number.isFinite(ts)) continue;
       if (ts < dayStart || ts > dayEnd) continue;
+
       if (!looksLikeCotd(c)) continue;
+
       hits.push(c);
     }
 
-    const total = data?.total ?? (offset + comps.length);
-    if (offset + comps.length >= total) break;
+    // ✅ Correct stop condition:
+    // If API doesn't provide total, don't try to infer it (that broke the loop).
+    // Just stop when the current page returned less than PAGE_LEN (last page).
+    if (comps.length < PAGE_LEN) break;
   }
 
   if (!hits.length) {
-  dlog(`[COTD] ${y}-${String(m1).padStart(2,"0")}-${String(d).padStart(2,"0")} – scanned page(s) but no COTD-like comps matched name`);
-}
+    dlog(
+      `[COTD] ${y}-${String(m1).padStart(2, "0")}-${String(d).padStart(2, "0")} – scanned pages, no COTD-like comps matched name`
+    );
+    return null;
+  }
 
-  const ymd = `${y}-${String(m1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-  let pick = hits.find(c => String(c.name ?? "").includes(ymd));
+  // Prefer the one whose name literally contains YYYY-MM-DD; else pick earliest start in the day (#1)
+  const ymd = `${y}-${String(m1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  let pick = hits.find((c) => String(c?.name ?? "").includes(ymd));
   if (!pick) {
     pick = hits.reduce((best, cur) => {
-      const bt = toMs(best.startDate ?? best.beginDate ?? best.startTime ?? best.beginTime);
-      const ct = toMs(cur.startDate  ?? cur.beginDate  ?? cur.startTime  ?? cur.beginTime);
-      return (ct < bt ? cur : best); // earliest (usually #1)
+      const bt = toMs(best?.startDate ?? best?.beginDate ?? best?.startTime ?? best?.beginTime);
+      const ct = toMs(cur?.startDate  ?? cur?.beginDate  ?? cur?.startTime  ?? cur?.beginTime);
+      return ct < bt ? cur : best;
     }, hits[0]);
   }
 
-  if (DEBUG) {
-    const id = pick?.id || pick?.liveId || pick?.uid || "?";
-    console.log(`[COTD] FOUND comp for ${ymd}: id=${id} name="${pick?.name}"`);
-  }
-  return pick;
+  dlog(
+    `[COTD] PICK ${ymd}: id=${pick?.id || pick?.liveId || "?"} name="${pick?.name ?? "(no name)"}"`
+  );
+  return pick || null;
 }
 
 async function getD1WinnerForCompetition(compId) {
