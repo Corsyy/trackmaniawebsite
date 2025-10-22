@@ -109,7 +109,7 @@ async function authedFetch(url, { audience, init = {}, retryOnAuth = true } = {}
   return r;
 }
 
-const fetchMeet = (url, init = {}) => authedFetch(url, { audience: "NadeoClubServices", init });
+const fetchMeet = (url, init = {}) => authedFetch(url, { audience: "NadeoLiveServices", init });
 const fetchCore = (url, init = {}) => authedFetch(url, { audience: "NadeoLiveServices", init });
 
 /* ------------------- indexes ------------------- */
@@ -217,11 +217,12 @@ function looksLikeCotd(c) {
   return (
     name.includes("cup of the day") ||
     name.includes("cotd") ||
-    name.match(/#\d{1,3}/) || // e.g. "COTD #152"
-    name.match(/\bday\b/) ||  // contains "day"
-    name.includes("cup du jour") // French version
+    /\bday\b/.test(name) ||
+    /#\d{1,3}/.test(name) ||     // e.g., "COTD #152"
+    name.includes("cup du jour")  // FR
   );
 }
+
 
 async function listCompetitions(offset = 0, length = 100) {
   const r = await fetchMeet(`${MEET}/api/competitions?offset=${offset}&length=${length}`);
@@ -256,7 +257,9 @@ async function findCotdCompetitionByDate(y, m1, d) {
     if (offset + comps.length >= total) break;
   }
 
-  if (!hits.length) return null;
+  if (!hits.length) {
+  dlog(`[COTD] ${y}-${String(m1).padStart(2,"0")}-${String(d).padStart(2,"0")} – scanned page(s) but no COTD-like comps matched name`);
+}
 
   const ymd = `${y}-${String(m1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
   let pick = hits.find(c => String(c.name ?? "").includes(ymd));
