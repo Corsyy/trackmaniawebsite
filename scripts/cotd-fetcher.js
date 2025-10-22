@@ -1,4 +1,4 @@
-// scripts/cotd-fetcher.js (slim)
+// scripts/cotd-fetcher.js (slim, patched)
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
@@ -132,7 +132,7 @@ async function hydrateDisplayNames(ids){
 
 async function upsertMonth(dir,mKey,dayKey,record){await ensureDir(dir);const p=path.join(dir,`${mKey}.json`);const data=await loadJson(p,{month:mKey,days:{}});data.days[dayKey]=record;await writeJson(p,data);await rebuildMonthIndex(dir);}
 
-/* --- Winner patch: finished gate + edition LB first --- */
+/* --- Winner gate + competition LB --- */
 const GRACE_MS=6*60*1000;
 async function getCompetitionDetail(compId){const r=await fetchMeet(`${MEET}/api/competitions/${compId}`);if(!r.ok)throw new Error(`competition detail failed: ${r.status}`);return r.json();}
 function isEditionFinishedLike(detail,nowMs=Date.now()){
@@ -142,22 +142,14 @@ function isEditionFinishedLike(detail,nowMs=Date.now()){
   if(Number.isFinite(endMs))return nowMs>=endMs+GRACE_MS;
   return false;
 }
-function extractEditionId(detail){return detail?.currentEditionId??detail?.editionId??detail?.edition?.id??(Array.isArray(detail?.editions)?detail.editions.at(-1)?.id:null)??null;}
-function extractWinnerNameFromLB(json){
-  const first=(Array.isArray(json?.top)&&json.top[0])||(Array.isArray(json?.results)&&json.results[0])||(Array.isArray(json?.ranks)&&json.ranks[0])||(Array.isArray(json?.players)&&json.players[0])||null;
-  if(!first)return{name:null,accountId:null};
-  const p=first.player||first.participant||first;
-  const name=p?.displayName||p?.name||first?.displayName||first?.name||null;
-  const accountId=p?.accountId||p?.id||p?.player?.accountId||p?.player?.id||null;
-  return{name:name||null,accountId:accountId||null};
-}
-async function getWinnerFromEditionLeaderboard(compId,editionId){
-  if(!editionId)return null;
-  const urls=[`${MEET}/api/competitions/${compId}/editions/${editionId}/leaderboard?length=1`,`${MEET}/api/competitions/${compId}/editions/${editionId}/top?length=1`];
-  for(const u of urls){
-    try{const r=await fetchMeet(u);if(!r.ok)continue;const j=await r.json();const {name,accountId}=extractWinnerNameFromLB(j);if(name||accountId)return{displayName:name,accountId:accountId,via:"editionLB"};}catch{}
-  }
-  return null;
+async function getWinnerFromCompetitionLeaderboard(compId){
+  const r=await fetchMeet(`${MEET}/api/competitions/${compId}/leaderboard?length=1`);
+  if(!r.ok)return null;
+  const j=await r.json();
+  const first=Array.isArray(j)&&j[0]?j[0]:null;
+  if(!first)return null;
+  const {accountId,displayName}=extractWinnerFields(first);
+  return{displayName:displayName||null,accountId:accountId||null,via:"competitionLB"};
 }
 
 async function updateCotdCurrentMonth(){
@@ -172,7 +164,7 @@ async function updateCotdCurrentMonth(){
     if(!monthData.days[dk]) monthData.days[dk]={date:dk,cotd:{winnerAccountId:null,winnerDisplayName:null}};
     const cur=monthData.days[dk]?.cotd;
     if(cur?.winnerAccountId && !cur?.winnerDisplayName){toHydrate.add(cur.winnerAccountId);continue;}
-    if(cur?.winnerAccountId || cur?.winnerDisplayName) continue; // don't redo a completed day
+    if(cur?.winnerAccountId || cur?.winnerDisplayName) continue;
 
     try{
       const comp=await findCotdCompetitionByDate(y,m1,d);
@@ -184,9 +176,8 @@ async function updateCotdCurrentMonth(){
       try{detail=await getCompetitionDetail(cid);}catch(e){dlog(`[COTD] ${dk} detail fetch failed: ${e.message}`);continue;}
       if(!isEditionFinishedLike(detail)){dlog(`[COTD] ${dk} pending — edition not finished/grace yet`);continue;}
 
-      const editionId=extractEditionId(detail);
-      let winner=await getWinnerFromEditionLeaderboard(cid,editionId);
-      if(!winner) winner=await getD1WinnerForCompetition(cid);
+      let winner=await getWinnerFromCompetitionLeaderboard(cid);   // ✅ correct endpoint
+      if(!winner) winner=await getD1WinnerForCompetition(cid);     // fallback
       if(!winner){dlog(`[COTD] ${dk} winner still computing — will retry next run`);continue;}
 
       monthData.days[dk]={date:dk,cotd:{winnerAccountId:winner.accountId||null,winnerDisplayName:winner.displayName||null}};
