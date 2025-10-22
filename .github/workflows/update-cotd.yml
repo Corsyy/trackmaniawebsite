@@ -1,42 +1,53 @@
 name: Update COTD/TOTD
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "15 * * * *"  # run hourly at :15
+    - cron: "0 * * * *"   # hourly
+  workflow_dispatch: {}
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      # CHANGE THIS if your site publishes from somewhere else
-      PUBLIC_DIR: .
-
-      # Secrets (Settings → Secrets and variables → Actions)
-      NADEO_REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
-      TM_CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
-      TM_CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
-      DEBUG: "1"  # ✅ Enables detailed logs in Actions console
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
+
+      - name: Install deps (if you have a package.json)
+        run: |
+          if [ -f package-lock.json ]; then npm ci; \
+          elif [ -f package.json ]; then npm i; \
+          fi
 
       - name: Run fetcher
-        run: node scripts/cotd-fetcher.js
-
-      - name: Commit JSON
+        env:
+          NADEO_LIVE_REFRESH_TOKEN: ${{ secrets.NADEO_LIVE_REFRESH_TOKEN }}
+          NADEO_CORE_REFRESH_TOKEN: ${{ secrets.NADEO_CORE_REFRESH_TOKEN }}
+          USER_AGENT: ${{ secrets.USER_AGENT }}
+          PUBLIC_DIR: ${{ secrets.PUBLIC_DIR }}
+          DEBUG: ${{ secrets.DEBUG }}
         run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A
-            git commit -m "data: refresh COTD/TOTD"
+          node -v
+          # quick presence check (does not print the secret)
+          if [ -z "${NADEO_LIVE_REFRESH_TOKEN}" ]; then
+            echo "LIVE refresh token not injected"; exit 1;
+          fi
+          node scripts/cotd-fetcher.js
+
+      - name: Commit & push data
+        if: always()
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/totd.json public/cotd.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update COTD/TOTD data"
             git push
           else
-            echo "No changes"
+            echo "No changes to commit."
           fi
