@@ -257,68 +257,63 @@ async function getWinnerFromCompetitionLeaderboard(compId){
 
 /* ------------------- path B: D1 match results (fallback) -------------------- */
 // REPLACE your entire getD1WinnerForCompetition() with this version:
-async function getD1WinnerForCompetition(compId){
-  if(!compId) return null;
+async function getD1WinnerForCompetition(compId) {
+  if (!compId) return null;
 
-  // 1) fetch all rounds
+  // 1) Fetch all rounds in the competition
   const roundsRes = await fetchMeet(`${MEET}/api/competitions/${compId}/rounds`);
-  if (DEBUG) dlog(`[winner] rounds http=${roundsRes.status} id=${compId}`);
-  if(!roundsRes.ok) return null;
-
+  if (!roundsRes.ok) throw new Error(`rounds failed: ${roundsRes.status}`);
   const rounds = await roundsRes.json();
-  if(!Array.isArray(rounds) || !rounds.length) return null;
+  if (!Array.isArray(rounds) || !rounds.length) return null;
 
-  // 2) fetch matches for ALL rounds (not just the one named "final")
+  // 2) Get matches for each round using the documented /rounds/{roundId}/matches endpoint
   const PAGE = 100;
   const allMatches = [];
-  for (const r of rounds) {
+  for (const round of rounds) {
     for (let offset = 0; offset < 2000; offset += PAGE) {
-      const res = await fetchMeet(`${MEET}/api/rounds/${r.id}/matches?length=${PAGE}&offset=${offset}`);
+      const res = await fetchMeet(`${MEET}/api/rounds/${round.id}/matches?length=${PAGE}&offset=${offset}`);
       if (!res.ok) break;
       const j = await res.json();
       const batch = j?.matches || j || [];
       if (!batch.length) break;
-      // tag each match with its round for possible tie-breaks
-      for (const m of batch) allMatches.push({ ...m, _round: r });
+      for (const m of batch) allMatches.push({ ...m, _round: round });
       if (batch.length < PAGE) break;
     }
   }
+
   if (DEBUG) dlog(`[winner] total matches fetched=${allMatches.length} comp=${compId}`);
   if (!allMatches.length) return null;
 
-  // 3) pick "Division 1" match robustly
-  const lc = (s)=>String(s||"").toLowerCase();
+  // 3) Try to identify Division 1 match
+  const lc = (s) => String(s || "").toLowerCase();
   let d1 =
-    allMatches.find(m => /\bdivision\s*1\b|\bdiv\s*1\b|\bd1\b/.test(lc(m.name))) ||
-    allMatches.find(m => (m.division ?? m.Division ?? m.divisionNumber) === 1);
+    allMatches.find((m) => /\bdivision\s*1\b|\bdiv\s*1\b|\bd1\b/.test(lc(m.name))) ||
+    allMatches.find((m) => (m.division ?? m.Division ?? m.divisionNumber) === 1);
 
-  // Heuristics if the above didn’t hit:
   if (!d1) {
-    // Prefer matches from the last round by position, then smallest match position/number
-    const lastRound = rounds.reduce((a,b)=>((a?.position??-1)>(b?.position??-1)?a:b), rounds[0]);
-    const inLast = allMatches.filter(m => m._round?.id === lastRound.id);
+    const lastRound = rounds.reduce((a, b) => ((a?.position ?? -1) > (b?.position ?? -1) ? a : b), rounds[0]);
+    const inLast = allMatches.filter((m) => m._round?.id === lastRound.id);
     const pool = inLast.length ? inLast : allMatches;
-    d1 = pool.reduce((best,cur) => {
+    d1 = pool.reduce((best, cur) => {
       const bp = best?.position ?? best?.number ?? Number.POSITIVE_INFINITY;
-      const cp =  cur?.position ??  cur?.number ?? Number.POSITIVE_INFINITY;
+      const cp = cur?.position ?? cur?.number ?? Number.POSITIVE_INFINITY;
       return cp < bp ? cur : best;
     }, pool[0]);
   }
+
   if (!d1?.id) return null;
 
-  // 4) winner from the D1 match results
+  // 4) Fetch results for the chosen match
   const resultsRes = await fetchMeet(`${MEET}/api/matches/${d1.id}/results?length=255&offset=0`);
-  if (DEBUG) dlog(`[winner] results http=${resultsRes.status} match=${d1.id} name="${d1.name}"`);
   if (!resultsRes.ok) return null;
-
-  const raw = await resultsRes.text();
-  if (!raw) return null;
-  let resultsJ; try { resultsJ = JSON.parse(raw); } catch { return null; }
+  const resultsJ = await resultsRes.json();
   const arr = resultsJ?.results || resultsJ?.participants || resultsJ || [];
   if (!Array.isArray(arr) || !arr.length) return null;
 
-  arr.sort((a,b)=>{
-    const ar = a.rank ?? a.position ?? Infinity, br = b.rank ?? b.position ?? Infinity;
+  // 5) Sort and pick the top player
+  arr.sort((a, b) => {
+    const ar = a.rank ?? a.position ?? Infinity;
+    const br = b.rank ?? b.position ?? Infinity;
     if (ar !== br) return ar - br;
     const ap = typeof a.points === "number" ? -a.points : 0;
     const bp = typeof b.points === "number" ? -b.points : 0;
@@ -327,7 +322,7 @@ async function getD1WinnerForCompetition(compId){
 
   const top = arr[0];
   const { accountId, displayName } = extractWinnerFields(top);
-  return { accountId: accountId || null, displayName: displayName || null, rank: top.rank ?? top.position ?? 1, via: "d1-all-rounds" };
+  return { accountId: accountId || null, displayName: displayName || null, rank: top.rank ?? top.position ?? 1 };
 }
 
 /* --------------------- display-name hydration (Core) ------------------------ */
