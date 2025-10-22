@@ -1,29 +1,30 @@
-// scripts/totd-fetcher.js — TOTD only + download URLs (no COTD, no tokens)
-// Node 18+ required (global fetch).
+// scripts/totd-fetcher.js — TOTD + auto downloadUrl (preserves manual URLs)
+// Node 18+ (global fetch). No secrets needed.
 
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
 
-const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
-const TOTD_DIR   = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
-const TOTD_LATEST= `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
-const TMIO       = "https://trackmania.io";
+/* ----------------------------- config/constants ---------------------------- */
+const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
+const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
+const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
+const TMIO        = "https://trackmania.io";
+const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.0 (github action)";
 
 const DEBUG = process.env.DEBUG === "1";
-const dlog = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
+const dlog  = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
 
-/* ------------------------------ fs helpers --------------------------------- */
+/* -------------------------------- fs helpers ------------------------------- */
 const ensureDir = (p)=>mkdir(p,{recursive:true});
 const exists = async(p)=>{ try{ await access(p,FS.F_OK); return true; } catch { return false; } };
 const loadJson = async(p,f)=>(await exists(p))?JSON.parse(await readFile(p,"utf8")):f;
 const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
 
-/* ------------------------------- utils ------------------------------------- */
+/* --------------------------------- utils ----------------------------------- */
 const pad2=(n)=>String(n).padStart(2,"0");
 const monthKey=(y,m1)=>`${y}-${pad2(m1)}`;
 const dateKey=(y,m1,d)=>`${y}-${pad2(m1)}-${pad2(d)}`;
-
 function stripTmFormatting(input){
   if(!input || typeof input!=="string") return input;
   const D="\uFFF0";
@@ -38,10 +39,10 @@ async function fetchRetry(url,opts={},retries=5,baseDelay=500){
   let lastErr;
   for(let i=0;i<=retries;i++){
     try{
-      const r=await fetch(url,opts);
+      const r=await fetch(url,{ ...opts, headers:{ "User-Agent":USER_AGENT, ...(opts.headers||{}) }});
       if(r.status===429 || (r.status>=500 && r.status<=599)){
         const wait=Math.min(baseDelay*Math.pow(2,i),8000);
-        if (DEBUG) dlog(`retry ${i} ${r.status} ${url} waiting ${wait}ms`);
+        if (DEBUG) dlog(`retry ${i} ${r.status} ${url} wait=${wait}ms`);
         await sleep(wait);
         continue;
       }
@@ -49,16 +50,16 @@ async function fetchRetry(url,opts={},retries=5,baseDelay=500){
     }catch(e){
       lastErr=e;
       const wait=Math.min(baseDelay*Math.pow(2,i),8000);
-      if (DEBUG) dlog(`retry ${i} error ${e?.message||e} waiting ${wait}ms`);
+      if (DEBUG) dlog(`retry ${i} err ${e?.message||e} wait=${wait}ms`);
       await sleep(wait);
     }
   }
   throw lastErr || new Error(`fetch failed for ${url}`);
 }
 
-/* ------------------------------ tm.io calls -------------------------------- */
+/* ------------------------------ tm.io helpers ------------------------------ */
 async function fetchTmioMonth(index=0){
-  const r=await fetchRetry(`${TMIO}/api/totd/${index}`,{ headers:{ "User-Agent":"tm-totd" }});
+  const r=await fetchRetry(`${TMIO}/api/totd/${index}`);
   if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
@@ -69,14 +70,14 @@ function tmioMonthYear(resp){
 }
 async function fetchMapDownload(mapUid){
   if (!mapUid) return null;
-  const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`, { headers:{ "User-Agent":"tm-totd" }});
+  const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
   if (!r.ok) { dlog("map detail failed", mapUid, r.status); return null; }
   const j = await r.json();
-  // typical field is "file" => direct TMX download URL
+  // The field from tm.io that points to TMX download is usually "file"
   return j?.file || j?.download || null;
 }
 
-/* ------------------------------ month writer ------------------------------- */
+/* ------------------------------ month writing ------------------------------ */
 async function rebuildMonthIndex(dir){
   await ensureDir(dir);
   const items=await readdir(dir,{withFileTypes:true});
@@ -103,45 +104,58 @@ function baseDayRecord(y,m1,entry,idx){
 }
 
 async function writeTotdMonth(index=0){
+  // 0) load remote list
   const j=await fetchTmioMonth(index);
   const {y,m1}=tmioMonthYear(j);
   const mKey=monthKey(y,m1);
 
-  // 1) shape all days
+  // 1) load existing month file (so manual downloadUrl entries are preserved)
+  const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
+  const prev = await loadJson(monthPath, { month:mKey, days:{} });
+  const prevDays = prev?.days || {};
+
+  // 2) normalize remote -> day records
   const daysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
 
-  // 2) fetch download URLs (polite sequential to avoid hammering; still fast: ≤31 calls)
+  // 3) for each day:
+  //    - keep manual downloadUrl if it already exists
+  //    - otherwise fetch from tm.io /api/map/{uid}
   for (const rec of daysArr){
-    if (!rec.map.uid) continue;
-    rec.map.downloadUrl = await fetchMapDownload(rec.map.uid);
-    await sleep(80); // tiny delay to be nice to tm.io
+    const prevDl = prevDays[rec.date]?.map?.downloadUrl || null;
+    if (prevDl) {
+      rec.map.downloadUrl = prevDl;       // preserve manual/old link
+      continue;
+    }
+    if (rec.map.uid){
+      rec.map.downloadUrl = await fetchMapDownload(rec.map.uid);
+      await sleep(80); // be nice to tm.io
+    }
   }
 
-  // 3) write month file
+  // 4) write month file
   const daysOut={};
   for (const rec of daysArr){ daysOut[rec.date]=rec; }
 
   await ensureDir(TOTD_DIR);
-  await writeJson(path.join(TOTD_DIR,`${mKey}.json`),{ month:mKey, days:daysOut });
+  await writeJson(monthPath,{ month:mKey, days:daysOut });
   await rebuildMonthIndex(TOTD_DIR);
 
-  // 4) write latest (most recent day in the month we fetched)
+  // 5) write latest snapshot
   const keys=Object.keys(daysOut).sort();
   const latestKey=keys[keys.length-1]||null;
   if(latestKey){
-    const latestTotd=daysOut[latestKey];
-    await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latestTotd });
-    dlog("latest:", latestTotd.date, latestTotd.map?.name, latestTotd.map?.downloadUrl ? "[dl]" : "");
+    const latest=daysOut[latestKey];
+    await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
+    dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "");
   }else{
     dlog("no days found for", mKey);
   }
-  return { mKey, days: daysOut };
 }
 
 /* ----------------------------------- main ---------------------------------- */
 async function main(){
   await ensureDir(TOTD_DIR);
-  await writeTotdMonth(0); // current month
-  console.log("[DONE] TOTD updated with download URLs.");
+  await writeTotdMonth(0); // current month (index 0)
+  console.log("[DONE] TOTD updated with download URLs (manual URLs preserved).");
 }
 main().catch(err=>{ console.error(err); process.exit(1); });
