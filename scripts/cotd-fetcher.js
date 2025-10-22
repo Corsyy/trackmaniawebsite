@@ -1,4 +1,4 @@
-// scripts/cotd-fetcher.js (your original, patched for winner reliability)
+// scripts/cotd-fetcher.js (patched with deeper COTD fallbacks + logging)
 // Node 18+ required (global fetch).
 
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
@@ -19,7 +19,7 @@ const TMIO = "https://trackmania.io";
 
 /* 🔐 separate refresh tokens for each audience */
 const NADEO_LIVE_REFRESH_TOKEN = process.env.NADEO_LIVE_REFRESH_TOKEN || "";
-const NADEO_CORE_REFRESH_TOKEN = process.env.NADEO_CORE_REFRESH_TOKEN || ""; // optional, only for display names
+const NADEO_CORE_REFRESH_TOKEN = process.env.NADEO_CORE_REFRESH_TOKEN || ""; // optional, for display names
 const USER_AGENT = process.env.USER_AGENT || "CorsySite/1.0";
 
 const DEBUG = process.env.DEBUG === "1";
@@ -159,7 +159,7 @@ function extractWinnerFields(result){
   return { accountId: accountId||null, displayName: displayName||null };
 }
 
-/* keep your original tm.io path for TOTD (works for you in CI) */
+/* keep tm.io for TOTD (this worked in your CI) */
 async function fetchTmioMonth(index=0){
   const r=await fetchRetry(`${TMIO}/api/totd/${index}`,{ headers:{ "User-Agent":"tm-cotd" }});
   if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
@@ -299,7 +299,7 @@ async function getD1WinnerForCompetition(compId) {
   const roundsRes = await fetchMeet(`${MEET}/api/competitions/${compId}/rounds`);
   if (!roundsRes.ok) {
     if (DEBUG) dlog(`[winner] rounds ${compId} http=${roundsRes.status}`);
-    return null; // soft fail (was throwing)
+    return null; // soft fail (some comps return 401/403 here)
   }
   const rounds = await roundsRes.json();
   if (!Array.isArray(rounds) || !rounds.length) return null;
@@ -362,13 +362,17 @@ async function getD1WinnerForCompetition(compId) {
 /* ------------------- path C: edition-level fallbacks ------------------------ */
 async function getCompetitionEditions(compId){
   const r = await fetchMeet(`${MEET}/api/competitions/${compId}/editions?length=50&offset=0`);
+  dlog(`[winner] editions comp=${compId} http=${r.status}`);
   if (!r.ok) return [];
   const j = await r.json();
-  return Array.isArray(j) ? j : (j?.editions || j?.items || []);
+  const arr = Array.isArray(j) ? j : (j?.editions || j?.items || []);
+  dlog(`[winner] editions count=${arr.length} comp=${compId}`);
+  return arr;
 }
 
 async function getEditionLeaderboardWinner(editionId){
   const r = await fetchMeet(`${MEET}/api/editions/${editionId}/leaderboard?length=1&offset=0`);
+  dlog(`[winner] edition LB eid=${editionId} http=${r.status}`);
   if (r.status === 204) return null;
   if (!r.ok) return null;
   const raw = await r.text();
@@ -380,11 +384,23 @@ async function getEditionLeaderboardWinner(editionId){
   return (accountId||displayName) ? { accountId: accountId||null, displayName: displayName||null, via: "editionLB" } : null;
 }
 
+async function getEditionRankingWinner(editionId){
+  const r = await fetchMeet(`${MEET}/api/editions/${editionId}/ranking?length=1&offset=0`);
+  dlog(`[winner] edition ranking eid=${editionId} http=${r.status}`);
+  if (!r.ok) return null;
+  const j = await r.json();
+  const arr = Array.isArray(j) ? j : (j?.ranking || j?.items || []);
+  if (!Array.isArray(arr) || !arr.length) return null;
+  const { accountId, displayName } = extractWinnerFields(arr[0]);
+  return (accountId||displayName) ? { accountId: accountId||null, displayName: displayName||null, via: "editionRanking" } : null;
+}
+
 async function listEditionMatches(editionId){
   const PAGE = 100;
   const matches = [];
   for(let offset=0; offset<2000; offset+=PAGE){
     const r = await fetchMeet(`${MEET}/api/editions/${editionId}/matches?length=${PAGE}&offset=${offset}`);
+    dlog(`[winner] edition matches eid=${editionId} http=${r.status} offset=${offset}`);
     if (!r.ok) break;
     const j = await r.json();
     const batch = j?.matches || j || [];
@@ -397,27 +413,32 @@ async function listEditionMatches(editionId){
 
 async function getEditionWinnerFallback(compId){
   try{
-    // try competition detail for current edition id
-    let detail = null;
-    try { detail = await getCompetitionDetail(compId); } catch {}
-    let editionId = extractEditionId(detail);
+    let detail = null, editionId = null;
+    try { detail = await getCompetitionDetail(compId); } catch(e){ dlog(`[winner] detail fail comp=${compId} ${e.message}`); }
+    editionId = extractEditionId(detail);
+    dlog(`[winner] editionId from detail comp=${compId} -> ${editionId}`);
 
-    // if missing, list editions and choose last/highest
     if (!editionId) {
       const eds = await getCompetitionEditions(compId);
       if (Array.isArray(eds) && eds.length) {
         eds.sort((a,b)=>(b.position??b.number??0)-(a.position??a.number??0));
         editionId = eds[0]?.id || eds.at(-1)?.id || null;
       }
+      dlog(`[winner] editionId from list comp=${compId} -> ${editionId}`);
     }
     if (!editionId) return null;
 
-    // edition leaderboard top-1
+    // C1: edition leaderboard top-1
     const lbWinner = await getEditionLeaderboardWinner(editionId);
     if (lbWinner) return lbWinner;
 
-    // otherwise, choose a plausible final match and read results
+    // C2: edition ranking top-1 (some comps only expose this)
+    const rkWinner = await getEditionRankingWinner(editionId);
+    if (rkWinner) return rkWinner;
+
+    // C3: edition matches -> results
     const matches = await listEditionMatches(editionId);
+    dlog(`[winner] edition matches count=${matches.length} eid=${editionId}`);
     if (!matches.length) return null;
 
     const lc = s => String(s||"").toLowerCase();
@@ -431,6 +452,7 @@ async function getEditionWinnerFallback(compId){
     if (!final?.id) return null;
 
     const res = await fetchMeet(`${MEET}/api/matches/${final.id}/results?length=255&offset=0`);
+    dlog(`[winner] edition final match results http=${res.status} mid=${final.id}`);
     if (!res.ok) return null;
     const J = await res.json();
     const arr = J?.results || J?.participants || J || [];
@@ -449,14 +471,62 @@ async function getEditionWinnerFallback(compId){
     const { accountId, displayName } = extractWinnerFields(top);
     return (accountId||displayName) ? { accountId: accountId||null, displayName: displayName||null, via: "editionMatches" } : null;
   }catch(e){
-    if (DEBUG) dlog(`[winner] edition fallback error comp=${compId}: ${e.message}`);
+    dlog(`[winner] edition fallback error comp=${compId}: ${e.message}`);
     return null;
   }
 }
 
+/* ------------------- path D: competition matches (direct) ------------------- */
+async function listCompetitionMatches(compId){
+  const PAGE = 100;
+  const matches = [];
+  for(let offset=0; offset<2000; offset+=PAGE){
+    const r = await fetchMeet(`${MEET}/api/competitions/${compId}/matches?length=${PAGE}&offset=${offset}`);
+    dlog(`[winner] comp matches comp=${compId} http=${r.status} offset=${offset}`);
+    if (!r.ok) break;
+    const j = await r.json();
+    const batch = j?.matches || j || [];
+    if (!batch.length) break;
+    matches.push(...batch);
+    if (batch.length < PAGE) break;
+  }
+  return matches;
+}
+async function getCompetitionMatchesWinner(compId){
+  const matches = await listCompetitionMatches(compId);
+  if (!matches.length) return null;
+  const lc = s => String(s||"").toLowerCase();
+  let final = matches.find(m => /\bdivision\s*1\b|\bdiv\s*1\b|\bd1\b/.test(lc(m.name))) ||
+              matches.reduce((best,cur)=>{
+                const bp = best?.position ?? best?.number ?? -1;
+                const cp = cur?.position ?? cur?.number ?? -1;
+                return cp > bp ? cur : best;
+              }, matches[0]);
+  if (!final?.id) return null;
+
+  const res = await fetchMeet(`${MEET}/api/matches/${final.id}/results?length=255&offset=0`);
+  dlog(`[winner] comp match results http=${res.status} mid=${final.id}`);
+  if (!res.ok) return null;
+  const J = await res.json();
+  const arr = J?.results || J?.participants || J || [];
+  if (!Array.isArray(arr) || !arr.length) return null;
+
+  arr.sort((a,b)=>{
+    const ar = a.rank ?? a.position ?? Infinity;
+    const br = b.rank ?? b.position ?? Infinity;
+    if (ar !== br) return ar - br;
+    const ap = typeof a.points === "number" ? -a.points : 0;
+    const bp = typeof b.points === "number" ? -b.points : 0;
+    return ap - bp;
+  });
+
+  const top = arr[0];
+  const { accountId, displayName } = extractWinnerFields(top);
+  return (accountId||displayName) ? { accountId: accountId||null, displayName: displayName||null, via: "compMatches" } : null;
+}
+
 /* -------------------------- finished gating & helpers ----------------------- */
-// 20-min grace (was 6) to let results propagate
-const GRACE_MS=20*60*1000;
+const GRACE_MS=20*60*1000; // 20-min grace
 
 async function getCompetitionDetail(compId){
   const r=await fetchMeet(`${MEET}/api/competitions/${compId}`);
@@ -515,7 +585,7 @@ async function updateCotdCurrentMonth(){
       // A: competition leaderboard (fast path)
       let winner=await getWinnerFromCompetitionLeaderboard(cid);
 
-      // B: D1 results (robust path)
+      // B: D1 results (rounds)
       if(!winner){
         dlog(`[winner] comp LB empty, trying D1 for comp ${cid}`);
         winner=await getD1WinnerForCompetition(cid);
@@ -525,6 +595,12 @@ async function updateCotdCurrentMonth(){
       if(!winner){
         dlog(`[winner] D1 empty, trying edition fallbacks for comp ${cid}`);
         winner=await getEditionWinnerFallback(cid);
+      }
+
+      // D: competition matches (direct) — some comps expose this even when rounds 401
+      if(!winner){
+        dlog(`[winner] edition fallbacks empty, trying comp matches for comp ${cid}`);
+        winner=await getCompetitionMatchesWinner(cid);
       }
 
       if(!winner){
@@ -561,8 +637,8 @@ async function updateCotdCurrentMonth(){
 async function main(){
   await ensureDir(TOTD_DIR);
   await ensureDir(COTD_DIR);
-  await writeTotdMonth(0);          // still uses tm.io (works for you)
-  await updateCotdCurrentMonth();   // uses Meet + Core for names, with fallbacks
+  await writeTotdMonth(0);          // tm.io for TOTD (kept)
+  await updateCotdCurrentMonth();   // Meet + Core for names, with deeper fallbacks
   console.log("[DONE] TOTD + COTD updated.");
 }
 main().catch(err=>{ console.error(err); process.exit(1); });
