@@ -1,9 +1,9 @@
 name: Update COTD/TOTD
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: "15 * * * *"    # hourly at :15
-  workflow_dispatch: {}
+    - cron: "15 * * * *"  # run hourly at :15
 
 jobs:
   update:
@@ -11,38 +11,38 @@ jobs:
     permissions:
       contents: write
 
+    env:
+      PUBLIC_DIR: .
+      NADEO_LIVE_REFRESH_TOKEN: ${{ secrets.NADEO_LIVE_REFRESH_TOKEN }}
+      NADEO_CORE_REFRESH_TOKEN: ${{ secrets.NADEO_CORE_REFRESH_TOKEN }}
+      USER_AGENT: ${{ secrets.USER_AGENT || 'CorsySite/1.0' }}
+      DEBUG: "1"
+
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Install deps (only if needed)
-        run: |
-          if [ -f package-lock.json ]; then npm ci; \
-          elif [ -f package.json ]; then npm i; \
-          fi
-
-      - name: Run fetcher
-        env:
-          NADEO_LIVE_REFRESH_TOKEN: ${{ secrets.NADEO_LIVE_REFRESH_TOKEN }}
-          NADEO_CORE_REFRESH_TOKEN: ${{ secrets.NADEO_CORE_REFRESH_TOKEN }}
-          USER_AGENT: ${{ secrets.USER_AGENT }}
-          PUBLIC_DIR: ${{ secrets.PUBLIC_DIR }}
-          DEBUG: ${{ secrets.DEBUG }}
+      - name: Run COTD/TOTD fetcher
         run: |
           node -v
-          [ -z "${NADEO_LIVE_REFRESH_TOKEN}" ] && echo "Missing NADEO_LIVE_REFRESH_TOKEN" && exit 1
           node scripts/cotd-fetcher.js
+          echo "Listing files generated:"
+          ls -R data || true
+          ls -l cotd.json totd.json || true
 
-      - name: Commit & push data
+      - name: Commit updated data
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/totd.json public/cotd.json 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stage all expected outputs
+          git add cotd.json totd.json data/cotd/*.json data/totd/*.json 2>/dev/null || true
+
+          # Only commit if something changed
           if ! git diff --cached --quiet; then
-            git commit -m "chore: update COTD/TOTD data"
+            git commit -m "data: refresh COTD/TOTD"
             git push
           else
             echo "No changes to commit."
