@@ -2,7 +2,7 @@ name: Update COTD/TOTD
 
 on:
   schedule:
-    - cron: "0 * * * *"   # hourly
+    - cron: "15 * * * *"    # hourly at :15
   workflow_dispatch: {}
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install deps (if you have a package.json)
+      - name: Install deps (only if needed)
         run: |
           if [ -f package-lock.json ]; then npm ci; \
           elif [ -f package.json ]; then npm i; \
@@ -33,14 +33,10 @@ jobs:
           DEBUG: ${{ secrets.DEBUG }}
         run: |
           node -v
-          # quick presence check (does not print the secret)
-          if [ -z "${NADEO_LIVE_REFRESH_TOKEN}" ]; then
-            echo "LIVE refresh token not injected"; exit 1;
-          fi
+          [ -z "${NADEO_LIVE_REFRESH_TOKEN}" ] && echo "Missing NADEO_LIVE_REFRESH_TOKEN" && exit 1
           node scripts/cotd-fetcher.js
 
       - name: Commit & push data
-        if: always()
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
