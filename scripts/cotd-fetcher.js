@@ -214,7 +214,13 @@ async function writeTotdMonth(index = 0) {
 /* ------------------- COTD helpers (Meet/Core) ------------------- */
 function looksLikeCotd(c) {
   const name = String(c?.name || "").toLowerCase();
-  return name.includes("cup of the day") || name.includes("cotd");
+  return (
+    name.includes("cup of the day") ||
+    name.includes("cotd") ||
+    name.match(/#\d{1,3}/) || // e.g. "COTD #152"
+    name.match(/\bday\b/) ||  // contains "day"
+    name.includes("cup du jour") // French version
+  );
 }
 
 async function listCompetitions(offset = 0, length = 100) {
