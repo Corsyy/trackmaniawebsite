@@ -308,52 +308,55 @@ async function getD1WinnerForCompetition(compId) {
     rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
   if (!finalRound?.id) return null;
 
-  // 2) matches (⚠️ length must be <= 100)
-  const matchesRes = await fetchMeet(
-    `${MEET}/api/rounds/${finalRound.id}/matches?length=100&offset=0`
-  );
-  if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
-  const matchesJ = await matchesRes.json();
-  const matches = matchesJ?.matches || matchesJ || [];
-  if (!Array.isArray(matches) || !matches.length) return null;
-
-  let best = null; // { accountId, displayName, rank, points }
-
-  for (const m of matches) {
-    if (!m?.id) continue;
-
-    // 3) results (⚠️ length must be <= 255)
-    const resultsRes = await fetchMeet(
-      `${MEET}/api/matches/${m.id}/results?length=255&offset=0`
-    );
-    if (!resultsRes.ok) continue;
-
-    const results = await resultsRes.json();
-    const arr = results?.results || results || [];
-    if (!Array.isArray(arr) || !arr.length) continue;
-
-    // Sort best first
-    arr.sort((a, b) => {
-      const ar = a.rank ?? a.position ?? Infinity;
-      const br = b.rank ?? b.position ?? Infinity;
-      if (ar !== br) return ar - br;
-      const ap = (typeof a.points === "number" ? -a.points : 0);
-      const bp = (typeof b.points === "number" ? -b.points : 0);
-      return ap - bp;
-    });
-
-    const top = arr[0];
-    const { accountId, displayName } = extractWinnerFields(top);
-    const rank = top.rank ?? top.position ?? Infinity;
-    const points = top.points ?? 0;
-
-    if (!best || rank < best.rank || (rank === best.rank && points > best.points)) {
-      best = { accountId, displayName, rank, points };
-    }
-    if (best.rank === 1) break; // can’t beat rank 1
+  // 2) page through ALL matches in the final (length <= 100 per page)
+  const PAGE = 100;
+  const allMatches = [];
+  for (let offset = 0; offset < 2000; offset += PAGE) { // safety cap
+    const res = await fetchMeet(`${MEET}/api/rounds/${finalRound.id}/matches?length=${PAGE}&offset=${offset}`);
+    if (!res.ok) throw new Error(`matches failed: ${res.status}`);
+    const j = await res.json();
+    const batch = j?.matches || j || [];
+    if (!batch.length) break;
+    allMatches.push(...batch);
+    if (batch.length < PAGE) break;
   }
+  if (!allMatches.length) return null;
 
-  return best;
+  // 3) pick Division 1 match
+  // Heuristics: name contains "division 1" / "div 1" / "d1", or explicit division/position fields, else smallest position/number.
+  const lc = (s) => String(s || "").toLowerCase();
+  let d1 = allMatches.find(m => /\bdivision\s*1\b|\bdiv\s*1\b|\bd1\b/.test(lc(m.name)));
+  if (!d1) d1 = allMatches.find(m => (m.division ?? m.Division ?? m.divisionNumber) === 1);
+  if (!d1) {
+    d1 = allMatches.reduce((best, cur) => {
+      const bp = best?.position ?? best?.number ?? Number.POSITIVE_INFINITY;
+      const cp = cur?.position  ?? cur?.number  ?? Number.POSITIVE_INFINITY;
+      return cp < bp ? cur : best;
+    }, allMatches[0]);
+  }
+  if (!d1?.id) return null;
+
+  // 4) fetch results for the D1 match (length <= 255)
+  const resultsRes = await fetchMeet(`${MEET}/api/matches/${d1.id}/results?length=255&offset=0`);
+  if (!resultsRes.ok) return null;
+
+  const resultsJ = await resultsRes.json();
+  const arr = resultsJ?.results || resultsJ?.participants || resultsJ || [];
+  if (!Array.isArray(arr) || !arr.length) return null;
+
+  // 5) best first: lowest rank/position, then highest points
+  arr.sort((a, b) => {
+    const ar = a.rank ?? a.position ?? Infinity;
+    const br = b.rank ?? b.position ?? Infinity;
+    if (ar !== br) return ar - br;
+    const ap = typeof a.points === "number" ? -a.points : 0;
+    const bp = typeof b.points === "number" ? -b.points : 0;
+    return ap - bp;
+  });
+
+  const top = arr[0];
+  const { accountId, displayName } = extractWinnerFields(top);
+  return { accountId: accountId || null, displayName: displayName || null, rank: top.rank ?? top.position ?? 1 };
 }
 
 /* -------- display-name hydration via Core (bulk + tiny cache) -------- */
