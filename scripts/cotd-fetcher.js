@@ -1,4 +1,4 @@
-// scripts/cotd-fetcher.js (your original, minimally patched)
+// scripts/cotd-fetcher.js (your original, patched for winner reliability)
 // Node 18+ required (global fetch).
 
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
@@ -17,7 +17,7 @@ const MEET = "https://meet.trackmania.nadeo.club";
 const CORE = "https://prod.trackmania.core.nadeo.online";
 const TMIO = "https://trackmania.io";
 
-/* 🔐 NEW: separate refresh tokens for each audience */
+/* 🔐 separate refresh tokens for each audience */
 const NADEO_LIVE_REFRESH_TOKEN = process.env.NADEO_LIVE_REFRESH_TOKEN || "";
 const NADEO_CORE_REFRESH_TOKEN = process.env.NADEO_CORE_REFRESH_TOKEN || ""; // optional, only for display names
 const USER_AGENT = process.env.USER_AGENT || "CorsySite/1.0";
@@ -68,14 +68,12 @@ if(!NADEO_LIVE_REFRESH_TOKEN){
 
 const tokenCache=new Map(); // audience -> { token, expAt }
 
-/* helper: choose correct refresh secret for audience */
 function getRefreshFor(audience){
   if(audience === "NadeoLiveServices") return NADEO_LIVE_REFRESH_TOKEN;
   if(audience === "NadeoServices")     return NADEO_CORE_REFRESH_TOKEN; // may be empty (names become null)
   throw new Error(`unknown audience ${audience}`);
 }
 
-/* 🔧 FIXED: refresh does NOT accept audience switching; use the audience-specific refresh token. */
 async function refreshForAudience(audience){
   const refreshToken = getRefreshFor(audience);
   if(!refreshToken) throw new Error(`Missing refresh token for ${audience} (set NADEO_CORE_REFRESH_TOKEN if you want display names).`);
@@ -83,7 +81,7 @@ async function refreshForAudience(audience){
   const r=await fetch(`${CORE}/v2/authentication/token/refresh`,{
     method:"POST",
     headers:{
-      Authorization: refreshToken,        // token already includes "nadeo_v1 t="
+      Authorization: refreshToken,   // token already includes "nadeo_v1 t="
       "User-Agent": USER_AGENT,
       Accept: "application/json"
     }
@@ -94,7 +92,7 @@ async function refreshForAudience(audience){
     throw new Error(`refresh(${audience}) failed: ${r.status} ${txt}`);
   }
   const j=await r.json(); // { accessToken, refreshToken, expiration }
-  const token=j.accessToken;             // already "nadeo_v1 t=..."
+  const token=j.accessToken; // already "nadeo_v1 t=..."
   const expAt= Date.parse(j.expiration || "") || (Date.now()+50*60*1000);
   tokenCache.set(audience,{ token, expAt });
   return token;
@@ -106,7 +104,6 @@ async function getToken(audience){
   return refreshForAudience(audience);
 }
 
-/* 🔧 FIXED: do NOT re-prepend "nadeo_v1 t="; send token AS-IS */
 async function authedFetch(url,{audience,init={},retryOnAuth=true}={}){
   let token=await getToken(audience);
   let r=await fetch(url,{
@@ -120,7 +117,7 @@ async function authedFetch(url,{audience,init={},retryOnAuth=true}={}){
   return r;
 }
 
-// NOTE: Meet/Live need NadeoLiveServices; Core needs NadeoServices.
+// Meet/Live need NadeoLiveServices; Core needs NadeoServices.
 const fetchMeet=(url,init={})=>authedFetch(url,{ audience:"NadeoLiveServices", init });
 const fetchCore=(url,init={})=>authedFetch(url,{ audience:"NadeoServices", init });
 
@@ -250,17 +247,25 @@ async function findCotdCompetitionByDate(y,m1,d){
   return pick||null;
 }
 
+/* --- TODAY helper: authoritative current COTD --- */
+async function getCurrentCotd(){
+  const r = await fetchMeet(`${MEET}/api/cup-of-the-day/current`);
+  if (r.status === 204) return null;
+  if (!r.ok) return null;
+  return r.json(); // { competition: { id, name, ... }, ... }
+}
+
 /* ---------- path A: competition leaderboard (first place = winner) ---------- */
 async function getWinnerFromCompetitionLeaderboard(compId){
   try{
     const url = `${MEET}/api/competitions/${compId}/leaderboard?length=1&offset=0`;
     const r = await fetchMeet(url);
     if (DEBUG) dlog(`[winner] comp LB http=${r.status} id=${compId}`);
-    if (r.status===204) return null; // no content
+    if (r.status===204) return null;
     if (!r.ok) return null;
 
     const raw = await r.text();
-    if (!raw) return null;
+    if (!raw || !raw.trim()) return null;
     let j; try { j = JSON.parse(raw); } catch { return null; }
 
     const pickFirst = (arr)=> {
@@ -269,13 +274,12 @@ async function getWinnerFromCompetitionLeaderboard(compId){
       return (accountId||displayName) ? { displayName: displayName||null, accountId: accountId||null, via:"competitionLB" } : null;
     };
 
-    let winner = Array.isArray(j) ? pickFirst(j) : null;
-    if (!winner && Array.isArray(j.leaderboard)) winner = pickFirst(j.leaderboard);
-    if (!winner && Array.isArray(j.top))         winner = pickFirst(j.top);
-    if (!winner && Array.isArray(j.results))     winner = pickFirst(j.results);
-    if (!winner && Array.isArray(j.ranks))       winner = pickFirst(j.ranks);
-    if (!winner && Array.isArray(j.players))     winner = pickFirst(j.players);
-    if (!winner && Array.isArray(j.items))       winner = pickFirst(j.items);
+    let winner = null;
+    if (Array.isArray(j)) winner = pickFirst(j);
+    if (!winner && j && typeof j==="object"){
+      winner = pickFirst(j.leaderboard) || pickFirst(j.top) || pickFirst(j.results) ||
+               pickFirst(j.ranks) || pickFirst(j.players) || pickFirst(j.items);
+    }
 
     if(!winner && DEBUG){
       const keys = (j && typeof j==="object") ? Object.keys(j) : [];
@@ -293,7 +297,10 @@ async function getD1WinnerForCompetition(compId) {
   if (!compId) return null;
 
   const roundsRes = await fetchMeet(`${MEET}/api/competitions/${compId}/rounds`);
-  if (!roundsRes.ok) throw new Error(`rounds failed: ${roundsRes.status}`);
+  if (!roundsRes.ok) {
+    if (DEBUG) dlog(`[winner] rounds ${compId} http=${roundsRes.status}`);
+    return null; // soft fail (was throwing)
+  }
   const rounds = await roundsRes.json();
   if (!Array.isArray(rounds) || !rounds.length) return null;
 
@@ -352,55 +359,105 @@ async function getD1WinnerForCompetition(compId) {
   return { accountId: accountId || null, displayName: displayName || null, rank: top.rank ?? top.position ?? 1 };
 }
 
-/* --------------------- display-name hydration (Core) ------------------------ */
-const NAMES_CACHE_PATH=path.join(COTD_DIR,"_names-cache.json");
-async function loadNamesCache(){ return await loadJson(NAMES_CACHE_PATH,{}); }
-async function saveNamesCache(cache){ await ensureDir(COTD_DIR); await writeJson(NAMES_CACHE_PATH,cache); }
-
-async function fetchDisplayNamesBulk(ids){
-  if(!ids?.length) return {};
-  if(!NADEO_CORE_REFRESH_TOKEN){
-    // core token not configured; return null names gracefully
-    return Object.fromEntries([...new Set(ids)].map(id=>[id,null]));
-  }
-  const uniq=[...new Set(ids)].filter(Boolean);
-  const chunks=[]; for(let i=0;i<uniq.length;i+=100) chunks.push(uniq.slice(i,i+100));
-  const out={};
-  for(const chunk of chunks){
-    const url=new URL(`${CORE}/accounts/displayNames`);
-    url.searchParams.set("accountIdList", chunk.join(","));
-    const r=await fetchCore(url.toString());
-    if(!r.ok) throw new Error(`displayNames failed: ${r.status}`);
-    const arr=await r.json();
-    for(const it of arr||[]){ if(it?.accountId) out[it.accountId]=it.displayName||null; }
-  }
-  return out;
+/* ------------------- path C: edition-level fallbacks ------------------------ */
+async function getCompetitionEditions(compId){
+  const r = await fetchMeet(`${MEET}/api/competitions/${compId}/editions?length=50&offset=0`);
+  if (!r.ok) return [];
+  const j = await r.json();
+  return Array.isArray(j) ? j : (j?.editions || j?.items || []);
 }
 
-async function hydrateDisplayNames(ids){
-  const cache=await loadNamesCache();
-  const missing=ids.filter(id=>cache[id]===undefined);
-  if(missing.length){
-    const fetched=await fetchDisplayNamesBulk(missing);
-    for(const id of missing) cache[id]=fetched[id]??null;
-    await saveNamesCache(cache);
-  }
-  const map={}; for(const id of ids) map[id]=cache[id]??null;
-  return map;
+async function getEditionLeaderboardWinner(editionId){
+  const r = await fetchMeet(`${MEET}/api/editions/${editionId}/leaderboard?length=1&offset=0`);
+  if (r.status === 204) return null;
+  if (!r.ok) return null;
+  const raw = await r.text();
+  if (!raw || !raw.trim()) return null;
+  let j; try { j = JSON.parse(raw); } catch { return null; }
+  const arr = Array.isArray(j) ? j : (j?.leaderboard || j?.top || j?.results || j?.items || []);
+  if (!Array.isArray(arr) || !arr.length) return null;
+  const { accountId, displayName } = extractWinnerFields(arr[0]);
+  return (accountId||displayName) ? { accountId: accountId||null, displayName: displayName||null, via: "editionLB" } : null;
 }
 
-/* ----------------------------- month aggregation ---------------------------- */
-async function upsertMonth(dir,mKey,dayKey,record){
-  await ensureDir(dir);
-  const p=path.join(dir,`${mKey}.json`);
-  const data=await loadJson(p,{ month:mKey, days:{} });
-  data.days[dayKey]=record;
-  await writeJson(p,data);
-  await rebuildMonthIndex(dir);
+async function listEditionMatches(editionId){
+  const PAGE = 100;
+  const matches = [];
+  for(let offset=0; offset<2000; offset+=PAGE){
+    const r = await fetchMeet(`${MEET}/api/editions/${editionId}/matches?length=${PAGE}&offset=${offset}`);
+    if (!r.ok) break;
+    const j = await r.json();
+    const batch = j?.matches || j || [];
+    if (!batch.length) break;
+    matches.push(...batch);
+    if (batch.length < PAGE) break;
+  }
+  return matches;
+}
+
+async function getEditionWinnerFallback(compId){
+  try{
+    // try competition detail for current edition id
+    let detail = null;
+    try { detail = await getCompetitionDetail(compId); } catch {}
+    let editionId = extractEditionId(detail);
+
+    // if missing, list editions and choose last/highest
+    if (!editionId) {
+      const eds = await getCompetitionEditions(compId);
+      if (Array.isArray(eds) && eds.length) {
+        eds.sort((a,b)=>(b.position??b.number??0)-(a.position??a.number??0));
+        editionId = eds[0]?.id || eds.at(-1)?.id || null;
+      }
+    }
+    if (!editionId) return null;
+
+    // edition leaderboard top-1
+    const lbWinner = await getEditionLeaderboardWinner(editionId);
+    if (lbWinner) return lbWinner;
+
+    // otherwise, choose a plausible final match and read results
+    const matches = await listEditionMatches(editionId);
+    if (!matches.length) return null;
+
+    const lc = s => String(s||"").toLowerCase();
+    let final = matches.find(m => /\bdivision\s*1\b|\bdiv\s*1\b|\bd1\b/.test(lc(m.name))) ||
+                matches.reduce((best,cur)=>{
+                  const bp = best?.position ?? best?.number ?? -1;
+                  const cp = cur?.position ?? cur?.number ?? -1;
+                  return cp > bp ? cur : best;
+                }, matches[0]);
+
+    if (!final?.id) return null;
+
+    const res = await fetchMeet(`${MEET}/api/matches/${final.id}/results?length=255&offset=0`);
+    if (!res.ok) return null;
+    const J = await res.json();
+    const arr = J?.results || J?.participants || J || [];
+    if (!Array.isArray(arr) || !arr.length) return null;
+
+    arr.sort((a,b)=>{
+      const ar = a.rank ?? a.position ?? Infinity;
+      const br = b.rank ?? b.position ?? Infinity;
+      if (ar !== br) return ar - br;
+      const ap = typeof a.points === "number" ? -a.points : 0;
+      const bp = typeof b.points === "number" ? -b.points : 0;
+      return ap - bp;
+    });
+
+    const top = arr[0];
+    const { accountId, displayName } = extractWinnerFields(top);
+    return (accountId||displayName) ? { accountId: accountId||null, displayName: displayName||null, via: "editionMatches" } : null;
+  }catch(e){
+    if (DEBUG) dlog(`[winner] edition fallback error comp=${compId}: ${e.message}`);
+    return null;
+  }
 }
 
 /* -------------------------- finished gating & helpers ----------------------- */
-const GRACE_MS=6*60*1000; // 6 min grace
+// 20-min grace (was 6) to let results propagate
+const GRACE_MS=20*60*1000;
+
 async function getCompetitionDetail(compId){
   const r=await fetchMeet(`${MEET}/api/competitions/${compId}`);
   if(!r.ok) throw new Error(`competition detail failed: ${r.status}`);
@@ -427,6 +484,7 @@ async function updateCotdCurrentMonth(){
   for(const d of daysOfMonth(y,m1)){
     if(!clampToToday(y,m1,d)) break;
     const dk=dateKey(y,m1,d);
+    const isToday = dk === dateKey(y,m1,now.getUTCDate());
 
     // ensure shape
     if(!monthData.days[dk]) monthData.days[dk]={ date:dk, cotd:{ winnerAccountId:null, winnerDisplayName:null } };
@@ -436,7 +494,14 @@ async function updateCotdCurrentMonth(){
     if(cur?.winnerAccountId || cur?.winnerDisplayName) continue; // already done
 
     try{
-      const comp=await findCotdCompetitionByDate(y,m1,d);
+      let comp=await findCotdCompetitionByDate(y,m1,d);
+
+      // TODAY fallback: authoritative current endpoint
+      if(!comp && isToday){
+        const current = await getCurrentCotd();
+        if (current?.competition?.id) comp = { id: current.competition.id, name: current.competition.name };
+      }
+
       if(!comp){ console.log(`[COTD] ${dk} no competition found`); continue; }
       const cid=comp.id||comp.liveId||comp.uid;
       if(DEBUG) console.log(`[COTD] ${dk} comp id=${cid} name="${comp.name}"`);
@@ -447,13 +512,19 @@ async function updateCotdCurrentMonth(){
       catch(e){ dlog(`[COTD] ${dk} detail fetch failed: ${e.message}`); continue; }
       if(!isEditionFinishedLike(detail)){ dlog(`[COTD] ${dk} pending — edition not finished/grace yet`); continue; }
 
-      // try A: competition leaderboard (fast path)
+      // A: competition leaderboard (fast path)
       let winner=await getWinnerFromCompetitionLeaderboard(cid);
 
-      // try B: D1 results (robust path)
+      // B: D1 results (robust path)
       if(!winner){
         dlog(`[winner] comp LB empty, trying D1 for comp ${cid}`);
         winner=await getD1WinnerForCompetition(cid);
+      }
+
+      // C: edition-level fallbacks
+      if(!winner){
+        dlog(`[winner] D1 empty, trying edition fallbacks for comp ${cid}`);
+        winner=await getEditionWinnerFallback(cid);
       }
 
       if(!winner){
@@ -490,8 +561,8 @@ async function updateCotdCurrentMonth(){
 async function main(){
   await ensureDir(TOTD_DIR);
   await ensureDir(COTD_DIR);
-  await writeTotdMonth(0);          // still uses tm.io as you had (works for you)
-  await updateCotdCurrentMonth();   // uses Meet + Core for names
+  await writeTotdMonth(0);          // still uses tm.io (works for you)
+  await updateCotdCurrentMonth();   // uses Meet + Core for names, with fallbacks
   console.log("[DONE] TOTD + COTD updated.");
 }
 main().catch(err=>{ console.error(err); process.exit(1); });
