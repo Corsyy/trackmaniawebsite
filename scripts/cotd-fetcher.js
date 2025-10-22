@@ -297,8 +297,9 @@ async function findCotdCompetitionByDate(y, m1, d) {
 async function getD1WinnerForCompetition(compId) {
   if (!compId) return null;
 
+  // 1) rounds
   const roundsRes  = await fetchMeet(`${MEET}/api/competitions/${compId}/rounds`);
-  if (!roundsRes.ok) { console.log(`[COTD] rounds ${compId} -> ${roundsRes.status}`); throw new Error(`rounds failed: ${roundsRes.status}`); }
+  if (!roundsRes.ok) throw new Error(`rounds failed: ${roundsRes.status}`);
   const rounds = await roundsRes.json();
   if (!Array.isArray(rounds) || !rounds.length) return null;
 
@@ -307,8 +308,11 @@ async function getD1WinnerForCompetition(compId) {
     rounds.reduce((a, b) => ((a?.position ?? 0) > (b?.position ?? 0) ? a : b));
   if (!finalRound?.id) return null;
 
-  const matchesRes = await fetchMeet(`${MEET}/api/rounds/${finalRound.id}/matches?length=200&offset=0`);
-  if (!matchesRes.ok) { console.log(`[COTD] matches ${finalRound.id} -> ${matchesRes.status}`); throw new Error(`matches failed: ${matchesRes.status}`); }
+  // 2) matches (⚠️ length must be <= 100)
+  const matchesRes = await fetchMeet(
+    `${MEET}/api/rounds/${finalRound.id}/matches?length=100&offset=0`
+  );
+  if (!matchesRes.ok) throw new Error(`matches failed: ${matchesRes.status}`);
   const matchesJ = await matchesRes.json();
   const matches = matchesJ?.matches || matchesJ || [];
   if (!Array.isArray(matches) || !matches.length) return null;
@@ -317,12 +321,18 @@ async function getD1WinnerForCompetition(compId) {
 
   for (const m of matches) {
     if (!m?.id) continue;
-    const resultsRes = await fetchMeet(`${MEET}/api/matches/${m.id}/results?length=512&offset=0`);
-    if (!resultsRes.ok) { console.log(`[COTD] results ${m.id} -> ${resultsRes.status}`); continue; }
+
+    // 3) results (⚠️ length must be <= 255)
+    const resultsRes = await fetchMeet(
+      `${MEET}/api/matches/${m.id}/results?length=255&offset=0`
+    );
+    if (!resultsRes.ok) continue;
+
     const results = await resultsRes.json();
     const arr = results?.results || results || [];
     if (!Array.isArray(arr) || !arr.length) continue;
 
+    // Sort best first
     arr.sort((a, b) => {
       const ar = a.rank ?? a.position ?? Infinity;
       const br = b.rank ?? b.position ?? Infinity;
@@ -340,9 +350,10 @@ async function getD1WinnerForCompetition(compId) {
     if (!best || rank < best.rank || (rank === best.rank && points > best.points)) {
       best = { accountId, displayName, rank, points };
     }
-    if (best.rank === 1) break; // can't beat rank 1
+    if (best.rank === 1) break; // can’t beat rank 1
   }
-  return best; // may have only displayName
+
+  return best;
 }
 
 /* -------- display-name hydration via Core (bulk + tiny cache) -------- */
