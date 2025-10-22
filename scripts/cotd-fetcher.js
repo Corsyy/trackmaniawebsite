@@ -143,13 +143,36 @@ function isEditionFinishedLike(detail,nowMs=Date.now()){
   return false;
 }
 async function getWinnerFromCompetitionLeaderboard(compId){
-  const r=await fetchMeet(`${MEET}/api/competitions/${compId}/leaderboard?length=1`);
-  if(!r.ok)return null;
-  const j=await r.json();
-  const first=Array.isArray(j)&&j[0]?j[0]:null;
-  if(!first)return null;
-  const {accountId,displayName}=extractWinnerFields(first);
-  return{displayName:displayName||null,accountId:accountId||null,via:"competitionLB"};
+  const url = `${MEET}/api/competitions/${compId}/leaderboard?length=1`;
+  const r = await fetchMeet(url);
+  if(!r.ok){
+    dlog(`[winner] competition LB http=${r.status} for comp ${compId}`);
+    return null;
+  }
+  const j = await r.json();
+
+  // Try multiple common shapes
+  const pickFirst = (arr)=> {
+    if (!Array.isArray(arr) || !arr.length) return null;
+    const first = arr[0];
+    const { accountId, displayName } = extractWinnerFields(first);
+    return (accountId || displayName) ? { displayName: displayName || null, accountId: accountId || null, via: "competitionLB" } : null;
+  };
+
+  // 1) Bare array
+  let winner = Array.isArray(j) ? pickFirst(j) : null;
+  // 2) Known objects
+  if (!winner && Array.isArray(j.leaderboard)) winner = pickFirst(j.leaderboard);
+  if (!winner && Array.isArray(j.top))         winner = pickFirst(j.top);
+  if (!winner && Array.isArray(j.results))     winner = pickFirst(j.results);
+  if (!winner && Array.isArray(j.ranks))       winner = pickFirst(j.ranks);
+  if (!winner && Array.isArray(j.players))     winner = pickFirst(j.players);
+  if (!winner && Array.isArray(j.items))       winner = pickFirst(j.items);
+
+  if(!winner){
+    dlog(`[winner] competition LB returned unknown shape for comp ${compId}: keys=${Object.keys(j||{}).join(",")}`);
+  }
+  return winner;
 }
 
 async function updateCotdCurrentMonth(){
