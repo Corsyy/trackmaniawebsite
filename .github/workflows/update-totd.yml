@@ -1,0 +1,43 @@
+name: Update TOTD
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 * * * *"  # hourly at :15
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      PUBLIC_DIR: .
+      DEBUG: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run TOTD fetcher
+        run: |
+          node -v
+          node scripts/totd-fetcher.js
+          echo "Listing files generated:"
+          ls -R data || true
+          ls -l totd.json || true
+
+      - name: Commit updated TOTD data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stage only TOTD outputs
+          git add totd.json data/totd/*.json 2>/dev/null || true
+
+          if ! git diff --cached --quiet; then
+            git commit -m "data: refresh TOTD"
+            git push
+          else
+            echo "No changes to commit."
+          fi
