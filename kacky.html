@@ -6,53 +6,140 @@
   <title>Kacky Finishes — Trackmania Events</title>
   <meta name="description" content="Upload and view Trackmania Kacky finish clips. Community submissions, moderated for quality." />
   <style>
-    :root{ --bg:#0a0f1a; --panel:#0f1524; --ink:#e6ecff; --muted:#9fb3ff; --brand:#6dfbff; --ring:rgba(109,251,255,.35) }
+    :root{
+      --bg:#0a0f1a;
+      --panel:#0f1524;
+      --panel-2:#0c1020;
+      --ink:#e6ecff;
+      --text:#e6ecff;
+      --muted:#9fb3ff;
+      --accent:#3aa0ff;
+      --accent-2:#6dfbff;
+      --brand:#6dfbff;
+      --border:rgba(109,251,255,.22);
+      --ring:0 0 0 3px rgba(61,165,255,.25);
+      --accent-glow:0 0 24px rgba(61,165,255,.35), 0 0 48px rgba(61,165,255,.2);
+    }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:#0a0f1a;color:var(--ink)}
-    header{background:#0f1524;padding:1rem 0;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(109,251,255,.2)}
-    .nav-container{width:min(1200px,92vw);margin:0 auto;display:flex;align-items:center;justify-content:space-between}
-    .brand{font-weight:800;font-size:1.2rem;letter-spacing:.3px;display:flex;align-items:center;gap:.4rem;color:#6dfbff}
-    .btn-nav{padding:.5rem 1rem;border:1px solid rgba(109,251,255,.3);border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s}
-    .btn-nav:hover{transform:translateY(-1px)}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      color:var(--ink);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
 
+    /* ====== Track Curves background (matches index) ====== */
+    body.bg-track-curves{
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
+        linear-gradient(180deg, #07101c, #0a0f1a 40%, #060a14 100%);
+    }
+    /* prettier-ignore */
+    body.bg-track-curves::before{
+      content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+      background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.6;mix-blend-mode:screen;
+    }
+    /* prettier-ignore */
+    body.bg-track-curves::after{
+      content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
+      background-size:280px 280px; animation:noiseShift 6s steps(2,end) infinite;
+    }
+    @keyframes noiseShift{50%{transform:translate3d(0,0,0)}50.01%{transform:translate3d(.5px,.5px,0)}}
+
+    /* ====== Header ====== */
+    header{
+      background:linear-gradient(180deg, rgba(10,15,26,.92), rgba(10,15,26,.72) 60%, rgba(10,15,26,0));
+      backdrop-filter:blur(8px);
+      position:sticky; top:0; z-index:50;
+      border-bottom:1px solid rgba(109,251,255,.18);
+    }
+    .nav-container{
+      width:min(1200px,92vw); margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between; padding:1rem 0;
+    }
+    .brand{
+      font-weight:800; font-size:1.1rem; letter-spacing:.3px; display:flex; align-items:center; gap:.5rem; color:var(--accent-2)
+    }
+    .btn-nav{
+      padding:.55rem 1rem; border:1px solid rgba(109,251,255,.25); border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#001220;
+      font-weight:800; cursor:pointer; text-decoration:none; transition:transform .2s ease, filter .2s ease;
+      box-shadow:var(--accent-glow)
+    }
+    .btn-nav:hover{transform:translateY(-1px); filter:brightness(1.05)}
+
+    /* ====== Layout ====== */
     .container{width:min(1200px,92vw);margin:0 auto;padding:1.4rem 0 2.2rem}
-    h1{font-size:2rem;margin:.2rem 0 1rem}
+    h1{font-size:2rem;margin:.2rem 0 1rem;text-shadow:0 0 12px rgba(61,165,255,.25)}
+    .hint{font-size:.95rem;color:var(--muted)}
+
+    /* ====== Card Grid ====== */
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
-    .card{background:linear-gradient(180deg,rgba(10,15,26,.85),rgba(10,15,26,.6));border:1px solid rgba(109,251,255,.15);border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.6rem;min-height:180px}
-    .card .slot{opacity:.8;font-size:.9rem}
+    .card{
+      background:rgba(15,21,36,.55);
+      border:1px solid var(--border);
+      border-radius:14px; padding:1rem; display:flex; flex-direction:column; gap:.6rem; min-height:180px;
+      backdrop-filter:blur(10px) saturate(160%);
+      box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
+      transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .card:hover{transform:translateY(-3px);box-shadow:0 0 18px rgba(61,165,255,.35);filter:brightness(1.03)}
+    .card .slot{opacity:.85;font-size:.9rem;color:var(--muted)}
     .badge{display:inline-block;font-size:.75rem;padding:.25rem .5rem;border:1px solid rgba(255,255,255,.2);border-radius:.5rem;background:rgba(255,255,255,.06)}
-    .card iframe{width:100%;height:220px;border:0;border-radius:10px}
     .row{display:flex;gap:.6rem;flex-wrap:wrap}
-    .btn{padding:.55rem .9rem;border:none;border-radius:10px;background:linear-gradient(135deg,#3aa0ff,#6dfbff);color:#001220;font-weight:700;cursor:pointer;transition:.2s}
-    .btn:hover{transform:translateY(-1px)}
-    .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(109,251,255,.25)}
-    .btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
 
-    /* Modal */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100}
+    /* ====== Buttons / Inputs ====== */
+    .btn{
+      padding:.6rem .95rem;border:none;border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001220;
+      font-weight:800;cursor:pointer;transition:transform .2s ease, filter .2s ease;box-shadow:var(--accent-glow)
+    }
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+    .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(109,251,255,.25);box-shadow:none}
+    .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+    .input{
+      width:100%;padding:.7rem .9rem;margin:.4rem 0;border-radius:10px;border:1px solid rgba(109,251,255,.25);
+      background:#0c1224;color:#e6ecff;outline:none
+    }
+    .input:focus{border-color:var(--brand);box-shadow:var(--ring)}
+
+    /* ====== Embeds ====== */
+    .card iframe{width:100%;height:220px;border:0;border-radius:10px;background:#000}
+
+    /* ====== Modals ====== */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100;padding:1rem}
     .modal.open{display:flex}
-    .modal-card{background:#0f1524;border:1px solid rgba(109,251,255,.2);border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,.55);width:min(950px,94vw);max-height:90vh;overflow:auto}
-    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.08)}
+    .modal-card{
+      background:rgba(15,21,36,.85);
+      border:1px solid rgba(109,251,255,.25);
+      border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 28px rgba(61,165,255,.25);
+      width:min(950px,94vw); max-height:90vh; overflow:auto; backdrop-filter:blur(12px) saturate(160%);
+    }
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px dashed rgba(255,255,255,.12)}
     .modal-body{padding:1rem}
-
-    /* Fullscreen/Lightbox Player */
     .player-frame{aspect-ratio:16/9;width:100%;border:0;border-radius:12px;background:#000}
 
-    .input{width:100%;padding:.7rem .9rem;margin:.4rem 0;border-radius:10px;border:1px solid rgba(109,251,255,.25);background:#0c1224;color:#e6ecff;outline:none}
-    .input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--ring)}
-    .hint{font-size:.9rem;color:var(--muted)}
+    /* Small sparkle underline for h1 (optional flair) */
+    .title-line{position:relative;display:inline-block}
+    .title-line::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
   </style>
 </head>
-<body>
+<body class="bg-track-curves">
   <header>
     <div class="nav-container">
       <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
-      <a href="/" class="btn-nav">Home</a>
+      <a href="/" class="btn-nav">🏠 Home</a>
     </div>
   </header>
 
   <div class="container">
-    <h1>Kacky Finishes</h1>
+    <h1 class="title-line">Kacky Finishes</h1>
     <p class="hint">Upload your kacky finishes, try to keep them in order when you are submitting finishes. If they are not in order it will be denied and you will have to reupload it once again.</p>
     <div id="clipsGrid" class="grid"></div>
   </div>
