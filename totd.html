@@ -107,6 +107,16 @@
   .btn:hover{filter:brightness(1.06)}
   .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+
+/* medal chips */
+.chip.medal { display:inline-flex; align-items:center; gap:.35rem; }
+.medal-icon { width:16px; height:16px; border-radius:50%; display:inline-block; }
+.medal-icon.at     { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #7b2cff; } /* Author: purple */
+.medal-icon.gold   { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #ffbf00; }
+.medal-icon.silver { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #c0c0c0; }
+.medal-icon.bronze { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #cd7f32; }
+
+
 </style>
 </head>
 <body class="bg-track-curves">
@@ -166,15 +176,51 @@
   const button = (label, href, extra='')=>`<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
 
   function chipsFromMap(map){
-    const arr=[];
-    if(map?.difficulty){ arr.push(chip(`⭐ <strong>${map.difficulty}</strong>`)); }
-    const at=fmtTime(map?.authorTime), gt=fmtTime(map?.goldTime), st=fmtTime(map?.silverTime), bt=fmtTime(map?.bronzeTime);
-    if(at){ arr.push(chip(`👑 AT: <strong class="mono">${at}</strong>`)); }
-    if(gt){ arr.push(chip(`🥇 ${gt}`)); }
-    if(st){ arr.push(chip(`🥈 ${st}`)); }
-    if(bt){ arr.push(chip(`🥉 ${bt}`)); }
-    return arr.join("");
+  const parts = [];
+  // difficulty (if you store it)
+  if(map?.difficulty){
+    parts.push(`<span class="chip">⭐ <strong>${map.difficulty}</strong></span>`);
   }
+
+  // helper to format times (already in your file)
+  const fmt = (ms)=> {
+    if(ms==null || isNaN(ms)) return null;
+    ms = Math.max(0, Math.floor(ms));
+    const m = Math.floor(ms/60000);
+    const s = Math.floor((ms%60000)/1000);
+    const ms3 = ms % 1000;
+    return `${String(m)}:${String(s).padStart(2,'0')}.${String(ms3).padStart(3,'0')}`;
+  };
+
+  const at = fmt(map?.authorTime);
+  const gt = fmt(map?.goldTime);
+  const st = fmt(map?.silverTime);
+  const bt = fmt(map?.bronzeTime);
+
+  // author medal (with purple medal icon)
+  if(at){
+    parts.push(
+      `<span class="chip medal"><i class="medal-icon at"></i> AT: <strong class="mono">${at}</strong></span>`
+    );
+  }
+  if(gt){
+    parts.push(
+      `<span class="chip medal"><i class="medal-icon gold"></i> ${gt}</span>`
+    );
+  }
+  if(st){
+    parts.push(
+      `<span class="chip medal"><i class="medal-icon silver"></i> ${st}</span>`
+    );
+  }
+  if(bt){
+    parts.push(
+      `<span class="chip medal"><i class="medal-icon bronze"></i> ${bt}</span>`
+    );
+  }
+  return parts.join("");
+}
+
 
   // LOCAL ACTIONS ONLY: Download + Copy UID
   function actionsFromMap(map){
