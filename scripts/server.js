@@ -73,7 +73,10 @@ async function jget(url, accessToken) {
       "User-Agent": "trackmaniaevents.com/1.0 (Render)"
     }
   });
-  if (!r.ok) throw new Error(`${url} -> ${r.status}`);
+  if (!r.ok) {
+    // include status in message for logs
+    throw new Error(`${url} -> ${r.status}`);
+  }
   return r.json();
 }
 
@@ -84,29 +87,49 @@ async function getAllOfficialCampaigns(accessToken) {
   return (j?.campaignList || []);
 }
 
-// TOTD seasons (many)
-async function getAllTotdSeasons(accessToken) {
-  const candidates = [
-    `${LIVE_BASE}/api/token/totd/season?offset=0&length=200`,
-    `${LIVE_BASE}/api/totd/season?offset=0&length=200`
-  ];
-  for (const url of candidates) {
+// ===== TOTD via month API (paged; reliable) =====
+
+// Fetch months in pages; returns an array of month objects with .days[].mapUid
+async function getTotdMonthsPaged(accessToken, {
+  pageLen = 12,   // months per call
+  startOffset = 0, // 0 = current month page
+  maxMonths = 120  // safety cap (~10 years). Raise if you want more.
+} = {}) {
+  const months = [];
+  let offset = startOffset;
+
+  while (months.length < maxMonths) {
+    const want = Math.min(pageLen, maxMonths - months.length);
+    const url = `${LIVE_BASE}/api/token/campaign/month?length=${want}&offset=${offset}&royal=false`;
     try {
       const j = await jget(url, accessToken);
-      return j?.seasonList || [];
+      const page = j?.monthList || [];
+      if (!page.length) break;
+      months.push(...page);
+      offset += page.length;
+      if (page.length < want) break; // no more pages
     } catch (e) {
-      console.warn("TOTD season fetch failed for", url, "-", e.message);
-      // try next candidate
+      console.warn("TOTD month fetch failed:", e.message);
+      break; // stop paging but keep whatever we already have
     }
   }
-  console.warn("TOTD season endpoints unavailable; proceeding without TOTD.");
-  return []; // fallback: no TOTD rather than throwing
+  return months;
 }
 
-// Extract mapUids from both sets
-function collectAllMapUids(officialCampaigns, totdSeasons) {
+// Flatten months → unique TOTD mapUids[]
+function collectTotdMapUidsFromMonths(months) {
+  const uids = [];
+  for (const m of months) {
+    const days = m?.days || [];
+    for (const d of days) if (d?.mapUid) uids.push(d.mapUid);
+  }
+  return Array.from(new Set(uids));
+}
+
+// Extract mapUids from both sets (official + TOTD months)
+function collectAllMapUids(officialCampaigns, totdMonths) {
   const officialUids = officialCampaigns.flatMap(c => (c.playlist || []).map(p => p.mapUid));
-  const totdUids = totdSeasons.flatMap(s => (s.days || []).map(d => d.mapUid));
+  const totdUids = collectTotdMapUidsFromMonths(totdMonths);
   return Array.from(new Set([...officialUids, ...totdUids]));
 }
 
@@ -130,6 +153,7 @@ async function getMapWR(accessToken, mapUid) {
 }
 
 // Display names (batched, best-effort)
+const nameCache = new Map(); // accountId -> displayName
 async function resolveDisplayNames(accessToken, ids) {
   const out = new Map();
   const want = Array.from(new Set(ids.filter(Boolean)));
@@ -142,11 +166,16 @@ async function resolveDisplayNames(accessToken, ids) {
       const j = await jget(url, accessToken);
       const arr = j?.displayNames || j || [];
       for (const row of arr) {
-        if (row?.accountId && row?.displayName) out.set(row.accountId, row.displayName);
+        if (row?.accountId && row?.displayName) {
+          out.set(row.accountId, row.displayName);
+          nameCache.set(row.accountId, row.displayName);
+        }
       }
     } catch {
       // keep IDs if this fails; don't kill the request
-      for (const id of batch) if (!out.has(id)) out.set(id, id);
+      for (const id of batch) {
+        if (!out.has(id)) out.set(id, nameCache.get(id) || id);
+      }
     }
   }
   return out;
@@ -156,15 +185,17 @@ async function resolveDisplayNames(accessToken, ids) {
 let wrCache = { ts: 0, rows: [] };
 const WR_TTL_MS = 10 * 60 * 1000; // 10 min
 const CONCURRENCY = 8;
+const MAX_TOTD_MONTHS = 120; // ~10 years; bump if you want even more
 
-// Build everything (all official + all TOTD)
+// Build everything (all official + ALL TOTD months up to cap)
 async function buildAllWRs() {
   const access = await getLiveAccessToken();
-  const [official, totd] = await Promise.all([
-  getAllOfficialCampaigns(access),
-  getAllTotdSeasons(access)
-]);
-  const mapUids = collectAllMapUids(official, totd);
+  const [official, totdMonths] = await Promise.all([
+    getAllOfficialCampaigns(access),
+    getTotdMonthsPaged(access, { pageLen: 12, startOffset: 0, maxMonths: MAX_TOTD_MONTHS })
+  ]);
+
+  const mapUids = collectAllMapUids(official, totdMonths);
 
   // fetch WRs with polite concurrency
   const wrs = [];
@@ -179,7 +210,7 @@ async function buildAllWRs() {
   const idList = wrs.map(r => r.accountId).filter(Boolean);
   const nameMap = await resolveDisplayNames(access, idList);
   for (const r of wrs) {
-    if (r.accountId) r.displayName = nameMap.get(r.accountId) || r.accountId;
+    if (r.accountId) r.displayName = nameMap.get(r.accountId) || nameCache.get(r.accountId) || r.accountId;
   }
 
   // newest first
@@ -191,8 +222,8 @@ async function buildAllWRs() {
 
 // ---------- Endpoints ----------
 
-// Most recent WRs across ALL official campaigns + ALL TOTD seasons
-// Optional: ?limit=300  ?source=official|totd  ?search=foo
+// Most recent WRs across ALL official campaigns + ALL TOTD months
+// Optional: ?limit=300  ?search=foo
 app.get("/api/wr-latest", async (req, res) => {
   try {
     const fresh = Date.now() - wrCache.ts < WR_TTL_MS && wrCache.rows.length;
@@ -201,16 +232,12 @@ app.get("/api/wr-latest", async (req, res) => {
     let out = rows;
     const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 300));
 
-    // NOTE: since we didn't attach source labels in safe-mode,
-    // we skip filtering by sourceType to keep things robust.
-    // (We can add sourceType and labels after we’re green.)
-
     const search = (req.query.search || "").toString().trim().toLowerCase();
     if (search) {
       out = out.filter(r =>
-        r.displayName?.toLowerCase().includes(search) ||
-        r.accountId?.toLowerCase().includes(search) ||
-        r.mapUid?.toLowerCase().includes(search)
+        (r.displayName || "").toLowerCase().includes(search) ||
+        (r.accountId || "").toLowerCase().includes(search) ||
+        (r.mapUid || "").toLowerCase().includes(search)
       );
     }
 
@@ -221,7 +248,7 @@ app.get("/api/wr-latest", async (req, res) => {
   }
 });
 
-// Players leaderboard across ALL official + TOTD WRs
+// Players leaderboard across ALL official + ALL TOTD WRs
 // Optional: ?limit=200  ?q=search
 app.get("/api/wr-players", async (req, res) => {
   try {
@@ -242,7 +269,7 @@ app.get("/api/wr-players", async (req, res) => {
     const q = (req.query.q || "").toString().trim().toLowerCase();
     if (q) {
       list = list.filter(p =>
-        p.displayName?.toLowerCase().includes(q) || p.accountId?.toLowerCase().includes(q)
+        (p.displayName || "").toLowerCase().includes(q) || (p.accountId || "").toLowerCase().includes(q)
       );
     }
 
@@ -252,6 +279,35 @@ app.get("/api/wr-players", async (req, res) => {
   } catch (err) {
     console.error("wr-players:", err);
     if (!res.headersSent) res.status(500).json({ error: "Failed to load WR players", detail: err?.message || String(err) });
+  }
+});
+
+// Resolve accountIds -> display names (used by your pages for lazy hydration)
+app.get("/api/resolve-names", async (req, res) => {
+  try {
+    const idsParam = (req.query.ids || "").toString();
+    const ids = Array.from(new Set(idsParam.split(",").map(s => s.trim()).filter(Boolean)));
+    if (!ids.length) return res.json({ names: {} });
+
+    const names = {};
+    // fill from cache first
+    const toFetch = [];
+    for (const id of ids) {
+      if (nameCache.has(id)) names[id] = nameCache.get(id);
+      else toFetch.push(id);
+    }
+    if (toFetch.length) {
+      const access = await getLiveAccessToken();
+      const got = await resolveDisplayNames(access, toFetch);
+      for (const [id, display] of got.entries()) {
+        names[id] = display;
+      }
+      for (const id of toFetch) if (!names[id]) names[id] = id; // fallback to ID
+    }
+    res.json({ names });
+  } catch (e) {
+    console.warn("resolve-names failed:", e.message);
+    res.json({ names: {} }); // never break pages
   }
 });
 
