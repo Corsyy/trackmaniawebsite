@@ -119,15 +119,30 @@
   .medal b{font-weight:800;letter-spacing:.2px}
   .medal.author{box-shadow:0 0 0 1px rgba(255,154,59,.25) inset}
 
-  /* pinned footer inside card content */
-  .card .meta-footer{
-    margin-top:auto;
-    padding-top:.7rem;
-    display:flex;
-    gap:.5rem;
-    flex-wrap:wrap;
-    align-items:center;
-  }
+ /* === Align AT chip right above the buttons on all cards === */
+.card .meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card .meta .medals {
+  margin-top: auto;           /* pushes it right above footer */
+}
+
+.card .meta-footer {
+  margin-top: 0;              /* remove extra gap so medals sit just above */
+  padding-top: .4rem;
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Make all cards the same height */
+.card { height: 100%; }
+.grid { align-items: stretch; } /* ensures grid rows stay even */
+
 </style>
 </head>
 <body class="bg-track-curves">
