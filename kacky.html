@@ -6,14 +6,13 @@
   <title>Kacky Finishes — Trackmania Events</title>
   <meta name="description" content="Upload and view Trackmania Kacky finish clips. Community submissions, moderated for quality." />
   <style>
-    :root{--bg:#0a0f1a;--text:#e6ecff;--muted:#9bb0ff;--accent:#3aa0ff;--accent-2:#6dfbff;--accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)}
-
+    :root{--bg:#0a0f1a;--text:#e6ecff;--muted:#9bb0ff;--accent:#3aa0ff;--accent-2:#6dfbff;--border:rgba(109,251,255,.22);--accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)}
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
       font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      color:var(--ink);
+      color:var(--text);
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
     }
@@ -53,13 +52,16 @@
     .brand{
       font-weight:800; font-size:1.1rem; letter-spacing:.3px; display:flex; align-items:center; gap:.5rem; color:var(--accent-2)
     }
-    .btn-nav{
-      padding:.55rem 1rem; border:1px solid rgba(109,251,255,.25); border-radius:12px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#001220;
-      font-weight:800; cursor:pointer; text-decoration:none; transition:transform .2s ease, filter .2s ease;
-      box-shadow:var(--accent-glow)
-    }
-    .btn-nav:hover{transform:translateY(-1px); filter:brightness(1.05)}
+    .btn{
+ padding:.6rem .95rem;
+   border:1px solid rgba(109,251,255,.25);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));   color:var(--text);
+   font-weight:700;
+   transition:.2s;
+   text-decoration:none;
+ }
+ .btn:hover{transform:translateY(-1px) scale(1.02); filter:brightness(1.06)}
 
     /* ====== Layout ====== */
     .container{width:min(1200px,92vw);margin:0 auto;padding:1.4rem 0 2.2rem}
@@ -118,7 +120,7 @@
   <header>
     <div class="nav-container">
       <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
-      <a href="/" class="btn-nav">Home</a>
+       <a href="/" class="btn">Home</a>
     </div>
   </header>
 
