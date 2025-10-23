@@ -95,12 +95,20 @@
     .row{display:flex;gap:.6rem;flex-wrap:wrap}
 
     /* ====== Buttons / Inputs ====== */
-    .btn{
-      padding:.6rem .95rem;border:none;border-radius:12px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001220;
-      font-weight:800;cursor:pointer;transition:transform .2s ease, filter .2s ease;box-shadow:var(--accent-glow)
-    }
-    .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+    .btn {
+  padding: .6rem .95rem;
+  border: 1px solid rgba(109,251,255,.25);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));
+  color: var(--text);
+  font-weight: 700;
+  transition: .2s;
+}
+.btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.06);
+}
+
     .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(109,251,255,.25);box-shadow:none}
     .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;filter:none}
     .input{
