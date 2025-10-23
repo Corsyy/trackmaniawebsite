@@ -149,7 +149,7 @@
 .event.with-bg{background-image:linear-gradient(180deg,rgba(15,21,36,.72),rgba(15,21,36,.45)),var(--event-img);background-size:contain,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;overflow:hidden;background-clip:padding-box,padding-box;min-height:180px;border-radius:16px}
 .event.with-bg:hover{background-image:linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)), var(--event-img);background-size:contain;background-position:center;background-repeat:no-repeat}
 .event.with-bg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(8,12,22,.5) 0%,rgba(8,12,22,.58) 55%,rgba(8,12,22,.78) 100%);z-index:0;pointer-events:none}
-.event.with-bg>*{position:relative;z-index:2}
+.event.with-bg > :not(.tag){position:relative; z-index:2;}
 
 
 
