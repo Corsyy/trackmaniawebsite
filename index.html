@@ -142,22 +142,20 @@
     .event:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 0 20px rgba(61,165,255,.35);filter:brightness(1.03)}
     .event h4{margin:.35rem 0 .25rem;letter-spacing:.2px}
     .event .meta{color:var(--muted);font-size:.9rem}
-    .event .tag {
+   .event .tag {
   position: absolute;
-  top: 8px;
-  left: 8px;           /* pinned to left edge */
-  right: auto;
+  top: 12px;
+  left: 14px; /* true top-left placement */
   z-index: 3;
 
   font-size: 0.7rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.6rem;
   border-radius: 999px;
   border: 1px solid rgba(109, 251, 255, 0.25);
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #001220;
+  box-shadow: 0 0 10px rgba(61, 165, 255, 0.4);
   animation: pulseAccent 3s infinite ease-in-out;
-
-  box-shadow: 0 0 8px rgba(61, 165, 255, 0.35);
 }
     .event::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(400px circle at var(--x,-100px) var(--y,-100px), rgba(61,165,255,.14), transparent 40%);opacity:0;transition:opacity .25s ease}
     .event:hover::before{opacity:1}
