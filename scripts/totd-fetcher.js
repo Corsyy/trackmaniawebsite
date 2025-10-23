@@ -1,5 +1,5 @@
-// scripts/totd-fetcher.js — TOTD + TMX-first download + medal times (tm.io) + difficulty (TMX)
-// Node 18+ (global fetch). No secrets needed.
+// scripts/totd-fetcher.js — TOTD + TMX medal times & difficulty (keeps manual downloadUrl)
+// Node 18+ (global fetch).
 
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
@@ -10,7 +10,7 @@ const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
 const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
 const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
 const TMIO        = "https://trackmania.io";
-const TMX_API     = "https://trackmania.exchange/api";
+const TMX_API     = "https://trackmania.exchange/api"; // base for TMX API
 const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
 const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.1 (github action)";
 
@@ -71,7 +71,10 @@ function tmioMonthYear(resp){
   return { y,m1 };
 }
 
-/* ------------------------------ TMX helpers -------------------------------- */
+/* ------------------------------ TMX helpers --------------------------------
+   We try TMX first: UID -> TMX map info (TrackID, medal times, difficulty, etc).
+   If TMX lacks the map, we fall back to trackmania.io for a download.
+-----------------------------------------------------------------------------*/
 async function fetchTmxInfoByUid(uid){
   if (!uid) return null;
   const url = `${TMX_API}/maps/get_map_info/uid/${encodeURIComponent(uid)}`;
@@ -84,6 +87,7 @@ async function fetchTmxInfoByUid(uid){
     return j;
   } catch { return null; }
 }
+
 async function fetchTmxInfoById(trackId){
   if (!trackId) return null;
   const url = `${TMX_API}/maps/get_map_info/id/${encodeURIComponent(trackId)}`;
@@ -96,22 +100,30 @@ async function fetchTmxInfoById(trackId){
     return j;
   } catch { return null; }
 }
+
 function tmxDownloadUrl(trackId, shortName){
   const base = `${TMX_DL_BASE}/${encodeURIComponent(trackId)}`;
   return shortName ? `${base}?shortName=${encodeURIComponent(shortName)}` : base;
 }
 
-/* --------------------------- meta + download resolver ---------------------- */
-// returns { downloadUrl, authorTime, goldTime, silverTime, bronzeTime, difficulty }
-async function fetchMapMeta(mapUid){
-  if (!mapUid) return {
-    downloadUrl: null, authorTime: null, goldTime: null, silverTime: null, bronzeTime: null, difficulty: null
+/* --------------------------- download & medals ----------------------------- */
+function pickMedalFields(tmx){
+  // TMX returns ms times; Difficulty is an integer-ish category (0–5+).
+  const toInt = v => (v==null ? null : Number(v));
+  const diff  = v => (v==null ? null : Number(v));
+  return {
+    authorTime : toInt(tmx?.AuthorTime),
+    goldTime   : toInt(tmx?.GoldTime),
+    silverTime : toInt(tmx?.SilverTime),
+    bronzeTime : toInt(tmx?.BronzeTime),
+    difficulty : diff(tmx?.Difficulty)
   };
+}
 
-  let downloadUrl = null;
-  let difficulty  = null;
+async function fetchMapDetails(mapUid){
+  if (!mapUid) return { downloadUrl:null, medals:null };
 
-  // 1) TMX first (download + difficulty)
+  // 1) Try TMX (prefer — gives us medals + difficulty + often a valid download)
   try {
     const tmx = await fetchTmxInfoByUid(mapUid);
     if (tmx && tmx.TrackID) {
@@ -123,33 +135,25 @@ async function fetchMapMeta(mapUid){
       }
 
       const downloadable = (tmx.Downloadable ?? true);
-      if (downloadable) downloadUrl = tmxDownloadUrl(tmx.TrackID, shortName);
+      const downloadUrl = downloadable ? tmxDownloadUrl(tmx.TrackID, shortName) : null;
+      const medals = pickMedalFields(tmx);
 
-      difficulty = tmx.Difficulty ?? tmx.Diff ?? tmx.DifficultyName ?? null;
+      return { downloadUrl, medals };
     }
   } catch (e) {
-    dlog("TMX meta err", mapUid, e?.message || e);
+    dlog("TMX resolver err", mapUid, e?.message || e);
   }
 
-  // 2) tm.io for medal times (and fallback download)
-  let authorTime = null, goldTime = null, silverTime = null, bronzeTime = null;
+  // 2) Fallback to trackmania.io for a file URL (no medals here)
   try {
     const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
-    if (r.ok) {
-      const j = await r.json();
-      authorTime = j?.authorTime ?? null;
-      goldTime   = j?.goldTime   ?? null;
-      silverTime = j?.silverTime ?? null;
-      bronzeTime = j?.bronzeTime ?? null;
-      if (!downloadUrl) downloadUrl = j?.file || j?.download || null;
-    } else {
-      dlog("tm.io map detail failed", mapUid, r.status);
-    }
+    if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return { downloadUrl:null, medals:null }; }
+    const j = await r.json();
+    return { downloadUrl: j?.file || j?.download || null, medals:null };
   } catch (e) {
-    dlog("tm.io meta err", mapUid, e?.message || e);
+    dlog("tm.io resolver err", mapUid, e?.message || e);
+    return { downloadUrl:null, medals:null };
   }
-
-  return { downloadUrl, authorTime, goldTime, silverTime, bronzeTime, difficulty };
 }
 
 /* ------------------------------ month writing ------------------------------ */
@@ -175,11 +179,9 @@ function baseDayRecord(y,m1,entry,idx){
   return {
     date: dateKey(y,m1,d),
     map: {
-      uid, name, authorAccountId, authorDisplayName,
-      thumbnailUrl: thumb,
+      uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb,
       downloadUrl: null,
-      authorTime: null, goldTime: null, silverTime: null, bronzeTime: null,
-      difficulty: null
+      authorTime:null, goldTime:null, silverTime:null, bronzeTime:null, difficulty:null
     }
   };
 }
@@ -190,7 +192,7 @@ async function writeTotdMonth(index=0){
   const {y,m1}=tmioMonthYear(j);
   const mKey=monthKey(y,m1);
 
-  // 1) load existing month file (so manual values are preserved)
+  // 1) load existing month file (so manual overrides are preserved)
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
   const prev = await loadJson(monthPath, { month:mKey, days:{} });
   const prevDays = prev?.days || {};
@@ -198,34 +200,37 @@ async function writeTotdMonth(index=0){
   // 2) normalize remote -> day records
   const daysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
 
-  // 3) merge previous values and fetch missing meta
+  // 3) hydrate each day with TMX medals/difficulty + download, preserving any manual downloadUrl
   for (const rec of daysArr){
     const prevRec = prevDays[rec.date]?.map || {};
-
-    // preserve existing/manual values
-    rec.map.downloadUrl = prevRec.downloadUrl ?? rec.map.downloadUrl;
-    rec.map.authorTime  = prevRec.authorTime  ?? rec.map.authorTime;
-    rec.map.goldTime    = prevRec.goldTime    ?? rec.map.goldTime;
-    rec.map.silverTime  = prevRec.silverTime  ?? rec.map.silverTime;
-    rec.map.bronzeTime  = prevRec.bronzeTime  ?? rec.map.bronzeTime;
-    rec.map.difficulty  = prevRec.difficulty  ?? rec.map.difficulty;
-
-    if (rec.map.uid){
-      const meta = await fetchMapMeta(rec.map.uid);
-      if (rec.map.downloadUrl == null) rec.map.downloadUrl = meta.downloadUrl;
-      if (rec.map.authorTime  == null) rec.map.authorTime  = meta.authorTime;
-      if (rec.map.goldTime    == null) rec.map.goldTime    = meta.goldTime;
-      if (rec.map.silverTime  == null) rec.map.silverTime  = meta.silverTime;
-      if (rec.map.bronzeTime  == null) rec.map.bronzeTime  = meta.bronzeTime;
-      if (rec.map.difficulty  == null) rec.map.difficulty  = meta.difficulty;
+    // keep any manual/previous link
+    if (prevRec.downloadUrl) {
+      rec.map.downloadUrl = prevRec.downloadUrl;
+    }
+    // only fetch if we have a UID and no preserved link/medals yet
+    if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime==null)){
+      const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
+      if (!rec.map.downloadUrl) rec.map.downloadUrl = downloadUrl || null;
+      if (medals){
+        rec.map.authorTime = medals.authorTime;
+        rec.map.goldTime   = medals.goldTime;
+        rec.map.silverTime = medals.silverTime;
+        rec.map.bronzeTime = medals.bronzeTime;
+        rec.map.difficulty = medals.difficulty;
+      }
       await sleep(120); // be nice to public APIs
+    }else{
+      // carry forward previously stored medals/difficulty if present
+      rec.map.authorTime = prevRec.authorTime ?? rec.map.authorTime;
+      rec.map.goldTime   = prevRec.goldTime   ?? rec.map.goldTime;
+      rec.map.silverTime = prevRec.silverTime ?? rec.map.silverTime;
+      rec.map.bronzeTime = prevRec.bronzeTime ?? rec.map.bronzeTime;
+      rec.map.difficulty = prevRec.difficulty ?? rec.map.difficulty;
     }
   }
 
   // 4) write month file
-  const daysOut={};
-  for (const rec of daysArr){ daysOut[rec.date]=rec; }
-
+  const daysOut={}; for (const rec of daysArr){ daysOut[rec.date]=rec; }
   await ensureDir(TOTD_DIR);
   await writeJson(monthPath,{ month:mKey, days:daysOut });
   await rebuildMonthIndex(TOTD_DIR);
@@ -236,7 +241,8 @@ async function writeTotdMonth(index=0){
   if(latestKey){
     const latest=daysOut[latestKey];
     await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
-    dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "");
+    dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "", "medals?",
+         latest.map?.authorTime!=null);
   }else{
     dlog("no days found for", mKey);
   }
@@ -246,6 +252,6 @@ async function writeTotdMonth(index=0){
 async function main(){
   await ensureDir(TOTD_DIR);
   await writeTotdMonth(0); // current month (index 0)
-  console.log("[DONE] TOTD updated with download URLs + medals + difficulty (manual values preserved).");
+  console.log("[DONE] TOTD updated with TMX medal times + difficulty.");
 }
 main().catch(err=>{ console.error(err); process.exit(1); });
