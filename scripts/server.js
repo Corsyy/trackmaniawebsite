@@ -1,30 +1,28 @@
 import express from "express";
 import fetch from "node-fetch";
 
+/**
+ * ENV required on Render:
+ *   REFRESH_TOKEN = <NadeoLiveServices refresh token>
+ * Optional:
+ *   CORS_ORIGINS = comma-separated list of extra origins
+ */
+
 const app = express();
 
-/** ---------- Config ---------- */
-const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
-const CORE_BASE = "https://prod.trackmania.core.nadeo.online";
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 min cache
-const MAP_BATCH = 100;               // map info batch size
-const NAME_BATCH = 100;              // display name batch size
-const CONCURRENCY = 8;               // polite concurrency
+// ---------- CORS ----------
+const DEFAULT_ORIGINS = new Set([
+  "https://trackmaniaevents.com",
+  "http://localhost:5500",
+  "http://127.0.0.1:5500"
+]);
+const EXTRA = (process.env.CORS_ORIGINS || "")
+  .split(",").map(s => s.trim()).filter(Boolean);
+const ALLOW = new Set([...DEFAULT_ORIGINS, ...EXTRA]);
 
-// Caches
-let wrCache = { ts: 0, rows: [] };   // [{mapUid, accountId, displayName, timeMs, timestamp, mapName, authorName, sourceType, sourceLabel}]
-let nameCache = new Map();           // accountId -> displayName
-let mapInfoCache = new Map();        // mapUid -> {name, authorName}
-
-/** ---------- CORS (allow your site) ---------- */
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  const allow = new Set([
-    "https://trackmaniaevents.com",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500"
-  ]);
-  if (origin && allow.has(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
+  const o = req.headers.origin;
+  if (o && ALLOW.has(o)) res.setHeader("Access-Control-Allow-Origin", o);
   res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -32,257 +30,219 @@ app.use((req, res, next) => {
   next();
 });
 
-/** ---------- Auth using your REFRESH_TOKEN ---------- */
-// NOTE: REFRESH_TOKEN must be for audience: NadeoLiveServices
-async function getLiveAccessToken() {
-  const refresh = process.env.REFRESH_TOKEN;
-  if (!refresh) throw new Error("Missing REFRESH_TOKEN env var");
+// ---------- Health ----------
+app.get("/", (_req, res) => res.send("OK"));
+app.get("/healthz", (_req, res) => res.json({ ok: true }));
+app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
-  const r = await fetch(`${CORE_BASE}/v2/authentication/token/refresh`, {
+// ---------- Auth (refresh -> access) ----------
+const NADEO_REFRESH = process.env.REFRESH_TOKEN;
+const CORE_REFRESH_URL = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
+let cachedAccess = { token: null, expAt: 0 };
+
+async function getLiveAccessToken() {
+  const now = Date.now();
+  if (cachedAccess.token && now < cachedAccess.expAt - 30_000) return cachedAccess.token;
+  if (!NADEO_REFRESH) throw new Error("Missing REFRESH_TOKEN");
+
+  const r = await fetch(CORE_REFRESH_URL, {
     method: "POST",
     headers: {
-      "Authorization": `nadeo_v1 t=${refresh}`,
+      "Authorization": `nadeo_v1 t=${NADEO_REFRESH}`,
       "Content-Type": "application/json",
-      "User-Agent": "trackmaniaevents.com/1.0"
+      "User-Agent": "trackmaniaevents.com/1.0 (Render)"
     },
     body: "{}"
   });
   if (!r.ok) throw new Error(`refresh failed ${r.status} ${await r.text()}`);
   const j = await r.json();
-  const token = j.accessToken || j.access_token;
-  if (!token) throw new Error("no accessToken in refresh response");
-  return token;
+  const accessToken = j.accessToken || j.access_token;
+  const expiresIn = j.expiresIn || j.expires_in || 3600;
+  if (!accessToken) throw new Error("no accessToken in refresh response");
+  cachedAccess = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
+  return cachedAccess.token;
 }
 
-/** ---------- helpers ---------- */
-async function jget(url, token) {
+// ---------- Live Services helpers ----------
+const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
+
+async function jget(url, accessToken) {
   const r = await fetch(url, {
     headers: {
-      "Authorization": `nadeo_v1 t=${token}`,
-      "User-Agent": "trackmaniaevents.com/1.0"
+      "Authorization": `nadeo_v1 t=${accessToken}`,
+      "User-Agent": "trackmaniaevents.com/1.0 (Render)"
     }
   });
   if (!r.ok) throw new Error(`${url} -> ${r.status}`);
   return r.json();
 }
 
-function chunk(arr, n) {
-  const out = [];
-  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+// Official campaigns (many)
+async function getAllOfficialCampaigns(accessToken) {
+  const url = `${LIVE_BASE}/api/campaign/official?offset=0&length=200`;
+  const j = await jget(url, accessToken);
+  return (j?.campaignList || []);
+}
+
+// TOTD seasons (many)
+async function getAllTotdSeasons(accessToken) {
+  const url = `${LIVE_BASE}/api/totd/season?offset=0&length=200`;
+  const j = await jget(url, accessToken);
+  return (j?.seasonList || []);
+}
+
+// Extract mapUids from both sets
+function collectAllMapUids(officialCampaigns, totdSeasons) {
+  const officialUids = officialCampaigns.flatMap(c => (c.playlist || []).map(p => p.mapUid));
+  const totdUids = totdSeasons.flatMap(s => (s.days || []).map(d => d.mapUid));
+  return Array.from(new Set([...officialUids, ...totdUids]));
+}
+
+// WR (top1 world) per map
+async function getMapWR(accessToken, mapUid) {
+  const groupUid = "Personal_Best";
+  const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
+  try {
+    const j = await jget(url, accessToken);
+    const top = j?.tops?.[0]?.top?.[0];
+    if (!top) return { mapUid, empty: true };
+    return {
+      mapUid,
+      accountId: top.accountId,
+      timeMs: top.score,
+      timestamp: Number(top.timestamp) || Date.parse(top.timestamp) || 0
+    };
+  } catch (e) {
+    return { mapUid, error: e.message || "leaderboard fetch failed" };
+  }
+}
+
+// Display names (batched, best-effort)
+async function resolveDisplayNames(accessToken, ids) {
+  const out = new Map();
+  const want = Array.from(new Set(ids.filter(Boolean)));
+  if (!want.length) return out;
+  const chunkSize = 100;
+  for (let i = 0; i < want.length; i += chunkSize) {
+    const batch = want.slice(i, i + chunkSize);
+    const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${encodeURIComponent(batch.join(","))}`;
+    try {
+      const j = await jget(url, accessToken);
+      const arr = j?.displayNames || j || [];
+      for (const row of arr) {
+        if (row?.accountId && row?.displayName) out.set(row.accountId, row.displayName);
+      }
+    } catch {
+      // keep IDs if this fails; don't kill the request
+      for (const id of batch) if (!out.has(id)) out.set(id, id);
+    }
+  }
   return out;
 }
 
-/** ---------- Sources (Official campaigns + TOTD seasons) ---------- */
-// Returns an array of { mapUid, sourceType: 'official'|'totd', sourceLabel: 'Fall 2025'|'2024-11 (TOTD)' }
-async function getAllMapsWithSource(token) {
-  const [official, totd] = await Promise.all([
-    jget(`${LIVE_BASE}/api/campaign/official?offset=0&length=200`, token),
-    jget(`${LIVE_BASE}/api/totd/season?offset=0&length=200`, token)
-  ]);
+// ---------- Cache ----------
+let wrCache = { ts: 0, rows: [] };
+const WR_TTL_MS = 10 * 60 * 1000; // 10 min
+const CONCURRENCY = 8;
 
-  const officialRows = (official.campaignList || []).flatMap(c => {
-    const label = c.name || c.seasonName || "Official Campaign";
-    const playlist = c.playlist || [];
-    return playlist.map(p => ({ mapUid: p.mapUid, sourceType: "official", sourceLabel: label }));
-  });
-
-  const totdRows = (totd.seasonList || []).flatMap(s => {
-    // season label like YYYY-MM (or s.name if present)
-    const year = s.year ?? s.seasonYear;
-    const month = s.month ?? s.seasonMonth;
-    const label = s.name || (year && month ? `${year}-${String(month).padStart(2, "0")} (TOTD)` : "TOTD");
-    const days = s.days || [];
-    return days.map(d => ({ mapUid: d.mapUid, sourceType: "totd", sourceLabel: label }));
-  });
-
-  // unique by mapUid; keep first source label encountered
-  const seen = new Set();
-  const merged = [];
-  for (const r of [...officialRows, ...totdRows]) {
-    if (!r.mapUid || seen.has(r.mapUid)) continue;
-    seen.add(r.mapUid);
-    merged.push(r);
-  }
-  return merged;
-}
-
-/** ---------- Map metadata ---------- */
-async function hydrateMapInfo(token, mapUids) {
-  const need = mapUids.filter(uid => uid && !mapInfoCache.has(uid));
-  if (!need.length) return;
-
-  // live endpoint accepts mapUidList (comma-separated)
-  // https://live-services.trackmania.nadeo.live/api/token/map/get-multiple?mapUidList=...
-  for (const batch of chunk(need, MAP_BATCH)) {
-    const url = `${LIVE_BASE}/api/token/map/get-multiple?mapUidList=${encodeURIComponent(batch.join(","))}`;
-    try {
-      const j = await jget(url, token);
-      const rows = j?.mapList || j || [];
-      for (const m of rows) {
-        if (m?.mapUid) {
-          mapInfoCache.set(m.mapUid, {
-            name: m?.name || "Unknown map",
-            authorName: m?.authorDisplayName || m?.author || "Unknown"
-          });
-        }
-      }
-    } catch (e) {
-      console.error("map info batch failed:", e.message);
-    }
-  }
-}
-
-/** ---------- WR for a map ---------- */
-// Use global PB group for world leaderboard; onlyWorld=true to restrict to WRs
-// Docs: groupUid "Personal_Best" is the global map leaderboard, "onlyWorld=true" exposes WRs. 
-async function getMapWR(token, mapUid) {
-  const groupUid = "Personal_Best";
-  const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
-  const j = await jget(url, token);
-  const top = j?.tops?.[0]?.top?.[0];
-  if (!top) return null;
-  return {
-    mapUid,
-    accountId: top.accountId,
-    timeMs: top.score,
-    timestamp: top.timestamp // unix ms per API; if ISO, Date.parse works the same in sort below
-  };
-}
-
-/** ---------- Resolve many accountIds -> displayName ---------- */
-async function resolveDisplayNames(token, accountIds) {
-  const ids = Array.from(new Set(accountIds.filter(Boolean).filter(id => !nameCache.has(id))));
-  if (!ids.length) return;
-
-  for (const batch of chunk(ids, NAME_BATCH)) {
-    // NOTE: This Live endpoint commonly works for user tokens. If your token ever stops
-    // resolving names, switch to the public OAuth endpoint (api.trackmania.com) instead.
-    const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${encodeURIComponent(batch.join(","))}`;
-    try {
-      const j = await jget(url, token);
-      const rows = j?.displayNames || j || [];
-      for (const r of rows) {
-        if (r?.accountId && r?.displayName) nameCache.set(r.accountId, r.displayName);
-      }
-    } catch (e) {
-      console.error("name batch failed:", e.message);
-      // Fallback: keep IDs (frontend can gray these)
-      for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
-    }
-  }
-}
-
-/** ---------- Build combined WR set (official + TOTD) ---------- */
+// Build everything (all official + all TOTD)
 async function buildAllWRs() {
-  const token = await getLiveAccessToken();
-  const maps = await getAllMapsWithSource(token); // [{mapUid, sourceType, sourceLabel}]
-  const uids = maps.map(m => m.mapUid);
+  const access = await getLiveAccessToken();
+  const [official, totd] = await Promise.all([
+    getAllOfficialCampaigns(access),
+    getAllTotdSeasons(access)
+  ]);
+  const mapUids = collectAllMapUids(official, totd);
 
-  // hydrate map metadata first
-  await hydrateMapInfo(token, uids);
-
-  // fetch WRs with gentle concurrency
+  // fetch WRs with polite concurrency
   const wrs = [];
-  for (let i = 0; i < uids.length; i += CONCURRENCY) {
+  for (let i = 0; i < mapUids.length; i += CONCURRENCY) {
     const part = await Promise.all(
-      uids.slice(i, i + CONCURRENCY).map(uid => getMapWR(token, uid).catch(() => null))
+      mapUids.slice(i, i + CONCURRENCY).map(uid => getMapWR(access, uid))
     );
-    for (const r of part) if (r) wrs.push(r);
+    wrs.push(...part.filter(Boolean));
   }
 
-  // add map/source meta
-  const byUid = new Map(maps.map(m => [m.mapUid, m]));
+  // best-effort names
+  const idList = wrs.map(r => r.accountId).filter(Boolean);
+  const nameMap = await resolveDisplayNames(access, idList);
   for (const r of wrs) {
-    const meta = mapInfoCache.get(r.mapUid) || {};
-    const src = byUid.get(r.mapUid) || {};
-    r.mapName = meta.name || "Unknown map";
-    r.authorName = meta.authorName || "Unknown";
-    r.sourceType = src.sourceType || "unknown";
-    r.sourceLabel = src.sourceLabel || "Unknown";
+    if (r.accountId) r.displayName = nameMap.get(r.accountId) || r.accountId;
   }
 
-  // resolve display names
-  await resolveDisplayNames(token, wrs.map(r => r.accountId));
-  for (const r of wrs) r.displayName = nameCache.get(r.accountId) || r.accountId;
-
-  // newest first (timestamp can be number or ISO; normalize)
-  wrs.sort((a, b) => (Number(b.timestamp) || Date.parse(b.timestamp) || 0) - (Number(a.timestamp) || Date.parse(a.timestamp) || 0));
+  // newest first
+  wrs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
   wrCache = { ts: Date.now(), rows: wrs };
   return wrs;
 }
 
-/** ---------- Endpoints ---------- */
+// ---------- Endpoints ----------
 
-// Latest WRs across ALL official campaigns + ALL TOTD seasons.
-// Optional query params:
-//   ?limit=200  -> limit number of rows (default 200)
-//   ?source=official|totd (optional filter)
-//   ?search=abc -> case-insensitive substring filter on map name or player name
+// Most recent WRs across ALL official campaigns + ALL TOTD seasons
+// Optional: ?limit=300  ?source=official|totd  ?search=foo
 app.get("/api/wr-latest", async (req, res) => {
   try {
-    const fresh = Date.now() - wrCache.ts < CACHE_TTL_MS && wrCache.rows.length;
+    const fresh = Date.now() - wrCache.ts < WR_TTL_MS && wrCache.rows.length;
     const rows = fresh ? wrCache.rows : await buildAllWRs();
 
     let out = rows;
-    const { source, search } = req.query;
-    const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 200));
+    const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 300));
 
-    if (source === "official" || source === "totd") {
-      out = out.filter(r => r.sourceType === source);
-    }
-    if (search && typeof search === "string") {
-      const q = search.toLowerCase();
+    // NOTE: since we didn't attach source labels in safe-mode,
+    // we skip filtering by sourceType to keep things robust.
+    // (We can add sourceType and labels after we’re green.)
+
+    const search = (req.query.search || "").toString().trim().toLowerCase();
+    if (search) {
       out = out.filter(r =>
-        (r.mapName || "").toLowerCase().includes(q) ||
-        (r.displayName || "").toLowerCase().includes(q)
+        r.displayName?.toLowerCase().includes(search) ||
+        r.accountId?.toLowerCase().includes(search) ||
+        r.mapUid?.toLowerCase().includes(search)
       );
     }
 
-    res.json({
-      rows: out.slice(0, limit),
-      total: out.length,
-      fetchedAt: wrCache.ts
-    });
+    res.json({ rows: out.slice(0, limit), total: out.length, fetchedAt: wrCache.ts });
   } catch (err) {
     console.error("wr-latest:", err);
-    if (!res.headersSent) res.status(500).json({ error: "Failed to load latest world records" });
+    if (!res.headersSent) res.status(500).json({ error: "Failed to load latest world records", detail: err?.message || String(err) });
   }
 });
 
 // Players leaderboard across ALL official + TOTD WRs
-// Optional: ?limit=100
+// Optional: ?limit=200  ?q=search
 app.get("/api/wr-players", async (req, res) => {
   try {
-    if (!wrCache.rows.length || Date.now() - wrCache.ts >= CACHE_TTL_MS) {
+    if (!wrCache.rows.length || Date.now() - wrCache.ts >= WR_TTL_MS) {
       await buildAllWRs();
     }
 
-    const counts = new Map(); // displayName -> {displayName, accountId, wrCount, latestTs}
+    const tally = new Map(); // accountId -> { accountId, displayName, wrCount, latestTs }
     for (const r of wrCache.rows) {
-      const name = r.displayName || r.accountId;
-      const rec = counts.get(name) || { displayName: name, accountId: r.accountId, wrCount: 0, latestTs: 0 };
+      if (!r.accountId) continue;
+      const rec = tally.get(r.accountId) || { accountId: r.accountId, displayName: r.displayName || r.accountId, wrCount: 0, latestTs: 0 };
       rec.wrCount += 1;
-      const ts = Number(r.timestamp) || Date.parse(r.timestamp) || 0;
-      if (ts > rec.latestTs) rec.latestTs = ts;
-      counts.set(name, rec);
+      if ((r.timestamp || 0) > rec.latestTs) rec.latestTs = r.timestamp || 0;
+      tally.set(r.accountId, rec);
     }
 
-    const players = Array.from(counts.values()).sort(
-      (a, b) => (b.wrCount - a.wrCount) || (b.latestTs - a.latestTs)
-    );
+    let list = Array.from(tally.values());
+    const q = (req.query.q || "").toString().trim().toLowerCase();
+    if (q) {
+      list = list.filter(p =>
+        p.displayName?.toLowerCase().includes(q) || p.accountId?.toLowerCase().includes(q)
+      );
+    }
 
+    list.sort((a, b) => (b.wrCount - a.wrCount) || (b.latestTs - a.latestTs));
     const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 200));
-    res.json({ players: players.slice(0, limit), total: players.length, fetchedAt: wrCache.ts });
+    res.json({ players: list.slice(0, limit), total: list.length, fetchedAt: wrCache.ts });
   } catch (err) {
     console.error("wr-players:", err);
-    if (!res.headersSent) res.status(500).json({ error: "Failed to load WR players" });
+    if (!res.headersSent) res.status(500).json({ error: "Failed to load WR players", detail: err?.message || String(err) });
   }
 });
 
-// Simple health
-app.get("/", (_req, res) => res.send("OK"));
-
-// start
+// ---------- Start ----------
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => console.log(`✅ API running on :${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`✅ API running on port ${PORT}`));
