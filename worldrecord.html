@@ -70,7 +70,7 @@ async function load(){
       tr.innerHTML =
         "<td>"+(i+1)+"</td>"+
         "<td>"+row.mapUid+"</td>"+
-        "<td>"+(row.holder || row.accountId || "—")+"</td>"+
+        "<td>"+(row.displayName || row.holder || row.accountId || "—")+"</td>"+
         "<td class=\"time\">"+(row.timeMs!=null?fmt(row.timeMs):"—")+"</td>"+
         "<td class=\"ts\">"+fmtTs(row.timestamp)+"</td>";
       tb.appendChild(tr);
