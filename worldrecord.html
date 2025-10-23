@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>WR Leaderboard — Trackmania Events</title>
-  <meta name="description" content="Trackmania world records for the current official campaign."/>
+  <meta name="description" content="Most recent Trackmania world records across all official campaigns and all TOTD seasons."/>
   <meta name="theme-color" content="#0a0f1a"/>
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
@@ -32,14 +32,13 @@
 <header>
   <div class="container">
     <a class="brand" href="/index"><span class="brand-badge">🏁</span><span>WR Leaderboard</span></a>
-    <a class="btn" href="/">Home</a>
-    <a class="btn" href="/wr-players">Most WRs</a>
-
+    <a class="btn" href="/index.html">Home</a>
+    <a class="btn" href="/wr-players.html">Most WRs</a>
   </div>
 </header>
 
 <main>
-  <h1>World-Record Leaderboard (Current Official Campaign)</h1>
+  <h1>World-Record Leaderboard (All Campaigns + TOTD)</h1>
   <div id="meta" class="meta">Loading…</div>
   <div class="card">
     <table>
@@ -50,43 +49,74 @@
 </main>
 
 <script>
-const API_BASE = "https://trackmaniawebsite.onrender.com"; // <-- replace with your Render URL
+const API_BASE = "https://trackmaniawebsite.onrender.com"; // your Render API
 
 function fmt(ms){
-  var m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000), x=ms%1000;
-  function pad(n,w){return String(n).padStart(w||2,"0")}
-  return pad(m)+":"+pad(s)+":"+String(x).padStart(3,"0");
+  if(!Number.isFinite(ms)) return "—";
+  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000), x=ms%1000;
+  const pad=(n,w=2)=>String(n).padStart(w,"0");
+  return `${pad(m)}:${pad(s)}:${String(x).padStart(3,"0")}`;
 }
-function fmtTs(sec){ return sec ? new Date(sec*1000).toLocaleString() : "—"; }
+// accepts ms, seconds, or ISO strings safely
+function fmtTs(ts){
+  if (ts === null || ts === undefined) return "—";
+  const n = Number(ts);
+  const ms = Number.isFinite(n) ? (n > 1e12 ? n : n*1000) : Date.parse(ts);
+  return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
+}
 
 async function load(){
   try{
-    const r = await fetch("/api/wr-latest?limit=300");
+    const r = await fetch(`${API_BASE}/api/wr-latest?limit=300`);
+    if (!r.ok) throw new Error(await r.text());
     const j = await r.json();
 
     const tb = document.getElementById("rows");
     tb.innerHTML = "";
 
-    (j.rows || []).forEach(function(row, i){
+    (j.rows || []).forEach((row, i)=>{
+      const holder = row.displayName || row.accountId || "—";
       const tr = document.createElement("tr");
       tr.innerHTML =
-        "<td>"+(i+1)+"</td>"+
-        "<td>"+row.mapUid+"</td>"+
-        "<td>"+(row.displayName || row.holder || row.accountId || "—")+"</td>"+
-        "<td class=\"time\">"+(row.timeMs!=null?fmt(row.timeMs):"—")+"</td>"+
-        "<td class=\"ts\">"+fmtTs(row.timestamp)+"</td>";
+        `<td>${i+1}</td>`+
+        `<td>${row.mapUid}</td>`+
+        `<td class="holder" data-id="${row.accountId||""}">${holder}</td>`+
+        `<td class="time">${row.timeMs!=null?fmt(row.timeMs):"—"}</td>`+
+        `<td class="ts">${fmtTs(row.timestamp)}</td>`;
       tb.appendChild(tr);
     });
 
+    // swap any remaining raw IDs for display names
+    await hydrateNamesIfNeeded();
+
     const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
     document.getElementById("meta").textContent =
-      "Fetched " + Math.round(ago/1000) + "s ago — " +
-      new Date(j.fetchedAt || Date.now()).toLocaleTimeString();
+      `Fetched ${Math.round(ago/1000)}s ago — ${new Date(j.fetchedAt || Date.now()).toLocaleTimeString()}`;
   }catch(e){
     document.getElementById("meta").textContent = "Failed to load leaderboard.";
     console.error(e);
   }
 }
+
+async function hydrateNamesIfNeeded(){
+  const cells = [...document.querySelectorAll("td.holder")];
+  const need = cells
+    .map(td => ({ id: td.dataset.id, text: td.textContent.trim(), td }))
+    .filter(x => x.id && x.text === x.id);
+  if (!need.length) return;
+
+  const ids = [...new Set(need.map(x => x.id))];
+  try{
+    const r = await fetch(`${API_BASE}/api/resolve-names?ids=${encodeURIComponent(ids.join(","))}`);
+    if (!r.ok) return;
+    const { names = {} } = await r.json();
+    for (const x of need) {
+      const pretty = names[x.id];
+      if (pretty && pretty !== x.text) x.td.textContent = pretty;
+    }
+  }catch(_){}
+}
+
 load();
 setInterval(load, 15000);
 </script>
