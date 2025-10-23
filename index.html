@@ -146,7 +146,12 @@
     .event::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(400px circle at var(--x,-100px) var(--y,-100px), rgba(61,165,255,.14), transparent 40%);opacity:0;transition:opacity .25s ease}
     .event:hover::before{opacity:1}
     .event>.meta:first-of-type{padding-right:120px}
+    .event.with-bg{background-image:linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)), var(--event-img);background-size:contain,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;overflow:hidden;background-clip:padding-box,padding-box;min-height:180px;border-radius:16px}
+    .event.with-bg:hover{background-image:linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)), var(--event-img);background-size:contain;background-position:center;background-repeat:no-repeat}
+    .event.with-bg::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(8,12,22,.5) 0%,rgba(8,12,22,.58) 55%,rgba(8,12,22,.78) 100%);z-index:0;pointer-events:none}
 
+
+    
     .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
     .shot{overflow:hidden;border-radius:18px;border:1px solid rgba(109,251,255,.16);background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.45))}
     .shot .media{aspect-ratio:4/3;display:grid;place-items:center;color:var(--muted)}
@@ -220,10 +225,6 @@
   letter-spacing: 0.3px;
   text-shadow: 0 0 6px rgba(61,165,255,0.4);
 }
-
-    /* event with background image */
-    .event.with-bg{background-image:linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)), var(--event-img);background-size:contain,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;overflow:hidden;background-clip:padding-box,padding-box;min-height:180px;border-radius:16px}
-    .event.with-bg:hover{background-image:linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)), var(--event-img);background-size:contain;background-position:center;background-repeat:no-repeat}
 
     /* mobile */
     .nav-toggle{display:none}
