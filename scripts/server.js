@@ -86,9 +86,21 @@ async function getAllOfficialCampaigns(accessToken) {
 
 // TOTD seasons (many)
 async function getAllTotdSeasons(accessToken) {
-  const url = `${LIVE_BASE}/api/totd/season?offset=0&length=200`;
-  const j = await jget(url, accessToken);
-  return (j?.seasonList || []);
+  const candidates = [
+    `${LIVE_BASE}/api/token/totd/season?offset=0&length=200`,
+    `${LIVE_BASE}/api/totd/season?offset=0&length=200`
+  ];
+  for (const url of candidates) {
+    try {
+      const j = await jget(url, accessToken);
+      return j?.seasonList || [];
+    } catch (e) {
+      console.warn("TOTD season fetch failed for", url, "-", e.message);
+      // try next candidate
+    }
+  }
+  console.warn("TOTD season endpoints unavailable; proceeding without TOTD.");
+  return []; // fallback: no TOTD rather than throwing
 }
 
 // Extract mapUids from both sets
@@ -149,9 +161,9 @@ const CONCURRENCY = 8;
 async function buildAllWRs() {
   const access = await getLiveAccessToken();
   const [official, totd] = await Promise.all([
-    getAllOfficialCampaigns(access),
-    getAllTotdSeasons(access)
-  ]);
+  getAllOfficialCampaigns(access),
+  getAllTotdSeasons(access)
+]);
   const mapUids = collectAllMapUids(official, totd);
 
   // fetch WRs with polite concurrency
