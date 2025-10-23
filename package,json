@@ -1,9 +1,14 @@
 {
-  "name": "trackmaniaevents-site",
+  "name": "trackmaniaevents-api",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "start": "node scripts/server.js",
     "cotd": "node scripts/cotd-fetcher.js"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "node-fetch": "^3.3.2"
   }
 }
