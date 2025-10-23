@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/server.js",
+    "cotd": "node scripts/cotd-fetcher.js"
   },
   "engines": {
     "node": ">=20"
