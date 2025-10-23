@@ -71,6 +71,8 @@
   .meta{padding:.9rem}
   .date{opacity:.85;font-size:.92rem;color:var(--muted)}
   .badge{border:1px solid var(--border);padding:.25rem .55rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.08)}
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0 0}
+  .chip{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .55rem;border-radius:999px;border:1px solid var(--border);font-size:.82rem;background:rgba(109,251,255,.08)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
 
   .hero{
@@ -82,6 +84,7 @@
   .hero .thumb{width:360px;flex:0 0 auto;border-radius:10px;overflow:hidden}
   .hero h2{margin:.2rem 0 .35rem}
   .hero .badge{background:rgba(109,251,255,.12)}
+  .hero .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
   @media(max-width:800px){.hero{flex-direction:column}.hero .thumb{width:auto}}
 
   /* Month select */
@@ -102,12 +105,17 @@
   .home-btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
   @keyframes pulseGlow{0%{box-shadow:0 0 8px rgba(77,159,255,.5)}50%{box-shadow:0 0 18px rgba(77,159,255,.9)}100%{box-shadow:0 0 8px rgba(77,159,255,.5)}}
 
-  .download-btn{
+  .btn{
     display:inline-block;background:linear-gradient(90deg,#3ae0ff,#4d9fff);
     color:#001220;font-weight:800;padding:.4rem .8rem;border-radius:.55rem;
-    text-decoration:none;border:1px solid var(--border);box-shadow:var(--accent-glow)
+    text-decoration:none;border:1px solid var(--border);box-shadow:var(--accent-glow);
+    white-space:nowrap
   }
-  .download-btn:hover{filter:brightness(1.06)}
+  .btn:hover{filter:brightness(1.06)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+
+  /* small utility */
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 </style>
 </head>
 <body class="bg-track-curves">
@@ -126,9 +134,15 @@
       <h2 id="t-name">(loading…)</h2>
       <p>Author: <span class="badge" id="t-author">—</span></p>
       <p id="t-date" class="date"></p>
-      <!-- download button for Today gets injected here if available -->
+
+      <!-- chips: difficulty & medal times -->
+      <div class="chips" id="t-chips"></div>
+
+      <!-- actions/buttons get injected here -->
+      <div class="actions" id="t-actions"></div>
     </div>
   </section>
+
   <section class="grid" id="grid"></section>
 </main>
 
@@ -139,40 +153,68 @@
   const label=(ym)=>{const [y,m]=ym.split("-");return `${MONTHS[+m-1]} ${y}`;}
   const maxKey=(obj)=>Object.keys(obj||{}).sort().pop();
 
-  async function jget(url){
+  const jget = async (url)=>{
     const r=await fetch(url+bust(),{cache:"no-store"});
     if(!r.ok) throw new Error(`${url} -> ${r.status}`);
     return r.json();
-  }
+  };
+
   const set=(id,html)=>{const el=document.getElementById(id); if(el) el.innerHTML=html;}
   const setText=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt??"";}
 
-  // Hero renders a download button if map.downloadUrl exists
-  function renderHero(rec){
-    if(!rec) return;
-    const dl = rec.map?.downloadUrl || null;
-    set("t-thumb",
-      rec.map?.thumbnailUrl
-        ? `<img src="${rec.map.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">`
-        : ""
-    );
-    setText("t-name",   rec.map?.name || "(unknown map)");
-    setText("t-author", rec.map?.authorDisplayName || "—");
-    setText("t-date",   rec.date || "");
-
-    const hero = document.getElementById("today");
-    const old = hero.querySelector(".today-dl");
-    if (old) old.remove();
-    if (dl){
-      const div = document.createElement("div");
-      div.className = "today-dl";
-      div.style.marginTop = ".6rem";
-      div.innerHTML = `<a class="download-btn" href="${dl}" target="_blank" rel="noopener">⬇️ Download Today’s Map</a>`;
-      hero.appendChild(div);
-    }
+  // MM:SS.mmm formatter for TM times (ms)
+  function fmtTime(ms){
+    if(ms==null || isNaN(ms)) return null;
+    ms = Math.max(0, Math.floor(ms));
+    const m = Math.floor(ms/60000);
+    const s = Math.floor((ms%60000)/1000);
+    const ms3 = ms % 1000;
+    return `${String(m)}:${String(s).padStart(2,'0')}.${String(ms3).padStart(3,'0')}`;
   }
 
-  // Cards show a button if map.downloadUrl exists
+  function chip(html){ return `<span class="chip">${html}</span>`; }
+  function button(label, href, extra=''){ return `<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`; }
+
+  function chipsFromMap(map){
+    const arr=[];
+    if(map?.difficulty){ arr.push(chip(`⭐ <strong>${map.difficulty}</strong>`)); }
+    const at=fmtTime(map?.authorTime), gt=fmtTime(map?.goldTime), st=fmtTime(map?.silverTime), bt=fmtTime(map?.bronzeTime);
+    if(at){ arr.push(chip(`👑 AT: <strong class="mono">${at}</strong>`)); }
+    if(gt){ arr.push(chip(`🥇 ${gt}`)); }
+    if(st){ arr.push(chip(`🥈 ${st}`)); }
+    if(bt){ arr.push(chip(`🥉 ${bt}`)); }
+    return arr.join("");
+  }
+
+  function actionsFromMap(map){
+    const acts=[];
+    if(map?.downloadUrl){ acts.push(button("⬇️ Download", map.downloadUrl)); }
+    if(map?.tmxPage){ acts.push(button("TMX Page", map.tmxPage)); }
+    if(map?.tmioPage){ acts.push(button("Trackmania.io", map.tmioPage)); }
+    if(map?.uid){
+      acts.push(`<button class="btn ghost" data-copy-uid="${map.uid}">Copy UID</button>`);
+    }
+    return acts.join("");
+  }
+
+  // Hero with new chips + actions
+  function renderHero(rec){
+    if(!rec) return;
+    const m = rec.map||{};
+    set("t-thumb",
+      m.thumbnailUrl
+        ? `<img src="${m.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">`
+        : `<div class="thumb" style="display:grid;place-items:center;color:var(--muted)">No image</div>`
+    );
+    setText("t-name",   m.name || "(unknown map)");
+    setText("t-author", m.authorDisplayName || "—");
+    setText("t-date",   rec.date || "");
+
+    set("t-chips", chipsFromMap(m));
+    set("t-actions", actionsFromMap(m));
+  }
+
+  // Cards now show medals/difficulty + quick links (TMX/TM.io) when available
   function renderGrid(days){
     const grid=document.getElementById("grid");
     if(!grid) return;
@@ -180,19 +222,24 @@
     const keys=Object.keys(days).sort(); // oldest -> newest
     for(const k of keys){
       const d=days[k];
-      const dl = d.map?.downloadUrl || null;
-
+      const m=d.map||{};
       const card=document.createElement("article");
       card.className="card";
       card.innerHTML=`
         <div class="thumb">
-          ${d.map?.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${d.map.thumbnailUrl}" alt="">` : ""}
+          ${m.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${m.thumbnailUrl}" alt="">` : ""}
         </div>
         <div class="meta">
           <div class="date">${d.date}</div>
-          <h3 style="margin:.35rem 0 .25rem">${d.map?.name || "(unknown map)"}</h3>
-          <div>Author: <span class="badge">${d.map?.authorDisplayName || "—"}</span></div>
-          ${dl ? `<div style="margin-top:.7rem"><a class="download-btn" href="${dl}" target="_blank" rel="noopener">⬇️ Download Map</a></div>` : ""}
+          <h3 style="margin:.35rem 0 .25rem">${m.name || "(unknown map)"}</h3>
+          <div>Author: <span class="badge">${m.authorDisplayName || "—"}</span></div>
+          <div class="chips" style="margin-top:.45rem">${chipsFromMap(m)}</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem">
+            ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank" rel="noopener">⬇️ Download</a>` : ""}
+            ${m.tmxPage ? `<a class="btn" href="${m.tmxPage}" target="_blank" rel="noopener">TMX</a>` : ""}
+            ${m.tmioPage ? `<a class="btn" href="${m.tmioPage}" target="_blank" rel="noopener">TM.io</a>` : ""}
+            ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
+          </div>
         </div>`;
       grid.appendChild(card);
     }
@@ -208,7 +255,7 @@
   async function init(){
     const sel=document.getElementById("month");
     const monthsJ=await jget("data/totd/months.json");
-    const months=(monthsJ?.months||[]).slice().sort().reverse(); // newest first
+    const months=(monthsJ?.months||[]).slice().sort().reverse();
     if(!months.length){ if(sel) sel.innerHTML=`<option>(no data yet)</option>`; return; }
     if(sel){
       sel.innerHTML=months.map(k=>`<option value="${k}">${label(k)}</option>`).join("");
@@ -217,6 +264,20 @@
     }
     await loadMonth(months[0]);
   }
+
+  // copy UID handling
+  document.addEventListener("click",(e)=>{
+    const t=e.target;
+    if(t && t.matches("[data-copy-uid]")){
+      const uid=t.getAttribute("data-copy-uid");
+      if(uid){
+        navigator.clipboard?.writeText(uid).then(()=>{
+          t.textContent="Copied!";
+          setTimeout(()=>t.textContent="Copy UID",1200);
+        }).catch(()=>{ t.textContent="Copy failed"; setTimeout(()=>t.textContent="Copy UID",1200); });
+      }
+    }
+  });
 
   init().catch(err=>{
     console.error("[TOTD] init failed:",err);
