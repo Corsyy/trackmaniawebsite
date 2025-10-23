@@ -4,143 +4,124 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Track of the Day</title>
 <style>
- :root{--bg:#0a0f1a;--text:#e6ecff;--muted:#9bb0ff;--accent:#3aa0ff;--accent-2:#6dfbff;--accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)}
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;color:var(--text)}
-  a{color:inherit;text-decoration:none}
-  .container{width:min(1100px,92vw);margin:0 auto;padding:1rem}
+ :root{
+  --bg:#0a0f1a;--text:#e6ecff;--muted:#9bb0ff;
+  --accent:#3aa0ff;--accent-2:#6dfbff;--border:rgba(109,251,255,.22);
+  --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)
+ }
+ *{box-sizing:border-box}
+ html,body{height:100%}
+ body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;color:var(--text)}
+ a{color:inherit;text-decoration:none}
+ .container{width:min(1100px,92vw);margin:0 auto;padding:1rem}
 
-  /* background to match index */
-  body.bg-track-curves{
-    background:
-      radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
-      radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
-      linear-gradient(180deg, #07101c, #0a0f1a 40%, #060a14 100%);
-    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  }
-  body.bg-track-curves::before{
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
-    background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.6;mix-blend-mode:screen;
-  }
-  body.bg-track-curves::after{
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
-    background-size:280px 280px; animation:noiseShift 6s steps(2,end) infinite;
-  }
-  @keyframes noiseShift{50%{transform:translate3d(0,0,0)}50.01%{transform:translate3d(.5px,.5px,0)}}
+ /* background */
+ body.bg-track-curves{
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
+    linear-gradient(180deg, #07101c, #0a0f1a 40%, #060a14 100%);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+ }
+ body.bg-track-curves::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+  background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.6;mix-blend-mode:screen;
+ }
+ body.bg-track-curves::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
+  background-size:280px 280px; animation:noiseShift 6s steps(2,end) infinite;
+ }
+ @keyframes noiseShift{50%{transform:translate3d(0,0,0)}50.01%{transform:translate3d(.5px,.5px,0)}}
 
-  /* header */
-  header{
-    position:sticky;top:0;z-index:10;
-    background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));
-    backdrop-filter:blur(8px);
-    border-bottom:1px solid rgba(109,251,255,.12);
-  }
-  h1{margin:0 0 .25rem}
-  .nav{display:flex;justify-content:space-between;align-items:center;gap:1rem}
-  .nav a{color:var(--accent-2);text-decoration:none;margin-right:1rem}
+ /* header */
+ header{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(109,251,255,.12);
+ }
+ h1{margin:0 0 .25rem}
+ .nav{display:flex;justify-content:space-between;align-items:center;gap:1rem}
 
-  /* cards */
-  .card{
-    background:rgba(15,21,36,.55);
-    border:1px solid var(--border);
-    border-radius:14px;overflow:hidden;
-    backdrop-filter:blur(10px) saturate(160%);
-    box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
-    transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
-    display:flex;flex-direction:column; /* for pinned footer */
-  }
-  .card:hover{transform:translateY(-3px);box-shadow:0 0 18px rgba(61,165,255,.35);filter:brightness(1.03)}
+ /* worldrecord-style button */
+ .btn{
+  padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;
+  background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
+  color:var(--text);font-weight:700;transition:.2s
+ }
+ .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
 
-  .thumb{aspect-ratio:16/9;background:#08101c}
-  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+ /* cards */
+ .card{
+  background:rgba(15,21,36,.55);
+  border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  backdrop-filter:blur(10px) saturate(160%);
+  box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
+  transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  display:flex;flex-direction:column;
+ }
+ .card:hover{transform:translateY(-3px);box-shadow:0 0 18px rgba(61,165,255,.35);filter:brightness(1.03)}
 
-  .meta{padding:.9rem;display:flex;flex-direction:column;flex:1}
-  .date{opacity:.85;font-size:.92rem;color:var(--muted)}
-  .badge{border:1px solid var(--border);padding:.25rem .55rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.08)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
+ .thumb{aspect-ratio:16/9;background:#08101c}
+ .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 
-  /* hero */
-  .hero{
-    display:flex;gap:1rem;margin:1rem 0;
-    background:rgba(15,21,36,.55);border:1px solid var(--border);
-    border-radius:14px;padding:1rem;backdrop-filter:blur(10px) saturate(160%);
-    box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
-  }
-  .hero .thumb{width:360px;flex:0 0 auto;border-radius:10px;overflow:hidden}
-  .hero h2{margin:.2rem 0 .35rem}
-  .hero .badge{background:rgba(109,251,255,.12)}
-  .hero .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
-  @media(max-width:800px){.hero{flex-direction:column}.hero .thumb{width:auto}}
+ .meta{padding:.9rem;display:flex;flex-direction:column;flex:1}
+ .date{opacity:.85;font-size:.92rem;color:var(--muted)}
+ .badge{border:1px solid var(--border);padding:.25rem .55rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.08)}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
 
-  /* month select */
-  .select{margin-top:.6rem}
-  select{
-    background:#0c1322;border:1px solid var(--border);color:var(--text);
-    padding:.5rem .7rem;border-radius:10px;box-shadow:inset 0 0 0 999px rgba(255,255,255,0);
-  }
+ /* hero */
+ .hero{
+  display:flex;gap:1rem;margin:1rem 0;
+  background:rgba(15,21,36,.55);border:1px solid var(--border);
+  border-radius:14px;padding:1rem;backdrop-filter:blur(10px) saturate(160%);
+  box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
+ }
+ .hero .thumb{width:360px;flex:0 0 auto;border-radius:10px;overflow:hidden}
+ .hero h2{margin:.2rem 0 .35rem}
+ .hero .badge{background:rgba(109,251,255,.12)}
+ .hero .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
+ @media(max-width:800px){.hero{flex-direction:column}.hero .thumb{width:auto}}
 
-  /* buttons */
-  .home-btn{
-    background:linear-gradient(90deg,#3ae0ff,#4d9fff);
-    border:none;color:#000;font-weight:700;font-size:1rem;
-    padding:.5rem 1.1rem;border-radius:.65rem;cursor:pointer;
-    box-shadow:var(--accent-glow);transition:transform .25s ease, filter .25s ease;
-    animation:pulseGlow 2.5s infinite ease-in-out
-  }
-  .home-btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
-  @keyframes pulseGlow{0%{box-shadow:0 0 8px rgba(77,159,255,.5)}50%{box-shadow:0 0 18px rgba(77,159,255,.9)}100%{box-shadow:0 0 8px rgba(77,159,255,.5)}}
+ /* month select */
+ .select{margin-top:.6rem}
+ select{
+  background:#0c1322;border:1px solid var(--border);color:var(--text);
+  padding:.5rem .7rem;border-radius:10px;box-shadow:inset 0 0 0 999px rgba(255,255,255,0);
+ }
 
-  .btn{padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));color:var(--text);font-weight:700;transition:.2s}
-    .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
-  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+ .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+ .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 
-  /* Author medal only */
-  .medals{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem}
-  .medal{
-    display:inline-flex;align-items:center;gap:.4rem;
-    padding:.25rem .55rem;border-radius:999px;font-size:.9rem;
-    background:rgba(15,21,36,.7);border:1px solid var(--border);
-    box-shadow:0 0 12px rgba(61,165,255,.08) inset;
-  }
-  .medal svg{width:16px;height:16px;display:block}
-  .medal b{font-weight:800;letter-spacing:.2px}
-  .medal.author{box-shadow:0 0 0 1px rgba(255,154,59,.25) inset}
+ /* Author medal only */
+ .medals{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem}
+ .medal{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.25rem .55rem;border-radius:999px;font-size:.9rem;
+  background:rgba(15,21,36,.7);border:1px solid var(--border);
+  box-shadow:0 0 12px rgba(61,165,255,.08) inset;
+ }
+ .medal svg{width:16px;height:16px;display:block}
+ .medal b{font-weight:800;letter-spacing:.2px}
+ .medal.author{box-shadow:0 0 0 1px rgba(255,154,59,.25) inset}
 
- /* === Align AT chip right above the buttons on all cards === */
-.card .meta {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.card .meta .medals {
-  margin-top: auto;           /* pushes it right above footer */
-}
-
-.card .meta-footer {
-  margin-top: 0;              /* remove extra gap so medals sit just above */
-  padding-top: .4rem;
-  display: flex;
-  gap: .5rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-/* Make all cards the same height */
-.card { height: 100%; }
-.grid { align-items: stretch; } /* ensures grid rows stay even */
-
+ /* align AT chip & footer */
+ .card .meta{display:flex;flex-direction:column;flex:1}
+ .card .meta .medals{margin-top:auto}
+ .card .meta-footer{margin-top:0;padding-top:.4rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+ .card{height:100%}
+ .grid{align-items:stretch}
 </style>
 </head>
 <body class="bg-track-curves">
 <header><div class="container">
   <div class="nav">
     <h1>Track of the Day</h1>
-    <a href="/"><button class="home-btn">Home</button></a>
+    <!-- worldrecord-style home button -->
+    <a href="/index.html" class="btn">Home</a>
   </div>
   <div class="select">Month: <select id="month"></select></div>
 </div></header>
@@ -165,6 +146,7 @@
 </main>
 
 <script>
+/* (your existing JS unchanged) */
 (function(){
   const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
   const bust=()=>`?t=${Date.now()}`;
@@ -180,7 +162,6 @@
   const set=(id,html)=>{const el=document.getElementById(id); if(el) el.innerHTML=html;}
   const setText=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt??"";}
 
-  /* ---------- author medal helpers ---------- */
   function fmtMs(ms){
     if(ms==null) return null;
     const t=Math.max(0,Number(ms)|0);
@@ -209,7 +190,6 @@
     return at ? `<div class="medals">${at}</div>` : "";
   }
 
-  /* ---------- actions ---------- */
   const button = (label, href, extra='')=>`<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
   function actionsFromMap(map){
     const acts=[];
@@ -218,7 +198,6 @@
     return acts.join("");
   }
 
-  /* ---------- render ---------- */
   function renderHero(rec){
     if(!rec) return;
     const m = rec.map||{};
@@ -238,7 +217,7 @@
     const grid=document.getElementById("grid");
     if(!grid) return;
     grid.innerHTML="";
-    const keys=Object.keys(days).sort(); // oldest -> newest
+    const keys=Object.keys(days).sort();
     for(const k of keys){
       const d=days[k]; const m=d.map||{};
       const card=document.createElement("article");
@@ -251,11 +230,7 @@
           <div class="date">${d.date}</div>
           <h3 style="margin:.35rem 0 .25rem">${m.name || "(unknown map)"}</h3>
           <div>Author: <span class="badge">${m.authorDisplayName || "—"}</span></div>
-
-          <!-- author medal -->
           <div style="margin-top:.45rem">${buildMedals(m)}</div>
-
-          <!-- pinned to bottom uniformly on all cards -->
           <div class="meta-footer">
             ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank" rel="noopener">⬇️ Download</a>` : ""}
             ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
@@ -267,7 +242,7 @@
 
   async function loadMonth(ym){
     const month=await jget(`data/totd/${ym}.json`);
-    const latest=month.days[maxKey(month.days)];
+    const latest=month.days[Object.keys(month.days).sort().pop()];
     renderHero(latest);
     renderGrid(month.days);
   }
@@ -278,14 +253,13 @@
     const months=(monthsJ?.months||[]).slice().sort().reverse();
     if(!months.length){ if(sel) sel.innerHTML=`<option>(no data yet)</option>`; return; }
     if(sel){
-      sel.innerHTML=months.map(k=>`<option value="${k}">${label(k)}</option>`).join("");
+      sel.innerHTML=months.map(k=>`<option value="${k}">${(m=>{const [y,mm]=m.split("-");return ["January","February","March","April","May","June","July","August","September","October","November","December"][+mm-1]+" "+y})(k)}</option>`).join("");
       sel.value=months[0];
       sel.onchange=()=>loadMonth(sel.value);
     }
     await loadMonth(months[0]);
   }
 
-  // copy UID
   document.addEventListener("click",(e)=>{
     const t=e.target;
     if(t && t.matches("[data-copy-uid]")){
@@ -301,7 +275,7 @@
 
   init().catch(err=>{
     console.error("[TOTD] init failed:",err);
-    setText("t-name","(failed to load)");
+    const n=document.getElementById("t-name"); if(n) n.textContent="(failed to load)";
   });
 })();
 </script>
