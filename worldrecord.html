@@ -61,7 +61,7 @@ function fmtTs(sec){ return sec ? new Date(sec*1000).toLocaleString() : "—"; }
 
 async function load(){
   try{
-    const r = await fetch(API_BASE + "/api/wr-leaderboard");
+    const r = await fetch("/api/wr-latest?limit=300");
     const j = await r.json();
 
     const tb = document.getElementById("rows");
