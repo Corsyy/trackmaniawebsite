@@ -20,7 +20,7 @@ h1{margin:0 0 .25rem}
 .hero .thumb{width:320px;flex:0 0 auto}
 @media(max-width:800px){.hero{flex-direction:column}.hero .thumb{width:auto}}
 
-/* Gradient Home button to match Kacky page */
+/* Gradient Home button (matches your Kacky page style if any) */
 .home-btn{
   background:linear-gradient(90deg,#3ae0ff,#4d9fff);
   border:none;color:#000;font-weight:600;font-size:1rem;
@@ -35,7 +35,7 @@ h1{margin:0 0 .25rem}
   100%{box-shadow:0 0 8px rgba(77,159,255,.5)}
 }
 
-/* NEW: download button */
+/* Download button */
 .download-btn{
   display:inline-block;
   background:linear-gradient(90deg,#3ae0ff,#4d9fff);
@@ -51,9 +51,7 @@ h1{margin:0 0 .25rem}
     <h1>Track of the Day</h1>
     <a href="/"><button class="home-btn">Home</button></a>
   </div>
-  <div class="nav" style="justify-content:flex-start;gap:1rem">
-    <a href="./cotd"></a>
-  </div>
+  <!-- Removed COTD nav -->
   <div class="select">Month: <select id="month"></select></div>
 </div></header>
 
@@ -85,7 +83,7 @@ h1{margin:0 0 .25rem}
   const set=(id,html)=>{const el=document.getElementById(id); if(el) el.innerHTML=html;}
   const setText=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt??"";}
 
-  // UPDATED: hero now renders a download button if map.downloadUrl exists
+  // Hero renders a download button if map.downloadUrl exists
   function renderHero(rec){
     if(!rec) return;
     const dl = rec.map?.downloadUrl || null;
@@ -99,10 +97,8 @@ h1{margin:0 0 .25rem}
     setText("t-date",   rec.date || "");
 
     const hero = document.getElementById("today");
-    // remove any old button
     const old = hero.querySelector(".today-dl");
     if (old) old.remove();
-    // add new if available
     if (dl){
       const div = document.createElement("div");
       div.className = "today-dl";
@@ -112,7 +108,7 @@ h1{margin:0 0 .25rem}
     }
   }
 
-  // UPDATED: cards also show the button if map.downloadUrl exists
+  // Cards show a button if map.downloadUrl exists
   function renderGrid(days){
     const grid=document.getElementById("grid");
     if(!grid) return;
@@ -140,7 +136,7 @@ h1{margin:0 0 .25rem}
 
   async function loadMonth(ym){
     const month=await jget(`data/totd/${ym}.json`);
-    const latest=month.days[maxKey(month.days)];   // latest in that month
+    const latest=month.days[maxKey(month.days)];
     renderHero(latest);
     renderGrid(month.days);
   }
