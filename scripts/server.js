@@ -2,6 +2,17 @@ import express from "express";
 import fetch from "node-fetch";
 
 const app = express();
+
+// === CONFIG ===
+const CACHE_TTL = 1000 * 60 * 30; // 30 min cache
+let wrCache = { ts: 0, data: [] };
+let playerCache = {};
+let displayCache = {};
+
+const NADEO_LIVE_URL = "https://live-services.trackmania.nadeo.live";
+const NADEO_CORE_URL = "https://prod.trackmania.core.nadeo.online";
+
+// === CORS ===
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://trackmaniaevents.com");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -10,50 +21,52 @@ app.use((req, res, next) => {
   next();
 });
 
-// ===== CONFIG =====
-const WR_TTL_MS = 10 * 60 * 1000; // cache for 10 minutes
-let wrCache = { ts: 0, data: null };
-let playersCache = {};
-
-// ===== NAD API HELPERS =====
-async function nadeoToken() {
-  const res = await fetch("https://prod.trackmania.core.nadeo.online/v2/authentication/token/basic", {
+// === NAD AUTH ===
+async function getAccessToken() {
+  const res = await fetch(`${NADEO_CORE_URL}/v2/authentication/token/basic`, {
     method: "POST",
     headers: {
-      "Authorization": "Basic " + Buffer.from(`${process.env.NADEO_CLIENT_ID}:${process.env.NADEO_CLIENT_SECRET}`).toString("base64"),
-      "Content-Type": "application/json"
+      Authorization:
+        "Basic " +
+        Buffer.from(
+          `${process.env.NADEO_CLIENT_ID}:${process.env.NADEO_CLIENT_SECRET}`
+        ).toString("base64"),
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       audience: "NadeoLiveServices",
-      grant_type: "client_credentials"
-    })
+      grant_type: "client_credentials",
+    }),
   });
   const j = await res.json();
   return j.access_token;
 }
 
-async function fetchJSON(url, token) {
+async function getJSON(url, token) {
   const res = await fetch(url, { headers: { Authorization: `nadeo_v1 t=${token}` } });
   return res.json();
 }
 
-// ===== MAP FETCHING =====
-async function getAllSeasonalCampaigns(token) {
-  const data = await fetchJSON("https://live-services.trackmania.nadeo.live/api/campaign/official?length=50", token);
-  return data.campaignList || [];
+// === FETCH ALL CAMPAIGN + TOTD MAPS ===
+async function getAllMapUids(token) {
+  const [campaigns, totdSeasons] = await Promise.all([
+    getJSON(`${NADEO_LIVE_URL}/api/campaign/official?length=50`, token),
+    getJSON(`${NADEO_LIVE_URL}/api/totd/season?length=50`, token),
+  ]);
+
+  const campaignUids = (campaigns.campaignList || []).flatMap(c => c.playlist?.map(m => m.mapUid) || []);
+  const totdUids = (totdSeasons.seasonList || []).flatMap(s => s.days?.map(d => d.mapUid) || []);
+  return [...new Set([...campaignUids, ...totdUids])];
 }
 
-async function getAllTOTDs(token) {
-  const data = await fetchJSON("https://live-services.trackmania.nadeo.live/api/totd/season?length=50", token);
-  return data.seasonList || [];
-}
-
+// === FETCH WR FOR MAP ===
 async function getMapWR(token, mapUid) {
-  const url = `https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/${mapUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
-  const data = await fetchJSON(url, token);
-  if (!data.tops || !data.tops[0] || !data.tops[0].top[0]) return null;
-
-  const wr = data.tops[0].top[0];
+  const data = await getJSON(
+    `${NADEO_LIVE_URL}/api/token/leaderboard/group/${mapUid}/map/${mapUid}/top?onlyWorld=true&length=1`,
+    token
+  );
+  const wr = data?.tops?.[0]?.top?.[0];
+  if (!wr) return null;
   return {
     mapUid,
     accountId: wr.accountId,
@@ -62,78 +75,73 @@ async function getMapWR(token, mapUid) {
   };
 }
 
-async function resolvePlayerName(accountId, token) {
-  if (playersCache[accountId]) return playersCache[accountId];
-  const res = await fetch(`https://prod.trackmania.core.nadeo.online/accounts/displayNames/?accountId[]=${accountId}`, {
-    headers: { Authorization: `nadeo_v1 t=${token}` }
-  });
+// === RESOLVE DISPLAY NAME ===
+async function resolveDisplayName(accountId, token) {
+  if (displayCache[accountId]) return displayCache[accountId];
+  const url = `${NADEO_CORE_URL}/accounts/displayNames/?accountId[]=${accountId}`;
+  const res = await fetch(url, { headers: { Authorization: `nadeo_v1 t=${token}` } });
   const data = await res.json();
-  const name = data[0]?.displayName || accountId;
-  playersCache[accountId] = name;
+  const name = data?.[0]?.displayName || accountId;
+  displayCache[accountId] = name;
   return name;
 }
 
-// ===== MAIN WR LEADERBOARD =====
-app.get("/api/wr-leaderboard", async (_req, res) => {
-  try {
-    const now = Date.now();
-    if (wrCache.data && now - wrCache.ts < WR_TTL_MS) return res.json(wrCache.data);
+// === BUILD FULL WR LIST ===
+async function buildLeaderboard() {
+  const token = await getAccessToken();
+  const uids = await getAllMapUids(token);
+  const wrs = [];
 
-    const token = await nadeoToken();
-
-    // seasonal + totd
-    const [seasonals, totds] = await Promise.all([
-      getAllSeasonalCampaigns(token),
-      getAllTOTDs(token)
-    ]);
-
-    const mapUids = [
-      ...seasonals.flatMap(s => s.playlist?.map(p => p.mapUid) || []),
-      ...totds.flatMap(s => s.days?.map(d => d.mapUid) || [])
-    ];
-
-    const wrs = [];
-    for (const uid of mapUids) {
-      const wr = await getMapWR(token, uid);
-      if (wr) {
-        wr.displayName = await resolvePlayerName(wr.accountId, token);
-        wrs.push(wr);
-      }
+  for (const uid of uids) {
+    const wr = await getMapWR(token, uid);
+    if (wr) {
+      wr.displayName = await resolveDisplayName(wr.accountId, token);
+      wrs.push(wr);
     }
+  }
 
-    const payload = {
-      rows: wrs.sort((a, b) => b.timestamp - a.timestamp),
-      fetchedAt: now,
-      total: wrs.length
-    };
+  const sorted = wrs.sort((a, b) => b.timestamp - a.timestamp);
+  wrCache = { ts: Date.now(), data: sorted };
+  return sorted;
+}
 
-    wrCache = { ts: now, data: payload };
-    res.json(payload);
-  } catch (err) {
-    console.error("WR leaderboard error:", err);
-    res.status(500).json({ error: "Failed to load leaderboard", details: err.message });
+// === ENDPOINTS ===
+app.get("/api/wr-leaderboard", async (req, res) => {
+  try {
+    if (Date.now() - wrCache.ts < CACHE_TTL && wrCache.data.length > 0)
+      return res.json({ rows: wrCache.data, fetchedAt: wrCache.ts });
+
+    const wrs = await buildLeaderboard();
+    res.json({ rows: wrs, fetchedAt: Date.now() });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to load WR leaderboard" });
   }
 });
 
-// ===== MOST WR PLAYERS =====
-app.get("/api/wr-players", async (_req, res) => {
+app.get("/api/wr-players", async (req, res) => {
   try {
-    const token = await nadeoToken();
-    const data = wrCache.data?.rows || [];
-    const count = {};
-    for (const wr of data) {
-      count[wr.displayName] = (count[wr.displayName] || 0) + 1;
-    }
-    const sorted = Object.entries(count)
-      .map(([name, total]) => ({ name, total }))
-      .sort((a, b) => b.total - a.total);
-    res.json({ players: sorted, fetchedAt: Date.now() });
-  } catch (err) {
-    console.error("WR player list error:", err);
-    res.status(500).json({ error: "Failed to load player list" });
+    if (!wrCache.data.length) await buildLeaderboard();
+    const playerCounts = {};
+
+    wrCache.data.forEach((wr) => {
+      const name = wr.displayName || wr.accountId;
+      playerCounts[name] = (playerCounts[name] || 0) + 1;
+    });
+
+    const leaderboard = Object.entries(playerCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    res.json({ players: leaderboard, fetchedAt: Date.now() });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to load WR players" });
   }
 });
 
 app.get("/", (_req, res) => res.send("OK"));
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => console.log(`✅ API running on ${PORT}`));
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`✅ API running on port ${PORT}`)
+);
