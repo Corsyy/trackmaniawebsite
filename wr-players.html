@@ -117,20 +117,39 @@ async function load(){
     if (!r.ok) throw new Error(await r.text());
     const j = await r.json();
 
+    // Step 1: figure out which entries still need names
+    const players = Array.isArray(j.players) ? j.players : [];
+    const needIds = [...new Set(
+      players
+        .filter(p => !p.displayName || p.displayName === p.accountId)
+        .map(p => p.accountId)
+        .filter(Boolean)
+    )];
+
+    // Step 2: resolve names in one batch (best-effort)
+    let namesMap = {};
+    if (needIds.length){
+      try{
+        const rNames = await fetch(`${API_BASE}/api/resolve-names?ids=${encodeURIComponent(needIds.join(","))}`);
+        if (rNames.ok){
+          const data = await rNames.json();
+          namesMap = data?.names || {};
+        }
+      }catch(_){}
+    }
+
+    // Step 3: render with upgraded names
     $rows.innerHTML = "";
-    (j.players || []).forEach((p,i)=>{
-      const nameOrId = p.displayName || p.accountId || "—";
+    players.forEach((p,i)=>{
+      const pretty = namesMap[p.accountId] || p.displayName || p.accountId || "—";
       const tr = document.createElement("tr");
       tr.innerHTML =
         `<td>${i+1}</td>`+
-        `<td class="player" data-id="${p.accountId||""}">${nameOrId}</td>`+
+        `<td>${pretty}</td>`+
         `<td>${p.wrCount}</td>`+
         `<td class="ts">${fmtTs(p.latestTs)}</td>`;
       $rows.appendChild(tr);
     });
-
-    // Lazy-hydrate any rows that still show raw accountIds
-    await hydrateNamesIfNeeded();
 
     const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
     $meta.textContent =
@@ -147,28 +166,8 @@ $q.addEventListener("input", ()=>{
   debounce = setTimeout(load, 250);
 });
 
-async function hydrateNamesIfNeeded(){
-  // collect cells that still look like UUIDs (accountIds)
-  const cells = [...document.querySelectorAll("td.player")];
-  const need = cells
-    .map(td => ({ id: td.dataset.id, text: td.textContent.trim(), td }))
-    .filter(x => x.id && x.text === x.id);
-
-  if (!need.length) return;
-
-  const ids = [...new Set(need.map(x => x.id))];
-  try{
-    const r = await fetch(`${API_BASE}/api/resolve-names?ids=${encodeURIComponent(ids.join(","))}`);
-    if (!r.ok) return;
-    const { names = {} } = await r.json();
-    for (const x of need) {
-      const pretty = names[x.id];
-      if (pretty && pretty !== x.text) x.td.textContent = pretty;
-    }
-  }catch(_){}
-}
-
 load();
 </script>
+
 </body>
 </html>
