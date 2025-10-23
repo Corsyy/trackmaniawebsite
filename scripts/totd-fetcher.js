@@ -1,4 +1,4 @@
-// scripts/totd-fetcher.js — TOTD + TMX/TM.io metadata enrichment
+// scripts/totd-fetcher.js — TOTD + TMX-first download + medal times (tm.io) + difficulty (TMX)
 // Node 18+ (global fetch). No secrets needed.
 
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
@@ -12,15 +12,16 @@ const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
 const TMIO        = "https://trackmania.io";
 const TMX_API     = "https://trackmania.exchange/api";
 const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
-const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.0 (github action)";
-const DEBUG       = process.env.DEBUG === "1";
-const dlog        = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
+const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.1 (github action)";
+
+const DEBUG = process.env.DEBUG === "1";
+const dlog  = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
 
 /* -------------------------------- fs helpers ------------------------------- */
 const ensureDir = (p)=>mkdir(p,{recursive:true});
-const exists    = async(p)=>{ try{ await access(p,FS.F_OK); return true; } catch { return false; } };
-const loadJson  = async(p,f)=>(await exists(p))?JSON.parse(await readFile(p,"utf8")):f;
-const writeJson = (p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
+const exists = async(p)=>{ try{ await access(p,FS.F_OK); return true; } catch { return false; } };
+const loadJson = async(p,f)=>(await exists(p))?JSON.parse(await readFile(p,"utf8")):f;
+const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
 
 /* --------------------------------- utils ----------------------------------- */
 const pad2=(n)=>String(n).padStart(2,"0");
@@ -33,9 +34,8 @@ function stripTmFormatting(input){
   s=s.replace(/\$[0-9a-fA-F]{1,3}|\$[a-zA-Z]|\$[<>\[\]\(\)]/g,"");
   return s.replace(new RegExp(D,"g"),"$");
 }
-function tmioDayNumber(dayObj,idx){
-  return dayObj?.day??dayObj?.dayIndex??dayObj?.monthDay??dayObj?.dayInMonth??(idx+1);
-}
+function tmioDayNumber(dayObj,idx){ return dayObj?.day??dayObj?.dayIndex??dayObj?.monthDay??dayObj?.dayInMonth??(idx+1); }
+
 async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 async function fetchRetry(url,opts={},retries=5,baseDelay=500){
   let lastErr;
@@ -76,7 +76,7 @@ async function fetchTmxInfoByUid(uid){
   if (!uid) return null;
   const url = `${TMX_API}/maps/get_map_info/uid/${encodeURIComponent(uid)}`;
   const r = await fetchRetry(url);
-  if (!r.ok) return null;
+  if (!r.ok) { dlog("TMX uid lookup failed", uid, r.status); return null; }
   try {
     const j = await r.json();
     if (!j || typeof j !== "object") return null;
@@ -101,57 +101,55 @@ function tmxDownloadUrl(trackId, shortName){
   return shortName ? `${base}?shortName=${encodeURIComponent(shortName)}` : base;
 }
 
-/* --------------------------- unified map resolver -------------------------- */
+/* --------------------------- meta + download resolver ---------------------- */
+// returns { downloadUrl, authorTime, goldTime, silverTime, bronzeTime, difficulty }
 async function fetchMapMeta(mapUid){
-  if (!mapUid) return null;
-
-  let out = {
-    downloadUrl:null, tmxId:null, tmxPage:null, tmioPage:`${TMIO}/map/${encodeURIComponent(mapUid)}`,
-    authorTime:null, goldTime:null, silverTime:null, bronzeTime:null, difficulty:null
+  if (!mapUid) return {
+    downloadUrl: null, authorTime: null, goldTime: null, silverTime: null, bronzeTime: null, difficulty: null
   };
 
-  // 1) TMX first
+  let downloadUrl = null;
+  let difficulty  = null;
+
+  // 1) TMX first (download + difficulty)
   try {
     const tmx = await fetchTmxInfoByUid(mapUid);
-    if (tmx && tmx.TrackID){
-      out.tmxId   = tmx.TrackID;
-      out.tmxPage = `https://trackmania.exchange/maps/${tmx.TrackID}`;
+    if (tmx && tmx.TrackID) {
       let shortName = tmx.ShortName || tmx.shortName || null;
-      if ((tmx.Unlisted === true || tmx.Unlisted === 1) && !shortName){
+
+      if ((tmx.Unlisted === true || tmx.Unlisted === 1) && !shortName) {
         const tmxById = await fetchTmxInfoById(tmx.TrackID);
         shortName = tmxById?.ShortName || tmxById?.shortName || null;
       }
-      const downloadable = (tmx.Downloadable ?? true);
-      if (downloadable){
-        out.downloadUrl = tmxDownloadUrl(tmx.TrackID, shortName);
-        return out; // TMX success
-      }
-    }
-  } catch(e){ dlog("TMX err", mapUid, e?.message||e); }
 
-  // 2) fallback to trackmania.io
+      const downloadable = (tmx.Downloadable ?? true);
+      if (downloadable) downloadUrl = tmxDownloadUrl(tmx.TrackID, shortName);
+
+      difficulty = tmx.Difficulty ?? tmx.Diff ?? tmx.DifficultyName ?? null;
+    }
+  } catch (e) {
+    dlog("TMX meta err", mapUid, e?.message || e);
+  }
+
+  // 2) tm.io for medal times (and fallback download)
+  let authorTime = null, goldTime = null, silverTime = null, bronzeTime = null;
   try {
     const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
-    if (!r.ok){ dlog("tm.io map fail", mapUid, r.status); return out; }
-    const j = await r.json();
-    const raw = j?.file || j?.download || "";
-    let tmxId = null;
-    if (typeof raw === "string"){
-      const m = raw.match(/trackmania\.exchange\/maps(?:\/download)?\/(\d+)/i);
-      if (m) tmxId = m[1];
+    if (r.ok) {
+      const j = await r.json();
+      authorTime = j?.authorTime ?? null;
+      goldTime   = j?.goldTime   ?? null;
+      silverTime = j?.silverTime ?? null;
+      bronzeTime = j?.bronzeTime ?? null;
+      if (!downloadUrl) downloadUrl = j?.file || j?.download || null;
+    } else {
+      dlog("tm.io map detail failed", mapUid, r.status);
     }
+  } catch (e) {
+    dlog("tm.io meta err", mapUid, e?.message || e);
+  }
 
-    out.downloadUrl = raw || (tmxId ? `${TMX_DL_BASE}/${tmxId}` : null);
-    out.tmxId   = out.tmxId   || tmxId;
-    out.tmxPage = out.tmxPage || (tmxId ? `https://trackmania.exchange/maps/${tmxId}` : null);
-    out.authorTime = j?.authorTime ?? null;
-    out.goldTime   = j?.goldTime   ?? null;
-    out.silverTime = j?.silverTime ?? null;
-    out.bronzeTime = j?.bronzeTime ?? null;
-    out.difficulty = j?.difficulty ?? j?.mapDifficulty ?? null;
-  } catch(e){ dlog("tm.io resolver err", mapUid, e?.message||e); }
-
-  return out;
+  return { downloadUrl, authorTime, goldTime, silverTime, bronzeTime, difficulty };
 }
 
 /* ------------------------------ month writing ------------------------------ */
@@ -177,68 +175,77 @@ function baseDayRecord(y,m1,entry,idx){
   return {
     date: dateKey(y,m1,d),
     map: {
-      uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb,
-      downloadUrl:null, tmxId:null, tmxPage:null, tmioPage:null,
-      authorTime:null, goldTime:null, silverTime:null, bronzeTime:null, difficulty:null
+      uid, name, authorAccountId, authorDisplayName,
+      thumbnailUrl: thumb,
+      downloadUrl: null,
+      authorTime: null, goldTime: null, silverTime: null, bronzeTime: null,
+      difficulty: null
     }
   };
 }
 
 async function writeTotdMonth(index=0){
+  // 0) load remote list
   const j=await fetchTmioMonth(index);
   const {y,m1}=tmioMonthYear(j);
   const mKey=monthKey(y,m1);
+
+  // 1) load existing month file (so manual values are preserved)
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
-  const prev = await loadJson(monthPath,{month:mKey,days:{}});
-  const prevDays = prev.days||{};
-  const daysArr=(Array.isArray(j.days)?j.days:[]).map((e,i)=>baseDayRecord(y,m1,e,i));
+  const prev = await loadJson(monthPath, { month:mKey, days:{} });
+  const prevDays = prev?.days || {};
 
-  for(const rec of daysArr){
-    const prevRec=prevDays[rec.date]?.map||{};
-    Object.assign(rec.map,{
-      downloadUrl:prevRec.downloadUrl??null,
-      tmxId:prevRec.tmxId??null,
-      tmxPage:prevRec.tmxPage??null,
-      tmioPage:prevRec.tmioPage??(rec.map.uid?`${TMIO}/map/${rec.map.uid}`:null),
-      authorTime:prevRec.authorTime??null,
-      goldTime:prevRec.goldTime??null,
-      silverTime:prevRec.silverTime??null,
-      bronzeTime:prevRec.bronzeTime??null,
-      difficulty:prevRec.difficulty??null
-    });
+  // 2) normalize remote -> day records
+  const daysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
 
-    if((!rec.map.downloadUrl||rec.map.authorTime==null)&&rec.map.uid){
-      const info=await fetchMapMeta(rec.map.uid);
-      if(info){
-        for(const k in info){
-          if(rec.map[k]==null && info[k]!=null) rec.map[k]=info[k];
-        }
-      }
-      await sleep(80);
+  // 3) merge previous values and fetch missing meta
+  for (const rec of daysArr){
+    const prevRec = prevDays[rec.date]?.map || {};
+
+    // preserve existing/manual values
+    rec.map.downloadUrl = prevRec.downloadUrl ?? rec.map.downloadUrl;
+    rec.map.authorTime  = prevRec.authorTime  ?? rec.map.authorTime;
+    rec.map.goldTime    = prevRec.goldTime    ?? rec.map.goldTime;
+    rec.map.silverTime  = prevRec.silverTime  ?? rec.map.silverTime;
+    rec.map.bronzeTime  = prevRec.bronzeTime  ?? rec.map.bronzeTime;
+    rec.map.difficulty  = prevRec.difficulty  ?? rec.map.difficulty;
+
+    if (rec.map.uid){
+      const meta = await fetchMapMeta(rec.map.uid);
+      if (rec.map.downloadUrl == null) rec.map.downloadUrl = meta.downloadUrl;
+      if (rec.map.authorTime  == null) rec.map.authorTime  = meta.authorTime;
+      if (rec.map.goldTime    == null) rec.map.goldTime    = meta.goldTime;
+      if (rec.map.silverTime  == null) rec.map.silverTime  = meta.silverTime;
+      if (rec.map.bronzeTime  == null) rec.map.bronzeTime  = meta.bronzeTime;
+      if (rec.map.difficulty  == null) rec.map.difficulty  = meta.difficulty;
+      await sleep(120); // be nice to public APIs
     }
   }
 
+  // 4) write month file
   const daysOut={};
-  for(const r of daysArr){ daysOut[r.date]=r; }
+  for (const rec of daysArr){ daysOut[rec.date]=rec; }
+
   await ensureDir(TOTD_DIR);
-  await writeJson(monthPath,{month:mKey,days:daysOut});
+  await writeJson(monthPath,{ month:mKey, days:daysOut });
   await rebuildMonthIndex(TOTD_DIR);
 
+  // 5) write latest snapshot
   const keys=Object.keys(daysOut).sort();
   const latestKey=keys[keys.length-1]||null;
   if(latestKey){
     const latest=daysOut[latestKey];
-    await writeJson(TOTD_LATEST,{generatedAt:new Date().toISOString(),...latest});
-    dlog("latest:",latest.date,latest.map?.name,latest.map?.downloadUrl?"[dl]":"");
+    await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
+    dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "");
   }else{
-    dlog("no days found for",mKey);
+    dlog("no days found for", mKey);
   }
 }
 
 /* ----------------------------------- main ---------------------------------- */
 async function main(){
   await ensureDir(TOTD_DIR);
-  await writeTotdMonth(0);
-  console.log("[DONE] TOTD updated with full TMX/TM.io metadata (manual URLs preserved).");
+  await writeTotdMonth(0); // current month (index 0)
+  console.log("[DONE] TOTD updated with download URLs + medals + difficulty (manual values preserved).");
 }
 main().catch(err=>{ console.error(err); process.exit(1); });
