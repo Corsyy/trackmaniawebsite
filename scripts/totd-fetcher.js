@@ -1,4 +1,4 @@
-// scripts/totd-fetcher.js — TOTD + auto downloadUrl (preserves manual URLs)
+// scripts/totd-fetcher.js — TOTD + auto downloadUrl (TMX-first, preserves manual URLs)
 // Node 18+ (global fetch). No secrets needed.
 
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
@@ -10,6 +10,8 @@ const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
 const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
 const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
 const TMIO        = "https://trackmania.io";
+const TMX_API     = "https://trackmania.exchange/api"; // base for TMX API
+const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
 const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.0 (github action)";
 
 const DEBUG = process.env.DEBUG === "1";
@@ -68,13 +70,89 @@ function tmioMonthYear(resp){
   const m1=(resp?.month?.month??new Date().getUTCMonth())+1;
   return { y,m1 };
 }
+
+/* ------------------------------ TMX helpers --------------------------------
+   We try TMX first: UID -> TMX map info (TrackID, Unlisted, maybe ShortName) -> download URL.
+   If TMX lacks the map, we fall back to trackmania.io.
+-----------------------------------------------------------------------------*/
+async function fetchTmxInfoByUid(uid){
+  if (!uid) return null;
+  // Returns a single object (not array) for a unique UID.
+  const url = `${TMX_API}/maps/get_map_info/uid/${encodeURIComponent(uid)}`;
+  const r = await fetchRetry(url);
+  if (!r.ok) {
+    dlog("TMX uid lookup failed", uid, r.status);
+    return null;
+  }
+  try {
+    const j = await r.json();
+    if (!j || typeof j !== "object") return null;
+    // Sanity check: ensure it really matches the UID we asked for
+    if (j.TrackUID && j.TrackUID !== uid) return null;
+    return j;
+  } catch {
+    return null;
+  }
+}
+
+// (Best-effort) Sometimes TMX requires a shortName query param for unlisted maps.
+// If the UID lookup returns ShortName we’ll use it; otherwise we try by id as a fallback.
+async function fetchTmxInfoById(trackId){
+  if (!trackId) return null;
+  const url = `${TMX_API}/maps/get_map_info/id/${encodeURIComponent(trackId)}`;
+  const r = await fetchRetry(url);
+  if (!r.ok) return null;
+  try {
+    const j = await r.json();
+    if (!j || typeof j !== "object") return null;
+    if (!j.TrackID || String(j.TrackID) !== String(trackId)) return null;
+    return j;
+  } catch {
+    return null;
+  }
+}
+
+function tmxDownloadUrl(trackId, shortName){
+  const base = `${TMX_DL_BASE}/${encodeURIComponent(trackId)}`;
+  return shortName ? `${base}?shortName=${encodeURIComponent(shortName)}` : base;
+}
+
+/* --------------------------- download resolver ----------------------------- */
 async function fetchMapDownload(mapUid){
   if (!mapUid) return null;
-  const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
-  if (!r.ok) { dlog("map detail failed", mapUid, r.status); return null; }
-  const j = await r.json();
-  // The field from tm.io that points to TMX download is usually "file"
-  return j?.file || j?.download || null;
+
+  // 1) TMX first
+  try {
+    const tmx = await fetchTmxInfoByUid(mapUid);
+    if (tmx && tmx.TrackID) {
+      // If Unlisted and we don't have ShortName yet, try get_map_info by ID (may expose ShortName).
+      let shortName = tmx.ShortName || tmx.shortName || null;
+
+      if ((tmx.Unlisted === true || tmx.Unlisted === 1) && !shortName) {
+        const tmxById = await fetchTmxInfoById(tmx.TrackID);
+        shortName = tmxById?.ShortName || tmxById?.shortName || null;
+      }
+
+      // If TMX says it's explicitly non-downloadable, skip to fallback
+      const downloadable = (tmx.Downloadable ?? true);
+      if (downloadable) {
+        return tmxDownloadUrl(tmx.TrackID, shortName);
+      }
+    }
+  } catch (e) {
+    dlog("TMX resolver err", mapUid, e?.message || e);
+  }
+
+  // 2) Fallback to trackmania.io /api/map/{uid} → j.file || j.download
+  try {
+    const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
+    if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return null; }
+    const j = await r.json();
+    return j?.file || j?.download || null;
+  } catch (e) {
+    dlog("tm.io resolver err", mapUid, e?.message || e);
+    return null;
+  }
 }
 
 /* ------------------------------ month writing ------------------------------ */
@@ -119,7 +197,7 @@ async function writeTotdMonth(index=0){
 
   // 3) for each day:
   //    - keep manual downloadUrl if it already exists
-  //    - otherwise fetch from tm.io /api/map/{uid}
+  //    - otherwise resolve (TMX first, tm.io fallback)
   for (const rec of daysArr){
     const prevDl = prevDays[rec.date]?.map?.downloadUrl || null;
     if (prevDl) {
@@ -128,7 +206,7 @@ async function writeTotdMonth(index=0){
     }
     if (rec.map.uid){
       rec.map.downloadUrl = await fetchMapDownload(rec.map.uid);
-      await sleep(80); // be nice to tm.io
+      await sleep(120); // be nice to public APIs (slightly higher than before)
     }
   }
 
