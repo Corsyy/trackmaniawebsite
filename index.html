@@ -162,59 +162,53 @@
 
 #toTop {
   position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 55px;
+  bottom: 26px;
+  right: 26px;
+  width: 65px;
   height: 55px;
-  border-radius: 50%;
+  border-radius: 12px;
   background: linear-gradient(135deg, #3ae0ff, #4d9fff);
-  color: #0a0f1a; /* dark text for contrast */
+  color: #001020; /* readable dark text */
   font-weight: 700;
   font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.1;
+  border: 1px solid rgba(109,251,255,.3);
+  box-shadow: 0 0 16px rgba(61,165,255,0.6);
   cursor: pointer;
-  border: 1px solid rgba(109,251,255,.25);
-  box-shadow: 0 0 15px rgba(61,165,255,0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s ease;
   z-index: 50;
 }
 
-/* visible after scroll */
 #toTop.show {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* hover animation */
 #toTop:hover {
   transform: translateY(-4px);
   box-shadow: 0 0 25px rgba(61,165,255,0.85);
+  filter: brightness(1.05);
 }
 
-/* arrow symbol */
 #toTop::before {
   content: "↑";
   display: block;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   line-height: 1;
   margin-bottom: 2px;
 }
 
-/* “Top” label stays below arrow */
 #toTop span {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
 }
-
-
-
 
     /* event with background image */
     .event.with-bg{background-image:linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)), var(--event-img);background-size:contain,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;overflow:hidden;background-clip:padding-box,padding-box;min-height:180px;border-radius:16px}
