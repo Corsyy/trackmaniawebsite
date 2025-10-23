@@ -63,8 +63,6 @@
   .meta{padding:.9rem}
   .date{opacity:.85;font-size:.92rem;color:var(--muted)}
   .badge{border:1px solid var(--border);padding:.25rem .55rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.08)}
-  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0 0}
-  .chip{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .55rem;border-radius:999px;border:1px solid var(--border);font-size:.82rem;background:rgba(109,251,255,.08)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
 
   /* hero */
@@ -108,15 +106,20 @@
   .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 
-/* medal chips */
-.chip.medal { display:inline-flex; align-items:center; gap:.35rem; }
-.medal-icon { width:16px; height:16px; border-radius:50%; display:inline-block; }
-.medal-icon.at     { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #7b2cff; } /* Author: purple */
-.medal-icon.gold   { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #ffbf00; }
-.medal-icon.silver { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #c0c0c0; }
-.medal-icon.bronze { background:radial-gradient(circle at 35% 35%, #fff8, transparent 60%), #cd7f32; }
-
-
+  /* ===== Medal badges ===== */
+  .medals{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem}
+  .medal{
+    display:inline-flex;align-items:center;gap:.4rem;
+    padding:.25rem .55rem;border-radius:999px;font-size:.9rem;
+    background:rgba(15,21,36,.7);border:1px solid var(--border);
+    box-shadow:0 0 12px rgba(61,165,255,.08) inset;
+  }
+  .medal svg{width:16px;height:16px;display:block}
+  .medal b{font-weight:800;letter-spacing:.2px}
+  .medal.author{box-shadow:0 0 0 1px rgba(255,154,59,.25) inset}
+  .medal.gold   {box-shadow:0 0 0 1px rgba(247,222,109,.25) inset}
+  .medal.silver {box-shadow:0 0 0 1px rgba(204,216,232,.25) inset}
+  .medal.bronze {box-shadow:0 0 0 1px rgba(196,140,93,.25) inset}
 </style>
 </head>
 <body class="bg-track-curves">
@@ -136,8 +139,8 @@
       <p>Author: <span class="badge" id="t-author">—</span></p>
       <p id="t-date" class="date"></p>
 
-      <!-- medals/difficulty -->
-      <div class="chips" id="t-chips"></div>
+      <!-- medals row gets injected here -->
+      <div id="t-medals"></div>
 
       <!-- only local actions -->
       <div class="actions" id="t-actions"></div>
@@ -163,75 +166,57 @@
   const set=(id,html)=>{const el=document.getElementById(id); if(el) el.innerHTML=html;}
   const setText=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt??"";}
 
-  function fmtTime(ms){
-    if(ms==null || isNaN(ms)) return null;
-    ms = Math.max(0, Math.floor(ms));
-    const m = Math.floor(ms/60000);
-    const s = Math.floor((ms%60000)/1000);
-    const ms3 = ms % 1000;
-    return `${String(m)}:${String(s).padStart(2,'0')}.${String(ms3).padStart(3,'0')}`;
+  /* ---------- medal helpers ---------- */
+  function fmtMs(ms){
+    if(ms==null) return null;
+    const t=Math.max(0,Number(ms)|0);
+    const m=Math.floor(t/60000);
+    const s=Math.floor((t%60000)/1000);
+    const ms3=(t%1000).toString().padStart(3,"0");
+    return `${m}:${s.toString().padStart(2,"0")}.${ms3}`;
+  }
+  function medalSvg(c1,c2){
+    return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/>
+      </linearGradient></defs>
+      <polygon points="12,2 20,7 20,17 12,22 4,17 4,7" fill="url(#g)"/>
+      <circle cx="12" cy="12" r="4.2" fill="rgba(0,0,0,.15)"/>
+    </svg>`;
+  }
+  function medalBadge(kind, msVal){
+    if(msVal==null) return "";
+    const colors={
+      author:["#FF9A3B","#FFCE6A"],
+      gold  :["#F7DE6D","#E4C24B"],
+      silver:["#D8E0F0","#B8C2D3"],
+      bronze:["#D4A77B","#B58158"],
+    };
+    const short={author:"AT",gold:"G",silver:"S",bronze:"B"}[kind];
+    const [c1,c2]=colors[kind]||["#93a","#b7c"];
+    return `<span class="medal ${kind}">${medalSvg(c1,c2)}<b>${short}</b> <span class="mono">${fmtMs(msVal)}</span></span>`;
+  }
+  function buildMedals(map){
+    if(!map) return "";
+    const parts=[];
+    if(map.authorTime!=null) parts.push(medalBadge("author", map.authorTime));
+    if(map.goldTime  !=null) parts.push(medalBadge("gold",   map.goldTime));
+    if(map.silverTime!=null) parts.push(medalBadge("silver", map.silverTime));
+    if(map.bronzeTime!=null) parts.push(medalBadge("bronze", map.bronzeTime));
+    return parts.length?`<div class="medals">${parts.join("")}</div>`:"";
   }
 
-  const chip = (html)=>`<span class="chip">${html}</span>`;
+  /* ---------- actions ---------- */
   const button = (label, href, extra='')=>`<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
-
-  function chipsFromMap(map){
-  const parts = [];
-  // difficulty (if you store it)
-  if(map?.difficulty){
-    parts.push(`<span class="chip">⭐ <strong>${map.difficulty}</strong></span>`);
-  }
-
-  // helper to format times (already in your file)
-  const fmt = (ms)=> {
-    if(ms==null || isNaN(ms)) return null;
-    ms = Math.max(0, Math.floor(ms));
-    const m = Math.floor(ms/60000);
-    const s = Math.floor((ms%60000)/1000);
-    const ms3 = ms % 1000;
-    return `${String(m)}:${String(s).padStart(2,'0')}.${String(ms3).padStart(3,'0')}`;
-  };
-
-  const at = fmt(map?.authorTime);
-  const gt = fmt(map?.goldTime);
-  const st = fmt(map?.silverTime);
-  const bt = fmt(map?.bronzeTime);
-
-  // author medal (with purple medal icon)
-  if(at){
-    parts.push(
-      `<span class="chip medal"><i class="medal-icon at"></i> AT: <strong class="mono">${at}</strong></span>`
-    );
-  }
-  if(gt){
-    parts.push(
-      `<span class="chip medal"><i class="medal-icon gold"></i> ${gt}</span>`
-    );
-  }
-  if(st){
-    parts.push(
-      `<span class="chip medal"><i class="medal-icon silver"></i> ${st}</span>`
-    );
-  }
-  if(bt){
-    parts.push(
-      `<span class="chip medal"><i class="medal-icon bronze"></i> ${bt}</span>`
-    );
-  }
-  return parts.join("");
-}
-
-
-  // LOCAL ACTIONS ONLY: Download + Copy UID
   function actionsFromMap(map){
     const acts=[];
     if(map?.downloadUrl){ acts.push(button("⬇️ Download", map.downloadUrl)); }
-    if(map?.uid){
-      acts.push(`<button class="btn ghost" data-copy-uid="${map.uid}">Copy UID</button>`);
-    }
+    if(map?.uid){ acts.push(`<button class="btn ghost" data-copy-uid="${map.uid}">Copy UID</button>`); }
     return acts.join("");
   }
 
+  /* ---------- render ---------- */
   function renderHero(rec){
     if(!rec) return;
     const m = rec.map||{};
@@ -243,7 +228,7 @@
     setText("t-name",   m.name || "(unknown map)");
     setText("t-author", m.authorDisplayName || "—");
     setText("t-date",   rec.date || "");
-    set("t-chips",   chipsFromMap(m));
+    set("t-medals", buildMedals(m));
     set("t-actions", actionsFromMap(m));
   }
 
@@ -253,8 +238,7 @@
     grid.innerHTML="";
     const keys=Object.keys(days).sort(); // oldest -> newest
     for(const k of keys){
-      const d=days[k];
-      const m=d.map||{};
+      const d=days[k]; const m=d.map||{};
       const card=document.createElement("article");
       card.className="card";
       card.innerHTML=`
@@ -265,7 +249,7 @@
           <div class="date">${d.date}</div>
           <h3 style="margin:.35rem 0 .25rem">${m.name || "(unknown map)"}</h3>
           <div>Author: <span class="badge">${m.authorDisplayName || "—"}</span></div>
-          <div class="chips" style="margin-top:.45rem">${chipsFromMap(m)}</div>
+          ${buildMedals(m)}
           <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem">
             ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank" rel="noopener">⬇️ Download</a>` : ""}
             ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
