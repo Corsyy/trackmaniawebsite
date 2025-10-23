@@ -2,48 +2,55 @@ import express from "express";
 import fetch from "node-fetch";
 
 /**
- * ENV REQUIRED:
- *   REFRESH_TOKEN = your Nadeo refresh token (aud: NadeoLiveServices)
+ * ENV you must set on Render:
+ *   REFRESH_TOKEN = <your Nadeo refresh token (audience: NadeoLiveServices)>
  *
  * Optional:
- *   CORS_ORIGIN = https://trackmaniaevents.com  (defaults to that if not set)
+ *   CORS_ORIGINS = comma-separated origins allowed to call this API
+ *                  (default allows https://trackmaniaevents.com and localhost:5500)
  */
 
 const app = express();
-const ORIGIN = process.env.CORS_ORIGIN || "https://trackmaniaevents.com";
 
-// --- CORS ---
+// ---------- CORS ----------
+const DEFAULT_ORIGINS = new Set([
+  "https://trackmaniaevents.com",
+  "http://localhost:5500",
+  "http://127.0.0.1:5500"
+]);
+const ENV_ORIGINS = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map(s => s.trim())
+  .filter(Boolean);
+const ALLOW = new Set([...DEFAULT_ORIGINS, ...ENV_ORIGINS]);
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", ORIGIN);
+  const o = req.headers.origin;
+  if (o && ALLOW.has(o)) res.setHeader("Access-Control-Allow-Origin", o);
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
 
-// --- Health ---
+// ---------- Health ----------
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/healthz", (_req, res) => res.json({ ok: true }));
 app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
-// ---------- Nadeo auth (refresh -> access) ----------
-const NADEO_REFRESH = process.env.REFRESH_TOKEN; // keep this safe on Render
+// ---------- Nadeo Auth: refresh -> access ----------
+const NADEO_REFRESH = process.env.REFRESH_TOKEN;
 const CORE_REFRESH_URL = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
 
-/** Cache the current live access token in memory. */
 let cachedAccess = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
   const now = Date.now();
-  if (cachedAccess.token && now < cachedAccess.expAt - 30_000) {
-    return cachedAccess.token;
-  }
-  if (!NADEO_REFRESH) {
-    throw new Error("Missing REFRESH_TOKEN env var");
-  }
+  if (cachedAccess.token && now < cachedAccess.expAt - 30_000) return cachedAccess.token;
+  if (!NADEO_REFRESH) throw new Error("Missing REFRESH_TOKEN env var");
 
-  // POST {} with Authorization: nadeo_v1 t=<refreshToken>
-  const resp = await fetch(CORE_REFRESH_URL, {
+  const r = await fetch(CORE_REFRESH_URL, {
     method: "POST",
     headers: {
       "Authorization": `nadeo_v1 t=${NADEO_REFRESH}`,
@@ -52,32 +59,19 @@ async function getLiveAccessToken() {
     },
     body: "{}"
   });
-
-  if (!resp.ok) {
-    const text = await resp.text();
-    throw new Error(`Refresh failed ${resp.status}: ${text}`);
-  }
-  const data = await resp.json();
-  const accessToken = data?.accessToken || data?.access_token || null;
-  const expiresIn = data?.expiresIn || data?.expires_in || 3600;
-
-  if (!accessToken) {
-    throw new Error("No accessToken in refresh response");
-  }
-
-  cachedAccess = {
-    token: accessToken,
-    expAt: Date.now() + expiresIn * 1000
-  };
+  if (!r.ok) throw new Error(`refresh failed ${r.status} ${await r.text()}`);
+  const j = await r.json();
+  const accessToken = j.accessToken || j.access_token;
+  const expiresIn = j.expiresIn || j.expires_in || 3600;
+  if (!accessToken) throw new Error("no accessToken in refresh response");
+  cachedAccess = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
   return cachedAccess.token;
 }
 
-// ---------- Live Services endpoints ----------
+// ---------- Live Services helpers ----------
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 
-// Get current seasonal campaign (playlist contains mapUids)
-// Docs: GET /api/campaign/official?offset=0&length=1  (v2)  → campaignList[0].playlist[].mapUid
-// https://webservices.openplanet.dev/live/campaigns/campaigns-v2
+// Current official campaign (v2)
 async function getCurrentCampaign(accessToken) {
   const url = `${LIVE_BASE}/api/campaign/official?offset=0&length=1`;
   const r = await fetch(url, {
@@ -88,22 +82,18 @@ async function getCurrentCampaign(accessToken) {
   });
   if (!r.ok) throw new Error(`campaign fetch ${r.status}`);
   const j = await r.json();
-  const camp = j?.campaignList?.[0];
-  if (!camp) throw new Error("No campaign returned");
+  const c = j?.campaignList?.[0];
+  if (!c) throw new Error("no campaign returned");
   return {
-    id: camp.id,
-    name: camp.name,
-    start: camp.startTimestamp,
-    end: camp.endTimestamp,
-    groupUid: camp.seasonUid || camp.leaderboardGroupUid, // either is fine for PB
-    mapUids: (camp.playlist || []).map(p => p.mapUid)
+    id: c.id,
+    name: c.name,
+    start: c.startTimestamp,
+    end: c.endTimestamp,
+    mapUids: (c.playlist || []).map(p => p.mapUid)
   };
 }
 
-// Get WR (top 1 world) for a single mapUid
-// Docs: GET /api/token/leaderboard/group/{groupUid}/map/{mapUid}/top?onlyWorld=true&length=1
-// groupUid=Personal_Best → global leaderboard
-// https://webservices.openplanet.dev/live/leaderboards/top
+// World record (top 1 world) for a map
 async function getMapWR(accessToken, mapUid) {
   const groupUid = "Personal_Best";
   const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
@@ -113,13 +103,10 @@ async function getMapWR(accessToken, mapUid) {
       "User-Agent": "trackmaniaevents.com/1.0 (Render)"
     }
   });
-  if (!r.ok) {
-    return { mapUid, error: `leaderboard ${r.status}` };
-  }
+  if (!r.ok) return { mapUid, error: `leaderboard ${r.status}` };
   const j = await r.json();
-  const top = j?.tops?.[0]?.top?.[0]; // first world entry
+  const top = j?.tops?.[0]?.top?.[0];
   if (!top) return { mapUid, empty: true };
-  // score is time in milliseconds; timestamp when record set (per docs)
   return {
     mapUid,
     accountId: top.accountId,
@@ -128,14 +115,13 @@ async function getMapWR(accessToken, mapUid) {
   };
 }
 
-// -- tiny in-memory cache so we don’t hammer the API --
+// ---------- Simple cache to avoid hammering API ----------
 let wrCache = { ts: 0, data: null };
-const WR_TTL_MS = 60 * 1000; // 60s cache
+const WR_TTL_MS = 60 * 1000;
 
-// ---------- Public route: world-record leaderboard ----------
+// ---------- Public route ----------
 app.get("/api/wr-leaderboard", async (_req, res) => {
   try {
-    // serve from cache if fresh
     const now = Date.now();
     if (wrCache.data && now - wrCache.ts < WR_TTL_MS) {
       return res.json(wrCache.data);
@@ -143,15 +129,12 @@ app.get("/api/wr-leaderboard", async (_req, res) => {
 
     const access = await getLiveAccessToken();
     const campaign = await getCurrentCampaign(access);
-    // Limit concurrency to be polite
-    const limit = 6;
-    const chunks = [];
-    for (let i = 0; i < campaign.mapUids.length; i += limit) {
-      chunks.push(campaign.mapUids.slice(i, i + limit));
-    }
+
+    const mapUids = campaign.mapUids || [];
+    const limit = 6; // polite concurrency
     const results = [];
-    for (const batch of chunks) {
-      const part = await Promise.all(batch.map(uid => getMapWR(access, uid)));
+    for (let i = 0; i < mapUids.length; i += limit) {
+      const part = await Promise.all(mapUids.slice(i, i + limit).map(uid => getMapWR(access, uid)));
       results.push(...part);
     }
 
@@ -162,18 +145,23 @@ app.get("/api/wr-leaderboard", async (_req, res) => {
         start: campaign.start,
         end: campaign.end
       },
-      rows: results,       // [{mapUid, accountId, timeMs, timestamp}]
+      rows: results,           // [{ mapUid, accountId, timeMs, timestamp }]
       fetchedAt: now
     };
 
     wrCache = { ts: now, data: payload };
-    res.json(payload);
+    return res.json(payload);
   } catch (err) {
     console.error("WR leaderboard error:", err);
-    res.status(500).json({ error: String(err?.message || err) });
+    if (!res.headersSent) {
+      return res.status(500).json({
+        error: "Failed to load leaderboard",
+        detail: err?.message || String(err)
+      });
+    }
   }
 });
 
-// --- Start server (Render) ---
+// ---------- Start server (Render) ----------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ API running on port ${PORT}`));
