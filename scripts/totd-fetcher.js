@@ -1,4 +1,4 @@
-// scripts/totd-fetcher.js — TOTD + auto downloadUrl (TMX-first, preserves manual URLs)
+// scripts/totd-fetcher.js — TOTD + TMX/TM.io metadata enrichment
 // Node 18+ (global fetch). No secrets needed.
 
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
@@ -10,18 +10,17 @@ const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
 const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
 const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
 const TMIO        = "https://trackmania.io";
-const TMX_API     = "https://trackmania.exchange/api"; // base for TMX API
+const TMX_API     = "https://trackmania.exchange/api";
 const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
 const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.0 (github action)";
-
-const DEBUG = process.env.DEBUG === "1";
-const dlog  = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
+const DEBUG       = process.env.DEBUG === "1";
+const dlog        = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
 
 /* -------------------------------- fs helpers ------------------------------- */
 const ensureDir = (p)=>mkdir(p,{recursive:true});
-const exists = async(p)=>{ try{ await access(p,FS.F_OK); return true; } catch { return false; } };
-const loadJson = async(p,f)=>(await exists(p))?JSON.parse(await readFile(p,"utf8")):f;
-const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
+const exists    = async(p)=>{ try{ await access(p,FS.F_OK); return true; } catch { return false; } };
+const loadJson  = async(p,f)=>(await exists(p))?JSON.parse(await readFile(p,"utf8")):f;
+const writeJson = (p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
 
 /* --------------------------------- utils ----------------------------------- */
 const pad2=(n)=>String(n).padStart(2,"0");
@@ -34,8 +33,9 @@ function stripTmFormatting(input){
   s=s.replace(/\$[0-9a-fA-F]{1,3}|\$[a-zA-Z]|\$[<>\[\]\(\)]/g,"");
   return s.replace(new RegExp(D,"g"),"$");
 }
-function tmioDayNumber(dayObj,idx){ return dayObj?.day??dayObj?.dayIndex??dayObj?.monthDay??dayObj?.dayInMonth??(idx+1); }
-
+function tmioDayNumber(dayObj,idx){
+  return dayObj?.day??dayObj?.dayIndex??dayObj?.monthDay??dayObj?.dayInMonth??(idx+1);
+}
 async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 async function fetchRetry(url,opts={},retries=5,baseDelay=500){
   let lastErr;
@@ -71,32 +71,19 @@ function tmioMonthYear(resp){
   return { y,m1 };
 }
 
-/* ------------------------------ TMX helpers --------------------------------
-   We try TMX first: UID -> TMX map info (TrackID, Unlisted, maybe ShortName) -> download URL.
-   If TMX lacks the map, we fall back to trackmania.io.
------------------------------------------------------------------------------*/
+/* ------------------------------ TMX helpers -------------------------------- */
 async function fetchTmxInfoByUid(uid){
   if (!uid) return null;
-  // Returns a single object (not array) for a unique UID.
   const url = `${TMX_API}/maps/get_map_info/uid/${encodeURIComponent(uid)}`;
   const r = await fetchRetry(url);
-  if (!r.ok) {
-    dlog("TMX uid lookup failed", uid, r.status);
-    return null;
-  }
+  if (!r.ok) return null;
   try {
     const j = await r.json();
     if (!j || typeof j !== "object") return null;
-    // Sanity check: ensure it really matches the UID we asked for
     if (j.TrackUID && j.TrackUID !== uid) return null;
     return j;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
-
-// (Best-effort) Sometimes TMX requires a shortName query param for unlisted maps.
-// If the UID lookup returns ShortName we’ll use it; otherwise we try by id as a fallback.
 async function fetchTmxInfoById(trackId){
   if (!trackId) return null;
   const url = `${TMX_API}/maps/get_map_info/id/${encodeURIComponent(trackId)}`;
@@ -107,52 +94,64 @@ async function fetchTmxInfoById(trackId){
     if (!j || typeof j !== "object") return null;
     if (!j.TrackID || String(j.TrackID) !== String(trackId)) return null;
     return j;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
-
 function tmxDownloadUrl(trackId, shortName){
   const base = `${TMX_DL_BASE}/${encodeURIComponent(trackId)}`;
   return shortName ? `${base}?shortName=${encodeURIComponent(shortName)}` : base;
 }
 
-/* --------------------------- download resolver ----------------------------- */
-async function fetchMapDownload(mapUid){
+/* --------------------------- unified map resolver -------------------------- */
+async function fetchMapMeta(mapUid){
   if (!mapUid) return null;
+
+  let out = {
+    downloadUrl:null, tmxId:null, tmxPage:null, tmioPage:`${TMIO}/map/${encodeURIComponent(mapUid)}`,
+    authorTime:null, goldTime:null, silverTime:null, bronzeTime:null, difficulty:null
+  };
 
   // 1) TMX first
   try {
     const tmx = await fetchTmxInfoByUid(mapUid);
-    if (tmx && tmx.TrackID) {
-      // If Unlisted and we don't have ShortName yet, try get_map_info by ID (may expose ShortName).
+    if (tmx && tmx.TrackID){
+      out.tmxId   = tmx.TrackID;
+      out.tmxPage = `https://trackmania.exchange/maps/${tmx.TrackID}`;
       let shortName = tmx.ShortName || tmx.shortName || null;
-
-      if ((tmx.Unlisted === true || tmx.Unlisted === 1) && !shortName) {
+      if ((tmx.Unlisted === true || tmx.Unlisted === 1) && !shortName){
         const tmxById = await fetchTmxInfoById(tmx.TrackID);
         shortName = tmxById?.ShortName || tmxById?.shortName || null;
       }
-
-      // If TMX says it's explicitly non-downloadable, skip to fallback
       const downloadable = (tmx.Downloadable ?? true);
-      if (downloadable) {
-        return tmxDownloadUrl(tmx.TrackID, shortName);
+      if (downloadable){
+        out.downloadUrl = tmxDownloadUrl(tmx.TrackID, shortName);
+        return out; // TMX success
       }
     }
-  } catch (e) {
-    dlog("TMX resolver err", mapUid, e?.message || e);
-  }
+  } catch(e){ dlog("TMX err", mapUid, e?.message||e); }
 
-  // 2) Fallback to trackmania.io /api/map/{uid} → j.file || j.download
+  // 2) fallback to trackmania.io
   try {
     const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
-    if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return null; }
+    if (!r.ok){ dlog("tm.io map fail", mapUid, r.status); return out; }
     const j = await r.json();
-    return j?.file || j?.download || null;
-  } catch (e) {
-    dlog("tm.io resolver err", mapUid, e?.message || e);
-    return null;
-  }
+    const raw = j?.file || j?.download || "";
+    let tmxId = null;
+    if (typeof raw === "string"){
+      const m = raw.match(/trackmania\.exchange\/maps(?:\/download)?\/(\d+)/i);
+      if (m) tmxId = m[1];
+    }
+
+    out.downloadUrl = raw || (tmxId ? `${TMX_DL_BASE}/${tmxId}` : null);
+    out.tmxId   = out.tmxId   || tmxId;
+    out.tmxPage = out.tmxPage || (tmxId ? `https://trackmania.exchange/maps/${tmxId}` : null);
+    out.authorTime = j?.authorTime ?? null;
+    out.goldTime   = j?.goldTime   ?? null;
+    out.silverTime = j?.silverTime ?? null;
+    out.bronzeTime = j?.bronzeTime ?? null;
+    out.difficulty = j?.difficulty ?? j?.mapDifficulty ?? null;
+  } catch(e){ dlog("tm.io resolver err", mapUid, e?.message||e); }
+
+  return out;
 }
 
 /* ------------------------------ month writing ------------------------------ */
@@ -177,63 +176,69 @@ function baseDayRecord(y,m1,entry,idx){
   name=stripTmFormatting(name); authorDisplayName=stripTmFormatting(authorDisplayName);
   return {
     date: dateKey(y,m1,d),
-    map: { uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb, downloadUrl: null }
+    map: {
+      uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb,
+      downloadUrl:null, tmxId:null, tmxPage:null, tmioPage:null,
+      authorTime:null, goldTime:null, silverTime:null, bronzeTime:null, difficulty:null
+    }
   };
 }
 
 async function writeTotdMonth(index=0){
-  // 0) load remote list
   const j=await fetchTmioMonth(index);
   const {y,m1}=tmioMonthYear(j);
   const mKey=monthKey(y,m1);
-
-  // 1) load existing month file (so manual downloadUrl entries are preserved)
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
-  const prev = await loadJson(monthPath, { month:mKey, days:{} });
-  const prevDays = prev?.days || {};
+  const prev = await loadJson(monthPath,{month:mKey,days:{}});
+  const prevDays = prev.days||{};
+  const daysArr=(Array.isArray(j.days)?j.days:[]).map((e,i)=>baseDayRecord(y,m1,e,i));
 
-  // 2) normalize remote -> day records
-  const daysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
+  for(const rec of daysArr){
+    const prevRec=prevDays[rec.date]?.map||{};
+    Object.assign(rec.map,{
+      downloadUrl:prevRec.downloadUrl??null,
+      tmxId:prevRec.tmxId??null,
+      tmxPage:prevRec.tmxPage??null,
+      tmioPage:prevRec.tmioPage??(rec.map.uid?`${TMIO}/map/${rec.map.uid}`:null),
+      authorTime:prevRec.authorTime??null,
+      goldTime:prevRec.goldTime??null,
+      silverTime:prevRec.silverTime??null,
+      bronzeTime:prevRec.bronzeTime??null,
+      difficulty:prevRec.difficulty??null
+    });
 
-  // 3) for each day:
-  //    - keep manual downloadUrl if it already exists
-  //    - otherwise resolve (TMX first, tm.io fallback)
-  for (const rec of daysArr){
-    const prevDl = prevDays[rec.date]?.map?.downloadUrl || null;
-    if (prevDl) {
-      rec.map.downloadUrl = prevDl;       // preserve manual/old link
-      continue;
-    }
-    if (rec.map.uid){
-      rec.map.downloadUrl = await fetchMapDownload(rec.map.uid);
-      await sleep(120); // be nice to public APIs (slightly higher than before)
+    if((!rec.map.downloadUrl||rec.map.authorTime==null)&&rec.map.uid){
+      const info=await fetchMapMeta(rec.map.uid);
+      if(info){
+        for(const k in info){
+          if(rec.map[k]==null && info[k]!=null) rec.map[k]=info[k];
+        }
+      }
+      await sleep(80);
     }
   }
 
-  // 4) write month file
   const daysOut={};
-  for (const rec of daysArr){ daysOut[rec.date]=rec; }
-
+  for(const r of daysArr){ daysOut[r.date]=r; }
   await ensureDir(TOTD_DIR);
-  await writeJson(monthPath,{ month:mKey, days:daysOut });
+  await writeJson(monthPath,{month:mKey,days:daysOut});
   await rebuildMonthIndex(TOTD_DIR);
 
-  // 5) write latest snapshot
   const keys=Object.keys(daysOut).sort();
   const latestKey=keys[keys.length-1]||null;
   if(latestKey){
     const latest=daysOut[latestKey];
-    await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
-    dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "");
+    await writeJson(TOTD_LATEST,{generatedAt:new Date().toISOString(),...latest});
+    dlog("latest:",latest.date,latest.map?.name,latest.map?.downloadUrl?"[dl]":"");
   }else{
-    dlog("no days found for", mKey);
+    dlog("no days found for",mKey);
   }
 }
 
 /* ----------------------------------- main ---------------------------------- */
 async function main(){
   await ensureDir(TOTD_DIR);
-  await writeTotdMonth(0); // current month (index 0)
-  console.log("[DONE] TOTD updated with download URLs (manual URLs preserved).");
+  await writeTotdMonth(0);
+  console.log("[DONE] TOTD updated with full TMX/TM.io metadata (manual URLs preserved).");
 }
 main().catch(err=>{ console.error(err); process.exit(1); });
