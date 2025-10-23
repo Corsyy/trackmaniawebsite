@@ -4,12 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node scripts/server.js",
-    "cotd": "node scripts/cotd-fetcher.js"
+    "start": "node scripts/server.js"
   },
-  "engines": {
-    "node": ">=20"
-  },
+  "engines": { "node": ">=20" },
   "dependencies": {
     "express": "^4.21.1",
     "node-fetch": "^3.3.2"
