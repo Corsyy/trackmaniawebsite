@@ -42,37 +42,50 @@
   .pager{ justify-content:center; gap:.5rem; }
   .pager .btn{ min-width:92px; }
 
-  /* Turn table into stacked "cards" */
-  table.mobile-stack{ border-collapse:separate; border-spacing:0; }
+  /* ===== Mobile Table: Stacked Card Style ===== */
+  table.mobile-stack{
+    border-collapse:separate !important;
+    border-spacing:0 !important;
+  }
   table.mobile-stack thead{ display:none; }
-  table.mobile-stack tbody{ display:block; }
+  table.mobile-stack tbody{ display:block; margin:0; padding:0; }
+
   table.mobile-stack tr{
     display:block;
-    padding:.7rem .6rem;
-    margin:0 0 .7rem 0;
+    padding:.55rem .75rem;
+    margin-bottom:.55rem;
+    border-radius:10px;
+    background:rgba(15,21,36,.75);
+    box-shadow:0 0 8px rgba(61,165,255,.08);
     border:1px solid rgba(255,255,255,.08);
-    border-radius:12px;
-    background:rgba(255,255,255,.02);
   }
+
+  /* Remove leftover borders & fix alignment */
+  table.mobile-stack th,
+  table.mobile-stack td,
+  th, td { border:0 !important; }
+
   table.mobile-stack td{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:1rem;
+    display:grid;
+    grid-template-columns:96px 1fr;
+    align-items:baseline;
+    gap:.5rem;
     padding:.35rem 0;
-    border:none;
     line-height:1.25;
+    font-size:.9rem;
   }
+
   table.mobile-stack td::before{
     content:attr(data-label);
     opacity:.7;
-    font-size:.92em;
-    margin-right:.75rem;
-    min-width:120px;  /* label width */
+    font-size:.85rem;
+    color:var(--muted);
+    margin:0;
+    min-width:0;
     flex-shrink:0;
   }
 
-  /* Truncate long values nicely */
+  /* Truncate long map UIDs or player names */
   .truncate{
     max-width:60vw;
     overflow:hidden;
@@ -80,6 +93,7 @@
     white-space:nowrap;
   }
 }
+
   </style>
 <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
 <link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
