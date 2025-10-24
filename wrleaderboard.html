@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Most WRs — Trackmania Events</title>
-  <meta name="description" content="Players with the most Trackmania world records across all official campaigns and all TOTD seasons."/>
+  <meta name="description" content="Players with the most Trackmania world records across all official campaigns, TOTD, and club campaigns."/>
   <meta name="theme-color" content="#0a0f1a"/>
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
@@ -49,6 +49,8 @@
     th,td{padding:.75rem;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
     th{opacity:.9}
     .ts{opacity:.75}
+    .pager{display:flex;gap:.6rem;align-items:center;justify-content:flex-end;margin:.8rem 0}
+    .skeleton{opacity:.7;padding:1rem}
   </style>
 </head>
 <body class="bg-track-curves">
@@ -71,6 +73,12 @@
     <button class="btn" id="clear">Clear</button>
   </div>
 
+  <div class="pager">
+    <button id="prevBtn" class="btn">Prev</button>
+    <span id="pageInfo" class="meta"></span>
+    <button id="nextBtn" class="btn">Next</button>
+  </div>
+
   <div class="card">
     <table>
       <thead>
@@ -81,13 +89,18 @@
           <th class="ts">Most Recent</th>
         </tr>
       </thead>
-      <tbody id="rows"></tbody>
+      <tbody id="rows"><tr><td colspan="4" class="skeleton">Loading…</td></tr></tbody>
     </table>
   </div>
 </main>
 
 <script>
-const API_BASE = "https://trackmaniawebsite.onrender.com"; // your Render API
+const API_BASE = "https://trackmaniawebsite.onrender.com";
+const PAGE_SIZE = 100;
+const FETCH_LIMIT = 300; // fetch once; paginate in the browser
+
+let allPlayers = [];
+let page = Number(new URLSearchParams(location.search).get('page')) || 1;
 
 function fmtTs(ts){
   if (ts === null || ts === undefined) return "—";
@@ -96,10 +109,57 @@ function fmtTs(ts){
   return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
 }
 
-const $rows = document.getElementById("rows");
-const $meta = document.getElementById("meta");
-const $q = document.getElementById("q");
-document.getElementById("clear").onclick = () => { $q.value=""; load(); };
+async function resolveNames(ids = []) {
+  if (!ids.length) return {};
+  try {
+    const url = `${API_BASE}/api/debug-names?ids=${encodeURIComponent(ids.join(","))}`;
+    const r = await fetch(url);
+    if (!r.ok) return {};
+    const data = await r.json();
+    const arr = Array.isArray(data?.data) ? data.data : [];
+    const map = {};
+    for (const row of arr) {
+      if (row && row.id) map[row.id] = row.name || row.id;
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
+
+function renderPage(p=1){
+  const total = allPlayers.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  page = Math.min(Math.max(1, p), totalPages);
+
+  const start = (page - 1) * PAGE_SIZE;
+  const slice = allPlayers.slice(start, start + PAGE_SIZE);
+
+  const tb = document.getElementById("rows");
+  tb.innerHTML = slice.map((pl, i) => `
+    <tr>
+      <td>${start + i + 1}</td>
+      <td>${pl.prettyName || pl.displayName || pl.accountId || "—"}</td>
+      <td>${pl.wrCount}</td>
+      <td class="ts">${fmtTs(pl.latestTs)}</td>
+    </tr>
+  `).join("");
+
+  // pager
+  document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
+  const prev = document.getElementById("prevBtn");
+  const next = document.getElementById("nextBtn");
+  prev.disabled = page <= 1;
+  next.disabled = page >= totalPages;
+  prev.onclick = () => goTo(page - 1);
+  next.onclick = () => goTo(page + 1);
+
+  const params = new URLSearchParams(location.search);
+  params.set('page', page);
+  history.replaceState({}, '', `${location.pathname}?${params}`);
+}
+
+function goTo(p){ if (p >= 1) renderPage(p); }
 
 let fetchCtrl = null;
 let debounce = null;
@@ -109,64 +169,54 @@ async function load(){
     if (fetchCtrl) fetchCtrl.abort();
     fetchCtrl = new AbortController();
 
-    const url = new URL(API_BASE + "/api/wr-players");
-    const query = ($q.value || "").trim();
-    if (query) url.searchParams.set("q", query);
+    document.getElementById("rows").innerHTML = `<tr><td colspan="4" class="skeleton">Loading…</td></tr>`;
 
-    const r = await fetch(url, { signal: fetchCtrl.signal });
+    const url = new URL(API_BASE + "/api/wr-players");
+    url.searchParams.set("limit", FETCH_LIMIT);
+    const q = (document.getElementById("q").value || "").trim();
+    if (q) url.searchParams.set("q", q);
+
+    const r = await fetch(url, { signal: fetchCtrl.signal, cache: "no-store" });
     if (!r.ok) throw new Error(await r.text());
     const j = await r.json();
 
-    // Step 1: figure out which entries still need names
     const players = Array.isArray(j.players) ? j.players : [];
+
     const needIds = [...new Set(
-      players
-        .filter(p => !p.displayName || p.displayName === p.accountId)
-        .map(p => p.accountId)
-        .filter(Boolean)
+      players.filter(p => p.accountId && (!p.displayName || p.displayName === p.accountId))
+             .map(p => p.accountId)
     )];
 
-    // Step 2: resolve names in one batch (best-effort)
-    let namesMap = {};
-    if (needIds.length){
-      try{
-        const rNames = await fetch(`${API_BASE}/api/resolve-names?ids=${encodeURIComponent(needIds.join(","))}`);
-        if (rNames.ok){
-          const data = await rNames.json();
-          namesMap = data?.names || {};
-        }
-      }catch(_){}
-    }
+    const names = await resolveNames(needIds);
 
-    // Step 3: render with upgraded names
-    $rows.innerHTML = "";
-    players.forEach((p,i)=>{
-      const pretty = namesMap[p.accountId] || p.displayName || p.accountId || "—";
-      const tr = document.createElement("tr");
-      tr.innerHTML =
-        `<td>${i+1}</td>`+
-        `<td>${pretty}</td>`+
-        `<td>${p.wrCount}</td>`+
-        `<td class="ts">${fmtTs(p.latestTs)}</td>`;
-      $rows.appendChild(tr);
-    });
+    allPlayers = players.map(p => ({
+      ...p,
+      prettyName: names[p.accountId] || p.displayName || p.accountId
+    }));
 
     const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
-    $meta.textContent =
+    document.getElementById("meta").textContent =
       `Fetched ${Math.round(ago/1000)}s ago — ${new Date(j.fetchedAt || Date.now()).toLocaleTimeString()}`;
+
+    renderPage(page);
   }catch(e){
-    if (e.name === "AbortError") return; // new request started
+    if (e.name === "AbortError") return;
     console.error(e);
-    $meta.textContent = "Failed to load player leaderboard.";
+    document.getElementById("meta").textContent = "Failed to load player leaderboard.";
+    document.getElementById("rows").innerHTML = `<tr><td colspan="4">Error loading data.</td></tr>`;
   }
 }
 
-$q.addEventListener("input", ()=>{
+document.getElementById("q").addEventListener("input", ()=>{
   clearTimeout(debounce);
-  debounce = setTimeout(load, 250);
+  debounce = setTimeout(()=>{ page = 1; load(); }, 250);
 });
+document.getElementById("clear").onclick = () => { document.getElementById("q").value=""; page=1; load(); };
 
+// initial
 load();
+// optional: refresh occasionally
+setInterval(() => load(), 25000);
 </script>
 
 </body>
