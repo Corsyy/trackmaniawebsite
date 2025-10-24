@@ -75,6 +75,7 @@ async function jget(url, accessToken) {
     headers: {
       Authorization: `nadeo_v1 t=${accessToken}`,
       "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+      Accept: "application/json",
     },
   });
   if (!r.ok) throw new Error(`${url} -> ${r.status}`);
@@ -88,13 +89,16 @@ async function getAllOfficialCampaigns(accessToken) {
   return j?.campaignList || [];
 }
 
-/* -------------------- Trackmania.io (TOTD months) -------------------- */
+/* -------------------- Trackmania.io (TOTD months brute force) -------------------- */
 const TMIO_BASE = "https://trackmania.io";
 
-// TMIO GET with robust JSON parse (avoid HTML surprises)
+// Robust text->JSON parser that throws on HTML
 async function jgetPublic(url) {
   const r = await fetch(url, {
-    headers: { "User-Agent": "trackmaniaevents.com/1.0 (Render)" },
+    headers: {
+      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+      Accept: "application/json",
+    },
   });
   const txt = await r.text();
   if (!r.ok) throw new Error(`${url} -> ${r.status} ${txt?.slice(0, 180)}`);
@@ -105,65 +109,43 @@ async function jgetPublic(url) {
   }
 }
 
-/**
- * Get list of all TOTD months from TM.io.
- * Tries:
- *  1) /api/totd/months      -> { months: ["YYYY-MM", ...] }
- *  2) /api/totd             -> { months: [...] } or sometimes an array
- */
-async function getTmioTotdMonths() {
-  const candidates = [`${TMIO_BASE}/api/totd/months`, `${TMIO_BASE}/api/totd`];
-  for (const url of candidates) {
-    try {
-      const j = await jgetPublic(url);
-      const arr = Array.isArray(j?.months) ? j.months : Array.isArray(j) ? j : [];
-      if (arr.length) return arr.map(String);
-    } catch {}
+// Build YYYY-MM list from 2020-07 (TOTD start) to current month
+function enumerateTotdMonths() {
+  const out = [];
+  const start = new Date(Date.UTC(2020, 6, 1)); // 2020-07-01
+  const now = new Date();
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  for (let d = start; d <= end; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))) {
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    out.push(`${y}-${m}`);
   }
-  return [];
+  return out;
 }
 
-/**
- * Get a month’s days from TM.io (array of day objects with mapUid).
- * Tries:
- *  1) /api/totd/YYYY/MM     -> { days: [...] }
- *  2) /api/totd?year=YYYY&month=MM
- */
+// Fetch a single month’s days (returns [] on errors/HTML/etc.)
 async function getTmioTotdMonthDays(ym) {
   const [year, m] = ym.split("-");
   const mm = String(m).padStart(2, "0");
-  const urls = [
-    `${TMIO_BASE}/api/totd/${year}/${mm}`,
-    `${TMIO_BASE}/api/totd?year=${encodeURIComponent(year)}&month=${encodeURIComponent(mm)}`,
-  ];
-  for (const url of urls) {
-    try {
-      const j = await jgetPublic(url);
-      const days = Array.isArray(j?.days) ? j.days : Array.isArray(j) ? j : [];
-      if (days.length) return days;
-    } catch {}
+  const url = `${TMIO_BASE}/api/totd/${year}/${mm}`;
+  try {
+    const j = await jgetPublic(url);
+    const days = Array.isArray(j?.days) ? j.days : Array.isArray(j) ? j : [];
+    return days;
+  } catch (e) {
+    // swallow and treat as no TOTD for that month
+    return [];
   }
-  return [];
 }
 
-/** Get ALL TOTD mapUids via TM.io months */
+// Get ALL TOTD mapUids by brute-forcing months (polite concurrency)
 async function getAllTotdMapUidsViaTMIO() {
-  const months = await getTmioTotdMonths();
-  if (!months.length) return [];
-
+  const months = enumerateTotdMonths();
   const uids = new Set();
-  const CONC = 6;
+  const CONC = 4; // polite
   for (let i = 0; i < months.length; i += CONC) {
     const batch = months.slice(i, i + CONC);
-    const chunks = await Promise.all(
-      batch.map(async (ym) => {
-        try {
-          return await getTmioTotdMonthDays(ym);
-        } catch {
-          return [];
-        }
-      })
-    );
+    const chunks = await Promise.all(batch.map((ym) => getTmioTotdMonthDays(ym)));
     for (const days of chunks) {
       for (const d of days) if (d?.mapUid) uids.add(d.mapUid);
     }
@@ -359,7 +341,7 @@ async function buildAllWRs() {
   // 1) Official (Nadeo)
   const official = await getAllOfficialCampaigns(access);
 
-  // 2) TOTD UIDs via Trackmania.io months (not Nadeo "season")
+  // 2) TOTD UIDs via Trackmania.io months (brute-force)
   const totdUids = await getAllTotdMapUidsViaTMIO();
 
   // 3) Merge + remember which are official
@@ -517,7 +499,7 @@ app.get("/api/debug-stats", async (_req, res) => {
       resolvedNamesCount: Array.from(nameCache.values()).filter(
         (v) => v && typeof v === "string" && v !== ""
       ).length,
-      unresolvedSample: [], // populate if you want to log misses
+      unresolvedSample: [],
     });
   } catch (e) {
     res.status(500).json({ error: e?.message || String(e) });
