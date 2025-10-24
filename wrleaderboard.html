@@ -52,6 +52,10 @@
     .pager{display:flex;gap:.6rem;align-items:center;justify-content:flex-end;margin:.8rem 0}
     .skeleton{opacity:.7;padding:1rem}
   </style>
+  <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
+<link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
+<link rel="prefetch" href="/wrleaderboard" as="document">
+<link rel="prefetch" href="/recentwrs" as="document">
 </head>
 <body class="bg-track-curves">
 <header>
@@ -96,8 +100,8 @@
 
 <script>
 const API_BASE = "https://trackmaniawebsite.onrender.com";
-const PAGE_SIZE = 100;
-const FETCH_LIMIT = 300; // fetch once; paginate in the browser
+const PAGE_SIZE = 50;
+const FETCH_LIMIT = 150; // fetch once; paginate in the browser
 
 let allPlayers = [];
 let page = Number(new URLSearchParams(location.search).get('page')) || 1;
@@ -218,6 +222,24 @@ load();
 // optional: refresh occasionally
 setInterval(() => load(), 25000);
 </script>
+
+<script>
+    setInterval(() => {
+      fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
+    }, 5 * 60 * 1000);
+    const prefetch = (url) => {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      link.as = 'fetch';
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    };
+    const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
+    const tblBtn = document.querySelector('a[href="/recentwrs"]');
+    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=300'), { once:true });
+    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=300'), { once:true });
+  </script>
 
 </body>
 </html>
