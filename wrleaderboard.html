@@ -100,8 +100,8 @@
 
 <script>
 const API_BASE = "https://trackmaniawebsite.onrender.com";
-const PAGE_SIZE = 50;
-const FETCH_LIMIT = 150; // fetch once; paginate in the browser
+const PAGE_SIZE = 25;
+const FETCH_LIMIT = 100; // fetch once; paginate in the browser
 
 let allPlayers = [];
 let page = Number(new URLSearchParams(location.search).get('page')) || 1;
@@ -220,7 +220,8 @@ document.getElementById("clear").onclick = () => { document.getElementById("q").
 // initial
 load();
 // optional: refresh occasionally
-setInterval(() => load(), 25000);
+setInterval(() => load(), 60 * 60 * 1000); // once every hour
+
 </script>
 
 <script>
@@ -237,8 +238,8 @@ setInterval(() => load(), 25000);
     };
     const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
     const tblBtn = document.querySelector('a[href="/recentwrs"]');
-    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=150'), { once:true });
-    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=150'), { once:true });
+    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once:true });
+    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once:true });
   </script>
 
 </body>
