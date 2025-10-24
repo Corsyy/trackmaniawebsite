@@ -28,6 +28,58 @@
     .time{font-variant-numeric:tabular-nums} .ts{opacity:.7;font-size:.9em}
     .pager{display:flex;gap:.6rem;align-items:center;justify-content:flex-end;margin:.8rem 0}
     .skeleton{opacity:.7;padding:1rem}
+
+/* ===== Mobile-friendly tables ===== */
+@media (max-width: 640px){
+  h1{ font-size:1.45rem; line-height:1.2; }
+  .container{ padding:.7rem 0; }
+  main{ padding:1rem .9rem; }
+
+  .btn{ padding:.55rem .8rem; border-radius:10px; }
+  .controls{ flex-wrap:wrap; gap:.5rem; }
+  .input{ width:100%; max-width:100%; }
+
+  .pager{ justify-content:center; gap:.5rem; }
+  .pager .btn{ min-width:92px; }
+
+  /* Turn table into stacked "cards" */
+  table.mobile-stack{ border-collapse:separate; border-spacing:0; }
+  table.mobile-stack thead{ display:none; }
+  table.mobile-stack tbody{ display:block; }
+  table.mobile-stack tr{
+    display:block;
+    padding:.7rem .6rem;
+    margin:0 0 .7rem 0;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:12px;
+    background:rgba(255,255,255,.02);
+  }
+  table.mobile-stack td{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:1rem;
+    padding:.35rem 0;
+    border:none;
+    line-height:1.25;
+  }
+  table.mobile-stack td::before{
+    content:attr(data-label);
+    opacity:.7;
+    font-size:.92em;
+    margin-right:.75rem;
+    min-width:120px;  /* label width */
+    flex-shrink:0;
+  }
+
+  /* Truncate long values nicely */
+  .truncate{
+    max-width:60vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+}
   </style>
 <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
 <link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
@@ -56,10 +108,21 @@
   </div>
 
   <div class="card">
-    <table>
-      <thead><tr><th>#</th><th>Map UID</th><th>Holder</th><th class="time">WR Time</th><th class="ts">Set</th></tr></thead>
-      <tbody id="rows"><tr><td colspan="5" class="skeleton">Loading…</td></tr></tbody>
-    </table>
+    <table class="mobile-stack">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Map UID</th>
+      <th>Holder</th>
+      <th class="time">WR Time</th>
+      <th class="ts">Set</th>
+    </tr>
+  </thead>
+  <tbody id="rows">
+    <tr><td colspan="5" class="skeleton">Loading…</td></tr>
+  </tbody>
+</table>
+
   </div>
 </main>
 
@@ -102,7 +165,7 @@ async function resolveNames(ids = []) {
   }
 }
 
-function renderPage(p=1){
+function renderPage(p = 1) {
   const total = allRows.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   page = Math.min(Math.max(1, p), totalPages);
@@ -110,18 +173,22 @@ function renderPage(p=1){
   const start = (page - 1) * PAGE_SIZE;
   const slice = allRows.slice(start, start + PAGE_SIZE);
 
-  const tb = document.getElementById("rows");
-  tb.innerHTML = slice.map((row, i) => `
-    <tr>
-      <td>${start + i + 1}</td>
-      <td>${row.mapUid}</td>
-      <td>${row.prettyName || row.displayName || row.accountId || "—"}</td>
-      <td class="time">${row.timeMs!=null?fmt(row.timeMs):"—"}</td>
-      <td class="ts">${fmtTs(row.timestamp)}</td>
-    </tr>
-  `).join("");
+  const $rows = document.getElementById("rows");
+  $rows.innerHTML = ""; // 👈 this is the $rows.innerHTML part
 
-  // pager
+  slice.forEach((row, i) => {
+    const pretty = row.prettyName || row.displayName || row.accountId || "—";
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      `<td data-label="#">${start + i + 1}</td>` +
+      `<td data-label="Map UID"><span class="truncate">${row.mapUid}</span></td>` +
+      `<td data-label="Holder"><span class="truncate">${pretty}</span></td>` +
+      `<td data-label="WR Time" class="time">${row.timeMs != null ? fmt(row.timeMs) : "—"}</td>` +
+      `<td data-label="Set" class="ts">${fmtTs(row.timestamp)}</td>`;
+    $rows.appendChild(tr);
+  });
+
+  // pager controls
   document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
   const prev = document.getElementById("prevBtn");
   const next = document.getElementById("nextBtn");
@@ -130,11 +197,12 @@ function renderPage(p=1){
   prev.onclick = () => goTo(page - 1);
   next.onclick = () => goTo(page + 1);
 
-  // keep URL ?page
+  // keep ?page in URL
   const params = new URLSearchParams(location.search);
   params.set('page', page);
   history.replaceState({}, '', `${location.pathname}?${params}`);
 }
+
 
 function goTo(p){ if (p >= 1) renderPage(p); }
 
