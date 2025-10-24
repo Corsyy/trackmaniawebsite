@@ -69,12 +69,15 @@ async function getLiveAccessToken() {
 
 /* ------------------ Live Services helpers ------------------ */
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
+// NEW: trackmania.io fallback base
+const TMIO_BASE = "https://trackmania.io/api";
 
 async function jget(url, accessToken) {
   const r = await fetch(url, {
     headers: {
-      Authorization: `nadeo_v1 t=${accessToken}`,
+      ...(accessToken ? { Authorization: `nadeo_v1 t=${accessToken}` } : {}),
       "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+      Accept: "application/json",
     },
   });
   if (!r.ok) throw new Error(`${url} -> ${r.status}`);
@@ -155,7 +158,41 @@ async function getMapWR(accessToken, mapUid) {
 // Process-wide cache so we only resolve each accountId once.
 const nameCache = new Map(); // accountId -> displayName
 
-// Robust resolver: batch (GET/POST in multiple shapes) + per-ID fallback, with caching
+// Helper: keep first non-empty human name and don't overwrite with an ID later
+function cacheName(id, maybeName) {
+  if (!id) return;
+  const current = nameCache.get(id);
+  const next = (maybeName || "").trim();
+  if (!current && next) nameCache.set(id, next);
+}
+
+// trackmania.io batch fallback
+async function resolveViaTMIO(ids) {
+  if (!ids.length) return new Map();
+  const out = new Map();
+  const CHUNK = 100;
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    const batch = ids.slice(i, i + CHUNK);
+    const url = `${TMIO_BASE}/accounts/displayNames?accountIds=${encodeURIComponent(
+      batch.join(",")
+    )}`;
+    try {
+      const j = await jget(url, null); // no auth
+      for (const row of j || []) {
+        const id = row?.accountId;
+        const dn =
+          row?.displayName || row?.name || row?.userName || row?.username;
+        if (id && dn) out.set(id, dn);
+      }
+    } catch (e) {
+      console.warn("TMIO fallback failed:", e.message);
+    }
+  }
+  return out;
+}
+
+// Robust resolver: batch (GET/POST in multiple shapes) + per-ID fallback,
+// then TMIO fallback, with caching
 async function resolveDisplayNames(accessToken, ids) {
   const allIds = Array.from(new Set((ids || []).filter(Boolean)));
   const need = allIds.filter((id) => !nameCache.has(id));
@@ -271,26 +308,34 @@ async function resolveDisplayNames(accessToken, ids) {
       } catch {}
     }
 
-    // Fill cache with successes
-    for (const [id, dn] of got) nameCache.set(id, dn);
+    // Fill cache with Nadeo successes
+    for (const [id, dn] of got) cacheName(id, dn);
 
     // Stragglers -> per-ID (polite parallelism)
-    const missing = batch.filter((id) => !nameCache.has(id));
-    if (missing.length) {
+    const missingAfterNadeo = batch.filter((id) => !nameCache.has(id));
+    if (missingAfterNadeo.length) {
       const limit = 6;
-      for (let j = 0; j < missing.length; j += limit) {
+      for (let j = 0; j < missingAfterNadeo.length; j += limit) {
         await Promise.all(
-          missing.slice(j, j + limit).map(async (id) => {
+          missingAfterNadeo.slice(j, j + limit).map(async (id) => {
             const dn = await tryPerId(id);
-            nameCache.set(id, dn || id); // ensure something is cached
+            if (dn) cacheName(id, dn);
           })
         );
       }
     }
+
+    // Anything STILL missing -> trackmania.io batch fallback
+    const missingForTMIO = batch.filter((id) => !nameCache.has(id));
+    if (missingForTMIO.length) {
+      const tmioMap = await resolveViaTMIO(missingForTMIO);
+      for (const [id, dn] of tmioMap) cacheName(id, dn);
+    }
+
+    // Final guarantee: cache the ID so we don't keep re-resolving
+    for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
   }
 
-  // Guarantee every requested id has an entry (even if it’s itself)
-  for (const id of need) if (!nameCache.has(id)) nameCache.set(id, id);
   return nameCache;
 }
 
