@@ -1,7 +1,6 @@
 import express from "express";
 import fetch from "node-fetch";
 import fs from "fs";
-import path from "path";
 
 /**
  * ENV:
@@ -17,7 +16,7 @@ import path from "path";
  *   CLUB_MAX_CAMPAIGNS      = 200
  *   CLUB_DETAIL_CONC        = 4
  *   CLUB_UID_TTL_HOURS      = 24
- *   CACHE_DIR               = override cache directory (default auto: /data/cache or /tmp/cache)
+ *   MAX_WR_MS               = (defaults to 24h in ms)
  */
 
 const app = express();
@@ -253,6 +252,19 @@ function normalizeToSeconds(val) {
   return 0;
 }
 
+/* ---- sanity for WR times ---- */
+const MAX_WR_MS = Number(process.env.MAX_WR_MS || 24 * 3600 * 1000); // cap at 24h by default
+function isValidTimeMs(ms) {
+  return Number.isFinite(ms) && ms > 0 && ms < MAX_WR_MS;
+}
+function sanitizeRow(row) {
+  if (!row || row.empty || row.error) return null;
+  const ms = Number(row.timeMs);
+  if (!isValidTimeMs(ms)) return null;
+  if (!row.accountId || typeof row.accountId !== "string") return null;
+  return { ...row, timeMs: ms };
+}
+
 async function getMapWR(accessToken, mapUid) {
   const groupUid = "Personal_Best";
   const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
@@ -260,10 +272,14 @@ async function getMapWR(accessToken, mapUid) {
     const j = await jget(url, accessToken);
     const top = j?.tops?.[0]?.top?.[0];
     if (!top) return { mapUid, empty: true };
+
+    const timeMs = Number(top.score);
+    if (!isValidTimeMs(timeMs)) return { mapUid, empty: true };
+
     return {
       mapUid,
       accountId: top.accountId,
-      timeMs: top.score,
+      timeMs,
       timestamp: normalizeToSeconds(top.timestamp),
     };
   } catch (e) {
@@ -315,36 +331,28 @@ async function resolveDisplayNames(_liveAccessToken, ids) {
 }
 
 /* ------------------------- Cache & disk -------------------- */
-// Decide where to store cache JSONs: prefer /data/cache if the disk is mounted
-const AUTO_DATA_DIR = fs.existsSync("/data") ? "/data/cache" : "/tmp/cache";
-const CACHE_DIR = process.env.CACHE_DIR || AUTO_DATA_DIR;
-try {
-  fs.mkdirSync(CACHE_DIR, { recursive: true });
-} catch {}
-
-const DISK_WR = path.join(CACHE_DIR, "wr-cache.json");
-const DISK_CLUB = path.join(CACHE_DIR, "club-uids.json");
-
 let wrCache = { ts: 0, rows: [] }; // rows: [{ mapUid, accountId, displayName, timeMs, timestamp, sourceType }]
 let metaCache = { officialSet: new Set(), clubSet: new Set(), allMapUids: [] };
 
-const WR_CONCURRENCY = Number(process.env.WR_CONCURRENCY || process.env.WR_CONCURRENCY === 0 ? process.env.WR_CONCURRENCY : process.env.WR_CONCURRENCY) || Number(process.env.WR_CONCURRENCY || 8);
+const WR_CONCURRENCY = Number(process.env.WR_CONCURRENCY || 8);
 const CLUB_UID_TTL = Number(process.env.CLUB_UID_TTL_HOURS || 24) * 3600 * 1000;
 const QUICK_REFRESH_COUNT = Number(process.env.QUICK_REFRESH_COUNT || 100);
 const AUTO_UID_REFRESH =
   (process.env.AUTO_UID_REFRESH ?? "true").toLowerCase() === "true";
 
-function loadJson(p) {
+const DISK_WR = "/tmp/wr_cache.json";
+const DISK_CLUB = "/tmp/club_uids.json";
+
+function loadJson(path) {
   try {
-    return JSON.parse(fs.readFileSync(p, "utf8"));
+    return JSON.parse(fs.readFileSync(path, "utf8"));
   } catch {
     return null;
   }
 }
-function saveJson(p, obj) {
+function saveJson(path, obj) {
   try {
-    fs.mkdirSync(path.dirname(p), { recursive: true });
-    fs.writeFileSync(p, JSON.stringify(obj));
+    fs.writeFileSync(path, JSON.stringify(obj));
   } catch {}
 }
 
@@ -389,16 +397,16 @@ async function computeAllMapUids(access, { includeClub }) {
 
 async function fetchAllWRs(access, allMapUids, officialSet, clubSet) {
   const wrs = [];
-  for (let i = 0; i < allMapUids.length; i += (Number(process.env.WR_CONCURRENCY) || 8)) {
+  for (let i = 0; i < allMapUids.length; i += WR_CONCURRENCY) {
     const part = await Promise.all(
-      allMapUids.slice(i, i + (Number(process.env.WR_CONCURRENCY) || 8)).map(async (uid) => {
+      allMapUids.slice(i, i + WR_CONCURRENCY).map(async (uid) => {
         // retry once for flakiness
-        let row = await getMapWR(access, uid);
-        if (!row || row.empty || row.error) {
+        let row = sanitizeRow(await getMapWR(access, uid));
+        if (!row) {
           await new Promise((r) => setTimeout(r, 60));
-          row = await getMapWR(access, uid);
+          row = sanitizeRow(await getMapWR(access, uid));
         }
-        if (!row || row.empty || row.error) return null;
+        if (!row) return null;
         row.sourceType = officialSet.has(uid)
           ? "official"
           : clubSet.has(uid)
@@ -509,14 +517,15 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
   const recent = wrCache.rows.slice(0, Math.min(count, wrCache.rows.length));
   const part = await Promise.all(
     recent.map(async (prev) => {
-      const row = await getMapWR(access, prev.mapUid);
-      if (!row || row.empty || row.error) return null;
+      const row = sanitizeRow(await getMapWR(access, prev.mapUid));
+      if (!row) return null;
       row.sourceType = prev.sourceType; // keep tag
       return row;
     })
   );
   const fresh = part.filter(Boolean);
 
+  // merge only if changed
   const byMap = new Map(wrCache.rows.map((r) => [r.mapUid, r]));
   let changed = 0;
   for (const r of fresh) {
@@ -533,6 +542,7 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
   }
   if (!changed) return;
 
+  // resolve new names if any
   const ids = fresh.map((r) => r.accountId).filter(Boolean);
   await resolveDisplayNames(null, ids);
   for (const r of byMap.values())
@@ -576,6 +586,7 @@ async function maybeRefreshUidUniverse() {
     for (const uid of list || []) latestClubSet.add(uid);
   }
 
+  // Diff vs known universe
   const oldSet = new Set(metaCache.allMapUids);
   const candidates = new Set([
     ...latestOfficialSet,
@@ -585,19 +596,21 @@ async function maybeRefreshUidUniverse() {
   const newUids = Array.from(candidates).filter((u) => !oldSet.has(u));
   if (!newUids.length) return;
 
+  // Expand tagging sets
   const officialSet = new Set([...metaCache.officialSet, ...latestOfficialSet]);
   const clubSet = new Set([...metaCache.clubSet, ...latestClubSet]);
 
+  // Fetch WRs only for the new UIDs
   const freshRows = [];
-  for (let i = 0; i < newUids.length; i += (Number(process.env.WR_CONCURRENCY) || 8)) {
+  for (let i = 0; i < newUids.length; i += WR_CONCURRENCY) {
     const part = await Promise.all(
-      newUids.slice(i, i + (Number(process.env.WR_CONCURRENCY) || 8)).map(async (uid) => {
-        let row = await getMapWR(access, uid);
-        if (!row || row.empty || row.error) {
+      newUids.slice(i, i + WR_CONCURRENCY).map(async (uid) => {
+        let row = sanitizeRow(await getMapWR(access, uid));
+        if (!row) {
           await new Promise((r) => setTimeout(r, 60));
-          row = await getMapWR(access, uid);
+          row = sanitizeRow(await getMapWR(access, uid));
         }
-        if (!row || row.empty || row.error) return null;
+        if (!row) return null;
         row.sourceType = officialSet.has(uid)
           ? "official"
           : clubSet.has(uid)
@@ -610,11 +623,13 @@ async function maybeRefreshUidUniverse() {
   }
   if (!freshRows.length) return;
 
+  // Resolve names for just new rows
   const ids = freshRows.map((r) => r.accountId).filter(Boolean);
   await resolveDisplayNames(null, ids);
   for (const r of freshRows)
     if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
+  // Merge rows + update meta
   const byMap = new Map(wrCache.rows.map((r) => [r.mapUid, r]));
   for (const r of freshRows) byMap.set(r.mapUid, r);
   const merged = Array.from(byMap.values()).sort(
@@ -635,15 +650,16 @@ async function maybeRefreshUidUniverse() {
   const disk = loadJson(DISK_WR);
   if (disk && Array.isArray(disk.rows) && disk.rows.length) {
     wrCache = { ts: disk.ts || Date.now(), rows: disk.rows };
-    console.log(`♻️  Warm-started cache from disk: ${wrCache.rows.length} rows (dir: ${CACHE_DIR})`);
+    console.log(`♻️  Warm-started cache from disk: ${wrCache.rows.length} rows`);
   } else {
-    console.log(`⚠️  No disk cache found in ${CACHE_DIR}; first request will trigger full build.`);
+    console.log("⚠️  No disk cache found; first request will trigger full build.");
   }
 })();
 
 /* ------------------------ Endpoints ------------------------ */
 
-// Latest WRs
+// Latest WRs (read from cache). Auto-discover new UIDs + quick refresh on request.
+// Optional: ?limit=300  ?search=foo  ?type=official,totd,club
 app.get("/api/wr-latest", async (req, res) => {
   try {
     if (!wrCache.rows.length) {
@@ -674,6 +690,9 @@ app.get("/api/wr-latest", async (req, res) => {
       out = out.filter((r) => allow.has(r.sourceType));
     }
 
+    // final safety: never return broken WR times
+    out = out.filter((r) => isValidTimeMs(Number(r.timeMs)));
+
     res.json({
       rows: out.slice(0, limit),
       total: out.length,
@@ -688,7 +707,7 @@ app.get("/api/wr-latest", async (req, res) => {
   }
 });
 
-// Players leaderboard
+// Players leaderboard (read from cache). Auto-discover new UIDs + quick refresh.
 app.get("/api/wr-players", async (req, res) => {
   try {
     if (!wrCache.rows.length) {
@@ -698,8 +717,13 @@ app.get("/api/wr-players", async (req, res) => {
     await maybeRefreshUidUniverse();
     await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
 
+    // (optional) defensive filter
+    const safeRows = (wrCache.rows || []).filter((r) =>
+      isValidTimeMs(Number(r.timeMs))
+    );
+
     const tally = new Map(); // accountId -> { accountId, displayName, wrCount, latestTs }
-    for (const r of wrCache.rows) {
+    for (const r of safeRows) {
       if (!r.accountId) continue;
       const rec =
         tally.get(r.accountId) || {
@@ -739,7 +763,8 @@ app.get("/api/wr-players", async (req, res) => {
   }
 });
 
-// Top players in last N days
+// Top players in last N days (read from cache). Auto-discover + quick refresh.
+// Optional: ?days=7  ?limit=3
 app.get("/api/top-weekly", async (req, res) => {
   try {
     if (!wrCache.rows.length) {
@@ -753,8 +778,13 @@ app.get("/api/top-weekly", async (req, res) => {
     const limit = Math.max(1, Math.min(50, Number(req.query.limit) || 3));
     const cutoff = Math.floor(Date.now() / 1000) - days * 24 * 3600;
 
+    // (optional) defensive filter
+    const safeRows = (wrCache.rows || []).filter((r) =>
+      isValidTimeMs(Number(r.timeMs))
+    );
+
     const tally = new Map(); // accountId -> { accountId, displayName, wrs, bySource, latestTs }
-    for (const r of wrCache.rows) {
+    for (const r of safeRows) {
       if (!r.accountId) continue;
       if (!r.timestamp || r.timestamp < cutoff) continue;
 
@@ -818,7 +848,8 @@ app.get("/api/debug-stats", async (_req, res) => {
   }
 });
 
-// Force a full diff-based rebuild
+// Force a full diff-based rebuild (use for manual/cron refresh)
+// Optional: ?includeClub=true|false
 app.post("/api/rebuild-now", async (req, res) => {
   try {
     const includeClubParam = (req.query.includeClub ?? "")
@@ -862,5 +893,5 @@ app.get("/api/debug-clubs", async (_req, res) => {
 /* ------------------------- Start --------------------------- */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () =>
-  console.log(`✅ API running on port ${PORT} (cache dir: ${CACHE_DIR})`)
+  console.log(`✅ API running on port ${PORT}`)
 );
