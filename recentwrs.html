@@ -187,8 +187,8 @@ setInterval(() => load(), 20000);
     };
     const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
     const tblBtn = document.querySelector('a[href="/recentwrs"]');
-    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=300'), { once:true });
-    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=300'), { once:true });
+    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=150'), { once:true });
+    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=150'), { once:true });
   </script>
 
 </body>
