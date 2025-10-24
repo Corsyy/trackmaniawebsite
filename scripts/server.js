@@ -155,82 +155,95 @@ async function getMapWR(accessToken, mapUid) {
 // Process-wide cache so we only resolve each accountId once.
 const nameCache = new Map(); // accountId -> displayName
 
-// Robust resolver: batch (GET/POST) + last-resort per-ID lookups.
+// Robust resolver: batch (GET/POST in multiple shapes) + per-ID fallback, with caching
 async function resolveDisplayNames(accessToken, ids) {
-  const all = Array.from(new Set((ids || []).filter(Boolean)));
+  const allIds = Array.from(new Set((ids || []).filter(Boolean)));
+  const need = allIds.filter((id) => !nameCache.has(id));
+  if (!need.length) return nameCache;
 
-  // Only fetch for IDs we don't have yet
-  const want = all.filter((id) => !nameCache.has(id));
-  if (!want.length) return nameCache;
+  const HJSON = {
+    Authorization: `nadeo_v1 t=${accessToken}`,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+  };
+  const HGET = {
+    Authorization: `nadeo_v1 t=${accessToken}`,
+    Accept: "application/json",
+    "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+  };
 
-  // --- batch helpers ---
-  async function batchGET(batch) {
+  // Batch attempts in various shapes
+  async function tryBatchGET_rawComma(batch) {
+    const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${batch.join(
+      ","
+    )}`;
+    const r = await fetch(url, { headers: HGET });
+    if (!r.ok) throw new Error(`GET rawComma ${r.status}`);
+    return r.json();
+  }
+  async function tryBatchGET_encoded(batch) {
     const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${encodeURIComponent(
       batch.join(",")
     )}`;
-    const r = await fetch(url, {
-      headers: {
-        Authorization: `nadeo_v1 t=${accessToken}`,
-        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-      },
-    });
-    if (!r.ok) throw new Error(`GET displayNames -> ${r.status}`);
-    const j = await r.json();
-    const arr = j?.displayNames || j || [];
-    const out = new Map();
-    for (const row of arr) {
-      if (row?.accountId && row?.displayName)
-        out.set(row.accountId, row.displayName);
-    }
-    return out;
+    const r = await fetch(url, { headers: HGET });
+    if (!r.ok) throw new Error(`GET encoded ${r.status}`);
+    return r.json();
   }
-
-  async function batchPOST(batch) {
+  async function tryBatchGET_legacy(batch) {
+    const url = `${LIVE_BASE}/api/accounts/displayNames?accountIdList=${batch.join(
+      ","
+    )}`;
+    const r = await fetch(url, { headers: HGET });
+    if (!r.ok) throw new Error(`GET legacy ${r.status}`);
+    return r.json();
+  }
+  async function tryBatchPOST_array(batch) {
     const url = `${LIVE_BASE}/api/token/accounts/displayNames`;
     const r = await fetch(url, {
       method: "POST",
-      headers: {
-        Authorization: `nadeo_v1 t=${accessToken}`,
-        "Content-Type": "application/json",
-        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-      },
+      headers: HJSON,
       body: JSON.stringify({ accountIdList: batch }),
     });
-    if (!r.ok) throw new Error(`POST displayNames -> ${r.status}`);
-    const j = await r.json();
-    const arr = j?.displayNames || j || [];
+    if (!r.ok) throw new Error(`POST array ${r.status}`);
+    return r.json();
+  }
+  async function tryBatchPOST_csv(batch) {
+    const url = `${LIVE_BASE}/api/token/accounts/displayNames`;
+    const r = await fetch(url, {
+      method: "POST",
+      headers: HJSON,
+      body: JSON.stringify({ accountIdList: batch.join(",") }),
+    });
+    if (!r.ok) throw new Error(`POST csv ${r.status}`);
+    return r.json();
+  }
+
+  function harvestNames(j) {
     const out = new Map();
+    const arr = (j && (j.displayNames || j)) || [];
     for (const row of arr) {
-      if (row?.accountId && row?.displayName)
-        out.set(row.accountId, row.displayName);
+      const id = row?.accountId;
+      const dn =
+        row?.displayName || row?.name || row?.userName || row?.username;
+      if (id && dn) out.set(id, dn);
     }
     return out;
   }
 
-  // Last-resort single-ID lookups (try two shapes)
-  async function single(id) {
+  // Per-ID fallback (two possible endpoints observed)
+  async function tryPerId(id) {
     const candidates = [
       `${LIVE_BASE}/api/token/accounts/${encodeURIComponent(id)}`,
       `${LIVE_BASE}/api/token/account/${encodeURIComponent(id)}`,
     ];
     for (const url of candidates) {
       try {
-        const r = await fetch(url, {
-          headers: {
-            Authorization: `nadeo_v1 t=${accessToken}`,
-            "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-          },
-        });
+        const r = await fetch(url, { headers: HGET });
         if (!r.ok) continue;
         const j = await r.json();
-        const obj =
-          j && Array.isArray(j) ? j[0] : j; // handle both array/object
-        const dn =
-          obj?.displayName ||
-          obj?.name ||
-          obj?.userName ||
-          obj?.username ||
-          null;
+        const o = Array.isArray(j) ? j[0] : j;
+        const dn = o?.displayName || o?.name || o?.userName || o?.username;
         if (dn) return dn;
       } catch {}
     }
@@ -238,44 +251,46 @@ async function resolveDisplayNames(accessToken, ids) {
   }
 
   const CHUNK = 100;
-  for (let i = 0; i < want.length; i += CHUNK) {
-    const batch = want.slice(i, i + CHUNK);
+  for (let i = 0; i < need.length; i += CHUNK) {
+    const batch = need.slice(i, i + CHUNK);
 
     let got = new Map();
-    try {
-      got = await batchGET(batch);
-    } catch {}
-
-    if (!got.size) {
+    const attempts = [
+      tryBatchGET_rawComma,
+      tryBatchGET_encoded,
+      tryBatchPOST_array,
+      tryBatchPOST_csv,
+      tryBatchGET_legacy,
+    ];
+    for (const fn of attempts) {
+      if (got.size === batch.length) break;
       try {
-        got = await batchPOST(batch);
+        const j = await fn(batch);
+        const m = harvestNames(j);
+        for (const [k, v] of m) got.set(k, v);
       } catch {}
     }
 
-    // Fill cache with what we got
-    for (const [id, name] of got) nameCache.set(id, name);
+    // Fill cache with successes
+    for (const [id, dn] of got) nameCache.set(id, dn);
 
-    // Any leftovers? Try per-ID.
+    // Stragglers -> per-ID (polite parallelism)
     const missing = batch.filter((id) => !nameCache.has(id));
     if (missing.length) {
-      console.warn(
-        `[names] batch unresolved (${missing.length}/${batch.length}) — trying single lookups`
-      );
       const limit = 6;
       for (let j = 0; j < missing.length; j += limit) {
-        const slice = missing.slice(j, j + limit);
         await Promise.all(
-          slice.map(async (id) => {
-            const dn = await single(id);
-            nameCache.set(id, dn || id); // fall back to ID
+          missing.slice(j, j + limit).map(async (id) => {
+            const dn = await tryPerId(id);
+            nameCache.set(id, dn || id); // ensure something is cached
           })
         );
       }
     }
   }
 
-  // Final sanity: ensure every requested id has *something* cached
-  for (const id of want) if (!nameCache.has(id)) nameCache.set(id, id);
+  // Guarantee every requested id has an entry (even if it’s itself)
+  for (const id of need) if (!nameCache.has(id)) nameCache.set(id, id);
   return nameCache;
 }
 
@@ -401,6 +416,23 @@ app.get("/api/wr-players", async (req, res) => {
         error: "Failed to load WR players",
         detail: err?.message || String(err),
       });
+  }
+});
+
+/* ---------------- Optional: name debug route ---------------- */
+// Quick check: /api/debug-names?ids=a,b,c
+app.get("/api/debug-names", async (req, res) => {
+  try {
+    const access = await getLiveAccessToken();
+    const ids = String(req.query.ids || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    await resolveDisplayNames(access, ids);
+    const data = ids.map((id) => ({ id, name: nameCache.get(id) || null }));
+    res.json({ data });
+  } catch (e) {
+    res.status(500).json({ error: e?.message || String(e) });
   }
 });
 
