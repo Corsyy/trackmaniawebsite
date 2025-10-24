@@ -2,8 +2,10 @@ import express from "express";
 import fetch from "node-fetch";
 
 /**
- * ENV on Render:
+ * ENV on Render (you already have these):
  *   REFRESH_TOKEN = <NadeoLiveServices refresh token>
+ *   CLIENT_ID = <api.trackmania.com client_id>
+ *   CLIENT_SECRET = <api.trackmania.com client_secret>
  * Optional:
  *   CORS_ORIGINS = comma-separated list of extra origins
  */
@@ -38,6 +40,7 @@ app.get("/healthz", (_req, res) => res.json({ ok: true }));
 app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
 /* -------------------- Auth (refresh -> access) -------------- */
+// Nadeo Live (refresh -> access token) for leaderboards & campaign/month
 const NADEO_REFRESH = process.env.REFRESH_TOKEN;
 const CORE_REFRESH_URL =
   "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
@@ -67,6 +70,40 @@ async function getLiveAccessToken() {
   return cachedAccess.token;
 }
 
+/* ---------------- OAuth (api.trackmania.com) ---------------- */
+// Public OAuth (client credentials) for display-name resolution
+const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
+const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
+let cachedOAuth = { token: null, expAt: 0 };
+
+async function getOAuthToken() {
+  const now = Date.now();
+  if (cachedOAuth.token && now < cachedOAuth.expAt - 30_000)
+    return cachedOAuth.token;
+  if (!OAUTH_CLIENT_ID || !OAUTH_CLIENT_SECRET)
+    throw new Error("Missing CLIENT_ID / CLIENT_SECRET");
+
+  const r = await fetch("https://api.trackmania.com/api/access_token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+    },
+    body: new URLSearchParams({
+      grant_type: "client_credentials",
+      client_id: OAUTH_CLIENT_ID,
+      client_secret: OAUTH_CLIENT_SECRET,
+    }).toString(),
+  });
+  if (!r.ok) throw new Error(`oauth token failed ${r.status} ${await r.text()}`);
+  const j = await r.json();
+  const accessToken = j.access_token || j.accessToken;
+  const expiresIn = j.expires_in || 3600;
+  if (!accessToken) throw new Error("no OAuth access_token");
+  cachedOAuth = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
+  return cachedOAuth.token;
+}
+
 /* ------------------ Live Services helpers ------------------ */
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 
@@ -82,78 +119,63 @@ async function jget(url, accessToken) {
   return r.json();
 }
 
-// Official campaigns (many)
+/* ---------------- Official campaigns (Nadeo) --------------- */
 async function getAllOfficialCampaigns(accessToken) {
+  // length=200 is enough for all seasonal campaigns so far
   const url = `${LIVE_BASE}/api/campaign/official?offset=0&length=200`;
   const j = await jget(url, accessToken);
   return j?.campaignList || [];
 }
 
-/* -------------------- Trackmania.io (TOTD months brute force) -------------------- */
-const TMIO_BASE = "https://trackmania.io";
-
-// Robust text->JSON parser that throws on HTML
-async function jgetPublic(url) {
-  const r = await fetch(url, {
-    headers: {
-      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-      Accept: "application/json",
-    },
-  });
-  const txt = await r.text();
-  if (!r.ok) throw new Error(`${url} -> ${r.status} ${txt?.slice(0, 180)}`);
-  try {
-    return JSON.parse(txt);
-  } catch {
-    throw new Error(`Non-JSON from TMIO at ${url}: ${txt?.slice(0, 180)}`);
-  }
-}
-
-// Build YYYY-MM list from 2020-07 (TOTD start) to current month
-function enumerateTotdMonths() {
-  const out = [];
+/* -------------------- TOTD via Live API -------------------- */
+/**
+ * We list all month entries from 2020-07 to current month using
+ * /api/token/campaign/month?length=X&offset=Y
+ * Each month has days[].mapUid
+ */
+function countMonthsFrom2020July() {
   const start = new Date(Date.UTC(2020, 6, 1)); // 2020-07-01
   const now = new Date();
   const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-  for (let d = start; d <= end; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))) {
-    const y = d.getUTCFullYear();
-    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-    out.push(`${y}-${m}`);
+  let count = 0;
+  for (
+    let d = start;
+    d <= end;
+    d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))
+  ) {
+    count++;
   }
-  return out;
+  return count;
 }
 
-// Fetch a single month’s days (returns [] on errors/HTML/etc.)
-async function getTmioTotdMonthDays(ym) {
-  const [year, m] = ym.split("-");
-  const mm = String(m).padStart(2, "0");
-  const url = `${TMIO_BASE}/api/totd/${year}/${mm}`;
-  try {
-    const j = await jgetPublic(url);
-    const days = Array.isArray(j?.days) ? j.days : Array.isArray(j) ? j : [];
-    return days;
-  } catch (e) {
-    // swallow and treat as no TOTD for that month
-    return [];
+async function getTotdMonthsFromLive(accessToken) {
+  const total = countMonthsFrom2020July();
+  const months = [];
+  const BATCH = 24; // fetch in chunks (be polite)
+  // Offset is zero-based from oldest; we want all, so walk backwards in batches
+  for (let offset = total - 1; offset >= 0; offset -= BATCH) {
+    const len = Math.min(BATCH, offset + 1);
+    const url = `${LIVE_BASE}/api/token/campaign/month?length=${len}&offset=${offset}`;
+    const j = await jget(url, accessToken);
+    const list = j?.monthList || [];
+    months.push(...list);
+    // tiny delay to reduce risk of 429 in shared hosting
+    await new Promise((r) => setTimeout(r, 60));
   }
+  return months;
 }
 
-// Get ALL TOTD mapUids by brute-forcing months (polite concurrency)
-async function getAllTotdMapUidsViaTMIO() {
-  const months = enumerateTotdMonths();
+async function getAllTotdMapUidsViaLive(accessToken) {
+  const months = await getTotdMonthsFromLive(accessToken);
   const uids = new Set();
-  const CONC = 4; // polite
-  for (let i = 0; i < months.length; i += CONC) {
-    const batch = months.slice(i, i + CONC);
-    const chunks = await Promise.all(batch.map((ym) => getTmioTotdMonthDays(ym)));
-    for (const days of chunks) {
-      for (const d of days) if (d?.mapUid) uids.add(d.mapUid);
-    }
+  for (const m of months) {
+    const days = Array.isArray(m?.days) ? m.days : [];
+    for (const d of days) if (d?.mapUid) uids.add(d.mapUid);
   }
   return Array.from(uids);
 }
 
-/* -------------------- Map UID collection (merge) -------------------- */
+/* -------------------- Map UID collection ------------------- */
 function collectAllMapUidsFromOfficialAndTotd(officialCampaigns, totdUidsList) {
   const officialUids = officialCampaigns.flatMap((c) =>
     (c.playlist || []).map((p) => p.mapUid)
@@ -202,137 +224,55 @@ async function getMapWR(accessToken, mapUid) {
 /* ---------------------- Display names ---------------------- */
 const nameCache = new Map(); // accountId -> displayName
 
-// Robust resolver: multiple batch shapes + per-ID fallback, then cache
-async function resolveDisplayNames(accessToken, ids) {
-  const allIds = Array.from(new Set((ids || []).filter(Boolean)));
-  const need = allIds.filter((id) => !nameCache.has(id));
+// Use public OAuth API (client-credentials) to resolve display names
+async function resolveDisplayNames(_liveAccessToken, ids) {
+  const all = Array.from(new Set((ids || []).filter(Boolean)));
+  const need = all.filter((id) => !nameCache.has(id));
   if (!need.length) return nameCache;
 
-  const HJSON = {
-    Authorization: `nadeo_v1 t=${accessToken}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-  };
-  const HGET = {
-    Authorization: `nadeo_v1 t=${accessToken}`,
-    Accept: "application/json",
-    "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-  };
-
-  async function tryBatchGET_rawComma(batch) {
-    const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${batch.join(",")}`;
-    const r = await fetch(url, { headers: HGET });
-    if (!r.ok) throw new Error(`GET rawComma ${r.status}`);
-    return r.json();
-  }
-  async function tryBatchGET_encoded(batch) {
-    const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${encodeURIComponent(batch.join(","))}`;
-    const r = await fetch(url, { headers: HGET });
-    if (!r.ok) throw new Error(`GET encoded ${r.status}`);
-    return r.json();
-  }
-  async function tryBatchGET_legacy(batch) {
-    const url = `${LIVE_BASE}/api/accounts/displayNames?accountIdList=${batch.join(",")}`;
-    const r = await fetch(url, { headers: HGET });
-    if (!r.ok) throw new Error(`GET legacy ${r.status}`);
-    return r.json();
-  }
-  async function tryBatchPOST_array(batch) {
-    const url = `${LIVE_BASE}/api/token/accounts/displayNames`;
-    const r = await fetch(url, {
-      method: "POST",
-      headers: HJSON,
-      body: JSON.stringify({ accountIdList: batch }),
-    });
-    if (!r.ok) throw new Error(`POST array ${r.status}`);
-    return r.json();
-  }
-  async function tryBatchPOST_csv(batch) {
-    const url = `${LIVE_BASE}/api/token/accounts/displayNames`;
-    const r = await fetch(url, {
-      method: "POST",
-      headers: HJSON,
-      body: JSON.stringify({ accountIdList: batch.join(",") }),
-    });
-    if (!r.ok) throw new Error(`POST csv ${r.status}`);
-    return r.json();
-  }
-
-  function harvestNames(j) {
-    const out = new Map();
-    const arr = (j && (j.displayNames || j)) || [];
-    for (const row of arr) {
-      const id = row?.accountId;
-      const dn =
-        row?.displayName || row?.name || row?.userName || row?.username;
-      if (id && dn) out.set(id, dn);
-    }
-    return out;
-  }
-
-  async function tryPerId(id) {
-    const candidates = [
-      `${LIVE_BASE}/api/token/accounts/${encodeURIComponent(id)}`,
-      `${LIVE_BASE}/api/token/account/${encodeURIComponent(id)}`,
-    ];
-    for (const url of candidates) {
-      try {
-        const r = await fetch(url, { headers: HGET });
-        if (!r.ok) continue;
-        const j = await r.json();
-        const o = Array.isArray(j) ? j[0] : j;
-        const dn = o?.displayName || o?.name || o?.userName || o?.username;
-        if (dn) return dn;
-      } catch {}
-    }
-    return null;
-  }
-
-  const CHUNK = 100;
+  const oToken = await getOAuthToken();
+  const CHUNK = 50; // API supports batch via accountId[]
   for (let i = 0; i < need.length; i += CHUNK) {
     const batch = need.slice(i, i + CHUNK);
+    const params = new URLSearchParams();
+    for (const id of batch) params.append("accountId[]", id);
 
-    let got = new Map();
-    const attempts = [
-      tryBatchGET_rawComma,
-      tryBatchGET_encoded,
-      tryBatchPOST_array,
-      tryBatchPOST_csv,
-      tryBatchGET_legacy,
-    ];
-    for (const fn of attempts) {
-      if (got.size === batch.length) break;
-      try {
-        const j = await fn(batch);
-        const m = harvestNames(j);
-        for (const [k, v] of m) got.set(k, v);
-      } catch {}
-    }
-
-    for (const [id, dn] of got) nameCache.set(id, dn);
-
-    const missing = batch.filter((id) => !nameCache.has(id));
-    if (missing.length) {
-      const limit = 6;
-      for (let j = 0; j < missing.length; j += limit) {
-        await Promise.all(
-          missing.slice(j, j + limit).map(async (id) => {
-            const dn = await tryPerId(id);
-            nameCache.set(id, dn || id);
-          })
-        );
+    try {
+      const r = await fetch(
+        `https://api.trackmania.com/api/display-names?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${oToken}`,
+            Accept: "application/json",
+            "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+          },
+        }
+      );
+      if (!r.ok) {
+        // map to IDs rather than failing hard
+        for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
+        continue;
       }
+      // Response is an object: { "<accountId>": "DisplayName", ... }
+      const j = await r.json();
+      for (const id of batch) {
+        const dn = j?.[id];
+        nameCache.set(id, (typeof dn === "string" && dn) || id);
+      }
+    } catch {
+      // fallback to ids on error
+      for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
     }
+    // small delay to be gentle
+    await new Promise((r) => setTimeout(r, 40));
   }
-
-  for (const id of need) if (!nameCache.has(id)) nameCache.set(id, id);
   return nameCache;
 }
+
 /* ------------------------- Cache --------------------------- */
 let wrCache = { ts: 0, rows: [] };
 const WR_TTL_MS = 10 * 60 * 1000; // 10 min
-const CONCURRENCY = 8;
+const CONCURRENCY = 6;
 
 /* --------------- Build ALL WRs (official + TOTD) ----------- */
 async function buildAllWRs() {
@@ -341,21 +281,20 @@ async function buildAllWRs() {
   // 1) Official (Nadeo)
   const official = await getAllOfficialCampaigns(access);
 
-  // 2) TOTD UIDs via Trackmania.io months (brute-force)
-  const totdUids = await getAllTotdMapUidsViaTMIO();
+  // 2) TOTD UIDs via official Live API (all months since 2020-07)
+  const totdUids = await getAllTotdMapUidsViaLive(access);
 
   // 3) Merge + remember which are official
   const { all: mapUids, officialSet } =
     collectAllMapUidsFromOfficialAndTotd(official, totdUids);
 
-  // 4) Fetch WRs
+  // 4) Fetch WRs with bounded concurrency
   const wrs = [];
   for (let i = 0; i < mapUids.length; i += CONCURRENCY) {
     const part = await Promise.all(
       mapUids.slice(i, i + CONCURRENCY).map(async (uid) => {
         const row = await getMapWR(access, uid);
         if (!row || row.empty || row.error) return null;
-        // tag the source for debug/stats
         row.sourceType = officialSet.has(uid) ? "official" : "totd";
         return row;
       })
@@ -363,7 +302,7 @@ async function buildAllWRs() {
     wrs.push(...part.filter(Boolean));
   }
 
-  // 5) Resolve names
+  // 5) Resolve names via OAuth Public API
   const idList = wrs.map((r) => r.accountId).filter(Boolean);
   await resolveDisplayNames(access, idList);
   for (const r of wrs) {
@@ -464,16 +403,13 @@ app.get("/api/wr-players", async (req, res) => {
 });
 
 /* ---------------- Debug helpers ---------------- */
-
-// Quick name check: /api/debug-names?ids=a,b,c
 app.get("/api/debug-names", async (req, res) => {
   try {
-    const access = await getLiveAccessToken();
     const ids = String(req.query.ids || "")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
-    await resolveDisplayNames(access, ids);
+    await resolveDisplayNames(null, ids);
     const data = ids.map((id) => ({ id, name: nameCache.get(id) || null }));
     res.json({ data });
   } catch (e) {
@@ -481,7 +417,6 @@ app.get("/api/debug-names", async (req, res) => {
   }
 });
 
-// Cache + counts insight
 app.get("/api/debug-stats", async (_req, res) => {
   try {
     if (!wrCache.rows.length) await buildAllWRs();
