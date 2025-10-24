@@ -2,12 +2,12 @@ import express from "express";
 import fetch from "node-fetch";
 
 /**
- * ENV on Render (you already have these):
+ * ENV:
  *   REFRESH_TOKEN = <NadeoLiveServices refresh token>
- *   CLIENT_ID = <api.trackmania.com client_id>
+ *   CLIENT_ID     = <api.trackmania.com client_id>
  *   CLIENT_SECRET = <api.trackmania.com client_secret>
  * Optional:
- *   CORS_ORIGINS = comma-separated list of extra origins
+ *   CORS_ORIGINS  = comma-separated list of extra allowed origins
  */
 
 const app = express();
@@ -40,7 +40,6 @@ app.get("/healthz", (_req, res) => res.json({ ok: true }));
 app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
 /* -------------------- Auth (refresh -> access) -------------- */
-// Nadeo Live (refresh -> access token) for leaderboards & campaign/month
 const NADEO_REFRESH = process.env.REFRESH_TOKEN;
 const CORE_REFRESH_URL =
   "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
@@ -121,18 +120,12 @@ async function jget(url, accessToken) {
 
 /* ---------------- Official campaigns (Nadeo) --------------- */
 async function getAllOfficialCampaigns(accessToken) {
-  // length=200 is enough for all seasonal campaigns so far
   const url = `${LIVE_BASE}/api/campaign/official?offset=0&length=200`;
   const j = await jget(url, accessToken);
   return j?.campaignList || [];
 }
 
 /* -------------------- TOTD via Live API -------------------- */
-/**
- * We list all month entries from 2020-07 to current month using
- * /api/token/campaign/month?length=X&offset=Y
- * Each month has days[].mapUid
- */
 function countMonthsFrom2020July() {
   const start = new Date(Date.UTC(2020, 6, 1)); // 2020-07-01
   const now = new Date();
@@ -151,16 +144,14 @@ function countMonthsFrom2020July() {
 async function getTotdMonthsFromLive(accessToken) {
   const total = countMonthsFrom2020July();
   const months = [];
-  const BATCH = 24; // fetch in chunks (be polite)
-  // Offset is zero-based from oldest; we want all, so walk backwards in batches
+  const BATCH = 24;
   for (let offset = total - 1; offset >= 0; offset -= BATCH) {
     const len = Math.min(BATCH, offset + 1);
     const url = `${LIVE_BASE}/api/token/campaign/month?length=${len}&offset=${offset}`;
     const j = await jget(url, accessToken);
     const list = j?.monthList || [];
     months.push(...list);
-    // tiny delay to reduce risk of 429 in shared hosting
-    await new Promise((r) => setTimeout(r, 60));
+    await new Promise((r) => setTimeout(r, 60)); // gentle
   }
   return months;
 }
@@ -175,16 +166,29 @@ async function getAllTotdMapUidsViaLive(accessToken) {
   return Array.from(uids);
 }
 
-/* -------------------- Map UID collection ------------------- */
-function collectAllMapUidsFromOfficialAndTotd(officialCampaigns, totdUidsList) {
-  const officialUids = officialCampaigns.flatMap((c) =>
-    (c.playlist || []).map((p) => p.mapUid)
+/* -------------------- Club campaigns (Live) ---------------- */
+const CLUB_BATCH = 100;
+
+/** Paginated list of verified club campaigns. */
+async function getAllClubCampaigns(accessToken) {
+  const all = [];
+  for (let offset = 0; ; offset += CLUB_BATCH) {
+    const url = `${LIVE_BASE}/api/token/club/campaign?length=${CLUB_BATCH}&offset=${offset}`;
+    const j = await jget(url, accessToken);
+    const list = j?.clubCampaignList || [];
+    if (!list.length) break;
+    all.push(...list);
+    if (list.length < CLUB_BATCH) break;
+    await new Promise((r) => setTimeout(r, 60)); // gentle
+  }
+  return all;
+}
+
+/** Extract mapUids from club campaigns' playlists. */
+function collectClubMapUids(clubCampaigns) {
+  return clubCampaigns.flatMap((cc) =>
+    (cc?.campaign?.playlist || []).map((p) => p.mapUid).filter(Boolean)
   );
-  const totdUids = Array.isArray(totdUidsList) ? totdUidsList : [];
-  return {
-    all: Array.from(new Set([...officialUids, ...totdUids])),
-    officialSet: new Set(officialUids),
-  };
 }
 
 /* ---------------- Time, WR fetch, names -------------------- */
@@ -202,7 +206,6 @@ function normalizeToSeconds(val) {
   return 0;
 }
 
-// WR (top1 world) per map
 async function getMapWR(accessToken, mapUid) {
   const groupUid = "Personal_Best";
   const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
@@ -224,14 +227,13 @@ async function getMapWR(accessToken, mapUid) {
 /* ---------------------- Display names ---------------------- */
 const nameCache = new Map(); // accountId -> displayName
 
-// Use public OAuth API (client-credentials) to resolve display names
 async function resolveDisplayNames(_liveAccessToken, ids) {
   const all = Array.from(new Set((ids || []).filter(Boolean)));
   const need = all.filter((id) => !nameCache.has(id));
   if (!need.length) return nameCache;
 
   const oToken = await getOAuthToken();
-  const CHUNK = 50; // API supports batch via accountId[]
+  const CHUNK = 50;
   for (let i = 0; i < need.length; i += CHUNK) {
     const batch = need.slice(i, i + CHUNK);
     const params = new URLSearchParams();
@@ -249,22 +251,18 @@ async function resolveDisplayNames(_liveAccessToken, ids) {
         }
       );
       if (!r.ok) {
-        // map to IDs rather than failing hard
         for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
         continue;
       }
-      // Response is an object: { "<accountId>": "DisplayName", ... }
-      const j = await r.json();
+      const j = await r.json(); // { "<accountId>": "DisplayName", ... }
       for (const id of batch) {
         const dn = j?.[id];
         nameCache.set(id, (typeof dn === "string" && dn) || id);
       }
     } catch {
-      // fallback to ids on error
       for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
     }
-    // small delay to be gentle
-    await new Promise((r) => setTimeout(r, 40));
+    await new Promise((r) => setTimeout(r, 40)); // gentle
   }
   return nameCache;
 }
@@ -274,42 +272,55 @@ let wrCache = { ts: 0, rows: [] };
 const WR_TTL_MS = 10 * 60 * 1000; // 10 min
 const CONCURRENCY = 6;
 
-/* --------------- Build ALL WRs (official + TOTD) ----------- */
+/* --------------- Build ALL WRs (official + TOTD + CLUB) --- */
 async function buildAllWRs() {
   const access = await getLiveAccessToken();
 
-  // 1) Official (Nadeo)
+  // 1) Official (seasons)
   const official = await getAllOfficialCampaigns(access);
 
-  // 2) TOTD UIDs via official Live API (all months since 2020-07)
+  // 2) TOTD (all months)
   const totdUids = await getAllTotdMapUidsViaLive(access);
 
-  // 3) Merge + remember which are official
-  const { all: mapUids, officialSet } =
-    collectAllMapUidsFromOfficialAndTotd(official, totdUids);
+  // 3) Club campaigns
+  const clubCampaigns = await getAllClubCampaigns(access);
+  const clubUids = collectClubMapUids(clubCampaigns);
 
-  // 4) Fetch WRs with bounded concurrency
+  // 4) Merge + tag sets
+  const officialUids = new Set(
+    official.flatMap((c) => (c.playlist || []).map((p) => p.mapUid))
+  );
+  const clubUidSet = new Set(clubUids);
+  const allMapUids = Array.from(
+    new Set([...officialUids, ...totdUids, ...clubUidSet])
+  );
+
+  // 5) Fetch WRs
   const wrs = [];
-  for (let i = 0; i < mapUids.length; i += CONCURRENCY) {
+  for (let i = 0; i < allMapUids.length; i += CONCURRENCY) {
     const part = await Promise.all(
-      mapUids.slice(i, i + CONCURRENCY).map(async (uid) => {
+      allMapUids.slice(i, i + CONCURRENCY).map(async (uid) => {
         const row = await getMapWR(access, uid);
         if (!row || row.empty || row.error) return null;
-        row.sourceType = officialSet.has(uid) ? "official" : "totd";
+        row.sourceType = officialUids.has(uid)
+          ? "official"
+          : clubUidSet.has(uid)
+          ? "club"
+          : "totd";
         return row;
       })
     );
     wrs.push(...part.filter(Boolean));
   }
 
-  // 5) Resolve names via OAuth Public API
+  // 6) Resolve names
   const idList = wrs.map((r) => r.accountId).filter(Boolean);
   await resolveDisplayNames(access, idList);
   for (const r of wrs) {
     if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
   }
 
-  // 6) Sort newest first and cache
+  // 7) Sort newest first and cache
   wrs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   wrCache = { ts: Date.now(), rows: wrs };
   return wrs;
@@ -317,8 +328,8 @@ async function buildAllWRs() {
 
 /* ------------------------ Endpoints ------------------------ */
 
-// Most recent WRs across ALL official campaigns + ALL TOTD months
-// Optional: ?limit=300  ?search=foo
+// Latest WRs (Campaign + TOTD + Club)
+// Optional: ?limit=300  ?search=foo  ?type=official,totd,club
 app.get("/api/wr-latest", async (req, res) => {
   try {
     const fresh = Date.now() - wrCache.ts < WR_TTL_MS && wrCache.rows.length;
@@ -337,6 +348,14 @@ app.get("/api/wr-latest", async (req, res) => {
       );
     }
 
+    const type = (req.query.type || "all").toString().trim().toLowerCase();
+    if (type !== "all") {
+      const allow = new Set(
+        type.split(",").map((s) => s.trim()).filter(Boolean)
+      );
+      out = out.filter((r) => allow.has(r.sourceType));
+    }
+
     res.json({
       rows: out.slice(0, limit),
       total: out.length,
@@ -352,7 +371,7 @@ app.get("/api/wr-latest", async (req, res) => {
   }
 });
 
-// Players leaderboard across ALL official + TOTD WRs
+// Players leaderboard across ALL sources (Campaign + TOTD + Club)
 // Optional: ?limit=200  ?q=search
 app.get("/api/wr-players", async (req, res) => {
   try {
@@ -402,6 +421,44 @@ app.get("/api/wr-players", async (req, res) => {
   }
 });
 
+// Top players in last N days (defaults: 7 days, top 3)
+app.get("/api/top-weekly", async (req, res) => {
+  try {
+    if (!wrCache.rows.length || Date.now() - wrCache.ts >= WR_TTL_MS) {
+      await buildAllWRs();
+    }
+    const days = Math.max(1, Math.min(90, Number(req.query.days) || 7));
+    const limit = Math.max(1, Math.min(50, Number(req.query.limit) || 3));
+    const cutoff = Math.floor(Date.now() / 1000) - days * 24 * 3600;
+
+    const tally = new Map(); // accountId -> { accountId, displayName, wrs, bySource, latestTs }
+    for (const r of wrCache.rows) {
+      if (!r.accountId) continue;
+      if (!r.timestamp || r.timestamp < cutoff) continue;
+
+      const rec = tally.get(r.accountId) || {
+        accountId: r.accountId,
+        displayName: r.displayName || r.accountId,
+        wrs: 0,
+        bySource: { official: 0, totd: 0, club: 0 },
+        latestTs: 0,
+      };
+      rec.wrs += 1;
+      rec.bySource[r.sourceType] = (rec.bySource[r.sourceType] || 0) + 1;
+      if (r.timestamp > rec.latestTs) rec.latestTs = r.timestamp;
+      tally.set(r.accountId, rec);
+    }
+
+    const top = Array.from(tally.values())
+      .sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs)
+      .slice(0, limit);
+
+    res.json({ rangeDays: days, top, generatedAt: Date.now() });
+  } catch (e) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+
 /* ---------------- Debug helpers ---------------- */
 app.get("/api/debug-names", async (req, res) => {
   try {
@@ -421,10 +478,9 @@ app.get("/api/debug-stats", async (_req, res) => {
   try {
     if (!wrCache.rows.length) await buildAllWRs();
     const rows = wrCache.rows || [];
-    const counts = { official: 0, totd: 0 };
+    const counts = { official: 0, totd: 0, club: 0 };
     for (const r of rows) {
-      if (r.sourceType === "official") counts.official++;
-      else if (r.sourceType === "totd") counts.totd++;
+      counts[r.sourceType] = (counts[r.sourceType] || 0) + 1;
     }
     res.json({
       cacheTime: wrCache.ts,
