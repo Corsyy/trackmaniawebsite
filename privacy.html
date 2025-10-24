@@ -33,8 +33,8 @@
     }
     body.bg-track-curves::before{
       content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
-      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
-      background-size:cover; opacity:.6; mix-blend-mode:screen;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+      background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.6;mix-blend-mode:screen;
     }
     body.bg-track-curves::after{
       content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
@@ -48,31 +48,36 @@
 
     /* Header */
     header{
-      position:sticky; top:0; z-index:50;
+      position:sticky;top:0;z-index:50;
       background:linear-gradient(180deg, rgba(10,15,26,.92), rgba(10,15,26,.72) 60%, rgba(10,15,26,0));
       backdrop-filter:blur(8px);
       border-bottom:1px solid rgba(109,251,255,.18);
     }
-    .nav{display:flex; align-items:center; justify-content:space-between; padding:.9rem 0}
-    .brand{display:flex; align-items:center; gap:.6rem; font-weight:800}
-    .brand-badge{
-      width:34px; height:34px; border-radius:10px; display:grid; place-items:center;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:var(--accent-glow)
-    }
-    .navlinks{display:flex; gap:.5rem; align-items:center}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .brand{display:flex;align-items:center;gap:.6rem;font-weight:800}
+    .brand-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow)}
+    .navlinks{display:flex;gap:.5rem;align-items:center}
+    /* Match worldrecord.html button style */
     .btn{
-      padding:.6rem .95rem; border:1px solid rgba(109,251,255,.25); border-radius:12px;
+      padding:.6rem .95rem;
+      border:1px solid rgba(109,251,255,.25);
+      border-radius:12px;
       background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));
-      color:var(--text); font-weight:700; transition:.2s;
+      color:var(--text);
+      font-weight:700;
+      transition:.2s;
     }
-    .btn:hover{transform:translateY(-1px) scale(1.02); filter:brightness(1.06)}
+    .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
 
     /* Content */
     main{padding: clamp(1.6rem, 4vw, 2.6rem) 0 3rem}
-    .title{font-size:clamp(1.7rem,3.2vw,2.2rem); font-weight:900; margin:0 0 .7rem; text-shadow:0 0 12px rgba(61,165,255,.25)}
+    .title{font-size:clamp(1.7rem,3.2vw,2.2rem);font-weight:900;margin:0 0 .7rem;text-shadow:0 0 12px rgba(61,165,255,.25)}
     .card{
-      border:1px solid var(--border); background:rgba(15,21,36,.55);
-      border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.35), 0 0 18px rgba(61,165,255,.18);
+      border:1px solid var(--border);
+      background:rgba(15,21,36,.55);
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35), 0 0 18px rgba(61,165,255,.18);
       backdrop-filter:blur(10px) saturate(160%);
     }
     .card-body{padding:1.15rem}
@@ -83,7 +88,7 @@
     .muted{color:var(--muted)}
 
     /* Footer */
-    footer{border-top:1px solid rgba(109,251,255,.12); padding:1.5rem 0; font-size:.95rem; color:var(--muted)}
+    footer{border-top:1px solid rgba(109,251,255,.12);padding:1.5rem 0;font-size:.95rem;color:var(--muted)}
   </style>
 </head>
 <body class="bg-track-curves">
@@ -95,7 +100,7 @@
       </a>
       <nav class="navlinks" aria-label="Primary">
         <!-- Only one button: Home -->
-        <a href="/index.html" class="btn">Home</a>
+        <a href="/" class="btn">Home</a>
       </nav>
     </div>
   </header>
@@ -105,50 +110,31 @@
       <h1 class="title">Privacy Policy</h1>
       <div class="card"><div class="card-body">
         <p><strong>Last updated:</strong> <span id="updated" class="muted"></span></p>
+        <p>This website collects only the information you submit via the contact form — your name, email, and message — for the sole purpose of responding to your inquiry.</p>
 
-        <h3>Overview</h3>
-        <p>Trackmania Events respects your privacy. This policy explains what we collect, how we use it, and the choices you have.</p>
-
-        <h3>Information We Collect</h3>
+        <h3>What we collect</h3>
         <ul>
-          <li><strong>Information you provide:</strong> details you submit through forms on the site (e.g., name, email, message).</li>
-          <li><strong>Basic usage data:</strong> standard, non-identifying information automatically sent by your browser or device, such as pages viewed, approximate time on page, and basic technical diagnostics used to keep the site reliable.</li>
-          <li><strong>Cookies/local storage (minimal):</strong> we may use strictly necessary cookies or local storage to remember simple UI preferences (for example, a filter or theme). We do not use them for advertising.</li>
+          <li>Contact form fields: name, email address, and message</li>
+          <li>Basic, anonymous site usage metrics (via GitHub Pages/CDN logs)</li>
         </ul>
 
-        <h3>How We Use Information</h3>
+        <h3>How we use your info</h3>
         <ul>
-          <li>To respond to messages or requests you send us.</li>
-          <li>To maintain and improve site stability, performance, and security.</li>
-          <li>To understand aggregate usage patterns and fix issues.</li>
+          <li>To reply to your message</li>
+          <li>To maintain site reliability and prevent abuse</li>
         </ul>
 
-        <h3>Sharing</h3>
-        <p>We do not sell your personal information. We may share limited data when necessary to operate the site (for example, with infrastructure providers), to comply with law, or to protect our rights and users’ safety.</p>
+        <h3>Third parties</h3>
+        <p>We use <strong>Formspree</strong> to process contact form submissions. Your message is transmitted to Formspree and delivered to our inbox. Refer to Formspree’s privacy policy for details on their processing.</p>
 
-        <h3>Data Retention</h3>
-        <p>We keep personal information only for as long as necessary to fulfill the purposes described in this policy or as required by law. If you contact us regarding deletion of your messages, we will take reasonable steps to honor that request.</p>
-
-        <h3>Your Choices</h3>
-        <ul>
-          <li>You may request access, correction, or deletion of personal information you’ve submitted by emailing <a href="mailto:contact@trackmaniaevents.com">contact@trackmaniaevents.com</a>.</li>
-          <li>You can control cookies via your browser settings. Disabling strictly necessary cookies may affect some site features.</li>
-        </ul>
+        <h3>Data retention & deletion</h3>
+        <p>We keep your messages only as long as needed to handle your request. You can request deletion at any time by emailing <a href="mailto:contact@trackmaniaevents.com">contact@trackmaniaevents.com</a>.</p>
 
         <h3>Security</h3>
-        <p>We use reasonable technical and organizational measures to protect information. However, no method of transmission or storage is completely secure.</p>
-
-        <h3>Children’s Privacy</h3>
-        <p>The site is intended for general audiences but not for children under the age where parental consent is required by local law. We do not knowingly collect personal information from such children.</p>
-
-        <h3>Links to Other Sites</h3>
-        <p>The site may link to third-party websites or services. Their privacy practices are governed by their own policies.</p>
-
-        <h3>Changes to This Policy</h3>
-        <p>We may update this policy periodically. The “Last updated” date reflects the latest version. Continued use of the site after changes take effect constitutes acceptance of the updated policy.</p>
+        <p>This site is served over HTTPS. While no method of transmission is 100% secure, we take reasonable steps to protect your information.</p>
 
         <h3>Contact</h3>
-        <p>Questions about this policy? Email <a href="mailto:contact@trackmaniaevents.com">contact@trackmaniaevents.com</a>.</p>
+        <p>Questions? Email <a href="mailto:contact@trackmaniaevents.com">contact@trackmaniaevents.com</a>.</p>
       </div></div>
     </div>
   </main>
@@ -156,14 +142,13 @@
   <footer>
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
       <div>© <span id="year"></span> Trackmania Events</div>
-      <div><a href="/privacy.html">Privacy</a> • <a href="/terms.html">Terms</a></div>
+      <div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a></div>
     </div>
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-    document.getElementById('updated').textContent =
-      new Date().toLocaleDateString(undefined, { year:'numeric', month:'long', day:'2-digit' });
+    document.getElementById('updated').textContent = new Date().toLocaleDateString(undefined, {year:'numeric', month:'long', day:'2-digit'});
   </script>
 </body>
 </html>
