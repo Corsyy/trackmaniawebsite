@@ -6,8 +6,6 @@ import fetch from "node-fetch";
  *   REFRESH_TOKEN = <NadeoLiveServices refresh token>
  * Optional:
  *   CORS_ORIGINS = comma-separated list of extra origins
- *   TOTD_START_YEAR = 2020
- *   TOTD_START_MONTH = 7   // 1-12; default is July 2020 (first TM2020 TOTDs)
  */
 
 const app = express();
@@ -28,7 +26,7 @@ app.use((req, res, next) => {
   const o = req.headers.origin;
   if (o && ALLOW.has(o)) res.setHeader("Access-Control-Allow-Origin", o);
   res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
@@ -69,14 +67,24 @@ async function getLiveAccessToken() {
   return cachedAccess.token;
 }
 
+/* ------------------ HTTP / JSON helpers ------------------ */
+function isJsonResponse(r) {
+  const ct = (r.headers?.get?.("content-type") || "").toLowerCase();
+  return ct.includes("application/json");
+}
+async function safeJson(r, label = "response") {
+  if (!r.ok) throw new Error(`${label} ${r.status}`);
+  if (!isJsonResponse(r)) throw new Error(`${label} is not JSON (${r.status})`);
+  return r.json();
+}
+
 /* ------------------ Live Services helpers ------------------ */
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
-const TMIO_BASE = "https://trackmania.io/api";
 
 async function jget(url, accessToken) {
   const r = await fetch(url, {
     headers: {
-      ...(accessToken ? { Authorization: `nadeo_v1 t=${accessToken}` } : {}),
+      Authorization: `nadeo_v1 t=${accessToken}`,
       "User-Agent": "trackmaniaevents.com/1.0 (Render)",
       Accept: "application/json",
     },
@@ -92,90 +100,41 @@ async function getAllOfficialCampaigns(accessToken) {
   return j?.campaignList || [];
 }
 
-/* ------------------- TOTD month-by-month ------------------- */
-/** We AVOID the /totd/season endpoints (they 404 for you).
- *  Instead, we iterate months from start (default: 2020-07) to NOW and
- *  call: /api/token/totd/month?year=YYYY&month=MM (and non-token as fallback)
- *  We cache the full UID set to reduce load.
+/**
+ * TOTD seasons (many).
+ * NOTE: Some environments return 404 for these endpoints.
+ * We try both token & non-token; if both fail, we proceed WITHOUT TOTD.
  */
-const TOTD_START_YEAR = Number(process.env.TOTD_START_YEAR || 2020);
-const TOTD_START_MONTH = Number(process.env.TOTD_START_MONTH || 7); // 1..12
-let totdMapCache = { ts: 0, uids: [] };
-const TOTD_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
-const MONTH_FETCH_CONCURRENCY = 3;
-
-function monthRange() {
-  const out = [];
-  const start = new Date(Date.UTC(TOTD_START_YEAR, TOTD_START_MONTH - 1, 1));
-  const now = new Date();
-  const cur = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1));
-  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-  while (cur <= end) {
-    out.push({ y: cur.getUTCFullYear(), m: cur.getUTCMonth() + 1 });
-    cur.setUTCMonth(cur.getUTCMonth() + 1);
-  }
-  return out;
-}
-
-async function fetchTotdMonth(accessToken, y, m) {
-  const endpoints = [
-    `${LIVE_BASE}/api/token/totd/month?year=${y}&month=${m}`,
-    `${LIVE_BASE}/api/totd/month?year=${y}&month=${m}`,
+async function getAllTotdSeasons(accessToken) {
+  const candidates = [
+    `${LIVE_BASE}/api/token/totd/season?offset=0&length=200`,
+    `${LIVE_BASE}/api/totd/season?offset=0&length=200`,
   ];
-  for (const url of endpoints) {
+  for (const url of candidates) {
     try {
       const j = await jget(url, accessToken);
-      if (j?.days && Array.isArray(j.days)) return j.days;
+      return j?.seasonList || [];
     } catch (e) {
-      // ignore and try next variant
+      console.warn("TOTD season fetch failed for", url, "-", e.message);
     }
   }
-  // No data for that month (or endpoint unavailable) -> return empty
+  console.warn("TOTD season endpoints unavailable; proceeding without TOTD.");
   return [];
 }
 
-async function getAllTotdMapUids(accessToken) {
-  const fresh = Date.now() - totdMapCache.ts < TOTD_CACHE_TTL_MS && totdMapCache.uids.length;
-  if (fresh) return totdMapCache.uids;
-
-  const months = monthRange();
-  const uids = new Set();
-  for (let i = 0; i < months.length; i += MONTH_FETCH_CONCURRENCY) {
-    const slice = months.slice(i, i + MONTH_FETCH_CONCURRENCY);
-    const parts = await Promise.all(
-      slice.map(({ y, m }) => fetchTotdMonth(accessToken, y, m))
-    );
-    for (const days of parts) {
-      for (const d of days || []) {
-        if (d?.mapUid) uids.add(d.mapUid);
-      }
-    }
-  }
-  totdMapCache = { ts: Date.now(), uids: Array.from(uids) };
-  return totdMapCache.uids;
-}
-
-/* ---- Collect maps with source tagging so we can debug/filter ---- */
-function collectAllMaps(officialCampaigns, totdUids) {
-  const seen = new Set();
-  const maps = [];
-
-  // Official first (if a map appears in both, keep 'official')
-  for (const c of officialCampaigns || []) {
-    for (const p of c?.playlist || []) {
-      const uid = p.mapUid;
-      if (!uid || seen.has(uid)) continue;
-      seen.add(uid);
-      maps.push({ mapUid: uid, sourceType: "official" });
-    }
-  }
-  // TOTD next (skip duplicates already marked as official)
-  for (const uid of totdUids || []) {
-    if (!uid || seen.has(uid)) continue;
-    seen.add(uid);
-    maps.push({ mapUid: uid, sourceType: "totd" });
-  }
-  return maps;
+// Extract mapUids from both sets
+function collectAllMapUids(officialCampaigns, totdSeasons) {
+  const officialUids = officialCampaigns.flatMap((c) =>
+    (c.playlist || []).map((p) => p.mapUid)
+  );
+  const totdUids = totdSeasons.flatMap((s) =>
+    (s.days || []).map((d) => d.mapUid)
+  );
+  return {
+    officialUids: Array.from(new Set(officialUids)),
+    totdUids: Array.from(new Set(totdUids)),
+    allUids: Array.from(new Set([...officialUids, ...totdUids])),
+  };
 }
 
 // Normalize leaderboard timestamps to seconds since epoch
@@ -213,68 +172,13 @@ async function getMapWR(accessToken, mapUid) {
 }
 
 /* ---------------------- Display names ---------------------- */
+// Process-wide cache so we only resolve each accountId once.
 const nameCache = new Map(); // accountId -> displayName
 
-function cacheName(id, maybeName) {
-  if (!id) return;
-  const next = (maybeName || "").trim();
-  if (next && (!nameCache.has(id) || nameCache.get(id) === id)) {
-    nameCache.set(id, next);
-  }
-}
-
-/** TM.io fallback with POST first (avoids 431 on long URLs), then small GETs */
-async function resolveViaTMIO(ids) {
-  if (!ids.length) return new Map();
+// Nadeo batch resolver (several shapes tried)
+async function resolveViaNadeo(accessToken, ids) {
   const out = new Map();
-
-  // 1) Try POST in chunks
-  const POST_CHUNK = 100;
-  for (let i = 0; i < ids.length; i += POST_CHUNK) {
-    const batch = ids.slice(i, i + POST_CHUNK);
-    try {
-      const r = await fetch(`${TMIO_BASE}/accounts/displayNames`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ accountIds: batch }),
-      });
-      if (!r.ok) throw new Error(`TMIO POST ${r.status}`);
-      const j = await r.json();
-      for (const row of j || []) {
-        const id = row?.accountId;
-        const dn =
-          row?.displayName || row?.name || row?.userName || row?.username;
-        if (id && dn) out.set(id, dn);
-      }
-    } catch {
-      // POST might not be supported — fall back to GET small chunks
-      const GET_CHUNK = 25; // small to avoid 431
-      for (let k = 0; k < batch.length; k += GET_CHUNK) {
-        const mini = batch.slice(k, k + GET_CHUNK);
-        const url = `${TMIO_BASE}/accounts/displayNames?accountIds=${encodeURIComponent(
-          mini.join(",")
-        )}`;
-        try {
-          const j2 = await jget(url, null);
-          for (const row of j2 || []) {
-            const id = row?.accountId;
-            const dn =
-              row?.displayName || row?.name || row?.userName || row?.username;
-            if (id && dn) out.set(id, dn);
-          }
-        } catch (e) {
-          console.warn("TMIO fallback failed:", e.message);
-        }
-      }
-    }
-  }
-  return out;
-}
-
-async function resolveDisplayNames(accessToken, ids) {
-  const allIds = Array.from(new Set((ids || []).filter(Boolean)));
-  const need = allIds.filter((id) => !nameCache.has(id));
-  if (!need.length) return nameCache;
+  if (!ids?.length) return out;
 
   const HJSON = {
     Authorization: `nadeo_v1 t=${accessToken}`,
@@ -288,13 +192,24 @@ async function resolveDisplayNames(accessToken, ids) {
     "User-Agent": "trackmaniaevents.com/1.0 (Render)",
   };
 
+  const harvest = (j) => {
+    const arr = (j && (j.displayNames || j)) || [];
+    for (const row of arr) {
+      const id = row?.accountId;
+      const dn =
+        row?.displayName || row?.name || row?.userName || row?.username;
+      if (id && dn) out.set(id, dn);
+    }
+  };
+
   async function tryBatchGET_rawComma(batch) {
     const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${batch.join(
       ","
     )}`;
     const r = await fetch(url, { headers: HGET });
     if (!r.ok) throw new Error(`GET rawComma ${r.status}`);
-    return r.json();
+    const j = await r.json();
+    harvest(j);
   }
   async function tryBatchGET_encoded(batch) {
     const url = `${LIVE_BASE}/api/token/accounts/displayNames?accountIdList=${encodeURIComponent(
@@ -302,7 +217,8 @@ async function resolveDisplayNames(accessToken, ids) {
     )}`;
     const r = await fetch(url, { headers: HGET });
     if (!r.ok) throw new Error(`GET encoded ${r.status}`);
-    return r.json();
+    const j = await r.json();
+    harvest(j);
   }
   async function tryBatchGET_legacy(batch) {
     const url = `${LIVE_BASE}/api/accounts/displayNames?accountIdList=${batch.join(
@@ -310,7 +226,8 @@ async function resolveDisplayNames(accessToken, ids) {
     )}`;
     const r = await fetch(url, { headers: HGET });
     if (!r.ok) throw new Error(`GET legacy ${r.status}`);
-    return r.json();
+    const j = await r.json();
+    harvest(j);
   }
   async function tryBatchPOST_array(batch) {
     const url = `${LIVE_BASE}/api/token/accounts/displayNames`;
@@ -320,7 +237,8 @@ async function resolveDisplayNames(accessToken, ids) {
       body: JSON.stringify({ accountIdList: batch }),
     });
     if (!r.ok) throw new Error(`POST array ${r.status}`);
-    return r.json();
+    const j = await r.json();
+    harvest(j);
   }
   async function tryBatchPOST_csv(batch) {
     const url = `${LIVE_BASE}/api/token/accounts/displayNames`;
@@ -330,44 +248,14 @@ async function resolveDisplayNames(accessToken, ids) {
       body: JSON.stringify({ accountIdList: batch.join(",") }),
     });
     if (!r.ok) throw new Error(`POST csv ${r.status}`);
-    return r.json();
-  }
-
-  function harvestNames(j) {
-    const out = new Map();
-    const arr = (j && (j.displayNames || j)) || [];
-    for (const row of arr) {
-      const id = row?.accountId;
-      const dn =
-        row?.displayName || row?.name || row?.userName || row?.username;
-      if (id && dn) out.set(id, dn);
-    }
-    return out;
-  }
-
-  async function tryPerId(id) {
-    const candidates = [
-      `${LIVE_BASE}/api/token/accounts/${encodeURIComponent(id)}`,
-      `${LIVE_BASE}/api/token/account/${encodeURIComponent(id)}`,
-    ];
-    for (const url of candidates) {
-      try {
-        const r = await fetch(url, { headers: HGET });
-        if (!r.ok) continue;
-        const j = await r.json();
-        const o = Array.isArray(j) ? j[0] : j;
-        const dn = o?.displayName || o?.name || o?.userName || o?.username;
-        if (dn) return dn;
-      } catch {}
-    }
-    return null;
+    const j = await r.json();
+    harvest(j);
   }
 
   const CHUNK = 100;
-  for (let i = 0; i < need.length; i += CHUNK) {
-    const batch = need.slice(i, i + CHUNK);
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    const batch = ids.slice(i, i + CHUNK);
 
-    let got = new Map();
     const attempts = [
       tryBatchGET_rawComma,
       tryBatchGET_encoded,
@@ -376,73 +264,150 @@ async function resolveDisplayNames(accessToken, ids) {
       tryBatchGET_legacy,
     ];
     for (const fn of attempts) {
-      if (got.size === batch.length) break;
       try {
-        const j = await fn(batch);
-        const m = harvestNames(j);
-        for (const [k, v] of m) got.set(k, v);
-      } catch {}
-    }
-
-    for (const [id, dn] of got) cacheName(id, dn);
-
-    // Still missing? Try per-id.
-    const missingAfterNadeo = batch.filter((id) => !nameCache.has(id));
-    if (missingAfterNadeo.length) {
-      const limit = 6;
-      for (let j = 0; j < missingAfterNadeo.length; j += limit) {
-        await Promise.all(
-          missingAfterNadeo.slice(j, j + limit).map(async (id) => {
-            const dn = await tryPerId(id);
-            if (dn) cacheName(id, dn);
-          })
-        );
+        await fn(batch);
+        // Keep trying remaining attempts—sometimes one shape returns more than another
+      } catch (e) {
+        // swallow & continue to other shapes
       }
     }
+  }
+  return out;
+}
 
-    // Still missing? Try TM.io (POST, then small GETs)
-    const missingForTMIO = batch.filter((id) => !nameCache.has(id));
-    if (missingForTMIO.length) {
-      const tmioMap = await resolveViaTMIO(missingForTMIO);
-      for (const [id, dn] of tmioMap) cacheName(id, dn);
+// trackmania.io fallback (tolerant to HTML / non-JSON)
+const TMIO_BASE = "https://trackmania.io/api";
+async function resolveViaTMIO(ids) {
+  const out = new Map();
+  if (!ids?.length) return out;
+
+  const harvest = (rows) => {
+    for (const row of rows || []) {
+      const id = row?.accountId;
+      const dn =
+        row?.displayName || row?.name || row?.userName || row?.username;
+      if (id && dn) out.set(id, dn);
+    }
+  };
+
+  // Try POST first (short body, avoids long URLs/431)
+  const POST_CHUNK = 80;
+  for (let i = 0; i < ids.length; i += POST_CHUNK) {
+    const batch = ids.slice(i, i + POST_CHUNK);
+    try {
+      const r = await fetch(`${TMIO_BASE}/accounts/displayNames`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+        },
+        body: JSON.stringify({ accountIds: batch }),
+      });
+      const j = await safeJson(r, "TMIO POST");
+      harvest(j);
+      continue;
+    } catch (e) {
+      console.warn("TMIO POST skipped:", e.message);
     }
 
-    for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
+    // GET fallback in small chunks; skip non-JSON quietly
+    const GET_CHUNK = 20;
+    for (let k = 0; k < batch.length; k += GET_CHUNK) {
+      const mini = batch.slice(k, k + GET_CHUNK);
+      const url = `${TMIO_BASE}/accounts/displayNames?accountIds=${encodeURIComponent(
+        mini.join(",")
+      )}`;
+      try {
+        const r = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+            "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+          },
+        });
+        if (!r.ok || !isJsonResponse(r)) {
+          console.warn(
+            `TMIO GET skipped: ${r.status}${!isJsonResponse(r) ? " (non-JSON)" : ""
+            }`
+          );
+          continue;
+        }
+        const j = await r.json();
+        harvest(j);
+      } catch (e) {
+        console.warn("TMIO GET skipped:", e.message);
+      }
+    }
   }
+  return out;
+}
+
+// Unified resolver that fills the global nameCache
+async function resolveDisplayNames(accessToken, ids) {
+  const all = Array.from(new Set((ids || []).filter(Boolean)));
+  const need = all.filter((id) => !nameCache.has(id));
+  if (!need.length) return nameCache;
+
+  // 1) Nadeo
+  try {
+    const nadeo = await resolveViaNadeo(accessToken, need);
+    for (const [k, v] of nadeo) nameCache.set(k, v);
+  } catch (e) {
+    console.warn("Nadeo name resolution failed:", e.message);
+  }
+
+  // 2) TMIO fallback for any still-missing
+  const missing = need.filter((id) => !nameCache.has(id));
+  if (missing.length) {
+    try {
+      const tmio = await resolveViaTMIO(missing);
+      for (const [k, v] of tmio) nameCache.set(k, v);
+    } catch (e) {
+      console.warn("TMIO fallback failed:", e.message);
+    }
+  }
+
+  // 3) Ensure everything has at least the id
+  for (const id of need) if (!nameCache.has(id)) nameCache.set(id, id);
 
   return nameCache;
 }
 
 /* ------------------------- Cache --------------------------- */
-let wrCache = { ts: 0, rows: [], counts: { officialMaps: 0, totdMaps: 0 } };
+let wrCache = { ts: 0, rows: [], counts: { official: 0, totd: 0 } };
 const WR_TTL_MS = 10 * 60 * 1000; // 10 min
 const CONCURRENCY = 8;
-
 /* --------------- Build ALL WRs (official + TOTD) ----------- */
 async function buildAllWRs() {
   const access = await getLiveAccessToken();
-  const [official, totdUids] = await Promise.all([
+  const [official, totd] = await Promise.all([
     getAllOfficialCampaigns(access),
-    getAllTotdMapUids(access),
+    getAllTotdSeasons(access),
   ]);
 
-  const maps = collectAllMaps(official, totdUids);
-  const counts = {
-    officialMaps: maps.filter((m) => m.sourceType === "official").length,
-    totdMaps: maps.filter((m) => m.sourceType === "totd").length,
-  };
+  const { officialUids, totdUids, allUids } = collectAllMapUids(
+    official,
+    totd
+  );
 
   const wrs = [];
-  for (let i = 0; i < maps.length; i += CONCURRENCY) {
-    const slice = maps.slice(i, i + CONCURRENCY);
+  // polite concurrency
+  for (let i = 0; i < allUids.length; i += CONCURRENCY) {
     const part = await Promise.all(
-      slice.map(async ({ mapUid, sourceType }) => {
-        const row = await getMapWR(access, mapUid);
-        if (row && !row.error && !row.empty) row.sourceType = sourceType;
-        return row;
-      })
+      allUids.slice(i, i + CONCURRENCY).map((uid) => getMapWR(access, uid))
     );
-    wrs.push(...part.filter(Boolean));
+    wrs.push(
+      ...part
+        .filter(Boolean)
+        .map((r) => ({
+          ...r,
+          sourceType: officialUids.includes(r.mapUid)
+            ? "official"
+            : totdUids.includes(r.mapUid)
+            ? "totd"
+            : "unknown",
+        }))
+    );
   }
 
   // resolve names
@@ -455,26 +420,34 @@ async function buildAllWRs() {
   // newest first
   wrs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-  wrCache = { ts: Date.now(), rows: wrs, counts };
+  wrCache = {
+    ts: Date.now(),
+    rows: wrs,
+    counts: {
+      official: wrs.filter((r) => r.sourceType === "official").length,
+      totd: wrs.filter((r) => r.sourceType === "totd").length,
+    },
+  };
   return wrs;
 }
 
 /* ------------------------ Endpoints ------------------------ */
 
-// Most recent WRs across ALL official campaigns + ALL TOTD
+// Most recent WRs across ALL official campaigns + ALL TOTD seasons
 // Optional: ?limit=300  ?search=foo  ?source=official|totd
 app.get("/api/wr-latest", async (req, res) => {
   try {
     const fresh = Date.now() - wrCache.ts < WR_TTL_MS && wrCache.rows.length;
     const rows = fresh ? wrCache.rows : await buildAllWRs();
 
-    const wantSource = String(req.query.source || "").toLowerCase();
     let out = rows;
-    if (wantSource === "official" || wantSource === "totd") {
-      out = out.filter((r) => r.sourceType === wantSource);
+    const limit = Math.max(1, Math.min(2000, Number(req.query.limit) || 300));
+
+    const src = (req.query.source || "").toString().trim().toLowerCase();
+    if (src === "official" || src === "totd") {
+      out = out.filter((r) => r.sourceType === src);
     }
 
-    const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 300));
     const search = (req.query.search || "").toString().trim().toLowerCase();
     if (search) {
       out = out.filter(
@@ -489,6 +462,7 @@ app.get("/api/wr-latest", async (req, res) => {
       rows: out.slice(0, limit),
       total: out.length,
       fetchedAt: wrCache.ts,
+      counts: wrCache.counts, // {official, totd}
     });
   } catch (err) {
     console.error("wr-latest:", err);
@@ -501,15 +475,21 @@ app.get("/api/wr-latest", async (req, res) => {
 });
 
 // Players leaderboard across ALL official + TOTD WRs
-// Optional: ?limit=200  ?q=search
+// Optional: ?limit=200  ?q=search  ?source=official|totd
 app.get("/api/wr-players", async (req, res) => {
   try {
     if (!wrCache.rows.length || Date.now() - wrCache.ts >= WR_TTL_MS) {
       await buildAllWRs();
     }
 
+    let rows = wrCache.rows;
+    const src = (req.query.source || "").toString().trim().toLowerCase();
+    if (src === "official" || src === "totd") {
+      rows = rows.filter((r) => r.sourceType === src);
+    }
+
     const tally = new Map(); // accountId -> { accountId, displayName, wrCount, latestTs }
-    for (const r of wrCache.rows) {
+    for (const r of rows) {
       if (!r.accountId) continue;
       const rec =
         tally.get(r.accountId) || {
@@ -533,12 +513,15 @@ app.get("/api/wr-players", async (req, res) => {
       );
     }
 
-    list.sort((a, b) => b.wrCount - a.wrCount || b.latestTs - a.latestTs);
-    const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 200));
+    list.sort(
+      (a, b) => b.wrCount - a.wrCount || b.latestTs - a.latestTs
+    );
+    const limit = Math.max(1, Math.min(2000, Number(req.query.limit) || 200));
     res.json({
       players: list.slice(0, limit),
       total: list.length,
       fetchedAt: wrCache.ts,
+      counts: wrCache.counts,
     });
   } catch (err) {
     console.error("wr-players:", err);
@@ -550,82 +533,8 @@ app.get("/api/wr-players", async (req, res) => {
   }
 });
 
-/* ---------------------- Debug Utilities -------------------- */
-
-// 1) Stats
-app.get("/api/debug-stats", async (_req, res) => {
-  try {
-    if (!wrCache.rows.length) await buildAllWRs();
-
-    const unresolved = wrCache.rows
-      .filter((r) => r.accountId && (!r.displayName || r.displayName === r.accountId))
-      .map((r) => r.accountId);
-
-    const sampleMissing = Array.from(new Set(unresolved)).slice(0, 25);
-
-    const bySource = wrCache.rows.reduce(
-      (acc, r) => {
-        acc[r.sourceType || "unknown"] = (acc[r.sourceType || "unknown"] || 0) + 1;
-        return acc;
-      },
-      {}
-    );
-
-    res.json({
-      fetchedAt: wrCache.ts,
-      counts: wrCache.counts,
-      rows: wrCache.rows.length,
-      rowsBySource: bySource,
-      unresolvedNameCount: new Set(unresolved).size,
-      unresolvedSample: sampleMissing,
-      nameCacheEntries: nameCache.size,
-    });
-  } catch (e) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-
-// 2) Peek rows
-app.get("/api/debug-wrs", async (req, res) => {
-  try {
-    if (!wrCache.rows.length) await buildAllWRs();
-    let out = wrCache.rows;
-    const src = String(req.query.source || "").toLowerCase();
-    if (src === "official" || src === "totd") {
-      out = out.filter((r) => r.sourceType === src);
-    }
-    const limit = Math.max(1, Math.min(200, Number(req.query.limit) || 50));
-    res.json({
-      fetchedAt: wrCache.ts,
-      rows: out.slice(0, limit).map((r) => ({
-        mapUid: r.mapUid,
-        sourceType: r.sourceType,
-        accountId: r.accountId,
-        displayName: r.displayName,
-        timeMs: r.timeMs,
-        timestamp: r.timestamp,
-      })),
-    });
-  } catch (e) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-
-// 3) Force rebuild
-app.post("/api/rebuild", async (req, res) => {
-  try {
-    const clear = String(req.query.clearNames || "") === "1";
-    if (clear) nameCache.clear();
-    wrCache = { ts: 0, rows: [], counts: { officialMaps: 0, totdMaps: 0 } };
-    totdMapCache = { ts: 0, uids: [] };
-    await buildAllWRs();
-    res.json({ ok: true, clearedNames: clear, fetchedAt: wrCache.ts });
-  } catch (e) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-
-// 4) Name probe
+/* ---------------- Debug helpers (optional) ------------------ */
+// Quick check: /api/debug-names?ids=a,b,c
 app.get("/api/debug-names", async (req, res) => {
   try {
     const access = await getLiveAccessToken();
@@ -639,6 +548,22 @@ app.get("/api/debug-names", async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e?.message || String(e) });
   }
+});
+
+// Show how many UIDs and how many names are resolved
+app.get("/api/debug-stats", (_req, res) => {
+  const resolved = Array.from(nameCache.values()).filter((v) => !!v && typeof v === "string");
+  res.json({
+    cacheTime: wrCache.ts,
+    rows: wrCache.rows.length,
+    counts: wrCache.counts,
+    nameCacheSize: nameCache.size,
+    resolvedNamesCount: resolved.length,
+    unresolvedSample: (wrCache.rows || [])
+      .filter((r) => r.accountId && !nameCache.get(r.accountId))
+      .slice(0, 10)
+      .map((r) => r.accountId),
+  });
 });
 
 /* ------------------------- Start --------------------------- */
