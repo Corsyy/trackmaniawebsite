@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>WR Leaderboard — Trackmania Events</title>
-  <meta name="description" content="Most recent Trackmania world records across all official campaigns and all TOTD seasons."/>
+  <title>Recent World Records — Trackmania Events</title>
+  <meta name="description" content="Most recent Trackmania world records across all official campaigns, TOTD, and club campaigns."/>
   <meta name="theme-color" content="#0a0f1a"/>
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
@@ -26,12 +26,14 @@
     .card{border:1px solid rgba(109,251,255,.25);background:rgba(15,21,36,.55);backdrop-filter:blur(12px) saturate(180%);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 20px rgba(61,165,255,.2);padding:1rem}
     table{width:100%;border-collapse:collapse} th,td{padding:.75rem;border-bottom:1px solid rgba(255,255,255,.08);text-align:left} th{opacity:.9}
     .time{font-variant-numeric:tabular-nums} .ts{opacity:.7;font-size:.9em}
+    .pager{display:flex;gap:.6rem;align-items:center;justify-content:flex-end;margin:.8rem 0}
+    .skeleton{opacity:.7;padding:1rem}
   </style>
 </head>
 <body class="bg-track-curves">
 <header>
   <div class="container">
-    <a class="brand" href="/index"><span class="brand-badge">🏁</span><span>WR Leaderboard</span></a>
+    <a class="brand" href="/index"><span class="brand-badge">🏁</span><span>Recent WRs</span></a>
     <div style="display:flex;gap:.5rem;">
       <a class="btn" href="/wrleaderboard">WR Leaderboard</a>
       <a class="btn" href="/">Home</a>
@@ -39,20 +41,31 @@
   </div>
 </header>
 
-
 <main>
-  <h1>World-Record Leaderboard (All Campaigns + TOTD)</h1>
+  <h1>Most Recent World Records (All Sources)</h1>
   <div id="meta" class="meta">Loading…</div>
+
+  <div class="pager">
+    <button id="prevBtn" class="btn">Prev</button>
+    <span id="pageInfo" class="meta"></span>
+    <button id="nextBtn" class="btn">Next</button>
+  </div>
+
   <div class="card">
     <table>
       <thead><tr><th>#</th><th>Map UID</th><th>Holder</th><th class="time">WR Time</th><th class="ts">Set</th></tr></thead>
-      <tbody id="rows"></tbody>
+      <tbody id="rows"><tr><td colspan="5" class="skeleton">Loading…</td></tr></tbody>
     </table>
   </div>
 </main>
 
 <script>
-const API_BASE = "https://trackmaniawebsite.onrender.com"; // your Render API
+const API_BASE = "https://trackmaniawebsite.onrender.com";
+const PAGE_SIZE = 100;   // rows per page
+const FETCH_LIMIT = 300; // how many records to fetch once
+
+let allRows = [];
+let page = Number(new URLSearchParams(location.search).get('page')) || 1;
 
 function fmt(ms){
   if(!Number.isFinite(ms)) return "—";
@@ -60,7 +73,6 @@ function fmt(ms){
   const pad=(n,w=2)=>String(n).padStart(w,"0");
   return `${pad(m)}:${pad(s)}:${String(x).padStart(3,"0")}`;
 }
-// accepts ms, seconds, or ISO strings safely
 function fmtTs(ts){
   if (ts === null || ts === undefined) return "—";
   const n = Number(ts);
@@ -68,64 +80,94 @@ function fmtTs(ts){
   return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
 }
 
+async function resolveNames(ids = []) {
+  if (!ids.length) return {};
+  try {
+    const url = `${API_BASE}/api/debug-names?ids=${encodeURIComponent(ids.join(","))}`;
+    const r = await fetch(url);
+    if (!r.ok) return {};
+    const data = await r.json();
+    const arr = Array.isArray(data?.data) ? data.data : [];
+    const map = {};
+    for (const row of arr) {
+      if (row && row.id) map[row.id] = row.name || row.id;
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
+
+function renderPage(p=1){
+  const total = allRows.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  page = Math.min(Math.max(1, p), totalPages);
+
+  const start = (page - 1) * PAGE_SIZE;
+  const slice = allRows.slice(start, start + PAGE_SIZE);
+
+  const tb = document.getElementById("rows");
+  tb.innerHTML = slice.map((row, i) => `
+    <tr>
+      <td>${start + i + 1}</td>
+      <td>${row.mapUid}</td>
+      <td>${row.prettyName || row.displayName || row.accountId || "—"}</td>
+      <td class="time">${row.timeMs!=null?fmt(row.timeMs):"—"}</td>
+      <td class="ts">${fmtTs(row.timestamp)}</td>
+    </tr>
+  `).join("");
+
+  // pager
+  document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
+  const prev = document.getElementById("prevBtn");
+  const next = document.getElementById("nextBtn");
+  prev.disabled = page <= 1;
+  next.disabled = page >= totalPages;
+  prev.onclick = () => goTo(page - 1);
+  next.onclick = () => goTo(page + 1);
+
+  // keep URL ?page
+  const params = new URLSearchParams(location.search);
+  params.set('page', page);
+  history.replaceState({}, '', `${location.pathname}?${params}`);
+}
+
+function goTo(p){ if (p >= 1) renderPage(p); }
+
 async function load(){
-  try{
-    // 1) Fetch rows
-    const r = await fetch(`${API_BASE}/api/wr-latest?limit=300`);
-    if (!r.ok) throw new Error(await r.text());
-    const j = await r.json();
+  try {
+    document.getElementById("rows").innerHTML = `<tr><td colspan="5" class="skeleton">Loading…</td></tr>`;
+    const res = await fetch(`${API_BASE}/api/wr-latest?limit=${FETCH_LIMIT}`, { cache: "no-store" });
+    if (!res.ok) throw new Error(await res.text());
+    const j = await res.json();
     const rows = Array.isArray(j.rows) ? j.rows : [];
 
-    // 2) Collect accountIds that still need names
-    const needIds = [...new Set(
-      rows
-        .map(r => r.accountId)
-        .filter(Boolean)
-        .filter(id => {
-          const dn = rows.find(x => x.accountId === id)?.displayName;
-          // needs hydration if displayName missing OR equals the raw id
-          return !dn || dn === id;
-        })
-    )];
+    // collect ids lacking proper names
+    const needIds = [...new Set(rows
+      .filter(r => r.accountId && (!r.displayName || r.displayName === r.accountId))
+      .map(r => r.accountId))];
 
-    // 3) Resolve names in one batch (best-effort)
-    let names = {};
-    if (needIds.length){
-      try{
-        const rn = await fetch(`${API_BASE}/api/resolve-names?ids=${encodeURIComponent(needIds.join(","))}`);
-        if (rn.ok){
-          const data = await rn.json();
-          names = data?.names || {};
-        }
-      }catch(_){}
-    }
+    const names = await resolveNames(needIds);
 
-    // 4) Render table with upgraded names
-    const tb = document.getElementById("rows");
-    tb.innerHTML = "";
-    rows.forEach((row, i)=>{
-      const pretty = names[row.accountId] || row.displayName || row.accountId || "—";
-      const tr = document.createElement("tr");
-      tr.innerHTML =
-        `<td>${i+1}</td>`+
-        `<td>${row.mapUid}</td>`+
-        `<td>${pretty}</td>`+
-        `<td class="time">${row.timeMs!=null?fmt(row.timeMs):"—"}</td>`+
-        `<td class="ts">${fmtTs(row.timestamp)}</td>`;
-      tb.appendChild(tr);
-    });
+    // attach prettyName once
+    allRows = rows.map(r => ({ ...r, prettyName: names[r.accountId] || r.displayName || r.accountId }));
 
     const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
     document.getElementById("meta").textContent =
       `Fetched ${Math.round(ago/1000)}s ago — ${new Date(j.fetchedAt || Date.now()).toLocaleTimeString()}`;
-  }catch(e){
-    document.getElementById("meta").textContent = "Failed to load leaderboard.";
+
+    renderPage(page);
+  } catch (e) {
     console.error(e);
+    document.getElementById("meta").textContent = "Failed to load recent WRs.";
+    document.getElementById("rows").innerHTML = `<tr><td colspan="5">Error loading data.</td></tr>`;
   }
 }
 
+// initial
 load();
-setInterval(load, 15000);
+// optional light auto-refresh of the first chunk (keeps page snappy)
+setInterval(() => load(), 20000);
 </script>
 
 </body>
