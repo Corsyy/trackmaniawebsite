@@ -10,11 +10,12 @@ import fs from "fs";
  * Optional:
  *   CORS_ORIGINS            = comma-separated list of extra allowed origins
  *   INCLUDE_CLUB_BY_DEFAULT = true|false   (default true)
+ *   AUTO_UID_REFRESH        = true|false   (default true; discover NEW maps on requests)
  *   WR_CONCURRENCY          = 8
- *   CLUB_MAX_CAMPAIGNS      = 150
+ *   QUICK_REFRESH_COUNT     = 100          (# recent maps to re-check on requests)
+ *   CLUB_MAX_CAMPAIGNS      = 200
  *   CLUB_DETAIL_CONC        = 4
  *   CLUB_UID_TTL_HOURS      = 24
- *   QUICK_REFRESH_COUNT     = 100         (# maps to re-check on each request)
  */
 
 const app = express();
@@ -176,7 +177,7 @@ async function getAllTotdMapUidsViaLive(accessToken) {
 /** Prefer playlist from list; fall back to campaign-details if missing. */
 const CLUB_LIST_BATCH = 100;
 const CLUB_DETAIL_CONC = Number(process.env.CLUB_DETAIL_CONC || 4);
-const CLUB_MAX_CAMPAIGNS = Number(process.env.CLUB_MAX_CAMPAIGNS || 150);
+const CLUB_MAX_CAMPAIGNS = Number(process.env.CLUB_MAX_CAMPAIGNS || 200);
 
 async function listAllClubCampaignRefsWithPlaylists(accessToken) {
   const out = [];
@@ -194,7 +195,8 @@ async function listAllClubCampaignRefsWithPlaylists(accessToken) {
       const playlist = (it?.campaign?.playlist || it?.playlist || [])
         .map((p) => p?.mapUid)
         .filter(Boolean);
-      if (clubId && campaignId) out.push({ clubId, campaignId, updatedAt, playlist });
+      if (clubId && campaignId)
+        out.push({ clubId, campaignId, updatedAt, playlist });
     }
 
     if (list.length < CLUB_LIST_BATCH) break;
@@ -228,7 +230,9 @@ async function getAllClubMapUids(accessToken) {
   for (let i = 0; i < missing.length; i += CLUB_DETAIL_CONC) {
     const batch = missing.slice(i, i + CLUB_DETAIL_CONC);
     const results = await Promise.all(
-      batch.map((r) => fetchClubCampaignPlaylist(accessToken, r.clubId, r.campaignId))
+      batch.map((r) =>
+        fetchClubCampaignPlaylist(accessToken, r.clubId, r.campaignId)
+      )
     );
     for (const arr of results) arr.forEach((uid) => uids.add(uid));
     await new Promise((r) => setTimeout(r, 80));
@@ -242,7 +246,8 @@ function normalizeToSeconds(val) {
   let n = Number(val);
   if (Number.isFinite(n)) return n > 1e12 ? Math.round(n / 1000) : Math.round(n);
   const parsed = Date.parse(String(val));
-  if (Number.isFinite(parsed)) return parsed > 1e12 ? Math.round(parsed / 1000) : Math.round(parsed);
+  if (Number.isFinite(parsed))
+    return parsed > 1e12 ? Math.round(parsed / 1000) : Math.round(parsed);
   return 0;
 }
 
@@ -302,7 +307,7 @@ async function resolveDisplayNames(_liveAccessToken, ids) {
     } catch {
       for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
     }
-    await new Promise((r) => setTimeout(r, 40));
+    await new Promise((r) => setTimeout(r, 40)); // gentle
   }
   return nameCache;
 }
@@ -314,15 +319,23 @@ let metaCache = { officialSet: new Set(), clubSet: new Set(), allMapUids: [] };
 const WR_CONCURRENCY = Number(process.env.WR_CONCURRENCY || 8);
 const CLUB_UID_TTL = Number(process.env.CLUB_UID_TTL_HOURS || 24) * 3600 * 1000;
 const QUICK_REFRESH_COUNT = Number(process.env.QUICK_REFRESH_COUNT || 100);
+const AUTO_UID_REFRESH =
+  (process.env.AUTO_UID_REFRESH ?? "true").toLowerCase() === "true";
 
 const DISK_WR = "/tmp/wr_cache.json";
 const DISK_CLUB = "/tmp/club_uids.json";
 
 function loadJson(path) {
-  try { return JSON.parse(fs.readFileSync(path, "utf8")); } catch { return null; }
+  try {
+    return JSON.parse(fs.readFileSync(path, "utf8"));
+  } catch {
+    return null;
+  }
 }
 function saveJson(path, obj) {
-  try { fs.writeFileSync(path, JSON.stringify(obj)); } catch {}
+  try {
+    fs.writeFileSync(path, JSON.stringify(obj));
+  } catch {}
 }
 
 /* --------------------- Build utilities --------------------- */
@@ -398,13 +411,16 @@ function swapCache(rows) {
 /* ---------------------- Full build (one-shot) -------------- */
 async function buildAllWRs({ includeClub = true } = {}) {
   const access = await getLiveAccessToken();
-  const { officialSet, clubSet, allMapUids } = await computeAllMapUids(access, { includeClub });
+  const { officialSet, clubSet, allMapUids } = await computeAllMapUids(access, {
+    includeClub,
+  });
 
   const wrs = await fetchAllWRs(access, allMapUids, officialSet, clubSet);
 
   const ids = wrs.map((r) => r.accountId).filter(Boolean);
   await resolveDisplayNames(access, ids);
-  for (const r of wrs) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
+  for (const r of wrs)
+    if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
   swapCache(wrs);
   metaCache = { officialSet, clubSet, allMapUids };
@@ -419,14 +435,20 @@ function diffAndMergeByMap(oldRows, newRows) {
 
   for (const [uid, n] of byNew) {
     const o = byOld.get(uid);
-    if (!o || o.accountId !== n.accountId || o.timeMs !== n.timeMs || (o.timestamp || 0) !== (n.timestamp || 0)) {
+    if (
+      !o ||
+      o.accountId !== n.accountId ||
+      o.timeMs !== n.timeMs ||
+      (o.timestamp || 0) !== (n.timestamp || 0)
+    ) {
       updated.push(n);
     }
   }
   const merged = [...byOld.values()];
   for (const u of updated) {
     const idx = merged.findIndex((r) => r.mapUid === u.mapUid);
-    if (idx >= 0) merged[idx] = u; else merged.push(u);
+    if (idx >= 0) merged[idx] = u;
+    else merged.push(u);
   }
   merged.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   return { merged, updatedCount: updated.length };
@@ -448,9 +470,13 @@ async function rebuildNow({ includeClub }) {
 
   const ids = newRows.map((r) => r.accountId).filter(Boolean);
   await resolveDisplayNames(access, ids);
-  for (const r of newRows) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
+  for (const r of newRows)
+    if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
-  const { merged, updatedCount } = diffAndMergeByMap(wrCache.rows || [], newRows);
+  const { merged, updatedCount } = diffAndMergeByMap(
+    wrCache.rows || [],
+    newRows
+  );
   wrCache = { ts: Date.now(), rows: merged };
   saveJson(DISK_WR, wrCache);
 
@@ -505,8 +531,101 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
   for (const r of byMap.values())
     if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
-  const merged = Array.from(byMap.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  const merged = Array.from(byMap.values()).sort(
+    (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
+  );
   wrCache = { ts: Date.now(), rows: merged };
+}
+
+/* --- Auto-discover NEW map UIDs on requests (cheap) -------- */
+async function maybeRefreshUidUniverse() {
+  if (!AUTO_UID_REFRESH) return;
+  if (!metaCache.allMapUids.length) return;
+
+  const access = await getLiveAccessToken();
+
+  // 1) OFFICIAL — current playlist set
+  const official = await getAllOfficialCampaigns(access);
+  const latestOfficialSet = new Set(
+    official.flatMap((c) => (c.playlist || []).map((p) => p.mapUid))
+  );
+
+  // 2) TOTD — last 2 months only
+  const months = await getTotdMonthsFromLive(access);
+  const last2 = months.slice(-2);
+  const latestTotdSet = new Set();
+  for (const m of last2) {
+    const days = Array.isArray(m?.days) ? m.days : [];
+    for (const d of days) if (d?.mapUid) latestTotdSet.add(d.mapUid);
+  }
+
+  // 3) CLUB — sample the newest ~100 campaigns
+  const recentClubRefs = await listAllClubCampaignRefsWithPlaylists(access);
+  const latestClubSet = new Set();
+  for (const r of recentClubRefs.slice(0, 100)) {
+    const list = r.playlist?.length
+      ? r.playlist
+      : await fetchClubCampaignPlaylist(access, r.clubId, r.campaignId);
+    for (const uid of list || []) latestClubSet.add(uid);
+  }
+
+  // Diff vs known universe
+  const oldSet = new Set(metaCache.allMapUids);
+  const candidates = new Set([
+    ...latestOfficialSet,
+    ...latestTotdSet,
+    ...latestClubSet,
+  ]);
+  const newUids = Array.from(candidates).filter((u) => !oldSet.has(u));
+  if (!newUids.length) return;
+
+  // Expand tagging sets
+  const officialSet = new Set([...metaCache.officialSet, ...latestOfficialSet]);
+  const clubSet = new Set([...metaCache.clubSet, ...latestClubSet]);
+
+  // Fetch WRs only for the new UIDs
+  const freshRows = [];
+  for (let i = 0; i < newUids.length; i += WR_CONCURRENCY) {
+    const part = await Promise.all(
+      newUids.slice(i, i + WR_CONCURRENCY).map(async (uid) => {
+        let row = await getMapWR(access, uid);
+        if (!row || row.empty || row.error) {
+          await new Promise((r) => setTimeout(r, 60));
+          row = await getMapWR(access, uid);
+        }
+        if (!row || row.empty || row.error) return null;
+        row.sourceType = officialSet.has(uid)
+          ? "official"
+          : clubSet.has(uid)
+          ? "club"
+          : "totd";
+        return row;
+      })
+    );
+    freshRows.push(...part.filter(Boolean));
+  }
+  if (!freshRows.length) return;
+
+  // Resolve names for just new rows
+  const ids = freshRows.map((r) => r.accountId).filter(Boolean);
+  await resolveDisplayNames(null, ids);
+  for (const r of freshRows)
+    if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
+
+  // Merge rows + update meta
+  const byMap = new Map(wrCache.rows.map((r) => [r.mapUid, r]));
+  for (const r of freshRows) byMap.set(r.mapUid, r);
+  const merged = Array.from(byMap.values()).sort(
+    (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
+  );
+  wrCache = { ts: Date.now(), rows: merged };
+
+  const combined = new Set([...metaCache.allMapUids, ...newUids]);
+  metaCache = {
+    officialSet,
+    clubSet,
+    allMapUids: Array.from(combined),
+  };
 }
 
 /* -------------------- Warm start from disk ----------------- */
@@ -522,7 +641,7 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
 
 /* ------------------------ Endpoints ------------------------ */
 
-// Latest WRs (read from cache). Quick-refresh a small slice on each request.
+// Latest WRs (read from cache). Auto-discover new UIDs + quick refresh on request.
 // Optional: ?limit=300  ?search=foo  ?type=official,totd,club
 app.get("/api/wr-latest", async (req, res) => {
   try {
@@ -530,6 +649,7 @@ app.get("/api/wr-latest", async (req, res) => {
       await buildAllWRs({ includeClub: includeClubByDefault() });
     }
 
+    await maybeRefreshUidUniverse();
     await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
 
     let out = wrCache.rows;
@@ -547,25 +667,34 @@ app.get("/api/wr-latest", async (req, res) => {
 
     const type = (req.query.type || "all").toString().trim().toLowerCase();
     if (type !== "all") {
-      const allow = new Set(type.split(",").map((s) => s.trim()).filter(Boolean));
+      const allow = new Set(
+        type.split(",").map((s) => s.trim()).filter(Boolean)
+      );
       out = out.filter((r) => allow.has(r.sourceType));
     }
 
-    res.json({ rows: out.slice(0, limit), total: out.length, fetchedAt: wrCache.ts });
+    res.json({
+      rows: out.slice(0, limit),
+      total: out.length,
+      fetchedAt: wrCache.ts,
+    });
   } catch (err) {
     console.error("wr-latest:", err);
-    res.status(500).json({ error: "Failed to load latest world records", detail: err?.message || String(err) });
+    res.status(500).json({
+      error: "Failed to load latest world records",
+      detail: err?.message || String(err),
+    });
   }
 });
 
-// Players leaderboard (read from cache). Quick-refresh recent on request.
-// Optional: ?limit=200  ?q=search
+// Players leaderboard (read from cache). Auto-discover new UIDs + quick refresh.
 app.get("/api/wr-players", async (req, res) => {
   try {
     if (!wrCache.rows.length) {
       await buildAllWRs({ includeClub: includeClubByDefault() });
     }
 
+    await maybeRefreshUidUniverse();
     await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
 
     const tally = new Map(); // accountId -> { accountId, displayName, wrCount, latestTs }
@@ -595,14 +724,21 @@ app.get("/api/wr-players", async (req, res) => {
 
     list.sort((a, b) => b.wrCount - a.wrCount || b.latestTs - a.latestTs);
     const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 200));
-    res.json({ players: list.slice(0, limit), total: list.length, fetchedAt: wrCache.ts });
+    res.json({
+      players: list.slice(0, limit),
+      total: list.length,
+      fetchedAt: wrCache.ts,
+    });
   } catch (err) {
     console.error("wr-players:", err);
-    res.status(500).json({ error: "Failed to load WR players", detail: err?.message || String(err) });
+    res.status(500).json({
+      error: "Failed to load WR players",
+      detail: err?.message || String(err),
+    });
   }
 });
 
-// Top players in last N days (read from cache). Quick-refresh recent on request.
+// Top players in last N days (read from cache). Auto-discover + quick refresh.
 // Optional: ?days=7  ?limit=3
 app.get("/api/top-weekly", async (req, res) => {
   try {
@@ -610,6 +746,7 @@ app.get("/api/top-weekly", async (req, res) => {
       await buildAllWRs({ includeClub: includeClubByDefault() });
     }
 
+    await maybeRefreshUidUniverse();
     await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
 
     const days = Math.max(1, Math.min(90, Number(req.query.days) || 7));
@@ -661,7 +798,8 @@ app.get("/api/debug-names", async (req, res) => {
 
 app.get("/api/debug-stats", async (_req, res) => {
   try {
-    if (!wrCache.rows.length) await buildAllWRs({ includeClub: includeClubByDefault() });
+    if (!wrCache.rows.length)
+      await buildAllWRs({ includeClub: includeClubByDefault() });
     const rows = wrCache.rows || [];
     const counts = { official: 0, totd: 0, club: 0 };
     for (const r of rows) counts[r.sourceType] = (counts[r.sourceType] || 0) + 1;
@@ -680,14 +818,19 @@ app.get("/api/debug-stats", async (_req, res) => {
   }
 });
 
-// Force a full diff-based rebuild (use for a manual/cron refresh)
+// Force a full diff-based rebuild (use for manual/cron refresh)
 // Optional: ?includeClub=true|false
 app.post("/api/rebuild-now", async (req, res) => {
   try {
-    const includeClubParam = (req.query.includeClub ?? "").toString().toLowerCase();
-    const includeClub = includeClubParam === "true" ? true
-                      : includeClubParam === "false" ? false
-                      : includeClubByDefault();
+    const includeClubParam = (req.query.includeClub ?? "")
+      .toString()
+      .toLowerCase();
+    const includeClub =
+      includeClubParam === "true"
+        ? true
+        : includeClubParam === "false"
+        ? false
+        : includeClubByDefault();
 
     const result = await rebuildNow({ includeClub });
     res.json({ ok: true, fetchedAt: wrCache.ts, ...result });
@@ -706,7 +849,10 @@ app.get("/api/debug-clubs", async (_req, res) => {
     res.json({
       campaignsListed: refs.length,
       mapUidsFound: uids.length,
-      cachedClubUids: { count: disk?.uids?.length || 0, ageMs: disk?.ts ? Date.now() - disk.ts : null },
+      cachedClubUids: {
+        count: disk?.uids?.length || 0,
+        ageMs: disk?.ts ? Date.now() - disk.ts : null,
+      },
       sampleUid: uids[0] || null,
     });
   } catch (e) {
