@@ -104,7 +104,21 @@
   background:rgba(15,21,36,.7);border:1px solid var(--border);
   box-shadow:0 0 12px rgba(61,165,255,.08) inset;
  }
- .medal svg{width:16px;height:16px;display:block}
+ .medal svg,
+.medal .medal-icon {
+  width:16px;
+  height:16px;
+  display:block;
+  object-fit:contain;
+  image-rendering:auto;
+}
+.medal.author {
+  box-shadow:0 0 0 1px rgba(255,154,59,.25) inset;
+  background:rgba(255,206,106,.08);
+  border-color:rgba(255,154,59,.35);
+}
+
+
  .medal b{font-weight:800;letter-spacing:.2px}
  .medal.author{box-shadow:0 0 0 1px rgba(255,154,59,.25) inset}
 
@@ -121,7 +135,7 @@
   <div class="nav">
     <h1>Track of the Day</h1>
     <!-- worldrecord-style home button -->
-    <a href="/" class="btn">Home</a>
+    <a href="/index.html" class="btn">Home</a>
   </div>
   <div class="select">Month: <select id="month"></select></div>
 </div></header>
@@ -180,10 +194,16 @@
       <circle cx="12" cy="12" r="4.2" fill="rgba(0,0,0,.15)"/>
     </svg>`;
   }
-  function authorMedal(msVal){
-    if(msVal==null) return "";
-    return `<span class="medal author">${medalSvg("#FF9A3B","#FFCE6A")}<b>AT</b> <span class="mono">${fmtMs(msVal)}</span></span>`;
-  }
+ function authorMedal(msVal){
+  if (msVal == null || Number(msVal) <= 0) return "";
+  return `
+    <span class="medal author">
+      <img class="medal-icon" src="/img/author.png" alt="Author Medal" loading="lazy">
+      <b>AT</b> <span class="mono">${fmtMs(msVal)}</span>
+    </span>
+  `;
+}
+
   function buildMedals(map){
     if(!map) return "";
     const at = authorMedal(map.authorTime);
