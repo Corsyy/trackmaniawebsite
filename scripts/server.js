@@ -842,6 +842,74 @@ app.get("/api/top-weekly", ensureCacheOr503, async (req, res) => {
   }
 });
 
+/* -------------------- Monthly WR Podium -------------------- */
+/** Convert ym ("YYYY-MM") to inclusive [startSec, endSec) in UTC. */
+function monthRangeUTC(ym) {
+  const pad2 = (n) => String(n).padStart(2, "0");
+  if (!ym || !/^\d{4}-\d{2}$/.test(ym)) {
+    const now = new Date();
+    const y = now.getUTCFullYear();
+    const m = now.getUTCMonth() + 1;
+    const start = Date.UTC(y, m - 1, 1, 0, 0, 0);
+    const end = Date.UTC(m === 12 ? y + 1 : y, m === 12 ? 0 : m, 1, 0, 0, 0);
+    return { ym: `${y}-${pad2(m)}`, startSec: Math.floor(start / 1000), endSec: Math.floor(end / 1000) };
+  }
+  const [yy, mm] = ym.split("-").map(Number);
+  const start = Date.UTC(yy, mm - 1, 1, 0, 0, 0);
+  const end = Date.UTC(mm === 12 ? yy + 1 : yy, mm === 12 ? 0 : mm, 1, 0, 0, 0);
+  return { ym, startSec: Math.floor(start / 1000), endSec: Math.floor(end / 1000) };
+}
+
+app.get("/api/top-monthly", ensureCacheOr503, async (req, res) => {
+  try {
+    if (wrCache.rows.length) {
+      await maybeRefreshUidUniverse();
+      await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
+    }
+
+    const ymParam = (req.query.ym || "").toString().trim();  // "YYYY-MM"
+    const limit = Math.max(1, Math.min(50, Number(req.query.limit) || 3));
+    const { ym, startSec, endSec } = monthRangeUTC(ymParam);
+
+    const type = (req.query.type || "all").toString().trim().toLowerCase();
+    let rows = wrCache.rows || [];
+    if (type !== "all") {
+      const allow = new Set(type.split(",").map((s) => s.trim()).filter(Boolean));
+      rows = rows.filter((r) => allow.has(r.sourceType));
+    }
+
+    rows = rows.filter((r) => isValidTimeMs(Number(r.timeMs)));
+
+    const tally = new Map(); // accountId -> { accountId, displayName, wrs, bySource, latestTs }
+    for (const r of rows) {
+      const ts = Number(r.timestamp || 0);
+      if (!ts || ts < startSec || ts >= endSec) continue;
+      const id = r.accountId;
+      if (!id) continue;
+
+      const rec = tally.get(id) || {
+        accountId: id,
+        displayName: r.displayName || id,
+        wrs: 0,
+        bySource: { official: 0, totd: 0, club: 0 },
+        latestTs: 0,
+      };
+      rec.wrs += 1;
+      rec.bySource[r.sourceType] = (rec.bySource[r.sourceType] || 0) + 1;
+      if (ts > rec.latestTs) rec.latestTs = ts;
+      tally.set(id, rec);
+    }
+
+    const top = Array.from(tally.values())
+      .sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs)
+      .slice(0, limit);
+
+    res.json({ ym, rangeStart: startSec, rangeEnd: endSec, top, generatedAt: Date.now() });
+  } catch (e) {
+    res.status(500).json({ error: e?.message || String(e) });
+  }
+});
+
 /* ---------------- Debug & control ---------------- */
 app.get("/api/debug-names", async (req, res) => {
   try {
