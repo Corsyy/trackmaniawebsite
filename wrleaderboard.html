@@ -46,7 +46,7 @@
     .input{width:280px;max-width:60vw;padding:.6rem .8rem;border-radius:12px;border:1px solid rgba(109,251,255,.22);background:#0c1224;color:var(--text)}
     .card{border:1px solid rgba(109,251,255,.25);background:rgba(15,21,36,.55);backdrop-filter:blur(12px) saturate(180%);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 20px rgba(61,165,255,.2);padding:1rem}
 
-    /* ⬇ NEW: podium styles */
+    /* Podium styles */
     .podium-head { display:flex; gap:.6rem; align-items:center; justify-content:space-between; margin:.25rem 0 .8rem; }
     .podium-ctrls { display:flex; gap:.5rem; align-items:center; }
     .podium-list { display:flex; gap:.8rem; flex-wrap:wrap; }
@@ -93,7 +93,7 @@
     <button class="btn" id="clear">Clear</button>
   </div>
 
-  <!-- ⬇ NEW: Monthly Podium Card -->
+  <!-- Monthly Podium Card -->
   <section class="card" style="margin-bottom:1rem;">
     <div class="podium-head">
       <div>
@@ -135,7 +135,7 @@
 <script>
 const API_BASE = "https://trackmaniawebsite.onrender.com";
 const PAGE_SIZE = 25;
-const FETCH_LIMIT = 100; // fetch once; paginate in the browser
+const FETCH_LIMIT = 100;
 
 let allPlayers = [];
 let page = Number(new URLSearchParams(location.search).get('page')) || 1;
@@ -183,7 +183,6 @@ function renderPage(p=1){
     </tr>
   `).join("");
 
-  // pager
   document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
   const prev = document.getElementById("prevBtn");
   const next = document.getElementById("nextBtn");
@@ -251,7 +250,7 @@ document.getElementById("q").addEventListener("input", ()=>{
 });
 document.getElementById("clear").onclick = () => { document.getElementById("q").value=""; page=1; load(); };
 
-// ⬇ NEW: Monthly podium logic
+/* -------- Monthly podium (tries /api/wr-podium, then /api/top-monthly) -------- */
 function ymDefaultUTC(){
   const now = new Date();
   const y = now.getUTCFullYear();
@@ -260,22 +259,44 @@ function ymDefaultUTC(){
 }
 function fmtNum(n){ try { return Number(n).toLocaleString(); } catch { return String(n); } }
 
+async function fetchJSONWithFallback(ym){
+  // Try new route first
+  const try1 = `${API_BASE}/api/wr-podium?month=${encodeURIComponent(ym)}`;
+  // Fallback (older route)
+  const try2 = `${API_BASE}/api/top-monthly?ym=${encodeURIComponent(ym)}&limit=3`;
+
+  // helper to fetch and validate
+  const one = async (url) => {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  };
+
+  try {
+    const j = await one(try1);
+    // normalize to common shape
+    if (Array.isArray(j.top)) return { ym: j.ym || ym, top: j.top };
+    if (Array.isArray(j.podium)) return { ym: j.month || ym, top: j.podium }; // just in case
+    // if some other shape, coerce best-effort
+    return { ym: j.ym || j.month || ym, top: j.top || j.podium || [] };
+  } catch {
+    const k = await one(try2);
+    return { ym: k.ym || ym, top: Array.isArray(k.top) ? k.top : [] };
+  }
+}
+
 async function loadPodium(){
   const ym = document.getElementById("ym").value || ymDefaultUTC();
-  const url = `${API_BASE}/api/top-monthly?ym=${encodeURIComponent(ym)}&limit=3`;
   const list = document.getElementById("podiumList");
   const meta = document.getElementById("podiumMeta");
   list.innerHTML = `<div class="meta">Loading podium…</div>`;
   meta.textContent = "";
 
   try{
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error(await r.text());
-    const j = await r.json();
+    const { ym: resolvedYm, top } = await fetchJSONWithFallback(ym);
 
-    const top = Array.isArray(j.top) ? j.top : [];
     if (!top.length) {
-      list.innerHTML = `<div class="meta">No records yet for ${j.ym || ym}.</div>`;
+      list.innerHTML = `<div class="meta">No records yet for ${resolvedYm}.</div>`;
       meta.textContent = "";
       return;
     }
@@ -285,9 +306,11 @@ async function loadPodium(){
       <div class="podium-item">
         <div class="podium-medal">${medals[idx] || ""}</div>
         <div style="min-width:0">
-          <div style="font-weight:800">${p.displayName || p.accountId}</div>
+          <div style="font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${p.displayName || p.accountId}
+          </div>
           <div class="meta" style="font-size:.9rem">
-            <span class="badge">${fmtNum(p.wrs)} WRs</span>
+            <span class="badge">${fmtNum(p.wrs || p.wrCount || 0)} WRs</span>
             <span style="margin-left:.35rem; opacity:.9">
               ${fmtNum(p.bySource?.official||0)} official • ${fmtNum(p.bySource?.totd||0)} totd • ${fmtNum(p.bySource?.club||0)} club
             </span>
@@ -296,32 +319,34 @@ async function loadPodium(){
       </div>
     `).join("");
 
-    meta.textContent = `Month: ${j.ym}`;
+    meta.textContent = `Month: ${resolvedYm}`;
   }catch(e){
     console.error(e);
     list.innerHTML = `<div class="meta">Failed to load podium.</div>`;
   }
 }
 
-// initial setup
+// init podium
 (function initPodium(){
   const ymIn = document.getElementById("ym");
   const btn  = document.getElementById("loadPodium");
   if (ymIn) ymIn.value = ymDefaultUTC();
   if (btn) btn.addEventListener("click", loadPodium);
-  loadPodium(); // load current month podium on page load
+  loadPodium(); // load current month on page load
 })();
 
-// initial
+// initial table load
 load();
-// optional: refresh occasionally
-setInterval(() => load(), 60 * 60 * 1000); // once every hour
+// occasional refresh
+setInterval(() => load(), 60 * 60 * 1000);
 </script>
 
 <script>
+  // keep server warm
   setInterval(() => {
     fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
   }, 5 * 60 * 1000);
+  // prefetches
   const prefetch = (url) => {
     const link = document.createElement('link');
     link.rel = 'prefetch';
