@@ -45,6 +45,22 @@
     .controls{display:flex;gap:.6rem;align-items:center;margin-bottom:1rem}
     .input{width:280px;max-width:60vw;padding:.6rem .8rem;border-radius:12px;border:1px solid rgba(109,251,255,.22);background:#0c1224;color:var(--text)}
     .card{border:1px solid rgba(109,251,255,.25);background:rgba(15,21,36,.55);backdrop-filter:blur(12px) saturate(180%);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 20px rgba(61,165,255,.2);padding:1rem}
+
+    /* ⬇ NEW: podium styles */
+    .podium-head { display:flex; gap:.6rem; align-items:center; justify-content:space-between; margin:.25rem 0 .8rem; }
+    .podium-ctrls { display:flex; gap:.5rem; align-items:center; }
+    .podium-list { display:flex; gap:.8rem; flex-wrap:wrap; }
+    .podium-item {
+      flex:1 1 220px;
+      min-width:220px;
+      border:1px solid rgba(109,251,255,.18);
+      background:rgba(12,18,36,.6);
+      border-radius:14px; padding:.75rem .9rem;
+      display:flex; align-items:center; gap:.7rem;
+    }
+    .podium-medal { font-size:1.25rem }
+    .badge { border:1px solid rgba(109,251,255,.25); padding:.2rem .5rem; border-radius:999px; font-size:.85rem; background:rgba(109,251,255,.08) }
+
     table{width:100%;border-collapse:collapse}
     th,td{padding:.75rem;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
     th{opacity:.9}
@@ -53,9 +69,9 @@
     .skeleton{opacity:.7;padding:1rem}
   </style>
   <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
-<link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
-<link rel="prefetch" href="/wrleaderboard" as="document">
-<link rel="prefetch" href="/recentwrs" as="document">
+  <link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
+  <link rel="prefetch" href="/wrleaderboard" as="document">
+  <link rel="prefetch" href="/recentwrs" as="document">
 </head>
 <body class="bg-track-curves">
 <header>
@@ -76,6 +92,24 @@
     <input id="q" class="input" type="search" placeholder="Search player or accountId…">
     <button class="btn" id="clear">Clear</button>
   </div>
+
+  <!-- ⬇ NEW: Monthly Podium Card -->
+  <section class="card" style="margin-bottom:1rem;">
+    <div class="podium-head">
+      <div>
+        <strong>Monthly WR Podium</strong>
+        <span id="podiumMeta" class="meta" style="margin-left:.4rem; font-size:.9rem"></span>
+      </div>
+      <div class="podium-ctrls">
+        <label for="ym" class="meta">Month:</label>
+        <input id="ym" type="month" class="input" style="width:auto; padding:.4rem .6rem">
+        <button id="loadPodium" class="btn">Load</button>
+      </div>
+    </div>
+    <div id="podiumList" class="podium-list">
+      <div class="meta">Loading podium…</div>
+    </div>
+  </section>
 
   <div class="pager">
     <button id="prevBtn" class="btn">Prev</button>
@@ -217,30 +251,90 @@ document.getElementById("q").addEventListener("input", ()=>{
 });
 document.getElementById("clear").onclick = () => { document.getElementById("q").value=""; page=1; load(); };
 
+// ⬇ NEW: Monthly podium logic
+function ymDefaultUTC(){
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const m = String(now.getUTCMonth()+1).padStart(2,"0");
+  return `${y}-${m}`;
+}
+function fmtNum(n){ try { return Number(n).toLocaleString(); } catch { return String(n); } }
+
+async function loadPodium(){
+  const ym = document.getElementById("ym").value || ymDefaultUTC();
+  const url = `${API_BASE}/api/top-monthly?ym=${encodeURIComponent(ym)}&limit=3`;
+  const list = document.getElementById("podiumList");
+  const meta = document.getElementById("podiumMeta");
+  list.innerHTML = `<div class="meta">Loading podium…</div>`;
+  meta.textContent = "";
+
+  try{
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(await r.text());
+    const j = await r.json();
+
+    const top = Array.isArray(j.top) ? j.top : [];
+    if (!top.length) {
+      list.innerHTML = `<div class="meta">No records yet for ${j.ym || ym}.</div>`;
+      meta.textContent = "";
+      return;
+    }
+
+    const medals = ["🥇","🥈","🥉"];
+    list.innerHTML = top.slice(0,3).map((p, idx) => `
+      <div class="podium-item">
+        <div class="podium-medal">${medals[idx] || ""}</div>
+        <div style="min-width:0">
+          <div style="font-weight:800">${p.displayName || p.accountId}</div>
+          <div class="meta" style="font-size:.9rem">
+            <span class="badge">${fmtNum(p.wrs)} WRs</span>
+            <span style="margin-left:.35rem; opacity:.9">
+              ${fmtNum(p.bySource?.official||0)} official • ${fmtNum(p.bySource?.totd||0)} totd • ${fmtNum(p.bySource?.club||0)} club
+            </span>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    meta.textContent = `Month: ${j.ym}`;
+  }catch(e){
+    console.error(e);
+    list.innerHTML = `<div class="meta">Failed to load podium.</div>`;
+  }
+}
+
+// initial setup
+(function initPodium(){
+  const ymIn = document.getElementById("ym");
+  const btn  = document.getElementById("loadPodium");
+  if (ymIn) ymIn.value = ymDefaultUTC();
+  if (btn) btn.addEventListener("click", loadPodium);
+  loadPodium(); // load current month podium on page load
+})();
+
 // initial
 load();
 // optional: refresh occasionally
 setInterval(() => load(), 60 * 60 * 1000); // once every hour
-
 </script>
 
 <script>
-    setInterval(() => {
-      fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
-    }, 5 * 60 * 1000);
-    const prefetch = (url) => {
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = url;
-      link.as = 'fetch';
-      link.crossOrigin = 'anonymous';
-      document.head.appendChild(link);
-    };
-    const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
-    const tblBtn = document.querySelector('a[href="/recentwrs"]');
-    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once:true });
-    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once:true });
-  </script>
+  setInterval(() => {
+    fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
+  }, 5 * 60 * 1000);
+  const prefetch = (url) => {
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = url;
+    link.as = 'fetch';
+    link.crossOrigin = 'anonymous';
+    document.head.appendChild(link);
+  };
+  const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
+  const tblBtn = document.querySelector('a[href="/recentwrs"]');
+  if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once:true });
+  if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once:true });
+</script>
 
 </body>
 </html>
