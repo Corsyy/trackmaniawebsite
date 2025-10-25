@@ -2,6 +2,9 @@ import express from "express";
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
+import compression from "compression";
+import http from "http";
+import https from "https";
 
 /**
  * Required ENV:
@@ -10,11 +13,11 @@ import path from "path";
  *   CLIENT_SECRET         = <api.trackmania.com client_secret>
  *
  * Optional ENV (recommended):
- *   ADMIN_SECRET          = <random string to secure /api/admin/set-refresh>
- *   REFRESH_TOKEN_FILE    = /data/nadeo_refresh_token.txt
- *   CACHE_PATH_WR         = /data/wr_cache.json
- *   CACHE_PATH_CLUB       = /data/club_uids.json
- *   CORS_ORIGINS          = comma-separated list of extra allowed origins
+ *   ADMIN_SECRET            = <random string to secure /api/admin/set-refresh>
+ *   REFRESH_TOKEN_FILE      = /data/nadeo_refresh_token.txt
+ *   CACHE_PATH_WR           = /data/wr_cache.json
+ *   CACHE_PATH_CLUB         = /data/club_uids.json
+ *   CORS_ORIGINS            = comma-separated list of extra allowed origins
  *   INCLUDE_CLUB_BY_DEFAULT = true|false (default true)
  *   AUTO_UID_REFRESH        = true|false (default true)
  *   WR_CONCURRENCY          = 8
@@ -23,9 +26,20 @@ import path from "path";
  *   CLUB_DETAIL_CONC        = 4
  *   CLUB_UID_TTL_HOURS      = 24
  *   MAX_WR_MS               = (defaults to 24h in ms)
+ *   RESPONSE_TTL_SECONDS    = 3  (small LRU TTL for route responses)
  */
 
 const app = express();
+
+/* ------------------------------ Perf -------------------------------- */
+// gzip/br compression
+app.use(compression({ level: 6 }));
+
+// HTTP/HTTPS keep-alive for node-fetch
+const keepAliveHttpAgent = new http.Agent({ keepAlive: true, maxSockets: 50 });
+const keepAliveHttpsAgent = new https.Agent({ keepAlive: true, maxSockets: 50 });
+const baseFetch = (url, opts = {}) =>
+  fetch(url, { agent: (parsedUrl => (String(parsedUrl).startsWith("https:") ? keepAliveHttpsAgent : keepAliveHttpAgent))(url), ...opts });
 
 /* --------------------------- CORS --------------------------- */
 const DEFAULT_ORIGINS = new Set([
@@ -58,7 +72,7 @@ app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 function fetchWithTimeout(url, opts = {}, ms = 15000) {
   const ac = new AbortController();
   const t = setTimeout(() => ac.abort(), ms);
-  return fetch(url, { ...opts, signal: ac.signal }).finally(() => clearTimeout(t));
+  return baseFetch(url, { ...opts, signal: ac.signal }).finally(() => clearTimeout(t));
 }
 
 /* -------------------- Refresh token engine ---------------- */
@@ -122,13 +136,12 @@ async function getLiveAccessToken() {
   const j = await r.json();
   const accessToken  = j.accessToken  || j.access_token;
   const expiresIn    = j.expiresIn    || j.expires_in || 3600;
-  const newRefresh   = j.refreshToken || j.refresh_token; // <-- auto-rotate if provided
+  const newRefresh   = j.refreshToken || j.refresh_token;
 
   if (!accessToken) throw new Error("no accessToken in refresh response");
 
-  // ✅ Persist the rotated refresh token if API returns one (keeps you logged in)
   if (typeof newRefresh === "string" && newRefresh.trim()) {
-    persistRefreshToken(cleanToken(newRefresh));
+    persistRefreshToken(cleanToken(newRefresh)); // ✅ auto-rotate refresh
   }
 
   cachedAccess = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
@@ -243,8 +256,7 @@ async function listAllClubCampaignRefsWithPlaylists(accessToken) {
       const campaignId = it?.id ?? it?.campaignId ?? it?.campaign?.id;
       const updatedAt = new Date(it?.updated || it?.updatedAt || 0).getTime() || 0;
       const playlist = (it?.campaign?.playlist || it?.playlist || [])
-        .map((p) => p?.mapUid)
-        .filter(Boolean);
+        .map((p) => p?.mapUid).filter(Boolean);
       if (clubId && campaignId) out.push({ clubId, campaignId, updatedAt, playlist });
     }
 
@@ -649,18 +661,61 @@ async function warmBuildInBackground() {
   }
 }
 warmBuildInBackground();
-setInterval(() => warmBuildInBackground(), 30 * 60 * 1000); // keep warm
+setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
 
-// Optional: proactive access/refresh keep-alive every 6h
+// keep auth warm
 setInterval(() => { getLiveAccessToken().catch(() => {}); }, 6 * 60 * 60 * 1000);
+
+/* -------------------- Debounced refresh guards ------------- */
+function makeDebounced(fn, waitMs) {
+  let last = 0, running = false, pending = false;
+  return async function wrapped(...args) {
+    const now = Date.now();
+    if (running) { pending = true; return; }
+    if (now - last < waitMs) return;
+    running = true;
+    try {
+      await fn(...args);
+    } finally {
+      last = Date.now();
+      running = false;
+      if (pending) { pending = false; wrapped(...args); }
+    }
+  };
+}
+const debouncedQuickRefresh = makeDebounced(() => quickRefreshRecent({ count: QUICK_REFRESH_COUNT }), 15_000);
+const debouncedUidRefresh   = makeDebounced(() => maybeRefreshUidUniverse(), 60_000);
+
+/* -------------------- Small response cache ----------------- */
+const RESPONSE_TTL_SECONDS = Number(process.env.RESPONSE_TTL_SECONDS || 3);
+const respCache = new Map(); // key -> { ts, body }
+function cacheKey(req) { return req.originalUrl || req.url; }
+function getCached(req) {
+  const k = cacheKey(req);
+  const v = respCache.get(k);
+  if (!v) return null;
+  if (Date.now() - v.ts > RESPONSE_TTL_SECONDS * 1000) { respCache.delete(k); return null; }
+  return v.body;
+}
+function setCached(req, payload) {
+  const k = cacheKey(req);
+  respCache.set(k, { ts: Date.now(), body: payload });
+  // simple LRU bound
+  if (respCache.size > 200) {
+    const first = respCache.keys().next().value;
+    if (first) respCache.delete(first);
+  }
+}
 
 /* ------------------------ Endpoints ------------------------ */
 
 // Readiness & auth probes
 app.get("/api/ready", (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   res.json({ ok: !!wrCache.rows.length, building, rows: wrCache.rows.length, fetchedAt: wrCache.ts || null });
 });
 app.get("/api/debug-auth", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   try {
     const token = await getLiveAccessToken();
     res.json({ ok: true, accessTokenPreview: token?.slice(0, 12) || null });
@@ -672,6 +727,7 @@ app.get("/api/debug-auth", async (_req, res) => {
 // Admin: rotate refresh token live (no redeploy)
 const ADMIN_SECRET = process.env.ADMIN_SECRET;
 app.post("/api/admin/set-refresh", express.json(), (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   const auth = req.headers["x-admin-secret"] || req.query.secret;
   if (!ADMIN_SECRET || auth !== ADMIN_SECRET) {
     return res.status(403).json({ ok: false, error: "forbidden" });
@@ -691,8 +747,8 @@ app.post("/api/admin/set-refresh", express.json(), (req, res) => {
   }
 });
 
-// Common middleware: if cache empty and auth fails, respond cleanly
-async function ensureCacheOr503(_req, res, next) {
+// Common middleware: ensure cache once; never block responses later
+async function ensureCacheOnce(_req, res, next) {
   try {
     if (!wrCache.rows.length) {
       await buildAllWRs({ includeClub: includeClubByDefault() });
@@ -700,20 +756,32 @@ async function ensureCacheOr503(_req, res, next) {
     return next();
   } catch (e) {
     const s = String(e || "");
+    // Serve empty but valid structure for instant paint; client can retry
     return res.status(503).json({ error: "AuthUnavailable", detail: s });
   }
 }
 
-// Latest WRs (read from cache). Auto-discover new UIDs + quick refresh on request.
-app.get("/api/wr-latest", ensureCacheOr503, async (req, res) => {
+// Utility: time format
+const detroitDate = (tsMs) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Detroit",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(tsMs)).replaceAll("/", "-");
+
+// Latest WRs (instant, cached)
+app.get("/api/wr-latest", ensureCacheOnce, async (req, res) => {
+  const cached = getCached(req);
+  if (cached) {
+    res.setHeader("Cache-Control", "public, max-age=3, stale-while-revalidate=60");
+    return res.json(cached);
+  }
+
   try {
-    if (wrCache.rows.length) {
-      await maybeRefreshUidUniverse();
-      await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
-    } else {
-      warmBuildInBackground();
-      return res.status(503).json({ building: true, message: "Preparing WR cache" });
-    }
+    // trigger background refreshers without blocking
+    debouncedUidRefresh();
+    debouncedQuickRefresh();
 
     let out = wrCache.rows;
     const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 300));
@@ -736,34 +804,33 @@ app.get("/api/wr-latest", ensureCacheOr503, async (req, res) => {
 
     out = out.filter((r) => isValidTimeMs(Number(r.timeMs)));
 
-    const detroitDate = (tsMs) =>
-      new Intl.DateTimeFormat("en-CA", {
-        timeZone: "America/Detroit",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date(tsMs)).replaceAll("/", "-");
-
-    res.json({
+    const payload = {
       rows: out.slice(0, limit),
       total: out.length,
       fetchedAt: wrCache.ts,
-      generatedAt: new Date(wrCache.ts).toISOString(), // back-compat
-      date: detroitDate(wrCache.ts),                    // back-compat calendar date
-    });
+      generatedAt: new Date(wrCache.ts).toISOString(),
+      date: detroitDate(wrCache.ts),
+    };
+    setCached(req, payload);
+    res.setHeader("Cache-Control", "public, max-age=3, stale-while-revalidate=60");
+    res.json(payload);
   } catch (err) {
     console.error("wr-latest:", err);
     res.status(500).json({ error: "Failed to load latest world records", detail: err?.message || String(err) });
   }
 });
 
-// Players leaderboard
-app.get("/api/wr-players", ensureCacheOr503, async (req, res) => {
+// Players leaderboard (instant, cached)
+app.get("/api/wr-players", ensureCacheOnce, async (req, res) => {
+  const cached = getCached(req);
+  if (cached) {
+    res.setHeader("Cache-Control", "public, max-age=3, stale-while-revalidate=60");
+    return res.json(cached);
+  }
+
   try {
-    if (wrCache.rows.length) {
-      await maybeRefreshUidUniverse();
-      await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
-    }
+    debouncedUidRefresh();
+    debouncedQuickRefresh();
 
     const safeRows = (wrCache.rows || []).filter((r) => isValidTimeMs(Number(r.timeMs)));
 
@@ -793,20 +860,28 @@ app.get("/api/wr-players", ensureCacheOr503, async (req, res) => {
 
     list.sort((a, b) => b.wrCount - a.wrCount || b.latestTs - a.latestTs);
     const limit = Math.max(1, Math.min(1000, Number(req.query.limit) || 200));
-    res.json({ players: list.slice(0, limit), total: list.length, fetchedAt: wrCache.ts });
+
+    const payload = { players: list.slice(0, limit), total: list.length, fetchedAt: wrCache.ts };
+    setCached(req, payload);
+    res.setHeader("Cache-Control", "public, max-age=3, stale-while-revalidate=60");
+    res.json(payload);
   } catch (err) {
     console.error("wr-players:", err);
     res.status(500).json({ error: "Failed to load WR players", detail: err?.message || String(err) });
   }
 });
 
-// Top players in last N days
-app.get("/api/top-weekly", ensureCacheOr503, async (req, res) => {
+// Top players in last N days (instant, cached)
+app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
+  const cached = getCached(req);
+  if (cached) {
+    res.setHeader("Cache-Control", "public, max-age=5, stale-while-revalidate=60");
+    return res.json(cached);
+  }
+
   try {
-    if (wrCache.rows.length) {
-      await maybeRefreshUidUniverse();
-      await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
-    }
+    debouncedUidRefresh();
+    debouncedQuickRefresh();
 
     const days = Math.max(1, Math.min(90, Number(req.query.days) || 7));
     const limit = Math.max(1, Math.min(50, Number(req.query.limit) || 3));
@@ -836,75 +911,75 @@ app.get("/api/top-weekly", ensureCacheOr503, async (req, res) => {
       .sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs)
       .slice(0, limit);
 
-    res.json({ rangeDays: days, top, generatedAt: Date.now() });
+    const payload = { rangeDays: days, top, generatedAt: Date.now() };
+    setCached(req, payload);
+    res.setHeader("Cache-Control", "public, max-age=5, stale-while-revalidate=60");
+    res.json(payload);
   } catch (e) {
     res.status(500).json({ error: e?.message || String(e) });
   }
 });
 
-/* -------------------- Monthly WR Podium -------------------- */
-/** Convert ym ("YYYY-MM") to inclusive [startSec, endSec) in UTC. */
-function monthRangeUTC(ym) {
-  const pad2 = (n) => String(n).padStart(2, "0");
-  if (!ym || !/^\d{4}-\d{2}$/.test(ym)) {
-    const now = new Date();
-    const y = now.getUTCFullYear();
-    const m = now.getUTCMonth() + 1;
-    const start = Date.UTC(y, m - 1, 1, 0, 0, 0);
-    const end = Date.UTC(m === 12 ? y + 1 : y, m === 12 ? 0 : m, 1, 0, 0, 0);
-    return { ym: `${y}-${pad2(m)}`, startSec: Math.floor(start / 1000), endSec: Math.floor(end / 1000) };
+// NEW: Monthly podium (instant, cached)
+// GET /api/top-monthly?ym=YYYY-MM  (defaults to current month in America/Detroit)
+// Response: { ym, top:[{accountId, displayName, wrs}], generatedAt }
+app.get("/api/top-monthly", ensureCacheOnce, async (req, res) => {
+  const cached = getCached(req);
+  if (cached) {
+    res.setHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
+    return res.json(cached);
   }
-  const [yy, mm] = ym.split("-").map(Number);
-  const start = Date.UTC(yy, mm - 1, 1, 0, 0, 0);
-  const end = Date.UTC(mm === 12 ? yy + 1 : yy, mm === 12 ? 0 : mm, 1, 0, 0, 0);
-  return { ym, startSec: Math.floor(start / 1000), endSec: Math.floor(end / 1000) };
-}
 
-app.get("/api/top-monthly", ensureCacheOr503, async (req, res) => {
   try {
-    if (wrCache.rows.length) {
-      await maybeRefreshUidUniverse();
-      await quickRefreshRecent({ count: QUICK_REFRESH_COUNT });
-    }
+    debouncedUidRefresh();
+    debouncedQuickRefresh();
 
-    const ymParam = (req.query.ym || "").toString().trim();  // "YYYY-MM"
-    const limit = Math.max(1, Math.min(50, Number(req.query.limit) || 3));
-    const { ym, startSec, endSec } = monthRangeUTC(ymParam);
+    const tz = "America/Detroit";
+    const ymRaw = (req.query.ym || "").toString().trim();
+    const now = new Date();
 
-    const type = (req.query.type || "all").toString().trim().toLowerCase();
-    let rows = wrCache.rows || [];
-    if (type !== "all") {
-      const allow = new Set(type.split(",").map((s) => s.trim()).filter(Boolean));
-      rows = rows.filter((r) => allow.has(r.sourceType));
-    }
+    const ym = /^\d{4}-\d{2}$/.test(ymRaw)
+      ? ymRaw
+      : new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit" })
+          .format(now).replace("/", "-"); // YYYY-MM from en-CA gives "YYYY/MM", normalize
 
-    rows = rows.filter((r) => isValidTimeMs(Number(r.timeMs)));
+    const [Y, M] = ym.split("-").map(n => Number(n));
+    const start = new Date(Date.UTC(Y, M - 1, 1, 0, 0, 0));
+    const end   = new Date(Date.UTC(Y, M - 1 + 1, 1, 0, 0, 0));
 
-    const tally = new Map(); // accountId -> { accountId, displayName, wrs, bySource, latestTs }
-    for (const r of rows) {
-      const ts = Number(r.timestamp || 0);
-      if (!ts || ts < startSec || ts >= endSec) continue;
-      const id = r.accountId;
-      if (!id) continue;
+    // Convert Detroit-local first/last day to UTC bounds (approx by month)
+    const detroitStart = new Date(new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(start) + " 00:00:00");
+    const detroitEnd   = new Date(new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(end)   + " 00:00:00");
+    const fromEpoch = Math.floor(start.getTime() / 1000);
+    const toEpoch   = Math.floor(end.getTime() / 1000);
 
-      const rec = tally.get(id) || {
-        accountId: id,
-        displayName: r.displayName || id,
+    const safeRows = (wrCache.rows || []).filter((r) =>
+      isValidTimeMs(Number(r.timeMs)) &&
+      r.timestamp && r.timestamp >= fromEpoch && r.timestamp < toEpoch
+    );
+
+    const tally = new Map(); // accountId -> { accountId, displayName, wrs, latestTs }
+    for (const r of safeRows) {
+      if (!r.accountId) continue;
+      const rec = tally.get(r.accountId) || {
+        accountId: r.accountId,
+        displayName: r.displayName || r.accountId,
         wrs: 0,
-        bySource: { official: 0, totd: 0, club: 0 },
         latestTs: 0,
       };
       rec.wrs += 1;
-      rec.bySource[r.sourceType] = (rec.bySource[r.sourceType] || 0) + 1;
-      if (ts > rec.latestTs) rec.latestTs = ts;
-      tally.set(id, rec);
+      if (r.timestamp > rec.latestTs) rec.latestTs = r.timestamp;
+      tally.set(r.accountId, rec);
     }
 
     const top = Array.from(tally.values())
       .sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs)
-      .slice(0, limit);
+      .slice(0, 3);
 
-    res.json({ ym, rangeStart: startSec, rangeEnd: endSec, top, generatedAt: Date.now() });
+    const payload = { ym, top, generatedAt: Date.now() };
+    setCached(req, payload);
+    res.setHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
+    res.json(payload);
   } catch (e) {
     res.status(500).json({ error: e?.message || String(e) });
   }
@@ -912,6 +987,7 @@ app.get("/api/top-monthly", ensureCacheOr503, async (req, res) => {
 
 /* ---------------- Debug & control ---------------- */
 app.get("/api/debug-names", async (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=120");
   try {
     const ids = String(req.query.ids || "").split(",").map((s) => s.trim()).filter(Boolean);
     await resolveDisplayNames(null, ids);
@@ -923,6 +999,7 @@ app.get("/api/debug-names", async (req, res) => {
 });
 
 app.get("/api/debug-stats", async (_req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=10");
   try {
     if (!wrCache.rows.length) await buildAllWRs({ includeClub: includeClubByDefault() });
     const rows = wrCache.rows || [];
@@ -941,8 +1018,9 @@ app.get("/api/debug-stats", async (_req, res) => {
   }
 });
 
-// Force a full diff-based rebuild
+// Force a full diff-based rebuild (non-blocking for reads)
 app.post("/api/rebuild-now", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   try {
     const includeClubParam = (req.query.includeClub ?? "").toString().toLowerCase();
     const includeClub =
@@ -951,6 +1029,8 @@ app.post("/api/rebuild-now", async (req, res) => {
       includeClubByDefault();
 
     const result = await rebuildNow({ includeClub });
+    // clear small response cache so next requests see fresh counts
+    respCache.clear();
     res.json({ ok: true, fetchedAt: wrCache.ts, ...result });
   } catch (e) {
     res.status(500).json({ error: e?.message || String(e) });
@@ -959,6 +1039,7 @@ app.post("/api/rebuild-now", async (req, res) => {
 
 // Quick club check
 app.get("/api/debug-clubs", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   try {
     const access = await getLiveAccessToken();
     const refs = await listAllClubCampaignRefsWithPlaylists(access);
