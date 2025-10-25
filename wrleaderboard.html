@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -260,12 +261,9 @@ function ymDefaultUTC(){
 function fmtNum(n){ try { return Number(n).toLocaleString(); } catch { return String(n); } }
 
 async function fetchJSONWithFallback(ym){
-  // Try new route first
   const try1 = `${API_BASE}/api/wr-podium?month=${encodeURIComponent(ym)}`;
-  // Fallback (older route)
   const try2 = `${API_BASE}/api/top-monthly?ym=${encodeURIComponent(ym)}&limit=3`;
 
-  // helper to fetch and validate
   const one = async (url) => {
     const r = await fetch(url, { cache: "no-store" });
     if (!r.ok) throw new Error(await r.text());
@@ -274,10 +272,8 @@ async function fetchJSONWithFallback(ym){
 
   try {
     const j = await one(try1);
-    // normalize to common shape
-    if (Array.isArray(j.top)) return { ym: j.ym || ym, top: j.top };
-    if (Array.isArray(j.podium)) return { ym: j.month || ym, top: j.podium }; // just in case
-    // if some other shape, coerce best-effort
+    if (Array.isArray(j.top))   return { ym: j.ym || ym,     top: j.top };
+    if (Array.isArray(j.podium))return { ym: j.month || ym,  top: j.podium };
     return { ym: j.ym || j.month || ym, top: j.top || j.podium || [] };
   } catch {
     const k = await one(try2);
@@ -301,6 +297,7 @@ async function loadPodium(){
       return;
     }
 
+    // ✅ Only show total WRs (no per-source breakdown)
     const medals = ["🥇","🥈","🥉"];
     list.innerHTML = top.slice(0,3).map((p, idx) => `
       <div class="podium-item">
@@ -309,11 +306,8 @@ async function loadPodium(){
           <div style="font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
             ${p.displayName || p.accountId}
           </div>
-          <div class="meta" style="font-size:.9rem">
-            <span class="badge">${fmtNum(p.wrs || p.wrCount || 0)} WRs</span>
-            <span style="margin-left:.35rem; opacity:.9">
-              ${fmtNum(p.bySource?.official||0)} official • ${fmtNum(p.bySource?.totd||0)} totd • ${fmtNum(p.bySource?.club||0)} club
-            </span>
+          <div class="meta" style="font-size:.95rem">
+            <span class="badge">${fmtNum(p.wrs ?? p.wrCount ?? 0)} WRs</span>
           </div>
         </div>
       </div>
