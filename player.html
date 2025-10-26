@@ -13,7 +13,8 @@
       --accent:#3aa0ff; --accent-2:#6dfbff;
       --accent-glow:0 0 24px rgba(61,165,255,.35), 0 0 48px rgba(61,165,255,.2);
     }
-    html,body{height:100%} body{margin:0;background:#0a0f1a;color:var(--text);
+    html,body{height:100%}
+    body{margin:0;background:#0a0f1a;color:var(--text);
       font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;}
     .container{width:min(1100px,92vw);margin:2rem auto}
     a{color:inherit;text-decoration:none}
@@ -116,6 +117,10 @@
 
   <script id="jsonld" type="application/ld+json">{}</script>
   <script>
+    // ---------- CONFIG ----------
+    // Point this at your Render API (the service hosting /api/players/*)
+    const API_BASE = 'https://trackmaniawebsite.onrender.com';
+
     // ---------- helpers ----------
     const qs = new URLSearchParams(location.search);
     const byId   = qs.get('id');
@@ -134,8 +139,18 @@
     };
 
     async function getJSON(url){
-      const r = await fetch(url, { headers:{'cache-control':'no-store'} });
-      if(!r.ok) throw new Error(await r.text().catch(()=>r.statusText));
+      // If relative and starts with /api/, prefix with API_BASE so it hits Render (not GitHub Pages)
+      const full = url.startsWith('http') ? url : (url.startsWith('/api/') ? (API_BASE + url) : url);
+      const r = await fetch(full, { headers:{'cache-control':'no-store'} });
+      if(!r.ok){
+        const txt = await r.text().catch(()=>r.statusText);
+        throw new Error(`HTTP ${r.status} fetching ${full}: ${txt}`);
+      }
+      const ct = r.headers.get('content-type') || '';
+      if(!ct.includes('application/json')){
+        const txt = await r.text().catch(()=>'(non-JSON response)');
+        throw new Error(`Non-JSON from ${full}: ${txt.slice(0,300)}`);
+      }
       return r.json();
     }
 
@@ -163,7 +178,7 @@
       // Public resources—adjust as you like
       add('Trackmania.io', id ? `https://trackmania.io/#/player/${encodeURIComponent(id)}` : null, true);
       if(displayName) add('TMX Search', `https://trackmania.exchange/search?author=${encodeURIComponent(displayName)}`);
-      add('Twitch', null); // fill if you store it later
+      // add('Twitch', 'https://twitch.tv/<username>'); // if you store it later
     }
 
     function renderRecords(list){
@@ -201,7 +216,11 @@
           displayName = r.displayName || displayName || '';
         }
 
-        if(!accountId){ set('#player-name','Player not found'); set('#player-id', displayName || '—'); return; }
+        if(!accountId){
+          set('#player-name','Player not found');
+          set('#player-id', displayName || '—');
+          return;
+        }
 
         set('#player-id', accountId);
 
