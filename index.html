@@ -136,16 +136,20 @@
 }
 
 /* Keep everything inside the card */
-#countdown-card{
+#countdown-card {
   position: relative;
-  overflow: hidden;                    /* clip image & tiles to rounded edges */
+  overflow: hidden; /* ⬅ hides that top bleed */
   border-radius: 18px;
-  background-image:
-    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
-    var(--cd-img, none);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+}
+#countdown-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(10,15,26,1); /* solid bar hides any glowing edge */
+  z-index: 3;
 }
 
 /* Frosted header bar */
@@ -161,7 +165,6 @@
 
 /* Body anchors tiles to the bottom; room for the button */
 #countdown-card .card-body{
-  flex:1;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;           /* tiles sit lower in the card */
@@ -182,13 +185,13 @@
 }
 
 /* Tile look */
-.timebox {
+.timebox{
   padding: .9rem .5rem;
   min-height: 72px;
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(16,24,44,1), rgba(16,24,44,.95)); /* ⬅ opaque */
-  border: 1px solid rgba(109,251,255,.18);
   text-align: center;
+  background: linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
+  border: 1px solid rgba(109,251,255,.18);
 }
 .timebox strong{ display:block; font-size: clamp(1.5rem, 2.6vw, 2rem); }
 .timebox span{ font-size: .85rem; color: var(--muted); }
