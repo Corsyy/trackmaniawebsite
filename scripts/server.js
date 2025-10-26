@@ -108,70 +108,43 @@ function persistRefreshToken(rt) {
 
 /* -------------------- Auth (refresh -> access) -------------- */
 const CORE_REFRESH_URL = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
-const LIVE_REFRESH_URL = "https://live-services.trackmania.nadeo.live/api/token/refresh";
-
 let cachedAccess = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
   const now = Date.now();
-  if (cachedAccess.token && now < cachedAccess.expAt - 30_000) {
+  if (cachedAccess.token && now < cachedAccess.expAt - 30_000)
     return cachedAccess.token;
-  }
 
   const refresh = getRefreshToken();
   if (!refresh) throw new Error("Missing REFRESH_TOKEN");
 
-  // 1) Refresh to a NadeoServices (Core) access token
-  const coreRes = await fetchWithTimeout(
-    CORE_REFRESH_URL,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `nadeo_v1 t=${refresh}`,
-        "Content-Type": "application/json",
-        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-      },
-      body: "{}",
+  const r = await fetchWithTimeout(CORE_REFRESH_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `nadeo_v1 t=${refresh}`,
+      "Content-Type": "application/json",
+      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
     },
-    15000
-  );
-  if (!coreRes.ok) {
-    const body = await coreRes.text().catch(() => "");
-    throw new Error(`core refresh failed ${coreRes.status} ${body || "(no body)"}`);
-  }
-  const core = await coreRes.json();
-  const coreAccess  = core.accessToken || core.access_token;
-  const coreExpires = core.expiresIn   || core.expires_in || 3600;
-  const newRefresh  = core.refreshToken || core.refresh_token;
+    body: "{}",
+  }, 15000);
 
-  if (!coreAccess) throw new Error("no core accessToken in refresh response");
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    throw new Error(`refresh failed ${r.status} ${body || "(no body)"} [len=${refresh.length}]`);
+  }
+
+  const j = await r.json();
+  const accessToken  = j.accessToken  || j.access_token;
+  const expiresIn    = j.expiresIn    || j.expires_in || 3600;
+  const newRefresh   = j.refreshToken || j.refresh_token;
+
+  if (!accessToken) throw new Error("no accessToken in refresh response");
+
   if (typeof newRefresh === "string" && newRefresh.trim()) {
-    persistRefreshToken(cleanToken(newRefresh)); // rotate refresh if provided
+    persistRefreshToken(cleanToken(newRefresh)); // ✅ auto-rotate refresh
   }
 
-  // 2) Exchange NadeoServices -> NadeoLive
-  const liveRes = await fetchWithTimeout(
-    LIVE_REFRESH_URL,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `nadeo_v1 t=${coreAccess}`,
-        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-      },
-    },
-    15000
-  );
-  if (!liveRes.ok) {
-    const body = await liveRes.text().catch(() => "");
-    throw new Error(`live exchange failed ${liveRes.status} ${body || "(no body)"}`);
-  }
-  const live = await liveRes.json();
-  const liveAccess = live.accessToken || live.access_token;
-  const liveExp    = live.expiresIn   || live.expires_in || coreExpires;
-
-  if (!liveAccess) throw new Error("no live accessToken from exchange");
-
-  cachedAccess = { token: liveAccess, expAt: Date.now() + liveExp * 1000 };
+  cachedAccess = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
   return cachedAccess.token;
 }
 
@@ -948,6 +921,8 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
 });
 
 // NEW: Monthly podium (instant, cached)
+// GET /api/top-monthly?ym=YYYY-MM  (defaults to current month in America/Detroit)
+// Response: { ym, top:[{accountId, displayName, wrs}], generatedAt }
 app.get("/api/top-monthly", ensureCacheOnce, async (req, res) => {
   const cached = getCached(req);
   if (cached) {
@@ -966,12 +941,15 @@ app.get("/api/top-monthly", ensureCacheOnce, async (req, res) => {
     const ym = /^\d{4}-\d{2}$/.test(ymRaw)
       ? ymRaw
       : new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit" })
-          .format(now).replace("/", "-"); // YYYY-MM
+          .format(now).replace("/", "-"); // YYYY-MM from en-CA gives "YYYY/MM", normalize
 
     const [Y, M] = ym.split("-").map(n => Number(n));
     const start = new Date(Date.UTC(Y, M - 1, 1, 0, 0, 0));
     const end   = new Date(Date.UTC(Y, M - 1 + 1, 1, 0, 0, 0));
 
+    // Convert Detroit-local first/last day to UTC bounds (approx by month)
+    const detroitStart = new Date(new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(start) + " 00:00:00");
+    const detroitEnd   = new Date(new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(end)   + " 00:00:00");
     const fromEpoch = Math.floor(start.getTime() / 1000);
     const toEpoch   = Math.floor(end.getTime() / 1000);
 
@@ -1080,188 +1058,6 @@ app.get("/api/debug-clubs", async (_req, res) => {
     res.status(500).json({ error: e?.message || String(e) });
   }
 });
-
-/* ===================== Player Profile Endpoints ===================== */
-/**
- * GET /api/players/resolve
- *   ?name=<displayName>  -> { accountId, displayName }
- *   ?id=<accountId>      -> { accountId, displayName }
- */
-app.get("/api/players/resolve", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  try {
-    const name = (req.query.name || "").toString().trim();
-    const id   = (req.query.id || "").toString().trim();
-    if (!name && !id) return res.status(400).json({ error: "pass ?name= or ?id=" });
-
-    const token = await getOAuthToken();
-    const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-
-    if (name) {
-      // name -> id
-      const url = `https://api.trackmania.com/api/display-names/account-ids?displayName[]=${encodeURIComponent(name)}`;
-      const r = await fetchWithTimeout(url, { headers }, 15000);
-      if (!r.ok) return res.status(502).json({ error: "resolve-name failed", status: r.status });
-      const j = await r.json(); // { "<DisplayName>": "<accountId>" }
-      return res.json({ accountId: j?.[name] || null, displayName: name });
-    } else {
-      // id -> name
-      const params = new URLSearchParams();
-      params.append("accountId[]", id);
-      const url = `https://api.trackmania.com/api/display-names?${params.toString()}`;
-      const r = await fetchWithTimeout(url, { headers }, 15000);
-      if (!r.ok) return res.status(502).json({ error: "resolve-id failed", status: r.status });
-      const j = await r.json(); // { "<accountId>": "<DisplayName>" }
-      return res.json({ accountId: id, displayName: j?.[id] || null });
-    }
-  } catch (e) {
-    res.status(500).json({ error: String(e) });
-  }
-});
-
-/**
- * GET /api/players/basic?id=<accountId>
- * Minimal basic profile using display-names for canonical casing.
- * (Country/zone/avatar can be plugged later if you add a source.)
- */
-app.get("/api/players/basic", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  try {
-    const id = (req.query.id || "").toString().trim();
-    if (!id) return res.status(400).json({ error: "?id=" });
-
-    const token = await getOAuthToken();
-    const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-    const params = new URLSearchParams();
-    params.append("accountId[]", id);
-    const url = `https://api.trackmania.com/api/display-names?${params.toString()}`;
-
-    const r = await fetchWithTimeout(url, { headers }, 15000);
-    if (!r.ok) return res.status(502).json({ error: "display-names failed", status: r.status });
-    const j = await r.json();
-
-    res.json({
-      accountId: id,
-      displayName: j?.[id] || null,
-      country: null,
-      zone: null,
-      avatar: null
-    });
-  } catch (e) {
-    res.status(500).json({ error: String(e) });
-  }
-});
-
-/**
- * GET /api/players/trophies?id=<accountId>
- * Trophy points & ranks from Nadeo Live.
- */
-app.get("/api/players/trophies", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  try {
-    const id = (req.query.id || "").toString().trim();
-    if (!id) return res.status(400).json({ error: "?id=" });
-
-    const live = await getLiveAccessToken();
-    const r = await fetchWithTimeout(
-      `${LIVE_BASE}/api/token/leaderboard/trophy/player`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `nadeo_v1 t=${live}`,
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ listPlayer: [{ accountId: id }] }),
-      },
-      15000
-    );
-
-    if (!r.ok) {
-      const text = await r.text().catch(() => "");
-      return res.status(502).json({ error: "trophy fetch failed", status: r.status, detail: text });
-    }
-    const j = await r.json();
-    const p = Array.isArray(j?.players) ? j.players[0] : null;
-
-    res.json({
-      points: p?.trophyPoints ?? null,
-      worldRank: p?.zoneRankings?.world?.position ?? null,
-      countryRank: p?.zoneRankings?.country?.position ?? null,
-      regionRank: p?.zoneRankings?.region?.position ?? null,
-    });
-  } catch (e) {
-    res.status(500).json({ error: String(e) });
-  }
-});
-
-/**
- * GET /api/players/records?id=<accountId>&limit=50
- * Returns recent records for a player from your in-memory WR cache.
- */
-app.get("/api/players/records", ensureCacheOnce, async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=5, stale-while-revalidate=60");
-  try {
-    const id = (req.query.id || "").toString().trim();
-    if (!id) return res.status(400).json({ error: "?id=" });
-
-    const limit = Math.max(1, Math.min(200, Number(req.query.limit) || 50));
-    const rows = (wrCache.rows || []).filter(
-      (r) => r.accountId === id && isValidTimeMs(Number(r.timeMs))
-    );
-
-    rows.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-    const out = rows.slice(0, limit).map((r) => ({
-      mapUid: r.mapUid,
-      time: r.timeMs,
-      isWR: true,
-      timestamp: r.timestamp || null,
-      sourceType: r.sourceType || null,
-    }));
-
-    res.json({ entries: out, fetchedAt: wrCache.ts || null });
-  } catch (e) {
-    res.status(500).json({ error: String(e) });
-  }
-});
-
-/**
- * (Optional helper) GET /api/players/search?q=<text>
- * Lightweight fuzzy search over cached display names & accountIds
- * to help your player.html autocomplete.
- */
-app.get("/api/players/search", ensureCacheOnce, async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
-  try {
-    const q = (req.query.q || "").toString().trim().toLowerCase();
-    if (!q) return res.json({ results: [] });
-
-    // Build a list from wrCache (fast)
-    const byId = new Map();
-    for (const r of wrCache.rows || []) {
-      if (!r.accountId) continue;
-      const id = r.accountId;
-      const name = r.displayName || id;
-      if (!byId.has(id)) byId.set(id, { accountId: id, displayName: name, wrs: 0 });
-      byId.get(id).wrs += 1;
-    }
-
-    const all = Array.from(byId.values());
-    const results = all
-      .filter(p =>
-        (p.displayName || "").toLowerCase().includes(q) ||
-        (p.accountId || "").toLowerCase().includes(q)
-      )
-      .sort((a,b) => b.wrs - a.wrs)
-      .slice(0, 20);
-
-    res.json({ results });
-  } catch (e) {
-    res.status(500).json({ error: String(e) });
-  }
-});
-/* =================== end Player Profile Endpoints =================== */
 
 /* ------------------------- Start --------------------------- */
 process.on("unhandledRejection", (err) => console.error("UNHANDLED_REJECTION:", err));
