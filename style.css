@@ -18,14 +18,15 @@ html, body { height:100%; scroll-behavior:smooth; }
 /* ========= BACKGROUND ========= */
 body.bg-track-curves {
   background:
-    radial-gradient(circle at 30% 10%, rgba(61,165,255,0.08), transparent 60%),
-    radial-gradient(circle at 80% 30%, rgba(109,251,255,0.06), transparent 70%),
-    linear-gradient(180deg, #08111f 0%, #0a0f1a 50%, #060a14 100%);
+    radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
+    linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
+
 
 /* Soft glowing arcs overlay (no seams, very light GPU load) */
 body.bg-track-curves::before {
