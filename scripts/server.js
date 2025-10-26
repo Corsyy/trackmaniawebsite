@@ -108,43 +108,70 @@ function persistRefreshToken(rt) {
 
 /* -------------------- Auth (refresh -> access) -------------- */
 const CORE_REFRESH_URL = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
+const LIVE_REFRESH_URL = "https://live-services.trackmania.nadeo.live/api/token/refresh";
+
 let cachedAccess = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
   const now = Date.now();
-  if (cachedAccess.token && now < cachedAccess.expAt - 30_000)
+  if (cachedAccess.token && now < cachedAccess.expAt - 30_000) {
     return cachedAccess.token;
+  }
 
   const refresh = getRefreshToken();
   if (!refresh) throw new Error("Missing REFRESH_TOKEN");
 
-  const r = await fetchWithTimeout(CORE_REFRESH_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `nadeo_v1 t=${refresh}`,
-      "Content-Type": "application/json",
-      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+  // 1) Refresh to a NadeoServices (Core) access token
+  const coreRes = await fetchWithTimeout(
+    CORE_REFRESH_URL,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `nadeo_v1 t=${refresh}`,
+        "Content-Type": "application/json",
+        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+      },
+      body: "{}",
     },
-    body: "{}",
-  }, 15000);
-
-  if (!r.ok) {
-    const body = await r.text().catch(() => "");
-    throw new Error(`refresh failed ${r.status} ${body || "(no body)"} [len=${refresh.length}]`);
+    15000
+  );
+  if (!coreRes.ok) {
+    const body = await coreRes.text().catch(() => "");
+    throw new Error(`core refresh failed ${coreRes.status} ${body || "(no body)"}`);
   }
+  const core = await coreRes.json();
+  const coreAccess  = core.accessToken || core.access_token;
+  const coreExpires = core.expiresIn   || core.expires_in || 3600;
+  const newRefresh  = core.refreshToken || core.refresh_token;
 
-  const j = await r.json();
-  const accessToken  = j.accessToken  || j.access_token;
-  const expiresIn    = j.expiresIn    || j.expires_in || 3600;
-  const newRefresh   = j.refreshToken || j.refresh_token;
-
-  if (!accessToken) throw new Error("no accessToken in refresh response");
-
+  if (!coreAccess) throw new Error("no core accessToken in refresh response");
   if (typeof newRefresh === "string" && newRefresh.trim()) {
-    persistRefreshToken(cleanToken(newRefresh)); // ✅ auto-rotate refresh
+    persistRefreshToken(cleanToken(newRefresh)); // rotate refresh if provided
   }
 
-  cachedAccess = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
+  // 2) Exchange NadeoServices -> NadeoLive
+  const liveRes = await fetchWithTimeout(
+    LIVE_REFRESH_URL,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `nadeo_v1 t=${coreAccess}`,
+        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+      },
+    },
+    15000
+  );
+  if (!liveRes.ok) {
+    const body = await liveRes.text().catch(() => "");
+    throw new Error(`live exchange failed ${liveRes.status} ${body || "(no body)"}`);
+  }
+  const live = await liveRes.json();
+  const liveAccess = live.accessToken || live.access_token;
+  const liveExp    = live.expiresIn   || live.expires_in || coreExpires;
+
+  if (!liveAccess) throw new Error("no live accessToken from exchange");
+
+  cachedAccess = { token: liveAccess, expAt: Date.now() + liveExp * 1000 };
   return cachedAccess.token;
 }
 
