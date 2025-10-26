@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Submit a Highlight — Trackmania Events</title>
+  <meta name="theme-color" content="#0a0f1a"/>
+  <link rel="icon" type="image/png" href="/logo.png">
+  <style>
+    :root{
+      --bg:#0a0f1a; --text:#e6ecff; --muted:#9bb0ff;
+      --accent:#3aa0ff; --accent-2:#6dfbff;
+      --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2);
+      --card: rgba(15,21,36,.55);
+      --border: rgba(109,251,255,.25);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+                     radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
+                     linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
+         color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
+         -webkit-font-smoothing:antialiased}
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(10,15,26,.9),rgba(10,15,26,.65) 60%,rgba(10,15,26,0));
+           backdrop-filter:blur(8px);border-bottom:1px solid rgba(109,251,255,.12)}
+    .container{width:min(1100px,92vw);margin:0 auto;padding:1rem 0;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:.6rem;align-items:center;font-weight:800}
+    .brand-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+                 background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow)}
+    .btn{padding:.6rem .95rem;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
+         color:var(--text);font-weight:700;transition:.2s;cursor:pointer}
+    .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
+    .btn.secondary{background:transparent}
+    main{width:min(1100px,92vw);margin:1.25rem auto 2rem}
+    h1{font-size:1.8rem;margin-bottom:.3rem;font-weight:900;text-shadow:0 0 12px rgba(61,165,255,.25)}
+    .meta{color:var(--muted);opacity:.9;margin-bottom:1rem}
+
+    .card{border:1px solid var(--border);background:var(--card);backdrop-filter:blur(12px) saturate(180%);
+          border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 20px rgba(61,165,255,.2);padding:1rem}
+
+    form{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .field{display:flex;flex-direction:column;gap:.4rem}
+    .field label{font-weight:700;opacity:.95}
+    .hint{color:var(--muted);font-size:.9rem;opacity:.9}
+    input[type="text"], input[type="url"], textarea, select{
+      background:rgba(10,15,26,.6);color:var(--text);border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;padding:.7rem .8rem;outline:none
+    }
+    input:focus, textarea:focus, select:focus{border-color:rgba(109,251,255,.5);box-shadow:0 0 0 3px rgba(109,251,255,.15)}
+    textarea{min-height:110px;resize:vertical}
+
+    .row-2{grid-column:1/-1}
+    .tags{display:flex;flex-wrap:wrap;gap:.5rem}
+    .tag{padding:.4rem .7rem;border:1px solid rgba(255,255,255,.15);border-radius:999px;cursor:pointer;
+         background:rgba(16,24,44,.7);user-select:none}
+    .tag.active{border-color:var(--border);box-shadow:var(--accent-glow)}
+
+    .drop{border:1.5px dashed rgba(255,255,255,.18);border-radius:14px;padding:1rem;display:grid;place-items:center;
+          background:rgba(14,20,34,.5)}
+    .drop.drag{border-color:var(--accent-2)}
+    .progress{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+    .progress>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+    .preview{aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#02060f;border:1px solid rgba(255,255,255,.1)}
+    .preview iframe, .preview video{width:100%;height:100%;display:block}
+
+    .actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.5rem}
+    .error{color:#ffb3b3}
+    .success{color:#b3ffda}
+
+    /* Mobile */
+    @media(max-width: 800px){
+      form{grid-template-columns:1fr}
+      .actions{justify-content:stretch}
+      .btn{width:100%}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <a class="brand" href="/"><span class="brand-badge">🎬</span><span>Submit a Highlight</span></a>
+    <div style="display:flex;gap:.5rem;">
+      <a class="btn secondary" href="/">Home</a>
+      <a class="btn" href="/highlights">Highlights</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <h1>Share your Trackmania highlight</h1>
+  <div class="meta">WR attempts, insane saves, fails, stylish lines—show the community!</div>
+
+  <div class="card">
+    <form id="uploadForm" novalidate>
+      <!-- Left column -->
+      <div class="field">
+        <label for="playerName">Player name</label>
+        <input id="playerName" name="playerName" type="text" placeholder="e.g., Corsy" required>
+        <div class="hint">Saved locally for next time.</div>
+      </div>
+
+      <div class="field">
+        <label for="accountId">Account ID (optional)</label>
+        <input id="accountId" name="accountId" type="text" placeholder="Ubisoft accountId (if you have it)">
+      </div>
+
+      <div class="field">
+        <label for="mapName">Map name</label>
+        <input id="mapName" name="mapName" type="text" placeholder="Realm CE" required>
+      </div>
+
+      <div class="field">
+        <label for="mapUid">Map UID</label>
+        <input id="mapUid" name="mapUid" type="text" placeholder="4xw1kNQhnVg4W0FvBT5o8z" required>
+      </div>
+
+      <div class="field row-2">
+        <label>Category tags</label>
+        <div class="tags" id="tagList">
+          <span class="tag" data-v="WR">WR</span>
+          <span class="tag" data-v="WR Attempt">WR Attempt</span>
+          <span class="tag" data-v="Save">Save</span>
+          <span class="tag" data-v="Fail">Fail</span>
+          <span class="tag" data-v="Style">Style</span>
+          <span class="tag" data-v="Kacky">Kacky</span>
+          <span class="tag" data-v="TOTD">TOTD</span>
+        </div>
+      </div>
+
+      <div class="field row-2">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" maxlength="300" placeholder="Short context (max 300 chars)"></textarea>
+        <div class="hint"><span id="descCount">0</span>/300</div>
+      </div>
+
+      <!-- Right column -->
+      <div class="field row-2">
+        <label>Video URL (YouTube or Twitch) <span class="hint">(or upload a file below)</span></label>
+        <input id="videoUrl" name="videoUrl" type="url" placeholder="https://youtu.be/… or https://twitch.tv/videos/…">
+        <div class="preview" id="urlPreview" hidden></div>
+      </div>
+
+      <div class="field row-2">
+        <label>Upload file (mp4/webm or GBX) <span class="hint">(10–200 MB recommended)</span></label>
+        <div id="drop" class="drop">
+          <div>Drag & drop here or <button class="btn secondary" id="pickBtn" type="button">Choose file</button></div>
+          <input id="file" name="file" type="file" accept=".mp4,.webm,.mov,.mkv,.gbx" hidden>
+        </div>
+        <div class="hint" id="fileInfo">No file selected.</div>
+        <div class="progress" hidden><i id="bar"></i></div>
+      </div>
+
+      <div class="field">
+        <label><input type="checkbox" id="consent" required> I agree to have my clip shown publicly and confirm I own the rights.</label>
+      </div>
+
+      <!-- Honeypot (bots only) -->
+      <input type="text" name="website" id="hp" style="display:none">
+
+      <div class="actions row-2">
+        <button type="button" class="btn secondary" id="resetBtn">Reset</button>
+        <button type="submit" class="btn">Submit Highlight</button>
+      </div>
+
+      <div id="status" class="meta"></div>
+    </form>
+  </div>
+</main>
+
+<script>
+  // ===== Helpers =====
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const byId = id => document.getElementById(id);
+
+  // Persist player name
+  const nameKey = 'tm-player-name';
+  byId('playerName').value = localStorage.getItem(nameKey) || '';
+  byId('playerName').addEventListener('input', e => localStorage.setItem(nameKey, e.target.value.trim()));
+
+  // Tag toggles
+  byId('tagList').addEventListener('click', e=>{
+    const t = e.target.closest('.tag'); if(!t) return;
+    t.classList.toggle('active');
+  });
+
+  // Description counter
+  const desc = byId('description');
+  const descCount = byId('descCount');
+  desc.addEventListener('input', ()=> descCount.textContent = desc.value.length);
+
+  // URL preview (YouTube/Twitch)
+  const urlInput = byId('videoUrl');
+  const preview = byId('urlPreview');
+  urlInput.addEventListener('input', ()=>{
+    const url = urlInput.value.trim();
+    const embed = getEmbed(url);
+    if(embed){
+      preview.innerHTML = `<iframe src="${embed}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      preview.hidden = false;
+    }else{
+      preview.hidden = true;
+      preview.innerHTML = '';
+    }
+  });
+
+  function getEmbed(url){
+    if(!url) return null;
+    try{
+      const u = new URL(url);
+      // YouTube
+      if(/(youtube\.com|youtu\.be)/.test(u.hostname)){
+        let id = u.searchParams.get('v');
+        if(!id && u.hostname==='youtu.be'){ id = u.pathname.slice(1); }
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+      }
+      // Twitch VOD
+      if(/twitch\.tv/.test(u.hostname)){
+        const id = u.pathname.split('/').filter(Boolean).pop();
+        if(u.pathname.includes('/videos/')) return `https://player.twitch.tv/?video=${id}&parent=${location.hostname}`;
+      }
+    }catch{}
+    return null;
+  }
+
+  // Drag & drop
+  const drop = byId('drop'), fileInput = byId('file'), info = byId('fileInfo'), bar = byId('bar');
+  byId('pickBtn').onclick = ()=> fileInput.click();
+  fileInput.onchange = ()=> showFile(fileInput.files?.[0]);
+  ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', e=>{
+    const f = e.dataTransfer.files?.[0];
+    if(f){ fileInput.files = e.dataTransfer.files; showFile(f); }
+  });
+  function showFile(f){
+    if(!f){ info.textContent = 'No file selected.'; return; }
+    const mb = (f.size/1024/1024).toFixed(1);
+    info.textContent = `${f.name} — ${mb} MB`;
+  }
+
+  // Submit
+  const form = byId('uploadForm');
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    byId('status').textContent = '';
+    const url = urlInput.value.trim();
+    const file = fileInput.files?.[0];
+    if(byId('hp').value){ return; } // honeypot
+    if(!byId('consent').checked){ return note('Please confirm consent.', true); }
+    if(!url && !file){ return note('Add a YouTube/Twitch URL or upload a file.', true); }
+    if(url && file){ return note('Choose either a URL or a file, not both.', true); }
+
+    const tags = $$('.tag.active').map(t=>t.dataset.v);
+    const fd = new FormData();
+    fd.append('playerName', byId('playerName').value.trim());
+    fd.append('accountId', byId('accountId').value.trim());
+    fd.append('mapName', byId('mapName').value.trim());
+    fd.append('mapUid', byId('mapUid').value.trim());
+    fd.append('description', desc.value.trim());
+    fd.append('tags', JSON.stringify(tags));
+    if(url) fd.append('videoUrl', url);
+    if(file) fd.append('file', file);
+
+    try{
+      showProgress(true);
+      const res = await fetch('/api/highlights/submit', {
+        method: 'POST',
+        body: fd,
+        // For real upload progress, switch to XHR below (fetch doesn’t expose progress).
+      });
+      if(!res.ok) throw new Error(await res.text());
+      const j = await res.json().catch(()=> ({}));
+      note('Thanks! Your highlight was submitted and will appear after review.', false);
+      form.reset(); preview.hidden = true; $$('.tag.active').forEach(t=>t.classList.remove('active')); descCount.textContent = '0';
+    }catch(err){
+      note('Upload failed. Please try again or use a smaller file.', true);
+      console.error(err);
+    }finally{
+      showProgress(false);
+    }
+  });
+
+  // Optional: XHR with progress (replace fetch above if you want real-time progress)
+  function showProgress(on){
+    const p = document.querySelector('.progress');
+    p.hidden = !on;
+    bar.style.width = on ? '35%' : '0%';
+  }
+
+  function note(msg, isErr){
+    const s = byId('status');
+    s.textContent = msg;
+    s.className = isErr ? 'error' : 'success';
+  }
+
+  // Reset
+  byId('resetBtn').onclick = ()=>{
+    form.reset(); preview.hidden = true; $$('.tag.active').forEach(t=>t.classList.remove('active'));
+    descCount.textContent = '0'; info.textContent = 'No file selected.'; byId('status').textContent = '';
+  };
+</script>
+</body>
+</html>
