@@ -136,23 +136,16 @@
 }
 
 /* Keep everything inside the card */
-#countdown-card {
+#countdown-card{
   position: relative;
-  overflow: hidden; /* ⬅ hides that top bleed */
+  overflow: hidden;        /* safe; doesn't affect the background image */
   border-radius: 18px;
-}
-#countdown-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(10,15,26,1); /* solid bar hides any glowing edge */
-  z-index: 3;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
-/* Frosted header bar */
+/* Mask the faint glow/bleed at the very top */
 #countdown-card .card-header{
   position: relative;
   z-index: 2;
@@ -161,6 +154,15 @@
   border-bottom: 1px dashed rgba(109,251,255,.20);
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
+}
+
+#countdown-card .card-header::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; top:-1px;
+  height:1px;                       /* 1px mask lives inside header */
+  background: rgba(10,15,26,.95);   /* hides the halo line */
+  pointer-events:none;
 }
 
 /* Body anchors tiles to the bottom; room for the button */
