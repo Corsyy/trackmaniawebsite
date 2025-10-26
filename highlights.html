@@ -8,45 +8,43 @@
 <link rel="icon" type="image/png" href="/logo.png">
 <style>
 body.bg-track-curves {
-  background:
-    radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
-    radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
-    linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
+  background: radial-gradient(circle at 30% 10%, rgba(61,165,255,0.08), transparent 60%),
+              radial-gradient(circle at 80% 30%, rgba(109,251,255,0.06), transparent 70%),
+              linear-gradient(180deg, #08111f 0%, #0a0f1a 50%, #060a14 100%);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
+/* Subtle moving arcs drawn via pseudo-element — lighter GPU load than SVG blur layers */
 body.bg-track-curves::before {
   content: "";
   position: fixed;
-  inset: -1px !important;
-  z-index: -1;
+  inset: 0;
   pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%236DAFFF' stop-opacity='.10'/%3E%3Cstop offset='100%25' stop-color='%233AE0FF' stop-opacity='.06'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='none' stroke='url(%23g)'%3E%3Cpath d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680' stroke-width='2'/%3E%3Cpath d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.6'/%3E%3Cpath d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: cover;
-  background-repeat: no-repeat;
-  opacity: .45;
-  mix-blend-mode: normal;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
+  z-index: -1;
+  opacity: 0.15;
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    rgba(90,180,255,0.05) 0px,
+    rgba(90,180,255,0.05) 2px,
+    transparent 3px,
+    transparent 10px
+  );
+  mix-blend-mode: screen;
+  transform: scale(1.1);
 }
 
+/* Optional fine noise for texture (zero seams) */
 body.bg-track-curves::after {
   content: "";
   position: fixed;
-  inset: -1px !important;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' style='color-interpolation-filters:sRGB'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0.25'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 280px 280px;
-  background-repeat: repeat;
-  opacity: .10;
-  animation: noiseShift 6s steps(2,end) infinite;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
+  inset: 0;
+  z-index: -2;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
+  opacity: 0.03;
+  background-size: 200px 200px;
 }
 
 a {
