@@ -178,24 +178,28 @@
 }
 
 /* Countdown grid (4 columns) */
-#countdown {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
-  gap: 0.75rem;
-  align-items: stretch;
-  justify-content: center;
-  margin-top: 2.5rem; /* <— moves the boxes downward */
+/* Countdown grid — no overflow, wraps as needed */
+#countdown{
+  display:grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* was repeat(4, minmax(120px,1fr)) */
+  gap:.75rem;
+  align-items:stretch;
+  justify-content:center;
+  width:100%;              /* never exceed card */
+  max-width:100%;
+  margin-top:1.25rem;      /* breathing room under the header */
 }
 
-/* Countdown tiles */
-.timebox {
-  padding: 0.9rem 0.5rem;
-  min-height: 72px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
-  border: 1px solid rgba(109,251,255,.18);
-  text-align: center;
+/* Tiles (unchanged except a touch more flexibility) */
+.timebox{
+  padding:.9rem .5rem;
+  min-height:72px;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
+  border:1px solid rgba(109,251,255,.18);
+  text-align:center;
 }
+
 
 .timebox strong {
   display: block;
