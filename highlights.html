@@ -13,29 +13,7 @@ body.bg-track-curves::before{content:"";position:fixed;inset:0;z-index:0;pointer
 
 body.bg-track-curves::after{
   content:"";
-  position:fixed; inset:0; z-index:0; pointer-events:none;
-
-  /* 1) ultra-light vertical dither to break banding
-     2) your original noise tile underneath */
-  background-image:
-    repeating-linear-gradient(0deg,
-      rgba(10,15,26,0.018) 0 1px,
-      rgba(10,15,26,0.000) 1px 3px),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
-
-  /* stripe height = 3px is usually enough to kill horizontal bands */
-  background-size:100% 3px, 280px 280px;
-  background-repeat:repeat, repeat;
-  background-position:0 0, 0 0;
-
-  /* animate only the noise (not the dither) */
-  animation: noiseShift 6s steps(2,end) infinite;
-  will-change: background-position;
-  transform: translateZ(0);
-
-  /* soft-light is subtle and keeps your glow intact */
-  mix-blend-mode: soft-light;
-}
+  position:fixed; inset:0; z-index:0; pointer-events:none;background-image:repeating-linear-gradient(0deg, rgba(10,15,26,0.018) 0 1px, rgba(10,15,26,0.000) 1px 3px),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");background-size:100% 3px, 280px 280px;background-repeat:repeat, repeat;background-position:0 0, 0 0;animation:none;will-change: background-position;transform: translateZ(0);mix-blend-mode: soft-light;}
 
 /* make sure content is above the overlays */
 header, main, footer { position: relative; z-index: 1; }
