@@ -502,7 +502,8 @@
   function renderFromData(events){
     const now=Date.now();
     const live=events.filter(e=>new Date(e.start_iso)<=now && now<=new Date(e.end_iso)).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
-    const upcoming=events.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
+    const upcoming = events.filter(e => new Date(e.start_iso) > now).sort((a,b)=> new Date(a.start_iso) - new Date(b.start_iso));
+
     const past=events.filter(e=>new Date(e.end_iso)<=now).sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso)).slice(0,6);
 
     const liveSection=document.getElementById('live-events');
@@ -573,31 +574,51 @@
     const header=document.getElementById('countdown-title');
     const cdCard=document.getElementById('countdown-card');
 
-    if(live.length){
-      const cur=live[0];
-      chip.textContent=`Live now • ${cur.title}`;
-      pills.innerHTML=`<div class="pill">🟢 Live</div>
-        <div class="pill">📍 ${cur.location||'Online'}</div>
-        <div class="pill">🏁 ${cur.description||''}</div>`;
-      header.textContent='Live now!';
-      setCountdown(0,0,0,0);
-      const heroImg=cur?.hero_image||cur?.image;
-      if(heroImg) cdCard?.style.setProperty('--cd-img',`url("${heroImg}")`); else cdCard?.style.removeProperty('--cd-img');
-    }else if(next){
-      chip.textContent=`Next Event • ${next.title}`;
-      pills.innerHTML=`<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-        <div class="pill">📍 ${next.location||'Online'}</div>
-        <div class="pill">🏁 ${next.description||''}</div>`;
-      startCountdown(next.start_iso,header);
-      const heroImg=next?.hero_image||next?.image;
-      if(heroImg) cdCard?.style.setProperty('--cd-img',`url("${heroImg}")`); else cdCard?.style.removeProperty('--cd-img');
-    }else{
-      chip.textContent='No upcoming event';
-      pills.innerHTML='<div class="pill">Check back soon</div>';
-      header.textContent='Countdown';
-      setCountdown(0,0,0,0);
-      cdCard?.style.removeProperty('--cd-img');
-    }
+    if (live.length) {
+  const cur = live[0];
+
+  // Chip shows how many are live; hero promotes the first one.
+  chip.textContent = live.length > 1
+    ? `🟢 ${live.length} events live — ${cur.title}`
+    : `Live now • ${cur.title}`;
+
+  pills.innerHTML = `<div class="pill">🟢 Live</div>
+    <div class="pill">📍 ${cur.location || 'Online'}</div>
+    <div class="pill">🏁 ${cur.description || ''}</div>`;
+
+  header.textContent = 'Live now!';
+  setCountdown(0, 0, 0, 0);
+
+  const heroImg = cur?.hero_image || cur?.image;
+  if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+  else cdCard?.style.removeProperty('--cd-img');
+
+  // Optional: if you have per-event Twitch channels, switch the embed.
+  // Safe no-op if setTwitchChannel isn't defined.
+  if (cur.twitch && typeof setTwitchChannel === 'function') {
+    setTwitchChannel(cur.twitch);
+  }
+
+} else if (next) {
+  chip.textContent = `Next Event • ${next.title}`;
+  pills.innerHTML = `<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+    <div class="pill">📍 ${next.location || 'Online'}</div>
+    <div class="pill">🏁 ${next.description || ''}</div>`;
+
+  startCountdown(next.start_iso, header);
+
+  const heroImg = next?.hero_image || next?.image;
+  if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+  else cdCard?.style.removeProperty('--cd-img');
+
+} else {
+  chip.textContent = 'No upcoming event';
+  pills.innerHTML = '<div class="pill">Check back soon</div>';
+  header.textContent = 'Countdown';
+  setCountdown(0, 0, 0, 0);
+  cdCard?.style.removeProperty('--cd-img');
+}
+
 
     updateJSONLD(live[0]||next||null);
     attachReveals();
