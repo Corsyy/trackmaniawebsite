@@ -137,28 +137,50 @@
 }
 
 /* Keep everything inside the card */
+/* Make countdown card behave like .event.with-bg */
 #countdown-card{
   position: relative;
-  overflow: hidden;                    /* clip image & tiles to rounded edges */
-  border-radius: 20px;
+  border-radius: 18px;
+  /* same dual-layer background as events */
   background-image:
-    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
+    linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
     var(--cd-img, none);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-size: contain, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+
+  /* the two lines below are what kill the faint seam */
+  overflow: hidden;
+  background-clip: padding-box, padding-box; /* mirror the event card */
 }
 
-/* Frosted header bar */
-#countdown-card .card-header{
-  position: relative;
-  z-index: 2;
-  background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
-  backdrop-filter: blur(4px);
-  border-bottom: 1px dashed rgba(109,251,255,.20);
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
+/* same subtle darkening veil used by event cards */
+#countdown-card::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:inherit;
+  background:linear-gradient(
+    180deg,
+    rgba(8,12,22,.45) 0%,
+    rgba(8,12,22,.55) 55%,
+    rgba(8,12,22,.72) 100%
+  );
+  z-index:0; /* sit under the content */
+  pointer-events:none;
 }
+
+/* ensure content sits above the ::after overlay */
+#countdown-card > *{
+  position: relative;
+  z-index:1;
+}
+
+/* optional: header strip—keep it subtle like the event cards */
+#countdown-card .card-header{
+  background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
+  border-bottom: 1px dashed rgba(109,251,255,.20);
+}
+
 
 /* Body anchors tiles to the bottom; room for the button */
 #countdown-card .card-body{
