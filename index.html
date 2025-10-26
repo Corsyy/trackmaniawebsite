@@ -37,67 +37,43 @@
     html{scroll-behavior:smooth}
 
     /* ==== THEME: TRACK CURVES (clean, premium) ==== */
-  body.bg-aurora {
-  /* base sky */
+   body.bg-track-curves {
   background:
-    /* soft glows */
-    radial-gradient(1200px 700px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
-    radial-gradient(900px 560px at 110% 8%, rgba(109,251,255,.08), transparent 70%),
-    /* deep vertical fade */
-    linear-gradient(180deg, #07101c 0%, #0a0f1a 40%, #060a14 100%);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+    radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
+    linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* Aurora ribbons (conic gradients, super light on GPU; no seams) */
-body.bg-aurora::before {
+    /* prettier-ignore */
+   body.bg-track-curves::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
+  opacity: 0.6;
   mix-blend-mode: screen;
-  opacity: 0.55;                    /* tune 0.4–0.7 */
-  background:
-    conic-gradient(from 210deg at 15% 40%,
-      rgba(61,165,255,.05) 0 40%,
-      rgba(61,165,255,0) 60% 100%),
-    conic-gradient(from 330deg at 85% 25%,
-      rgba(109,251,255,.06) 0 35%,
-      rgba(109,251,255,0) 55% 100%),
-    conic-gradient(from 265deg at 60% 85%,
-      rgba(61,165,255,.045) 0 30%,
-      rgba(61,165,255,0) 55% 100%);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+  background-size: cover;
   background-repeat: no-repeat;
-  background-size: 140% 140%, 140% 140%, 130% 130%;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
 
 
-/* Subtle noise texture */
-html::after {
+    /* prettier-ignore */
+   body.bg-track-curves::after {
   content: "";
   position: fixed;
   inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: .06;                     /* tweak 0.03–0.10 */
-  mix-blend-mode: overlay;
-  background-image:
-    /* 2D micro-dither */
-    repeating-linear-gradient(0deg,
-      rgba(255,255,255,.02) 0, rgba(255,255,255,.02) 1px,
-      transparent 1px, transparent 2px),
-    repeating-linear-gradient(90deg,
-      rgba(0,0,0,.02) 0, rgba(0,0,0,.02) 1px,
-      transparent 1px, transparent 2px);
-  background-size: 180px 180px, 180px 180px;
+  z-index: -2;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
+  opacity: 0.09;
+  background-size: 120px 120px;
 }
 
     @keyframes noiseShift{ 50%{transform:translate3d(0,0,0)} 50.01%{transform:translate3d(.5px,.5px,0)} }
@@ -325,7 +301,7 @@ html::after {
   </style>
 </head>
 
-<body class="bg-aurora">
+<body class="bg-track-curves">
 <header>
   <div class="container nav">
     <a class="brand" href="#" aria-label="Trackmania Events Home">
