@@ -153,7 +153,22 @@
   justify-content:flex-end;       /* push boxes down */
   padding-bottom:4.5rem;          /* space for Add to Calendar */
 }
+#countdown-card .card-header{
+  background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
+  backdrop-filter: blur(4px);
+  border-bottom: 1px dashed rgba(109,251,255,.20);
+}
 
+/* Nudge countdown tiles down a bit from the header */
+#countdown{
+  margin-top: .75rem; /* adjust 0.5rem–1rem to taste */
+}
+
+/* Optional: round the top corners of the header so it matches the card */
+#countdown-card .card-header{
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
 /* Add to Calendar button (bottom-left) */
 #countdown-card #addCal{
   position:absolute; bottom:16px; left:18px; margin:0!important;
