@@ -137,36 +137,18 @@
 
 /* Keep everything inside the card */
 #countdown-card{
-  position:relative;
-  overflow:hidden; /* <— prevents bleed */
-  background-image:linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)), var(--cd-img, none);
-  background-size:contain, cover;
-  background-position:center, center;
-  background-repeat:no-repeat, no-repeat;
+  position: relative;
+  overflow: hidden;                    /* clip image & tiles to rounded edges */
+  border-radius: 18px;
+  background-image:
+    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
+    var(--cd-img, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Make body fill the card so we can anchor the boxes to the bottom */
-#countdown-card .card-body{
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;      /* tiles sit lower in the card */
-  padding:1rem 1rem 4.5rem;      /* room for Add to Calendar at bottom */
-  gap:.75rem;
-}
-#countdown-card .card-header{
-  background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
-  backdrop-filter: blur(4px);
-  border-bottom: 1px dashed rgba(109,251,255,.20);
-}
-
-.countdown{
-  display:grid !important;
-  grid-template-columns:repeat(4, minmax(120px, 1fr)); /* 4 across */
-  gap:.75rem;
-  align-items:stretch;
-  margin-top:1.25rem;            /* push tiles down a bit under the header */
-}
-
+/* Frosted header bar */
 #countdown-card .card-header{
   position: relative;
   z-index: 2;
@@ -177,36 +159,38 @@
   border-top-right-radius: 18px;
 }
 
-/* The body owns vertical spacing so tiles are pushed down cleanly */
+/* Body anchors tiles to the bottom; room for the button */
 #countdown-card .card-body{
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: .75rem;                 /* space between tiles and the button area */
-  padding: 1rem 1rem 4.5rem;   /* top | sides | bottom (bottom = room for button) */
+  justify-content: flex-end;           /* tiles sit lower in the card */
+  gap: .75rem;
+  padding: 1rem 1rem 4.5rem;           /* bottom = button space */
 }
 
-/* Tiles block: no extra top margin; rely on body padding */
+/* 4-across tiles, centered, tidy spacing */
 #countdown{
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: .75rem;
+  align-items: stretch;
+  justify-content: center;
+  margin-top: 0;                       /* body padding handles the offset */
   position: relative;
   z-index: 1;
-  margin-top: 0;
 }
 
-/* (keep your existing tile sizes) */
+/* Tile look */
 .timebox{
-  padding:.9rem .6rem;
-  min-height:72px;
-  border-radius:12px;
-  background:linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
-  border:1px solid rgba(109,251,255,.18);
-  text-align:center;
-  /* ensure grid can shrink them nicely */
-  width:auto; min-width:0;
+  padding: .9rem .5rem;
+  min-height: 72px;
+  border-radius: 12px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
+  border: 1px solid rgba(109,251,255,.18);
 }
-
-.timebox strong{display:block;font-size:clamp(1.6rem,2.6vw,2.1rem);}
-.timebox span{font-size:.9rem;color:var(--muted);}
+.timebox strong{ display:block; font-size: clamp(1.5rem, 2.6vw, 2rem); }
+.timebox span{ font-size: .85rem; color: var(--muted); }
 /* Responsive: stack to 2x2 on mobile */
 @media (max-width: 640px) {
   #countdown {
