@@ -60,9 +60,9 @@ const getCached = (key, ttlMs, fn) => {
 async function getTMAccessToken() {
   const body = new URLSearchParams({
     grant_type: "refresh_token",
-    client_id: process.env.TM_CLIENT_ID,
-    client_secret: process.env.TM_CLIENT_SECRET,
-    refresh_token: process.env.TM_REFRESH_TOKEN
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    refresh_token: process.env.REFRESH_TOKEN
   });
   const r = await fetch("https://api.trackmania.com/api/access_token", { method: "POST", body });
   if (!r.ok) throw new Error("TM OAuth failed");
