@@ -138,14 +138,17 @@
 /* Keep everything inside the card */
 #countdown-card{
   position: relative;
-  overflow: hidden;        /* safe; doesn't affect the background image */
+  overflow: hidden;                    /* clip image & tiles to rounded edges */
   border-radius: 18px;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-image:
+    linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)),
+    var(--cd-img, none);
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Mask the faint glow/bleed at the very top */
+/* Frosted header bar */
 #countdown-card .card-header{
   position: relative;
   z-index: 2;
@@ -154,15 +157,6 @@
   border-bottom: 1px dashed rgba(109,251,255,.20);
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
-}
-
-#countdown-card .card-header::after{
-  content:"";
-  position:absolute;
-  left:0; right:0; top:-1px;
-  height:1px;                       /* 1px mask lives inside header */
-  background: rgba(10,15,26,.95);   /* hides the halo line */
-  pointer-events:none;
 }
 
 /* Body anchors tiles to the bottom; room for the button */
