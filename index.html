@@ -105,10 +105,10 @@
     .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
 
    /* hero */
-.hero{position:relative;padding:clamp(2rem,5vw,4rem) 0 2.5rem;border-radius:16px;overflow:hidden;isolation:isolate;mask-image:radial-gradient(white,black);-webkit-mask-image:-webkit-radial-gradient(white,black);background-clip:padding-box}
+.hero{position:relative;padding:clamp(2rem,5vw,4rem) 0 2.5rem;border-radius:16px;overflow:visible;isolation:isolate;mask-image:radial-gradient(white,black);-webkit-mask-image:-webkit-radial-gradient(white,black);background-clip:padding-box}
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 60% 80%,rgba(61,165,255,.2),transparent 70%);mix-blend-mode:screen;opacity:.25;pointer-events:none;border-radius:inherit}
 .hero-media{position:relative;border-radius:inherit;overflow:hidden}
-.hero-media img,.hero-media video,.hero-media canvas{display:block;width:100%;height:auto;border-radius:inherit;object-fit:cover}
+.hero-media img,.hero-media video,.hero-media canvas{display:block;width:100%;height:auto;border-radius:inherit;object-fit:cover;overflow:hidden}
 .hero .countdown{position:absolute;left:0;right:0;top:0;z-index:2;pointer-events:none}
 .hero-grid{display:block}
 .chip{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border-radius:999px;font-size:.8rem;color:#001220;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow);animation:pulseAccent 3s infinite ease-in-out}
@@ -143,7 +143,7 @@
   background-size: contain, cover;
   background-position: center, center;
   background-repeat: no-repeat, no-repeat;
-  overflow: hidden; /* clean edges */
+  overflow: hidden; 
   position: relative;
 }
 
