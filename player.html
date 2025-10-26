@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Player Profile — Trackmania Events</title>
+  <meta name="theme-color" content="#0a0f1a" />
+  <meta name="description" content="Live Trackmania player profile: records, trophies, ranks." />
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
+  <style>
+    :root{
+      --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff;
+      --accent:#3aa0ff; --accent-2:#6dfbff;
+      --accent-glow:0 0 24px rgba(61,165,255,.35), 0 0 48px rgba(61,165,255,.2);
+    }
+    html,body{height:100%} body{margin:0;background:#0a0f1a;color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;}
+    .container{width:min(1100px,92vw);margin:2rem auto}
+    a{color:inherit;text-decoration:none}
+    .btn{display:inline-block;padding:.55rem .9rem;border-radius:12px;border:1px solid rgba(109,251,255,.25);
+      background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));color:var(--text);font-weight:700}
+    .btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001220;box-shadow:var(--accent-glow)}
+    .pill{display:inline-block;padding:.4rem .7rem;border-radius:999px;border:1px solid rgba(109,251,255,.25);
+      background:linear-gradient(180deg,rgba(12,16,32,.7),rgba(12,16,32,.45));margin:.2rem .35rem .2rem 0}
+    .card{border:1px solid rgba(109,251,255,.25);background:rgba(15,21,36,.5);
+      backdrop-filter:blur(12px) saturate(160%);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+    .pad{padding:1rem}
+    .row{display:grid;grid-template-columns:280px 1fr;gap:1rem}
+    @media(max-width:900px){.row{grid-template-columns:1fr}}
+    .avatar{width:220px;height:220px;border-radius:16px;background:#0c1224;display:grid;place-items:center;
+      border:1px solid rgba(109,251,255,.2);font-weight:800;overflow:hidden}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    h1{margin:.2rem 0 0;font-size:2rem}
+    h2{margin:0 0 .6rem;font-size:1.2rem;opacity:.95}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.6rem .5rem;border-bottom:1px solid rgba(109,251,255,.12);text-align:left}
+    .badge{display:inline-block;font-size:.75rem;font-weight:800;padding:.2rem .45rem;border-radius:8px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#001220}
+    .title{font-size:1.6rem;font-weight:900;margin:0 0 1rem;display:inline-block;position:relative}
+    .title::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:100%;
+      background:linear-gradient(90deg, var(--accent), var(--accent-2))}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(10,15,26,.95), rgba(10,15,26,.7) 60%, rgba(10,15,26,0));
+      border-bottom:1px solid rgba(109,251,255,.12)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .brand{display:flex;align-items:center;gap:.6rem;font-weight:800}
+    .brand-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow)}
+    .hero{margin:1rem 0}
+    .error{color:#ffb02e}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Home">
+        <span class="brand-badge" aria-hidden="true">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
+      <nav style="display:flex;gap:1rem">
+        <a class="btn" href="/wrleaderboard">WR Leaderboard</a>
+        <a class="btn" href="/totd">TOTD</a>
+        <a class="btn" href="/kacky">Kacky</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <a class="btn" href="/">← Back</a>
+
+    <section class="hero">
+      <h2 class="title">Player Profile</h2>
+      <div class="card pad">
+        <div class="row">
+          <div>
+            <div id="avatar" class="avatar"><span class="muted">No Avatar</span></div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+              <span class="pill" id="player-id">—</span>
+              <span class="pill" id="player-zone">—</span>
+            </div>
+            <h1 id="player-name">Loading…</h1>
+            <div class="muted" id="player-country"></div>
+
+            <div id="quick-stats" style="margin-top:1rem">
+              <span class="pill" id="stat-trophies">Trophies: —</span>
+              <span class="pill" id="rank-world">World: —</span>
+              <span class="pill" id="rank-country">Country: —</span>
+              <span class="pill" id="rank-region">Region: —</span>
+            </div>
+
+            <div id="links" style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap"></div>
+            <div id="status" class="muted" style="margin-top:.6rem"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:1rem">
+      <div class="card pad">
+        <h2>Recent Records</h2>
+        <table>
+          <thead><tr><th>Map</th><th>Pos</th><th>Time</th><th>Date</th></tr></thead>
+          <tbody id="records-body"><tr><td class="muted" colspan="4">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card pad">
+        <h2>Highlights</h2>
+        <div id="highlights" class="muted">No highlights yet.</div>
+      </div>
+    </section>
+  </main>
+
+  <script id="jsonld" type="application/ld+json">{}</script>
+  <script>
+    // ---------- helpers ----------
+    const qs = new URLSearchParams(location.search);
+    const byId   = qs.get('id');
+    const byName = qs.get('name');
+
+    const $  = (s)=>document.querySelector(s);
+    const set= (s,v)=>{const el=$(s); if(el) el.innerHTML=v;}
+    const fmtDate=(iso)=> iso ? new Date(iso).toLocaleString(undefined,{year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    const fmtMs=(ms)=>{
+      if(ms==null) return '';
+      const t = Number(ms);
+      const mm = Math.floor(t/60000);
+      const ss = Math.floor((t%60000)/1000).toString().padStart(2,'0');
+      const ms3 = Math.floor(t%1000).toString().padStart(3,'0');
+      return `${mm}:${ss}.${ms3}`;
+    };
+
+    async function getJSON(url){
+      const r = await fetch(url, { headers:{'cache-control':'no-store'} });
+      if(!r.ok) throw new Error(await r.text().catch(()=>r.statusText));
+      return r.json();
+    }
+
+    function setJSONLD(person){
+      const el = $('#jsonld'); if(!el) return;
+      el.textContent = JSON.stringify({
+        "@context":"https://schema.org",
+        "@type":"Person",
+        name: person?.displayName || person?.name || '',
+        image: person?.avatar || undefined,
+        url: location.href
+      });
+    }
+
+    function renderLinks(id, displayName){
+      const wrap = $('#links'); if(!wrap) return;
+      wrap.innerHTML = '';
+      const add = (label, href, primary=false)=>{
+        if(!href) return;
+        const a=document.createElement('a');
+        a.className='btn' + (primary?' primary':'');
+        a.target='_blank'; a.rel='noreferrer'; a.href=href; a.textContent=label;
+        wrap.appendChild(a);
+      };
+      // Public resources—adjust as you like
+      add('Trackmania.io', id ? `https://trackmania.io/#/player/${encodeURIComponent(id)}` : null, true);
+      if(displayName) add('TMX Search', `https://trackmania.exchange/search?author=${encodeURIComponent(displayName)}`);
+      add('Twitch', null); // fill if you store it later
+    }
+
+    function renderRecords(list){
+      const tb = $('#records-body'); if(!tb) return;
+      tb.innerHTML = '';
+      if(!list || !list.length){
+        tb.innerHTML = '<tr><td class="muted" colspan="4">No recent records.</td></tr>';
+        return;
+      }
+      list.forEach(r=>{
+        const tr = document.createElement('tr');
+        const map = document.createElement('td'); map.textContent = r.mapName || r.mapUid || '';
+        const pos = document.createElement('td'); pos.innerHTML = r.isWR ? '<span class="badge">WR</span>' : (r.position ?? '');
+        const time= document.createElement('td'); time.textContent = fmtMs(r.time);
+        const date= document.createElement('td'); date.textContent = r.timestamp ? fmtDate(r.timestamp) : '';
+        tr.append(map,pos,time,date);
+        tb.appendChild(tr);
+      });
+    }
+
+    // ---------- page init ----------
+    (async function init(){
+      try{
+        if(!byId && !byName){ set('#status','Provide ?id= or ?name= in the URL.'); return; }
+
+        // 1) Resolve to accountId if needed
+        let accountId = byId;
+        let displayName = byName || '';
+        if(!accountId){
+          const r = await getJSON(`/api/players/resolve?name=${encodeURIComponent(byName)}`);
+          accountId   = r.accountId || '';
+          displayName = r.displayName || byName || '';
+        }else{
+          const r = await getJSON(`/api/players/resolve?id=${encodeURIComponent(byId)}`);
+          displayName = r.displayName || displayName || '';
+        }
+
+        if(!accountId){ set('#player-name','Player not found'); set('#player-id', displayName || '—'); return; }
+
+        set('#player-id', accountId);
+
+        // 2) Fetch basics / trophies / records (in parallel)
+        const [basic, trophies, records] = await Promise.allSettled([
+          getJSON(`/api/players/basic?id=${encodeURIComponent(accountId)}`),
+          getJSON(`/api/players/trophies?id=${encodeURIComponent(accountId)}`),
+          getJSON(`/api/players/records?id=${encodeURIComponent(accountId)}`)
+        ]);
+
+        // Basics
+        if(basic.status==='fulfilled'){
+          const b=basic.value;
+          const name = b.displayName || displayName || accountId;
+          set('#player-name', name);
+          set('#player-country', b.country ? `Country: ${b.country}` : '');
+          set('#player-zone', b.zone || '');
+          if(b.avatar){
+            const a=$('#avatar'); a.innerHTML='';
+            const img=document.createElement('img'); img.alt='avatar'; img.src=b.avatar; a.appendChild(img);
+          }
+          setJSONLD({ displayName: name, avatar: b.avatar });
+          renderLinks(accountId, name);
+        }else{
+          set('#player-name', displayName || accountId);
+          $('#status').innerHTML = `<span class="error">Basic info unavailable</span>`;
+        }
+
+        // Trophies / Ranks
+        if(trophies.status==='fulfilled'){
+          const t=trophies.value;
+          set('#stat-trophies', `Trophies: ${t.points ?? '—'}`);
+          set('#rank-world',   `World: ${t.worldRank ?? '—'}`);
+          set('#rank-country', `Country: ${t.countryRank ?? '—'}`);
+          set('#rank-region',  `Region: ${t.regionRank ?? '—'}`);
+        }else{
+          const s=$('#status'); s.innerHTML += (s.innerHTML? ' · ' : '') + `<span class="error">Trophies unavailable</span>`;
+        }
+
+        // Records
+        if(records.status==='fulfilled'){
+          // Expect shape: { entries: [{ mapUid, mapName?, position, time, isWR, timestamp }] }
+          const r = records.value?.entries || [];
+          renderRecords(r);
+        }else{
+          renderRecords([]);
+          const s=$('#status'); s.innerHTML += (s.innerHTML? ' · ' : '') + `<span class="error">Records unavailable</span>`;
+        }
+
+      }catch(err){
+        set('#player-name','Error');
+        $('#status').innerHTML = `<span class="error">${(err && err.message) || err}</span>`;
+      }
+    })();
+  </script>
+</body>
+</html>
