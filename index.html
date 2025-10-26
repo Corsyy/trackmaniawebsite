@@ -147,11 +147,11 @@
 
 /* Make body fill the card so we can anchor the boxes to the bottom */
 #countdown-card .card-body{
-  flex:1;                         /* <— the missing piece */
   display:flex;
   flex-direction:column;
-  justify-content:flex-end;       /* push boxes down */
-  padding-bottom:4.5rem;          /* space for Add to Calendar */
+  justify-content:flex-end;      /* tiles sit lower in the card */
+  padding:1rem 1rem 4.5rem;      /* room for Add to Calendar at bottom */
+  gap:.75rem;
 }
 #countdown-card .card-header{
   background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
@@ -159,40 +159,54 @@
   border-bottom: 1px dashed rgba(109,251,255,.20);
 }
 
-/* Nudge countdown tiles down a bit from the header */
-#countdown{
-  margin-top: .75rem; /* adjust 0.5rem–1rem to taste */
+.countdown{
+  display:grid !important;
+  grid-template-columns:repeat(4, minmax(120px, 1fr)); /* 4 across */
+  gap:.75rem;
+  align-items:stretch;
+  margin-top:1.25rem;            /* push tiles down a bit under the header */
 }
 
-/* Optional: round the top corners of the header so it matches the card */
 #countdown-card .card-header{
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
+  backdrop-filter: blur(4px);
+  border-bottom: 1px dashed rgba(109,251,255,.20);
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
 }
-/* Add to Calendar button (bottom-left) */
-#countdown-card #addCal{
-  position:absolute; bottom:16px; left:18px; margin:0!important;
-  background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6))!important;
-  border:1px solid rgba(109,251,255,.25)!important;
-  color:var(--text)!important; border-radius:12px; font-weight:700;
-  padding:.6rem 1rem; transition:transform .25s ease, filter .25s ease;
-}
-#countdown-card #addCal:hover{ transform:translateY(-2px); filter:brightness(1.1); }
 
-/* Countdown grid — responsive, won’t overflow */
-#countdown{
-  display:grid!important;
-  grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); /* <— responsive */
-  gap:.75rem; align-items:stretch; justify-content:center; margin-top:0;
+/* The body owns vertical spacing so tiles are pushed down cleanly */
+#countdown-card .card-body{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: .75rem;                 /* space between tiles and the button area */
+  padding: 1rem 1rem 4.5rem;   /* top | sides | bottom (bottom = room for button) */
 }
+
+/* Tiles block: no extra top margin; rely on body padding */
+#countdown{
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+}
+
+/* (keep your existing tile sizes) */
 .timebox{
-  padding:.9rem .5rem; min-height:72px; border-radius:12px; text-align:center;
+  padding:.9rem .6rem;
+  min-height:72px;
+  border-radius:12px;
   background:linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
   border:1px solid rgba(109,251,255,.18);
+  text-align:center;
+  /* ensure grid can shrink them nicely */
+  width:auto; min-width:0;
 }
-.timebox strong{ display:block; font-size:clamp(1.5rem, 2.6vw, 2rem); }
-.timebox span{ font-size:.85rem; color:var(--muted); }
 
+.timebox strong{display:block;font-size:clamp(1.6rem,2.6vw,2.1rem);}
+.timebox span{font-size:.9rem;color:var(--muted);}
 /* Responsive: stack to 2x2 on mobile */
 @media (max-width: 640px) {
   #countdown {
