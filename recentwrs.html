@@ -165,11 +165,8 @@ function escapeHTML(s=''){
     {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
   ));
 }
-function playerLinkHTML({ id, name }){
-  const label = escapeHTML(name || id || '—');
-  if (id)   return `<a href="/player.html?id=${encodeURIComponent(id)}">${label}</a>`;
-  if (name) return `<a href="/player.html?name=${encodeURIComponent(name)}">${label}</a>`;
-  return label;
+function playerLinkHTML({ id, name }) {
+  return escapeHTML(name || id || '—');
 }
 /* ======================================================================== */
 
