@@ -128,88 +128,55 @@
     .card-header{padding:1rem 1rem .6rem;border-bottom:1px dashed rgba(109,251,255,.2)}
     .card-body{padding:1rem}
 
-   /* >>> hero card sizing (countdown & twitch) */
-/* Countdown and Live cards */
 #countdown-card,
-#live .card {
+#live .card{
   min-height: var(--heroCardH);
-  display: flex;
-  flex-direction: column;
+  display:flex;
+  flex-direction:column;
 }
 
-/* Countdown card background and look */
-#countdown-card {
-  background-image: linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)), var(--cd-img, none);
-  background-size: contain, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
-  overflow: hidden; 
-  position: relative;
+/* Keep everything inside the card */
+#countdown-card{
+  position:relative;
+  overflow:hidden; /* <— prevents bleed */
+  background-image:linear-gradient(180deg, rgba(10,15,26,.68), rgba(10,15,26,.44)), var(--cd-img, none);
+  background-size:contain, cover;
+  background-position:center, center;
+  background-repeat:no-repeat, no-repeat;
 }
 
-/* Add to Calendar button styling + position */
-#countdown-card #addCal {
-  position: absolute;
-  bottom: 16px;
-  left: 18px;
-  margin: 0 !important;
-  background: linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6)) !important;
-  border: 1px solid rgba(109,251,255,.25) !important;
-  color: var(--text) !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
-  border-radius: 12px;
-  font-weight: 700;
-  padding: .6rem 1rem;
-  transition: transform .25s ease, filter .25s ease;
+/* Make body fill the card so we can anchor the boxes to the bottom */
+#countdown-card .card-body{
+  flex:1;                         /* <— the missing piece */
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;       /* push boxes down */
+  padding-bottom:4.5rem;          /* space for Add to Calendar */
 }
 
-#countdown-card #addCal:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
+/* Add to Calendar button (bottom-left) */
+#countdown-card #addCal{
+  position:absolute; bottom:16px; left:18px; margin:0!important;
+  background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6))!important;
+  border:1px solid rgba(109,251,255,.25)!important;
+  color:var(--text)!important; border-radius:12px; font-weight:700;
+  padding:.6rem 1rem; transition:transform .25s ease, filter .25s ease;
 }
+#countdown-card #addCal:hover{ transform:translateY(-2px); filter:brightness(1.1); }
 
-/* Make countdown sit lower in the card */
-#countdown-card .card-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding-bottom: 4.5rem;
-}
-
-/* Countdown grid (4 columns) */
-/* Countdown grid — no overflow, wraps as needed */
+/* Countdown grid — responsive, won’t overflow */
 #countdown{
-  display:grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* was repeat(4, minmax(120px,1fr)) */
-  gap:.75rem;
-  align-items:stretch;
-  justify-content:center;
-  width:100%;              /* never exceed card */
-  max-width:100%;
-  margin-top:1.25rem;      /* breathing room under the header */
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); /* <— responsive */
+  gap:.75rem; align-items:stretch; justify-content:center; margin-top:0;
 }
-
-/* Tiles (unchanged except a touch more flexibility) */
 .timebox{
-  padding:.9rem .5rem;
-  min-height:72px;
-  border-radius:12px;
+  padding:.9rem .5rem; min-height:72px; border-radius:12px; text-align:center;
   background:linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
   border:1px solid rgba(109,251,255,.18);
-  text-align:center;
 }
-
-
-.timebox strong {
-  display: block;
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-}
-
-.timebox span {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
+.timebox strong{ display:block; font-size:clamp(1.5rem, 2.6vw, 2rem); }
+.timebox span{ font-size:.85rem; color:var(--muted); }
 
 /* Responsive: stack to 2x2 on mobile */
 @media (max-width: 640px) {
