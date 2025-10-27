@@ -275,6 +275,24 @@
 }
 .event.with-bg > :not(.tag){position:relative; z-index:2;}
 
+/* Make the entire card clickable when wrapped in <a> */
+.event-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.event-link:hover .event,
+.event-link:focus-visible .event {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(61,165,255,.35);
+}
+.event-link:focus-visible {
+  outline: none;
+}
+.event-link:focus-visible .event {
+  box-shadow: 0 0 0 3px rgba(61,165,255,.35), 0 10px 30px rgba(0,0,0,.45);
+}
+
 
 
     .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
@@ -609,6 +627,46 @@
     });
   }
 
+  /* NEW: Build an event element and wrap with <a> if discordUrl (or url) is present */
+  function makeEventElement(e, options = {}) {
+    const article = document.createElement('article');
+    article.className = 'event reveal';
+
+    const tag = options.tagText || e.tag || 'Event';
+    const subline = options.subline === 'location'
+      ? (e.location || '')
+      : (e.description || '');
+
+    article.innerHTML = `
+      <span class="tag">${tag}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${subline}</div>
+    `;
+
+    if (e.image) {
+      article.classList.add('with-bg');
+      article.style.setProperty('--event-img', `url("${e.image}")`);
+    }
+
+    const href = e.discordUrl && e.discordUrl.trim()
+      ? e.discordUrl.trim()
+      : (e.url && e.url.trim() ? e.url.trim() : '');
+
+    if (href) {
+      const a = document.createElement('a');
+      a.className = 'event-link';
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.setAttribute('aria-label', `${e.title} — more info on Discord`);
+      a.appendChild(article);
+      return a;
+    }
+
+    return article;
+  }
+
   function renderFromData(events){
     const now=Date.now();
     const live=events.filter(e=>new Date(e.start_iso)<=now && now<=new Date(e.end_iso)).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
@@ -621,17 +679,9 @@
     if(live.length){
       liveSection.style.display='';
       liveGrid.innerHTML='';
+      /* UPDATED: build via helper, tag "LIVE NOW" */
       live.forEach(e=>{
-        const el=document.createElement('article');
-        el.className='event reveal';
-        el.innerHTML=`<span class="tag">LIVE NOW</span>
-          <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-          <h4>${e.title}</h4>
-          <div class="meta">${e.description||''}</div>`;
-        if(e.image){
-          el.classList.add('with-bg');
-          el.style.setProperty('--event-img',`url("${e.image}")`);
-        }
+        const el = makeEventElement(e, { tagText: 'LIVE NOW', subline: 'description' });
         liveGrid.appendChild(el);
       });
     }else{
