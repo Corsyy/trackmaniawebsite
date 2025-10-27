@@ -688,21 +688,13 @@
       liveSection.style.display='none';
     }
 
-    const grid=document.getElementById('events-grid');
-    grid.innerHTML='';
-    upcoming.forEach(e=>{
-      const el=document.createElement('article');
-      el.className='event reveal';
-      el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
-        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-        <h4>${e.title}</h4>
-        <div class="meta">${e.description||''}</div>`;
-      if(e.image){
-        el.classList.add('with-bg');
-        el.style.setProperty('--event-img',`url("${e.image}")`);
-      }
-      grid.appendChild(el);
-    });
+const grid = document.getElementById('events-grid');
+grid.innerHTML = '';
+upcoming.forEach(e => {
+  const el = makeEventElement(e, { subline: 'description' });
+  grid.appendChild(el);
+});
+
 
     let pastWrap=document.getElementById('past-events');
     if(!pastWrap){
