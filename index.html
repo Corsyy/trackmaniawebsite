@@ -37,7 +37,7 @@
     html{scroll-behavior:smooth}
 
     /* ==== THEME: TRACK CURVES (clean, premium) ==== */
-   body.bg-track-curves {
+  body.bg-track-curves{
   background:
     radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
     radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
@@ -48,32 +48,36 @@
   overflow-x: hidden;
 }
 
-    /* prettier-ignore */
-   body.bg-track-curves::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.6;
-  mix-blend-mode: screen;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
-  background-size: cover;
-  background-repeat: no-repeat;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+/* Soft blue glow arcs — no SVG, no seams */
+body.bg-track-curves::before{
+  content:"";
+  position:fixed;
+  inset:-1px;                /* slight overscan removes any 1px seam */
+  pointer-events:none;
+  z-index:-1;
+  opacity:.55;
+  mix-blend-mode:screen;
+  background:
+    radial-gradient(900px 460px at 18% 8%,  rgba(58,160,255,.10), transparent 60%),
+    radial-gradient(760px 420px at 84% 14%, rgba(109,251,255,.08), transparent 66%),
+    radial-gradient(1000px 520px at 50% 118%, rgba(61,165,255,.06), transparent 72%);
+  background-repeat:no-repeat;
+  background-size:cover;
+  transform:translateZ(0);
+  backface-visibility:hidden;
 }
 
-
-    /* prettier-ignore */
-   body.bg-track-curves::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
-  opacity: 0.09;
-  background-size: 120px 120px;
+/* Fine film grain (PNG noise), also overscanned */
+body.bg-track-curves::after{
+  content:"";
+  position:fixed;
+  inset:-1px;                /* overscan prevents mid-screen joins */
+  z-index:-2;
+  pointer-events:none;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
+  background-size:160px 160px;
+  background-repeat:repeat;
+  opacity:.09;
 }
 
     @keyframes noiseShift{ 50%{transform:translate3d(0,0,0)} 50.01%{transform:translate3d(.5px,.5px,0)} }
