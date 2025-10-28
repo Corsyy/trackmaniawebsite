@@ -37,56 +37,69 @@
     html{scroll-behavior:smooth}
 
     /* ==== THEME: TRACK CURVES (clean, premium) ==== */
-  body.bg-track-curves{
+ body.bg-aurora {
+  /* base sky */
   background:
-    radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
-    radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
-    linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
+    /* soft glows */
+    radial-gradient(1200px 700px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+    radial-gradient(900px 560px at 110% 8%, rgba(109,251,255,.08), transparent 70%),
+    /* deep vertical fade */
+    linear-gradient(180deg, #07101c 0%, #0a0f1a 40%, #060a14 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* Soft blue glow arcs — no SVG, no seams */
-body.bg-track-curves::before {
+/* Aurora ribbons (conic gradients, super light on GPU; no seams) */
+body.bg-aurora::before {
   content: "";
   position: fixed;
-  inset: -1px; /* overscan removes 1px seam on some GPUs */
+  inset: 0;
   pointer-events: none;
-  z-index: -1;
-  opacity: 0.55;
+  z-index: 0;
   mix-blend-mode: screen;
-
-  /* smooth electric-blue gradients, no SVG, no blur */
+  opacity: 0.55;                    /* tune 0.4–0.7 */
   background:
-    radial-gradient(900px 460px at 18% 8%,  rgba(58,160,255,.10), transparent 60%),
-    radial-gradient(760px 420px at 84% 14%, rgba(109,251,255,.08), transparent 66%),
-    radial-gradient(1000px 520px at 50% 118%, rgba(61,165,255,.06), transparent 72%);
-  
+    conic-gradient(from 210deg at 15% 40%,
+      rgba(61,165,255,.05) 0 40%,
+      rgba(61,165,255,0) 60% 100%),
+    conic-gradient(from 330deg at 85% 25%,
+      rgba(109,251,255,.06) 0 35%,
+      rgba(109,251,255,0) 55% 100%),
+    conic-gradient(from 265deg at 60% 85%,
+      rgba(61,165,255,.045) 0 30%,
+      rgba(61,165,255,0) 55% 100%);
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: 140% 140%, 140% 140%, 130% 130%;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
 
-/* Fine film grain (PNG noise), also overscanned */
-body.bg-track-curves::after {
+
+/* Subtle noise texture */
+html::after {
   content: "";
   position: fixed;
-  inset: -1px; /* overscan removes faint join lines */
-  z-index: -2;
+  inset: 0;
   pointer-events: none;
-
-  /* subtle repeating noise */
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
-  background-repeat: repeat;
-  background-size: 160px 160px;
-  opacity: 0.09;
-  mix-blend-mode: overlay; /* adds depth without visible pattern */
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  z-index: 1;
+  opacity: .06;                     /* tweak 0.03–0.10 */
+  mix-blend-mode: overlay;
+  background-image:
+    /* 2D micro-dither */
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.02) 0, rgba(255,255,255,.02) 1px,
+      transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.02) 0, rgba(0,0,0,.02) 1px,
+      transparent 1px, transparent 2px);
+  background-size: 180px 180px, 180px 180px;
 }
+
 
 
     @keyframes noiseShift{ 50%{transform:translate3d(0,0,0)} 50.01%{transform:translate3d(.5px,.5px,0)} }
@@ -426,7 +439,7 @@ body.bg-track-curves::after {
   </style>
 </head>
 
-<body class="bg-track-curves">
+<body class="bg-aurora">
 <header>
   <div class="container nav">
     <a class="brand" href="#" aria-label="Trackmania Events Home">
