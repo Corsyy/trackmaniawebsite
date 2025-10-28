@@ -49,36 +49,45 @@
 }
 
 /* Soft blue glow arcs — no SVG, no seams */
-body.bg-track-curves::before{
-  content:"";
-  position:fixed;
-  inset:-1px;                /* slight overscan removes any 1px seam */
-  pointer-events:none;
-  z-index:-1;
-  opacity:.55;
-  mix-blend-mode:screen;
+body.bg-track-curves::before {
+  content: "";
+  position: fixed;
+  inset: -1px; /* overscan removes 1px seam on some GPUs */
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+
+  /* smooth electric-blue gradients, no SVG, no blur */
   background:
     radial-gradient(900px 460px at 18% 8%,  rgba(58,160,255,.10), transparent 60%),
     radial-gradient(760px 420px at 84% 14%, rgba(109,251,255,.08), transparent 66%),
     radial-gradient(1000px 520px at 50% 118%, rgba(61,165,255,.06), transparent 72%);
-  background-repeat:no-repeat;
-  background-size:cover;
-  transform:translateZ(0);
-  backface-visibility:hidden;
+  
+  background-repeat: no-repeat;
+  background-size: cover;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Fine film grain (PNG noise), also overscanned */
-body.bg-track-curves::after{
-  content:"";
-  position:fixed;
-  inset:-1px;                /* overscan prevents mid-screen joins */
-  z-index:-2;
-  pointer-events:none;
-  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
-  background-size:160px 160px;
-  background-repeat:repeat;
-  opacity:.09;
+body.bg-track-curves::after {
+  content: "";
+  position: fixed;
+  inset: -1px; /* overscan removes faint join lines */
+  z-index: -2;
+  pointer-events: none;
+
+  /* subtle repeating noise */
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
+  background-repeat: repeat;
+  background-size: 160px 160px;
+  opacity: 0.09;
+  mix-blend-mode: overlay; /* adds depth without visible pattern */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
+
 
     @keyframes noiseShift{ 50%{transform:translate3d(0,0,0)} 50.01%{transform:translate3d(.5px,.5px,0)} }
 
