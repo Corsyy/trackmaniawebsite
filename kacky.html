@@ -140,7 +140,7 @@
       <div class="modal-body">
         <form id="submitForm">
           <div class="row">
-            <input class="input" name="slot" id="slotField" type="number" min="1" max="75" placeholder="Slot # (1–75)" required />
+            <input class="input" name="slot" id="slotField" type="number" min="376" max="450" placeholder="Slot # (376–450)" required />
             <input class="input" name="title" placeholder="Title" required />
           </div>
           <input class="input" name="url" placeholder="Twitch or YouTube URL" required />
@@ -245,7 +245,7 @@
     function render(clips, occupied){
       const grid = document.getElementById('clipsGrid');
       grid.innerHTML = '';
-      for(let i=1;i<=75;i++){
+      for(let i=376;i<=450;i++){
         const clip = clips.find(c => Number(c.slot)===i);
         const isOccupied = occupied.has(i);
         const card = document.createElement('div');
@@ -312,7 +312,7 @@
       const status=document.getElementById('submitStatus');
 
       function isValidClipUrl(u){ try{ const h=new URL(u).hostname; return /twitch\.tv|youtube\.com|youtu\.be/i.test(h); } catch{ return false; } }
-      function clampSlot(n){ n=Number(n||0); return Math.min(75, Math.max(1, n)); }
+      function clampSlot(n){ n=Number(n||0); return Math.min(450, Math.max(376, n)); }
 
       form?.addEventListener('submit', async e => {
         e.preventDefault();
