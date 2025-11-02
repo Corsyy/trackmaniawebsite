@@ -53,15 +53,15 @@
       font-weight:800; font-size:1.1rem; letter-spacing:.3px; display:flex; align-items:center; gap:.5rem; color:var(--accent-2)
     }
     .btn{
- padding:.6rem .95rem;
-   border:1px solid rgba(109,251,255,.25);
-  border-radius:12px;
-  background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));   color:var(--text);
-   font-weight:700;
-   transition:.2s;
-   text-decoration:none;
- }
- .btn:hover{transform:translateY(-1px) scale(1.02); filter:brightness(1.06)}
+      padding:.6rem .95rem;
+      border:1px solid rgba(109,251,255,.25);
+      border-radius:12px;
+      background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));   color:var(--text);
+      font-weight:700;
+      transition:.2s;
+      text-decoration:none;
+    }
+    .btn:hover{transform:translateY(-1px) scale(1.02); filter:brightness(1.06)}
 
     /* ====== Layout ====== */
     .container{width:min(1200px,92vw);margin:0 auto;padding:1.4rem 0 2.2rem}
@@ -84,7 +84,7 @@
     .row{display:flex;gap:.6rem;flex-wrap:wrap}
 
     /* ====== Buttons / Inputs ====== */
-     .btn{padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));color:var(--text);font-weight:700;transition:.2s}
+    .btn{padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));color:var(--text);font-weight:700;transition:.2s}
     .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
 
     .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(109,251,255,.25);box-shadow:none}
@@ -120,7 +120,10 @@
   <header>
     <div class="nav-container">
       <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
-       <a href="/" class="btn">Home</a>
+      <div style="display:flex; gap:.5rem;">
+        <a href="/" class="btn">Home</a>
+        <a href="https://kacky.gg/leaderboard" target="_blank" rel="noopener" class="btn">Kacky Leaderboard</a>
+      </div>
     </div>
   </header>
 
