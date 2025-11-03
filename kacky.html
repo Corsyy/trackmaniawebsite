@@ -146,7 +146,8 @@
             <input class="input" name="slot" id="slotField" type="number" min="376" max="450" placeholder="Slot # (376–450)" required />
             <input class="input" name="title" placeholder="Title" required />
           </div>
-          <input class="input" name="url" placeholder="Twitch or YouTube URL" required />
+          <!-- UPDATED: mention Streamable in placeholder -->
+          <input class="input" name="url" placeholder="Twitch, YouTube, or Streamable URL" required />
           <div class="row">
             <input class="input" name="map" placeholder="Map (optional)" />
             <input class="input" name="thumb" placeholder="Thumbnail URL (optional)" />
@@ -225,6 +226,20 @@
             return `https://player.twitch.tv/?channel=${encodeURIComponent(parts[0])}&${twitchParents()}&autoplay=false`;
           }
         }
+
+        // Streamable
+        if (host === 'streamable.com') {
+          const parts = u.pathname.split('/').filter(Boolean);
+          let id = null;
+          // Accept /e/{id}, /o/{id}, or /{id}
+          if (parts[0] === 'e' || parts[0] === 'o') {
+            id = parts[1];
+          } else {
+            id = parts[0];
+          }
+          if (id) return `https://streamable.com/e/${encodeURIComponent(id)}`;
+        }
+
         return raw;
       }catch(e){ return raw; }
     }
@@ -314,7 +329,16 @@
       const form=document.getElementById('submitForm');
       const status=document.getElementById('submitStatus');
 
-      function isValidClipUrl(u){ try{ const h=new URL(u).hostname; return /twitch\.tv|youtube\.com|youtu\.be/i.test(h); } catch{ return false; } }
+      // UPDATED: allow Streamable
+      function isValidClipUrl(u){
+        try{
+          const h=new URL(u).hostname;
+          return /twitch\.tv|youtube\.com|youtu\.be|streamable\.com/i.test(h);
+        } catch {
+          return false;
+        }
+      }
+
       function clampSlot(n){ n=Number(n||0); return Math.min(450, Math.max(376, n)); }
 
       form?.addEventListener('submit', async e => {
@@ -333,7 +357,7 @@
           approved: false
         };
 
-        if(!isValidClipUrl(payload.url)){ status.textContent='Please enter a Twitch or YouTube URL.'; return; }
+        if(!isValidClipUrl(payload.url)){ status.textContent='Please enter a Twitch, YouTube, or Streamable URL.'; return; }
 
         // Live pre-check: block if any row already exists for this slot (approved or not)
         try{
