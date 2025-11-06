@@ -279,10 +279,10 @@
         if (id) return `https://cdn-cf-east.streamable.com/image/${encodeURIComponent(id)}.jpg`;
       }
     }catch(e){}
-    return null; // Twitch clip requires async fetch
+    return null; // Twitch clip needs async fetch
   }
 
-  // Twitch clip: fetch og:image via read-only proxy (bypasses CORS)
+  // Twitch clip: fetch og:image via read-only proxy (CORS-safe)
   async function fetchTwitchClipThumb(raw){
     try{
       const u = new URL(raw);
@@ -290,14 +290,19 @@
       const isClip = host === 'clips.twitch.tv' || /\/clip\/[^/]+/i.test(u.pathname);
       if (!isClip) return null;
 
-      // Read page HTML via r.jina.ai (GET only, cached, CORS-friendly)
-      const proxied = `https://r.jina.ai/http://${u.host}${u.pathname}${u.search}`;
+      // Preserve the real scheme (https:) and host/path
+      const scheme = u.protocol.replace(':','').toLowerCase(); // "https" or "http"
+      const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
       const res = await fetch(proxied, { method:'GET' });
       if (!res.ok) return null;
       const html = await res.text();
 
       // Parse <meta property="og:image" content="...">
-      const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+      let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+      if (!m || !m[1]) {
+        // Some clip pages expose JSON-LD with "thumbnailUrl"
+        m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
+      }
       if (m && m[1]) return m[1];
     }catch(e){}
     return null;
@@ -309,7 +314,7 @@
       const u = new URL(raw);
       const host = u.hostname.replace(/^www\./,'');
 
-      // Prefer YouTube oEmbed (reliable)
+      // YouTube: oEmbed
       if (host.includes('youtube') || host === 'youtu.be') {
         const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
         if (res.ok) {
@@ -318,13 +323,13 @@
         }
       }
 
-      // Twitch clips: use proxyed OG scrape
+      // Twitch clips: proxy OG scrape
       if (host.includes('twitch.tv')) {
         const t = await fetchTwitchClipThumb(raw);
         if (t) return t;
       }
 
-      // Streamable oEmbed (as a fallback)
+      // Streamable: oEmbed
       if (host === 'streamable.com') {
         const res = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
         if (res.ok) {
@@ -380,15 +385,15 @@
         const mapTxt = clip.map ? ` · ${escapeHtml(clip.map)}` : '';
         const plat = platformLabel(clip.url);
 
-        // Try: user-provided thumb -> sync guess -> async later
         const syncThumb = clip.thumb || buildPreviewURLSync(clip.url);
-        const showFallbackBox = !syncThumb;
+        const needsAsync = !syncThumb;
+
         card.innerHTML = `
           <div class="slot">Slot ${i}${mapTxt}</div>
           <strong>${title}</strong>
 
           <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}"
-                  ${showFallbackBox ? 'data-thumb-src-needed="1" data-raw-url="'+encodeURIComponent(clip.url)+'"' : ''}>
+                  ${needsAsync ? `data-thumb-src-needed="1" data-raw-url="${encodeURIComponent(clip.url)}"` : ''}>
             ${syncThumb ? `<img src="${syncThumb}" alt="${title}" loading="lazy">`
                         : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.7">Loading preview…</div>`}
             <div class="thumb-center"></div>
@@ -396,9 +401,9 @@
           </button>
 
           <div class="row">
-            <button class='btn openPlayer' data-url='${encodeURIComponent(embed)}'>View / Fullscreen</button>
-            <span class="badge">Locked (filled)</span>
-          </div>`;
+  <button class='btn openPlayer' data-url='${encodeURIComponent(embed)}'>View / Fullscreen</button>
+</div>
+`;
       } else if(isOccupied){
         card.innerHTML = `
           <div class="slot">Slot ${i}</div>
@@ -419,7 +424,7 @@
     }
   }
 
-  // After render, try to fetch thumbnails we couldn't derive synchronously (Twitch clips)
+  // After render, fetch thumbnails we couldn’t derive synchronously (Twitch clips etc.)
   async function hydrateThumbnails(){
     const wraps = [...document.querySelectorAll('.thumb-wrap[data-thumb-src-needed="1"]')];
     if (!wraps.length) return;
@@ -431,7 +436,6 @@
 
       const imgUrl = await fetchPreviewURL(raw);
       if (imgUrl) {
-        // Replace fallback box with <img>
         wrap.querySelectorAll('div').forEach(d => { if (d.textContent?.includes('Loading preview')) d.remove(); });
         const img = document.createElement('img');
         img.alt = 'Clip preview';
