@@ -201,7 +201,6 @@
       const u = new URL(raw);
       const host = u.hostname.replace(/^www\./,'');
 
-      // YouTube / Shorts / Live / Embed
       const yid = extractYouTubeId(u);
       if (yid) return `https://www.youtube.com/embed/${encodeURIComponent(yid)}?modestbranding=1&rel=0&playsinline=1`;
 
@@ -238,35 +237,27 @@
     }catch(e){ return raw; }
   }
 
-  // ---- Robust YouTube ID extractor (covers watch, youtu.be, shorts, live, embed, and weird params) ----
+  // ---- Robust YouTube ID extractor ----
   function extractYouTubeId(u){
     try{
       const host = u.hostname.replace(/^www\./,'');
       const path = u.pathname;
       const qs = u.searchParams;
 
-      // Common: watch?v=ID
       if ((host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') && qs.get('v')) {
         return qs.get('v');
       }
-      // youtu.be/ID
       if (host === 'youtu.be') {
         const id = (path || '').slice(1).split('/')[0];
         if (id) return id;
       }
-      // /shorts/ID
       const shorts = path.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
       if (shorts) return shorts[1];
-
-      // /live/ID
       const live = path.match(/\/live\/([a-zA-Z0-9_-]{6,})/);
       if (live) return live[1];
-
-      // /embed/ID
       const embed = path.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
       if (embed) return embed[1];
 
-      // Last-resort regex search in whole URL
       const m = u.href.match(/(?:(?:v=|\/)([a-zA-Z0-9_-]{11}))(?:[&?/]|$)/);
       if (m) return m[1];
     }catch(e){}
@@ -274,7 +265,7 @@
   }
 
   // --- Thumbnail helpers ---
-  // Fast, synchronous guesses (no network). Returns string or null.
+  // Synchronous guess (no network): YT + Streamable
   function buildPreviewURLSync(raw){
     try{
       const u = new URL(raw);
@@ -288,16 +279,37 @@
         if (id) return `https://cdn-cf-east.streamable.com/image/${encodeURIComponent(id)}.jpg`;
       }
     }catch(e){}
-    return null; // Twitch will be handled by async fallback or show a platform placeholder
+    return null; // Twitch clip requires async fetch
   }
 
-  // If sync guess failed, do a lightweight oEmbed fetch for YouTube/Twitch/Streamable (if allowed by CORS)
+  // Twitch clip: fetch og:image via read-only proxy (bypasses CORS)
+  async function fetchTwitchClipThumb(raw){
+    try{
+      const u = new URL(raw);
+      const host = u.hostname.replace(/^www\./,'');
+      const isClip = host === 'clips.twitch.tv' || /\/clip\/[^/]+/i.test(u.pathname);
+      if (!isClip) return null;
+
+      // Read page HTML via r.jina.ai (GET only, cached, CORS-friendly)
+      const proxied = `https://r.jina.ai/http://${u.host}${u.pathname}${u.search}`;
+      const res = await fetch(proxied, { method:'GET' });
+      if (!res.ok) return null;
+      const html = await res.text();
+
+      // Parse <meta property="og:image" content="...">
+      const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+      if (m && m[1]) return m[1];
+    }catch(e){}
+    return null;
+  }
+
+  // General async fetcher used after render to hydrate missing thumbs
   async function fetchPreviewURL(raw){
     try{
       const u = new URL(raw);
       const host = u.hostname.replace(/^www\./,'');
 
-      // YouTube oEmbed (very reliable)
+      // Prefer YouTube oEmbed (reliable)
       if (host.includes('youtube') || host === 'youtu.be') {
         const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
         if (res.ok) {
@@ -306,16 +318,13 @@
         }
       }
 
-      // Twitch clips oEmbed (works for clips; may not for full VOD without Client-ID)
+      // Twitch clips: use proxyed OG scrape
       if (host.includes('twitch.tv')) {
-        const res = await fetch(`https://clips.twitch.tv/oembed?url=${encodeURIComponent(raw)}`);
-        if (res.ok) {
-          const j = await res.json();
-          if (j.thumbnail_url) return j.thumbnail_url;
-        }
+        const t = await fetchTwitchClipThumb(raw);
+        if (t) return t;
       }
 
-      // Streamable oEmbed
+      // Streamable oEmbed (as a fallback)
       if (host === 'streamable.com') {
         const res = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
         if (res.ok) {
@@ -348,8 +357,7 @@
       const all = await allRes.json();
       const occupied = new Set(all.map(r => Number(r.slot)));
       render(approved, occupied);
-      // After initial render, hydrate any missing thumbs asynchronously
-      hydrateThumbnails();
+      hydrateThumbnails(); // async fill-ins (esp. Twitch clips)
     }catch(err){
       console.error(err);
       document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
@@ -374,15 +382,15 @@
 
         // Try: user-provided thumb -> sync guess -> async later
         const syncThumb = clip.thumb || buildPreviewURLSync(clip.url);
-        const thumbAttr = syncThumb ? `src="${syncThumb}"` : '';
-        const needsAsync = !syncThumb ? 'true' : 'false';
-
+        const showFallbackBox = !syncThumb;
         card.innerHTML = `
           <div class="slot">Slot ${i}${mapTxt}</div>
           <strong>${title}</strong>
 
-          <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}">
-            ${thumbAttr ? `<img ${thumbAttr} alt="${title}" loading="lazy">` : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.7">No thumbnail</div>`}
+          <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}"
+                  ${showFallbackBox ? 'data-thumb-src-needed="1" data-raw-url="'+encodeURIComponent(clip.url)+'"' : ''}>
+            ${syncThumb ? `<img src="${syncThumb}" alt="${title}" loading="lazy">`
+                        : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.7">Loading preview…</div>`}
             <div class="thumb-center"></div>
             <span class="play-badge">${plat}</span>
           </button>
@@ -391,23 +399,6 @@
             <button class='btn openPlayer' data-url='${encodeURIComponent(embed)}'>View / Fullscreen</button>
             <span class="badge">Locked (filled)</span>
           </div>`;
-
-        // mark for async fetch if missing
-        if (needsAsync === 'true') {
-          const img = card.querySelector('img');
-          // If there's no <img> because we showed "No thumbnail", create one hidden we can fill later
-          if (!img) {
-            const wrap = card.querySelector('.thumb-wrap');
-            const ghost = document.createElement('img');
-            ghost.alt = title;
-            ghost.loading = 'lazy';
-            ghost.style.display = 'none';
-            wrap.prepend(ghost);
-          }
-          card.querySelector('.thumb-wrap').setAttribute('data-thumb-src-needed', '1');
-          card.querySelector('.thumb-wrap').setAttribute('data-raw-url', clip.url);
-        }
-
       } else if(isOccupied){
         card.innerHTML = `
           <div class="slot">Slot ${i}</div>
@@ -428,26 +419,28 @@
     }
   }
 
-  // After render, try to fetch thumbnails we couldn't derive synchronously
+  // After render, try to fetch thumbnails we couldn't derive synchronously (Twitch clips)
   async function hydrateThumbnails(){
-    const wrapsNeedingThumb = [...document.querySelectorAll('.thumb-wrap[data-thumb-src-needed="1"]')];
-    if (!wrapsNeedingThumb.length) return;
+    const wraps = [...document.querySelectorAll('.thumb-wrap[data-thumb-src-needed="1"]')];
+    if (!wraps.length) return;
 
-    await Promise.all(wrapsNeedingThumb.map(async wrap => {
-      const raw = wrap.getAttribute('data-raw-url');
-      const img = wrap.querySelector('img');
-      try{
-        const url = await fetchPreviewURL(raw);
-        if (url && img) {
-          img.src = url;
-          img.style.display = '';
-        }
-      }catch(e){
-        /* ignore; we already show a text fallback */
-      }finally{
-        wrap.removeAttribute('data-thumb-src-needed');
-        wrap.removeAttribute('data-raw-url');
+    await Promise.all(wraps.map(async wrap => {
+      const rawEncoded = wrap.getAttribute('data-raw-url');
+      const raw = rawEncoded ? decodeURIComponent(rawEncoded) : null;
+      if (!raw) return;
+
+      const imgUrl = await fetchPreviewURL(raw);
+      if (imgUrl) {
+        // Replace fallback box with <img>
+        wrap.querySelectorAll('div').forEach(d => { if (d.textContent?.includes('Loading preview')) d.remove(); });
+        const img = document.createElement('img');
+        img.alt = 'Clip preview';
+        img.loading = 'lazy';
+        img.src = imgUrl;
+        wrap.prepend(img);
       }
+      wrap.removeAttribute('data-thumb-src-needed');
+      wrap.removeAttribute('data-raw-url');
     }));
   }
 
@@ -466,21 +459,16 @@
   function closeSubmit(){ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true'); }
 
   function openPlayer(url){
-    // Add autoplay params when possible
     try{
       const u = new URL(decodeURIComponent(url));
       if (u.host.includes('youtube.com')) {
-        u.searchParams.set('autoplay','1');
-        u.searchParams.set('playsinline','1');
-        url = u.toString();
+        u.searchParams.set('autoplay','1'); u.searchParams.set('playsinline','1'); url = u.toString();
       } else if (u.host.includes('twitch.tv')) {
-        u.searchParams.set('autoplay','true');
-        url = u.toString();
+        u.searchParams.set('autoplay','true'); url = u.toString();
       } else if (u.host.includes('streamable.com')) {
-        if (!u.searchParams.has('autoplay')) u.searchParams.set('autoplay','1');
-        url = u.toString();
+        if (!u.searchParams.has('autoplay')) u.searchParams.set('autoplay','1'); url = u.toString();
       }
-    }catch(e){ /* keep original url */ }
+    }catch(e){}
 
     playerFrame.src = url;
     playerModal.classList.add('open');
@@ -489,7 +477,6 @@
 
   function closePlayer(){ playerFrame.src = ''; playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true'); }
 
-  // Robust event delegation (handles clicks on child elements)
   document.addEventListener('click', (e)=>{
     const t = e.target;
 
@@ -583,6 +570,5 @@
   // Initial load
   loadClips();
 </script>
-
 </body>
 </html>
