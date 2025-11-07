@@ -185,8 +185,7 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
   const H = { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } };
 
-  /* ---------- EMBED & THUMB HELPERS (minimal Twitch fixes) ---------- */
-
+  /* ----------------- helpers: parsing ----------------- */
   function twitchParents(){
     const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
     return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
@@ -211,7 +210,6 @@
     return null;
   }
 
-  // NEW: accept both clips.twitch.tv/<slug> and twitch.tv/clip/<slug> (or /channel/clip/<slug>)
   function parseTwitchClipSlug(raw){
     try{
       const u = new URL(raw);
@@ -226,48 +224,17 @@
     return null;
   }
 
-  // Keep sync thumbnails for YT & Streamable (fast, no network)
-  function buildPreviewURLSync(raw){
+  function getStreamableId(raw){
     try{
       const u = new URL(raw);
-      const host = u.hostname.replace(/^www\./,'');
-      const yid = extractYouTubeId(u);
-      if (yid) return `https://i.ytimg.com/vi/${encodeURIComponent(yid)}/hqdefault.jpg`;
-
-      if (host === 'streamable.com') {
-        const parts = u.pathname.split('/').filter(Boolean);
-        const id = parts[0] === 'e' || parts[0] === 'o' ? parts[1] : parts[0];
-        if (id) return `https://cdn-cf-east.streamable.com/image/${encodeURIComponent(id)}.jpg`;
-      }
+      if (u.hostname.replace(/^www\./,'') !== 'streamable.com') return null;
+      const parts = u.pathname.split('/').filter(Boolean);
+      return (parts[0] === 'e' || parts[0] === 'o') ? parts[1] : parts[0];
     }catch(e){}
-    return null; // Twitch clips handled async
+    return null;
   }
 
-  // Normalize Twitch {width}x{height} template
-  function normalizeTwitchThumb(u){
-    if (!u) return u;
-    if (u.startsWith('//')) u = 'https:' + u;
-    u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640')
-         .replace(/%7Bheight%7D|\{height\}/gi, '360');
-    if (/twitch|ttvthumb/i.test(u) && !/[?&]imwidth=\d+/.test(u)) {
-      u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
-    }
-    return u;
-  }
-
-  // Proxy ONLY Twitch images to avoid referrer/CDN blocking
-  function proxifyIfTwitch(url){
-    if(!url) return url;
-    try{
-      const h = new URL(url).hostname.toLowerCase();
-      if (h.includes('twitch') || h.includes('ttvthumb')) {
-        return `https://r.jina.ai/${url.replace(/^https?:\/\//,'https://')}`;
-      }
-    }catch(e){}
-    return url;
-  }
-
-  // Build the final player embed URL
+  /* --------------- helpers: embed URLs ---------------- */
   function buildEmbedURL(raw){
     try{
       const u = new URL(raw);
@@ -280,8 +247,7 @@
       if (tslug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(tslug)}&${twitchParents()}&autoplay=false`;
 
       if (host === 'streamable.com') {
-        const parts = u.pathname.split('/').filter(Boolean);
-        const id = (parts[0] === 'e' || parts[0] === 'o') ? parts[1] : parts[0];
+        const id = getStreamableId(raw);
         if (id) return `https://streamable.com/e/${encodeURIComponent(id)}`;
       }
 
@@ -289,12 +255,73 @@
     }catch(e){ return raw; }
   }
 
-  // Get a preview URL when not available synchronously (Twitch clips etc.)
+  /* -------------- helpers: thumbnail build ------------- */
+  // Sync guess (fast) for YT; Streamable can be flaky -> do async too
+  function buildPreviewURLSync(raw){
+    try{
+      const u = new URL(raw);
+      const host = u.hostname.replace(/^www\./,'');
+
+      const yid = extractYouTubeId(u);
+      if (yid) return `https://i.ytimg.com/vi/${encodeURIComponent(yid)}/hqdefault.jpg`;
+
+      const sid = getStreamableId(raw);
+      if (sid) return `https://cdn.streamable.com/image/${encodeURIComponent(sid)}.jpg`;
+    }catch(e){}
+    return null;
+  }
+
+  function normalizeTwitchThumb(u){
+    if (!u) return u;
+    if (u.startsWith('//')) u = 'https:' + u;
+    u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640')
+         .replace(/%7Bheight%7D|\{height\}/gi, '360');
+    if (/twitch|ttvthumb/i.test(u) && !/[?&]imwidth=\d+/.test(u)) {
+      u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
+    }
+    return u;
+  }
+
+  // Proxy ONLY Twitch images
+  function proxifyIfTwitch(url){
+    if(!url) return url;
+    try{
+      const u = new URL(url);
+      const host = u.hostname.toLowerCase();
+      if (host.includes('twitch') || host.includes('ttvthumb')) {
+        return `https://r.jina.ai/${u.protocol}//${u.host}${u.pathname}${u.search}`;
+      }
+    }catch(e){}
+    return url;
+  }
+
+  // Twitch fallbacks by slug
+  function twitchFallbackThumbs(slug){
+    const g = [
+      `https://clips-media-assets2.twitch.tv/${encodeURIComponent(slug)}-preview-480x272.jpg`,
+      `https://clips-media-assets2.twitch.tv/${encodeURIComponent(slug)}-preview-86x45.jpg`,
+      `https://static-cdn.jtvnw.net/ttv-thumbnails/${encodeURIComponent(slug)}-social-preview.jpg`
+    ];
+    return [...g, ...g.map(proxifyIfTwitch)];
+  }
+
+  // Streamable fallbacks by id
+  function streamableFallbackThumbs(id){
+    const cdns = [
+      'https://cdn.streamable.com',
+      'https://cdn-cf.streamable.com',
+      'https://cdn-cf-east.streamable.com',
+      'https://cdn-cf-west.streamable.com',
+      'https://thumbs.streamable.com'
+    ];
+    return cdns.map(base => `${base}/image/${encodeURIComponent(id)}.jpg`);
+  }
+
+  // Asynchronous thumbnail lookups
   async function fetchTwitchThumb(raw){
     const slug = parseTwitchClipSlug(raw);
     if (!slug) return null;
 
-    // 1) oEmbed
     try{
       const resp = await fetch(`https://clips.twitch.tv/oembed?url=${encodeURIComponent('https://clips.twitch.tv/'+slug)}`);
       if (resp.ok){
@@ -303,20 +330,18 @@
       }
     }catch(e){}
 
-    // 2) Fallback: scrape via r.jina.ai
     try{
       const res = await fetch(`https://r.jina.ai/https://clips.twitch.tv/${encodeURIComponent(slug)}`);
-      if (!res.ok) return null;
-      const html = await res.text();
-
-      let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-      if (m?.[1]) return normalizeTwitchThumb(m[1]);
-      m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-      if (m?.[1]) return normalizeTwitchThumb(m[1]);
-      m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
-      if (m?.[1]) return normalizeTwitchThumb(m[1]);
+      if (res.ok){
+        const html = await res.text();
+        let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+        if (m?.[1]) return normalizeTwitchThumb(m[1]);
+        m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+        if (m?.[1]) return normalizeTwitchThumb(m[1]);
+        m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
+        if (m?.[1]) return normalizeTwitchThumb(m[1]);
+      }
     }catch(e){}
-
     return null;
   }
 
@@ -343,6 +368,36 @@
     return null;
   }
 
+  // Attempt to load an image URL; resolves {ok,url}
+  function tryLoadImage(url){
+    return new Promise(resolve => {
+      const img = new Image();
+      img.referrerPolicy = 'no-referrer';
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve({ ok:true, url });
+      img.onerror = () => resolve({ ok:false, url });
+      img.src = url + (url.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    });
+  }
+
+  // Build candidate list for a clip URL
+  async function thumbnailCandidates(raw){
+    const list = [];
+    const primary = await fetchPreviewURL(raw);
+    if (primary){
+      list.push(primary);
+      list.push(proxifyIfTwitch(primary));
+    }
+
+    const tslug = parseTwitchClipSlug(raw);
+    if (tslug) list.push(...twitchFallbackThumbs(tslug));
+
+    const sid = getStreamableId(raw);
+    if (sid) list.push(...streamableFallbackThumbs(sid));
+
+    return list.filter(Boolean);
+  }
+
   function platformLabel(raw){
     try{
       const h = new URL(raw).hostname.replace(/^www\./,'');
@@ -353,7 +408,7 @@
     return 'Video';
   }
 
-  /* ---------- Data load ---------- */
+  /* ---------------- data load & render ----------------- */
   async function loadClips(){
     try{
       const [approvedRes, allRes] = await Promise.all([
@@ -364,14 +419,13 @@
       const all = await allRes.json();
       const occupied = new Set(all.map(r => Number(r.slot)));
       render(approved, occupied);
-      hydrateThumbnails(); // async fill-ins (Twitch clips)
+      hydrateThumbnails();
     }catch(err){
       console.error(err);
       document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
     }
   }
 
-  /* ---------- Render grid with thumbnails (no iframes here) ---------- */
   function render(clips, occupied){
     const grid = document.getElementById('clipsGrid');
     grid.innerHTML = '';
@@ -388,7 +442,9 @@
         const plat = platformLabel(clip.url);
 
         const syncThumb = clip.thumb || buildPreviewURLSync(clip.url);
-        const needsAsync = !syncThumb;
+        const isTwitch = !!parseTwitchClipSlug(clip.url);
+        const isStreamable = !!getStreamableId(clip.url);
+        const needsAsync = isTwitch || (isStreamable && !clip.thumb) || !syncThumb;
 
         card.innerHTML = `
           <div class="slot">Slot ${i}${mapTxt}</div>
@@ -396,8 +452,9 @@
 
           <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}"
                   ${needsAsync ? `data-thumb-src-needed="1" data-raw-url="${encodeURIComponent(clip.url)}"` : ''}>
-            ${syncThumb ? `<img src="${proxifyIfTwitch(syncThumb)}" alt="${title}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous">`
-                        : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.7">Loading preview…</div>`}
+            ${(!needsAsync && syncThumb)
+                ? `<img src="${proxifyIfTwitch(syncThumb)}" alt="${title}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous">`
+                : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.7">Loading preview…</div>`}
             <div class="thumb-center"></div>
             <span class="play-badge">${plat}</span>
           </button>
@@ -426,7 +483,7 @@
     }
   }
 
-  // After render, fetch thumbnails we couldn’t derive synchronously (Twitch clips etc.)
+  // After render, fetch thumbnails we couldn’t set synchronously
   async function hydrateThumbnails(){
     const wraps = [...document.querySelectorAll('.thumb-wrap[data-thumb-src-needed="1"]')];
     if (!wraps.length) return;
@@ -436,23 +493,34 @@
       const raw = rawEncoded ? decodeURIComponent(rawEncoded) : null;
       if (!raw) return;
 
-      const imgUrl = await fetchPreviewURL(raw);
-      if (imgUrl) {
-        wrap.querySelectorAll('div').forEach(d => { if (d.textContent?.includes('Loading preview')) d.remove(); });
+      const candidates = await thumbnailCandidates(raw);
+
+      let working = null;
+      for (const url of candidates){
+        /* eslint-disable no-await-in-loop */
+        const r = await tryLoadImage(url);
+        if (r.ok){ working = r.url; break; }
+      }
+
+      if (working){
+        wrap.querySelectorAll('div').forEach(d => {
+          if (d.textContent?.toLowerCase().includes('loading preview')) d.remove();
+        });
         const img = document.createElement('img');
         img.alt = 'Clip preview';
         img.loading = 'lazy';
         img.referrerPolicy = 'no-referrer';
         img.crossOrigin = 'anonymous';
-        img.src = proxifyIfTwitch(imgUrl);
+        img.src = working;
         wrap.prepend(img);
       }
+
       wrap.removeAttribute('data-thumb-src-needed');
       wrap.removeAttribute('data-raw-url');
     }));
   }
 
-  /* ---------- Utils & wiring ---------- */
+  /* ---------------- utils & wiring ----------------- */
   function escapeHtml(s){
     return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
   }
@@ -484,25 +552,22 @@
 
   document.addEventListener('click', (e)=>{
     const t = e.target;
-
     const openBtn = t.closest?.('.openPlayer');
     if (openBtn) {
       const url = openBtn.getAttribute('data-url');
       if (url) openPlayer(url);
       return;
     }
-
     if(t.matches('.upload')){ const slot = t.getAttribute('data-slot'); openSubmit(slot); return; }
     if(t.matches('[data-close-submit]')) { closeSubmit(); return; }
     if(t.matches('[data-close-player]')) { closePlayer(); return; }
-
     if(t.classList.contains('modal')){
       if(t.id==='submit-modal') closeSubmit();
       if(t.id==='player-modal') closePlayer();
     }
   });
 
-  // Submit flow (unchanged except for validator)
+  // Submit flow (same, with validator supporting twitch.tv/clip)
   (function(){
     const form=document.getElementById('submitForm');
     const status=document.getElementById('submitStatus');
@@ -514,7 +579,7 @@
         const parts = url.pathname.split('/').filter(Boolean).map(s=>s.toLowerCase());
         if (/youtube\.com|youtu\.be|streamable\.com/.test(h)) return true;
         if (h === 'clips.twitch.tv') return true;
-        if (h.endsWith('twitch.tv') && parts.includes('clip')) return true; // twitch.tv/clip/... or /{channel}/clip/...
+        if (h.endsWith('twitch.tv') && parts.includes('clip')) return true;
         return false;
       } catch { return false; }
     }
