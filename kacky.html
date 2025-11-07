@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kacky Finishes — Trackmania Events</title>
   <meta name="description" content="Upload and view Trackmania Kacky finish clips. Community submissions, moderated for quality." />
-  <!-- Helps Twitch/Streamable thumbs load -->
   <meta name="referrer" content="no-referrer" />
   <style>
     :root{--bg:#0a0f1a;--text:#e6ecff;--muted:#9bb0ff;--accent:#3aa0ff;--accent-2:#6dfbff;--border:rgba(109,251,255,.22);--accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)}
@@ -17,73 +16,25 @@
       color:var(--text);
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
-    }
-
-    /* ----- background ----- */
-    body.bg-track-curves{
       background:
         radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
         radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
         linear-gradient(180deg, #07101c, #0a0f1a 40%, #060a14 100%);
     }
-    body.bg-track-curves::before{
-      content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
-      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
-      background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.6;mix-blend-mode:screen;
-    }
-    body.bg-track-curves::after{
-      content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
-      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
-      background-size:280px 280px; animation:noiseShift 6s steps(2,end) infinite;
-    }
-    @keyframes noiseShift{50%{transform:translate3d(0,0,0)}50.01%{transform:translate3d(.5px,.5px,0)}}
-
-    /* ----- header ----- */
     header{
       background:linear-gradient(180deg, rgba(10,15,26,.92), rgba(10,15,26,.72) 60%, rgba(10,15,26,0));
       backdrop-filter:blur(8px);
       position:sticky; top:0; z-index:50;
       border-bottom:1px solid rgba(109,251,255,.18);
     }
-    .nav-container{
-      width:min(1200px,92vw); margin:0 auto;
-      display:flex; align-items:center; justify-content:space-between; padding:1rem 0;
-    }
-    .brand{
-      font-weight:800; font-size:1.1rem; letter-spacing:.3px; display:flex; align-items:center; gap:.5rem; color:var(--accent-2)
-    }
-    .btn{
-      padding:.6rem .95rem;
-      border:1px solid rgba(109,251,255,.25);
-      border-radius:12px;
-      background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));   color:var(--text);
-      font-weight:700;
-      transition:.2s;
-      text-decoration:none;
-    }
+    .nav-container{width:min(1200px,92vw); margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:1rem 0;}
+    .brand{font-weight:800; font-size:1.1rem; letter-spacing:.3px; display:flex; align-items:center; gap:.5rem; color:var(--accent-2)}
+    .btn{padding:.6rem .95rem; border:1px solid rgba(109,251,255,.25); border-radius:12px; background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6)); color:var(--text); font-weight:700; transition:.2s; text-decoration:none;}
     .btn:hover{transform:translateY(-1px) scale(1.02); filter:brightness(1.06)}
 
-    /* ----- layout ----- */
     .container{width:min(1200px,92vw);margin:0 auto;padding:1.4rem 0 2.2rem}
     h1{font-size:2rem;margin:.2rem 0 1rem;text-shadow:0 0 12px rgba(61,165,255,.25)}
     .hint{font-size:.95rem;color:var(--muted)}
-
-    .thumb-wrap{
-      position:relative; width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden;
-      background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6));
-      border:1px solid rgba(109,251,255,.18);
-    }
-    .thumb-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .play-badge{
-      position:absolute; inset:auto auto 10px 10px; padding:.35rem .55rem; border-radius:.5rem;
-      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.18); font-weight:800; font-size:.8rem;
-    }
-    .thumb-center{
-      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-      width:68px; height:68px; border-radius:999px; border:2px solid rgba(255,255,255,.25);
-      display:grid; place-items:center; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
-    }
-    .thumb-center::after{ content:"▶"; font-size:1.4rem; }
 
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
     .card{
@@ -98,37 +49,25 @@
     .card .slot{opacity:.85;font-size:.9rem;color:var(--muted)}
     .badge{display:inline-block;font-size:.75rem;padding:.25rem .5rem;border:1px solid rgba(255,255,255,.2);border-radius:.5rem;background:rgba(255,255,255,.06)}
     .row{display:flex;gap:.6rem;flex-wrap:wrap}
+    .input{width:100%;padding:.7rem .9rem;margin:.4rem 0;border-radius:10px;border:1px solid rgba(109,251,255,.25);background:#0c1224;color:#e6ecff;outline:none}
 
-    .btn{padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));color:var(--text);font-weight:700;transition:.2s}
-    .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
-
-    .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(109,251,255,.25);box-shadow:none}
-    .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;filter:none}
-    .input{
-      width:100%;padding:.7rem .9rem;margin:.4rem 0;border-radius:10px;border:1px solid rgba(109,251,255,.25);
-      background:#0c1224;color:#e6ecff;outline:none
-    }
-    .input:focus{border-color:var(--brand);box-shadow:var(--ring)}
-
-    .card iframe{width:100%;height:220px;border:0;border-radius:10px;background:#000}
+    .thumb-wrap{position:relative; width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden; background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6)); border:1px solid rgba(109,251,255,.18);}
+    .thumb-wrap img{width:100%; height:100%; object-fit:cover; display:block;}
+    .thumb-center{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:68px; height:68px; border-radius:999px; border:2px solid rgba(255,255,255,.25); display:grid; place-items:center; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);}
+    .thumb-center::after{ content:"▶"; font-size:1.4rem; }
+    .play-badge{position:absolute; inset:auto auto 10px 10px; padding:.35rem .55rem; border-radius:.5rem; background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.18); font-weight:800; font-size:.8rem;}
 
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100;padding:1rem}
     .modal.open{display:flex}
-    .modal-card{
-      background:rgba(15,21,36,.85);
-      border:1px solid rgba(109,251,255,.25);
-      border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 28px rgba(61,165,255,.25);
-      width:min(950px,94vw); max-height:90vh; overflow:auto; backdrop-filter:blur(12px) saturate(160%);
-    }
+    .modal-card{background:rgba(15,21,36,.85); border:1px solid rgba(109,251,255,.25); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 28px rgba(61,165,255,.25); width:min(950px,94vw); max-height:90vh; overflow:auto; backdrop-filter:blur(12px) saturate(160%);}
     .modal-head{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px dashed rgba(255,255,255,.12)}
     .modal-body{padding:1rem}
     .player-frame{aspect-ratio:16/9;width:100%;border:0;border-radius:12px;background:#000}
-
     .title-line{position:relative;display:inline-block}
     .title-line::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
   </style>
 </head>
-<body class="bg-track-curves">
+<body>
   <header>
     <div class="nav-container">
       <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
@@ -145,11 +84,12 @@
     <div id="clipsGrid" class="grid"></div>
   </div>
 
+  <!-- Submit modal -->
   <div class="modal" id="submit-modal" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-head">
         <strong>Submit Kacky Clip</strong>
-        <button class="btn ghost" data-close-submit>Close</button>
+        <button class="btn" data-close-submit>Close</button>
       </div>
       <div class="modal-body">
         <form id="submitForm">
@@ -157,10 +97,10 @@
             <input class="input" name="slot" id="slotField" type="number" min="376" max="450" placeholder="Slot # (376–450)" required />
             <input class="input" name="title" placeholder="Title" required />
           </div>
-          <input class="input" name="url" placeholder="Twitch (clip), YouTube, or Streamable URL" required />
+          <input class="input" name="url" placeholder="Twitch clip / YouTube / Streamable URL" required />
           <div class="row">
             <input class="input" name="map" placeholder="Map (optional)" />
-            <input class="input" name="thumb" placeholder="Thumbnail URL (optional)" />
+            <input class="input" name="thumb" placeholder="(optional) Override thumbnail URL" />
           </div>
           <input class="input" name="date" type="datetime-local" />
           <div class="row" style="align-items:center">
@@ -172,11 +112,12 @@
     </div>
   </div>
 
+  <!-- Player modal -->
   <div class="modal" id="player-modal" aria-hidden="true">
     <div class="modal-card" style="width:min(1280px,96vw)">
       <div class="modal-head">
         <strong>Player</strong>
-        <button class="btn ghost" data-close-player>Close</button>
+        <button class="btn" data-close-player>Close</button>
       </div>
       <div class="modal-body">
         <iframe id="playerFrame" class="player-frame" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -185,150 +126,76 @@
   </div>
 
 <script>
+  /* ---------- CONFIG ---------- */
+  // Put your images at /kacky-thumbs/376.jpg ... /kacky-thumbs/450.jpg
+  const KACKY_THUMB_BASE = "/kacky-thumbs/";   // change if you use another folder
+  const KACKY_THUMB_EXT  = "jpg";              // change to 'png' if needed
+
   /* ---------- Supabase ---------- */
   const SUPABASE_URL = "https://lertzsobphopkoyaxrwk.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
   const H = { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } };
 
-  /* ---------- small utils ---------- */
-  const $ = sel => document.querySelector(sel);
-  function normalizeUrl(raw){
-    if (!raw) return raw;
-    const hasScheme = /^[a-z]+:\/\//i.test(raw);
-    try { return new URL(hasScheme ? raw : `https://${raw}`).toString(); }
-    catch { return hasScheme ? raw : `https://${raw}`; }
+  /* ---------- Helpers ---------- */
+  function kackyThumbForSlot(slot){
+    return `${KACKY_THUMB_BASE}${slot}.${KACKY_THUMB_EXT}`;
   }
   function escapeHtml(s){
     return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
   }
-
-  /* ---------- provider parsing ---------- */
+  function normalizeUrl(raw){
+    if (!raw) return raw;
+    const has = /^[a-z]+:\/\//i.test(raw);
+    try { return new URL(has ? raw : `https://${raw}`).toString(); } catch { return has ? raw : `https://${raw}`; }
+  }
+  function twitchParents(){
+    const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
+    return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
+  }
   function extractYouTubeId(uLike){
     try{
-      const u = new URL(normalizeUrl(uLike));
-      const host = u.hostname.replace(/^www\./,'');
-      const path = u.pathname;
-      const qs = u.searchParams;
-      if ((/^(youtube\.com|m\.youtube\.com|music\.youtube\.com)$/).test(host) && qs.get('v')) return qs.get('v');
-      if (host === 'youtu.be') { const id = (path||'').slice(1).split('/')[0]; if (id) return id; }
-      const m = u.href.match(/(?:(?:v=|\/)([a-zA-Z0-9_-]{11}))(?:[&?/]|$)/) ||
-                path.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/) ||
-                path.match(/\/live\/([a-zA-Z0-9_-]{6,})/) ||
-                path.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
+      const u = new URL(normalizeUrl(uLike)); const h=u.hostname.replace(/^www\./,''); const p=u.pathname; const q=u.searchParams;
+      if ((/^(youtube\.com|m\.youtube\.com|music\.youtube\.com)$/).test(h) && q.get('v')) return q.get('v');
+      if (h==='youtu.be'){const id=(p||'').slice(1).split('/')[0]; if(id) return id;}
+      const m = u.href.match(/(?:(?:v=|\/)([a-zA-Z0-9_-]{11}))(?:[&?/]|$)/) || p.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/) || p.match(/\/live\/([a-zA-Z0-9_-]{6,})/) || p.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
       return m ? m[1] : null;
-    }catch{return null;}
+    }catch{ return null; }
   }
-
   function parseTwitchClipSlug(raw){
     try{
-      const u = new URL(/^[a-z]+:\/\//i.test(raw) ? raw : `https://${raw}`);
-      const host = u.hostname.replace(/^www\./,'').toLowerCase();
-      const parts = u.pathname.split('/').filter(Boolean);
-      if (host === 'clips.twitch.tv' && parts[0]) return parts[0];          // clips.twitch.tv/Slug
-      const idx = parts.findIndex(p => p.toLowerCase() === 'clip');         // twitch.tv/clip/Slug  or /{channel}/clip/Slug
-      if (idx !== -1 && parts[idx+1]) return parts[idx+1];
-      if (host === 'm.twitch.tv' && parts[0] === 'clip' && parts[1]) return parts[1];
+      const u=new URL(normalizeUrl(raw)); const host=u.hostname.replace(/^www\./,'').toLowerCase(); const parts=u.pathname.split('/').filter(Boolean);
+      if (host==='clips.twitch.tv' && parts[0]) return parts[0];
+      const idx = parts.findIndex(p=>p.toLowerCase()==='clip'); if (idx!==-1 && parts[idx+1]) return parts[idx+1];
+      if (host==='m.twitch.tv' && parts[0]==='clip' && parts[1]) return parts[1];
     }catch{}
     return null;
   }
   function getStreamableId(raw){
     try{
-      const u = new URL(normalizeUrl(raw));
-      if (u.hostname.replace(/^www\./,'').toLowerCase() !== 'streamable.com') return null;
-      const p = u.pathname.split('/').filter(Boolean);
-      return (p[0] === 'e' || p[0] === 'o') ? p[1] : p[0];
+      const u=new URL(normalizeUrl(raw)); const host=u.hostname.replace(/^www\./,'').toLowerCase(); if(host!=='streamable.com') return null;
+      const p=u.pathname.split('/').filter(Boolean); return (p[0]==='e'||p[0]==='o')?p[1]:p[0];
     }catch{}
     return null;
   }
-
-  /* ---------- embedders ---------- */
-  function twitchParents(){
-    const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
-    return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
-  }
   function buildEmbedURL(raw){
     try{
-      const u = new URL(normalizeUrl(raw));
-      const host = u.hostname.replace(/^www\./,'').toLowerCase();
-
-      const yid = extractYouTubeId(u);
-      if (yid) return `https://www.youtube.com/embed/${encodeURIComponent(yid)}?modestbranding=1&rel=0&playsinline=1`;
-
-      const tslug = parseTwitchClipSlug(u.toString());
-      if (tslug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(tslug)}&${twitchParents()}&autoplay=false`;
-
-      if (host === 'streamable.com') {
-        const id = getStreamableId(u.toString());
-        if (id) return `https://streamable.com/e/${encodeURIComponent(id)}`;
-      }
+      const u=new URL(normalizeUrl(raw)); const host=u.hostname.replace(/^www\./,'').toLowerCase();
+      const yid=extractYouTubeId(u); if (yid) return `https://www.youtube.com/embed/${encodeURIComponent(yid)}?modestbranding=1&rel=0&playsinline=1`;
+      const tslug=parseTwitchClipSlug(u.toString()); if (tslug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(tslug)}&${twitchParents()}&autoplay=false`;
+      if (host==='streamable.com'){ const id=getStreamableId(u.toString()); if(id) return `https://streamable.com/e/${encodeURIComponent(id)}`; }
       return u.toString();
     }catch{ return raw; }
   }
 
-  /* ---------- thumbnail resolvers (one-time, saved to DB) ---------- */
-  function normalizeTwitchThumb(u){
-    if (!u) return u;
-    if (u.startsWith('//')) u = 'https:' + u;
-    u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640').replace(/%7Bheight%7D|\{height\}/gi, '360');
-    if (/twitch|ttvthumb/i.test(u) && !/[?&]imwidth=\d+/.test(u)) u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
-    return u;
-  }
+  const PLACEHOLDER_SVG = `
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675' width="100%" height="100%">
+      <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#0f1524'/><stop offset='100%' stop-color='#101a2e'/></linearGradient></defs>
+      <rect width='1200' height='675' fill='url(#g)'/>
+      <circle cx='600' cy='337' r='56' fill='none' stroke='rgba(255,255,255,.22)' stroke-width='6'/>
+      <polygon points='580,305 630,337 580,369' fill='rgba(255,255,255,.65)'/>
+    </svg>`;
 
-  async function resolveThumb(url){
-    // YT quick
-    const yid = extractYouTubeId(url);
-    if (yid) return `https://i.ytimg.com/vi/${encodeURIComponent(yid)}/hqdefault.jpg`;
-
-    // Streamable quick
-    const sid = getStreamableId(url);
-    if (sid) return `https://cdn-cf-east.streamable.com/image/${encodeURIComponent(sid)}.jpg`;
-
-    // Twitch oEmbed
-    const slug = parseTwitchClipSlug(url);
-    if (slug){
-      try{
-        const o = await fetch(`https://clips.twitch.tv/oembed?url=${encodeURIComponent(`https://clips.twitch.tv/${slug}`)}`);
-        if (o.ok){
-          const j = await o.json();
-          if (j.thumbnail_url) return normalizeTwitchThumb(j.thumbnail_url);
-        }
-      }catch{}
-      // Scrape public pages via readonly proxy (CORS-free)
-      const pages = [
-        `https://clips.twitch.tv/${slug}`,
-        `https://clips.twitch.tv/embed?clip=${slug}`,
-        `https://m.twitch.tv/clip/${slug}`
-      ];
-      for (const p of pages){
-        try{
-          const prox = `https://r.jina.ai/https://${p.replace(/^https?:\/\//,'')}`;
-          const r = await fetch(prox);
-          if (!r.ok) continue;
-          const html = await r.text();
-          let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-          if (m?.[1]) return normalizeTwitchThumb(m[1]);
-          m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-          if (m?.[1]) return normalizeTwitchThumb(m[1]);
-          m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
-          if (m?.[1]) return normalizeTwitchThumb(m[1]);
-          m = html.match(/"thumbnail_url"\s*:\s*"([^"]+)"/i);
-          if (m?.[1]) return normalizeTwitchThumb(m[1]);
-        }catch{}
-      }
-    }
-
-    // Streamable oEmbed (slower, but sometimes different image)
-    if (sid){
-      try{
-        const r = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(url)}`);
-        if (r.ok){ const j = await r.json(); if (j.thumbnail_url) return j.thumbnail_url; }
-      }catch{}
-    }
-
-    return null;
-  }
-
-  /* ---------- data load ---------- */
+  /* ---------- Load & render ---------- */
   async function loadClips(){
     try{
       const [approvedRes, allRes] = await Promise.all([
@@ -339,8 +206,8 @@
       const all = await allRes.json();
       const occupied = new Set(all.map(r => Number(r.slot)));
       render(approved, occupied);
-    }catch(err){
-      console.error(err);
+    }catch(e){
+      console.error(e);
       document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
     }
   }
@@ -354,16 +221,6 @@
     }catch{}
     return 'Video';
   }
-
-  const PLACEHOLDER_SVG = `
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675' width="100%" height="100%">
-      <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-        <stop offset='0%' stop-color='#0f1524'/><stop offset='100%' stop-color='#101a2e'/>
-      </linearGradient></defs>
-      <rect width='1200' height='675' fill='url(#g)'/>
-      <circle cx='600' cy='337' r='56' fill='none' stroke='rgba(255,255,255,.22)' stroke-width='6'/>
-      <polygon points='580,305 630,337 580,369' fill='rgba(255,255,255,.65)'/>
-    </svg>`;
 
   function render(clips, occupied){
     const grid = document.getElementById('clipsGrid');
@@ -380,17 +237,20 @@
         const mapTxt = clip.map ? ` · ${escapeHtml(clip.map)}` : '';
         const plat = platformLabel(clip.url);
 
-        const src = clip.thumb ? clip.thumb : '';
+        const hardThumb = kackyThumbForSlot(i);
+        const overrideThumb = clip.thumb || null; // optional override in DB
+
         card.innerHTML = `
           <div class="slot">Slot ${i}${mapTxt}</div>
           <strong>${title}</strong>
+
           <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}">
-            ${src
-              ? `<img src="${src}" alt="${title}" loading="lazy" referrerpolicy="no-referrer">`
-              : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.9">${PLACEHOLDER_SVG}</div>`}
+            <img src="${hardThumb}" alt="${title}" loading="lazy"
+                 onerror="this.onerror=null; ${overrideThumb ? `this.src='${overrideThumb}'` : `this.outerHTML=\`<div style=&quot;width:100%;height:100%;display:grid;place-items:center;opacity:.9&quot;>${PLACEHOLDER_SVG}</div>\``}">
             <div class="thumb-center"></div>
             <span class="play-badge">${plat}</span>
           </button>
+
           <div class="row">
             <button class='btn openPlayer' data-url='${encodeURIComponent(embed)}'>View / Fullscreen</button>
           </div>
@@ -415,7 +275,7 @@
     }
   }
 
-  /* ---------- modals / player ---------- */
+  /* ---------- Modals / submit ---------- */
   const submitModal = document.getElementById('submit-modal');
   const playerModal = document.getElementById('player-modal');
   const slotField = document.getElementById('slotField');
@@ -423,7 +283,6 @@
 
   function openSubmit(slot){ if(slot){ slotField.value = slot; } submitModal.classList.add('open'); submitModal.setAttribute('aria-hidden','false'); }
   function closeSubmit(){ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true'); }
-
   function openPlayer(url){
     try{
       const u = new URL(decodeURIComponent(url));
@@ -437,14 +296,10 @@
   }
   function closePlayer(){ playerFrame.src = ''; playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true'); }
 
-  document.addEventListener('click', async (e)=>{
+  document.addEventListener('click', (e)=>{
     const t = e.target;
     const openBtn = t.closest?.('.openPlayer');
-    if (openBtn) {
-      const url = openBtn.getAttribute('data-url');
-      if (url) openPlayer(url);
-      return;
-    }
+    if (openBtn) { const url = openBtn.getAttribute('data-url'); if (url) openPlayer(url); return; }
     if(t.matches('.upload')){ const slot = t.getAttribute('data-slot'); openSubmit(slot); return; }
     if(t.matches('[data-close-submit]')) { closeSubmit(); return; }
     if(t.matches('[data-close-player]')) { closePlayer(); return; }
@@ -454,10 +309,9 @@
     }
   });
 
-  /* ---------- submit flow (now saves thumbnail to DB) ---------- */
   (function(){
-    const form=$("#submitForm");
-    const status=$("#submitStatus");
+    const form=document.getElementById('submitForm');
+    const status=document.getElementById('submitStatus');
 
     function isValidClipUrl(u){
       try{
@@ -479,40 +333,25 @@
 
       const fd = new FormData(form);
       const dateRaw = (fd.get('date')||'').toString().trim();
-      const url = (fd.get('url')||'').toString().trim();
-      const userThumb = (fd.get('thumb')||'').toString().trim();
-
       const payload = {
         title: (fd.get('title')||'').toString().trim(),
-        url,
+        url:   (fd.get('url')||'').toString().trim(),
         slot:  clampSlot(fd.get('slot')),
         map:   (fd.get('map')||'').toString().trim() || null,
-        thumb: userThumb || null,
+        thumb: (fd.get('thumb')||'').toString().trim() || null, // optional manual override
         date:  dateRaw ? new Date(dateRaw).toISOString() : null,
         approved: false
       };
 
       if(!isValidClipUrl(payload.url)){
-        status.textContent='Please enter a YouTube, Streamable, or Twitch *clip* URL (clips.twitch.tv or twitch.tv/clip/…).';
+        status.textContent='Please enter a YouTube, Streamable, or Twitch *clip* URL.';
         return;
       }
 
       try{
         const existsRes = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?slot=eq.${encodeURIComponent(payload.slot)}&select=slot`, H);
         const exists = await existsRes.json();
-        if(Array.isArray(exists) && exists.length){
-          status.textContent='❌ This slot already has a submission.';
-          return;
-        }
-      }catch{}
-
-      // **NEW**: resolve and save a thumbnail if user didn't provide one
-      try{
-        if (!payload.thumb){
-          status.textContent='Finding thumbnail…';
-          const t = await resolveThumb(payload.url);
-          if (t) payload.thumb = t;
-        }
+        if(Array.isArray(exists) && exists.length){ status.textContent='❌ This slot already has a submission.'; return; }
       }catch{}
 
       status.textContent='Sending…';
@@ -541,50 +380,9 @@
     });
   })();
 
-  /* ---------- admin backfill (quick repair for existing rows) ---------- */
-  async function backfillThumbs(){
-    const btn = document.getElementById('backfillThumbsBtn');
-    if (btn) btn.disabled = true;
-    try{
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?approved=eq.true&thumb=is.null&select=id,url`, H);
-      const rows = await r.json();
-      for (const row of rows){
-        try{
-          const t = await resolveThumb(row.url);
-          if (!t) continue;
-          await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?id=eq.${encodeURIComponent(row.id)}`, {
-            method:'PATCH',
-            headers: { 'Content-Type':'application/json', ...H.headers, Prefer:'return=minimal' },
-            body: JSON.stringify({ thumb: t })
-          });
-        }catch{}
-      }
-    }catch(e){ console.error(e); }
-    finally{
-      if (btn) btn.disabled = false;
-      loadClips();
-    }
-  }
-
-  // show a tiny backfill button only when ?admin=1 is in the URL
-  (function(){
-    const params = new URLSearchParams(location.search);
-    if (params.get('admin') === '1'){
-      const nav = document.querySelector('.nav-container > div:last-child');
-      if (nav){
-        const b = document.createElement('button');
-        b.id = 'backfillThumbsBtn';
-        b.className = 'btn';
-        b.textContent = 'Fix thumbnails';
-        b.style.marginLeft = '.5rem';
-        b.addEventListener('click', backfillThumbs);
-        nav.appendChild(b);
-      }
-    }
-  })();
-
-  // start
+  // kick off
   loadClips();
 </script>
+
 </body>
 </html>
