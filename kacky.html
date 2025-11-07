@@ -283,63 +283,68 @@
   }
 
   // Twitch clip: fetch og:image via read-only proxy (CORS-safe)
-  async function fetchTwitchClipThumb(raw){
-    try{
-      const u = new URL(raw);
-      const host = u.hostname.replace(/^www\./,'');
-      const isClip = host === 'clips.twitch.tv' || /\/clip\/[^/]+/i.test(u.pathname);
-      if (!isClip) return null;
+ async function fetchTwitchThumb(raw){
+  try{
+    const u = new URL(raw);
+    const host = u.hostname.replace(/^www\./,'');
+    if (!host.endsWith('twitch.tv')) return null;
 
-      // Preserve the real scheme (https:) and host/path
-      const scheme = u.protocol.replace(':','').toLowerCase(); // "https" or "http"
-      const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
-      const res = await fetch(proxied, { method:'GET' });
-      if (!res.ok) return null;
-      const html = await res.text();
+    // r.jina.ai/<scheme>://<host><path><query>
+    const scheme = u.protocol.replace(':','').toLowerCase(); // "https" or "http"
+    const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
 
-      // Parse <meta property="og:image" content="...">
-      let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-      if (!m || !m[1]) {
-        // Some clip pages expose JSON-LD with "thumbnailUrl"
-        m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
-      }
-      if (m && m[1]) return m[1];
-    }catch(e){}
+    const res = await fetch(proxied, { method:'GET' });
+    if (!res.ok) return null;
+    const html = await res.text();
+
+    // Try OpenGraph first
+    let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+    if (m && m[1]) return m[1];
+
+    // Then twitter:image
+    m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+    if (m && m[1]) return m[1];
+
+    // Some pages expose JSON-LD thumbnailUrl
+    m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
+    if (m && m[1]) return m[1];
+
     return null;
-  }
+  }catch(e){ return null; }
+}
 
   // General async fetcher used after render to hydrate missing thumbs
-  async function fetchPreviewURL(raw){
-    try{
-      const u = new URL(raw);
-      const host = u.hostname.replace(/^www\./,'');
+ async function fetchPreviewURL(raw){
+  try{
+    const u = new URL(raw);
+    const host = u.hostname.replace(/^www\./,'');
 
-      // YouTube: oEmbed
-      if (host.includes('youtube') || host === 'youtu.be') {
-        const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
-        if (res.ok) {
-          const j = await res.json();
-          if (j.thumbnail_url) return j.thumbnail_url;
-        }
+    // YouTube: oEmbed (reliable)
+    if (host.includes('youtube') || host === 'youtu.be') {
+      const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
+      if (res.ok) {
+        const j = await res.json();
+        if (j.thumbnail_url) return j.thumbnail_url;
       }
+    }
 
-      // Twitch clips: proxy OG scrape
-      if (host.includes('twitch.tv')) {
-        const t = await fetchTwitchClipThumb(raw);
-        if (t) return t;
-      }
+    // Twitch: works for clips AND videos now
+    if (host.endsWith('twitch.tv')) {
+      const t = await fetchTwitchThumb(raw);
+      if (t) return t;
+    }
 
-      // Streamable: oEmbed
-      if (host === 'streamable.com') {
-        const res = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
-        if (res.ok) {
-          const j = await res.json();
-          if (j.thumbnail_url) return j.thumbnail_url;
-        }
+    // Streamable: oEmbed
+    if (host === 'streamable.com') {
+      const res = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
+      if (res.ok) {
+        const j = await res.json();
+        if (j.thumbnail_url) return j.thumbnail_url;
       }
-    }catch(e){}
-    return null;
-  }
+    }
+  }catch(e){}
+  return null;
+}
 
   function platformLabel(raw){
     try{
