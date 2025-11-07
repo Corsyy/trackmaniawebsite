@@ -201,35 +201,20 @@
       const u = new URL(raw);
       const host = u.hostname.replace(/^www\./,'');
 
+      // YouTube
       const yid = extractYouTubeId(u);
       if (yid) return `https://www.youtube.com/embed/${encodeURIComponent(yid)}?modestbranding=1&rel=0&playsinline=1`;
 
-      // Twitch clip / video / channel
+      // Twitch CLIP ONLY
       if (host === 'clips.twitch.tv') {
         const slug = u.pathname.split('/').filter(Boolean)[0];
         if (slug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&${twitchParents()}&autoplay=false`;
-      }
-      if (host.endsWith('twitch.tv')) {
-        const parts = u.pathname.split('/').filter(Boolean);
-        const clipIdx = parts.indexOf('clip');
-        if (clipIdx >= 0 && parts[clipIdx+1]) {
-          const slug = parts[clipIdx+1];
-          return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&${twitchParents()}&autoplay=false`;
-        }
-        const vIdx = parts.indexOf('videos');
-        if (vIdx >= 0 && parts[vIdx+1]) {
-          return `https://player.twitch.tv/?video=${encodeURIComponent(parts[vIdx+1])}&${twitchParents()}&autoplay=false`;
-        }
-        if (parts[0]) {
-          return `https://player.twitch.tv/?channel=${encodeURIComponent(parts[0])}&${twitchParents()}&autoplay=false`;
-        }
       }
 
       // Streamable
       if (host === 'streamable.com') {
         const parts = u.pathname.split('/').filter(Boolean);
-        let id = null;
-        if (parts[0] === 'e' || parts[0] === 'o') id = parts[1]; else id = parts[0];
+        const id = (parts[0] === 'e' || parts[0] === 'o') ? parts[1] : parts[0];
         if (id) return `https://streamable.com/e/${encodeURIComponent(id)}`;
       }
 
@@ -244,9 +229,7 @@
       const path = u.pathname;
       const qs = u.searchParams;
 
-      if ((host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') && qs.get('v')) {
-        return qs.get('v');
-      }
+      if ((host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') && qs.get('v')) return qs.get('v');
       if (host === 'youtu.be') {
         const id = (path || '').slice(1).split('/')[0];
         if (id) return id;
@@ -265,7 +248,7 @@
   }
 
   // --- Thumbnail helpers ---
-  // Synchronous guess (no network): YT + Streamable
+  // Synchronous (no network): YT + Streamable
   function buildPreviewURLSync(raw){
     try{
       const u = new URL(raw);
@@ -279,72 +262,72 @@
         if (id) return `https://cdn-cf-east.streamable.com/image/${encodeURIComponent(id)}.jpg`;
       }
     }catch(e){}
-    return null; // Twitch clip needs async fetch
+    return null; // Twitch clips handled async
   }
 
-  // Twitch clip: fetch og:image via read-only proxy (CORS-safe)
- async function fetchTwitchThumb(raw){
-  try{
-    const u = new URL(raw);
-    const host = u.hostname.replace(/^www\./,'');
-    if (!host.endsWith('twitch.tv')) return null;
+  // Normalize Twitch {width}x{height} thumbnail URLs
+  function normalizeTwitchThumb(u){
+    if (!u) return u;
+    u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640')
+         .replace(/%7Bheight%7D|\{height\}/gi, '360');
+    if (/ttvthumb|twitch/.test(u) && !/[?&]imwidth=\d+/.test(u)) {
+      u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
+    }
+    return u;
+  }
 
-    // r.jina.ai/<scheme>://<host><path><query>
-    const scheme = u.protocol.replace(':','').toLowerCase(); // "https" or "http"
-    const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
+  // Twitch (CLIPS pages): fetch og/twitter image via read-only proxy then normalize
+  async function fetchTwitchThumb(raw){
+    try{
+      const u = new URL(raw);
+      const host = u.hostname.replace(/^www\./,'');
+      if (host !== 'clips.twitch.tv') return null;
 
-    const res = await fetch(proxied, { method:'GET' });
-    if (!res.ok) return null;
-    const html = await res.text();
+      const scheme = u.protocol.replace(':','').toLowerCase();
+      const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
+      const res = await fetch(proxied, { method:'GET' });
+      if (!res.ok) return null;
+      const html = await res.text();
 
-    // Try OpenGraph first
-    let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-    if (m && m[1]) return m[1];
+      let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+      if (m && m[1]) return normalizeTwitchThumb(m[1]);
 
-    // Then twitter:image
-    m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-    if (m && m[1]) return m[1];
+      m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+      if (m && m[1]) return normalizeTwitchThumb(m[1]);
 
-    // Some pages expose JSON-LD thumbnailUrl
-    m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
-    if (m && m[1]) return m[1];
+      m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
+      if (m && m[1]) return normalizeTwitchThumb(m[1]);
 
-    return null;
-  }catch(e){ return null; }
-}
+      return null;
+    }catch(e){ return null; }
+  }
 
   // General async fetcher used after render to hydrate missing thumbs
- async function fetchPreviewURL(raw){
-  try{
-    const u = new URL(raw);
-    const host = u.hostname.replace(/^www\./,'');
+  async function fetchPreviewURL(raw){
+    try{
+      const u = new URL(raw);
+      const host = u.hostname.replace(/^www\./,'');
 
-    // YouTube: oEmbed (reliable)
-    if (host.includes('youtube') || host === 'youtu.be') {
-      const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
-      if (res.ok) {
-        const j = await res.json();
-        if (j.thumbnail_url) return j.thumbnail_url;
+      // YouTube: oEmbed
+      if (host.includes('youtube') || host === 'youtu.be') {
+        const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
+        if (res.ok) { const j = await res.json(); if (j.thumbnail_url) return j.thumbnail_url; }
       }
-    }
 
-    // Twitch: works for clips AND videos now
-    if (host.endsWith('twitch.tv')) {
-      const t = await fetchTwitchThumb(raw);
-      if (t) return t;
-    }
-
-    // Streamable: oEmbed
-    if (host === 'streamable.com') {
-      const res = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
-      if (res.ok) {
-        const j = await res.json();
-        if (j.thumbnail_url) return j.thumbnail_url;
+      // Twitch CLIPS
+      if (host === 'clips.twitch.tv') {
+        const t = await fetchTwitchThumb(raw);
+        if (t) return t;
       }
-    }
-  }catch(e){}
-  return null;
-}
+
+      // Streamable: oEmbed
+      if (host === 'streamable.com') {
+        const res = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
+        if (res.ok) { const j = await res.json(); if (j.thumbnail_url) return j.thumbnail_url; }
+      }
+    }catch(e){}
+    return null;
+  }
 
   function platformLabel(raw){
     try{
@@ -367,7 +350,7 @@
       const all = await allRes.json();
       const occupied = new Set(all.map(r => Number(r.slot)));
       render(approved, occupied);
-      hydrateThumbnails(); // async fill-ins (esp. Twitch clips)
+      hydrateThumbnails(); // async fill-ins (Twitch clips)
     }catch(err){
       console.error(err);
       document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
@@ -406,9 +389,9 @@
           </button>
 
           <div class="row">
-  <button class='btn openPlayer' data-url='${encodeURIComponent(embed)}'>View / Fullscreen</button>
-</div>
-`;
+            <button class='btn openPlayer' data-url='${encodeURIComponent(embed)}'>View / Fullscreen</button>
+          </div>
+        `;
       } else if(isOccupied){
         card.innerHTML = `
           <div class="slot">Slot ${i}</div>
@@ -428,48 +411,6 @@
       grid.appendChild(card);
     }
   }
-  function normalizeTwitchThumb(u){
-  if (!u) return u;
-  // turn {width} / {height} (or URL-encoded) into 640x360
-  u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640')
-       .replace(/%7Bheight%7D|\{height\}/gi, '360');
-
-  // Some thumbs use a query param imwidth - ensure it's present
-  if (/ttvthumb|twitch/.test(u) && !/[?&]imwidth=\d+/.test(u)) {
-    u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
-  }
-  return u;
-}
-
-// Twitch (clips or VOD pages): read HTML and grab og/twitter image, then normalize
-async function fetchTwitchThumb(raw){
-  try{
-    const u = new URL(raw);
-    const host = u.hostname.replace(/^www\./,'');
-    if (!host.endsWith('twitch.tv')) return null;
-
-    const scheme = u.protocol.replace(':','').toLowerCase(); // "https" or "http"
-    const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
-
-    const res = await fetch(proxied, { method:'GET' });
-    if (!res.ok) return null;
-    const html = await res.text();
-
-    // Try OpenGraph
-    let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-    if (m && m[1]) return normalizeTwitchThumb(m[1]);
-
-    // Try twitter:image
-    m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-    if (m && m[1]) return normalizeTwitchThumb(m[1]);
-
-    // JSON-LD thumbnailUrl
-    m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
-    if (m && m[1]) return normalizeTwitchThumb(m[1]);
-
-    return null;
-  }catch(e){ return null; }
-}
 
   // After render, fetch thumbnails we couldn’t derive synchronously (Twitch clips etc.)
   async function hydrateThumbnails(){
@@ -553,10 +494,13 @@ async function fetchTwitchThumb(raw){
     const form=document.getElementById('submitForm');
     const status=document.getElementById('submitStatus');
 
+    // Allow: YouTube, Streamable, Twitch CLIPS only
     function isValidClipUrl(u){
       try{
-        const h=new URL(u).hostname;
-        return /twitch\.tv|youtube\.com|youtu\.be|streamable\.com/i.test(h);
+        const h=new URL(u).hostname.replace(/^www\./,'');
+        if (/youtube\.com|youtu\.be|streamable\.com/i.test(h)) return true;
+        if (h === 'clips.twitch.tv') return true;
+        return false;
       } catch { return false; }
     }
 
@@ -579,7 +523,7 @@ async function fetchTwitchThumb(raw){
       };
 
       if(!isValidClipUrl(payload.url)){
-        status.textContent='Please enter a Twitch, YouTube, or Streamable URL.';
+        status.textContent='Please enter a YouTube, Streamable, or Twitch *clip* URL (clips.twitch.tv).';
         return;
       }
 
@@ -621,5 +565,6 @@ async function fetchTwitchThumb(raw){
   // Initial load
   loadClips();
 </script>
+
 </body>
 </html>
