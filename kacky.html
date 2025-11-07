@@ -428,6 +428,48 @@
       grid.appendChild(card);
     }
   }
+  function normalizeTwitchThumb(u){
+  if (!u) return u;
+  // turn {width} / {height} (or URL-encoded) into 640x360
+  u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640')
+       .replace(/%7Bheight%7D|\{height\}/gi, '360');
+
+  // Some thumbs use a query param imwidth - ensure it's present
+  if (/ttvthumb|twitch/.test(u) && !/[?&]imwidth=\d+/.test(u)) {
+    u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
+  }
+  return u;
+}
+
+// Twitch (clips or VOD pages): read HTML and grab og/twitter image, then normalize
+async function fetchTwitchThumb(raw){
+  try{
+    const u = new URL(raw);
+    const host = u.hostname.replace(/^www\./,'');
+    if (!host.endsWith('twitch.tv')) return null;
+
+    const scheme = u.protocol.replace(':','').toLowerCase(); // "https" or "http"
+    const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
+
+    const res = await fetch(proxied, { method:'GET' });
+    if (!res.ok) return null;
+    const html = await res.text();
+
+    // Try OpenGraph
+    let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+    if (m && m[1]) return normalizeTwitchThumb(m[1]);
+
+    // Try twitter:image
+    m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+    if (m && m[1]) return normalizeTwitchThumb(m[1]);
+
+    // JSON-LD thumbnailUrl
+    m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
+    if (m && m[1]) return normalizeTwitchThumb(m[1]);
+
+    return null;
+  }catch(e){ return null; }
+}
 
   // After render, fetch thumbnails we couldn’t derive synchronously (Twitch clips etc.)
   async function hydrateThumbnails(){
