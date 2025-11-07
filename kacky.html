@@ -379,7 +379,7 @@
 
           <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}"
                   ${needsAsync ? `data-thumb-src-needed="1" data-raw-url="${encodeURIComponent(clip.url)}"` : ''}>
-            ${syncThumb ? `<img src="${syncThumb}" alt="${title}" loading="lazy" referrerpolicy="no-referrer">`
+           ${syncThumb ? `<img src="${proxifyIfTwitch(syncThumb)}" alt="${title}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous">`
                         : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.7">Loading preview…</div>`}
             <div class="thumb-center"></div>
             <span class="play-badge">${plat}</span>
@@ -422,11 +422,15 @@
       if (imgUrl) {
         wrap.querySelectorAll('div').forEach(d => { if (d.textContent?.includes('Loading preview')) d.remove(); });
         const img = document.createElement('img');
-        img.alt = 'Clip preview';
-        img.loading = 'lazy';
-        img.referrerPolicy = 'no-referrer';   // important for Twitch CDN
-        img.src = imgUrl;
-        wrap.prepend(img);
+img.alt = 'Clip preview';
+img.loading = 'lazy';
+img.referrerPolicy = 'no-referrer';
+img.crossOrigin = 'anonymous';
+
+// If it's a Twitch/TTV URL, proxy it so it *always* loads
+img.src = proxifyIfTwitch(imgUrl);
+
+wrap.prepend(img);
       }
       wrap.removeAttribute('data-thumb-src-needed');
       wrap.removeAttribute('data-raw-url');
@@ -498,6 +502,17 @@
         return false;
       } catch { return false; }
     }
+    function proxifyIfTwitch(url){
+  if(!url) return url;
+  try{
+    const h = new URL(url).hostname.toLowerCase();
+    if (h.includes('twitch') || h.includes('ttvthumb')) {
+      // Proxy the actual image bytes to bypass referrer/CDN issues
+      return `https://r.jina.ai/${url.startsWith('https://') ? 'https://' : url.startsWith('http://') ? 'http://' : ''}${url.replace(/^https?:\/\//,'')}`;
+    }
+  }catch(e){}
+  return url;
+}
 
     function clampSlot(n){ n=Number(n||0); return Math.min(450, Math.max(376, n)); }
 
