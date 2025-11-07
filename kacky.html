@@ -17,20 +17,18 @@
       -moz-osx-font-smoothing:grayscale;
     }
 
-    
+    /* ----- background ----- */
     body.bg-track-curves{
       background:
         radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
         radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
         linear-gradient(180deg, #07101c, #0a0f1a 40%, #060a14 100%);
     }
-    
     body.bg-track-curves::before{
       content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
       background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
       background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.6;mix-blend-mode:screen;
     }
-    
     body.bg-track-curves::after{
       content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
       background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
@@ -38,7 +36,7 @@
     }
     @keyframes noiseShift{50%{transform:translate3d(0,0,0)}50.01%{transform:translate3d(.5px,.5px,0)}}
 
-    
+    /* ----- header ----- */
     header{
       background:linear-gradient(180deg, rgba(10,15,26,.92), rgba(10,15,26,.72) 60%, rgba(10,15,26,0));
       backdrop-filter:blur(8px);
@@ -63,27 +61,27 @@
     }
     .btn:hover{transform:translateY(-1px) scale(1.02); filter:brightness(1.06)}
 
-    
+    /* ----- layout ----- */
     .container{width:min(1200px,92vw);margin:0 auto;padding:1.4rem 0 2.2rem}
     h1{font-size:2rem;margin:.2rem 0 1rem;text-shadow:0 0 12px rgba(61,165,255,.25)}
     .hint{font-size:.95rem;color:var(--muted)}
 
     .thumb-wrap{
-  position:relative; width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden;
-  background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6));
-  border:1px solid rgba(109,251,255,.18);
-}
-.thumb-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
-.play-badge{
-  position:absolute; inset:auto auto 10px 10px; padding:.35rem .55rem; border-radius:.5rem;
-  background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.18); font-weight:800; font-size:.8rem;
-}
-.thumb-center{
-  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  width:68px; height:68px; border-radius:999px; border:2px solid rgba(255,255,255,.25);
-  display:grid; place-items:center; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
-}
-.thumb-center::after{ content:"▶"; font-size:1.4rem; }
+      position:relative; width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden;
+      background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6));
+      border:1px solid rgba(109,251,255,.18);
+    }
+    .thumb-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .play-badge{
+      position:absolute; inset:auto auto 10px 10px; padding:.35rem .55rem; border-radius:.5rem;
+      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.18); font-weight:800; font-size:.8rem;
+    }
+    .thumb-center{
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      width:68px; height:68px; border-radius:999px; border:2px solid rgba(255,255,255,.25);
+      display:grid; place-items:center; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
+    }
+    .thumb-center::after{ content:"▶"; font-size:1.4rem; }
 
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
     .card{
@@ -157,7 +155,7 @@
             <input class="input" name="slot" id="slotField" type="number" min="376" max="450" placeholder="Slot # (376–450)" required />
             <input class="input" name="title" placeholder="Title" required />
           </div>
-          <input class="input" name="url" placeholder="Twitch, YouTube, or Streamable URL" required />
+          <input class="input" name="url" placeholder="Twitch (clip), YouTube, or Streamable URL" required />
           <div class="row">
             <input class="input" name="map" placeholder="Map (optional)" />
             <input class="input" name="thumb" placeholder="Thumbnail URL (optional)" />
@@ -190,10 +188,41 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
   const H = { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } };
 
-  // --- Embed helpers ---
+  /* ---------- EMBED & THUMB HELPERS (updated) ---------- */
+
   function twitchParents(){
     const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
     return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
+  }
+
+  function extractYouTubeId(u){
+    try{
+      const host = u.hostname.replace(/^www\./,'');
+      const path = u.pathname;
+      const qs = u.searchParams;
+      if ((host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') && qs.get('v')) return qs.get('v');
+      if (host === 'youtu.be') { const id = (path||'').slice(1).split('/')[0]; if (id) return id; }
+      const m = u.href.match(/(?:(?:v=|\/)([a-zA-Z0-9_-]{11}))(?:[&?/]|$)/) ||
+                path.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/) ||
+                path.match(/\/live\/([a-zA-Z0-9_-]{6,})/) ||
+                path.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
+      if (m) return m[1];
+    }catch(e){}
+    return null;
+  }
+
+  function parseTwitchClipSlug(raw){
+    try{
+      const u = new URL(raw);
+      const host = u.hostname.replace(/^www\./,'');
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (host === 'clips.twitch.tv' && parts.length >= 1) return parts[0];
+      if (host.endsWith('twitch.tv')) {
+        const idx = parts.findIndex(p => p.toLowerCase() === 'clip');
+        if (idx !== -1 && parts[idx+1]) return parts[idx+1];
+      }
+    }catch(e){}
+    return null;
   }
 
   function buildEmbedURL(raw){
@@ -201,17 +230,12 @@
       const u = new URL(raw);
       const host = u.hostname.replace(/^www\./,'');
 
-      // YouTube
       const yid = extractYouTubeId(u);
       if (yid) return `https://www.youtube.com/embed/${encodeURIComponent(yid)}?modestbranding=1&rel=0&playsinline=1`;
 
-      // Twitch CLIP ONLY
-      if (host === 'clips.twitch.tv') {
-        const slug = u.pathname.split('/').filter(Boolean)[0];
-        if (slug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&${twitchParents()}&autoplay=false`;
-      }
+      const tslug = parseTwitchClipSlug(raw);
+      if (tslug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(tslug)}&${twitchParents()}&autoplay=false`;
 
-      // Streamable
       if (host === 'streamable.com') {
         const parts = u.pathname.split('/').filter(Boolean);
         const id = (parts[0] === 'e' || parts[0] === 'o') ? parts[1] : parts[0];
@@ -222,33 +246,6 @@
     }catch(e){ return raw; }
   }
 
-  // ---- Robust YouTube ID extractor ----
-  function extractYouTubeId(u){
-    try{
-      const host = u.hostname.replace(/^www\./,'');
-      const path = u.pathname;
-      const qs = u.searchParams;
-
-      if ((host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') && qs.get('v')) return qs.get('v');
-      if (host === 'youtu.be') {
-        const id = (path || '').slice(1).split('/')[0];
-        if (id) return id;
-      }
-      const shorts = path.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
-      if (shorts) return shorts[1];
-      const live = path.match(/\/live\/([a-zA-Z0-9_-]{6,})/);
-      if (live) return live[1];
-      const embed = path.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
-      if (embed) return embed[1];
-
-      const m = u.href.match(/(?:(?:v=|\/)([a-zA-Z0-9_-]{11}))(?:[&?/]|$)/);
-      if (m) return m[1];
-    }catch(e){}
-    return null;
-  }
-
-  // --- Thumbnail helpers ---
-  // Synchronous (no network): YT + Streamable
   function buildPreviewURLSync(raw){
     try{
       const u = new URL(raw);
@@ -262,84 +259,73 @@
         if (id) return `https://cdn-cf-east.streamable.com/image/${encodeURIComponent(id)}.jpg`;
       }
     }catch(e){}
-    return null; // Twitch clips handled async
+    return null;
   }
 
-  // Normalize Twitch {width}x{height} thumbnail URLs
- // --- helpers ---
-function normalizeTwitchThumb(u){
-  if (!u) return u;
-  // protocol-relative -> https
-  if (u.startsWith('//')) u = 'https:' + u;
-  // replace Twitch template tokens
-  u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640')
-       .replace(/%7Bheight%7D|\{height\}/gi, '360');
-  // ensure a sane width hint
-  if (/twitch|ttvthumb/i.test(u) && !/[?&]imwidth=\d+/.test(u)) {
-    u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
+  function normalizeTwitchThumb(u){
+    if (!u) return u;
+    if (u.startsWith('//')) u = 'https:' + u;
+    u = u.replace(/%7Bwidth%7D|\{width\}/gi, '640')
+         .replace(/%7Bheight%7D|\{height\}/gi, '360');
+    if (/twitch|ttvthumb/i.test(u) && !/[?&]imwidth=\d+/.test(u)) {
+      u += (u.includes('?') ? '&' : '?') + 'imwidth=640';
+    }
+    return u;
   }
-  return u;
-}
 
-// Prefer oEmbed for clips.twitch.tv, then fallback to OG scraping via r.jina.ai
-async function fetchTwitchThumb(raw){
-  try{
-    const u = new URL(raw);
-    const host = u.hostname.replace(/^www\./,'');
-    if (host !== 'clips.twitch.tv') return null;
+  async function fetchTwitchThumb(raw){
+    const slug = parseTwitchClipSlug(raw);
+    if (!slug) return null;
 
-    // 1) oEmbed (most reliable, CORS-friendly)
-    // https://clips.twitch.tv/oembed?url=<clipUrl>
-    const oe = await fetch(`https://clips.twitch.tv/oembed?url=${encodeURIComponent(raw)}`);
-    if (oe.ok){
-      const j = await oe.json();
-      if (j.thumbnail_url) return normalizeTwitchThumb(j.thumbnail_url);
-    }
+    const canonical = `https://clips.twitch.tv/${encodeURIComponent(slug)}`;
 
-    // 2) Fallback: scrape OG/Twitter image through read-only proxy
-    const scheme = u.protocol.replace(':','').toLowerCase();
-    const proxied = `https://r.jina.ai/${scheme}://${u.host}${u.pathname}${u.search}`;
-    const res = await fetch(proxied, { method:'GET' });
-    if (!res.ok) return null;
-    const html = await res.text();
+    try{
+      const resp = await fetch(`https://clips.twitch.tv/oembed?url=${encodeURIComponent(canonical)}`);
+      if (resp.ok){
+        const j = await resp.json();
+        if (j.thumbnail_url) return normalizeTwitchThumb(j.thumbnail_url);
+      }
+    }catch(e){/* continue to fallback */ }
 
-    let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
-    if (m && m[1]) return normalizeTwitchThumb(m[1]);
-    m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-    if (m && m[1]) return normalizeTwitchThumb(m[1]);
-    m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
-    if (m && m[1]) return normalizeTwitchThumb(m[1]);
-  }catch(e){}
-  return null;
-}
+    try{
+      const proxied = `https://r.jina.ai/https://clips.twitch.tv/${encodeURIComponent(slug)}`;
+      const res = await fetch(proxied, { method:'GET' });
+      if (!res.ok) return null;
+      const html = await res.text();
 
-// Resolve a preview URL for anything we couldn't do synchronously
-async function fetchPreviewURL(raw){
-  try{
-    const u = new URL(raw);
-    const host = u.hostname.replace(/^www\./,'');
+      let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+      if (m?.[1]) return normalizeTwitchThumb(m[1]);
+      m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+      if (m?.[1]) return normalizeTwitchThumb(m[1]);
+      m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
+      if (m?.[1]) return normalizeTwitchThumb(m[1]);
+    }catch(e){}
 
-    // YouTube
-    if (host.includes('youtube') || host === 'youtu.be'){
-      const r = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
-      if (r.ok){ const j = await r.json(); if (j.thumbnail_url) return j.thumbnail_url; }
-    }
+    return null;
+  }
 
-    // Twitch CLIPS
-    if (host === 'clips.twitch.tv'){
-      const t = await fetchTwitchThumb(raw);
-      if (t) return t;
-    }
+  async function fetchPreviewURL(raw){
+    try{
+      const u = new URL(raw);
+      const host = u.hostname.replace(/^www\./,'');
 
-    // Streamable
-    if (host === 'streamable.com'){
-      const r = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
-      if (r.ok){ const j = await r.json(); if (j.thumbnail_url) return j.thumbnail_url; }
-    }
-  }catch(e){}
-  return null;
-}
+      if (host.includes('youtube') || host === 'youtu.be'){
+        const r = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(raw)}&format=json`);
+        if (r.ok){ const j = await r.json(); if (j.thumbnail_url) return j.thumbnail_url; }
+      }
 
+      if (host === 'clips.twitch.tv' || host.endsWith('twitch.tv')){
+        const t = await fetchTwitchThumb(raw);
+        if (t) return t;
+      }
+
+      if (host === 'streamable.com'){
+        const r = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(raw)}`);
+        if (r.ok){ const j = await r.json(); if (j.thumbnail_url) return j.thumbnail_url; }
+      }
+    }catch(e){}
+    return null;
+  }
 
   function platformLabel(raw){
     try{
@@ -351,7 +337,7 @@ async function fetchPreviewURL(raw){
     return 'Video';
   }
 
-  // --- Data load ---
+  /* ---------- Data load & render ---------- */
   async function loadClips(){
     try{
       const [approvedRes, allRes] = await Promise.all([
@@ -362,14 +348,13 @@ async function fetchPreviewURL(raw){
       const all = await allRes.json();
       const occupied = new Set(all.map(r => Number(r.slot)));
       render(approved, occupied);
-      hydrateThumbnails(); // async fill-ins (Twitch clips)
+      hydrateThumbnails();
     }catch(err){
       console.error(err);
       document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
     }
   }
 
-  // --- Render grid with thumbnails (no iframes here) ---
   function render(clips, occupied){
     const grid = document.getElementById('clipsGrid');
     grid.innerHTML = '';
@@ -394,7 +379,7 @@ async function fetchPreviewURL(raw){
 
           <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}"
                   ${needsAsync ? `data-thumb-src-needed="1" data-raw-url="${encodeURIComponent(clip.url)}"` : ''}>
-            ${syncThumb ? `<img src="${syncThumb}" alt="${title}" loading="lazy">`
+            ${syncThumb ? `<img src="${syncThumb}" alt="${title}" loading="lazy" referrerpolicy="no-referrer">`
                         : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.7">Loading preview…</div>`}
             <div class="thumb-center"></div>
             <span class="play-badge">${plat}</span>
@@ -424,7 +409,6 @@ async function fetchPreviewURL(raw){
     }
   }
 
-  // After render, fetch thumbnails we couldn’t derive synchronously (Twitch clips etc.)
   async function hydrateThumbnails(){
     const wraps = [...document.querySelectorAll('.thumb-wrap[data-thumb-src-needed="1"]')];
     if (!wraps.length) return;
@@ -440,6 +424,7 @@ async function fetchPreviewURL(raw){
         const img = document.createElement('img');
         img.alt = 'Clip preview';
         img.loading = 'lazy';
+        img.referrerPolicy = 'no-referrer';   // important for Twitch CDN
         img.src = imgUrl;
         wrap.prepend(img);
       }
@@ -448,12 +433,11 @@ async function fetchPreviewURL(raw){
     }));
   }
 
-  // --- Utils ---
+  /* ---------- Utils & wiring ---------- */
   function escapeHtml(s){
     return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
   }
 
-  // --- Modals / player wiring ---
   const submitModal = document.getElementById('submit-modal');
   const playerModal = document.getElementById('player-modal');
   const slotField = document.getElementById('slotField');
@@ -473,12 +457,10 @@ async function fetchPreviewURL(raw){
         if (!u.searchParams.has('autoplay')) u.searchParams.set('autoplay','1'); url = u.toString();
       }
     }catch(e){}
-
     playerFrame.src = url;
     playerModal.classList.add('open');
     playerModal.setAttribute('aria-hidden','false');
   }
-
   function closePlayer(){ playerFrame.src = ''; playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true'); }
 
   document.addEventListener('click', (e)=>{
@@ -501,17 +483,18 @@ async function fetchPreviewURL(raw){
     }
   });
 
-  // --- Submit flow ---
   (function(){
     const form=document.getElementById('submitForm');
     const status=document.getElementById('submitStatus');
 
-    // Allow: YouTube, Streamable, Twitch CLIPS only
     function isValidClipUrl(u){
       try{
-        const h=new URL(u).hostname.replace(/^www\./,'');
-        if (/youtube\.com|youtu\.be|streamable\.com/i.test(h)) return true;
+        const url = new URL(u);
+        const h = url.hostname.replace(/^www\./,'').toLowerCase();
+        const parts = url.pathname.split('/').filter(Boolean).map(s=>s.toLowerCase());
+        if (/youtube\.com|youtu\.be|streamable\.com/.test(h)) return true;
         if (h === 'clips.twitch.tv') return true;
+        if (h.endsWith('twitch.tv') && parts.includes('clip')) return true; // twitch.tv/clip/... or /{channel}/clip/...
         return false;
       } catch { return false; }
     }
@@ -535,7 +518,7 @@ async function fetchPreviewURL(raw){
       };
 
       if(!isValidClipUrl(payload.url)){
-        status.textContent='Please enter a YouTube, Streamable, or Twitch *clip* URL (clips.twitch.tv).';
+        status.textContent='Please enter a YouTube, Streamable, or Twitch *clip* URL (clips.twitch.tv or twitch.tv/clip/…).';
         return;
       }
 
