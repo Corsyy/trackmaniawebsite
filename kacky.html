@@ -190,19 +190,19 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
   const H = { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } };
 
-  /* ---------- Helpers ---------- */
+  /* ---------- small utils ---------- */
+  const $ = sel => document.querySelector(sel);
   function normalizeUrl(raw){
     if (!raw) return raw;
     const hasScheme = /^[a-z]+:\/\//i.test(raw);
     try { return new URL(hasScheme ? raw : `https://${raw}`).toString(); }
     catch { return hasScheme ? raw : `https://${raw}`; }
   }
-
-  function twitchParents(){
-    const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
-    return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
+  function escapeHtml(s){
+    return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
   }
 
+  /* ---------- provider parsing ---------- */
   function extractYouTubeId(uLike){
     try{
       const u = new URL(normalizeUrl(uLike));
@@ -216,7 +216,7 @@
                 path.match(/\/live\/([a-zA-Z0-9_-]{6,})/) ||
                 path.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
       return m ? m[1] : null;
-    }catch{ return null; }
+    }catch{return null;}
   }
 
   function parseTwitchClipSlug(raw){
@@ -224,20 +224,13 @@
       const u = new URL(/^[a-z]+:\/\//i.test(raw) ? raw : `https://${raw}`);
       const host = u.hostname.replace(/^www\./,'').toLowerCase();
       const parts = u.pathname.split('/').filter(Boolean);
-
-      // clips.twitch.tv/Slug
-      if (host === 'clips.twitch.tv' && parts[0]) return parts[0];
-
-      // twitch.tv/clip/Slug  or  twitch.tv/{channel}/clip/Slug
-      const idx = parts.findIndex(p => p.toLowerCase() === 'clip');
+      if (host === 'clips.twitch.tv' && parts[0]) return parts[0];          // clips.twitch.tv/Slug
+      const idx = parts.findIndex(p => p.toLowerCase() === 'clip');         // twitch.tv/clip/Slug  or /{channel}/clip/Slug
       if (idx !== -1 && parts[idx+1]) return parts[idx+1];
-
-      // m.twitch.tv/clip/Slug
       if (host === 'm.twitch.tv' && parts[0] === 'clip' && parts[1]) return parts[1];
     }catch{}
     return null;
   }
-
   function getStreamableId(raw){
     try{
       const u = new URL(normalizeUrl(raw));
@@ -248,7 +241,11 @@
     return null;
   }
 
-  /* ---------- Embeds ---------- */
+  /* ---------- embedders ---------- */
+  function twitchParents(){
+    const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
+    return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
+  }
   function buildEmbedURL(raw){
     try{
       const u = new URL(normalizeUrl(raw));
@@ -268,22 +265,7 @@
     }catch{ return raw; }
   }
 
-  /* ---------- Thumbnails ---------- */
-  function buildPreviewURLSync(raw){
-    try{
-      const url = normalizeUrl(raw);
-      const u = new URL(url);
-      const host = u.hostname.replace(/^www\./,'').toLowerCase();
-
-      const yid = extractYouTubeId(url);
-      if (yid) return `https://i.ytimg.com/vi/${encodeURIComponent(yid)}/hqdefault.jpg`;
-
-      const sid = getStreamableId(url);
-      if (sid) return `https://cdn.streamable.com/image/${encodeURIComponent(sid)}.jpg`;
-    }catch{}
-    return null;
-  }
-
+  /* ---------- thumbnail resolvers (one-time, saved to DB) ---------- */
   function normalizeTwitchThumb(u){
     if (!u) return u;
     if (u.startsWith('//')) u = 'https:' + u;
@@ -292,133 +274,61 @@
     return u;
   }
 
-  function proxifyIfTwitch(url){
-    if(!url) return url;
-    try{
-      const u = new URL(normalizeUrl(url));
-      const host = u.hostname.toLowerCase();
-      if (host.includes('twitch') || host.includes('ttvthumb')) {
-        return `https://r.jina.ai/${u.protocol}//${u.host}${u.pathname}${u.search}`;
-      }
-    }catch{}
-    return url;
-  }
+  async function resolveThumb(url){
+    // YT quick
+    const yid = extractYouTubeId(url);
+    if (yid) return `https://i.ytimg.com/vi/${encodeURIComponent(yid)}/hqdefault.jpg`;
 
-  /* Streamable CDNs (the one that worked for you is first) */
-  function streamableFallbackThumbs(id){
-    const cdns = [
-      'https://cdn-cf-east.streamable.com',
-      'https://cdn.streamable.com',
-      'https://cdn-cf.streamable.com',
-      'https://cdn-cf-west.streamable.com',
-      'https://thumbs.streamable.com'
-    ];
-    const paths = ['image','images'];
-    const out = [];
-    for (const base of cdns) for (const p of paths) out.push(`${base}/${p}/${encodeURIComponent(id)}.jpg`);
-    return out;
-  }
+    // Streamable quick
+    const sid = getStreamableId(url);
+    if (sid) return `https://cdn-cf-east.streamable.com/image/${encodeURIComponent(sid)}.jpg`;
 
-  /* Robust Twitch thumbnail fetch: oEmbed → clip page → embed page → mobile page */
-  async function fetchTwitchThumb(raw){
-    const slug = parseTwitchClipSlug(raw);
-    if (!slug) return null;
-
-    // 1) oEmbed
-    try{
-      const o = await fetch(`https://clips.twitch.tv/oembed?url=${encodeURIComponent(`https://clips.twitch.tv/${slug}`)}`);
-      if (o.ok){
-        const j = await o.json();
-        if (j.thumbnail_url) return normalizeTwitchThumb(j.thumbnail_url);
-      }
-    }catch{}
-
-    // 2) Scrape public pages via read-only proxy (no CORS/auth)
-    const pages = [
-      `https://clips.twitch.tv/${slug}`,
-      `https://clips.twitch.tv/embed?clip=${slug}`,
-      `https://m.twitch.tv/clip/${slug}`
-    ];
-    const schemes = ['https://', 'http://'];
-
-    for (const p of pages){
-      for (const scheme of schemes){
+    // Twitch oEmbed
+    const slug = parseTwitchClipSlug(url);
+    if (slug){
+      try{
+        const o = await fetch(`https://clips.twitch.tv/oembed?url=${encodeURIComponent(`https://clips.twitch.tv/${slug}`)}`);
+        if (o.ok){
+          const j = await o.json();
+          if (j.thumbnail_url) return normalizeTwitchThumb(j.thumbnail_url);
+        }
+      }catch{}
+      // Scrape public pages via readonly proxy (CORS-free)
+      const pages = [
+        `https://clips.twitch.tv/${slug}`,
+        `https://clips.twitch.tv/embed?clip=${slug}`,
+        `https://m.twitch.tv/clip/${slug}`
+      ];
+      for (const p of pages){
         try{
-          const prox = `https://r.jina.ai/${scheme}${p.replace(/^https?:\/\//,'')}`;
+          const prox = `https://r.jina.ai/https://${p.replace(/^https?:\/\//,'')}`;
           const r = await fetch(prox);
           if (!r.ok) continue;
           const html = await r.text();
-
           let m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
           if (m?.[1]) return normalizeTwitchThumb(m[1]);
-
           m = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
           if (m?.[1]) return normalizeTwitchThumb(m[1]);
-
           m = html.match(/"thumbnailUrl"\s*:\s*\[\s*"([^"]+)"\s*\]/i);
           if (m?.[1]) return normalizeTwitchThumb(m[1]);
-
           m = html.match(/"thumbnail_url"\s*:\s*"([^"]+)"/i);
           if (m?.[1]) return normalizeTwitchThumb(m[1]);
         }catch{}
       }
     }
-    return null;
-  }
 
-  async function fetchPreviewURL(raw){
-    try{
-      const url = normalizeUrl(raw);
-      const u = new URL(url);
-      const host = u.hostname.replace(/^www\./,'').toLowerCase();
-
-      if (host.includes('youtube') || host === 'youtu.be'){
-        const r = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
-        if (r.ok){ const j = await r.json(); if (j.thumbnail_url) return j.thumbnail_url; }
-      }
-      if (host === 'clips.twitch.tv' || host.endsWith('twitch.tv')){
-        const t = await fetchTwitchThumb(url);
-        if (t) return t;
-      }
-      if (host === 'streamable.com'){
+    // Streamable oEmbed (slower, but sometimes different image)
+    if (sid){
+      try{
         const r = await fetch(`https://api.streamable.com/oembed.json?url=${encodeURIComponent(url)}`);
         if (r.ok){ const j = await r.json(); if (j.thumbnail_url) return j.thumbnail_url; }
-      }
-    }catch{}
+      }catch{}
+    }
+
     return null;
   }
 
-  async function thumbnailCandidates(raw){
-    const url = /^[a-z]+:\/\//i.test(raw) ? raw : `https://${raw}`;
-    const list = [];
-
-    const primary = await fetchPreviewURL(url);
-    if (primary) list.push(primary, proxifyIfTwitch(primary));
-
-    const slug = parseTwitchClipSlug(url);
-    if (slug){
-      const t = await fetchTwitchThumb(url);
-      if (t) list.push(t, proxifyIfTwitch(t));
-    }
-
-    const sid = getStreamableId(url);
-    if (sid) list.push(...streamableFallbackThumbs(sid));
-
-    return [...new Set(list.filter(Boolean))];
-  }
-
-  /* ---------- Resilient image loader ---------- */
-  function tryLoadImage(url){
-    return new Promise(resolve => {
-      const img = new Image();
-      img.referrerPolicy = 'no-referrer';
-      img.onload  = () => resolve({ ok:true,  url });
-      img.onerror = () => resolve({ ok:false, url });
-      img.src = url;
-    });
-  }
-
-  /* ---------- Data load & render ---------- */
+  /* ---------- data load ---------- */
   async function loadClips(){
     try{
       const [approvedRes, allRes] = await Promise.all([
@@ -429,7 +339,6 @@
       const all = await allRes.json();
       const occupied = new Set(all.map(r => Number(r.slot)));
       render(approved, occupied);
-      hydrateThumbnails();
     }catch(err){
       console.error(err);
       document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
@@ -471,24 +380,17 @@
         const mapTxt = clip.map ? ` · ${escapeHtml(clip.map)}` : '';
         const plat = platformLabel(clip.url);
 
-        const syncThumb = clip.thumb || buildPreviewURLSync(clip.url);
-        const isTwitch = !!parseTwitchClipSlug(clip.url);
-        const isStreamable = !!getStreamableId(clip.url);
-        const needsAsync = isTwitch || (isStreamable && !clip.thumb) || !syncThumb;
-
+        const src = clip.thumb ? clip.thumb : '';
         card.innerHTML = `
           <div class="slot">Slot ${i}${mapTxt}</div>
           <strong>${title}</strong>
-
-          <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}"
-                  ${needsAsync ? `data-thumb-src-needed="1" data-raw-url="${encodeURIComponent(clip.url)}"` : ''}>
-            ${(!needsAsync && syncThumb)
-                ? `<img src="${proxifyIfTwitch(syncThumb)}" alt="${title}" loading="lazy" referrerpolicy="no-referrer">`
-                : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.9">${PLACEHOLDER_SVG}</div>`}
+          <button class="thumb-wrap openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}">
+            ${src
+              ? `<img src="${src}" alt="${title}" loading="lazy" referrerpolicy="no-referrer">`
+              : `<div style="width:100%;height:100%;display:grid;place-items:center;opacity:.9">${PLACEHOLDER_SVG}</div>`}
             <div class="thumb-center"></div>
             <span class="play-badge">${plat}</span>
           </button>
-
           <div class="row">
             <button class='btn openPlayer' data-url='${encodeURIComponent(embed)}'>View / Fullscreen</button>
           </div>
@@ -513,47 +415,7 @@
     }
   }
 
-  async function hydrateThumbnails(){
-    const wraps = [...document.querySelectorAll('.thumb-wrap[data-thumb-src-needed="1"]')];
-    if (!wraps.length) return;
-
-    for (const wrap of wraps){
-      const rawEncoded = wrap.getAttribute('data-raw-url');
-      const raw = rawEncoded ? decodeURIComponent(rawEncoded) : null;
-      if (!raw) { wrap.removeAttribute('data-thumb-src-needed'); continue; }
-
-      let candidates = [];
-      try { candidates = await thumbnailCandidates(raw); } catch {}
-      candidates = [...new Set(candidates)];
-
-      let working = null;
-      for (const url of candidates){
-        const r = await tryLoadImage(url);
-        if (r.ok){ working = r.url; break; }
-      }
-
-      if (working){
-        wrap.querySelectorAll('div').forEach(d => {
-          if (d.querySelector && d.querySelector('svg')) d.remove();
-          if (d.textContent?.toLowerCase().includes('loading preview')) d.remove();
-        });
-        const img = document.createElement('img');
-        img.alt = 'Clip preview';
-        img.loading = 'lazy';
-        img.referrerPolicy = 'no-referrer';
-        img.src = working;
-        wrap.prepend(img);
-      }
-      wrap.removeAttribute('data-thumb-src-needed');
-      wrap.removeAttribute('data-raw-url');
-    }
-  }
-
-  /* ---------- Utils & wiring ---------- */
-  function escapeHtml(s){
-    return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
-  }
-
+  /* ---------- modals / player ---------- */
   const submitModal = document.getElementById('submit-modal');
   const playerModal = document.getElementById('player-modal');
   const slotField = document.getElementById('slotField');
@@ -565,13 +427,9 @@
   function openPlayer(url){
     try{
       const u = new URL(decodeURIComponent(url));
-      if (u.host.includes('youtube.com')) {
-        u.searchParams.set('autoplay','1'); u.searchParams.set('playsinline','1'); url = u.toString();
-      } else if (u.host.includes('twitch.tv')) {
-        u.searchParams.set('autoplay','true'); url = u.toString();
-      } else if (u.host.includes('streamable.com')) {
-        if (!u.searchParams.has('autoplay')) u.searchParams.set('autoplay','1'); url = u.toString();
-      }
+      if (u.host.includes('youtube.com')) { u.searchParams.set('autoplay','1'); u.searchParams.set('playsinline','1'); url = u.toString(); }
+      else if (u.host.includes('twitch.tv')) { u.searchParams.set('autoplay','true'); url = u.toString(); }
+      else if (u.host.includes('streamable.com')) { if (!u.searchParams.has('autoplay')) u.searchParams.set('autoplay','1'); url = u.toString(); }
     }catch{}
     playerFrame.src = url;
     playerModal.classList.add('open');
@@ -579,7 +437,7 @@
   }
   function closePlayer(){ playerFrame.src = ''; playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true'); }
 
-  document.addEventListener('click', (e)=>{
+  document.addEventListener('click', async (e)=>{
     const t = e.target;
     const openBtn = t.closest?.('.openPlayer');
     if (openBtn) {
@@ -596,9 +454,10 @@
     }
   });
 
+  /* ---------- submit flow (now saves thumbnail to DB) ---------- */
   (function(){
-    const form=document.getElementById('submitForm');
-    const status=document.getElementById('submitStatus');
+    const form=$("#submitForm");
+    const status=$("#submitStatus");
 
     function isValidClipUrl(u){
       try{
@@ -620,12 +479,15 @@
 
       const fd = new FormData(form);
       const dateRaw = (fd.get('date')||'').toString().trim();
+      const url = (fd.get('url')||'').toString().trim();
+      const userThumb = (fd.get('thumb')||'').toString().trim();
+
       const payload = {
         title: (fd.get('title')||'').toString().trim(),
-        url:   (fd.get('url')||'').toString().trim(),
+        url,
         slot:  clampSlot(fd.get('slot')),
         map:   (fd.get('map')||'').toString().trim() || null,
-        thumb: (fd.get('thumb')||'').toString().trim() || null,
+        thumb: userThumb || null,
         date:  dateRaw ? new Date(dateRaw).toISOString() : null,
         approved: false
       };
@@ -641,6 +503,15 @@
         if(Array.isArray(exists) && exists.length){
           status.textContent='❌ This slot already has a submission.';
           return;
+        }
+      }catch{}
+
+      // **NEW**: resolve and save a thumbnail if user didn't provide one
+      try{
+        if (!payload.thumb){
+          status.textContent='Finding thumbnail…';
+          const t = await resolveThumb(payload.url);
+          if (t) payload.thumb = t;
         }
       }catch{}
 
@@ -662,7 +533,7 @@
 
         status.textContent='✅ Submitted! Awaiting approval.';
         form.reset();
-        setTimeout(()=>{ closeSubmit(); status.textContent=''; loadClips(); }, 1000);
+        setTimeout(()=>{ closeSubmit(); status.textContent=''; loadClips(); }, 800);
       }catch(err){
         console.error(err);
         status.textContent='⚠️ Network error. Please try again later.';
@@ -670,9 +541,50 @@
     });
   })();
 
-  // Initial load
+  /* ---------- admin backfill (quick repair for existing rows) ---------- */
+  async function backfillThumbs(){
+    const btn = document.getElementById('backfillThumbsBtn');
+    if (btn) btn.disabled = true;
+    try{
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?approved=eq.true&thumb=is.null&select=id,url`, H);
+      const rows = await r.json();
+      for (const row of rows){
+        try{
+          const t = await resolveThumb(row.url);
+          if (!t) continue;
+          await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?id=eq.${encodeURIComponent(row.id)}`, {
+            method:'PATCH',
+            headers: { 'Content-Type':'application/json', ...H.headers, Prefer:'return=minimal' },
+            body: JSON.stringify({ thumb: t })
+          });
+        }catch{}
+      }
+    }catch(e){ console.error(e); }
+    finally{
+      if (btn) btn.disabled = false;
+      loadClips();
+    }
+  }
+
+  // show a tiny backfill button only when ?admin=1 is in the URL
+  (function(){
+    const params = new URLSearchParams(location.search);
+    if (params.get('admin') === '1'){
+      const nav = document.querySelector('.nav-container > div:last-child');
+      if (nav){
+        const b = document.createElement('button');
+        b.id = 'backfillThumbsBtn';
+        b.className = 'btn';
+        b.textContent = 'Fix thumbnails';
+        b.style.marginLeft = '.5rem';
+        b.addEventListener('click', backfillThumbs);
+        nav.appendChild(b);
+      }
+    }
+  })();
+
+  // start
   loadClips();
 </script>
-
 </body>
 </html>
