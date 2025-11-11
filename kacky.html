@@ -315,8 +315,6 @@
   <header>
   <div class="container nav">
     <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
-      <span class="brand-badge" aria-hidden="true">🎮</span>
-    </a>
     <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
     <nav id="primary-nav" class="navlinks" aria-label="Primary">
       <a href="/wrleaderboard">WR Leaderboard</a>
@@ -329,6 +327,17 @@
     </div>
   </div>
 </header>
+<script>
+  (function(){
+    const btn=document.getElementById('navToggle');
+    const nav=document.getElementById('primary-nav');
+    if(!btn||!nav) return;
+    btn.addEventListener('click',()=>{
+      const open=nav.classList.toggle('show');
+      btn.setAttribute('aria-expanded',open?'true':'false');
+    });
+  })();
+</script>
 
   <div class="container">
     <h1 class="title-line">Kacky Finishes</h1>
