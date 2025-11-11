@@ -8,61 +8,112 @@
   <meta name="referrer" content="no-referrer" />
 <style>
   :root{
-    --bg:#0a0f1a; --text:#e6ecff; --muted:#9bb0ff;
-    --accent:#3aa0ff; --accent-2:#6dfbff;
-    --border:rgba(109,251,255,.22);
-    --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)
+    --bg:#0a0f1a;
+    --panel:#0f1524;
+    --panel-2:#0c1020;
+    --text:#e6ecff;
+    --muted:#9bb0ff;
+    --accent:#3aa0ff;
+    --accent-2:#6dfbff;
+    --ring:0 0 0 3px rgba(61,165,255,.25);
+    --accent-glow:0 0 24px rgba(61,165,255,.35), 0 0 48px rgba(61,165,255,.2);
   }
+
   *{box-sizing:border-box}
   html,body{height:100%}
+  html{scroll-behavior:smooth}
+
   body{
     margin:0;
-    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
     color:var(--text);
+    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
     -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
     background:
       radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
       radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
       linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
   }
+
+  /* subtle curved track background */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    opacity:.6;
+    mix-blend-mode:screen;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+    background-size:cover;
+    background-repeat:no-repeat;
+    pointer-events:none;
+  }
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
+    opacity:.09;
+    background-size:120px 120px;
+  }
+
   header{
-    background:linear-gradient(180deg, rgba(10,15,26,.92), rgba(10,15,26,.72) 60%, rgba(10,15,26,0));
-    backdrop-filter:blur(8px);
     position:sticky;
     top:0;
     z-index:50;
-    border-bottom:1px solid rgba(109,251,255,.18);
+    background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(109,251,255,.12);
   }
-  .nav-container{
-    width:min(1200px,92vw);
-    margin:0 auto;
+
+  .nav{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:1rem 0;
-    position:relative;
-    gap:1.5rem;
+    padding:.9rem 0;
   }
-  .nav-left{
-    display:flex;
-    align-items:center;
-    gap:.5rem;
-  }
-  .nav-right{
-    display:flex;
-    align-items:center;
-    gap:.5rem;
-  }
+
+  .container{width:min(1200px,92vw);margin:0 auto}
+
   .brand{
-    font-weight:800;
-    font-size:1.1rem;
-    letter-spacing:.3px;
     display:flex;
     align-items:center;
-    gap:.5rem;
-    color:var(--accent-2)
+    gap:.6rem;
+    font-weight:800;
+    letter-spacing:.2px;
   }
+
+  .brand-badge{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    box-shadow:var(--accent-glow);
+    animation:pulseAccent 2.5s infinite ease-in-out;
+    transition:transform .4s ease;
+  }
+  .brand-badge:hover{transform:rotate(360deg)}
+
+  .navlinks{display:flex;gap:1.25rem}
+  .nav a{opacity:.85;text-decoration:none;color:var(--muted)}
+  .nav a:hover{opacity:1;color:var(--accent-2)}
+  .nav a.active{
+    opacity:1;
+    position:relative;
+    color:var(--accent-2);
+  }
+  .nav a.active::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:-6px;
+    height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    border-radius:2px;
+  }
+
+  .cta{display:flex;gap:.6rem}
   .btn{
     padding:.6rem .95rem;
     border:1px solid rgba(109,251,255,.25);
@@ -70,272 +121,71 @@
     background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
     color:var(--text);
     font-weight:700;
-    transition:.2s;
     text-decoration:none;
-    cursor:pointer;
-  }
-  .btn:hover{
-    transform:translateY(-1px) scale(1.02);
-    filter:brightness(1.06);
-  }
-  .container{
-    width:min(1200px,92vw);
-    margin:0 auto;
-    padding:1.4rem 0 2.2rem;
-  }
-  h1{
-    font-size:2rem;
-    margin:.2rem 0 1rem;
-    text-shadow:0 0 12px rgba(61,165,255,.25);
-  }
-  .hint{font-size:.95rem;color:var(--muted)}
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-    gap:1rem;
-    align-items:stretch;
-  }
-  .card{
-    background:rgba(15,21,36,.55);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:1rem;
-    display:flex;
-    flex-direction:column;
-    gap:.6rem;
-    overflow:hidden;
-    backdrop-filter:blur(10px) saturate(160%);
-    box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
     transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
   }
-  .card:hover{
-    transform:translateY(-3px);
-    box-shadow:0 0 18px rgba(61,165,255,.35);
-    filter:brightness(1.03);
-  }
-  .card .slot{
-    opacity:.85;
-    font-size:.9rem;
-    color:var(--muted);
-  }
-  .card strong{font-size:1rem}
-  .thumb-wrap{
-    position:relative;
-    width:100%;
-    margin:0;
-    aspect-ratio:16/9;
-    overflow:hidden;
-    background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6));
-    border:none;
-    border-radius:14px;
-  }
-  .thumb-wrap img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center;
-    border-radius:inherit;
-  }
-  .thumb-center{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    width:68px;
-    height:68px;
-    border-radius:999px;
-    border:2px solid rgba(255,255,255,.25);
-    display:grid;
-    place-items:center;
-    background:rgba(0,0,0,.35);
-    backdrop-filter:blur(2px);
-  }
-  .thumb-center::after{
-    content:"▶";
-    font-size:1.4rem;
-  }
-  .play-badge{display:none!important}
-  .modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.65);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:100;
-    padding:1rem;
-  }
-  .modal.open{display:flex}
-  .modal-card{
-    background:rgba(15,21,36,.85);
-    border:1px solid rgba(109,251,255,.25);
-    border-radius:16px;
-    box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 28px rgba(61,165,255,.25);
-    width:min(950px,94vw);
-    max-height:90vh;
-    overflow:auto;
-    backdrop-filter:blur(12px) saturate(160%);
-  }
-  .modal-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:.9rem 1rem;
-    border-bottom:1px dashed rgba(255,255,255,.12);
-  }
-  .modal-body{padding:1rem 1.25rem 1.3rem;}
-  .player-frame{
-    aspect-ratio:16/9;
-    width:100%;
-    border:0;
-    border-radius:16px;
-    background:#000;
-  }
-  .title-line{position:relative;display:inline-block}
-  .title-line::after{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:-6px;
-    height:2px;
-    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
+  .btn:focus{outline:none;box-shadow:var(--ring)}
+
+  .btn.primary{
+    border-color:transparent;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#001220;
+    box-shadow:var(--accent-glow);
   }
 
-  /* ---------- SUBMIT FORM STYLING (fixed) ---------- */
-  #submitForm{
-    display:flex;
-    flex-direction:column;
-    gap:.75rem;
-    max-width:640px;
-  }
-  .row{
-    display:flex;
-    gap:.75rem;
-    margin-bottom:.25rem;
-  }
-  .row:last-child{
-    margin-bottom:0;
-    margin-top:.25rem;
-  }
-  .input{
-    flex:1;
-    width:100%;
-    padding:.55rem .75rem;
-    border-radius:10px;
-    border:1px solid rgba(109,251,255,.32);
-    background:rgba(4,8,18,.95);
-    color:var(--text);
-    font-size:.9rem;
-    outline:none;
-  }
-  .input::placeholder{
-    color:var(--muted);
-    opacity:.85;
-  }
-  .input:focus{
-    border-color:var(--accent-2);
-    box-shadow:0 0 0 1px rgba(109,251,255,.55);
-  }
-  #submitStatus{
-    font-size:.85rem;
-  }
+  @keyframes pulseAccent{0%,100%{box-shadow:0 0 8px rgba(61,165,255,.5)}50%{box-shadow:0 0 20px rgba(61,165,255,.9)}}
+
+  /* mobile nav */
+  .nav-toggle{display:none}
   @media (max-width:640px){
-    .row{
-      flex-direction:column;
+    .nav-toggle{
+      display:block;
+      border:1px solid rgba(109,251,255,.25);
+      background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
+      color:var(--text);
+      border-radius:10px;
+      padding:.4rem .6rem;
     }
-  }
-
-  /* ---------- TOP NAVIGATION ---------- */
-  .navlinks{
-    display:flex;
-    gap:2rem;
-    font-size:.9rem;
-    font-weight:500;
-  }
-
-  .navlinks a{
-    color:var(--muted);
-    text-decoration:none;
-    white-space:nowrap;
-    transition:color .15s ease, opacity .15s ease;
-  }
-
-  .navlinks a:hover{
-    color:var(--accent-2);
-    opacity:1;
-  }
-
-  .navlinks a.active{
-    color:var(--accent-2);
-    font-weight:600;
-  }
-
-  .nav-toggle{
-    display:none;
-    padding:.25rem .5rem;
-    border-radius:8px;
-    border:1px solid rgba(109,251,255,.3);
-    background:rgba(10,15,26,.9);
-    color:var(--text);
-    cursor:pointer;
-    font-size:1rem;
-  }
-
-  /* mobile behaviour */
-  @media (max-width:768px){
-    .nav-toggle{display:block;}
-
-    .nav-container{
-      align-items:flex-start;
-    }
-
     .navlinks{
       display:none;
       position:absolute;
-      top:3rem;
-      left:0;
-      right:0;
-      padding:.5rem 1.25rem .75rem;
-      background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.85));
-      border-bottom:1px solid rgba(109,251,255,.18);
+      top:58px;
+      left:0;right:0;
+      padding:.75rem;
+      background:linear-gradient(180deg,rgba(10,15,26,.98),rgba(10,15,26,.92));
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(109,251,255,.12);
       flex-direction:column;
-      gap:.45rem;
+      gap:.6rem;
     }
-
-    .navlinks.open{
-      display:flex;
-    }
-
-    .navlinks a{
-      padding:.15rem 0;
-    }
-
-    .nav-right{
-      display:none;
-    }
+    .navlinks.show{display:flex}
   }
 </style>
+
 
 
 
 </head>
 <body>
   <header>
-  <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+  <div class="container nav">
+    <a class="brand" href="/" aria-label="Trackmania Events Home">
+      <span class="brand-badge" aria-hidden="true">🎮</span>
+      <span>Trackmania Events</span>
+    </a>
 
-  <nav id="primary-nav" class="navlinks" aria-label="Primary">
-    <a href="/wrleaderboard">WR Leaderboard</a>
-    <a href="/totd">Track of the Day</a>
-    <a href="/highlights">Community Highlights</a>
-  </nav>
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
 
-  <div class="nav-container">
-    <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
-    <div style="display:flex; gap:.5rem;">
-      <a href="/" class="btn">Home</a>
-      <a href="https://kacky.gg/leaderboard" target="_blank" rel="noopener" class="btn">Kacky Leaderboard</a>
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="/wrleaderboard">WR Leaderboard</a>
+      <a href="/totd">Track of the Day</a>
+      <a href="/highlights">Community Highlights</a>
+    </nav>
+
+    <div class="cta">
+      <a class="btn" href="/">Home</a>
+      <a class="btn" href="https://kacky.gg/leaderboard" target="_blank" rel="noopener">Kacky Leaderboard</a>
     </div>
   </div>
 </header>
