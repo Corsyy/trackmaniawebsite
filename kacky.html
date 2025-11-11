@@ -171,11 +171,42 @@
     width:min(950px,94vw);max-height:90vh;overflow:auto;
     backdrop-filter:blur(12px) saturate(160%);
   }
+  .modal-head {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:.9rem 1rem;
+  border-bottom:1px dashed rgba(255,255,255,.12);
+}
+
+.modal-head strong {
+  font-size:1.05rem;
+  font-weight:700;
+  color:var(--text);
+}
+
+.modal-close {
+  position:absolute;
+  right:1rem;
+  top:.6rem;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(109,251,255,.25);
+  border-radius:50%;
+  width:32px;
+  height:32px;
+  color:var(--accent-2);
+  font-size:1.2rem;
+  font-weight:600;
+  line-height:1;
+  cursor:pointer;
+  transition:.2s;
+}
+.modal-close:hover {
+  background:rgba(255,255,255,.12);
+  transform:scale(1.1);
+}
 </style>
-
-
-
-
 
 </head>
 <body>
@@ -210,9 +241,10 @@
   <div class="modal" id="submit-modal" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-head">
-        <strong>Submit Kacky Clip</strong>
-        <button class="btn" data-close-submit>Close</button>
-      </div>
+  <strong>Submit Kacky Clip</strong>
+  <button class="modal-close" data-close-submit aria-label="Close">×</button>
+</div>
+
       <div class="modal-body">
         <form id="submitForm">
           <div class="row">
