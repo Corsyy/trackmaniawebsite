@@ -64,12 +64,14 @@ body.bg-aurora::before {
     gap:1rem;
     padding:.9rem 0;
   }
-  
+
 .navlinks{
     display:flex;
     gap:1.25rem;
   }
-
+.nav-toggle {
+  display: none;
+}
   .navlinks a{
     color:var(--muted);
     text-decoration:none;
@@ -78,7 +80,11 @@ body.bg-aurora::before {
     opacity:.85;
     transition:color .2s ease, opacity .2s ease;
   }
-
+@media (max-width: 640px) {
+  .nav-toggle {
+    display: block;
+  }
+}
   .navlinks a:hover{
     opacity:1;
     color:var(--accent-2);
