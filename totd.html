@@ -43,6 +43,28 @@
   backdrop-filter:blur(8px);
   border-bottom:1px solid rgba(109,251,255,.12);
  }
+ .month-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* change to center if you want it centered */
+  padding: 0 1rem .75rem;
+  font-size: .95rem;
+  color: var(--muted);
+}
+
+.month-row .select {
+  margin: 0;
+}
+
+.month-row select {
+  background: #0c1322;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: .45rem .65rem;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
  h1{margin:0 0 .25rem}
  .nav{
     display:flex;
@@ -210,9 +232,15 @@
       <a href="/highlights">Community Highlights</a>
     </nav>
     <div class="cta">
- <a href="/" class="btn">Home</a>
+      <a href="/" class="btn">Home</a>
     </div>
-    <div class="select">Month: <select id="month"></select></div>
+  </div>
+
+  <!-- Month selector row BELOW header -->
+  <div class="container month-row">
+    <div class="select">
+      Month: <select id="month"></select>
+    </div>
   </div>
 </header>
 <script>
