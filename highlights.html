@@ -22,21 +22,11 @@
       <a href="/recentwrs">Recent WRs</a>
     </nav>
     <div class="cta">
-       <a href="/" class="btn">Home</a>
+ <a href="/" class="btn">Home</a>
+       <button id="openModal" class="btn">Submit Highlight</button>
     </div>
   </div>
 </header>
-<script>
-  (function(){
-    const btn = document.getElementById('navToggle');
-    const nav = document.getElementById('primary-nav');
-    if (!btn || !nav) return;
-    btn.addEventListener('click', () => {
-      const open = nav.classList.toggle('show');
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-  })();
-</script>
 
 <main>
   <h1>Community Highlights</h1>
