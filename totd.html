@@ -134,24 +134,25 @@
  .hero h2{margin:.2rem 0 .35rem}
  .hero .badge{background:rgba(109,251,255,.12)}
  .hero .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
- @media(max-width:800px){.hero{flex-direction:column}.hero .thumb{width:auto}}
- .nav-toggle{display:block;}
+  @media(max-width:640px){
+   .nav-toggle{display:block;}
 
-    .navlinks{
-      display:none;
-      position:absolute;
-      top:58px;
-      left:0;
-      right:0;
-      padding:.75rem;
-      background:linear-gradient(180deg,rgba(10,15,26,.98),rgba(10,15,26,.92));
-      backdrop-filter:blur(8px);
-      border-bottom:1px solid rgba(109,251,255,.12);
-      flex-direction:column;
-      gap:.6rem;
-    }
+   .navlinks{
+     display:none;
+     position:absolute;
+     top:58px;
+     left:0;
+     right:0;
+     padding:.75rem;
+     background:linear-gradient(180deg,rgba(10,15,26,.98),rgba(10,15,26,.92));
+     backdrop-filter:blur(8px);
+     border-bottom:1px solid rgba(109,251,255,.12);
+     flex-direction:column;
+     gap:.6rem;
+   }
 
-    .navlinks.show{display:flex;}
+   .navlinks.show{display:flex;}
+ }
 
  .select{margin-top:.6rem}
  select{
