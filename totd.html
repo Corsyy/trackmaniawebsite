@@ -41,7 +41,62 @@
   border-bottom:1px solid rgba(109,251,255,.12);
  }
  h1{margin:0 0 .25rem}
- .nav{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+ .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:.9rem 0;
+  }
+  .navlinks{
+    display:flex;
+    gap:1.25rem;
+  }
+
+  .navlinks a{
+    color:var(--muted);
+    text-decoration:none;
+    white-space:nowrap;
+    font-weight:500;
+    opacity:.85;
+    transition:color .2s ease, opacity .2s ease;
+  }
+
+  .navlinks a:hover{
+    opacity:1;
+    color:var(--accent-2);
+  }
+
+  .navlinks a.active{
+    opacity:1;
+    color:var(--accent-2);
+    position:relative;
+  }
+
+  .navlinks a.active::after{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-6px;
+    height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    border-radius:2px;
+  }
+
+  .cta{
+    display:flex;
+    gap:.6rem;
+  }
+  .nav-toggle{
+    display:none;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
+    color:var(--text);
+    border-radius:10px;
+    padding:.4rem .6rem;
+    cursor:pointer;
+  }
 
  .btn{
   padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;
@@ -138,62 +193,6 @@
  .card{height:100%}
  .grid{align-items:stretch}
 
-  .nav{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:1rem;
-    padding:.9rem 0;
-  }
-  .navlinks{
-    display:flex;
-    gap:1.25rem;
-  }
-
-  .navlinks a{
-    color:var(--muted);
-    text-decoration:none;
-    white-space:nowrap;
-    font-weight:500;
-    opacity:.85;
-    transition:color .2s ease, opacity .2s ease;
-  }
-
-  .navlinks a:hover{
-    opacity:1;
-    color:var(--accent-2);
-  }
-
-  .navlinks a.active{
-    opacity:1;
-    color:var(--accent-2);
-    position:relative;
-  }
-
-  .navlinks a.active::after{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:-6px;
-    height:2px;
-    background:linear-gradient(90deg,var(--accent),var(--accent-2));
-    border-radius:2px;
-  }
-
-  .cta{
-    display:flex;
-    gap:.6rem;
-  }
-  .nav-toggle{
-    display:none;
-    border:1px solid rgba(109,251,255,.25);
-    background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
-    color:var(--text);
-    border-radius:10px;
-    padding:.4rem .6rem;
-    cursor:pointer;
-  }
 </style>
 </head>
 <body class="bg-track-curves">
