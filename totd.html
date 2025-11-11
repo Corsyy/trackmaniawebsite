@@ -15,7 +15,6 @@
  a{color:inherit;text-decoration:none}
  .container{width:min(1100px,92vw);margin:0 auto;padding:1rem}
 
- /* background */
  body.bg-track-curves{
   background:
     radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
@@ -35,7 +34,6 @@
  }
  @keyframes noiseShift{50%{transform:translate3d(0,0,0)}50.01%{transform:translate3d(.5px,.5px,0)}}
 
- /* header */
  header{
   position:sticky;top:0;z-index:10;
   background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));
@@ -45,7 +43,6 @@
  h1{margin:0 0 .25rem}
  .nav{display:flex;justify-content:space-between;align-items:center;gap:1rem}
 
- /* worldrecord-style button */
  .btn{
   padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;
   background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
@@ -53,7 +50,6 @@
  }
  .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
 
- /* cards */
  .card{
   background:rgba(15,21,36,.55);
   border:1px solid var(--border);
@@ -73,7 +69,6 @@
  .badge{border:1px solid var(--border);padding:.25rem .55rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.08)}
  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
 
- /* hero */
  .hero{
   display:flex;gap:1rem;margin:1rem 0;
   background:rgba(15,21,36,.55);border:1px solid var(--border);
@@ -85,8 +80,24 @@
  .hero .badge{background:rgba(109,251,255,.12)}
  .hero .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
  @media(max-width:800px){.hero{flex-direction:column}.hero .thumb{width:auto}}
+ .nav-toggle{display:block;}
 
- /* month select */
+    .navlinks{
+      display:none;
+      position:absolute;
+      top:58px;
+      left:0;
+      right:0;
+      padding:.75rem;
+      background:linear-gradient(180deg,rgba(10,15,26,.98),rgba(10,15,26,.92));
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(109,251,255,.12);
+      flex-direction:column;
+      gap:.6rem;
+    }
+
+    .navlinks.show{display:flex;}
+
  .select{margin-top:.6rem}
  select{
   background:#0c1322;border:1px solid var(--border);color:var(--text);
@@ -96,7 +107,6 @@
  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 
- /* Author medal only */
  .medals{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem}
  .medal{
   display:inline-flex;align-items:center;gap:.4rem;
@@ -122,23 +132,97 @@
  .medal b{font-weight:800;letter-spacing:.2px}
  .medal.author{box-shadow:0 0 0 1px rgba(255,154,59,.25) inset}
 
- /* align AT chip & footer */
  .card .meta{display:flex;flex-direction:column;flex:1}
  .card .meta .medals{margin-top:auto}
  .card .meta-footer{margin-top:0;padding-top:.4rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
  .card{height:100%}
  .grid{align-items:stretch}
+
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:.9rem 0;
+  }
+  .navlinks{
+    display:flex;
+    gap:1.25rem;
+  }
+
+  .navlinks a{
+    color:var(--muted);
+    text-decoration:none;
+    white-space:nowrap;
+    font-weight:500;
+    opacity:.85;
+    transition:color .2s ease, opacity .2s ease;
+  }
+
+  .navlinks a:hover{
+    opacity:1;
+    color:var(--accent-2);
+  }
+
+  .navlinks a.active{
+    opacity:1;
+    color:var(--accent-2);
+    position:relative;
+  }
+
+  .navlinks a.active::after{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-6px;
+    height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    border-radius:2px;
+  }
+
+  .cta{
+    display:flex;
+    gap:.6rem;
+  }
+  .nav-toggle{
+    display:none;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
+    color:var(--text);
+    border-radius:10px;
+    padding:.4rem .6rem;
+    cursor:pointer;
+  }
 </style>
 </head>
 <body class="bg-track-curves">
-<header><div class="container">
-  <div class="nav">
+<header>
+  <div class="container nav">
     <h1>Track of the Day</h1>
-    <!-- worldrecord-style home button -->
-    <a href="/index.html" class="btn">Home</a>
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="/kacky">Kacky Finishes</a>
+      <a href="/recentwrs">Recent WRs</a>
+      <a href="/highlights">Community Highlights</a>
+    </nav>
+    <div class="cta">
+ <a href="/" class="btn">Home</a>
+    </div>
+    <div class="select">Month: <select id="month"></select></div>
   </div>
-  <div class="select">Month: <select id="month"></select></div>
-</div></header>
+</header>
+<script>
+  (function(){
+    const btn = document.getElementById('navToggle');
+    const nav = document.getElementById('primary-nav');
+    if (!btn || !nav) return;
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('show');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  })();
+</script>
 
 <main class="container">
   <section id="today" class="hero">
@@ -160,7 +244,6 @@
 </main>
 
 <script>
-/* (your existing JS unchanged) */
 (function(){
   const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
   const bust=()=>`?t=${Date.now()}`;
