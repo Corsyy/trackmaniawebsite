@@ -172,7 +172,7 @@
 
     <!-- Live search toolbar -->
     <div class="toolbar" style="display:flex;gap:.5rem;align-items:center;margin:.6rem 0 1rem">
-      <input id="search" class="input" type="search" placeholder="Search slot # or title… (auto)" autocomplete="off" style="max-width:360px">
+      <input id="search" class="input" type="search" placeholder="Search slot # or title…" autocomplete="off" style="max-width:360px">
       <button id="searchClear" class="btn" type="button" aria-label="Clear">Clear</button>
     </div>
 
@@ -370,17 +370,61 @@
 
   function openSubmit(slot){ if(slot){ slotField.value = slot; } submitModal.classList.add('open'); submitModal.setAttribute('aria-hidden','false'); }
   function closeSubmit(){ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true'); }
-  function openPlayer(url){
-    try{
-      const u = new URL(decodeURIComponent(url));
-      if (u.host.includes('youtube.com')) { u.searchParams.set('autoplay','1'); u.searchParams.set('playsinline','1'); url = u.toString(); }
-      else if (u.host.includes('twitch.tv')) { u.searchParams.set('autoplay','true'); url = u.toString(); }
-      else if (u.host.includes('streamable.com')) { if (!u.searchParams.has('autoplay')) u.searchParams.set('autoplay','1'); url = u.toString(); }
-    }catch{}
+  function openPlayer(url) {
+  try {
+    let u = decodeURIComponent(url);
+
+    // If it's a direct MP4 (Supabase or anywhere)
+    if (u.endsWith(".mp4") || u.includes(".mp4?")) {
+      playerFrame.style.display = "none";
+
+      // Create a video element if not exists
+      let v = document.getElementById("playerVideo");
+      if (!v) {
+        v = document.createElement("video");
+        v.id = "playerVideo";
+        v.className = "player-frame";
+        v.controls = true;
+        v.style.borderRadius = "16px";
+        v.style.width = "100%";
+        v.style.height = "100%";
+        document.querySelector("#player-modal .modal-body").appendChild(v);
+      }
+
+      v.style.display = "block";
+      v.src = u;
+      v.play().catch(()=>{});
+
+      playerModal.classList.add("open");
+      playerModal.setAttribute("aria-hidden", "false");
+      return;
+    }
+
+    // Otherwise fallback to iframe embeds (YT/Twitch/etc)
+    const parsed = new URL(normalizeUrl(u));
+
+    if (parsed.host.includes("youtube.com")) {
+      parsed.searchParams.set("autoplay", "1");
+      parsed.searchParams.set("playsinline", "1");
+    } else if (parsed.host.includes("twitch.tv")) {
+      parsed.searchParams.set("autoplay", "true");
+    } else if (parsed.host.includes("streamable.com")) {
+      parsed.searchParams.set("autoplay", "1");
+    }
+
+    playerFrame.style.display = "block";
+    playerFrame.src = parsed.toString();
+
+  } catch (err) {
+    console.error(err);
+    playerFrame.style.display = "block";
     playerFrame.src = url;
-    playerModal.classList.add('open');
-    playerModal.setAttribute('aria-hidden','false');
   }
+
+  playerModal.classList.add("open");
+  playerModal.setAttribute("aria-hidden", "false");
+}
+
   function closePlayer(){ playerFrame.src = ''; playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true'); }
 
   document.addEventListener('click', (e)=>{
