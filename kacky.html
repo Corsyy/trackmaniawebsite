@@ -143,6 +143,11 @@
   .input:focus{ border-color:var(--accent-2); box-shadow:0 0 0 1px rgba(109,251,255,.55) }
   #submitStatus{ font-size:.85rem }
 
+  @media (max-width: 640px) {
+    .mobile-only { display: block !important; }
+  }
+  .mobile-only { display: none; }
+
   @media (max-width:640px){ .row{ flex-direction:column } }
 </style>
 </head>
@@ -152,10 +157,17 @@
       <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
       <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <nav id="primary-nav" class="navlinks" aria-label="Primary">
-        <a href="/wrleaderboard">WR Leaderboard</a>
-        <a href="/totd">Track of the Day</a>
-        <a href="/highlights">Community Highlights</a>
-      </nav>
+
+  <!-- Mobile-only extra links -->
+  <a href="/" class="mobile-only">Home</a>
+  <a href="https://kacky.gg/leaderboard" class="mobile-only" target="_blank" rel="noopener">Kacky Leaderboard</a>
+
+  <!-- Normal site pages -->
+  <a href="/wrleaderboard">WR Leaderboard</a>
+  <a href="/totd">Track of the Day</a>
+  <a href="/highlights">Community Highlights</a>
+</nav>
+
       <div class="cta">
         <a href="/" class="btn">Home</a>
         <a href="https://kacky.gg/leaderboard" target="_blank" rel="noopener" class="btn">Kacky Leaderboard</a>
