@@ -57,60 +57,84 @@ body.bg-aurora::before {
   transform: translateZ(0);
   backface-visibility: hidden;
 }
- .nav{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:1rem;
-    padding:.9rem 0;
-  }
 
-.navlinks{
-    display:flex;
-    gap:1.25rem;
-  }
+/* ========= NAVIGATION ========= */
+.nav {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.9rem 0;
+}
+
+.navlinks {
+  display:flex;
+  gap:1.25rem;
+  align-items:center;
+}
+
 .nav-toggle {
-  display: none;
+  display:none;
 }
-  .navlinks a{
-    color:var(--muted);
-    text-decoration:none;
-    white-space:nowrap;
-    font-weight:500;
-    opacity:.85;
-    transition:color .2s ease, opacity .2s ease;
-  }
-@media (max-width: 640px) {
-  .nav-toggle {
-    display: block;
-  }
+
+/* base nav links */
+.navlinks a {
+  color:var(--muted);
+  text-decoration:none;
+  white-space:nowrap;
+  font-weight:500;
+  opacity:.85;
+  transition:color .2s ease, opacity .2s ease;
 }
-  .navlinks a:hover{
-    opacity:1;
-    color:var(--accent-2);
-  }
 
-  .navlinks a.active{
-    opacity:1;
-    color:var(--accent-2);
-    position:relative;
-  }
+.navlinks a:hover {
+  opacity:1;
+  color:var(--accent-2);
+}
 
-  .navlinks a.active::after{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:-6px;
-    height:2px;
-    background:linear-gradient(90deg,var(--accent),var(--accent-2));
-    border-radius:2px;
-  }
+.navlinks a.active {
+  opacity:1;
+  color:var(--accent-2);
+  position:relative;
+}
 
-  .cta{
-    display:flex;
-    gap:.6rem;
-  }
+.navlinks a.active::after {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-6px;
+  height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  border-radius:2px;
+}
+
+/* CTA buttons container (desktop) */
+.cta {
+  display:flex;
+  gap:.6rem;
+}
+
+/* items that should ONLY show inside mobile hamburger */
+.mobile-only {
+  display:none;
+}
+
+/* button styled like a text link (for things like "Submit Highlight" inside nav) */
+.btn-as-link {
+  background:none;
+  border:none;
+  padding:0;
+  margin:0;
+  color:var(--muted);
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+}
+.btn-as-link:hover {
+  color:var(--accent-2);
+}
+
 /* Subtle noise texture */
 html::after {
   content: "";
@@ -231,7 +255,7 @@ h1 {
 
 /* ========= GRID & CARDS ========= */
 .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
-@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:680px){.grid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion: no-preference) {
   body.bg-aurora::before {
@@ -370,6 +394,44 @@ h1 {
     0%   { background-position: 0% 0%, 0% 0%, 0% 0%; }
     100% { background-position: 2% 1%, -2% 1.5%, 1% -1%; }
   }
-  
+}
 
+/* ========= MOBILE NAV BEHAVIOR ========= */
+@media (max-width: 640px) {
+  /* Only hamburger visible in header; hide brand + CTA row */
+  .brand {
+    display:none !important;
+  }
+
+  .cta {
+    display:none !important;
+  }
+
+  .nav-toggle {
+    display:block !important;
+  }
+
+  /* Hamburger dropdown */
+  .navlinks {
+    position:absolute;
+    top:58px;
+    left:0;
+    right:0;
+    padding:.75rem;
+    background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(109,251,255,.12);
+    flex-direction:column;
+    gap:.8rem;
+    display:none;
+  }
+
+  .navlinks.show {
+    display:flex !important;
+  }
+
+  /* Show mobile-only items (like Home / Submit duplicates inside nav) */
+  .mobile-only {
+    display:block !important;
+  }
 }
