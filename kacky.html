@@ -157,6 +157,31 @@
   <script>
     (function(){
       const btn=document.getElementById('navToggle');
+      (function(){
+  const current = location.pathname.replace(/\/+$/, "") || "/";
+  const nav = document.getElementById("primary-nav");
+
+  if (!nav) return;
+
+  // Hide only on mobile — desktop stays unchanged
+  function updateMobileNav() {
+    if (window.innerWidth <= 640) {
+      nav.querySelectorAll("a").forEach(a => {
+        const href = a.getAttribute("href").replace(/\/+$/, "") || "/";
+        a.style.display = (href === current) ? "none" : "block";
+      });
+    } else {
+      // reset on desktop
+      nav.querySelectorAll("a").forEach(a => {
+        a.style.display = "";
+      });
+    }
+  }
+
+  updateMobileNav();
+  window.addEventListener("resize", updateMobileNav);
+})();
+
       const nav=document.getElementById('primary-nav');
       if(!btn||!nav) return;
       btn.addEventListener('click',()=>{
@@ -184,7 +209,6 @@
     <div class="modal-card">
       <div class="modal-head">
         <strong>Submit Kacky Clip</strong>
-        <button class="btn" data-close-submit>Close</button>
       </div>
       <div class="modal-body">
         <form id="submitForm">
