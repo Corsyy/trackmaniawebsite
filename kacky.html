@@ -57,14 +57,23 @@
     color:var(--text); border-radius:10px; padding:.4rem .6rem; cursor:pointer;
   }
   @media (max-width: 640px) {
+    .cta {display:none !important;}
+    .nav-toggle {display:block !important;}
     .nav-toggle { display:block; }
-    .navlinks{
-      display:none; position:absolute; top:58px; left:0; right:0; padding:.75rem;
-      background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));
-      backdrop-filter:blur(8px); border-bottom:1px solid rgba(109,251,255,.12);
-      flex-direction:column; gap:.6rem;
+    .navlinks {
+        display: none;
+        position: absolute;
+        top: 58px;
+        left: 0;
+        right: 0;
+        padding: .75rem;
+        background: linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(109,251,255,.12);
+        flex-direction: column;
+        gap: .8rem;
     }
-    .navlinks.show { display:flex; }
+    .navlinks.show { display:flex !important;}
   }
   .brand{
     font-weight:800; font-size:1.1rem; letter-spacing:.3px; display:flex; align-items:center; gap:.5rem; color:var(--accent-2)
@@ -155,41 +164,48 @@
   </header>
 
   <script>
-    (function(){
-      const btn=document.getElementById('navToggle');
-      (function(){
+(function() {
+  const btn = document.getElementById('navToggle');
+  const nav = document.getElementById('primary-nav');
+  if (!btn || !nav) return;
+
+  btn.addEventListener('click', () => {
+    const open = nav.classList.toggle('show');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+})();
+</script>
+
+<script>
+(function () {
   const current = location.pathname.replace(/\/+$/, "") || "/";
   const nav = document.getElementById("primary-nav");
 
   if (!nav) return;
 
-  // Hide only on mobile — desktop stays unchanged
   function updateMobileNav() {
-    if (window.innerWidth <= 640) {
-      nav.querySelectorAll("a").forEach(a => {
-        const href = a.getAttribute("href").replace(/\/+$/, "") || "/";
-        a.style.display = (href === current) ? "none" : "block";
-      });
-    } else {
-      // reset on desktop
-      nav.querySelectorAll("a").forEach(a => {
+    const isMobile = window.innerWidth <= 640;
+
+    nav.querySelectorAll("a").forEach(a => {
+      const href = a.getAttribute("href").replace(/\/+$/, "") || "/";
+
+      if (isMobile) {
+        if (href === current) {
+          a.style.display = "none";
+        } else {
+          a.style.display = "block";
+        }
+      } else {
         a.style.display = "";
-      });
-    }
+      }
+    });
   }
 
   updateMobileNav();
   window.addEventListener("resize", updateMobileNav);
 })();
+</script>
 
-      const nav=document.getElementById('primary-nav');
-      if(!btn||!nav) return;
-      btn.addEventListener('click',()=>{
-        const open=nav.classList.toggle('show');
-        btn.setAttribute('aria-expanded',open?'true':'false');
-      });
-    })();
-  </script>
 
   <div class="container">
     <h1 class="title-line">Kacky Finishes</h1>
