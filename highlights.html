@@ -1,136 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Community Highlights — Trackmania Events</title>
-<meta name="theme-color" content="#0a0f1a"/>
-<link rel="icon" type="image/png" href="/logo.png">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Community Highlights — Trackmania Events</title>
+  <meta name="theme-color" content="#0a0f1a"/>
+  <link rel="icon" type="image/png" href="/logo.png">
 
-<!-- ✅ REPLACE the entire <style> block with this single line -->
-<link rel="stylesheet" href="/style.css">
-
+  <!-- Shared site styles -->
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body class="bg-aurora">
-<header>
-  <div class="container nav">
-    <div class="brand"><span class="badge">🎬</span><span>Community Highlights</span></div>
-    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-    <nav id="primary-nav" class="navlinks" aria-label="Primary">
-      <a href="/kacky">Kacky Finishes</a>
-      <a href="/totd">Track of the Day</a>
-      <a href="/recentwrs">Recent WRs</a>
-    </nav>
-    <div class="cta">
- <a href="/" class="btn">Home</a>
-       <button id="openModal" class="btn">Submit Highlight</button>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <span class="badge">🎬</span>
+        <span>Community Highlights</span>
+      </div>
+
+      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">
+        ☰
+      </button>
+
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
+
+        <a href="/" class="mobile-only">Home</a>
+        <button class="mobile-only btn-as-link" data-open-modal>Submit Highlight</button>
+  <!-- Normal site pages -->
+        <a href="/kacky">Kacky Finishes</a>
+        <a href="/totd">Track of the Day</a>
+        <a href="/recentwrs">Recent WRs</a>
+      </nav>
+
+      <div class="cta">
+        <a href="/" class="btn">Home</a>
+        <button id="openModal" class="btn">Submit Highlight</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page">
+      <header class="page-header">
+        <h1>Community Highlights</h1>
+        <p class="meta">
+          Share your best WR attempts, saves, fails, and stylish lines.
+        </p>
+      </header>
+
+      <section class="controls">
+        <div id="chips" class="chips" style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <span class="chip active" data-tag="All">All</span>
+          <span class="chip" data-tag="WR">WR</span>
+          <span class="chip" data-tag="WR Attempt">WR Attempt</span>
+          <span class="chip" data-tag="Save">Save</span>
+          <span class="chip" data-tag="Fail">Fail</span>
+          <span class="chip" data-tag="Style">Style</span>
+          <span class="chip" data-tag="Kacky">Kacky</span>
+          <span class="chip" data-tag="TOTD">TOTD</span>
+        </div>
+
+        <div class="toolbar-row">
+          <div class="search">
+            <input id="q" type="search" placeholder="Search player, map, tag…">
+          </div>
+          <button id="refresh" class="btn ghost">Refresh</button>
+        </div>
+      </section>
+
+      <section aria-live="polite">
+        <div id="grid" class="grid"></div>
+        <div id="empty" class="empty" style="display:none">
+          No highlights yet. Be the first to submit!
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal: Submit -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="dialog">
+      <h2>Submit a Highlight</h2>
+      <form id="form" class="form" novalidate>
+        <div class="field">
+          <label for="playerName">Username (required)</label>
+          <input id="playerName" name="playerName" type="text" placeholder="e.g., Corsy" required>
+        </div>
+
+        <div class="field">
+          <label for="mapName">Map name (required)</label>
+          <input id="mapName" name="mapName" type="text" placeholder="Realm CE" required>
+        </div>
+
+        <div class="field">
+          <label for="mapUid">Map UID</label>
+          <input id="mapUid" name="mapUid" type="text" placeholder="4xw1kNQh…">
+        </div>
+
+        <div class="field">
+          <label for="accountId">Account ID (optional)</label>
+          <input id="accountId" name="accountId" type="text" placeholder="Ubisoft accountId">
+        </div>
+
+        <div class="field row-2">
+          <label>Tags</label>
+          <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+            <label class="pill"><input type="checkbox" name="tags" value="WR"> WR</label>
+            <label class="pill"><input type="checkbox" name="tags" value="WR Attempt"> WR Attempt</label>
+            <label class="pill"><input type="checkbox" name="tags" value="Save"> Save</label>
+            <label class="pill"><input type="checkbox" name="tags" value="Fail"> Fail</label>
+            <label class="pill"><input type="checkbox" name="tags" value="Style"> Style</label>
+            <label class="pill"><input type="checkbox" name="tags" value="Kacky"> Kacky</label>
+            <label class="pill"><input type="checkbox" name="tags" value="TOTD"> TOTD</label>
+            <label class="pill">
+              Custom:
+              <input
+                id="customTag"
+                type="text"
+                placeholder="your tag"
+                style="margin-left:.35rem;padding:.25rem .45rem;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(10,15,26,.6);color:var(--text);width:120px">
+            </label>
+          </div>
+          <div class="small">You can add a custom tag (e.g., “Tech”, “Fullspeed”).</div>
+        </div>
+
+        <div class="field row-2">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" maxlength="300" placeholder="Short context (max 300 chars)"></textarea>
+          <div class="small">
+            <span id="descLen">0</span>/300
+          </div>
+        </div>
+
+        <div class="field row-2">
+          <label for="videoUrl">
+            Video URL (YouTube or Twitch)
+            <span class="small">(or upload a file below)</span>
+          </label>
+          <input id="videoUrl" name="videoUrl" type="url" placeholder="https://youtu.be/… or https://twitch.tv/videos/…">
+          <div class="small">Provide a URL <b>or</b> upload a file. Not both.</div>
+        </div>
+
+        <div class="field row-2">
+          <label>Upload file (mp4/webm/mov/mkv or GBX)</label>
+          <div id="drop" class="drop">
+            <div>
+              Drag &amp; drop here or
+              <button id="pick" type="button" class="btn ghost">Choose file</button>
+            </div>
+            <input id="file" name="file" type="file" accept=".mp4,.webm,.mov,.mkv,.gbx" hidden>
+          </div>
+          <div class="small" id="fileInfo">No file selected.</div>
+        </div>
+
+        <div class="field row-2">
+          <label>
+            <input id="consent" type="checkbox" required>
+            I agree to show this publicly and I own the rights.
+          </label>
+        </div>
+
+        <!-- honeypot -->
+        <input type="text" id="website" name="website" style="display:none">
+
+        <div id="status" class="small"></div>
+
+        <div class="actions row-2">
+          <button type="button" id="close" class="btn ghost">Cancel</button>
+          <button type="submit" class="btn">Submit</button>
+        </div>
+      </form>
     </div>
   </div>
-</header>
 
-<main>
-  <h1>Community Highlights</h1>
-  <div class="meta">Share your best WR attempts, saves, fails, and stylish lines.</div>
+  <!-- Small script just for nav toggle so it matches other pages -->
+  <script>
+    (function () {
+      const btn = document.getElementById('navToggle');
+      const nav = document.getElementById('primary-nav');
+      if (!btn || !nav) return;
 
-  <div class="controls">
-    <div class="chips" id="chips" style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <span class="chip active" data-tag="All">All</span>
-      <span class="chip" data-tag="WR">WR</span>
-      <span class="chip" data-tag="WR Attempt">WR Attempt</span>
-      <span class="chip" data-tag="Save">Save</span>
-      <span class="chip" data-tag="Fail">Fail</span>
-      <span class="chip" data-tag="Style">Style</span>
-      <span class="chip" data-tag="Kacky">Kacky</span>
-      <span class="chip" data-tag="TOTD">TOTD</span>
-    </div>
-    <div class="search"><input id="q" type="search" placeholder="Search player, map, tag…"></div>
-    <button id="refresh" class="btn ghost">Refresh</button>
-  </div>
+      btn.addEventListener('click', () => {
+        const open = nav.classList.toggle('show');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    })();
+  </script>
 
-  <div id="grid" class="grid"></div>
-  <div id="empty" class="empty" style="display:none">No highlights yet. Be the first to submit!</div>
-</main>
-
-<!-- Modal: Submit -->
-<div id="modal" class="modal" aria-hidden="true">
-  <div class="dialog">
-    <h2>Submit a Highlight</h2>
-    <form id="form" class="form" novalidate>
-      <div class="field">
-        <label>Username (required)</label>
-        <input id="playerName" name="playerName" type="text" placeholder="e.g., Corsy" required>
-      </div>
-
-      <div class="field">
-        <label>Map name (required)</label>
-        <input id="mapName" name="mapName" type="text" placeholder="Realm CE" required>
-      </div>
-
-      <div class="field">
-        <label>Map UID</label>
-        <input id="mapUid" name="mapUid" type="text" placeholder="4xw1kNQh…">
-      </div>
-
-      <div class="field">
-        <label>Account ID (optional)</label>
-        <input id="accountId" name="accountId" type="text" placeholder="Ubisoft accountId">
-      </div>
-
-      <div class="field row-2">
-        <label>Tags</label>
-        <div style="display:flex;gap:.4rem;flex-wrap:wrap">
-          <label class="pill"><input type="checkbox" name="tags" value="WR"> WR</label>
-          <label class="pill"><input type="checkbox" name="tags" value="WR Attempt"> WR Attempt</label>
-          <label class="pill"><input type="checkbox" name="tags" value="Save"> Save</label>
-          <label class="pill"><input type="checkbox" name="tags" value="Fail"> Fail</label>
-          <label class="pill"><input type="checkbox" name="tags" value="Style"> Style</label>
-          <label class="pill"><input type="checkbox" name="tags" value="Kacky"> Kacky</label>
-          <label class="pill"><input type="checkbox" name="tags" value="TOTD"> TOTD</label>
-          <label class="pill">Custom: <input id="customTag" type="text" placeholder="your tag" style="margin-left:.35rem;padding:.25rem .45rem;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(10,15,26,.6);color:var(--text);width:120px"></label>
-        </div>
-        <div class="small">You can add a custom tag (e.g., “Tech”, “Fullspeed”).</div>
-      </div>
-
-      <div class="field row-2">
-        <label>Description</label>
-        <textarea id="description" name="description" maxlength="300" placeholder="Short context (max 300 chars)"></textarea>
-        <div class="small"><span id="descLen">0</span>/300</div>
-      </div>
-
-      <div class="field row-2">
-        <label>Video URL (YouTube or Twitch) <span class="small">(or upload a file below)</span></label>
-        <input id="videoUrl" name="videoUrl" type="url" placeholder="https://youtu.be/… or https://twitch.tv/videos/…">
-        <div class="small">Provide a URL <b>or</b> upload a file. Not both.</div>
-      </div>
-
-      <div class="field row-2">
-        <label>Upload file (mp4/webm/mov/mkv or GBX)</label>
-        <div id="drop" class="drop">
-          <div>Drag & drop here or <button id="pick" type="button" class="btn ghost">Choose file</button></div>
-          <input id="file" name="file" type="file" accept=".mp4,.webm,.mov,.mkv,.gbx" hidden>
-        </div>
-        <div class="small" id="fileInfo">No file selected.</div>
-      </div>
-
-      <div class="field row-2">
-        <label><input id="consent" type="checkbox" required> I agree to show this publicly and I own the rights.</label>
-      </div>
-
-      <!-- honeypot -->
-      <input type="text" id="website" name="website" style="display:none">
-
-      <div id="status" class="small"></div>
-      <div class="actions row-2">
-        <button type="button" id="close" class="btn ghost">Cancel</button>
-        <button type="submit" class="btn">Submit</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-  // (your full JavaScript stays the same)
-  // nothing changes here
-</script>
+  <script>
+    // ⬇️ Put your existing Community Highlights JavaScript here.
+    // (All IDs and classes are the same: #grid, #q, #chips, #refresh, #modal, #openModal, etc.)
+  </script>
 </body>
 </html>
