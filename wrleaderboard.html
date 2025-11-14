@@ -119,11 +119,61 @@ header{
     padding:.4rem .6rem;
     cursor:pointer;
   }
+  .mobile-only {
+  display: none;
+}
+
+/* Turns a button into a nav-style text link */
+.btn-as-link {
+  background:none;
+  border:none;
+  padding:0;
+  margin:0;
+  color:var(--muted);
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+}
+.btn-as-link:hover {
+  color:var(--accent-2);
+}
   @media (max-width: 640px) {
   .nav-toggle {
-    display: block;
+    display: block !important;
+  }
+   .cta {
+    display:none !important;
+  }
+    .nav-toggle {
+    display:block !important;
+  }
+
+  /* Hamburger dropdown */
+  .navlinks {
+    position:absolute;
+    top:58px;
+    left:0;
+    right:0;
+    padding:.75rem;
+    background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(109,251,255,.12);
+    flex-direction:column;
+    gap:.8rem;
+    display:none;
+  }
+
+  /* When JS adds .show */
+  .navlinks.show {
+    display:flex !important;
+  }
+
+  /* Items that only show in hamburger */
+  .mobile-only {
+    display:block !important;
   }
 }
+
     /* Podium styles */
     .podium-head { display:flex; gap:.6rem; align-items:center; justify-content:space-between; margin:.25rem 0 .8rem; }
     .podium-ctrls { display:flex; gap:.5rem; align-items:center; }
@@ -176,6 +226,9 @@ header{
       <a href="/kacky">Kacky Finishes</a>
       <a href="/totd">Track of the Day</a>
       <a href="/highlights">Community Highlights</a>
+
+       <a href="/" class="mobile-only btn-as-link">Home</a>
+       <a href="/recentwrs" class="mobile-only btn-as-link">Recent WRs</a>
     </nav>
     <div class="cta">
  <a href="/" class="btn">Home</a>
