@@ -186,10 +186,11 @@
 #countdown-card .card-body{
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;           /* tiles sit lower in the card */
-  gap: .75rem;
-  padding: 1rem 1rem 4.5rem;           /* bottom = button space */
+  justify-content: flex-start; /* move content back to top */
+  gap: 1rem;
+  padding: 1rem 1rem 1.5rem; /* remove huge bottom padding */
 }
+
 
 /* 4-across tiles, centered, tidy spacing */
 #countdown{
