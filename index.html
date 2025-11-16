@@ -914,8 +914,10 @@ upcoming.forEach(e => {
   header.textContent = 'Countdown';
   setCountdown(0, 0, 0, 0);
   cdCard?.style.removeProperty('--cd-img');
-}
 
+  // Always show calendar using the current month
+  loadMiniCalendar(new Date().toISOString());
+}
 
     updateJSONLD(live[0]||next||null);
     attachReveals();
