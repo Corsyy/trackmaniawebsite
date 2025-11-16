@@ -598,43 +598,43 @@ document.addEventListener("click", (e) => {
     </div>
 
     <div class="hero-row">
-      <div>
-        <div class="card" id="countdown-card" aria-live="polite">
-          <div class="card-header">
-            <strong id="countdown-title">Countdown to green light</strong>
-          </div>
-          <div class="card-body">
-            <div class="countdown" id="countdown">
-  <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
-  <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
-  <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
-  <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
-</div>
-<div id="miniCalendar" class="calendar-container">
-  <div class="cal-header">
-    <button id="cal-prev" aria-label="Previous Month">←</button>
-    <div id="cal-title"></div>
-    <button id="cal-next" aria-label="Next Month">→</button>
-  </div>
-  <table id="cal-grid"></table>
-</div>
-
-            </div>
-          </div>
-        </div>
+  <div>
+    <div class="card" id="countdown-card" aria-live="polite">
+      <div class="card-header">
+        <strong id="countdown-title">Countdown to green light</strong>
       </div>
-
-      <div id="live" class="live">
-        <div class="card reveal">
-          <div class="card-header"><strong>Live on Twitch</strong></div>
-          <div class="card-body">
-            <div id="twitch-embed"></div>
-          </div>
+      <div class="card-body">
+        <div class="countdown" id="countdown">
+          <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+          <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+          <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+          <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
         </div>
+
+        <div id="miniCalendar" class="calendar-container">
+          <div class="cal-header">
+            <button id="cal-prev">←</button>
+            <div id="cal-title"></div>
+            <button id="cal-next">→</button>
+          </div>
+          <table id="cal-grid"></table>
+        </div>
+
       </div>
     </div>
+  </div> <!-- THIS closes left column -->
 
+  <div id="live" class="live">
+    <div class="card reveal">
+      <div class="card-header"><strong>Live on Twitch</strong></div>
+      <div class="card-body">
+        <div id="twitch-embed"></div>
+      </div>
+    </div>
   </div>
+
+</div>
+
 </section>
 
 <section id="live-events" class="section">
