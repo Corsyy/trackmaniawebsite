@@ -267,6 +267,22 @@
   font-size: 1rem;
   font-weight: 700;
 }
+#cal-tooltip {
+  position: absolute;
+  background: rgba(15, 21, 36, 0.95);
+  border: 1px solid rgba(109, 251, 255, 0.35);
+  padding: .65rem .9rem;
+  border-radius: 10px;
+  color: var(--text);
+  box-shadow: 0 0 18px rgba(61,165,255,.25);
+  font-size: .85rem;
+  line-height: 1.25rem;
+  pointer-events: none;
+  z-index: 99999;
+  display: none;
+  max-width: 220px;
+}
+
 
 .cal-header button {
   background: rgba(16,24,44,0.7);
@@ -528,12 +544,10 @@ function renderCalendar() {
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
 
-  const monthName = new Date(calYear, calMonth, 1).toLocaleString("default", {
+  title.textContent = new Date(calYear, calMonth, 1).toLocaleString("default", {
     month: "long",
     year: "numeric"
   });
-
-  title.textContent = monthName;
 
   let html = `
     <tr>
@@ -542,46 +556,79 @@ function renderCalendar() {
     </tr><tr>
   `;
 
-  // leading blanks
   for (let i = 0; i < firstDay; i++) html += "<td></td>";
 
-  // days
   for (let day = 1; day <= lastDate; day++) {
-    const todayDate = new Date();
+    const today = new Date();
     const isToday =
-      todayDate.toDateString() === new Date(calYear, calMonth, day).toDateString();
+      today.toDateString() === new Date(calYear, calMonth, day).toDateString();
 
-    // check multi-day ranges
     const current = new Date(calYear, calMonth, day);
-    const isEvent = allEventRanges.some(ev =>
-      current >= ev.start && current <= ev.end
-    );
 
-    html += `<td class="${
-      isEvent ? "eventDay" : isToday ? "today" : ""
-    }">${day}</td>`;
+    // find ALL events that match this day
+    const eventsToday = allEventRanges
+      .map((ev, i) => ({ ev, index: i }))
+      .filter(
+        o => current >= o.ev.start && current <= o.ev.end
+      )
+      .map(o => window.__eventsCache[o.index]); // actual event objects
+
+    const isEvent = eventsToday.length > 0;
+
+    html += `<td 
+        class="${isEvent ? "eventDay" : isToday ? "today" : ""}"
+        data-day="${day}"
+      >${day}</td>`;
 
     if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
   }
 
   html += "</tr>";
   grid.innerHTML = html;
+
+  activateCalendarTooltips();
+
+}
+function activateCalendarTooltips() {
+  const tooltip = document.getElementById("cal-tooltip");
+
+  document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
+    td.addEventListener("mouseenter", e => {
+      const day = parseInt(td.dataset.day);
+      const current = new Date(calYear, calMonth, day);
+
+      // find events
+      const eventsToday = allEventRanges
+        .map((ev, i) => ({ ev, index: i }))
+        .filter(o => current >= o.ev.start && current <= o.ev.end)
+        .map(o => window.__eventsCache[o.index]);
+
+      if (!eventsToday.length) {
+        tooltip.style.display = "none";
+        return;
+      }
+
+      // build tooltip text
+      let text = "";
+      eventsToday.forEach(ev => {
+        text += `<strong style="color:${ev.accent || 'var(--accent-2)'}">${ev.title}</strong><br>`;
+        text += `<span style="color:var(--muted);">${new Date(ev.start_iso).toLocaleDateString()} → ${new Date(ev.end_iso).toLocaleDateString()}</span><br><br>`;
+      });
+
+      tooltip.innerHTML = text;
+      tooltip.style.display = "block";
+
+      const rect = td.getBoundingClientRect();
+      tooltip.style.left = rect.left + window.scrollX + rect.width / 2 + "px";
+      tooltip.style.top = rect.top + window.scrollY - 55 + "px";
+    });
+
+    td.addEventListener("mouseleave", () => {
+      tooltip.style.display = "none";
+    });
+  });
 }
 
-// prev / next month
-document.addEventListener("click", (e) => {
-  if (e.target.id === "cal-prev") {
-    calMonth--;
-    if (calMonth < 0) { calMonth = 11; calYear--; }
-    renderCalendar();
-  }
-
-  if (e.target.id === "cal-next") {
-    calMonth++;
-    if (calMonth > 11) { calMonth = 0; calYear++; }
-    renderCalendar();
-  }
-});
 </script>
 
 
@@ -621,6 +668,7 @@ document.addEventListener("click", (e) => {
             <button id="cal-next">→</button>
           </div>
           <table id="cal-grid"></table>
+          <div id="cal-tooltip"></div>
         </div>
 
       </div>
