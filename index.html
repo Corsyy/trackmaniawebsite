@@ -264,6 +264,10 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+.calendar-container {
+  position: relative; /* popup anchors to this */
+}
+
 .cal-popup-title {
   font-weight: 800;
   color: var(--accent-2);
@@ -714,10 +718,14 @@ function activateCalendarTooltips() {
       td.appendChild(popup);
 
       // Positioning (center above)
-      popup.style.left = "50%";
-      popup.style.transform = "translateX(-50%)";
-      popup.style.bottom = "calc(100% + 8px)";
-      popup.style.position = "absolute";
+      // Center popup inside the calendar card instead of near the day
+const container = document.getElementById("miniCalendar");
+
+popup.style.position = "absolute";
+popup.style.top = "50%";
+popup.style.left = "50%";
+popup.style.transform = "translate(-50%, -50%)";
+
       popup.style.zIndex = "50";
       popup.style.display = "block";
     });
