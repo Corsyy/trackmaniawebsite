@@ -710,8 +710,15 @@ function activateCalendarTooltips() {
       popup.style.display = "block";
 
       const rect = td.getBoundingClientRect();
-      popup.style.left = (rect.left + rect.width / 2 - popup.offsetWidth / 2 + window.scrollX) + "px";
-      popup.style.top  = (rect.top - popup.offsetHeight - 12 + window.scrollY) + "px";
+const container = document.getElementById("miniCalendar");
+const cRect = container.getBoundingClientRect();
+
+// Position popup *inside the calendar container*
+popup.style.left =
+  (rect.left - cRect.left) + rect.width / 2 - popup.offsetWidth / 2 + "px";
+
+popup.style.top =
+  (rect.top - cRect.top) - popup.offsetHeight - 10 + "px";
     });
 
     td.addEventListener("mouseleave", () => {
