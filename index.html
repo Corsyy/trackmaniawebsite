@@ -236,9 +236,48 @@
   border-radius: 0 0 18px 18px;
   overflow: hidden;
 }
+#miniCalendar {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(16,24,44,.75), rgba(16,24,44,.45));
+  border: 1px solid rgba(109,251,255,.22);
+  box-shadow: 0 0 18px rgba(61,165,255,.18);
+  color: var(--text);
+  font-size: .9rem;
+  backdrop-filter: blur(10px);
+}
 
+#miniCalendar table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
 
+#miniCalendar th {
+  padding-bottom: .4rem;
+  font-size: .75rem;
+  color: var(--muted);
+}
 
+#miniCalendar td {
+  padding: .35rem 0;
+  border-radius: 6px;
+}
+
+#miniCalendar td.today {
+  background: linear-gradient(135deg,var(--accent),var(--accent-2));
+  color: #001220;
+  font-weight: 800;
+  box-shadow: var(--accent-glow);
+}
+
+#miniCalendar td.eventDay {
+  background: rgba(109,251,255,.20);
+  border: 1px solid rgba(109,251,255,.35);
+  font-weight: 700;
+  color: var(--accent-2);
+}
 
     /* sections */
     .section{padding:3rem 0}
@@ -444,6 +483,42 @@
       btn.setAttribute('aria-expanded',open?'true':'false');
     });
   })();
+
+  function loadMiniCalendar(dateIso){
+  const target = document.getElementById("miniCalendar");
+  if(!target) return;
+
+  const eventDate = new Date(dateIso);
+  const year = eventDate.getFullYear();
+  const month = eventDate.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month + 1, 0).getDate();
+
+  let html = `<table><tr>
+    <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th>
+    <th>Thu</th><th>Fri</th><th>Sat</th>
+  </tr><tr>`;
+
+  // Empty cells before 1st
+  for (let i=0; i<firstDay; i++) html += "<td></td>";
+
+  // Days
+  for (let day=1; day<=lastDate; day++){
+    const isToday = new Date().toDateString() === new Date(year,month,day).toDateString();
+    const isEvent = eventDate.getDate() === day;
+
+    html += `<td class="${
+      isEvent ? "eventDay" : isToday ? "today" : ""
+    }">${day}</td>`;
+
+    if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
+  }
+
+  html += "</tr></table>";
+  target.innerHTML = html;
+}
+
 </script>
 
 <section class="hero" id="home">
@@ -473,9 +548,7 @@
               <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
               <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
               <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
-            </div>
-            <div style="margin-top:.9rem">
-              <button class="btn" id="addCal">Add to Calendar</button>
+              <div id="miniCalendar"></div>
             </div>
           </div>
         </div>
@@ -763,6 +836,8 @@ upcoming.forEach(e => {
   if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
   else cdCard?.style.removeProperty('--cd-img');
 
+  loadMiniCalendar(next.start_iso);
+
 } else {
   chip.textContent = 'No upcoming event';
   pills.innerHTML = '<div class="pill">Check back soon</div>';
@@ -854,25 +929,6 @@ upcoming.forEach(e => {
     const btn=document.getElementById('toTop');
     addEventListener('scroll',()=>btn.classList.toggle('show',scrollY>600));
     btn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
-  })();
-
-  (function(){
-    const btn=document.getElementById('addCal');
-    function icsEscape(s){return (s||'').replace(/[\\,;]/g,m=>"\\"+m).replace(/\n/g,"\\n");}
-    function dt(iso){return iso.replace(/[-:]/g,"").replace(/\.\d{3}Z$/,'Z');}
-    function downloadICS(ev){
-      const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TrackmaniaEvents//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
-        'DTSTART:'+dt(ev.start_iso),'DTEND:'+dt(ev.end_iso),'SUMMARY:'+icsEscape(ev.title),
-        ev.location?'LOCATION:'+icsEscape(ev.location):'',ev.description?'DESCRIPTION:'+icsEscape(ev.description):'',
-        'END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');
-      const blob=new Blob([ics],{type:'text/calendar'});
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(ev.title||'event')+'.ics';a.click();URL.revokeObjectURL(a.href);
-    }
-    btn?.addEventListener('click',()=>{
-      const evts=window.__eventsCache||[];
-      const next=(function(evs){const now=Date.now();return evs.filter(e=>new Date(e.end_iso)>now).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso))[0];})(evts);
-      if(next) downloadICS(next);
-    });
   })();
 
   loadEvents();
