@@ -244,20 +244,20 @@
   overflow: hidden;
 }
 /* ===== Interactive Calendar ===== */
-#cal-popup {
+.cal-popup {
   position: absolute;
   min-width: 220px;
   max-width: 260px;
   background: rgba(15, 21, 36, 0.97);
-  border: 1px solid rgba(109, 251, 255, 0.30);
+  border: 1px solid rgba(109,251,255,0.30);
   border-radius: 12px;
   padding: 0.9rem 1rem;
   box-shadow: 0 0 20px rgba(61,165,255,.35);
   backdrop-filter: blur(10px);
-  z-index: 999999;
   display: none;
-  animation: calPopFade 0.15s ease-out;
+  animation: calPopFade 0.18s ease-out;
 }
+
 
 @keyframes calPopFade {
   from { opacity: 0; transform: translateY(6px); }
@@ -673,8 +673,6 @@ html += `
    TOOLTIP SYSTEM
 ------------------------------ */
 function activateCalendarTooltips() {
-  const popup = document.getElementById("cal-popup");
-
   document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
     td.addEventListener("mouseenter", () => {
       const day = parseInt(td.dataset.day);
@@ -685,21 +683,25 @@ function activateCalendarTooltips() {
         .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
         .map(o => window.__eventsCache[o.i]);
 
-      if (matches.length === 0) {
-        popup.style.display = "none";
-        return;
-      }
+      // No events → no popup
+      if (!matches.length) return;
+
+      // Remove old popup if any
+      const old = td.querySelector(".cal-popup");
+      if (old) old.remove();
+
+      // Build popup
+      const popup = document.createElement("div");
+      popup.className = "cal-popup";
 
       let html = "";
       matches.forEach(ev => {
-        const start = new Date(ev.start_iso);
-        const end   = new Date(ev.end_iso);
-
         html += `
           ${ev.image ? `<img class="cal-popup-image" src="${ev.image}">` : ""}
           <div class="cal-popup-title">${ev.title}</div>
           <div class="cal-popup-date">
-            ${start.toLocaleDateString()} → ${end.toLocaleDateString()}
+            ${new Date(ev.start_iso).toLocaleDateString()} →
+            ${new Date(ev.end_iso).toLocaleDateString()}
           </div>
           ${ev.description ? `<div class="cal-popup-desc">${ev.description}</div>` : ""}
           <div class="cal-popup-spacer"></div>
@@ -707,34 +709,26 @@ function activateCalendarTooltips() {
       });
 
       popup.innerHTML = html;
+
+      // Append inside TD
+      td.appendChild(popup);
+
+      // Positioning (center above)
+      popup.style.left = "50%";
+      popup.style.transform = "translateX(-50%)";
+      popup.style.bottom = "calc(100% + 8px)";
+      popup.style.position = "absolute";
+      popup.style.zIndex = "50";
       popup.style.display = "block";
-
-      const rect = td.getBoundingClientRect();
-const container = document.getElementById("miniCalendar");
-const cRect = container.getBoundingClientRect();
-
-// Calculate left inside container
-let left = (rect.left - cRect.left) + rect.width / 2 - popup.offsetWidth / 2;
-
-// Calculate top inside container
-let top = (rect.top - cRect.top) - popup.offsetHeight - 12;
-
-// Prevent popup from going above the calendar border
-if (top < 0) {
-  top = rect.top - cRect.top + rect.height + 12; // flip below
-}
-
-// Apply the final position
-popup.style.left = left + "px";
-popup.style.top = top + "px";
-
     });
 
     td.addEventListener("mouseleave", () => {
-      popup.style.display = "none";
+      const p = td.querySelector(".cal-popup");
+      if (p) p.remove();
     });
   });
 }
+
 
 
 /* ============================================================
@@ -831,7 +825,6 @@ loadEvents();
             <button id="cal-next">→</button>
           </div>
           <table id="cal-grid"></table>
-          <div id="cal-popup"></div>
         </div>
 
       </div>
