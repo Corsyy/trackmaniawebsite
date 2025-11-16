@@ -109,7 +109,13 @@
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 60% 80%,rgba(61,165,255,.2),transparent 70%);mix-blend-mode:screen;opacity:.25;pointer-events:none;border-radius:inherit}
 .hero-media{position:relative;border-radius:inherit;overflow:hidden}
 .hero-media img,.hero-media video,.hero-media canvas{display:block;width:100%;height:auto;border-radius:inherit;object-fit:cover;overflow:hidden}
-.hero .countdown{position:absolute;left:0;right:0;top:0;z-index:2;pointer-events:none}
+.hero .countdown {
+  position: static;   /* ← NORMAL FLOW, NOT FLOATING */
+  z-index: auto;
+  pointer-events: auto;
+  margin-top: 0;
+}
+
 .hero-grid{display:block}
 .chip{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border-radius:999px;font-size:.8rem;color:#001220;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow);animation:pulseAccent 3s infinite ease-in-out}
 #hero-chip,#live-chip{display:inline-block;width:auto;max-width:fit-content;padding:.4rem .9rem;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#001220;font-weight:800;box-shadow:var(--accent-glow)}
@@ -874,7 +880,6 @@ upcoming.forEach(e => {
     if (live.length) {
   const cur = live[0];
 
-  // Chip shows how many are live; hero promotes the first one.
   chip.textContent = live.length > 1
     ? `🟢 ${live.length} events live — ${cur.title}`
     : `Live now • ${cur.title}`;
@@ -889,6 +894,9 @@ upcoming.forEach(e => {
   const heroImg = cur?.hero_image || cur?.image;
   if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
   else cdCard?.style.removeProperty('--cd-img');
+
+  // ADD THIS RIGHT HERE 🔥🔥🔥🔥
+  loadMiniCalendar(new Date().toISOString());
 
   // Optional: if you have per-event Twitch channels, switch the embed.
   // Safe no-op if setTwitchChannel isn't defined.
