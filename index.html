@@ -713,12 +713,21 @@ function activateCalendarTooltips() {
 const container = document.getElementById("miniCalendar");
 const cRect = container.getBoundingClientRect();
 
-// Position popup *inside the calendar container*
-popup.style.left =
-  (rect.left - cRect.left) + rect.width / 2 - popup.offsetWidth / 2 + "px";
+// Calculate left inside container
+let left = (rect.left - cRect.left) + rect.width / 2 - popup.offsetWidth / 2;
 
-popup.style.top =
-  (rect.top - cRect.top) - popup.offsetHeight - 10 + "px";
+// Calculate top inside container
+let top = (rect.top - cRect.top) - popup.offsetHeight - 12;
+
+// Prevent popup from going above the calendar border
+if (top < 0) {
+  top = rect.top - cRect.top + rect.height + 12; // flip below
+}
+
+// Apply the final position
+popup.style.left = left + "px";
+popup.style.top = top + "px";
+
     });
 
     td.addEventListener("mouseleave", () => {
