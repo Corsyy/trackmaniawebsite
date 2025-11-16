@@ -236,43 +236,71 @@
   border-radius: 0 0 18px 18px;
   overflow: hidden;
 }
-#miniCalendar {
+/* ===== Interactive Calendar ===== */
+
+.calendar-container {
   margin-top: 1.2rem;
-  padding: 1rem;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(16,24,44,.75), rgba(16,24,44,.45));
-  border: 1px solid rgba(109,251,255,.22);
-  box-shadow: 0 0 18px rgba(61,165,255,.18);
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  background: rgba(16,24,44,0.40);
+  border: 1px solid rgba(109,251,255,0.22);
+  box-shadow: 0 0 18px rgba(61,165,255,0.18);
+  backdrop-filter: blur(12px);
+  width: 100%;
   color: var(--text);
-  font-size: .9rem;
-  backdrop-filter: blur(10px);
 }
 
-#miniCalendar table {
+.cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .6rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cal-header button {
+  background: rgba(16,24,44,0.7);
+  border: 1px solid rgba(109,251,255,0.22);
+  color: var(--accent-2);
+  padding: .25rem .6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .9rem;
+  transition: .15s ease;
+}
+
+.cal-header button:hover {
+  background: rgba(16,24,44,0.9);
+  transform: scale(1.05);
+}
+
+#cal-grid {
   width: 100%;
   border-collapse: collapse;
   text-align: center;
 }
 
-#miniCalendar th {
-  padding-bottom: .4rem;
-  font-size: .75rem;
+#cal-grid th {
   color: var(--muted);
+  padding-bottom: .4rem;
+  font-size: .8rem;
 }
 
-#miniCalendar td {
+#cal-grid td {
   padding: .35rem 0;
-  border-radius: 6px;
+  border-radius: 8px;
+  transition: .15s ease;
 }
 
-#miniCalendar td.today {
-  background: linear-gradient(135deg,var(--accent),var(--accent-2));
+#cal-grid td.today {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #001220;
   font-weight: 800;
   box-shadow: var(--accent-glow);
 }
 
-#miniCalendar td.eventDay {
+#cal-grid td.eventDay {
   background: rgba(109,251,255,.20);
   border: 1px solid rgba(109,251,255,.35);
   font-weight: 700;
@@ -484,29 +512,47 @@
     });
   })();
 
-  function loadMiniCalendar(dateIso){
-  const target = document.getElementById("miniCalendar");
-  if(!target) return;
+ let calYear, calMonth, calEventDate;
 
-  const eventDate = new Date(dateIso);
-  const year = eventDate.getFullYear();
-  const month = eventDate.getMonth();
+function loadMiniCalendar(dateIso) {
+  const d = new Date(dateIso);
+  calYear = d.getFullYear();
+  calMonth = d.getMonth();
+  calEventDate = d.getDate();
 
-  const firstDay = new Date(year, month, 1).getDay();
-  const lastDate = new Date(year, month + 1, 0).getDate();
+  renderCalendar();
+}
 
-  let html = `<table><tr>
-    <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th>
-    <th>Thu</th><th>Fri</th><th>Sat</th>
-  </tr><tr>`;
+function renderCalendar() {
+  const title = document.getElementById("cal-title");
+  const grid = document.getElementById("cal-grid");
 
-  // Empty cells before 1st
-  for (let i=0; i<firstDay; i++) html += "<td></td>";
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+
+  const monthName = new Date(calYear, calMonth, 1).toLocaleString("default", {
+    month: "long",
+    year: "numeric"
+  });
+
+  title.textContent = monthName;
+
+  // Build table
+  let html = `
+    <tr>
+      <th>Sun</th><th>Mon</th><th>Tue</th>
+      <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+    </tr><tr>`;
+
+  // Empty spaces
+  for (let i = 0; i < firstDay; i++) html += "<td></td>";
 
   // Days
-  for (let day=1; day<=lastDate; day++){
-    const isToday = new Date().toDateString() === new Date(year,month,day).toDateString();
-    const isEvent = eventDate.getDate() === day;
+  for (let day = 1; day <= lastDate; day++) {
+    const isToday =
+      new Date().toDateString() === new Date(calYear, calMonth, day).toDateString();
+
+    const isEvent = day === calEventDate;
 
     html += `<td class="${
       isEvent ? "eventDay" : isToday ? "today" : ""
@@ -515,10 +561,24 @@
     if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
   }
 
-  html += "</tr></table>";
-  target.innerHTML = html;
+  html += "</tr>";
+  grid.innerHTML = html;
 }
 
+// Navigation buttons
+document.addEventListener("click", (e) => {
+  if (e.target.id === "cal-prev") {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  }
+
+  if (e.target.id === "cal-next") {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  }
+});
 </script>
 
 <section class="hero" id="home">
@@ -544,11 +604,20 @@
           </div>
           <div class="card-body">
             <div class="countdown" id="countdown">
-              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
-              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
-              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
-              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
-              <div id="miniCalendar"></div>
+  <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+  <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+  <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+  <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+</div>
+<div id="miniCalendar" class="calendar-container">
+  <div class="cal-header">
+    <button id="cal-prev" aria-label="Previous Month">←</button>
+    <div id="cal-title"></div>
+    <button id="cal-next" aria-label="Next Month">→</button>
+  </div>
+  <table id="cal-grid"></table>
+</div>
+
             </div>
           </div>
         </div>
