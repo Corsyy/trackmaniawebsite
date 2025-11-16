@@ -528,9 +528,16 @@
 
 <script>
 let calYear, calMonth;
-let allEventRanges = []; // supports multi-day events
-window.__eventsCache = []; // DEFAULT empty so calendar never breaks
+let allEventRanges = [];
+window.__eventsCache = [];
 
+/* Remove time zone offsets (VERY IMPORTANT) */
+function stripTime(iso) {
+  const d = new Date(iso);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+/* Build calendar with given ISO date */
 function loadMiniCalendar(dateIso) {
   const d = new Date(dateIso);
   calYear = d.getFullYear();
@@ -538,6 +545,9 @@ function loadMiniCalendar(dateIso) {
   renderCalendar();
 }
 
+/* ------------------------------
+   RENDER CALENDAR GRID
+------------------------------ */
 function renderCalendar() {
   const title = document.getElementById("cal-title");
   const grid = document.getElementById("cal-grid");
@@ -545,10 +555,8 @@ function renderCalendar() {
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
 
-  title.textContent = new Date(calYear, calMonth, 1).toLocaleString("default", {
-    month: "long",
-    year: "numeric"
-  });
+  title.textContent = new Date(calYear, calMonth, 1)
+    .toLocaleString("default", { month: "long", year: "numeric" });
 
   let html = `
     <tr>
@@ -560,24 +568,28 @@ function renderCalendar() {
   for (let i = 0; i < firstDay; i++) html += "<td></td>";
 
   for (let day = 1; day <= lastDate; day++) {
+    const dayObj = new Date(calYear, calMonth, day);
     const today = new Date();
-    const isToday =
-      today.toDateString() === new Date(calYear, calMonth, day).toDateString();
+    today.setHours(0,0,0,0);
 
-    const current = new Date(calYear, calMonth, day);
+    const isToday = (dayObj.getTime() === today.getTime());
 
-    // find ALL events that match this day
-    const eventsToday = allEventRanges
-      .map((ev, i) => ({ ev, index: i }))
-      .filter(o => current >= o.ev.start && current <= o.ev.end)
-      .map(o => window.__eventsCache[o.index]);
+    // MATCH EVENTS
+    const matches = allEventRanges
+      .map((range, i) => ({ range, i }))
+      .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
+      .map(o => window.__eventsCache[o.i]);
 
-    const isEvent = eventsToday.length > 0;
+    const isEventDay = matches.length > 0;
 
-    html += `<td 
-        class="${isEvent ? "eventDay" : isToday ? "today" : ""}"
+    html += `
+      <td 
         data-day="${day}"
-      >${day}</td>`;
+        class="${isToday ? "today" : isEventDay ? "eventDay" : ""}"
+      >
+        ${day}
+      </td>
+    `;
 
     if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
   }
@@ -588,59 +600,109 @@ function renderCalendar() {
   activateCalendarTooltips();
 }
 
+/* ------------------------------
+   TOOLTIP SYSTEM
+------------------------------ */
 function activateCalendarTooltips() {
   const tooltip = document.getElementById("cal-tooltip");
 
   document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
     td.addEventListener("mouseenter", () => {
       const day = parseInt(td.dataset.day);
-      const current = new Date(calYear, calMonth, day);
+      const dayObj = new Date(calYear, calMonth, day);
 
-      // find matching events
-      const eventsToday = allEventRanges
-        .map((ev, i) => ({ ev, index: i }))
-        .filter(o => current >= o.ev.start && current <= o.ev.end)
-        .map(o => window.__eventsCache[o.index]);
+      const matches = allEventRanges
+        .map((range, i) => ({ range, i }))
+        .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
+        .map(o => window.__eventsCache[o.i]);
 
-      if (!eventsToday.length) {
+      if (matches.length === 0) {
         tooltip.style.display = "none";
         return;
       }
 
-      let text = "";
-      eventsToday.forEach(ev => {
-        text += `<strong style="color:${ev.accent || 'var(--accent-2)'}">${ev.title}</strong><br>`;
-        text += `<span style="color:var(--muted);">${new Date(ev.start_iso).toLocaleDateString()} → ${new Date(ev.end_iso).toLocaleDateString()}</span><br><br>`;
+      let html = "";
+      matches.forEach(ev => {
+        html += `
+          <strong style="color:var(--accent-2)">${ev.title}</strong><br>
+          <span style="color:var(--muted)">
+            ${new Date(ev.start_iso).toLocaleDateString()} → 
+            ${new Date(ev.end_iso).toLocaleDateString()}
+          </span>
+          <br><br>
+        `;
       });
 
-      tooltip.innerHTML = text;
+      tooltip.innerHTML = html;
       tooltip.style.display = "block";
 
       const rect = td.getBoundingClientRect();
       tooltip.style.left = rect.left + window.scrollX + rect.width / 2 + "px";
-      tooltip.style.top = rect.top + window.scrollY - 55 + "px";
+      tooltip.style.top  = rect.top + window.scrollY - 55 + "px";
     });
 
     td.addEventListener("mouseleave", () => {
-      tooltip.style.display = "none";
+      document.getElementById("cal-tooltip").style.display = "none";
     });
   });
 }
 
-// Navigation: previous / next month
-document.addEventListener("click", (e) => {
-  if (e.target.id === "cal-prev") {
-    calMonth--;
-    if (calMonth < 0) { calMonth = 11; calYear--; }
-    renderCalendar();
+/* ============================================================
+   EVENT RENDERING + CALENDAR HOOK
+============================================================ */
+
+function renderFromData(events) {
+  window.__eventsCache = events;  // <-- MUST HAPPEN FIRST
+
+  const now = Date.now();
+  const live = events.filter(e => new Date(e.start_iso) <= now && now <= new Date(e.end_iso));
+  const upcoming = events.filter(e => new Date(e.start_iso) > now);
+
+  /* Build multi-day event ranges */
+  allEventRanges = events.map(ev => ({
+    start: stripTime(ev.start_iso),
+    end: stripTime(ev.end_iso)
+  }));
+
+  /* PICK WHAT MONTH TO SHOW */
+  if (live.length) {
+    loadMiniCalendar(new Date().toISOString());
+  } else if (upcoming.length) {
+    loadMiniCalendar(upcoming[0].start_iso);
+  } else {
+    loadMiniCalendar(new Date().toISOString());
   }
 
-  if (e.target.id === "cal-next") {
-    calMonth++;
-    if (calMonth > 11) { calMonth = 0; calYear++; }
-    renderCalendar();
+  /* Your OTHER page logic can stay as-is */
+}
+
+/* ============================================================
+   LOAD EVENTS.JSON
+============================================================ */
+async function loadEvents() {
+  try {
+    const res = await fetch('/events.json?cb=' + Date.now());
+    const data = await res.json();
+    renderFromData(data);
+  } catch (err) {
+    console.error("Failed to load events:", err);
   }
-});
+}
+
+document.getElementById("cal-prev").onclick = () => {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+};
+
+document.getElementById("cal-next").onclick = () => {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+};
+
+/* Start everything */
+loadEvents();
 </script>
 
 <section class="hero" id="home">
