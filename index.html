@@ -244,6 +244,56 @@
   overflow: hidden;
 }
 /* ===== Interactive Calendar ===== */
+#cal-popup {
+  position: absolute;
+  min-width: 220px;
+  max-width: 260px;
+  background: rgba(15, 21, 36, 0.97);
+  border: 1px solid rgba(109, 251, 255, 0.30);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 0 20px rgba(61,165,255,.35);
+  backdrop-filter: blur(10px);
+  z-index: 999999;
+  display: none;
+  animation: calPopFade 0.15s ease-out;
+}
+
+@keyframes calPopFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cal-popup-title {
+  font-weight: 800;
+  color: var(--accent-2);
+  margin-bottom: 2px;
+}
+
+.cal-popup-date {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.cal-popup-desc {
+  font-size: 0.8rem;
+  color: #c8d6ff;
+  opacity: .85;
+  line-height: 1.25rem;
+}
+
+.cal-popup-spacer {
+  height: 8px;
+}
+
+.cal-popup-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(109,251,255,.22);
+}
+
 
 .calendar-container {
   margin-top: 1.2rem;
@@ -623,7 +673,7 @@ html += `
    TOOLTIP SYSTEM
 ------------------------------ */
 function activateCalendarTooltips() {
-  const tooltip = document.getElementById("cal-tooltip");
+  const popup = document.getElementById("cal-popup");
 
   document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
     td.addEventListener("mouseenter", () => {
@@ -636,35 +686,40 @@ function activateCalendarTooltips() {
         .map(o => window.__eventsCache[o.i]);
 
       if (matches.length === 0) {
-        tooltip.style.display = "none";
+        popup.style.display = "none";
         return;
       }
 
       let html = "";
       matches.forEach(ev => {
+        const start = new Date(ev.start_iso);
+        const end   = new Date(ev.end_iso);
+
         html += `
-          <strong style="color:var(--accent-2)">${ev.title}</strong><br>
-          <span style="color:var(--muted)">
-            ${new Date(ev.start_iso).toLocaleDateString()} → 
-            ${new Date(ev.end_iso).toLocaleDateString()}
-          </span>
-          <br><br>
+          ${ev.image ? `<img class="cal-popup-image" src="${ev.image}">` : ""}
+          <div class="cal-popup-title">${ev.title}</div>
+          <div class="cal-popup-date">
+            ${start.toLocaleDateString()} → ${end.toLocaleDateString()}
+          </div>
+          ${ev.description ? `<div class="cal-popup-desc">${ev.description}</div>` : ""}
+          <div class="cal-popup-spacer"></div>
         `;
       });
 
-      tooltip.innerHTML = html;
-      tooltip.style.display = "block";
+      popup.innerHTML = html;
+      popup.style.display = "block";
 
       const rect = td.getBoundingClientRect();
-      tooltip.style.left = rect.left + window.scrollX + rect.width / 2 + "px";
-      tooltip.style.top  = rect.top + window.scrollY - 55 + "px";
+      popup.style.left = (rect.left + rect.width / 2 - popup.offsetWidth / 2 + window.scrollX) + "px";
+      popup.style.top  = (rect.top - popup.offsetHeight - 12 + window.scrollY) + "px";
     });
 
     td.addEventListener("mouseleave", () => {
-      document.getElementById("cal-tooltip").style.display = "none";
+      popup.style.display = "none";
     });
   });
 }
+
 
 /* ============================================================
    EVENT RENDERING + CALENDAR HOOK
@@ -760,7 +815,7 @@ loadEvents();
             <button id="cal-next">→</button>
           </div>
           <table id="cal-grid"></table>
-          <div id="cal-tooltip"></div>
+          <div id="cal-popup"></div>
         </div>
 
       </div>
