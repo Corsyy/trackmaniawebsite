@@ -317,6 +317,21 @@
   border-radius: 8px;
   transition: .15s ease;
 }
+.cal-day-boxes {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 3px;
+}
+
+.cal-box {
+  width: 14px;
+  height: 10px;
+  border: 2px solid #00ff73; /* neon green like your screenshot */
+  border-radius: 4px;
+  box-shadow: 0 0 6px #00ff73a0;
+}
+
 
 #cal-grid td.today {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
@@ -324,14 +339,6 @@
   font-weight: 800;
   box-shadow: var(--accent-glow);
 }
-
-#cal-grid td.eventDay {
-  background: rgba(109,251,255,.20);
-  border: 1px solid rgba(109,251,255,.35);
-  font-weight: 700;
-  color: var(--accent-2);
-}
-
     /* sections */
     .section{padding:3rem 0}
     .title{font-size:1.8rem;font-weight:900;margin:0 0 1rem;display:inline-block;position:relative}
@@ -582,14 +589,26 @@ function renderCalendar() {
 
     const isEventDay = matches.length > 0;
 
-    html += `
-      <td 
-        data-day="${day}"
-        class="${isToday ? "today" : isEventDay ? "eventDay" : ""}"
-      >
-        ${day}
-      </td>
-    `;
+  // HOW MANY EVENTS ON THIS DAY?
+const eventCount = matches.length;
+
+// BUILD BOXES
+let boxesHTML = "";
+if (eventCount > 0) {
+  boxesHTML = `
+    <div class="cal-day-boxes">
+      ${Array(eventCount).fill('<div class="cal-box"></div>').join('')}
+    </div>
+  `;
+}
+
+html += `
+  <td data-day="${day}" class="${isToday ? "today" : ""}">
+    <div>${day}</div>
+    ${boxesHTML}
+  </td>
+`;
+
 
     if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
   }
