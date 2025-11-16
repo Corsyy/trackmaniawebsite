@@ -529,6 +529,7 @@
 <script>
 let calYear, calMonth;
 let allEventRanges = []; // supports multi-day events
+window.__eventsCache = []; // DEFAULT empty so calendar never breaks
 
 function loadMiniCalendar(dateIso) {
   const d = new Date(dateIso);
@@ -568,10 +569,8 @@ function renderCalendar() {
     // find ALL events that match this day
     const eventsToday = allEventRanges
       .map((ev, i) => ({ ev, index: i }))
-      .filter(
-        o => current >= o.ev.start && current <= o.ev.end
-      )
-      .map(o => window.__eventsCache[o.index]); // actual event objects
+      .filter(o => current >= o.ev.start && current <= o.ev.end)
+      .map(o => window.__eventsCache[o.index]);
 
     const isEvent = eventsToday.length > 0;
 
@@ -587,17 +586,17 @@ function renderCalendar() {
   grid.innerHTML = html;
 
   activateCalendarTooltips();
-
 }
+
 function activateCalendarTooltips() {
   const tooltip = document.getElementById("cal-tooltip");
 
   document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
-    td.addEventListener("mouseenter", e => {
+    td.addEventListener("mouseenter", () => {
       const day = parseInt(td.dataset.day);
       const current = new Date(calYear, calMonth, day);
 
-      // find events
+      // find matching events
       const eventsToday = allEventRanges
         .map((ev, i) => ({ ev, index: i }))
         .filter(o => current >= o.ev.start && current <= o.ev.end)
@@ -608,7 +607,6 @@ function activateCalendarTooltips() {
         return;
       }
 
-      // build tooltip text
       let text = "";
       eventsToday.forEach(ev => {
         text += `<strong style="color:${ev.accent || 'var(--accent-2)'}">${ev.title}</strong><br>`;
@@ -629,8 +627,21 @@ function activateCalendarTooltips() {
   });
 }
 
-</script>
+// Navigation: previous / next month
+document.addEventListener("click", (e) => {
+  if (e.target.id === "cal-prev") {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  }
 
+  if (e.target.id === "cal-next") {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  }
+});
+</script>
 
 <section class="hero" id="home">
   <div class="container hero-grid">
