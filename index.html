@@ -278,7 +278,7 @@
   font-size: .85rem;
   line-height: 1.25rem;
   pointer-events: none;
-  z-index: 99999;
+  z-index: 99999 !important;
   display: none;
   max-width: 220px;
 }
@@ -873,6 +873,7 @@ document.addEventListener("click", (e) => {
   }
 
   function renderFromData(events){
+    window.__eventsCache = events;
     const now=Date.now();
     const live=events.filter(e=>new Date(e.start_iso)<=now && now<=new Date(e.end_iso)).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
     const upcoming = events.filter(e => new Date(e.start_iso) > now).sort((a,b)=> new Date(a.start_iso) - new Date(b.start_iso));
@@ -933,6 +934,8 @@ allEventRanges = events.map(e => {
     end: new Date(end.getFullYear(), end.getMonth(), end.getDate())
   };
 });
+
+
     const next=upcoming[0];
     const chip=document.getElementById('hero-chip');
     const pills=document.getElementById('hero-pills');
