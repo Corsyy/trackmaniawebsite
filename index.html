@@ -511,24 +511,13 @@
 </header>
 
 <script>
-  (function(){
-    const btn=document.getElementById('navToggle');
-    const nav=document.getElementById('primary-nav');
-    if(!btn||!nav) return;
-    btn.addEventListener('click',()=>{
-      const open=nav.classList.toggle('show');
-      btn.setAttribute('aria-expanded',open?'true':'false');
-    });
-  })();
-
- let calYear, calMonth, calEventDate;
+let calYear, calMonth;
+let allEventRanges = []; // supports multi-day events
 
 function loadMiniCalendar(dateIso) {
   const d = new Date(dateIso);
   calYear = d.getFullYear();
   calMonth = d.getMonth();
-  calEventDate = d.getDate();
-
   renderCalendar();
 }
 
@@ -546,22 +535,27 @@ function renderCalendar() {
 
   title.textContent = monthName;
 
-  // Build table
   let html = `
     <tr>
       <th>Sun</th><th>Mon</th><th>Tue</th>
       <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-    </tr><tr>`;
+    </tr><tr>
+  `;
 
-  // Empty spaces
+  // leading blanks
   for (let i = 0; i < firstDay; i++) html += "<td></td>";
 
-  // Days
+  // days
   for (let day = 1; day <= lastDate; day++) {
+    const todayDate = new Date();
     const isToday =
-      new Date().toDateString() === new Date(calYear, calMonth, day).toDateString();
+      todayDate.toDateString() === new Date(calYear, calMonth, day).toDateString();
 
-    const isEvent = day === calEventDate;
+    // check multi-day ranges
+    const current = new Date(calYear, calMonth, day);
+    const isEvent = allEventRanges.some(ev =>
+      current >= ev.start && current <= ev.end
+    );
 
     html += `<td class="${
       isEvent ? "eventDay" : isToday ? "today" : ""
@@ -574,7 +568,7 @@ function renderCalendar() {
   grid.innerHTML = html;
 }
 
-// Navigation buttons
+// prev / next month
 document.addEventListener("click", (e) => {
   if (e.target.id === "cal-prev") {
     calMonth--;
@@ -589,6 +583,7 @@ document.addEventListener("click", (e) => {
   }
 });
 </script>
+
 
 <section class="hero" id="home">
   <div class="container hero-grid">
@@ -870,7 +865,15 @@ upcoming.forEach(e => {
       }
       pastGrid.appendChild(el);
     });
+allEventRanges = events.map(e => {
+  const start = new Date(e.start_iso);
+  const end = new Date(e.end_iso);
 
+  return {
+    start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
+    end: new Date(end.getFullYear(), end.getMonth(), end.getDate())
+  };
+});
     const next=upcoming[0];
     const chip=document.getElementById('hero-chip');
     const pills=document.getElementById('hero-pills');
