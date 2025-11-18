@@ -1090,6 +1090,16 @@ allEventRanges = events.map(e => {
     attachHoverGlow();
     window.__eventsCache=events;
   }
+  
+  if (!calendarInitialized) {
+  const initialMonth =
+    live[0]?.start_iso ||
+    next?.start_iso ||
+    new Date().toISOString();
+
+  loadMiniCalendar(initialMonth);
+  calendarInitialized = true;
+}
 
   function updateJSONLD(next){
     const el=document.getElementById('event-jsonld');
