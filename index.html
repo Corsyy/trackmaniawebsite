@@ -595,6 +595,13 @@ function stripTime(iso) {
   const d = new Date(iso);
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
+function loadMiniCalendar(dateIso) {
+  const d = new Date(dateIso);
+  calYear = d.getFullYear();
+  calMonth = d.getMonth();
+  renderCalendar();
+}
+
 function renderCalendar() {
   const title = document.getElementById("cal-title");
   const grid = document.getElementById("cal-grid");
