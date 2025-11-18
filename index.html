@@ -371,19 +371,18 @@
   border-radius: 8px;
   transition: .15s ease;
 }
-.cal-day-boxes {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  margin-top: 3px;
+.cal-event-day {
+  position: relative;
+  font-weight: 700;
+  color: var(--text);
 }
 
-.cal-box {
-  width: 14px;
-  height: 10px;
-  border: 2px solid #00ff73; /* neon green like your screenshot */
-  border-radius: 4px;
-  box-shadow: 0 0 6px #00ff73a0;
+.cal-event-day div:first-child {
+  padding: 3px 6px;
+  border: 2px solid #00ff73;
+  border-radius: 6px;
+  box-shadow: 0 0 8px #00ff73a0;
+  display: inline-block;
 }
 
 
@@ -643,25 +642,12 @@ function renderCalendar() {
 
     const isEventDay = matches.length > 0;
 
-  // HOW MANY EVENTS ON THIS DAY?
-const eventCount = matches.length;
-
-// BUILD BOXES
-let boxesHTML = "";
-if (eventCount > 0) {
-  boxesHTML = `
-    <div class="cal-day-boxes">
-      ${Array(eventCount).fill('<div class="cal-box"></div>').join('')}
-    </div>
-  `;
-}
-
 html += `
-  <td data-day="${day}" class="${isToday ? "today" : ""}">
+  <td data-day="${day}" class="${isToday ? "today" : ""} ${isEventDay ? "cal-event-day" : ""}">
     <div>${day}</div>
-    ${boxesHTML}
   </td>
 `;
+
 
 
     if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
