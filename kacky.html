@@ -477,7 +477,21 @@
   playerModal.setAttribute("aria-hidden", "false");
 }
 
-  function closePlayer(){ playerFrame.src = ''; playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true'); }
+  function closePlayer() {
+  playerFrame.src = '';
+  let v = document.getElementById("playerVideo");
+  if (v) {
+    v.pause();
+    v.currentTime = 0;
+    v.src = '';       
+    v.style.display = "none";
+  }
+
+  // Close modal visually
+  playerModal.classList.remove('open'); 
+  playerModal.setAttribute('aria-hidden','true'); 
+}
+
 
   document.addEventListener('click', (e)=>{
     const t = e.target;
