@@ -590,24 +590,11 @@
 let calYear, calMonth;
 let allEventRanges = [];
 window.__eventsCache = [];
-
-/* Remove time zone offsets (VERY IMPORTANT) */
+let calendarInitialized = false;
 function stripTime(iso) {
   const d = new Date(iso);
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
-
-/* Build calendar with given ISO date */
-function loadMiniCalendar(dateIso) {
-  const d = new Date(dateIso);
-  calYear = d.getFullYear();
-  calMonth = d.getMonth();
-  renderCalendar();
-}
-
-/* ------------------------------
-   RENDER CALENDAR GRID
------------------------------- */
 function renderCalendar() {
   const title = document.getElementById("cal-title");
   const grid = document.getElementById("cal-grid");
@@ -633,8 +620,6 @@ function renderCalendar() {
     today.setHours(0,0,0,0);
 
     const isToday = (dayObj.getTime() === today.getTime());
-
-    // MATCH EVENTS
     const matches = allEventRanges
       .map((range, i) => ({ range, i }))
       .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
@@ -659,9 +644,6 @@ html += `
   activateCalendarTooltips();
 }
 
-/* ------------------------------
-   TOOLTIP SYSTEM
------------------------------- */
 function activateCalendarTooltips() {
   const container = document.getElementById("miniCalendar");
 
@@ -677,11 +659,9 @@ function activateCalendarTooltips() {
 
       if (!matches.length) return;
 
-      // Remove previous popup
       const exist = document.querySelector(".cal-popup");
       if (exist) exist.remove();
 
-      // Build popup
       const popup = document.createElement("div");
       popup.className = "cal-popup";
 
@@ -702,14 +682,12 @@ function activateCalendarTooltips() {
       popup.innerHTML = html;
       container.appendChild(popup);
 
-      // Position popup ABOVE the day
       const tdRect = td.getBoundingClientRect();
       const contRect = container.getBoundingClientRect();
 
       let left = tdRect.left - contRect.left + tdRect.width / 2;
       let top = tdRect.top - contRect.top - popup.offsetHeight - 10;
 
-      // If there's no room above, put below instead
       if (top < 0) {
         top = tdRect.top - contRect.top + tdRect.height + 10;
       }
@@ -723,39 +701,19 @@ function activateCalendarTooltips() {
 }
 
 
-
-/* ============================================================
-   EVENT RENDERING + CALENDAR HOOK
-============================================================ */
-
 function renderFromData(events) {
-  window.__eventsCache = events;  // <-- MUST HAPPEN FIRST
+  window.__eventsCache = events; 
 
   const now = Date.now();
   const live = events.filter(e => new Date(e.start_iso) <= now && now <= new Date(e.end_iso));
   const upcoming = events.filter(e => new Date(e.start_iso) > now);
-
-  /* Build multi-day event ranges */
   allEventRanges = events.map(ev => ({
     start: stripTime(ev.start_iso),
     end: stripTime(ev.end_iso)
   }));
 
-  /* PICK WHAT MONTH TO SHOW */
-  if (live.length) {
-    loadMiniCalendar(new Date().toISOString());
-  } else if (upcoming.length) {
-    loadMiniCalendar(upcoming[0].start_iso);
-  } else {
-    loadMiniCalendar(new Date().toISOString());
-  }
-
-  /* Your OTHER page logic can stay as-is */
 }
 
-/* ============================================================
-   LOAD EVENTS.JSON
-============================================================ */
 async function loadEvents() {
   try {
     const res = await fetch('/events.json?cb=' + Date.now());
@@ -778,7 +736,6 @@ document.getElementById("cal-next").onclick = () => {
   renderCalendar();
 };
 
-/* Start everything */
 loadEvents();
 </script>
 
@@ -822,7 +779,7 @@ loadEvents();
 
       </div>
     </div>
-  </div> <!-- THIS closes left column -->
+  </div> 
 
   <div id="live" class="live">
     <div class="card reveal">
@@ -970,7 +927,6 @@ loadEvents();
     });
   }
 
-  /* NEW: Build an event element and wrap with <a> if discordUrl (or url) is present */
   function makeEventElement(e, options = {}) {
     const article = document.createElement('article');
     article.className = 'event reveal';
@@ -1023,7 +979,6 @@ loadEvents();
     if(live.length){
       liveSection.style.display='';
       liveGrid.innerHTML='';
-      /* UPDATED: build via helper, tag "LIVE NOW" */
       live.forEach(e=>{
         const el = makeEventElement(e, { tagText: 'LIVE NOW', subline: 'description' });
         liveGrid.appendChild(el);
@@ -1098,11 +1053,6 @@ allEventRanges = events.map(e => {
   if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
   else cdCard?.style.removeProperty('--cd-img');
 
-  // ADD THIS RIGHT HERE 🔥🔥🔥🔥
-  loadMiniCalendar(new Date().toISOString());
-
-  // Optional: if you have per-event Twitch channels, switch the embed.
-  // Safe no-op if setTwitchChannel isn't defined.
   if (cur.twitch && typeof setTwitchChannel === 'function') {
     setTwitchChannel(cur.twitch);
   }
@@ -1119,7 +1069,6 @@ allEventRanges = events.map(e => {
   if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
   else cdCard?.style.removeProperty('--cd-img');
 
-  loadMiniCalendar(next.start_iso);
 
 } else {
   chip.textContent = 'No upcoming event';
@@ -1127,9 +1076,6 @@ allEventRanges = events.map(e => {
   header.textContent = 'Countdown';
   setCountdown(0, 0, 0, 0);
   cdCard?.style.removeProperty('--cd-img');
-
-  // Always show calendar using the current month
-  loadMiniCalendar(new Date().toISOString());
 }
 
     updateJSONLD(live[0]||next||null);
@@ -1171,7 +1117,6 @@ allEventRanges = events.map(e => {
     }
   }
 
-  /* twitch embed */
   (function(){
     const parents=['trackmaniaevents.com','www.trackmaniaevents.com'];
     const embed=document.getElementById('twitch-embed');
@@ -1183,7 +1128,6 @@ allEventRanges = events.map(e => {
     embed.appendChild(iframe);
   })();
 
-  /* nav active highlight on scroll */
   (function(){
     const sections=[...document.querySelectorAll('section[id]')];
     const links=[...document.querySelectorAll('.navlinks a')];
