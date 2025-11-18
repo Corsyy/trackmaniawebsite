@@ -707,20 +707,6 @@ function activateCalendarTooltips() {
   });
 }
 
-
-function renderFromData(events) {
-  window.__eventsCache = events; 
-
-  const now = Date.now();
-  const live = events.filter(e => new Date(e.start_iso) <= now && now <= new Date(e.end_iso));
-  const upcoming = events.filter(e => new Date(e.start_iso) > now);
-  allEventRanges = events.map(ev => ({
-    start: stripTime(ev.start_iso),
-    end: stripTime(ev.end_iso)
-  }));
-
-}
-
 async function loadEvents() {
   try {
     const res = await fetch('/events.json?cb=' + Date.now());
@@ -1084,13 +1070,6 @@ allEventRanges = events.map(e => {
   setCountdown(0, 0, 0, 0);
   cdCard?.style.removeProperty('--cd-img');
 }
-
-    updateJSONLD(live[0]||next||null);
-    attachReveals();
-    attachHoverGlow();
-    window.__eventsCache=events;
-  }
-  
   if (!calendarInitialized) {
   const initialMonth =
     live[0]?.start_iso ||
@@ -1100,6 +1079,12 @@ allEventRanges = events.map(e => {
   loadMiniCalendar(initialMonth);
   calendarInitialized = true;
 }
+    updateJSONLD(live[0]||next||null);
+    attachReveals();
+    attachHoverGlow();
+    window.__eventsCache=events;
+  }
+
 
   function updateJSONLD(next){
     const el=document.getElementById('event-jsonld');
