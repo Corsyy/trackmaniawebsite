@@ -958,105 +958,93 @@
   }
 
   function attachCalendarTooltips() {
-    const container = document.getElementById("miniCalendar");
-    const grid = document.getElementById("cal-grid");
-    if (!container || !grid) return;
+  const container = document.getElementById("miniCalendar");
+  const grid = document.getElementById("cal-grid");
+  if (!container || !grid) return;
 
-    const tooltip = ensureCalTooltip();
+  // Create tooltip if missing
+  let tooltip = document.getElementById("cal-tooltip");
+  if (!tooltip) {
+    tooltip = document.createElement("div");
+    tooltip.id = "cal-tooltip";
+    container.appendChild(tooltip);
+  }
+  tooltip.style.display = "none";
+
+  function hideTooltip() {
     tooltip.style.display = "none";
+  }
 
-    function hideTooltip() {
-      tooltip.style.display = "none";
-    }
+  grid.querySelectorAll("td[data-day]").forEach(td => {
+    td.addEventListener("mouseenter", () => {
+      const day = parseInt(td.dataset.day, 10);
+      const dayObj = new Date(calYear, calMonth, day);
 
-    grid
-      .querySelectorAll("td[data-day]")
-      .forEach((td) => {
-        td.addEventListener("mouseenter", () => {
-          const day = parseInt(td.dataset.day, 10);
-          const dayObj = new Date(calYear, calMonth, day);
+      const matches = allEventRanges
+        .filter(o => dayObj >= o.start && dayObj <= o.end)
+        .map(o => window.__eventsCache[o.index]);
 
-          const matches = allEventRanges
-            .filter(
-              (o) => dayObj >= o.start && dayObj <= o.end
-            )
-            .map((o) => window.__eventsCache[o.index]);
+      if (!matches.length) {
+        hideTooltip();
+        return;
+      }
 
-          if (!matches.length) {
-            hideTooltip();
-            return;
-          }
-
-          // build simple text-only content
-          let html = "";
-          matches.forEach((ev, idx) => {
-            if (idx > 0) {
-              html +=
-                '<div class="cal-popup-spacer"></div>';
-            }
-            html += `
-              <div class="cal-popup-title">${ev.title}</div>
-              <div class="cal-popup-date">
-                ${new Date(ev.start_iso).toLocaleDateString()}
-                –
-                ${new Date(ev.end_iso).toLocaleDateString()}
-              </div>
-              ${
-                ev.location
-                  ? `<div class="cal-popup-desc">${ev.location}</div>`
-                  : ""
-              }
-            `;
-          });
-
-          tooltip.innerHTML = html;
-          tooltip.style.display = "block";
-
-          const tdRect = td.getBoundingClientRect();
-          const contRect = container.getBoundingClientRect();
-
-          const tooltipRect =
-            tooltip.getBoundingClientRect();
-
-          let left =
-            tdRect.left -
-            contRect.left +
-            tdRect.width / 2;
-          let top =
-            tdRect.top -
-            contRect.top -
-            tooltipRect.height -
-            10;
-
-          // if there's no room above, show below the cell
-          if (top < 0) {
-            top =
-              tdRect.top -
-              contRect.top +
-              tdRect.height +
-              10;
-          }
-
-          // clamp horizontally so it stays inside calendar
-          const minLeft =
-            tooltipRect.width / 2 + 8;
-          const maxLeft =
-            contRect.width -
-            tooltipRect.width / 2 -
-            8;
-          if (left < minLeft) left = minLeft;
-          if (left > maxLeft) left = maxLeft;
-
-          tooltip.style.left = `${left}px`;
-          tooltip.style.top = `${top}px`;
-          tooltip.style.transform = "translateX(-50%)";
-        });
-
-        td.addEventListener("mouseleave", hideTooltip);
+      // Build popup content
+      let html = "";
+      matches.forEach((ev, idx) => {
+        if (idx > 0) {
+          html += `<div class="cal-popup-spacer"></div>`;
+        }
+        html += `
+          <div class="cal-popup-title">${ev.title}</div>
+          <div class="cal-popup-date">
+            ${new Date(ev.start_iso).toLocaleDateString()} –
+            ${new Date(ev.end_iso).toLocaleDateString()}
+          </div>
+          <div class="cal-popup-desc">${ev.location || ""}</div>
+        `;
       });
 
-    container.addEventListener("mouseleave", hideTooltip);
-  }
+      tooltip.innerHTML = html;
+      tooltip.style.display = "block";
+
+      // Position tooltip properly
+      const tdRect = td.getBoundingClientRect();
+      const contRect = container.getBoundingClientRect();
+      const popupRect = tooltip.getBoundingClientRect();
+
+      // Try placing ABOVE the cell
+      let top = tdRect.top - contRect.top - popupRect.height - 10;
+
+      // If not enough room above, place BELOW
+      if (top < 0) {
+        top = tdRect.top - contRect.top + tdRect.height + 10;
+      }
+
+      // Center horizontally over the TD, then clamp
+      const padding = 12;
+      let left =
+        tdRect.left -
+        contRect.left +
+        tdRect.width / 2 -
+        popupRect.width / 2;
+
+      if (left < padding) {
+        left = padding;
+      } else if (left + popupRect.width > contRect.width - padding) {
+        left = contRect.width - popupRect.width - padding;
+      }
+
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.transform = "none";
+    });
+
+    td.addEventListener("mouseleave", hideTooltip);
+  });
+
+  container.addEventListener("mouseleave", hideTooltip);
+}
 
   // ---------- RENDER EVENTS + HOOK CALENDAR ----------
   function renderFromData(events) {
