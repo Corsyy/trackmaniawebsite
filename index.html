@@ -28,7 +28,6 @@
       --warn:#ffb02e;
       --ring:0 0 0 3px rgba(61,165,255,.25);
       --accent-glow:0 0 24px rgba(61,165,255,.35), 0 0 48px rgba(61,165,255,.2);
-      /* hero card target height (countdown & twitch) */
       --heroCardH: 420px;
     }
 
@@ -36,52 +35,47 @@
     html,body{height:100%}
     html{scroll-behavior:smooth}
 
-    /* ==== THEME: TRACK CURVES (clean, premium) ==== */
-   body.bg-track-curves {
-  background:
-    radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
-    radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
-    linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
-  color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
+    /* THEME BACKGROUND */
+    body.bg-track-curves {
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
+        linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
 
-    /* prettier-ignore */
-   body.bg-track-curves::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.6;
-  mix-blend-mode: screen;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
-  background-size: cover;
-  background-repeat: no-repeat;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
+    body.bg-track-curves::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.6;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+      background-size: cover;
+      background-repeat: no-repeat;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
 
-
-    /* prettier-ignore */
-   body.bg-track-curves::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
-  opacity: 0.09;
-  background-size: 120px 120px;
-}
-
-    @keyframes noiseShift{ 50%{transform:translate3d(0,0,0)} 50.01%{transform:translate3d(.5px,.5px,0)} }
+    body.bg-track-curves::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
+      opacity: 0.09;
+      background-size: 120px 120px;
+    }
 
     a{color:inherit;text-decoration:none}
     .container{width:min(1200px,92vw);margin:0 auto}
 
-    /* nav */
+    /* NAV */
     header{
       position:sticky;top:0;z-index:50;
       background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));
@@ -104,348 +98,344 @@
     .btn:focus{outline:none;box-shadow:var(--ring)}
     .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
 
-   /* hero */
-.hero{position:relative;padding:clamp(2rem,5vw,4rem) 0 2.5rem;border-radius:16px;overflow:visible;isolation:isolate;mask-image:radial-gradient(white,black);-webkit-mask-image:-webkit-radial-gradient(white,black);background-clip:padding-box}
-.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 60% 80%,rgba(61,165,255,.2),transparent 70%);mix-blend-mode:screen;opacity:.25;pointer-events:none;border-radius:inherit}
-.hero-media{position:relative;border-radius:inherit;overflow:hidden}
-.hero-media img,.hero-media video,.hero-media canvas{display:block;width:100%;height:auto;border-radius:inherit;object-fit:cover;overflow:hidden}
-.hero .countdown {
-  position: static;   /* ← NORMAL FLOW, NOT FLOATING */
-  z-index: auto;
-  pointer-events: auto;
-  margin-top: 0;
-}
+    /* HERO */
+    .hero{
+      position:relative;
+      padding:clamp(2rem,5vw,4rem) 0 2.5rem;
+      border-radius:16px;
+      overflow:visible;
+      isolation:isolate;
+      mask-image:radial-gradient(white,black);
+      -webkit-mask-image:-webkit-radial-gradient(white,black);
+      background-clip:padding-box;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at 60% 80%,rgba(61,165,255,.2),transparent 70%);
+      mix-blend-mode:screen;
+      opacity:.25;
+      pointer-events:none;
+      border-radius:inherit;
+    }
+    .hero-grid{display:block}
+    .hero-top{display:flex;flex-direction:column;gap:1rem}
+    .hero-row{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:start;margin-top:1rem}
+    .hero-row>div:first-child{margin-top:0}
 
-.hero-grid{display:block}
-.chip{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border-radius:999px;font-size:.8rem;color:#001220;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow);animation:pulseAccent 3s infinite ease-in-out}
-#hero-chip,#live-chip{display:inline-block;width:auto;max-width:fit-content;padding:.4rem .9rem;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#001220;font-weight:800;box-shadow:var(--accent-glow)}
-.h1{font-size:clamp(2.1rem,3.8vw,3rem);line-height:1.1;margin:.8rem 0 0;font-weight:900;letter-spacing:.4px;text-shadow:0 0 12px rgba(61,165,255,.25)}
-.lead{color:var(--muted);max-width:60ch;margin-top:.85rem}
-.keyfacts{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.2rem 0}
-.pill{padding:.5rem .75rem;border-radius:999px;border:1px solid rgba(109,251,255,.25);background:linear-gradient(180deg,rgba(12,16,32,.7),rgba(12,16,32,.45))}
-.hero-top{display:flex;flex-direction:column;gap:1rem}
-.hero-row{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:start;margin-top:1rem}
-.hero-row>div:first-child{margin-top:0}
-@media(max-width:900px){.hero-row{grid-template-columns:1fr}.hero .countdown{position:static;margin-top:.75rem}}
+    .chip{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border-radius:999px;font-size:.8rem;color:#001220;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow);animation:pulseAccent 3s infinite ease-in-out}
+    #hero-chip,#live-chip{display:inline-block;width:auto;max-width:fit-content;padding:.4rem .9rem;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#001220;font-weight:800;box-shadow:var(--accent-glow)}
+    .h1{font-size:clamp(2.1rem,3.8vw,3rem);line-height:1.1;margin:.8rem 0 0;font-weight:900;letter-spacing:.4px;text-shadow:0 0 12px rgba(61,165,255,.25)}
+    .lead{color:var(--muted);max-width:60ch;margin-top:.85rem}
+    .keyfacts{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.2rem 0}
+    .pill{padding:.5rem .75rem;border-radius:999px;border:1px solid rgba(109,251,255,.25);background:linear-gradient(180deg,rgba(12,16,32,.7),rgba(12,16,32,.45))}
+    .hero .countdown{
+      position:static;
+      z-index:auto;
+      pointer-events:auto;
+      margin-top:0;
+    }
 
-
-    /* glassy cards */
-    .card{border:1px solid rgba(109,251,255,.25);background:rgba(15,21,36,.5);backdrop-filter:blur(12px) saturate(180%);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 20px rgba(61,165,255,.2)}
+    /* GLASS CARDS */
+    .card{
+      border:1px solid rgba(109,251,255,.25);
+      background:rgba(15,21,36,.5);
+      backdrop-filter:blur(12px) saturate(180%);
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 20px rgba(61,165,255,.2)
+    }
     .card-header{padding:1rem 1rem .6rem;border-bottom:1px dashed rgba(109,251,255,.2)}
     .card-body{padding:1rem}
 
-#countdown-card,
-#live .card{
-  min-height: var(--heroCardH);
-  display:flex;
-  overflow:hidden;
-  flex-direction:column;
-}
+    #countdown-card,
+    #live .card{
+      min-height: var(--heroCardH);
+      display:flex;
+      overflow:hidden;
+      flex-direction:column;
+    }
 
-/* Keep everything inside the card */
-/* Make countdown card behave like .event.with-bg */
-#countdown-card{
-  position: relative;
-  border-radius: 18px;
-  /* same dual-layer background as events */
-  background-image:
-    linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
-    var(--cd-img, none);
-  background-size: contain, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
+    #countdown-card{
+      position: relative;
+      border-radius: 18px;
+      background-image:
+        linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
+        var(--cd-img, none);
+      background-size: contain, cover;
+      background-position: center, center;
+      background-repeat: no-repeat, no-repeat;
+      overflow: hidden;
+      background-clip: padding-box, padding-box;
+    }
 
-  /* the two lines below are what kill the faint seam */
-  overflow: hidden;
-  background-clip: padding-box, padding-box; /* mirror the event card */
-}
+    #countdown-card::after{
+      content:"";
+      position:absolute; inset:0;
+      border-radius:inherit;
+      background:linear-gradient(
+        180deg,
+        rgba(8,12,22,.45) 0%,
+        rgba(8,12,22,.55) 55%,
+        rgba(8,12,22,.72) 100%
+      );
+      z-index:0;
+      pointer-events:none;
+    }
 
-/* same subtle darkening veil used by event cards */
-#countdown-card::after{
-  content:"";
-  position:absolute; inset:0;
-  border-radius:inherit;
-  background:linear-gradient(
-    180deg,
-    rgba(8,12,22,.45) 0%,
-    rgba(8,12,22,.55) 55%,
-    rgba(8,12,22,.72) 100%
-  );
-  z-index:0; /* sit under the content */
-  pointer-events:none;
-}
+    #countdown-card > *{
+      position: relative;
+      z-index:1;
+    }
 
-/* ensure content sits above the ::after overlay */
-#countdown-card > *{
-  position: relative;
-  z-index:1;
-}
+    #countdown-card .card-header{
+      background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
+      border-bottom: 1px dashed rgba(109,251,255,.20);
+    }
 
-/* optional: header strip—keep it subtle like the event cards */
-#countdown-card .card-header{
-  background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
-  border-bottom: 1px dashed rgba(109,251,255,.20);
-}
+    #countdown-card .card-body{
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 1rem;
+      padding: 1rem 1rem 1.5rem;
+    }
 
+    #countdown{
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: .75rem;
+      align-items: stretch;
+      justify-content: center;
+      margin-top: 0;
+      position: relative;
+      z-index: 1;
+    }
 
-/* Body anchors tiles to the bottom; room for the button */
-#countdown-card .card-body{
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* move content back to top */
-  gap: 1rem;
-  padding: 1rem 1rem 1.5rem; /* remove huge bottom padding */
-}
+    .timebox{
+      padding: .9rem .5rem;
+      min-height: 72px;
+      border-radius: 12px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
+      border: 1px solid rgba(109,251,255,.18);
+    }
+    .timebox strong{ display:block; font-size: clamp(1.5rem, 2.6vw, 2rem); }
+    .timebox span{ font-size: .85rem; color: var(--muted); }
 
+    #live .card-body {
+      flex: 1;
+      display: grid;
+      padding: 0;
+    }
+    #live .player {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+      border-radius: 0 0 18px 18px;
+      overflow: hidden;
+    }
 
-/* 4-across tiles, centered, tidy spacing */
-#countdown{
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
-  gap: .75rem;
-  align-items: stretch;
-  justify-content: center;
-  margin-top: 0;                       /* body padding handles the offset */
-  position: relative;
-  z-index: 1;
-}
+    /* CALENDAR POPUP */
+    .cal-popup {
+      position: absolute;
+      min-width: 220px;
+      max-width: 260px;
+      background: rgba(15, 21, 36, 0.97);
+      border: 1px solid rgba(109,251,255,0.30);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      box-shadow: 0 0 20px rgba(61,165,255,.35);
+      backdrop-filter: blur(10px);
+      display: none;
+      animation: calPopFade 0.18s ease-out;
+    }
 
-/* Tile look */
-.timebox{
-  padding: .9rem .5rem;
-  min-height: 72px;
-  border-radius: 12px;
-  text-align: center;
-  background: linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
-  border: 1px solid rgba(109,251,255,.18);
-}
-.timebox strong{ display:block; font-size: clamp(1.5rem, 2.6vw, 2rem); }
-.timebox span{ font-size: .85rem; color: var(--muted); }
-/* Responsive: stack to 2x2 on mobile */
-@media (max-width: 640px) {
-  #countdown {
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
-  }
-}
+    @keyframes calPopFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-/* Twitch card fill */
-#live .card-body {
-  flex: 1;
-  display: grid;
-  padding: 0;
-}
+    .calendar-container {
+      margin-top: 1.2rem;
+      padding: 1rem 1.2rem;
+      border-radius: 16px;
+      background: rgba(16,24,44,0.40);
+      border: 1px solid rgba(109,251,255,0.22);
+      box-shadow: 0 0 18px rgba(61,165,255,0.18);
+      position:relative;
+      z-index: 2;
+      backdrop-filter: blur(12px);
+      width: 100%;
+      color: var(--text);
+    }
 
-#live .player {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border: 0;
-  border-radius: 0 0 18px 18px;
-  overflow: hidden;
-}
-/* ===== Interactive Calendar ===== */
-.cal-popup {
-  position: absolute;
-  min-width: 220px;
-  max-width: 260px;
-  background: rgba(15, 21, 36, 0.97);
-  border: 1px solid rgba(109,251,255,0.30);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
-  box-shadow: 0 0 20px rgba(61,165,255,.35);
-  backdrop-filter: blur(10px);
-  display: none;
-  animation: calPopFade 0.18s ease-out;
-}
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .6rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
 
+    .cal-header button {
+      background: rgba(16,24,44,0.7);
+      border: 1px solid rgba(109,251,255,0.22);
+      color: var(--accent-2);
+      padding: .25rem .6rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .9rem;
+      transition: .15s ease;
+    }
 
-@keyframes calPopFade {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+    .cal-header button:hover {
+      background: rgba(16,24,44,0.9);
+      transform: scale(1.05);
+    }
 
-.calendar-container {
-  position: relative; /* popup anchors to this */
-}
+    #cal-grid {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+    }
 
-.cal-popup-title {
-  font-weight: 800;
-  color: var(--accent-2);
-  margin-bottom: 2px;
-}
+    #cal-grid th {
+      color: var(--muted);
+      padding-bottom: .4rem;
+      font-size: .8rem;
+    }
 
-.cal-popup-date {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
+    #cal-grid td {
+      padding: .35rem 0;
+      border-radius: 8px;
+      transition: .15s ease;
+    }
 
-.cal-popup-desc {
-  font-size: 0.8rem;
-  color: #c8d6ff;
-  opacity: .85;
-  line-height: 1.25rem;
-}
+    .cal-event-day {
+      position: relative;
+      font-weight: 700;
+      color: var(--text);
+    }
 
-.cal-popup-spacer {
-  height: 8px;
-}
+    .cal-event-day div:first-child {
+      padding: 3px 6px;
+      border: 2px solid #00ff73;
+      border-radius: 6px;
+      box-shadow: 0 0 8px #00ff73a0;
+      display: inline-block;
+    }
 
-.cal-popup-image {
-  width: 100%;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  border: 1px solid rgba(109,251,255,.22);
-}
+    #cal-grid td.today {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #001220;
+      font-weight: 800;
+      box-shadow: var(--accent-glow);
+    }
 
-
-.calendar-container {
-  margin-top: 1.2rem;
-  padding: 1rem 1.2rem;
-  border-radius: 16px;
-  background: rgba(16,24,44,0.40);
-  border: 1px solid rgba(109,251,255,0.22);
-  box-shadow: 0 0 18px rgba(61,165,255,0.18);
-  position:relative;
-  z-index: 2;
-  backdrop-filter: blur(12px);
-  width: 100%;
-  color: var(--text);
-}
-
-.cal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: .6rem;
-  font-size: 1rem;
-  font-weight: 700;
-}
-#cal-tooltip {
-  position: absolute;
-  background: rgba(15, 21, 36, 0.95);
-  border: 1px solid rgba(109, 251, 255, 0.35);
-  padding: .65rem .9rem;
-  border-radius: 10px;
-  color: var(--text);
-  box-shadow: 0 0 18px rgba(61,165,255,.25);
-  font-size: .85rem;
-  line-height: 1.25rem;
-  pointer-events: none;
-  z-index: 99999 !important;
-  display: none;
-  max-width: 220px;
-}
-
-
-.cal-header button {
-  background: rgba(16,24,44,0.7);
-  border: 1px solid rgba(109,251,255,0.22);
-  color: var(--accent-2);
-  padding: .25rem .6rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: .9rem;
-  transition: .15s ease;
-}
-
-.cal-header button:hover {
-  background: rgba(16,24,44,0.9);
-  transform: scale(1.05);
-}
-
-#cal-grid {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-}
-
-#cal-grid th {
-  color: var(--muted);
-  padding-bottom: .4rem;
-  font-size: .8rem;
-}
-
-#cal-grid td {
-  padding: .35rem 0;
-  border-radius: 8px;
-  transition: .15s ease;
-}
-.cal-event-day {
-  position: relative;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.cal-event-day div:first-child {
-  padding: 3px 6px;
-  border: 2px solid #00ff73;
-  border-radius: 6px;
-  box-shadow: 0 0 8px #00ff73a0;
-  display: inline-block;
-}
-
-
-#cal-grid td.today {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #001220;
-  font-weight: 800;
-  box-shadow: var(--accent-glow);
-}
-    /* sections */
+    /* SECTIONS */
     .section{padding:3rem 0}
     .title{font-size:1.8rem;font-weight:900;margin:0 0 1rem;display:inline-block;position:relative}
     .title::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:100%;background:linear-gradient(90deg, var(--accent), var(--accent-2));animation:lineSwipe 3s linear infinite}
 
-    /* grid + events */
+    /* EVENTS GRID + CARDS */
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.event{position:relative;padding:1rem;padding-top:3.25rem;border-radius:18px;overflow:hidden;background:linear-gradient(180deg, rgba(20,28,46,.8), rgba(20,28,46,.5));border:1px solid rgba(109,251,255,.18);transition:transform .25s ease, box-shadow .25s ease, filter .25s ease}
-.event h4{
-  margin:.35rem 0 .25rem;
-  letter-spacing:.2px;
-  color:#fff;
-  text-shadow:0 2px 8px rgba(0,0,0,.7), 0 0 4px rgba(61,165,255,.25);
-}
-.event .meta{
-  color:#d5deff;
-  font-size:.9rem;
-  text-shadow:0 1px 5px rgba(0,0,0,.6), 0 0 3px rgba(61,165,255,.2);}
-.event .tag{position:absolute;top:10px;right:10px;z-index:5;font-size:.7rem;padding:.25rem .5rem;border-radius:999px;border:1px solid rgba(109,251,255,.25);background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001220;animation:pulseAccent 3s infinite ease-in-out}
-.event::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(400px circle at var(--x,-100px) var(--y,-100px), rgba(61,165,255,.14), transparent 40%);opacity:0;transition:opacity .25s ease;z-index:1}
-.event:hover::before{opacity:1}
-.event>.meta:first-of-type{padding-right:120px}
-.event.with-bg{background-image:linear-gradient(180deg,rgba(15,21,36,.72),rgba(15,21,36,.45)),var(--event-img);background-size:contain,cover;background-position:center,center;background-repeat:no-repeat,no-repeat;overflow:hidden;background-clip:padding-box,padding-box;min-height:180px;border-radius:16px}
-.event.with-bg:hover{background-image:linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)), var(--event-img);background-size:contain;background-position:center;background-repeat:no-repeat}
-.event.with-bg::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  background:linear-gradient(180deg, rgba(8,12,22,.45) 0%, rgba(8,12,22,.55) 55%, rgba(8,12,22,.72) 100%);
-  z-index:0;
-  pointer-events:none;
-}
-.event.with-bg > :not(.tag){position:relative; z-index:2;}
+    .event{
+      position:relative;
+      padding:1rem;
+      padding-top:3.25rem;
+      border-radius:18px;
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(20,28,46,.8), rgba(20,28,46,.5));
+      border:1px solid rgba(109,251,255,.18);
+      transition:transform .25s ease, box-shadow .25s ease, filter .25s ease
+    }
+    .event h4{
+      margin:.35rem 0 .25rem;
+      letter-spacing:.2px;
+      color:#fff;
+      text-shadow:0 2px 8px rgba(0,0,0,.7), 0 0 4px rgba(61,165,255,.25);
+    }
+    .event .meta{
+      color:#d5deff;
+      font-size:.9rem;
+      text-shadow:0 1px 5px rgba(0,0,0,.6), 0 0 3px rgba(61,165,255,.2);
+    }
+    .event .tag{
+      position:absolute;
+      top:10px;
+      right:10px;
+      z-index:5;
+      font-size:.7rem;
+      padding:.25rem .5rem;
+      border-radius:999px;
+      border:1px solid rgba(109,251,255,.25);
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:#001220;
+      animation:pulseAccent 3s infinite ease-in-out
+    }
+    .event::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:radial-gradient(400px circle at var(--x,-100px) var(--y,-100px), rgba(61,165,255,.14), transparent 40%);
+      opacity:0;
+      transition:opacity .25s ease;
+      z-index:1
+    }
+    .event:hover::before{opacity:1}
+    .event>.meta:first-of-type{padding-right:120px}
 
-/* Make the entire card clickable when wrapped in <a> */
-.event-link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-}
-.event-link:hover .event,
-.event-link:focus-visible .event {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(61,165,255,.35);
-}
-.event-link:focus-visible {
-  outline: none;
-}
-.event-link:focus-visible .event {
-  box-shadow: 0 0 0 3px rgba(61,165,255,.35), 0 10px 30px rgba(0,0,0,.45);
-}
+    .event.with-bg{
+      background-image:
+        linear-gradient(180deg,rgba(15,21,36,.72),rgba(15,21,36,.45)),
+        var(--event-img);
+      background-size:contain,cover;
+      background-position:center,center;
+      background-repeat:no-repeat,no-repeat;
+      overflow:hidden;
+      background-clip:padding-box,padding-box;
+      min-height:180px;
+      border-radius:16px
+    }
+    .event.with-bg:hover{
+      background-image:
+        linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)),
+        var(--event-img);
+      background-size:contain;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+    .event.with-bg::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background:linear-gradient(180deg, rgba(8,12,22,.45) 0%, rgba(8,12,22,.55) 55%, rgba(8,12,22,.72) 100%);
+      z-index:0;
+      pointer-events:none;
+    }
+    .event.with-bg > :not(.tag){position:relative; z-index:2;}
 
-
+    .event-link {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+    .event-link:hover .event,
+    .event-link:focus-visible .event {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(61,165,255,.35);
+    }
+    .event-link:focus-visible {
+      outline: none;
+    }
+    .event-link:focus-visible .event {
+      box-shadow: 0 0 0 3px rgba(61,165,255,.35), 0 10px 30px rgba(0,0,0,.45);
+    }
 
     .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
     .shot{overflow:hidden;border-radius:18px;border:1px solid rgba(109,251,255,.16);background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.45))}
@@ -454,74 +444,77 @@
 
     footer{border-top:1px solid rgba(109,251,255,.12);padding:1.5rem 0;font-size:.95rem;color:var(--muted)}
 
-    /* (removed) diagonal stripe decorative block */
     .tm-stripes{display:none !important}
 
-    /* reveals */
     .reveal{opacity:0;transform:translateY(30px) scale(.98);transition:opacity .8s ease, transform .8s ease}
     .reveal.show{opacity:1;transform:none}
 
-#toTop {
-  position: fixed;
-  bottom: 26px;
-  right: 26px;
-  width: 65px;
-  height: 55px;
-  border-radius: 12px;
-  background: rgba(15, 21, 36, 0.55); /* translucent glass-like background */
-  backdrop-filter: blur(10px) saturate(160%);
-  border: 1px solid rgba(109, 251, 255, 0.25);
-  box-shadow: 0 0 18px rgba(61, 165, 255, 0.35);
-  cursor: pointer;
+    #toTop {
+      position: fixed;
+      bottom: 26px;
+      right: 26px;
+      width: 65px;
+      height: 55px;
+      border-radius: 12px;
+      background: rgba(15, 21, 36, 0.55);
+      backdrop-filter: blur(10px) saturate(160%);
+      border: 1px solid rgba(109, 251, 255, 0.25);
+      box-shadow: 0 0 18px rgba(61, 165, 255, 0.35);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #6dfbff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1.1;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 50;
+    }
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+    #toTop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-  color: #6dfbff; /* blue text + arrow */
-  font-weight: 700;
-  font-size: 0.9rem;
-  line-height: 1.1;
+    #toTop:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 25px rgba(61, 165, 255, 0.75);
+      filter: brightness(1.15);
+    }
 
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  z-index: 50;
-}
+    #toTop::before {
+      content: "↑";
+      display: block;
+      font-size: 1.4rem;
+      line-height: 1;
+      color: #6dfbff;
+      margin-bottom: 2px;
+      text-shadow: 0 0 8px rgba(61,165,255,0.4);
+    }
 
-#toTop.show {
-  opacity: 1;
-  pointer-events: auto;
-}
+    #toTop span {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-shadow: 0 0 6px rgba(61,165,255,0.4);
+    }
 
-#toTop:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 25px rgba(61, 165, 255, 0.75);
-  filter: brightness(1.15);
-}
+    /* FORMS */
+    .form .field{display:flex;flex-direction:column;gap:.35rem}
+    .form .twocol{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+    .input,.textarea{width:100%;padding:.7rem .85rem;border-radius:12px;border:1px solid rgba(109,251,255,.22);background:#0c1224;color:var(--text)}
+    .input::placeholder,.textarea::placeholder{color:rgba(155,176,255,.8)}
+    .help{font-size:.85rem;color:var(--muted)}
 
-/* arrow above text */
-#toTop::before {
-  content: "↑";
-  display: block;
-  font-size: 1.4rem;
-  line-height: 1;
-  color: #6dfbff;
-  margin-bottom: 2px;
-  text-shadow: 0 0 8px rgba(61,165,255,0.4);
-}
+    @keyframes pulseAccent{0%,100%{box-shadow:0 0 8px rgba(61,165,255,.5)}50%{box-shadow:0 0 20px rgba(61,165,255,.9)}}
+    @keyframes lineSwipe{0%{opacity:0;transform:scaleX(0)}10%,90%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(0)}}
 
-/* “Top” label */
-#toTop span {
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-shadow: 0 0 6px rgba(61,165,255,0.4);
-}
-
-    /* mobile */
+    /* MOBILE */
     .nav-toggle{display:none}
     @media (max-width:960px){
       .grid{grid-template-columns:1fr 1fr}
@@ -533,35 +526,25 @@
       .navlinks{display:none;position:absolute;top:58px;left:0;right:0;padding:.75rem;background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));backdrop-filter:blur(8px);border-bottom:1px solid rgba(109,251,255,.12);flex-direction:column;gap:.6rem}
       .navlinks.show{display:flex}
       .grid,.cards{grid-template-columns:1fr}
-      .countdown{flex-wrap:wrap}
       .event{padding-top:3.6rem}
+      #countdown{
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
     }
+
     @media (max-width: 640px){
-  :root { --heroCardH: 400px; }
-  #countdown-card{
-    background-size: 100% 100%, auto 65%;
-    background-position: center, center 70%;
-    background-image:
-      linear-gradient(180deg, rgba(10,15,26,.82), rgba(10,15,26,.60)),
-      var(--cd-img, none);
-  }
-}
+      :root { --heroCardH: 400px; }
+      #countdown-card{
+        background-size: 100% 100%, auto 65%;
+        background-position: center, center 70%;
+        background-image:
+          linear-gradient(180deg, rgba(10,15,26,.82), rgba(10,15,26,.60)),
+          var(--cd-img, none);
+      }
+    }
 
     #schedule{--section-img:none !important}
     #schedule::before{background:none !important}
-
-    /* forms */
-    .form .field{display:flex;flex-direction:column;gap:.35rem}
-    .form .twocol{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
-    .input,.textarea{width:100%;padding:.7rem .85rem;border-radius:12px;border:1px solid rgba(109,251,255,.22);background:#0c1224;color:var(--text)}
-    .input::placeholder,.textarea::placeholder{color:rgba(155,176,255,.8)}
-    .help{font-size:.85rem;color:var(--muted)}
-    @keyframes pulseAccent{0%,100%{box-shadow:0 0 8px rgba(61,165,255,.5)}50%{box-shadow:0 0 20px rgba(61,165,255,.9)}}
-    @keyframes lineSwipe{0%{opacity:0;transform:scaleX(0)}10%,90%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(0)}}
-
-  
-
-
   </style>
 </head>
 
@@ -574,13 +557,13 @@
     </a>
     <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
     <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="#home">Home</a>
       <a href="/kacky">Kacky Finishes</a>
       <a href="/wrleaderboard">WR Leaderboard</a>
       <a href="/totd">Track of the Day</a>
       <a href="/highlights">Community Highlights</a>
     </nav>
     <div class="cta">
-</form>
       <a class="btn" href="#contact">Contact</a>
     </div>
   </div>
@@ -588,7 +571,6 @@
 
 <section class="hero" id="home">
   <div class="container hero-grid">
-
     <div class="hero-top">
       <span class="chip" id="hero-chip">Next Event</span>
       <h1 class="h1">Live Trackmania events and community races</h1>
@@ -602,43 +584,43 @@
     </div>
 
     <div class="hero-row">
-  <div>
-    <div class="card" id="countdown-card" aria-live="polite">
-      <div class="card-header">
-        <strong id="countdown-title">Countdown to green light</strong>
-      </div>
-      <div class="card-body">
-        <div class="countdown" id="countdown">
-          <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
-          <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
-          <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
-          <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
-        </div>
-
-        <div id="miniCalendar" class="calendar-container">
-          <div class="cal-header">
-            <button id="cal-prev">←</button>
-            <div id="cal-title"></div>
-            <button id="cal-next">→</button>
+      <div>
+        <div class="card" id="countdown-card" aria-live="polite">
+          <div class="card-header">
+            <strong id="countdown-title">Countdown to green light</strong>
           </div>
-          <table id="cal-grid"></table>
+          <div class="card-body">
+            <div class="countdown" id="countdown">
+              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+            </div>
+
+            <div id="miniCalendar" class="calendar-container">
+              <div class="cal-header">
+                <button id="cal-prev" type="button">←</button>
+                <div id="cal-title"></div>
+                <button id="cal-next" type="button">→</button>
+              </div>
+              <table id="cal-grid"></table>
+            </div>
+
+          </div>
         </div>
-
       </div>
-    </div>
-  </div> 
 
-  <div id="live" class="live">
-    <div class="card reveal">
-      <div class="card-header"><strong>Live on Twitch</strong></div>
-      <div class="card-body">
-        <div id="twitch-embed"></div>
+      <div id="live" class="live">
+        <div class="card reveal">
+          <div class="card-header"><strong>Live on Twitch</strong></div>
+          <div class="card-body">
+            <div id="twitch-embed"></div>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
-
-</div>
-
 </section>
 
 <section id="live-events" class="section">
@@ -728,7 +710,7 @@
   </div>
 </section>
 
-<button id="toTop" aria-label="Back to top">Top</button>
+<button id="toTop" aria-label="Back to top"><span>Top</span></button>
 
 <footer>
   <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
@@ -738,36 +720,60 @@
 </footer>
 
 <script>
-  const TTV_CHANNEL="C0rsy";
-  const d=document.getElementById('d');
-  const h=document.getElementById('h');
-  const m=document.getElementById('m');
-  const s=document.getElementById('s');
+  const TTV_CHANNEL = "C0rsy";
 
-  const fmtDate=(iso)=>{
-    const dt=new Date(iso);
-    return dt.toLocaleString(undefined,{month:'short',day:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit'});
+  const d = document.getElementById('d');
+  const h = document.getElementById('h');
+  const m = document.getElementById('m');
+  const s = document.getElementById('s');
+
+  let calYear, calMonth;
+  let allEventRanges = [];
+  let calendarInitialized = false;
+  window.__eventsCache = [];
+
+  const fmtDate = (iso) => {
+    const dt = new Date(iso);
+    return dt.toLocaleString(undefined, {
+      month:'short',
+      day:'2-digit',
+      year:'numeric',
+      hour:'numeric',
+      minute:'2-digit'
+    });
   };
 
-  function setCountdown(dd,hh,mm,ss){ if(d) d.textContent=dd; if(h) h.textContent=hh; if(m) m.textContent=mm; if(s) s.textContent=ss; }
+  function setCountdown(dd,hh,mm,ss){
+    if(d) d.textContent = dd;
+    if(h) h.textContent = hh;
+    if(m) m.textContent = mm;
+    if(s) s.textContent = ss;
+  }
 
   function startCountdown(iso,titleEl){
     function tick(){
-      const now=new Date();const then=new Date(iso);let diff=then-now;
-      if(diff<=0){setCountdown(0,0,0,0);if(titleEl) titleEl.textContent='Live now!';return;}
-      const days=Math.floor(diff/86400000);diff%=86400000;
-      const hrs=Math.floor(diff/3600000);diff%=3600000;
-      const mins=Math.floor(diff/60000);diff%=60000;
-      const secs=Math.floor(diff/1000);
+      const now = new Date();
+      const then = new Date(iso);
+      let diff = then - now;
+      if(diff <= 0){
+        setCountdown(0,0,0,0);
+        if(titleEl) titleEl.textContent = 'Live now!';
+        return;
+      }
+      const days = Math.floor(diff/86400000); diff %= 86400000;
+      const hrs  = Math.floor(diff/3600000);  diff %= 3600000;
+      const mins = Math.floor(diff/60000);    diff %= 60000;
+      const secs = Math.floor(diff/1000);
       setCountdown(days,hrs,mins,secs);
     }
-    tick();setInterval(tick,1000);
+    tick();
+    setInterval(tick,1000);
   }
 
   function attachHoverGlow(){
     document.querySelectorAll('.event').forEach(e=>{
       e.addEventListener('mousemove',ev=>{
-        const r=e.getBoundingClientRect();
+        const r = e.getBoundingClientRect();
         e.style.setProperty('--x', `${ev.clientX - r.left}px`);
         e.style.setProperty('--y', `${ev.clientY - r.top}px`);
       });
@@ -812,248 +818,268 @@
 
     return article;
   }
-let calYear = 0;
-let calMonth = 0;
-
-function loadMiniCalendar(dateIso) {
-  const d = new Date(dateIso);
-  calYear = d.getFullYear();
-  calMonth = d.getMonth();
-  renderCalendar();
-}
-
-function renderCalendar() {
-  const title = document.getElementById("cal-title");
-  const grid = document.getElementById("cal-grid");
-
-  if (!title || !grid) return;
-
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
-
-  title.textContent = new Date(calYear, calMonth, 1)
-    .toLocaleString("default", { month: "long", year: "numeric" });
-
-  let html = `
-    <tr>
-      <th>Sun</th><th>Mon</th><th>Tue</th>
-      <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-    </tr><tr>
-  `;
-
-  for (let i = 0; i < firstDay; i++) html += "<td></td>";
-
-  for (let day = 1; day <= lastDate; day++) {
-    const dayDate = new Date(calYear, calMonth, day);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
-    const isToday = dayDate.getTime() === today.getTime();
-
-    const matches = allEventRanges
-      .map((range, i) => ({ range, i }))
-      .filter(o => dayDate >= o.range.start && dayDate <= o.range.end)
-      .map(o => window.__eventsCache[o.i]);
-
-    const isEvent = matches.length > 0;
-
-    html += `
-      <td data-day="${day}" 
-          class="${isToday ? "today" : ""} ${isEvent ? "cal-event-day" : ""}">
-        <div>${day}</div>
-      </td>
-    `;
-
-    if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
-  }
-
-  html += "</tr>";
-  grid.innerHTML = html;
-
-  activateCalendarTooltips();
-}
-
-function activateCalendarTooltips() {
-  const container = document.getElementById("miniCalendar");
-  if (!container) return;
-
-  document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
-    td.addEventListener("mouseenter", () => {
-      const day = parseInt(td.dataset.day);
-      const d = new Date(calYear, calMonth, day);
-
-      const matches = allEventRanges
-        .map((range, i) => ({ range, i }))
-        .filter(o => d >= o.range.start && d <= o.range.end)
-        .map(o => window.__eventsCache[o.i]);
-
-      if (!matches.length) return;
-
-      const old = document.querySelector(".cal-popup");
-      if (old) old.remove();
-
-      const popup = document.createElement("div");
-      popup.className = "cal-popup";
-
-      popup.innerHTML = matches.map(ev => `
-        ${ev.image ? `<img class="cal-popup-image" src="${ev.image}">` : ""}
-        <div class="cal-popup-title">${ev.title}</div>
-        <div class="cal-popup-date">
-          ${new Date(ev.start_iso).toLocaleDateString()} →
-          ${new Date(ev.end_iso).toLocaleDateString()}
-        </div>
-        <div class="cal-popup-desc">${ev.description || ""}</div>
-      `).join("<div style='height:6px'></div>");
-
-      container.appendChild(popup);
-
-      const tdRect = td.getBoundingClientRect();
-      const contRect = container.getBoundingClientRect();
-
-      let left = tdRect.left - contRect.left + tdRect.width / 2;
-      let top = tdRect.top - contRect.top - popup.offsetHeight - 10;
-
-      if (top < 0) top = tdRect.top - contRect.top + tdRect.height + 10;
-
-      popup.style.left = `${left}px`;
-      popup.style.top = `${top}px`;
-      popup.style.transform = "translateX(-50%)";
-      popup.style.display = "block";
-    });
-  });
-}
 
   function renderFromData(events){
     window.__eventsCache = events;
-    const now=Date.now();
-    const live=events.filter(e=>new Date(e.start_iso)<=now && now<=new Date(e.end_iso)).sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
-    const upcoming = events.filter(e => new Date(e.start_iso) > now).sort((a,b)=> new Date(a.start_iso) - new Date(b.start_iso));
+    const now = Date.now();
 
-    const past=events.filter(e=>new Date(e.end_iso)<=now).sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso)).slice(0,6);
+    const live = events
+      .filter(e => new Date(e.start_iso) <= now && now <= new Date(e.end_iso))
+      .sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
 
-    const liveSection=document.getElementById('live-events');
-    const liveGrid=document.getElementById('live-events-grid');
+    const upcoming = events
+      .filter(e => new Date(e.start_iso) > now)
+      .sort((a,b)=> new Date(a.start_iso) - new Date(b.start_iso));
+
+    const past = events
+      .filter(e => new Date(e.end_iso) <= now)
+      .sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso))
+      .slice(0,6);
+
+    const liveSection = document.getElementById('live-events');
+    const liveGrid = document.getElementById('live-events-grid');
+
     if(live.length){
-      liveSection.style.display='';
-      liveGrid.innerHTML='';
+      liveSection.style.display = '';
+      liveGrid.innerHTML = '';
       live.forEach(e=>{
         const el = makeEventElement(e, { tagText: 'LIVE NOW', subline: 'description' });
         liveGrid.appendChild(el);
       });
-    }else{
-      liveSection.style.display='none';
+    } else {
+      liveSection.style.display = 'none';
     }
 
-const grid = document.getElementById('events-grid');
-grid.innerHTML = '';
-upcoming.forEach(e => {
-  const el = makeEventElement(e, { subline: 'description' });
-  grid.appendChild(el);
-});
+    const grid = document.getElementById('events-grid');
+    grid.innerHTML = '';
+    upcoming.forEach(e => {
+      const el = makeEventElement(e, { subline: 'description' });
+      grid.appendChild(el);
+    });
 
-
-    let pastWrap=document.getElementById('past-events');
+    let pastWrap = document.getElementById('past-events');
     if(!pastWrap){
-      pastWrap=document.createElement('div');
-      pastWrap.id='past-events';
-      pastWrap.innerHTML=`<h3 class="title" style="margin-top:2rem">Past Events</h3>
-        <div class="grid" id="past-grid"></div>`;
+      pastWrap = document.createElement('div');
+      pastWrap.id = 'past-events';
+      pastWrap.innerHTML = `
+        <h3 class="title" style="margin-top:2rem">Past Events</h3>
+        <div class="grid" id="past-grid"></div>
+      `;
       document.querySelector('#schedule .container').appendChild(pastWrap);
     }
-    const pastGrid=document.getElementById('past-grid');
-    pastGrid.innerHTML='';
+    const pastGrid = document.getElementById('past-grid');
+    pastGrid.innerHTML = '';
     past.forEach(e=>{
-      const el=document.createElement('article');
-      el.className='event reveal';
-      el.innerHTML=`<span class="tag">${e.tag||'Event'}</span>
+      const el = document.createElement('article');
+      el.className = 'event reveal';
+      el.innerHTML = `
+        <span class="tag">${e.tag || 'Event'}</span>
         <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
         <h4>${e.title}</h4>
-        <div class="meta">${e.location||''}</div>`;
+        <div class="meta">${e.location || ''}</div>
+      `;
       if(e.image){
         el.classList.add('with-bg');
-        el.style.setProperty('--event-img',`url("${e.image}")`);
+        el.style.setProperty('--event-img', `url("${e.image}")`);
       }
       pastGrid.appendChild(el);
     });
-allEventRanges = events.map(e => {
-  const start = new Date(e.start_iso);
-  const end = new Date(e.end_iso);
 
-  return {
-    start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
-    end: new Date(end.getFullYear(), end.getMonth(), end.getDate())
-  };
-});
+    allEventRanges = events.map(e => {
+      const start = new Date(e.start_iso);
+      const end = new Date(e.end_iso);
+      return {
+        start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
+        end:   new Date(end.getFullYear(),   end.getMonth(),   end.getDate())
+      };
+    });
 
-
-    const next=upcoming[0];
-    const chip=document.getElementById('hero-chip');
-    const pills=document.getElementById('hero-pills');
-    const header=document.getElementById('countdown-title');
-    const cdCard=document.getElementById('countdown-card');
+    const next = upcoming[0];
+    const chip = document.getElementById('hero-chip');
+    const pills = document.getElementById('hero-pills');
+    const header = document.getElementById('countdown-title');
+    const cdCard = document.getElementById('countdown-card');
 
     if (live.length) {
-  const cur = live[0];
+      const cur = live[0];
 
-  chip.textContent = live.length > 1
-    ? `🟢 ${live.length} events live — ${cur.title}`
-    : `Live now • ${cur.title}`;
+      chip.textContent = live.length > 1
+        ? `🟢 ${live.length} events live — ${cur.title}`
+        : `Live now • ${cur.title}`;
 
-  pills.innerHTML = `<div class="pill">🟢 Live</div>
-    <div class="pill">📍 ${cur.location || 'Online'}</div>
-    <div class="pill">🏁 ${cur.description || ''}</div>`;
+      pills.innerHTML = `
+        <div class="pill">🟢 Live</div>
+        <div class="pill">📍 ${cur.location || 'Online'}</div>
+        <div class="pill">🏁 ${cur.description || ''}</div>
+      `;
 
-  header.textContent = 'Live now!';
-  setCountdown(0, 0, 0, 0);
+      header.textContent = 'Live now!';
+      setCountdown(0,0,0,0);
 
-  const heroImg = cur?.hero_image || cur?.image;
-  if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
-  else cdCard?.style.removeProperty('--cd-img');
+      const heroImg = cur.hero_image || cur.image;
+      if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+      else cdCard?.style.removeProperty('--cd-img');
 
-  if (cur.twitch && typeof setTwitchChannel === 'function') {
-    setTwitchChannel(cur.twitch);
-  }
+      if (cur.twitch && typeof setTwitchChannel === 'function') {
+        setTwitchChannel(cur.twitch);
+      }
 
-} else if (next) {
-  chip.textContent = `Next Event • ${next.title}`;
-  pills.innerHTML = `<div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-    <div class="pill">📍 ${next.location || 'Online'}</div>
-    <div class="pill">🏁 ${next.description || ''}</div>`;
+    } else if (next) {
+      chip.textContent = `Next Event • ${next.title}`;
+      pills.innerHTML = `
+        <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+        <div class="pill">📍 ${next.location || 'Online'}</div>
+        <div class="pill">🏁 ${next.description || ''}</div>
+      `;
 
-  startCountdown(next.start_iso, header);
+      startCountdown(next.start_iso, header);
 
-  const heroImg = next?.hero_image || next?.image;
-  if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
-  else cdCard?.style.removeProperty('--cd-img');
+      const heroImg = next.hero_image || next.image;
+      if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
+      else cdCard?.style.removeProperty('--cd-img');
 
+    } else {
+      chip.textContent = 'No upcoming event';
+      pills.innerHTML = '<div class="pill">Check back soon</div>';
+      header.textContent = 'Countdown';
+      setCountdown(0,0,0,0);
+      cdCard?.style.removeProperty('--cd-img');
+    }
 
-} else {
-  chip.textContent = 'No upcoming event';
-  pills.innerHTML = '<div class="pill">Check back soon</div>';
-  header.textContent = 'Countdown';
-  setCountdown(0, 0, 0, 0);
-  cdCard?.style.removeProperty('--cd-img');
-}
-  if (!calendarInitialized) {
-  const initialMonth =
-    live[0]?.start_iso ||
-    next?.start_iso ||
-    new Date().toISOString();
+    if (!calendarInitialized) {
+      const initialMonth =
+        (live[0] && live[0].start_iso) ||
+        (next && next.start_iso) ||
+        new Date().toISOString();
 
-  loadMiniCalendar(initialMonth);
-  calendarInitialized = true;
-}
-    updateJSONLD(live[0]||next||null);
+      loadMiniCalendar(initialMonth);
+      calendarInitialized = true;
+    }
+
+    updateJSONLD(live[0] || next || null);
     attachReveals();
     attachHoverGlow();
-    window.__eventsCache=events;
   }
 
+  function loadMiniCalendar(dateIso) {
+    const d = new Date(dateIso);
+    calYear = d.getFullYear();
+    calMonth = d.getMonth();
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const title = document.getElementById("cal-title");
+    const grid = document.getElementById("cal-grid");
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+
+    title.textContent = new Date(calYear, calMonth, 1)
+      .toLocaleString("default", { month: "long", year: "numeric" });
+
+    let html = `
+      <tr>
+        <th>Sun</th><th>Mon</th><th>Tue</th>
+        <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+      </tr><tr>
+    `;
+
+    for (let i = 0; i < firstDay; i++) html += "<td></td>";
+
+    for (let day = 1; day <= lastDate; day++) {
+      const dayObj = new Date(calYear, calMonth, day);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      const isToday = (dayObj.getTime() === today.getTime());
+      const matches = allEventRanges
+        .map((range, i) => ({ range, i }))
+        .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
+        .map(o => window.__eventsCache[o.i]);
+
+      const isEventDay = matches.length > 0;
+
+      html += `
+        <td data-day="${day}" class="${isToday ? "today" : ""} ${isEventDay ? "cal-event-day" : ""}">
+          <div>${day}</div>
+        </td>
+      `;
+
+      if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
+    }
+
+    html += "</tr>";
+    grid.innerHTML = html;
+
+    activateCalendarTooltips();
+  }
+
+  function activateCalendarTooltips() {
+    const container = document.getElementById("miniCalendar");
+
+    document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
+      td.addEventListener("mouseenter", () => {
+        const day = parseInt(td.dataset.day);
+        const dayObj = new Date(calYear, calMonth, day);
+
+        const matches = allEventRanges
+          .map((range, i) => ({ range, i }))
+          .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
+          .map(o => window.__eventsCache[o.i]);
+
+        if (!matches.length) return;
+
+        const exist = document.querySelector(".cal-popup");
+        if (exist) exist.remove();
+
+        const popup = document.createElement("div");
+        popup.className = "cal-popup";
+
+        let html = "";
+        matches.forEach(ev => {
+          html += `
+            ${ev.image ? `<img class="cal-popup-image" src="${ev.image}">` : ""}
+            <div class="cal-popup-title">${ev.title}</div>
+            <div class="cal-popup-date">
+              ${new Date(ev.start_iso).toLocaleDateString()} →
+              ${new Date(ev.end_iso).toLocaleDateString()}
+            </div>
+            ${ev.description ? `<div class="cal-popup-desc">${ev.description}</div>` : ""}
+            <div class="cal-popup-spacer"></div>
+          `;
+        });
+
+        popup.innerHTML = html;
+        container.appendChild(popup);
+
+        const tdRect = td.getBoundingClientRect();
+        const contRect = container.getBoundingClientRect();
+
+        let left = tdRect.left - contRect.left + tdRect.width / 2;
+        let top = tdRect.top - contRect.top - popup.offsetHeight - 10;
+
+        if (top < 0) {
+          top = tdRect.top - contRect.top + tdRect.height + 10;
+        }
+
+        popup.style.left = `${left}px`;
+        popup.style.top = `${top}px`;
+        popup.style.transform = "translateX(-50%)";
+        popup.style.display = "block";
+      });
+
+      td.addEventListener("mouseleave", () => {
+        const exist = document.querySelector(".cal-popup");
+        if (exist) exist.remove();
+      });
+    });
+  }
 
   function updateJSONLD(next){
-    const el=document.getElementById('event-jsonld');
+    const el = document.getElementById('event-jsonld');
     if(!next){el.textContent='{}';return;}
-    el.textContent=JSON.stringify({
+    el.textContent = JSON.stringify({
       "@context":"https://schema.org",
       "@type":"Event",
       name:next.title,
@@ -1062,23 +1088,28 @@ allEventRanges = events.map(e => {
       eventAttendanceMode:"https://schema.org/OnlineEventAttendanceMode",
       eventStatus:"https://schema.org/EventScheduled",
       location:{"@type":"VirtualLocation","url":"https://trackmaniaevents.com"},
-      description:next.description||"",
-      image:next.image||undefined,
-      organizer:{"@type":"Organization","name":"Trackmania Events","url":"https://trackmaniaevents.com"}
+      description:next.description || "",
+      image:next.image || undefined,
+      organizer:{
+        "@type":"Organization",
+        "name":"Trackmania Events",
+        "url":"https://trackmaniaevents.com"
+      }
     });
   }
 
   async function loadEvents(){
     try{
-      const res=await fetch('/events.json?cb='+Date.now());
+      const res = await fetch('/events.json?cb=' + Date.now());
       if(!res.ok) throw new Error('Failed to fetch events.json');
-      const data=await res.json();
-      renderFromData(Array.isArray(data)?data:[]);
+      const data = await res.json();
+      renderFromData(Array.isArray(data) ? data : []);
     }catch(err){
       console.error(err);
-      const grid=document.getElementById('events-grid');
-      grid.innerHTML='<article class="event"><div class="meta">Could not load events.</div></article>';
-      const t=document.getElementById('countdown-title'); if(t) t.textContent='Countdown';
+      const grid = document.getElementById('events-grid');
+      grid.innerHTML = '<article class="event"><div class="meta">Could not load events.</div></article>';
+      const t = document.getElementById('countdown-title');
+      if(t) t.textContent = 'Countdown';
       setCountdown(0,0,0,0);
     }
   }
@@ -1090,7 +1121,9 @@ allEventRanges = events.map(e => {
     iframe.className='player';
     iframe.allowFullscreen=true;
     iframe.allow='autoplay; encrypted-media; picture-in-picture';
-    iframe.src=`https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&autoplay=false`+parents.map(p=>`&parent=${encodeURIComponent(p)}`).join('')+`&muted=true`;
+    iframe.src=`https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&autoplay=false`+
+      parents.map(p=>`&parent=${encodeURIComponent(p)}`).join('')+
+      `&muted=true`;
     embed.appendChild(iframe);
   })();
 
@@ -1102,7 +1135,8 @@ allEventRanges = events.map(e => {
       entries.forEach(e=>{
         if(e.isIntersecting){
           links.forEach(a=>a.classList.remove('active'));
-          const a=byId(e.target.id); if(a) a.classList.add('active');
+          const a=byId(e.target.id);
+          if(a) a.classList.add('active');
         }
       });
     },{rootMargin:'-40% 0px -55% 0px',threshold:0});
@@ -1113,7 +1147,10 @@ allEventRanges = events.map(e => {
     const reveals=document.querySelectorAll('.reveal:not(.show)');
     const io2=new IntersectionObserver((entries,obs)=>{
       entries.forEach(e=>{
-        if(e.isIntersecting){e.target.classList.add('show');obs.unobserve(e.target);}
+        if(e.isIntersecting){
+          e.target.classList.add('show');
+          obs.unobserve(e.target);
+        }
       });
     },{threshold:0.12});
     reveals.forEach(el=>io2.observe(el));
@@ -1125,6 +1162,32 @@ allEventRanges = events.map(e => {
     addEventListener('scroll',()=>btn.classList.toggle('show',scrollY>600));
     btn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
   })();
+
+  (function(){
+    const navToggle = document.getElementById('navToggle');
+    const nav = document.getElementById('primary-nav');
+    if(!navToggle || !nav) return;
+    navToggle.addEventListener('click', ()=>{
+      const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+      navToggle.setAttribute('aria-expanded', String(!expanded));
+      nav.classList.toggle('show', !expanded);
+    });
+  })();
+
+  const prevBtn = document.getElementById("cal-prev");
+  const nextBtn = document.getElementById("cal-next");
+  if (prevBtn && nextBtn) {
+    prevBtn.onclick = () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    };
+    nextBtn.onclick = () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    };
+  }
 
   loadEvents();
   document.getElementById('year').textContent=new Date().getFullYear();
