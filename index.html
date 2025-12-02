@@ -732,19 +732,12 @@
 
 <script>
   const TTV_CHANNEL = "C0rsy";
-
-  // ===== Countdown DOM refs =====
   const d = document.getElementById("d");
   const h = document.getElementById("h");
   const m = document.getElementById("m");
   const s = document.getElementById("s");
 
-  // ===== Calendar state =====
-  let calYear, calMonth;
-  let allEventRanges = [];
-  let calendarInitialized = false;
-
-  // ===== Helpers =====
+  // ---------- COUNTDOWN HELPERS ----------
   const fmtDate = (iso) => {
     const dt = new Date(iso);
     return dt.toLocaleString(undefined, {
@@ -782,14 +775,13 @@
       const mins = Math.floor(diff / 60000);
       diff %= 60000;
       const secs = Math.floor(diff / 1000);
-
       setCountdown(days, hrs, mins, secs);
     }
-
     tick();
     setInterval(tick, 1000);
   }
 
+  // ---------- HOVER GLOW ON EVENT CARDS ----------
   function attachHoverGlow() {
     document.querySelectorAll(".event").forEach((e) => {
       e.addEventListener("mousemove", (ev) => {
@@ -800,89 +792,7 @@
     });
   }
 
-  // ===== Calendar rendering (no popups/images) =====
-  function loadMiniCalendar(dateIso) {
-    const d = new Date(dateIso);
-    calYear = d.getFullYear();
-    calMonth = d.getMonth();
-    renderCalendar();
-  }
-
-  function renderCalendar() {
-    const title = document.getElementById("cal-title");
-    const grid = document.getElementById("cal-grid");
-    if (!title || !grid || calYear == null || calMonth == null) return;
-
-    const firstDay = new Date(calYear, calMonth, 1).getDay();
-    const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
-
-    title.textContent = new Date(calYear, calMonth, 1).toLocaleString(
-      "default",
-      { month: "long", year: "numeric" }
-    );
-
-    let html = `
-      <tr>
-        <th>Sun</th><th>Mon</th><th>Tue</th>
-        <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-      </tr><tr>
-    `;
-
-    for (let i = 0; i < firstDay; i++) html += "<td></td>";
-
-    for (let day = 1; day <= lastDate; day++) {
-      const dayObj = new Date(calYear, calMonth, day);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const isToday = dayObj.getTime() === today.getTime();
-
-      const matches = allEventRanges.filter(
-        (rng) => dayObj >= rng.start && dayObj <= rng.end
-      );
-      const isEventDay = matches.length > 0;
-
-      html += `
-        <td data-day="${day}" class="${
-          isToday ? "today" : ""
-        } ${isEventDay ? "cal-event-day" : ""}">
-          <div>${day}</div>
-        </td>
-      `;
-
-      if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
-    }
-
-    html += "</tr>";
-    grid.innerHTML = html;
-  }
-
-  // Allow month navigation
-  (function setupCalNav() {
-    const prev = document.getElementById("cal-prev");
-    const next = document.getElementById("cal-next");
-    if (!prev || !next) return;
-
-    prev.addEventListener("click", () => {
-      calMonth--;
-      if (calMonth < 0) {
-        calMonth = 11;
-        calYear--;
-      }
-      renderCalendar();
-    });
-
-    next.addEventListener("click", () => {
-      calMonth++;
-      if (calMonth > 11) {
-        calMonth = 0;
-        calYear++;
-      }
-      renderCalendar();
-    });
-  })();
-
-  // ===== Event card builder =====
+  // ---------- EVENT CARD FACTORY ----------
   function makeEventElement(e, options = {}) {
     const article = document.createElement("article");
     article.className = "event reveal";
@@ -916,7 +826,10 @@
       a.href = href;
       a.target = "_blank";
       a.rel = "noopener noreferrer";
-      a.setAttribute("aria-label", `${e.title} — more info`);
+      a.setAttribute(
+        "aria-label",
+        `${e.title} — more info on Discord`
+      );
       a.appendChild(article);
       return a;
     }
@@ -924,14 +837,197 @@
     return article;
   }
 
-  // ===== Main render from events.json =====
+  // ---------- MINI CALENDAR STATE ----------
+  let calYear, calMonth;
+  let allEventRanges = []; // [{start: Date, end: Date, index: number}]
+  let calendarInitialized = false;
+  let calTooltipEl = null;
+
+  function ensureCalTooltip() {
+    if (!calTooltipEl) {
+      calTooltipEl = document.createElement("div");
+      calTooltipEl.id = "cal-tooltip";
+      document
+        .getElementById("miniCalendar")
+        .appendChild(calTooltipEl);
+    }
+    return calTooltipEl;
+  }
+
+  function loadMiniCalendar(dateIso) {
+    const d = new Date(dateIso);
+    calYear = d.getFullYear();
+    calMonth = d.getMonth();
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const title = document.getElementById("cal-title");
+    const grid = document.getElementById("cal-grid");
+    if (!title || !grid) return;
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+
+    title.textContent = new Date(calYear, calMonth, 1).toLocaleString(
+      "default",
+      { month: "long", year: "numeric" }
+    );
+
+    let html = `
+      <tr>
+        <th>Sun</th><th>Mon</th><th>Tue</th>
+        <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+      </tr><tr>
+    `;
+
+    for (let i = 0; i < firstDay; i++) html += "<td></td>";
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let day = 1; day <= lastDate; day++) {
+      const dayObj = new Date(calYear, calMonth, day);
+      const isToday = dayObj.getTime() === today.getTime();
+
+      // which events cover this date?
+      const matches = allEventRanges
+        .filter(
+          (o) => dayObj >= o.start && dayObj <= o.end
+        )
+        .map((o) => window.__eventsCache[o.index]);
+
+      const isEventDay = matches.length > 0;
+
+      html += `
+        <td data-day="${day}" class="${
+        isToday ? "today" : ""
+      } ${isEventDay ? "cal-event-day" : ""}">
+          <div>${day}</div>
+        </td>
+      `;
+
+      if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
+    }
+
+    html += "</tr>";
+    grid.innerHTML = html;
+
+    // attach hover for tooltip
+    attachCalendarTooltips();
+  }
+
+  function attachCalendarTooltips() {
+    const container = document.getElementById("miniCalendar");
+    const grid = document.getElementById("cal-grid");
+    if (!container || !grid) return;
+
+    const tooltip = ensureCalTooltip();
+    tooltip.style.display = "none";
+
+    function hideTooltip() {
+      tooltip.style.display = "none";
+    }
+
+    grid
+      .querySelectorAll("td[data-day]")
+      .forEach((td) => {
+        td.addEventListener("mouseenter", () => {
+          const day = parseInt(td.dataset.day, 10);
+          const dayObj = new Date(calYear, calMonth, day);
+
+          const matches = allEventRanges
+            .filter(
+              (o) => dayObj >= o.start && dayObj <= o.end
+            )
+            .map((o) => window.__eventsCache[o.index]);
+
+          if (!matches.length) {
+            hideTooltip();
+            return;
+          }
+
+          // build simple text-only content
+          let html = "";
+          matches.forEach((ev, idx) => {
+            if (idx > 0) {
+              html +=
+                '<div class="cal-popup-spacer"></div>';
+            }
+            html += `
+              <div class="cal-popup-title">${ev.title}</div>
+              <div class="cal-popup-date">
+                ${new Date(ev.start_iso).toLocaleDateString()}
+                –
+                ${new Date(ev.end_iso).toLocaleDateString()}
+              </div>
+              ${
+                ev.location
+                  ? `<div class="cal-popup-desc">${ev.location}</div>`
+                  : ""
+              }
+            `;
+          });
+
+          tooltip.innerHTML = html;
+          tooltip.style.display = "block";
+
+          const tdRect = td.getBoundingClientRect();
+          const contRect = container.getBoundingClientRect();
+
+          const tooltipRect =
+            tooltip.getBoundingClientRect();
+
+          let left =
+            tdRect.left -
+            contRect.left +
+            tdRect.width / 2;
+          let top =
+            tdRect.top -
+            contRect.top -
+            tooltipRect.height -
+            10;
+
+          // if there's no room above, show below the cell
+          if (top < 0) {
+            top =
+              tdRect.top -
+              contRect.top +
+              tdRect.height +
+              10;
+          }
+
+          // clamp horizontally so it stays inside calendar
+          const minLeft =
+            tooltipRect.width / 2 + 8;
+          const maxLeft =
+            contRect.width -
+            tooltipRect.width / 2 -
+            8;
+          if (left < minLeft) left = minLeft;
+          if (left > maxLeft) left = maxLeft;
+
+          tooltip.style.left = `${left}px`;
+          tooltip.style.top = `${top}px`;
+          tooltip.style.transform = "translateX(-50%)";
+        });
+
+        td.addEventListener("mouseleave", hideTooltip);
+      });
+
+    container.addEventListener("mouseleave", hideTooltip);
+  }
+
+  // ---------- RENDER EVENTS + HOOK CALENDAR ----------
   function renderFromData(events) {
+    window.__eventsCache = events;
     const now = Date.now();
 
     const live = events
       .filter(
         (e) =>
-          new Date(e.start_iso) <= now && now <= new Date(e.end_iso)
+          new Date(e.start_iso) <= now &&
+          now <= new Date(e.end_iso)
       )
       .sort(
         (a, b) =>
@@ -953,9 +1049,11 @@
       )
       .slice(0, 6);
 
-    // ===== Live section =====
-    const liveSection = document.getElementById("live-events");
-    const liveGrid = document.getElementById("live-events-grid");
+    // Live section
+    const liveSection =
+      document.getElementById("live-events");
+    const liveGrid =
+      document.getElementById("live-events-grid");
     if (live.length) {
       liveSection.style.display = "";
       liveGrid.innerHTML = "";
@@ -970,15 +1068,17 @@
       liveSection.style.display = "none";
     }
 
-    // ===== Upcoming =====
+    // Upcoming section
     const grid = document.getElementById("events-grid");
     grid.innerHTML = "";
     upcoming.forEach((e) => {
-      const el = makeEventElement(e, { subline: "description" });
+      const el = makeEventElement(e, {
+        subline: "description",
+      });
       grid.appendChild(el);
     });
 
-    // ===== Past =====
+    // Past section
     let pastWrap = document.getElementById("past-events");
     if (!pastWrap) {
       pastWrap = document.createElement("div");
@@ -998,21 +1098,24 @@
       el.className = "event reveal";
       el.innerHTML = `
         <span class="tag">${e.tag || "Event"}</span>
-        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(
-        e.end_iso
-      )}</div>
+        <div class="meta">${fmtDate(
+          e.start_iso
+        )} — ${fmtDate(e.end_iso)}</div>
         <h4>${e.title}</h4>
         <div class="meta">${e.location || ""}</div>
       `;
       if (e.image) {
         el.classList.add("with-bg");
-        el.style.setProperty("--event-img", `url("${e.image}")`);
+        el.style.setProperty(
+          "--event-img",
+          `url("${e.image}")`
+        );
       }
       pastGrid.appendChild(el);
     });
 
-    // ===== Calendar ranges (no popup, just highlight days) =====
-    allEventRanges = events.map((e) => {
+    // Build date ranges for calendar
+    allEventRanges = events.map((e, idx) => {
       const start = new Date(e.start_iso);
       const end = new Date(e.end_iso);
       return {
@@ -1026,18 +1129,18 @@
           end.getMonth(),
           end.getDate()
         ),
+        index: idx,
       };
     });
 
-    // ===== Hero header + countdown (no background image) =====
+    // Hero / countdown content
     const next = upcoming[0];
     const chip = document.getElementById("hero-chip");
     const pills = document.getElementById("hero-pills");
-    const header = document.getElementById("countdown-title");
-    const cdCard = document.getElementById("countdown-card");
-
-    // Always keep plain gradient background
-    if (cdCard) cdCard.style.removeProperty("--cd-img");
+    const header =
+      document.getElementById("countdown-title");
+    const cdCard =
+      document.getElementById("countdown-card");
 
     if (live.length) {
       const cur = live[0];
@@ -1049,34 +1152,56 @@
 
       pills.innerHTML = `
         <div class="pill">🟢 Live</div>
-        <div class="pill">📍 ${cur.location || "Online"}</div>
-        <div class="pill">🏁 ${cur.description || ""}</div>
+        <div class="pill">📍 ${
+          cur.location || "Online"
+        }</div>
+        <div class="pill">🏁 ${
+          cur.description || ""
+        }</div>
       `;
 
       header.textContent = "Live now!";
       setCountdown(0, 0, 0, 0);
+
+      // NO IMAGE in countdown card; keep background clean
+      cdCard?.style.removeProperty("--cd-img");
+
+      if (cur.twitch && typeof setTwitchChannel === "function") {
+        setTwitchChannel(cur.twitch);
+      }
     } else if (next) {
       chip.textContent = `Next Event • ${next.title}`;
       pills.innerHTML = `
-        <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-        <div class="pill">📍 ${next.location || "Online"}</div>
-        <div class="pill">🏁 ${next.description || ""}</div>
+        <div class="pill">🗓️ ${fmtDate(
+          next.start_iso
+        )}</div>
+        <div class="pill">📍 ${
+          next.location || "Online"
+        }</div>
+        <div class="pill">🏁 ${
+          next.description || ""
+        }</div>
       `;
+
       startCountdown(next.start_iso, header);
+
+      // still no hero image in countdown bg
+      cdCard?.style.removeProperty("--cd-img");
     } else {
       chip.textContent = "No upcoming event";
-      pills.innerHTML = `<div class="pill">Check back soon</div>`;
+      pills.innerHTML =
+        '<div class="pill">Check back soon</div>';
       header.textContent = "Countdown";
       setCountdown(0, 0, 0, 0);
+      cdCard?.style.removeProperty("--cd-img");
     }
 
-    // ===== Calendar initial view =====
+    // Init calendar once we have events
     if (!calendarInitialized) {
       const initialMonth =
-        (live[0] && live[0].start_iso) ||
-        (next && next.start_iso) ||
+        live[0]?.start_iso ||
+        next?.start_iso ||
         new Date().toISOString();
-
       loadMiniCalendar(initialMonth);
       calendarInitialized = true;
     } else {
@@ -1088,10 +1213,9 @@
     attachHoverGlow();
   }
 
-  // ===== JSON-LD for SEO =====
+  // ---------- STRUCTURED DATA ----------
   function updateJSONLD(next) {
     const el = document.getElementById("event-jsonld");
-    if (!el) return;
     if (!next) {
       el.textContent = "{}";
       return;
@@ -1119,72 +1243,97 @@
     });
   }
 
-  // ===== Load events.json =====
+  // ---------- LOAD EVENTS.JSON ----------
   async function loadEvents() {
     try {
-      const res = await fetch("/events.json?cb=" + Date.now());
-      if (!res.ok) throw new Error("Failed to fetch events.json");
+      const res = await fetch(
+        "/events.json?cb=" + Date.now()
+      );
+      if (!res.ok)
+        throw new Error("Failed to fetch events.json");
       const data = await res.json();
       renderFromData(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
-      const grid = document.getElementById("events-grid");
-      if (grid) {
-        grid.innerHTML =
-          '<article class="event"><div class="meta">Could not load events.</div></article>';
-      }
-      const t = document.getElementById("countdown-title");
+      const grid =
+        document.getElementById("events-grid");
+      grid.innerHTML =
+        '<article class="event"><div class="meta">Could not load events.</div></article>';
+      const t =
+        document.getElementById("countdown-title");
       if (t) t.textContent = "Countdown";
       setCountdown(0, 0, 0, 0);
     }
   }
 
-  // ===== Twitch embed =====
+  // ---------- TWITCH EMBED ----------
+  function setTwitchChannel(ch) {
+    // if you ever want dynamic channel switching later
+  }
+
   (function () {
-    const parents = ["trackmaniaevents.com", "www.trackmaniaevents.com"];
-    const embed = document.getElementById("twitch-embed");
-    if (!embed) return;
+    const parents = [
+      "trackmaniaevents.com",
+      "www.trackmaniaevents.com",
+    ];
+    const embed =
+      document.getElementById("twitch-embed");
     const iframe = document.createElement("iframe");
     iframe.className = "player";
     iframe.allowFullscreen = true;
-    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+    iframe.allow =
+      "autoplay; encrypted-media; picture-in-picture";
     iframe.src =
       `https://player.twitch.tv/?channel=${encodeURIComponent(
         TTV_CHANNEL
       )}&autoplay=false` +
       parents
-        .map((p) => `&parent=${encodeURIComponent(p)}`)
+        .map(
+          (p) => `&parent=${encodeURIComponent(p)}`
+        )
         .join("") +
       `&muted=true`;
     embed.appendChild(iframe);
   })();
 
-  // ===== Nav highlight while scrolling =====
+  // ---------- NAV ACTIVE LINK ----------
   (function () {
-    const sections = [...document.querySelectorAll("section[id]")];
-    const links = [...document.querySelectorAll(".navlinks a")];
+    const sections = [
+      ...document.querySelectorAll("section[id]"),
+    ];
+    const links = [
+      ...document.querySelectorAll(".navlinks a"),
+    ];
     const byId = (id) =>
-      links.find((a) => a.getAttribute("href") === `#${id}`);
-
+      links.find(
+        (a) => a.getAttribute("href") === `#${id}`
+      );
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            links.forEach((a) => a.classList.remove("active"));
+            links.forEach((a) =>
+              a.classList.remove("active")
+            );
             const a = byId(e.target.id);
             if (a) a.classList.add("active");
           }
         });
       },
-      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+      {
+        rootMargin: "-40% 0px -55% 0px",
+        threshold: 0,
+      }
     );
-
     sections.forEach((s) => io.observe(s));
   })();
 
-  // ===== Reveal animations =====
+  // ---------- SCROLL REVEALS ----------
   function attachReveals() {
-    const reveals = document.querySelectorAll(".reveal:not(.show)");
+    const reveals =
+      document.querySelectorAll(
+        ".reveal:not(.show)"
+      );
     const io2 = new IntersectionObserver(
       (entries, obs) => {
         entries.forEach((e) => {
@@ -1200,10 +1349,9 @@
   }
   attachReveals();
 
-  // ===== Back-to-top button =====
+  // ---------- BACK TO TOP ----------
   (function () {
     const btn = document.getElementById("toTop");
-    if (!btn) return;
     addEventListener("scroll", () =>
       btn.classList.toggle("show", scrollY > 600)
     );
@@ -1211,10 +1359,32 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
   })();
 
-  // ===== Init =====
+  // ---------- KICK IT ALL OFF ----------
   loadEvents();
-  const yearEl = document.getElementById("year");
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  document.getElementById("year").textContent =
+    new Date().getFullYear();
+
+  // calendar next/prev buttons
+  document.getElementById("cal-prev").onclick =
+    () => {
+      if (calYear == null || calMonth == null) return;
+      calMonth--;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear--;
+      }
+      renderCalendar();
+    };
+  document.getElementById("cal-next").onclick =
+    () => {
+      if (calYear == null || calMonth == null) return;
+      calMonth++;
+      if (calMonth > 11) {
+        calMonth = 0;
+        calYear++;
+      }
+      renderCalendar();
+    };
 </script>
 </body>
 </html>
