@@ -812,6 +812,116 @@
 
     return article;
   }
+let calYear = 0;
+let calMonth = 0;
+
+function loadMiniCalendar(dateIso) {
+  const d = new Date(dateIso);
+  calYear = d.getFullYear();
+  calMonth = d.getMonth();
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const title = document.getElementById("cal-title");
+  const grid = document.getElementById("cal-grid");
+
+  if (!title || !grid) return;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+
+  title.textContent = new Date(calYear, calMonth, 1)
+    .toLocaleString("default", { month: "long", year: "numeric" });
+
+  let html = `
+    <tr>
+      <th>Sun</th><th>Mon</th><th>Tue</th>
+      <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+    </tr><tr>
+  `;
+
+  for (let i = 0; i < firstDay; i++) html += "<td></td>";
+
+  for (let day = 1; day <= lastDate; day++) {
+    const dayDate = new Date(calYear, calMonth, day);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const isToday = dayDate.getTime() === today.getTime();
+
+    const matches = allEventRanges
+      .map((range, i) => ({ range, i }))
+      .filter(o => dayDate >= o.range.start && dayDate <= o.range.end)
+      .map(o => window.__eventsCache[o.i]);
+
+    const isEvent = matches.length > 0;
+
+    html += `
+      <td data-day="${day}" 
+          class="${isToday ? "today" : ""} ${isEvent ? "cal-event-day" : ""}">
+        <div>${day}</div>
+      </td>
+    `;
+
+    if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
+  }
+
+  html += "</tr>";
+  grid.innerHTML = html;
+
+  activateCalendarTooltips();
+}
+
+function activateCalendarTooltips() {
+  const container = document.getElementById("miniCalendar");
+  if (!container) return;
+
+  document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
+    td.addEventListener("mouseenter", () => {
+      const day = parseInt(td.dataset.day);
+      const d = new Date(calYear, calMonth, day);
+
+      const matches = allEventRanges
+        .map((range, i) => ({ range, i }))
+        .filter(o => d >= o.range.start && d <= o.range.end)
+        .map(o => window.__eventsCache[o.i]);
+
+      if (!matches.length) return;
+
+      const old = document.querySelector(".cal-popup");
+      if (old) old.remove();
+
+      const popup = document.createElement("div");
+      popup.className = "cal-popup";
+
+      popup.innerHTML = matches.map(ev => `
+        ${ev.image ? `<img class="cal-popup-image" src="${ev.image}">` : ""}
+        <div class="cal-popup-title">${ev.title}</div>
+        <div class="cal-popup-date">
+          ${new Date(ev.start_iso).toLocaleDateString()} →
+          ${new Date(ev.end_iso).toLocaleDateString()}
+        </div>
+        <div class="cal-popup-desc">${ev.description || ""}</div>
+      `).join("<div style='height:6px'></div>");
+
+      container.appendChild(popup);
+
+      const tdRect = td.getBoundingClientRect();
+      const contRect = container.getBoundingClientRect();
+
+      let left = tdRect.left - contRect.left + tdRect.width / 2;
+      let top = tdRect.top - contRect.top - popup.offsetHeight - 10;
+
+      if (top < 0) top = tdRect.top - contRect.top + tdRect.height + 10;
+
+      popup.style.left = `${left}px`;
+      popup.style.top = `${top}px`;
+      popup.style.transform = "translateX(-50%)";
+      popup.style.display = "block";
+    });
+  });
+}
 
   function renderFromData(events){
     window.__eventsCache = events;
