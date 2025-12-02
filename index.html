@@ -148,26 +148,36 @@
     .card-header{padding:1rem 1rem .6rem;border-bottom:1px dashed rgba(109,251,255,.2)}
     .card-body{padding:1rem}
 
-    #countdown-card,
-    #live .card{
-      min-height: var(--heroCardH);
-      display:flex;
-      overflow:hidden;
-      flex-direction:column;
-    }
+  #live .card{
+  min-height: var(--heroCardH);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+    /* Make countdown card behave like the event cards, but let it grow naturally */
+#countdown-card{
+  position: relative;
+  border-radius: 18px;
+  display:flex;
+  flex-direction:column;
 
-    #countdown-card{
-      position: relative;
-      border-radius: 18px;
-      background-image:
-        linear-gradient(180deg, rgba(15,21,36,.72), rgba(15,21,36,.45)),
-        var(--cd-img, none);
-      background-size: contain, cover;
-      background-position: center, center;
-      background-repeat: no-repeat, no-repeat;
-      overflow: hidden;
-      background-clip: padding-box, padding-box;
-    }
+  /* hero art + strong dark overlay */
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(15,21,36,.88) 0%,
+      rgba(15,21,36,.82) 40%,
+      rgba(15,21,36,.94) 100%
+    ),
+    var(--cd-img, none);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+
+  /* keep the border radius clean */
+  background-clip: padding-box;
+}
+
 
     #countdown-card::after{
       content:"";
@@ -258,18 +268,19 @@
     }
 
     .calendar-container {
-      margin-top: 1.2rem;
-      padding: 1rem 1.2rem;
-      border-radius: 16px;
-      background: rgba(16,24,44,0.40);
-      border: 1px solid rgba(109,251,255,0.22);
-      box-shadow: 0 0 18px rgba(61,165,255,0.18);
-      position:relative;
-      z-index: 2;
-      backdrop-filter: blur(12px);
-      width: 100%;
-      color: var(--text);
-    }
+  margin-top: 1.2rem;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  background: rgba(16,24,44,0.90);  /* much more solid */
+  border: 1px solid rgba(109,251,255,0.28);
+  box-shadow: 0 0 18px rgba(61,165,255,0.18);
+  position:relative;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+  width: 100%;
+  color: var(--text);
+}
+
 
     .cal-header {
       display: flex;
