@@ -733,245 +733,74 @@
 <script>
   const TTV_CHANNEL = "C0rsy";
 
-  const d = document.getElementById('d');
-  const h = document.getElementById('h');
-  const m = document.getElementById('m');
-  const s = document.getElementById('s');
+  // ===== Countdown DOM refs =====
+  const d = document.getElementById("d");
+  const h = document.getElementById("h");
+  const m = document.getElementById("m");
+  const s = document.getElementById("s");
 
+  // ===== Calendar state =====
   let calYear, calMonth;
   let allEventRanges = [];
   let calendarInitialized = false;
-  window.__eventsCache = [];
 
+  // ===== Helpers =====
   const fmtDate = (iso) => {
     const dt = new Date(iso);
     return dt.toLocaleString(undefined, {
-      month:'short',
-      day:'2-digit',
-      year:'numeric',
-      hour:'numeric',
-      minute:'2-digit'
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
     });
   };
 
-  function setCountdown(dd,hh,mm,ss){
-    if(d) d.textContent = dd;
-    if(h) h.textContent = hh;
-    if(m) m.textContent = mm;
-    if(s) s.textContent = ss;
+  function setCountdown(dd, hh, mm, ss) {
+    if (d) d.textContent = dd;
+    if (h) h.textContent = hh;
+    if (m) m.textContent = mm;
+    if (s) s.textContent = ss;
   }
 
-  function startCountdown(iso,titleEl){
-    function tick(){
+  function startCountdown(iso, titleEl) {
+    function tick() {
       const now = new Date();
       const then = new Date(iso);
       let diff = then - now;
-      if(diff <= 0){
-        setCountdown(0,0,0,0);
-        if(titleEl) titleEl.textContent = 'Live now!';
+
+      if (diff <= 0) {
+        setCountdown(0, 0, 0, 0);
+        if (titleEl) titleEl.textContent = "Live now!";
         return;
       }
-      const days = Math.floor(diff/86400000); diff %= 86400000;
-      const hrs  = Math.floor(diff/3600000);  diff %= 3600000;
-      const mins = Math.floor(diff/60000);    diff %= 60000;
-      const secs = Math.floor(diff/1000);
-      setCountdown(days,hrs,mins,secs);
+
+      const days = Math.floor(diff / 86400000);
+      diff %= 86400000;
+      const hrs = Math.floor(diff / 3600000);
+      diff %= 3600000;
+      const mins = Math.floor(diff / 60000);
+      diff %= 60000;
+      const secs = Math.floor(diff / 1000);
+
+      setCountdown(days, hrs, mins, secs);
     }
+
     tick();
-    setInterval(tick,1000);
+    setInterval(tick, 1000);
   }
 
-  function attachHoverGlow(){
-    document.querySelectorAll('.event').forEach(e=>{
-      e.addEventListener('mousemove',ev=>{
+  function attachHoverGlow() {
+    document.querySelectorAll(".event").forEach((e) => {
+      e.addEventListener("mousemove", (ev) => {
         const r = e.getBoundingClientRect();
-        e.style.setProperty('--x', `${ev.clientX - r.left}px`);
-        e.style.setProperty('--y', `${ev.clientY - r.top}px`);
+        e.style.setProperty("--x", `${ev.clientX - r.left}px`);
+        e.style.setProperty("--y", `${ev.clientY - r.top}px`);
       });
     });
   }
 
-  function makeEventElement(e, options = {}) {
-    const article = document.createElement('article');
-    article.className = 'event reveal';
-
-    const tag = options.tagText || e.tag || 'Event';
-    const subline = options.subline === 'location'
-      ? (e.location || '')
-      : (e.description || '');
-
-    article.innerHTML = `
-      <span class="tag">${tag}</span>
-      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-      <h4>${e.title}</h4>
-      <div class="meta">${subline}</div>
-    `;
-
-    if (e.image) {
-      article.classList.add('with-bg');
-      article.style.setProperty('--event-img', `url("${e.image}")`);
-    }
-
-    const href = e.discordUrl && e.discordUrl.trim()
-      ? e.discordUrl.trim()
-      : (e.url && e.url.trim() ? e.url.trim() : '');
-
-    if (href) {
-      const a = document.createElement('a');
-      a.className = 'event-link';
-      a.href = href;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.setAttribute('aria-label', `${e.title} — more info on Discord`);
-      a.appendChild(article);
-      return a;
-    }
-
-    return article;
-  }
-
-  function renderFromData(events){
-    window.__eventsCache = events;
-    const now = Date.now();
-
-    const live = events
-      .filter(e => new Date(e.start_iso) <= now && now <= new Date(e.end_iso))
-      .sort((a,b)=>new Date(a.start_iso)-new Date(b.start_iso));
-
-    const upcoming = events
-      .filter(e => new Date(e.start_iso) > now)
-      .sort((a,b)=> new Date(a.start_iso) - new Date(b.start_iso));
-
-    const past = events
-      .filter(e => new Date(e.end_iso) <= now)
-      .sort((a,b)=>new Date(b.end_iso)-new Date(a.end_iso))
-      .slice(0,6);
-
-    const liveSection = document.getElementById('live-events');
-    const liveGrid = document.getElementById('live-events-grid');
-
-    if(live.length){
-      liveSection.style.display = '';
-      liveGrid.innerHTML = '';
-      live.forEach(e=>{
-        const el = makeEventElement(e, { tagText: 'LIVE NOW', subline: 'description' });
-        liveGrid.appendChild(el);
-      });
-    } else {
-      liveSection.style.display = 'none';
-    }
-
-    const grid = document.getElementById('events-grid');
-    grid.innerHTML = '';
-    upcoming.forEach(e => {
-      const el = makeEventElement(e, { subline: 'description' });
-      grid.appendChild(el);
-    });
-
-    let pastWrap = document.getElementById('past-events');
-    if(!pastWrap){
-      pastWrap = document.createElement('div');
-      pastWrap.id = 'past-events';
-      pastWrap.innerHTML = `
-        <h3 class="title" style="margin-top:2rem">Past Events</h3>
-        <div class="grid" id="past-grid"></div>
-      `;
-      document.querySelector('#schedule .container').appendChild(pastWrap);
-    }
-    const pastGrid = document.getElementById('past-grid');
-    pastGrid.innerHTML = '';
-    past.forEach(e=>{
-      const el = document.createElement('article');
-      el.className = 'event reveal';
-      el.innerHTML = `
-        <span class="tag">${e.tag || 'Event'}</span>
-        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
-        <h4>${e.title}</h4>
-        <div class="meta">${e.location || ''}</div>
-      `;
-      if(e.image){
-        el.classList.add('with-bg');
-        el.style.setProperty('--event-img', `url("${e.image}")`);
-      }
-      pastGrid.appendChild(el);
-    });
-
-    allEventRanges = events.map(e => {
-      const start = new Date(e.start_iso);
-      const end = new Date(e.end_iso);
-      return {
-        start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
-        end:   new Date(end.getFullYear(),   end.getMonth(),   end.getDate())
-      };
-    });
-
-    const next = upcoming[0];
-    const chip = document.getElementById('hero-chip');
-    const pills = document.getElementById('hero-pills');
-    const header = document.getElementById('countdown-title');
-    const cdCard = document.getElementById('countdown-card');
-
-    if (live.length) {
-      const cur = live[0];
-
-      chip.textContent = live.length > 1
-        ? `🟢 ${live.length} events live — ${cur.title}`
-        : `Live now • ${cur.title}`;
-
-      pills.innerHTML = `
-        <div class="pill">🟢 Live</div>
-        <div class="pill">📍 ${cur.location || 'Online'}</div>
-        <div class="pill">🏁 ${cur.description || ''}</div>
-      `;
-
-      header.textContent = 'Live now!';
-      setCountdown(0,0,0,0);
-
-      const heroImg = cur.hero_image || cur.image;
-      if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
-      else cdCard?.style.removeProperty('--cd-img');
-
-      if (cur.twitch && typeof setTwitchChannel === 'function') {
-        setTwitchChannel(cur.twitch);
-      }
-
-    } else if (next) {
-      chip.textContent = `Next Event • ${next.title}`;
-      pills.innerHTML = `
-        <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
-        <div class="pill">📍 ${next.location || 'Online'}</div>
-        <div class="pill">🏁 ${next.description || ''}</div>
-      `;
-
-      startCountdown(next.start_iso, header);
-
-      const heroImg = next.hero_image || next.image;
-      if (heroImg) cdCard?.style.setProperty('--cd-img', `url("${heroImg}")`);
-      else cdCard?.style.removeProperty('--cd-img');
-
-    } else {
-      chip.textContent = 'No upcoming event';
-      pills.innerHTML = '<div class="pill">Check back soon</div>';
-      header.textContent = 'Countdown';
-      setCountdown(0,0,0,0);
-      cdCard?.style.removeProperty('--cd-img');
-    }
-
-    if (!calendarInitialized) {
-      const initialMonth =
-        (live[0] && live[0].start_iso) ||
-        (next && next.start_iso) ||
-        new Date().toISOString();
-
-      loadMiniCalendar(initialMonth);
-      calendarInitialized = true;
-    }
-
-    updateJSONLD(live[0] || next || null);
-    attachReveals();
-    attachHoverGlow();
-  }
-
+  // ===== Calendar rendering (no popups/images) =====
   function loadMiniCalendar(dateIso) {
     const d = new Date(dateIso);
     calYear = d.getFullYear();
@@ -982,12 +811,15 @@
   function renderCalendar() {
     const title = document.getElementById("cal-title");
     const grid = document.getElementById("cal-grid");
+    if (!title || !grid || calYear == null || calMonth == null) return;
 
     const firstDay = new Date(calYear, calMonth, 1).getDay();
     const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
 
-    title.textContent = new Date(calYear, calMonth, 1)
-      .toLocaleString("default", { month: "long", year: "numeric" });
+    title.textContent = new Date(calYear, calMonth, 1).toLocaleString(
+      "default",
+      { month: "long", year: "numeric" }
+    );
 
     let html = `
       <tr>
@@ -1001,18 +833,19 @@
     for (let day = 1; day <= lastDate; day++) {
       const dayObj = new Date(calYear, calMonth, day);
       const today = new Date();
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
 
-      const isToday = (dayObj.getTime() === today.getTime());
-      const matches = allEventRanges
-        .map((range, i) => ({ range, i }))
-        .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
-        .map(o => window.__eventsCache[o.i]);
+      const isToday = dayObj.getTime() === today.getTime();
 
+      const matches = allEventRanges.filter(
+        (rng) => dayObj >= rng.start && dayObj <= rng.end
+      );
       const isEventDay = matches.length > 0;
 
       html += `
-        <td data-day="${day}" class="${isToday ? "today" : ""} ${isEventDay ? "cal-event-day" : ""}">
+        <td data-day="${day}" class="${
+          isToday ? "today" : ""
+        } ${isEventDay ? "cal-event-day" : ""}">
           <div>${day}</div>
         </td>
       `;
@@ -1022,186 +855,366 @@
 
     html += "</tr>";
     grid.innerHTML = html;
-
-    activateCalendarTooltips();
   }
 
-  function activateCalendarTooltips() {
-    const container = document.getElementById("miniCalendar");
+  // Allow month navigation
+  (function setupCalNav() {
+    const prev = document.getElementById("cal-prev");
+    const next = document.getElementById("cal-next");
+    if (!prev || !next) return;
 
-    document.querySelectorAll("#cal-grid td[data-day]").forEach(td => {
-      td.addEventListener("mouseenter", () => {
-        const day = parseInt(td.dataset.day);
-        const dayObj = new Date(calYear, calMonth, day);
-
-        const matches = allEventRanges
-          .map((range, i) => ({ range, i }))
-          .filter(o => dayObj >= o.range.start && dayObj <= o.range.end)
-          .map(o => window.__eventsCache[o.i]);
-
-        if (!matches.length) return;
-
-        const exist = document.querySelector(".cal-popup");
-        if (exist) exist.remove();
-
-        const popup = document.createElement("div");
-        popup.className = "cal-popup";
-
-        let html = "";
-        matches.forEach(ev => {
-          html += `
-            ${ev.image ? `<img class="cal-popup-image" src="${ev.image}">` : ""}
-            <div class="cal-popup-title">${ev.title}</div>
-            <div class="cal-popup-date">
-              ${new Date(ev.start_iso).toLocaleDateString()} →
-              ${new Date(ev.end_iso).toLocaleDateString()}
-            </div>
-            ${ev.description ? `<div class="cal-popup-desc">${ev.description}</div>` : ""}
-            <div class="cal-popup-spacer"></div>
-          `;
-        });
-
-        popup.innerHTML = html;
-        container.appendChild(popup);
-
-        const tdRect = td.getBoundingClientRect();
-        const contRect = container.getBoundingClientRect();
-
-        let left = tdRect.left - contRect.left + tdRect.width / 2;
-        let top = tdRect.top - contRect.top - popup.offsetHeight - 10;
-
-        if (top < 0) {
-          top = tdRect.top - contRect.top + tdRect.height + 10;
-        }
-
-        popup.style.left = `${left}px`;
-        popup.style.top = `${top}px`;
-        popup.style.transform = "translateX(-50%)";
-        popup.style.display = "block";
-      });
-
-      td.addEventListener("mouseleave", () => {
-        const exist = document.querySelector(".cal-popup");
-        if (exist) exist.remove();
-      });
-    });
-  }
-
-  function updateJSONLD(next){
-    const el = document.getElementById('event-jsonld');
-    if(!next){el.textContent='{}';return;}
-    el.textContent = JSON.stringify({
-      "@context":"https://schema.org",
-      "@type":"Event",
-      name:next.title,
-      startDate:next.start_iso,
-      endDate:next.end_iso,
-      eventAttendanceMode:"https://schema.org/OnlineEventAttendanceMode",
-      eventStatus:"https://schema.org/EventScheduled",
-      location:{"@type":"VirtualLocation","url":"https://trackmaniaevents.com"},
-      description:next.description || "",
-      image:next.image || undefined,
-      organizer:{
-        "@type":"Organization",
-        "name":"Trackmania Events",
-        "url":"https://trackmaniaevents.com"
+    prev.addEventListener("click", () => {
+      calMonth--;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear--;
       }
+      renderCalendar();
+    });
+
+    next.addEventListener("click", () => {
+      calMonth++;
+      if (calMonth > 11) {
+        calMonth = 0;
+        calYear++;
+      }
+      renderCalendar();
+    });
+  })();
+
+  // ===== Event card builder =====
+  function makeEventElement(e, options = {}) {
+    const article = document.createElement("article");
+    article.className = "event reveal";
+
+    const tag = options.tagText || e.tag || "Event";
+    const subline =
+      options.subline === "location"
+        ? e.location || ""
+        : e.description || "";
+
+    article.innerHTML = `
+      <span class="tag">${tag}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${subline}</div>
+    `;
+
+    if (e.image) {
+      article.classList.add("with-bg");
+      article.style.setProperty("--event-img", `url("${e.image}")`);
+    }
+
+    const href =
+      (e.discordUrl && e.discordUrl.trim()) ||
+      (e.url && e.url.trim()) ||
+      "";
+
+    if (href) {
+      const a = document.createElement("a");
+      a.className = "event-link";
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.setAttribute("aria-label", `${e.title} — more info`);
+      a.appendChild(article);
+      return a;
+    }
+
+    return article;
+  }
+
+  // ===== Main render from events.json =====
+  function renderFromData(events) {
+    const now = Date.now();
+
+    const live = events
+      .filter(
+        (e) =>
+          new Date(e.start_iso) <= now && now <= new Date(e.end_iso)
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.start_iso) - new Date(b.start_iso)
+      );
+
+    const upcoming = events
+      .filter((e) => new Date(e.start_iso) > now)
+      .sort(
+        (a, b) =>
+          new Date(a.start_iso) - new Date(b.start_iso)
+      );
+
+    const past = events
+      .filter((e) => new Date(e.end_iso) <= now)
+      .sort(
+        (a, b) =>
+          new Date(b.end_iso) - new Date(a.end_iso)
+      )
+      .slice(0, 6);
+
+    // ===== Live section =====
+    const liveSection = document.getElementById("live-events");
+    const liveGrid = document.getElementById("live-events-grid");
+    if (live.length) {
+      liveSection.style.display = "";
+      liveGrid.innerHTML = "";
+      live.forEach((e) => {
+        const el = makeEventElement(e, {
+          tagText: "LIVE NOW",
+          subline: "description",
+        });
+        liveGrid.appendChild(el);
+      });
+    } else {
+      liveSection.style.display = "none";
+    }
+
+    // ===== Upcoming =====
+    const grid = document.getElementById("events-grid");
+    grid.innerHTML = "";
+    upcoming.forEach((e) => {
+      const el = makeEventElement(e, { subline: "description" });
+      grid.appendChild(el);
+    });
+
+    // ===== Past =====
+    let pastWrap = document.getElementById("past-events");
+    if (!pastWrap) {
+      pastWrap = document.createElement("div");
+      pastWrap.id = "past-events";
+      pastWrap.innerHTML = `
+        <h3 class="title" style="margin-top:2rem">Past Events</h3>
+        <div class="grid" id="past-grid"></div>
+      `;
+      document
+        .querySelector("#schedule .container")
+        .appendChild(pastWrap);
+    }
+    const pastGrid = document.getElementById("past-grid");
+    pastGrid.innerHTML = "";
+    past.forEach((e) => {
+      const el = document.createElement("article");
+      el.className = "event reveal";
+      el.innerHTML = `
+        <span class="tag">${e.tag || "Event"}</span>
+        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(
+        e.end_iso
+      )}</div>
+        <h4>${e.title}</h4>
+        <div class="meta">${e.location || ""}</div>
+      `;
+      if (e.image) {
+        el.classList.add("with-bg");
+        el.style.setProperty("--event-img", `url("${e.image}")`);
+      }
+      pastGrid.appendChild(el);
+    });
+
+    // ===== Calendar ranges (no popup, just highlight days) =====
+    allEventRanges = events.map((e) => {
+      const start = new Date(e.start_iso);
+      const end = new Date(e.end_iso);
+      return {
+        start: new Date(
+          start.getFullYear(),
+          start.getMonth(),
+          start.getDate()
+        ),
+        end: new Date(
+          end.getFullYear(),
+          end.getMonth(),
+          end.getDate()
+        ),
+      };
+    });
+
+    // ===== Hero header + countdown (no background image) =====
+    const next = upcoming[0];
+    const chip = document.getElementById("hero-chip");
+    const pills = document.getElementById("hero-pills");
+    const header = document.getElementById("countdown-title");
+    const cdCard = document.getElementById("countdown-card");
+
+    // Always keep plain gradient background
+    if (cdCard) cdCard.style.removeProperty("--cd-img");
+
+    if (live.length) {
+      const cur = live[0];
+
+      chip.textContent =
+        live.length > 1
+          ? `🟢 ${live.length} events live — ${cur.title}`
+          : `Live now • ${cur.title}`;
+
+      pills.innerHTML = `
+        <div class="pill">🟢 Live</div>
+        <div class="pill">📍 ${cur.location || "Online"}</div>
+        <div class="pill">🏁 ${cur.description || ""}</div>
+      `;
+
+      header.textContent = "Live now!";
+      setCountdown(0, 0, 0, 0);
+    } else if (next) {
+      chip.textContent = `Next Event • ${next.title}`;
+      pills.innerHTML = `
+        <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+        <div class="pill">📍 ${next.location || "Online"}</div>
+        <div class="pill">🏁 ${next.description || ""}</div>
+      `;
+      startCountdown(next.start_iso, header);
+    } else {
+      chip.textContent = "No upcoming event";
+      pills.innerHTML = `<div class="pill">Check back soon</div>`;
+      header.textContent = "Countdown";
+      setCountdown(0, 0, 0, 0);
+    }
+
+    // ===== Calendar initial view =====
+    if (!calendarInitialized) {
+      const initialMonth =
+        (live[0] && live[0].start_iso) ||
+        (next && next.start_iso) ||
+        new Date().toISOString();
+
+      loadMiniCalendar(initialMonth);
+      calendarInitialized = true;
+    } else {
+      renderCalendar();
+    }
+
+    updateJSONLD(live[0] || next || null);
+    attachReveals();
+    attachHoverGlow();
+  }
+
+  // ===== JSON-LD for SEO =====
+  function updateJSONLD(next) {
+    const el = document.getElementById("event-jsonld");
+    if (!el) return;
+    if (!next) {
+      el.textContent = "{}";
+      return;
+    }
+    el.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: next.title,
+      startDate: next.start_iso,
+      endDate: next.end_iso,
+      eventAttendanceMode:
+        "https://schema.org/OnlineEventAttendanceMode",
+      eventStatus: "https://schema.org/EventScheduled",
+      location: {
+        "@type": "VirtualLocation",
+        url: "https://trackmaniaevents.com",
+      },
+      description: next.description || "",
+      image: next.image || undefined,
+      organizer: {
+        "@type": "Organization",
+        name: "Trackmania Events",
+        url: "https://trackmaniaevents.com",
+      },
     });
   }
 
-  async function loadEvents(){
-    try{
-      const res = await fetch('/events.json?cb=' + Date.now());
-      if(!res.ok) throw new Error('Failed to fetch events.json');
+  // ===== Load events.json =====
+  async function loadEvents() {
+    try {
+      const res = await fetch("/events.json?cb=" + Date.now());
+      if (!res.ok) throw new Error("Failed to fetch events.json");
       const data = await res.json();
       renderFromData(Array.isArray(data) ? data : []);
-    }catch(err){
+    } catch (err) {
       console.error(err);
-      const grid = document.getElementById('events-grid');
-      grid.innerHTML = '<article class="event"><div class="meta">Could not load events.</div></article>';
-      const t = document.getElementById('countdown-title');
-      if(t) t.textContent = 'Countdown';
-      setCountdown(0,0,0,0);
+      const grid = document.getElementById("events-grid");
+      if (grid) {
+        grid.innerHTML =
+          '<article class="event"><div class="meta">Could not load events.</div></article>';
+      }
+      const t = document.getElementById("countdown-title");
+      if (t) t.textContent = "Countdown";
+      setCountdown(0, 0, 0, 0);
     }
   }
 
-  (function(){
-    const parents=['trackmaniaevents.com','www.trackmaniaevents.com'];
-    const embed=document.getElementById('twitch-embed');
-    const iframe=document.createElement('iframe');
-    iframe.className='player';
-    iframe.allowFullscreen=true;
-    iframe.allow='autoplay; encrypted-media; picture-in-picture';
-    iframe.src=`https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&autoplay=false`+
-      parents.map(p=>`&parent=${encodeURIComponent(p)}`).join('')+
+  // ===== Twitch embed =====
+  (function () {
+    const parents = ["trackmaniaevents.com", "www.trackmaniaevents.com"];
+    const embed = document.getElementById("twitch-embed");
+    if (!embed) return;
+    const iframe = document.createElement("iframe");
+    iframe.className = "player";
+    iframe.allowFullscreen = true;
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+    iframe.src =
+      `https://player.twitch.tv/?channel=${encodeURIComponent(
+        TTV_CHANNEL
+      )}&autoplay=false` +
+      parents
+        .map((p) => `&parent=${encodeURIComponent(p)}`)
+        .join("") +
       `&muted=true`;
     embed.appendChild(iframe);
   })();
 
-  (function(){
-    const sections=[...document.querySelectorAll('section[id]')];
-    const links=[...document.querySelectorAll('.navlinks a')];
-    const byId=id=>links.find(a=>a.getAttribute('href')===`#${id}`);
-    const io=new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          links.forEach(a=>a.classList.remove('active'));
-          const a=byId(e.target.id);
-          if(a) a.classList.add('active');
-        }
-      });
-    },{rootMargin:'-40% 0px -55% 0px',threshold:0});
-    sections.forEach(s=>io.observe(s));
+  // ===== Nav highlight while scrolling =====
+  (function () {
+    const sections = [...document.querySelectorAll("section[id]")];
+    const links = [...document.querySelectorAll(".navlinks a")];
+    const byId = (id) =>
+      links.find((a) => a.getAttribute("href") === `#${id}`);
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            links.forEach((a) => a.classList.remove("active"));
+            const a = byId(e.target.id);
+            if (a) a.classList.add("active");
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+
+    sections.forEach((s) => io.observe(s));
   })();
 
-  function attachReveals(){
-    const reveals=document.querySelectorAll('.reveal:not(.show)');
-    const io2=new IntersectionObserver((entries,obs)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          e.target.classList.add('show');
-          obs.unobserve(e.target);
-        }
-      });
-    },{threshold:0.12});
-    reveals.forEach(el=>io2.observe(el));
+  // ===== Reveal animations =====
+  function attachReveals() {
+    const reveals = document.querySelectorAll(".reveal:not(.show)");
+    const io2 = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("show");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    reveals.forEach((el) => io2.observe(el));
   }
   attachReveals();
 
-  (function(){
-    const btn=document.getElementById('toTop');
-    addEventListener('scroll',()=>btn.classList.toggle('show',scrollY>600));
-    btn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+  // ===== Back-to-top button =====
+  (function () {
+    const btn = document.getElementById("toTop");
+    if (!btn) return;
+    addEventListener("scroll", () =>
+      btn.classList.toggle("show", scrollY > 600)
+    );
+    btn.onclick = () =>
+      window.scrollTo({ top: 0, behavior: "smooth" });
   })();
 
-  (function(){
-    const navToggle = document.getElementById('navToggle');
-    const nav = document.getElementById('primary-nav');
-    if(!navToggle || !nav) return;
-    navToggle.addEventListener('click', ()=>{
-      const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-      navToggle.setAttribute('aria-expanded', String(!expanded));
-      nav.classList.toggle('show', !expanded);
-    });
-  })();
-
-  const prevBtn = document.getElementById("cal-prev");
-  const nextBtn = document.getElementById("cal-next");
-  if (prevBtn && nextBtn) {
-    prevBtn.onclick = () => {
-      calMonth--;
-      if (calMonth < 0) { calMonth = 11; calYear--; }
-      renderCalendar();
-    };
-    nextBtn.onclick = () => {
-      calMonth++;
-      if (calMonth > 11) { calMonth = 0; calYear++; }
-      renderCalendar();
-    };
-  }
-
+  // ===== Init =====
   loadEvents();
-  document.getElementById('year').textContent=new Date().getFullYear();
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
