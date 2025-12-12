@@ -1046,73 +1046,70 @@
   }
 
   function expandRecurringEvents(events) {
-    const now = new Date();
-    const startDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
-    const out = [];
+  const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+  const out = [];
 
-    for (const e of events) {
-      const rec = e && e.recurrence;
-      const isWeekly =
-        rec &&
-        String(rec.freq || "").toLowerCase().trim() === "weekly" &&
-        Array.isArray(rec.byDay) &&
-        rec.byDay.length;
+  for (const e of events) {
+    const rec = e && e.recurrence;
+    const isWeekly =
+      rec &&
+      String(rec.freq || "").toLowerCase() === "weekly" &&
+      Array.isArray(rec.byDay) &&
+      rec.byDay.length;
 
-      if (!isWeekly) {
-        out.push(e);
-        continue;
-      }
-
-      // IMPORTANT: template should include start_iso to anchor offset
-      const offset = getOffsetFromIso(e.start_iso) || "";
-      const count = Math.max(1, Number(rec.count || 8));
-      const durationMinutes = Math.max(1, Number(rec.durationMinutes || 60));
-
-      const time = String(rec.time || "19:00");
-      const [HH, MM] = time.split(":").map((v) => parseInt(v, 10));
-
-      let made = 0;
-
-      // Search forward up to ~1 year to find the next N occurrences
-      for (let i = 0; i < 370 && made < count; i++) {
-        const candidate = new Date(startDay);
-        candidate.setDate(startDay.getDate() + i);
-
-        const dow = candidate.getDay();
-        const want = rec.byDay.some((code) => dayMap[code] === dow);
-        if (!want) continue;
-
-        // Build a start ISO that encodes the offset (so the instant is correct)
-        const startIso = buildIsoWithOffset(
-          candidate.getFullYear(),
-          candidate.getMonth() + 1,
-          candidate.getDate(),
-          HH,
-          MM,
-          offset
-        );
-
-        const startDt = new Date(startIso);
-        const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
-
-        // Keep your original style by storing strings that Date() can parse reliably
-        // (start keeps offset; end uses ISO Z — both parse correctly and display fine)
-        const occ = {
-          ...e,
-          start_iso: startIso,
-          end_iso: endDt.toISOString(),
-          _generated: true,
-        };
-
-        out.push(occ);
-        made++;
-      }
+    // Non-recurring events pass straight through
+    if (!isWeekly) {
+      out.push(e);
+      continue;
     }
 
-    return out;
+    // Use start_iso ONLY as a timezone anchor
+    const offset = (String(e.start_iso || "").match(/([+-]\d{2}:\d{2}|Z)$/) || [])[1] || "";
+
+    const durationMinutes = Number(rec.durationMinutes || 60);
+    const [HH, MM] = String(rec.time || "19:00")
+      .split(":")
+      .map((v) => parseInt(v, 10));
+
+    let found = false;
+
+    // Look ahead up to 14 days to find the next occurrence
+    for (let i = 0; i < 14 && !found; i++) {
+      const candidate = new Date(today);
+      candidate.setDate(today.getDate() + i);
+
+      const dow = candidate.getDay();
+      const want = rec.byDay.some((code) => dayMap[code] === dow);
+      if (!want) continue;
+
+      const startIso = `${candidate.getFullYear()}-${String(
+        candidate.getMonth() + 1
+      ).padStart(2, "0")}-${String(candidate.getDate()).padStart(2, "0")}T${String(
+        HH
+      ).padStart(2, "0")}:${String(MM).padStart(2, "0")}:00${offset}`;
+
+      const startDt = new Date(startIso);
+      const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
+
+      // Skip if it already ended
+      if (endDt <= now) continue;
+
+      out.push({
+        ...e,
+        start_iso: startIso,
+        end_iso: endDt.toISOString(),
+        _generated: true,
+      });
+
+      found = true;
+    }
   }
+
+  return out;
+}
 
   // ---------- RENDER EVENTS + HOOK CALENDAR ----------
   function renderFromData(rawEvents) {
