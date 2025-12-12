@@ -157,6 +157,7 @@
 /* --- MINI CALENDAR TOOLTIP FIX --- */
 #miniCalendar {
   position: relative;    /* REQUIRED so the tooltip stays inside */
+  overflow: visible !important;
 }
 
 #cal-tooltip {
@@ -170,7 +171,7 @@
   color: var(--text);
   font-size: 0.85rem;
   line-height: 1.3;
-  z-index: 50;           /* stays ABOVE calendar but INSIDE hero */
+  z-index: 9999;           /* stays ABOVE calendar but INSIDE hero */
   pointer-events: none;  /* no weird hovering */
   box-shadow: 0 8px 30px rgba(0,0,0,0.45);
 }
@@ -316,6 +317,7 @@
   box-shadow: 0 0 18px rgba(61,165,255,0.18);
   position:relative;
   z-index: 2;
+  overflow: visible !important;
   backdrop-filter: blur(10px);
   width: 100%;
   color: var(--text);
@@ -351,18 +353,21 @@
       width: 100%;
       border-collapse: collapse;
       text-align: center;
+      overflow: visible !important;
     }
 
     #cal-grid th {
       color: var(--muted);
       padding-bottom: .4rem;
       font-size: .8rem;
+      overflow: visible !important;
     }
 
     #cal-grid td {
       padding: .35rem 0;
       border-radius: 8px;
       transition: .15s ease;
+      overflow: visible !important;
     }
 
     .cal-event-day {
