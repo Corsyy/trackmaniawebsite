@@ -959,78 +959,95 @@
   }
 
   function attachCalendarTooltips() {
-    const container = document.getElementById("miniCalendar");
-    const grid = document.getElementById("cal-grid");
-    if (!container || !grid) return;
+  const container = document.getElementById("miniCalendar");
+  const grid = document.getElementById("cal-grid");
+  if (!container || !grid) return;
 
-    let tooltip = document.getElementById("cal-tooltip");
-    if (!tooltip) {
-      tooltip = document.createElement("div");
-      tooltip.id = "cal-tooltip";
-      container.appendChild(tooltip);
-    }
+  // Create tooltip ONCE on <body> so it's never clipped by hero mask/overflow
+  let tooltip = document.getElementById("cal-tooltip");
+  if (!tooltip) {
+    tooltip = document.createElement("div");
+    tooltip.id = "cal-tooltip";
+    document.body.appendChild(tooltip);
+  }
+
+  // Ensure tooltip styling still applies (your CSS already targets #cal-tooltip)
+  tooltip.style.display = "none";
+
+  function hideTooltip() {
     tooltip.style.display = "none";
+  }
 
-    function hideTooltip() {
-      tooltip.style.display = "none";
-    }
+  grid.querySelectorAll("td[data-day]").forEach((td) => {
+    td.addEventListener("mouseenter", () => {
+      const day = parseInt(td.dataset.day, 10);
+      const dayObj = new Date(calYear, calMonth, day);
 
-    grid.querySelectorAll("td[data-day]").forEach((td) => {
-      td.addEventListener("mouseenter", () => {
-        const day = parseInt(td.dataset.day, 10);
-        const dayObj = new Date(calYear, calMonth, day);
+      const matches = allEventRanges
+        .filter((o) => dayObj >= o.start && dayObj <= o.end)
+        .map((o) => window.__eventsCache[o.index]);
 
-        const matches = allEventRanges
-          .filter((o) => dayObj >= o.start && dayObj <= o.end)
-          .map((o) => window.__eventsCache[o.index]);
+      if (!matches.length) {
+        hideTooltip();
+        return;
+      }
 
-        if (!matches.length) {
-          hideTooltip();
-          return;
-        }
-
-        let html = "";
-        matches.forEach((ev, idx) => {
-          if (idx > 0) html += `<div class="cal-popup-spacer"></div>`;
-          html += `
-            <div class="cal-popup-title">${ev.title}</div>
-            <div class="cal-popup-date">
-              ${new Date(ev.start_iso).toLocaleDateString()} –
-              ${new Date(ev.end_iso).toLocaleDateString()}
-            </div>
-            <div class="cal-popup-desc">${ev.location || ""}</div>
-          `;
-        });
-
-        tooltip.innerHTML = html;
-        tooltip.style.display = "block";
-
-        const tdRect = td.getBoundingClientRect();
-        const contRect = container.getBoundingClientRect();
-        const popupRect = tooltip.getBoundingClientRect();
-
-        let top = tdRect.top - contRect.top - popupRect.height - 10;
-        if (top < 0) top = tdRect.top - contRect.top + tdRect.height + 10;
-
-        const padding = 12;
-        let left =
-          tdRect.left - contRect.left + tdRect.width / 2 - popupRect.width / 2;
-
-        if (left < padding) left = padding;
-        else if (left + popupRect.width > contRect.width - padding) {
-          left = contRect.width - popupRect.width - padding;
-        }
-
-        tooltip.style.top = `${top}px`;
-        tooltip.style.left = `${left}px`;
-        tooltip.style.transform = "none";
+      let html = "";
+      matches.forEach((ev, idx) => {
+        if (idx > 0) html += `<div class="cal-popup-spacer"></div>`;
+        html += `
+          <div class="cal-popup-title">${ev.title}</div>
+          <div class="cal-popup-date">
+            ${new Date(ev.start_iso).toLocaleDateString()} –
+            ${new Date(ev.end_iso).toLocaleDateString()}
+          </div>
+          <div class="cal-popup-desc">${ev.location || ""}</div>
+        `;
       });
 
-      td.addEventListener("mouseleave", hideTooltip);
+      tooltip.innerHTML = html;
+      tooltip.style.display = "block";
+      tooltip.style.position = "fixed";
+      tooltip.style.zIndex = "9999";
+      tooltip.style.pointerEvents = "none";
+
+      const tdRect = td.getBoundingClientRect();
+
+      // Measure after showing
+      const popRect = tooltip.getBoundingClientRect();
+
+      // Prefer above, otherwise below
+      let top = tdRect.top - popRect.height - 10;
+      if (top < 10) top = tdRect.bottom + 10;
+
+      // Center horizontally on the cell, clamp to viewport
+      let left = tdRect.left + tdRect.width / 2 - popRect.width / 2;
+      const pad = 12;
+
+      if (left < pad) left = pad;
+      if (left + popRect.width > window.innerWidth - pad) {
+        left = window.innerWidth - popRect.width - pad;
+      }
+
+      // Also clamp bottom edge (in case it's near the bottom)
+      if (top + popRect.height > window.innerHeight - pad) {
+        top = Math.max(pad, window.innerHeight - popRect.height - pad);
+      }
+
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.transform = "none";
     });
 
-    container.addEventListener("mouseleave", hideTooltip);
-  }
+    td.addEventListener("mouseleave", hideTooltip);
+  });
+
+  container.addEventListener("mouseleave", hideTooltip);
+
+  // Optional: hide on scroll (prevents "floating" tooltip)
+  window.addEventListener("scroll", hideTooltip, { passive: true });
+}
+
 
   // ---------- RECURRENCE (WEEKLY) ----------
   // events.json weekly template example:
