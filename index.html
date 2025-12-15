@@ -1459,6 +1459,16 @@
   window.CRISP_WEBSITE_ID = "2a765414-4f31-4911-8a74-b759faffc780";
 
   (function () {
+    const GRACE_MINUTES = 3;                 // keep chat if refresh within this window
+    const TS_KEY = "__crisp_last_seen_ts";   // shared across tabs
+    const RELOAD_KEY = "__crisp_reset_reloaded"; // per-tab loop guard
+
+    const now = Date.now();
+    const last = parseInt(localStorage.getItem(TS_KEY) || "0", 10);
+    localStorage.setItem(TS_KEY, String(now));
+
+    const withinGrace = last && (now - last) <= GRACE_MINUTES * 60 * 1000;
+
     // Load Crisp once
     if (!window.__CRISP_LOADED__) {
       window.__CRISP_LOADED__ = true;
@@ -1468,23 +1478,26 @@
       document.head.appendChild(s);
     }
 
-    // Run once Crisp is fully ready
-    window.CRISP_READY_TRIGGER = function () {
-      const key = "__crisp_hard_reset_done";
+    // When Crisp is ready:
+    window.$crisp.push(["on", "ready", function () {
+      // Always show launcher
+      window.$crisp.push(["do", "chat:show"]);
 
-      // Hard reset ONCE per tab load, then reload (Crisp supports reload=true) :contentReference[oaicite:1]{index=1}
-      if (!sessionStorage.getItem(key)) {
-        sessionStorage.setItem(key, "1");
-        $crisp.push(["do", "session:reset", [true]]);
-        return;
+      // If user refreshed quickly, keep the same conversation
+      if (withinGrace) return;
+
+      // Outside grace: reset once, then reload once (prevents loops)
+      if (!sessionStorage.getItem(RELOAD_KEY)) {
+        sessionStorage.setItem(RELOAD_KEY, "1");
+        window.$crisp.push(["do", "session:reset"]);
+        setTimeout(function () { location.reload(); }, 150);
+      } else {
+        // After reload, clear guard so future visits can reset again when needed
+        sessionStorage.removeItem(RELOAD_KEY);
       }
-
-      // Make sure the launcher is visible
-      $crisp.push(["do", "chat:show"]);
-    };
+    }]);
   })();
 </script>
-
 
 </body>
 </html>
