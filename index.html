@@ -1459,17 +1459,23 @@
   };
 </script>
 <!-- Help button -->
-<!-- Help button -->
-<button id="helpChatBtn" type="button" aria-label="Open help chat">
-  Help
-</button>
+<button id="helpChatBtn" type="button" aria-label="Open help chat">Help</button>
 
 <script>
-  // --- Crisp: load once + use a custom button ---
+  // ---- Crisp bootstrap (single instance) ----
   window.$crisp = window.$crisp || [];
   window.CRISP_WEBSITE_ID = "2a765414-4f31-4911-8a74-b759faffc780";
 
-  (function loadCrispOnce() {
+  (function () {
+    // If crisp is already present (loaded elsewhere), do NOT inject again.
+    // Crisp sets a global "Crisp" object when loaded.
+    if (window.Crisp) {
+      // Hide the default bubble anyway
+      window.$crisp.push(["do", "chat:hide"]);
+      return;
+    }
+
+    // If we're already injecting, don't do it twice
     if (document.getElementById("crisp-chat-loader")) return;
 
     var s = document.createElement("script");
@@ -1478,12 +1484,12 @@
     s.async = true;
     document.head.appendChild(s);
 
-    // Hide default Crisp bubble (keep only your Help button)
+    // Always hide the default bubble (we only want your Help button)
     window.$crisp.push(["do", "chat:hide"]);
   })();
 
-  // Open chat from your custom button
-  document.addEventListener("DOMContentLoaded", function () {
+  // ---- Open Crisp from your custom button ----
+  (function () {
     var btn = document.getElementById("helpChatBtn");
     if (!btn) return;
 
@@ -1491,19 +1497,16 @@
       window.$crisp.push(["do", "chat:show"]);
       window.$crisp.push(["do", "chat:open"]);
     });
-  });
+  })();
 
-  // End chat: send closing message, close/hide, then reset session
-  // Call this from anywhere: endCrispChat("your message")
+  // ---- End / reset chat (call this when YOU decide it's resolved) ----
   function endCrispChat(message) {
     var text =
       message ||
-      "✅ This chat has been resolved. If you need help again, just click Help to start a new conversation.";
+      "✅ This chat has been resolved. If you need help again, click Help to start a new conversation.";
 
-    // Send final message
     window.$crisp.push(["do", "message:send", ["text", text]]);
 
-    // Give it a moment to render, then close + reset so next time is fresh
     setTimeout(function () {
       window.$crisp.push(["do", "chat:close"]);
       window.$crisp.push(["do", "chat:hide"]);
@@ -1511,29 +1514,18 @@
     }, 1200);
   }
 
-  // OPTIONAL: Let the visitor type "end" or "/end" to reset their chat
-  // (Comment this whole block out if you do NOT want users to be able to do this.)
-  window.$crisp.push([
-    "on",
-    "message:sent",
-    function () {
-      window.$crisp.push([
-        "get",
-        "chat:last_message",
-        function (msg) {
-          try {
-            var content = (msg && msg.content ? String(msg.content) : "").trim().toLowerCase();
-            if (content === "end" || content === "/end" || content === "close chat" || content === "/close") {
-              endCrispChat("✅ Chat closed. Click Help any time to start a new conversation.");
-            }
-          } catch (e) {}
+  // Optional: visitor types /end to reset
+  window.$crisp.push(["on", "message:sent", function () {
+    window.$crisp.push(["get", "chat:last_message", function (msg) {
+      try {
+        var content = (msg && msg.content ? String(msg.content) : "").trim().toLowerCase();
+        if (content === "/end" || content === "end" || content === "/close" || content === "close chat") {
+          endCrispChat("✅ Chat closed. Click Help to start a new conversation.");
         }
-      ]);
-    }
-  ]);
+      } catch (e) {}
+    }]);
+  }]);
 </script>
-
-
 
 </body>
 </html>
