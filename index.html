@@ -1464,9 +1464,10 @@
 </button>
 
 <script>
-  // Load Crisp
+  // Initialize Crisp
   window.$crisp = window.$crisp || [];
   window.CRISP_WEBSITE_ID = "2a765414-4f31-4911-8a74-b759faffc780";
+
   (function () {
     var d = document, s = d.createElement("script");
     s.src = "https://client.crisp.chat/l.js";
@@ -1474,17 +1475,20 @@
     d.getElementsByTagName("head")[0].appendChild(s);
   })();
 
-  // Button -> open chat
+  // Hide Crisp's default floating bubble
+  window.$crisp.push(["do", "chat:hide"]);
+
+  // Use YOUR Help button to open chat
   (function () {
     const btn = document.getElementById("helpChatBtn");
     if (!btn) return;
 
     btn.addEventListener("click", () => {
       window.$crisp.push(["do", "chat:open"]);
-      window.$crisp.push(["do", "chat:show"]);
     });
   })();
 </script>
+
 
 </body>
 </html>
