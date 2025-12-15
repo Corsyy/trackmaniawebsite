@@ -1459,25 +1459,32 @@
   window.CRISP_WEBSITE_ID = "2a765414-4f31-4911-8a74-b759faffc780";
 
   (function () {
-    if (window.__CRISP_LOADED__) return;
-    window.__CRISP_LOADED__ = true;
+    // Load Crisp once
+    if (!window.__CRISP_LOADED__) {
+      window.__CRISP_LOADED__ = true;
+      var s = document.createElement("script");
+      s.src = "https://client.crisp.chat/l.js";
+      s.async = true;
+      document.head.appendChild(s);
+    }
 
-    var s = document.createElement("script");
-    s.src = "https://client.crisp.chat/l.js";
-    s.async = true;
-    document.head.appendChild(s);
+    // Run once Crisp is fully ready
+    window.CRISP_READY_TRIGGER = function () {
+      const key = "__crisp_hard_reset_done";
 
-    // CRITICAL: wait for Crisp to be fully ready
-    window.$crisp.push(["on", "ready", function () {
+      // Hard reset ONCE per tab load, then reload (Crisp supports reload=true) :contentReference[oaicite:1]{index=1}
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        $crisp.push(["do", "session:reset", [true]]);
+        return;
+      }
 
-      // 1) Kill any existing conversation/session
-      window.$crisp.push(["do", "session:reset"]);
-
-      // 2) Show launcher AFTER reset (prevents old chat flash)
-      window.$crisp.push(["do", "chat:show"]);
-    }]);
+      // Make sure the launcher is visible
+      $crisp.push(["do", "chat:show"]);
+    };
   })();
 </script>
+
 
 </body>
 </html>
