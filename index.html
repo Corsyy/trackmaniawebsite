@@ -390,7 +390,23 @@
       font-weight: 800;
       box-shadow: var(--accent-glow);
     }
-
+#helpChatBtn{
+  position:fixed;
+  right:22px;
+  bottom:96px; /* sits above your Top button */
+  z-index:9999;
+  border:1px solid rgba(109,251,255,.25);
+  border-radius:14px;
+  padding:.65rem .9rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#001220;
+  font-weight:900;
+  box-shadow:var(--accent-glow);
+  cursor:pointer;
+  transition:transform .2s ease, filter .2s ease;
+}
+#helpChatBtn:hover{ transform:translateY(-2px) scale(1.02); filter:brightness(1.06); }
+#helpChatBtn:focus{ outline:none; box-shadow:var(--ring); }
     /* SECTIONS */
     .section{padding:3rem 0}
     .title{font-size:1.8rem;font-weight:900;margin:0 0 1rem;display:inline-block;position:relative}
@@ -1442,6 +1458,8 @@
     renderCalendar();
   };
 </script>
+<script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="2a765414-4f31-4911-8a74-b759faffc780";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+<button id="helpChatBtn" type="button">Help</button>
 
 </body>
 </html>
