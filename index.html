@@ -1458,8 +1458,8 @@
     renderCalendar();
   };
 </script>
-<!-- Help button -->
 <button id="helpChatBtn" type="button" aria-label="Open help chat">Help</button>
+
 
 <script>
   window.$crisp = window.$crisp || [];
@@ -1467,33 +1467,39 @@
 
   (function () {
     // Load Crisp once
-    if (document.getElementById("crisp-chat-loader")) return;
+    if (!document.getElementById("crisp-chat-loader")) {
+      var s = document.createElement("script");
+      s.id = "crisp-chat-loader";
+      s.src = "https://client.crisp.chat/l.js";
+      s.async = true;
+      document.head.appendChild(s);
+    }
 
-    var s = document.createElement("script");
-    s.id = "crisp-chat-loader";
-    s.src = "https://client.crisp.chat/l.js";
-    s.async = true;
-    document.head.appendChild(s);
-
-    // IMPORTANT:
-    // Always start with a fresh session on page load
-    window.$crisp.push(["do", "session:reset", [true]]);
-
-    // Hide Crisp's default bubble (you use your own button)
+    // Hide Crisp bubble (you use your own button)
     window.$crisp.push(["do", "chat:hide"]);
+
+    // Reset ONLY once per page-load (prevents weird loops)
+    if (!sessionStorage.getItem("crisp_reset_done")) {
+      sessionStorage.setItem("crisp_reset_done", "1");
+      window.$crisp.push(["do", "session:reset", [true]]);
+    }
   })();
 
-  // Open chat from your Help button
   document.addEventListener("DOMContentLoaded", function () {
     var btn = document.getElementById("helpChatBtn");
     if (!btn) return;
 
-    btn.addEventListener("click", function () {
+    btn.addEventListener("click", function (e) {
+      // Prevent any form submit / navigation
+      e.preventDefault();
+      e.stopPropagation();
+
       window.$crisp.push(["do", "chat:show"]);
       window.$crisp.push(["do", "chat:open"]);
     });
   });
 </script>
+
 
 
 </body>
