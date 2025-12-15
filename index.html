@@ -1462,20 +1462,10 @@
 <button id="helpChatBtn" type="button" aria-label="Open help chat">Help</button>
 
 <script>
-  // ---- Crisp bootstrap (single instance) ----
   window.$crisp = window.$crisp || [];
   window.CRISP_WEBSITE_ID = "2a765414-4f31-4911-8a74-b759faffc780";
 
-  (function () {
-    // If crisp is already present (loaded elsewhere), do NOT inject again.
-    // Crisp sets a global "Crisp" object when loaded.
-    if (window.Crisp) {
-      // Hide the default bubble anyway
-      window.$crisp.push(["do", "chat:hide"]);
-      return;
-    }
-
-    // If we're already injecting, don't do it twice
+  (function loadCrispOnce() {
     if (document.getElementById("crisp-chat-loader")) return;
 
     var s = document.createElement("script");
@@ -1483,13 +1473,10 @@
     s.src = "https://client.crisp.chat/l.js";
     s.async = true;
     document.head.appendChild(s);
-
-    // Always hide the default bubble (we only want your Help button)
     window.$crisp.push(["do", "chat:hide"]);
   })();
 
-  // ---- Open Crisp from your custom button ----
-  (function () {
+  document.addEventListener("DOMContentLoaded", function () {
     var btn = document.getElementById("helpChatBtn");
     if (!btn) return;
 
@@ -1497,10 +1484,9 @@
       window.$crisp.push(["do", "chat:show"]);
       window.$crisp.push(["do", "chat:open"]);
     });
-  })();
+  });
 
-  // ---- End / reset chat (call this when YOU decide it's resolved) ----
-  function endCrispChat(message) {
+  function endCrispChat(message, hardReload) {
     var text =
       message ||
       "✅ This chat has been resolved. If you need help again, click Help to start a new conversation.";
@@ -1510,22 +1496,48 @@
     setTimeout(function () {
       window.$crisp.push(["do", "chat:close"]);
       window.$crisp.push(["do", "chat:hide"]);
-      window.$crisp.push(["do", "session:reset"]);
-    }, 1200);
+
+      if (hardReload) {
+        window.$crisp.push(["do", "session:reset", [true]]);
+      } else {
+        window.$crisp.push(["do", "session:reset"]);
+      }
+    }, 900);
   }
 
-  // Optional: visitor types /end to reset
-  window.$crisp.push(["on", "message:sent", function () {
-    window.$crisp.push(["get", "chat:last_message", function (msg) {
-      try {
-        var content = (msg && msg.content ? String(msg.content) : "").trim().toLowerCase();
-        if (content === "/end" || content === "end" || content === "/close" || content === "close chat") {
-          endCrispChat("✅ Chat closed. Click Help to start a new conversation.");
-        }
-      } catch (e) {}
-    }]);
-  }]);
+  window.endCrispChat = endCrispChat;
+
+  window.$crisp.push([
+    "on",
+    "message:sent",
+    function () {
+      setTimeout(function () {
+        window.$crisp.push([
+          "get",
+          "chat:last_message",
+          function (msg) {
+            try {
+              var content = (msg && msg.content ? String(msg.content) : "")
+                .trim()
+                .toLowerCase();
+
+              if (
+                content === "end" ||
+                content === "/end" ||
+                content === "close chat" ||
+                content === "/close" ||
+                content === "resolved"
+              ) {
+                endCrispChat("✅ Chat closed. Click Help any time to start a new conversation.", false);
+              }
+            } catch (e) {}
+          }
+        ]);
+      }, 80);
+    }
+  ]);
 </script>
+
 
 </body>
 </html>
