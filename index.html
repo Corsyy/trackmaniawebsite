@@ -1467,13 +1467,14 @@
     s.async = true;
     document.head.appendChild(s);
 
-    // Run once Crisp is fully initialized
+    // CRITICAL: wait for Crisp to be fully ready
     window.$crisp.push(["on", "ready", function () {
-      // Ensure Crisp button shows (native launcher)
-      window.$crisp.push(["do", "chat:show"]);
 
-      // Fresh session every page load (no history after reload)
+      // 1) Kill any existing conversation/session
       window.$crisp.push(["do", "session:reset"]);
+
+      // 2) Show launcher AFTER reset (prevents old chat flash)
+      window.$crisp.push(["do", "chat:show"]);
     }]);
   })();
 </script>
