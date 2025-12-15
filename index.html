@@ -1455,15 +1455,16 @@
     s.async = true;
     document.head.appendChild(s);
 
+    // Run once Crisp is fully initialized
     window.$crisp.push(["on", "ready", function () {
-      // Always start fresh on every page load
+      // Ensure Crisp button shows (native launcher)
+      window.$crisp.push(["do", "chat:show"]);
+
+      // Fresh session every page load (no history after reload)
       window.$crisp.push(["do", "session:reset"]);
-      // Do NOT hide the launcher; Crisp button stays visible
-      // window.$crisp.push(["do", "chat:hide"]);
     }]);
   })();
 </script>
-
 
 </body>
 </html>
