@@ -390,23 +390,6 @@
       font-weight: 800;
       box-shadow: var(--accent-glow);
     }
-#helpChatBtn{
-  position:fixed;
-  right:22px;
-  bottom:96px; /* sits above your Top button */
-  z-index:9999;
-  border:1px solid rgba(109,251,255,.25);
-  border-radius:14px;
-  padding:.65rem .9rem;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#001220;
-  font-weight:900;
-  box-shadow:var(--accent-glow);
-  cursor:pointer;
-  transition:transform .2s ease, filter .2s ease;
-}
-#helpChatBtn:hover{ transform:translateY(-2px) scale(1.02); filter:brightness(1.06); }
-#helpChatBtn:focus{ outline:none; box-shadow:var(--ring); }
     /* SECTIONS */
     .section{padding:3rem 0}
     .title{font-size:1.8rem;font-weight:900;margin:0 0 1rem;display:inline-block;position:relative}
@@ -1458,16 +1441,12 @@
     renderCalendar();
   };
 </script>
-<button id="helpChatBtn" type="button" aria-label="Open help chat">Help</button>
-
 
 <script>
-  // Crisp bootstrap
   window.$crisp = window.$crisp || [];
   window.CRISP_WEBSITE_ID = "2a765414-4f31-4911-8a74-b759faffc780";
 
   (function () {
-    // Load Crisp once
     if (window.__CRISP_LOADED__) return;
     window.__CRISP_LOADED__ = true;
 
@@ -1476,45 +1455,15 @@
     s.async = true;
     document.head.appendChild(s);
 
-    // When Crisp is ready: enforce your rules
     window.$crisp.push(["on", "ready", function () {
-      // Never show Crisp default launcher/bubble
-      window.$crisp.push(["do", "chat:hide"]);
-
-      // Always start a fresh session on every page load
+      // Always start fresh on every page load
       window.$crisp.push(["do", "session:reset"]);
+      // Do NOT hide the launcher; Crisp button stays visible
+      // window.$crisp.push(["do", "chat:hide"]);
     }]);
   })();
-
-  (function () {
-    function bindHelpBtn() {
-      var btn = document.getElementById("helpChatBtn");
-      if (!btn || btn.__crispBound) return;
-      btn.__crispBound = true;
-
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Wait until Crisp is ready, then reset + open
-        window.$crisp.push(["on", "ready", function () {
-          // Reset again right before opening to guarantee no old thread flashes
-          window.$crisp.push(["do", "session:reset"]);
-
-          // Keep launcher hidden, but open the chatbox
-          window.$crisp.push(["do", "chat:hide"]);
-          window.$crisp.push(["do", "chat:open"]);
-        }]);
-      });
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", bindHelpBtn);
-    } else {
-      bindHelpBtn();
-    }
-  })();
 </script>
+
 
 </body>
 </html>
