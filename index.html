@@ -1465,7 +1465,8 @@
   window.$crisp = window.$crisp || [];
   window.CRISP_WEBSITE_ID = "2a765414-4f31-4911-8a74-b759faffc780";
 
-  (function loadCrispOnce() {
+  (function () {
+    // Load Crisp once
     if (document.getElementById("crisp-chat-loader")) return;
 
     var s = document.createElement("script");
@@ -1473,9 +1474,16 @@
     s.src = "https://client.crisp.chat/l.js";
     s.async = true;
     document.head.appendChild(s);
+
+    // IMPORTANT:
+    // Always start with a fresh session on page load
+    window.$crisp.push(["do", "session:reset", [true]]);
+
+    // Hide Crisp's default bubble (you use your own button)
     window.$crisp.push(["do", "chat:hide"]);
   })();
 
+  // Open chat from your Help button
   document.addEventListener("DOMContentLoaded", function () {
     var btn = document.getElementById("helpChatBtn");
     if (!btn) return;
@@ -1485,57 +1493,6 @@
       window.$crisp.push(["do", "chat:open"]);
     });
   });
-
-  function endCrispChat(message, hardReload) {
-    var text =
-      message ||
-      "✅ This chat has been resolved. If you need help again, click Help to start a new conversation.";
-
-    window.$crisp.push(["do", "message:send", ["text", text]]);
-
-    setTimeout(function () {
-      window.$crisp.push(["do", "chat:close"]);
-      window.$crisp.push(["do", "chat:hide"]);
-
-      if (hardReload) {
-        window.$crisp.push(["do", "session:reset", [true]]);
-      } else {
-        window.$crisp.push(["do", "session:reset"]);
-      }
-    }, 900);
-  }
-
-  window.endCrispChat = endCrispChat;
-
-  window.$crisp.push([
-    "on",
-    "message:sent",
-    function () {
-      setTimeout(function () {
-        window.$crisp.push([
-          "get",
-          "chat:last_message",
-          function (msg) {
-            try {
-              var content = (msg && msg.content ? String(msg.content) : "")
-                .trim()
-                .toLowerCase();
-
-              if (
-                content === "end" ||
-                content === "/end" ||
-                content === "close chat" ||
-                content === "/close" ||
-                content === "resolved"
-              ) {
-                endCrispChat("✅ Chat closed. Click Help any time to start a new conversation.", false);
-              }
-            } catch (e) {}
-          }
-        ]);
-      }, 80);
-    }
-  ]);
 </script>
 
 
