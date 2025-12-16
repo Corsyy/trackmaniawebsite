@@ -3,14 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "start": "node server.js"
   },
+  "engines": { "node": ">=20" },
   "dependencies": {
     "express": "^4.21.1",
-    "ws": "^8.18.0"
+    "compression": "^1.7.4"
   }
 }
