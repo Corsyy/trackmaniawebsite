@@ -1,4 +1,4 @@
-// scripts/server.js
+// trackmaniaevents-chat/server.js
 import express from "express";
 import compression from "compression";
 import path from "path";
@@ -24,11 +24,11 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
 // Used to sign cookies/tokens (set in Render Environment)
 // AUTH_SECRET = "random-long-secret"
-const AUTH_SECRET = process.env.AUTH_SECRET || crypto.randomBytes(32).toString("hex");
+const AUTH_SECRET =
+  process.env.AUTH_SECRET || crypto.randomBytes(32).toString("hex");
 
-// Data file stored on the Render disk (ephemeral unless you add a persistent disk)
-// For Phase 1 this is fine; in Phase 2/3 we can move to Postgres.
-const DATA_DIR = path.join(__dirname, "..", "data");
+// Data directory inside this service (trackmaniaevents-chat/data)
+const DATA_DIR = path.join(__dirname, "data");
 const DATA_FILE = path.join(DATA_DIR, "chat-store.json");
 
 // -------------------- SIMPLE STORE --------------------
@@ -101,11 +101,13 @@ function parseCookies(req) {
 function requireAdmin(req, res, next) {
   const cookies = parseCookies(req);
   const token = cookies.admin_session;
-  if (!token || !verifyToken(token)) return res.status(401).json({ error: "unauthorized" });
+  if (!token || !verifyToken(token))
+    return res.status(401).json({ error: "unauthorized" });
 
   const raw = token.split(".")[0];
   const sess = adminSessions.get(raw);
-  if (!sess || sess.exp < Date.now()) return res.status(401).json({ error: "expired" });
+  if (!sess || sess.exp < Date.now())
+    return res.status(401).json({ error: "expired" });
 
   next();
 }
@@ -124,19 +126,37 @@ function rateLimit(key, limit, windowMs) {
   return true;
 }
 
-// -------------------- STATIC: admin UI --------------------
-app.use("/admin", express.static(path.join(__dirname, "..", "admin"), {
-  extensions: ["html"],
-  setHeaders(res) {
-    res.setHeader("Cache-Control", "no-store");
-  }
-}));
+// -------------------- STATIC: admin UI (Option A) --------------------
+// Folder: trackmaniaevents-chat/admin/index.html
+const ADMIN_DIR = path.join(__dirname, "admin");
+
+app.use(
+  "/admin",
+  express.static(ADMIN_DIR, {
+    extensions: ["html"],
+    setHeaders(res) {
+      res.setHeader("Cache-Control", "no-store");
+    },
+  })
+);
+
+// Ensure /admin and /admin/ both load the UI
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(ADMIN_DIR, "index.html"));
+});
+app.get("/admin/", (req, res) => {
+  res.sendFile(path.join(ADMIN_DIR, "index.html"));
+});
 
 // -------------------- API: visitor --------------------
 // Create/get conversation
 app.post("/api/chat/init", (req, res) => {
-  const ip = req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() || req.socket.remoteAddress || "unknown";
-  if (!rateLimit(`init:${ip}`, 30, 60_000)) return res.status(429).json({ error: "rate_limited" });
+  const ip =
+    req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "unknown";
+  if (!rateLimit(`init:${ip}`, 30, 60_000))
+    return res.status(429).json({ error: "rate_limited" });
 
   const store = readStore();
 
@@ -148,7 +168,7 @@ app.post("/api/chat/init", (req, res) => {
       createdAt: nowIso(),
       lastAt: nowIso(),
       title: "Visitor",
-      messages: []
+      messages: [],
     };
     writeStore(store);
   }
@@ -158,8 +178,12 @@ app.post("/api/chat/init", (req, res) => {
 
 // Post message (visitor or admin)
 app.post("/api/chat/message", (req, res) => {
-  const ip = req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() || req.socket.remoteAddress || "unknown";
-  if (!rateLimit(`msg:${ip}`, 120, 60_000)) return res.status(429).json({ error: "rate_limited" });
+  const ip =
+    req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "unknown";
+  if (!rateLimit(`msg:${ip}`, 120, 60_000))
+    return res.status(429).json({ error: "rate_limited" });
 
   const { sid, from, text } = req.body || {};
   if (!sid) return res.status(400).json({ error: "missing_sid" });
@@ -171,10 +195,12 @@ app.post("/api/chat/message", (req, res) => {
   if (who === "admin") {
     const cookies = parseCookies(req);
     const token = cookies.admin_session;
-    if (!token || !verifyToken(token)) return res.status(401).json({ error: "unauthorized" });
+    if (!token || !verifyToken(token))
+      return res.status(401).json({ error: "unauthorized" });
     const raw = token.split(".")[0];
     const sess = adminSessions.get(raw);
-    if (!sess || sess.exp < Date.now()) return res.status(401).json({ error: "expired" });
+    if (!sess || sess.exp < Date.now())
+      return res.status(401).json({ error: "expired" });
   }
 
   const store = readStore();
@@ -185,7 +211,7 @@ app.post("/api/chat/message", (req, res) => {
     id: makeId("m_"),
     at: nowIso(),
     from: who,
-    text: msgText
+    text: msgText,
   };
 
   conv.messages.push(msg);
@@ -210,24 +236,30 @@ app.get("/api/chat/poll", (req, res) => {
   if (!conv) return res.status(404).json({ error: "unknown_conversation" });
 
   const sinceTime = since ? Date.parse(since) : 0;
-  const msgs = conv.messages.filter(m => Date.parse(m.at) > sinceTime);
+  const msgs = conv.messages.filter((m) => Date.parse(m.at) > sinceTime);
 
   res.json({
     sid,
     messages: msgs,
-    lastAt: conv.lastAt
+    lastAt: conv.lastAt,
   });
 });
 
 // -------------------- API: admin --------------------
 app.post("/api/admin/login", (req, res) => {
-  const ip = req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() || req.socket.remoteAddress || "unknown";
-  if (!rateLimit(`login:${ip}`, 20, 60_000)) return res.status(429).json({ error: "rate_limited" });
+  const ip =
+    req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    "unknown";
+  if (!rateLimit(`login:${ip}`, 20, 60_000))
+    return res.status(429).json({ error: "rate_limited" });
 
-  if (!ADMIN_PASSWORD) return res.status(500).json({ error: "ADMIN_PASSWORD_not_set" });
+  if (!ADMIN_PASSWORD)
+    return res.status(500).json({ error: "ADMIN_PASSWORD_not_set" });
 
   const pw = safeText(req.body?.password);
-  if (!pw || pw !== ADMIN_PASSWORD) return res.status(401).json({ error: "invalid" });
+  if (!pw || pw !== ADMIN_PASSWORD)
+    return res.status(401).json({ error: "invalid" });
 
   const raw = makeId("s_");
   const token = signToken(raw);
@@ -237,7 +269,9 @@ app.post("/api/admin/login", (req, res) => {
 
   // httpOnly cookie so JS can’t read it
   res.setHeader("Set-Cookie", [
-    `admin_session=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Secure`
+    `admin_session=${encodeURIComponent(
+      token
+    )}; Path=/; HttpOnly; SameSite=Lax; Secure`,
   ]);
 
   res.json({ ok: true });
@@ -251,7 +285,7 @@ app.post("/api/admin/logout", (req, res) => {
     adminSessions.delete(raw);
   }
   res.setHeader("Set-Cookie", [
-    `admin_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0`
+    `admin_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0`,
   ]);
   res.json({ ok: true });
 });
@@ -259,12 +293,12 @@ app.post("/api/admin/logout", (req, res) => {
 app.get("/api/admin/conversations", requireAdmin, (req, res) => {
   const store = readStore();
   const list = Object.values(store.conversations)
-    .map(c => ({
+    .map((c) => ({
       id: c.id,
       title: c.title,
       createdAt: c.createdAt,
       lastAt: c.lastAt,
-      lastMsg: c.messages[c.messages.length - 1]?.text?.slice(0, 80) || ""
+      lastMsg: c.messages[c.messages.length - 1]?.text?.slice(0, 80) || "",
     }))
     .sort((a, b) => Date.parse(b.lastAt) - Date.parse(a.lastAt));
 
@@ -280,14 +314,14 @@ app.get("/api/admin/conversation", requireAdmin, (req, res) => {
   if (!conv) return res.status(404).json({ error: "unknown_conversation" });
 
   const sinceTime = since ? Date.parse(since) : 0;
-  const msgs = conv.messages.filter(m => Date.parse(m.at) > sinceTime);
+  const msgs = conv.messages.filter((m) => Date.parse(m.at) > sinceTime);
 
   res.json({
     id: conv.id,
     title: conv.title,
     createdAt: conv.createdAt,
     lastAt: conv.lastAt,
-    messages: msgs
+    messages: msgs,
   });
 });
 
