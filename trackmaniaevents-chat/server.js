@@ -38,6 +38,43 @@ app.use(cookieParser());
 // Serve admin UI
 app.use("/admin", express.static(path.join(__dirname, "admin"), { extensions: ["html"] }));
 
+// ===========================
+// CORS (CRITICAL FIX)
+// ===========================
+//
+// Your public site origin is different from Render, so the browser sends
+// a preflight OPTIONS request before POSTs. If that OPTIONS response does
+// not include Access-Control-Allow-Origin, the browser blocks the request.
+//
+const ALLOWED_ORIGINS = new Set([
+  "https://trackmaniaevents.com",
+  "https://www.trackmaniaevents.com",
+  "https://trackmaniaevents-chat.onrender.com",
+]);
+
+function applyChatCors(req, res) {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Max-Age", "86400");
+}
+
+// Handle preflight for ALL chat endpoints
+app.options("/api/chat/*", (req, res) => {
+  applyChatCors(req, res);
+  return res.sendStatus(204);
+});
+
+// Apply CORS headers for ALL chat responses
+app.use("/api/chat", (req, res, next) => {
+  applyChatCors(req, res);
+  next();
+});
+
 // ---- utilities ----
 function now() {
   return Date.now();
@@ -50,18 +87,16 @@ function newSid() {
 
 function safeText(input) {
   const t = String(input ?? "").trim();
-  // Prevent absurd payloads
   if (t.length > 2000) return t.slice(0, 2000);
   return t;
 }
 
 // ---- CORS for public widget endpoints (no cookies needed) ----
+// NOTE: This is now redundant with the global /api/chat CORS above,
+// but keeping it is fine; it won't break anything.
 function publicCors(req, res, next) {
-  // widget does NOT need cookies; allow any origin
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.setHeader("Access-Control-Max-Age", "86400");
+  // CORS headers are already applied by app.use("/api/chat", ...)
+  // but we still support returning 204 for OPTIONS here too.
   if (req.method === "OPTIONS") return res.sendStatus(204);
   next();
 }
@@ -69,7 +104,6 @@ function publicCors(req, res, next) {
 // ---- simple signed cookie auth for admin ----
 const ADMIN_COOKIE_NAME = "tme_admin";
 function signToken(payload) {
-  // payload is string
   const h = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
   return `${payload}.${h}`;
 }
@@ -96,8 +130,6 @@ function requireAdmin(req, res, next) {
   const token = req.cookies?.[ADMIN_COOKIE_NAME];
   const payload = verifyToken(token);
   if (!payload) return res.status(401).json({ ok: false, error: "Unauthorized" });
-
-  // payload format: "v1:<iat>:<nonce>"
   if (!payload.startsWith("v1:")) return res.status(401).json({ ok: false, error: "Unauthorized" });
   next();
 }
@@ -138,9 +170,7 @@ app.post("/api/chat/init", publicCors, (req, res) => {
     status: "open",
     createdAt: ts,
     updatedAt: ts,
-    messages: [
-      { from: "system", text: "Chat started.", ts },
-    ],
+    messages: [{ from: "system", text: "Chat started.", ts }],
   };
   conversations.set(sid, convo);
   res.json({ ok: true, sid, status: convo.status });
@@ -154,13 +184,10 @@ app.get("/api/chat/poll", publicCors, (req, res) => {
 
   const convo = conversations.get(sid);
   if (!convo) {
-    // widget should treat as missing -> clear sid -> init new
     return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
   }
 
-  const msgs = since > 0
-    ? convo.messages.filter(m => m.ts > since)
-    : convo.messages;
+  const msgs = since > 0 ? convo.messages.filter(m => m.ts > since) : convo.messages;
 
   res.json({
     ok: true,
@@ -209,13 +236,12 @@ app.post("/api/admin/login", (req, res) => {
   const payload = `v1:${now()}:${crypto.randomBytes(12).toString("hex")}`;
   const token = signToken(payload);
 
-  // Cookie works when /admin is served from same origin: trackmaniaevents-chat.onrender.com
   res.cookie(ADMIN_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: true, // Render is https
+    secure: true,
     path: "/",
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+    maxAge: 1000 * 60 * 60 * 24 * 7,
   });
 
   res.json({ ok: true });
@@ -228,7 +254,7 @@ app.post("/api/admin/logout", requireAdmin, (req, res) => {
 
 app.get("/api/admin/conversations", requireAdmin, (req, res) => {
   const list = [...conversations.values()]
-    .sort((a, b) => (b.updatedAt - a.updatedAt))
+    .sort((a, b) => b.updatedAt - a.updatedAt)
     .map(convoSummary);
 
   res.json({ ok: true, conversations: list });
