@@ -1568,11 +1568,11 @@
 </script>
 
 <script>
-  // ===== CONFIG =====
-  const CHAT_HTTP = "https://YOUR-CHAT-SERVICE.onrender.com";
-  const CHAT_WS   = "wss://YOUR-CHAT-SERVICE.onrender.com";
+(() => {
+  const CHAT_API_BASE = "https://trackmaniaevents-chat.onrender.com";
+  const SID_KEY = "tme_chat_sid";
+  const POLL_MS = 1200;
 
-  // ===== UI =====
   const btn = document.getElementById("tmeChatBtn");
   const panel = document.getElementById("tmeChatPanel");
   const closeBtn = document.getElementById("tmeChatClose");
@@ -1580,16 +1580,11 @@
   const input = document.getElementById("tmeChatInput");
   const sendBtn = document.getElementById("tmeChatSend");
 
-  function showPanel(){ panel.style.display = "block"; connect(); input.focus(); }
-  function hidePanel(){ panel.style.display = "none"; }
+  let sid = localStorage.getItem(SID_KEY) || "";
+  let lastTs = 0;
+  let pollTimer = null;
 
-  btn.addEventListener("click", () => {
-    if (panel.style.display === "block") hidePanel();
-    else showPanel();
-  });
-  closeBtn.addEventListener("click", hidePanel);
-
-  function addMsg(text, who="me"){
+  function addMsg(text, who = "them", ts = Date.now()) {
     const wrap = document.createElement("div");
     wrap.className = "tmeMsg " + (who === "me" ? "me" : "them");
     wrap.textContent = text;
@@ -1597,58 +1592,104 @@
     log.scrollTop = log.scrollHeight;
   }
 
-  // ===== Identity (simple visitor id) =====
-  const VID_KEY = "tme_vid";
-  const vid = localStorage.getItem(VID_KEY) || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
-  localStorage.setItem(VID_KEY, vid);
+  async function initChat() {
+    const r = await fetch(CHAT_API_BASE + "/api/chat/init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    }).then(r => r.json()).catch(() => null);
 
-  // ===== WebSocket =====
-  let ws = null;
+    if (!r || !r.ok) return false;
 
-  function connect(){
-    if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+    sid = r.sid;
+    localStorage.setItem(SID_KEY, sid);
+    lastTs = 0;
+    log.innerHTML = "";
+    addMsg("Connected. How can we help?", "them");
+    return true;
+  }
 
-    const url = CHAT_WS.replace(/\/$/, "") + "/ws?vid=" + encodeURIComponent(vid);
-    ws = new WebSocket(url);
+  async function pollOnce() {
+    if (!sid) return;
 
-    ws.addEventListener("open", () => {
-      addMsg("Connected. An operator will reply here.", "them");
-    });
+    const res = await fetch(
+      `${CHAT_API_BASE}/api/chat/poll?sid=${encodeURIComponent(sid)}&since=${lastTs}`
+    ).catch(() => null);
 
-    ws.addEventListener("message", (ev) => {
-      try{
-        const msg = JSON.parse(ev.data);
-        if (msg && msg.type === "message") addMsg(msg.text || "", "them");
-      }catch{
-        // fallback
-        addMsg(String(ev.data || ""), "them");
-      }
-    });
+    if (!res) return;
 
-    ws.addEventListener("close", () => {
-      // silent; reconnect happens when user opens panel again
+    if (res.status === 404) {
+      localStorage.removeItem(SID_KEY);
+      sid = "";
+      await initChat();
+      return;
+    }
+
+    const data = await res.json();
+    if (data.status === "closed") {
+      localStorage.removeItem(SID_KEY);
+      sid = "";
+      await initChat();
+      return;
+    }
+
+    (data.messages || []).forEach(m => {
+      addMsg(m.text, m.from === "visitor" ? "me" : "them", m.ts);
+      lastTs = Math.max(lastTs, m.ts);
     });
   }
 
-  function send(){
-    const text = (input.value || "").trim();
+  async function send() {
+    const text = input.value.trim();
     if (!text) return;
-    addMsg(text, "me");
+
+    if (!sid && !(await initChat())) return;
+
     input.value = "";
+    addMsg(text, "me");
 
-    if (!ws || ws.readyState !== 1) connect();
+    const res = await fetch(CHAT_API_BASE + "/api/chat/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sid, text })
+    });
 
-    const payload = JSON.stringify({ type:"message", vid, text });
-    try{ ws.send(payload); }catch{}
+    if (res.status === 409) {
+      localStorage.removeItem(SID_KEY);
+      sid = "";
+      await initChat();
+    }
   }
 
-  sendBtn.addEventListener("click", send);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") send();
-  });
+  function startPolling() {
+    stopPolling();
+    pollTimer = setInterval(pollOnce, POLL_MS);
+  }
 
-  // Optional: wake the service so first message doesn't feel laggy on free tier
-  fetch(CHAT_HTTP + "/health").catch(()=>{});
+  function stopPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = null;
+  }
+
+  btn.onclick = async () => {
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+    if (panel.style.display === "block") {
+      if (!sid) await initChat();
+      startPolling();
+      input.focus();
+    } else {
+      stopPolling();
+    }
+  };
+
+  closeBtn.onclick = () => {
+    panel.style.display = "none";
+    stopPolling();
+  };
+
+  sendBtn.onclick = send;
+  input.addEventListener("keydown", e => e.key === "Enter" && send());
+})();
 </script>
 
 </body>
