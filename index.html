@@ -1584,7 +1584,7 @@
   let lastTs = 0;
   let pollTimer = null;
 
-  function addMsg(text, who = "them", ts = Date.now()) {
+  function addMsg(text, who = "them") {
     const wrap = document.createElement("div");
     wrap.className = "tmeMsg " + (who === "me" ? "me" : "them");
     wrap.textContent = text;
@@ -1592,105 +1592,153 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  function setSystem(text) {
+    // lightweight status line
+    if (!log.childElementCount) addMsg(text, "them");
+  }
+
   async function initChat() {
-    const r = await fetch(CHAT_API_BASE + "/api/chat/init", {
+    const res = await fetch(CHAT_API_BASE + "/api/chat/init", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: "{}"
-    }).then(r => r.json()).catch(() => null);
+      body: "{}",
+    }).catch(() => null);
 
-    if (!r || !r.ok) return false;
+    if (!res) {
+      addMsg("Network error starting chat.", "them");
+      return false;
+    }
 
-    sid = r.sid;
+    const data = await res.json().catch(() => null);
+    if (!data || !data.ok || !data.sid) {
+      addMsg("Failed to start chat.", "them");
+      return false;
+    }
+
+    sid = data.sid;
     localStorage.setItem(SID_KEY, sid);
     lastTs = 0;
     log.innerHTML = "";
-    addMsg("Connected. How can we help?", "them");
+    addMsg("Connected. An operator will reply here.", "them");
     return true;
   }
 
   async function pollOnce() {
     if (!sid) return;
 
-    const res = await fetch(
-      `${CHAT_API_BASE}/api/chat/poll?sid=${encodeURIComponent(sid)}&since=${lastTs}`
-    ).catch(() => null);
-
+    const url = `${CHAT_API_BASE}/api/chat/poll?sid=${encodeURIComponent(sid)}&since=${encodeURIComponent(lastTs)}`;
+    const res = await fetch(url).catch(() => null);
     if (!res) return;
 
     if (res.status === 404) {
+      // sid unknown on server
       localStorage.removeItem(SID_KEY);
       sid = "";
+      lastTs = 0;
       await initChat();
       return;
     }
 
-    const data = await res.json();
+    const data = await res.json().catch(() => null);
+    if (!data || !data.ok) return;
+
     if (data.status === "closed") {
       localStorage.removeItem(SID_KEY);
       sid = "";
+      lastTs = 0;
       await initChat();
       return;
     }
 
-    (data.messages || []).forEach(m => {
-      addMsg(m.text, m.from === "visitor" ? "me" : "them", m.ts);
-      lastTs = Math.max(lastTs, m.ts);
-    });
+    const msgs = data.messages || [];
+    for (const m of msgs) {
+      const ts = Number(m.ts || 0);
+      // only append messages we haven't seen
+      if (ts > lastTs) {
+        addMsg(m.text || "", m.from === "visitor" ? "me" : "them");
+        lastTs = Math.max(lastTs, ts);
+      }
+    }
   }
 
   async function send() {
-    const text = input.value.trim();
+    const text = (input.value || "").trim();
     if (!text) return;
 
-    if (!sid && !(await initChat())) return;
+    if (!sid) {
+      const ok = await initChat();
+      if (!ok) return;
+    }
 
     input.value = "";
-    addMsg(text, "me");
 
     const res = await fetch(CHAT_API_BASE + "/api/chat/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sid, text })
-    });
+      body: JSON.stringify({ sid, text }),
+    }).catch(() => null);
+
+    if (!res) {
+      addMsg("Network error sending message.", "them");
+      return;
+    }
 
     if (res.status === 409) {
+      // closed on server
       localStorage.removeItem(SID_KEY);
       sid = "";
+      lastTs = 0;
       await initChat();
+      return;
     }
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      addMsg(data?.error || "Send failed.", "them");
+      return;
+    }
+
+    // Sync immediately after send
+    await pollOnce();
   }
 
   function startPolling() {
     stopPolling();
     pollTimer = setInterval(pollOnce, POLL_MS);
   }
-
   function stopPolling() {
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = null;
   }
 
-  btn.onclick = async () => {
-    panel.style.display = panel.style.display === "block" ? "none" : "block";
-    if (panel.style.display === "block") {
+  function showPanel() {
+    panel.style.display = "block";
+    input.focus();
+    setSystem("Connecting…");
+    (async () => {
       if (!sid) await initChat();
+      else await pollOnce();
       startPolling();
-      input.focus();
-    } else {
-      stopPolling();
-    }
-  };
-
-  closeBtn.onclick = () => {
+    })();
+  }
+  function hidePanel() {
     panel.style.display = "none";
     stopPolling();
-  };
+  }
 
-  sendBtn.onclick = send;
-  input.addEventListener("keydown", e => e.key === "Enter" && send());
+  btn.addEventListener("click", () => {
+    if (panel.style.display === "block") hidePanel();
+    else showPanel();
+  });
+  closeBtn.addEventListener("click", hidePanel);
+
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") send();
+  });
 })();
 </script>
+
 
 </body>
 </html>
