@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trackmania Events — Admin Chat</title>
+  <style>
+    :root{
+      --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff;
+      --accent:#3aa0ff; --accent2:#6dfbff; --border:rgba(109,251,255,.22);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    .wrap{display:grid;grid-template-columns:340px 1fr;min-height:100vh}
+    .left{border-right:1px solid var(--border);background:rgba(15,21,36,.6)}
+    .right{display:flex;flex-direction:column}
+    header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#001220;font-weight:800;border-radius:10px;padding:8px 10px;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text);font-weight:700}
+    .list{padding:10px;display:flex;flex-direction:column;gap:10px}
+    .conv{border:1px solid var(--border);border-radius:12px;padding:10px;cursor:pointer;background:rgba(12,16,32,.55)}
+    .conv.active{outline:2px solid rgba(61,165,255,.35)}
+    .small{color:var(--muted);font-size:.85rem}
+    .title{font-weight:900;margin:0 0 6px}
+    .chat{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+    .msg{max-width:70ch;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(12,16,32,.55)}
+    .msg.admin{margin-left:auto;background:rgba(58,160,255,.14)}
+    .msg .meta{font-size:.8rem;color:var(--muted);margin-bottom:4px}
+    .composer{border-top:1px solid var(--border);padding:12px;display:flex;gap:10px}
+    textarea{flex:1;min-height:44px;max-height:160px;resize:vertical;border-radius:12px;border:1px solid var(--border);background:#0c1224;color:var(--text);padding:10px}
+    .login{max-width:420px;margin:10vh auto;border:1px solid var(--border);border-radius:16px;background:rgba(15,21,36,.6);padding:18px}
+    input{width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:#0c1224;color:var(--text)}
+    @media(max-width:900px){ .wrap{grid-template-columns:1fr} .left{display:none} }
+  </style>
+</head>
+<body>
+
+<div id="login" class="login">
+  <h2 style="margin:0 0 8px">Admin Login</h2>
+  <div class="small" style="margin-bottom:12px">Enter your admin password.</div>
+  <input id="pw" type="password" placeholder="Password" />
+  <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+    <button class="btn" id="loginBtn">Login</button>
+    <span class="small" id="loginStatus"></span>
+  </div>
+</div>
+
+<div id="app" style="display:none" class="wrap">
+  <div class="left">
+    <header>
+      <strong>Conversations</strong>
+      <button class="btn ghost" id="logoutBtn">Logout</button>
+    </header>
+    <div class="list" id="convList"></div>
+  </div>
+
+  <div class="right">
+    <header>
+      <div>
+        <div style="font-weight:900" id="chatTitle">Select a conversation</div>
+        <div class="small" id="chatSub"></div>
+      </div>
+      <button class="btn ghost" id="refreshBtn">Refresh</button>
+    </header>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="composer">
+      <textarea id="reply" placeholder="Type your reply…" disabled></textarea>
+      <button class="btn" id="sendBtn" disabled>Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  let activeSid = null;
+  let lastIso = "";
+
+  async function api(path, opts) {
+    const res = await fetch(path, opts);
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
+
+  async function login() {
+    $("loginStatus").textContent = "Signing in…";
+    try {
+      await api("/api/admin/login", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ password: $("pw").value })
+      });
+      $("login").style.display = "none";
+      $("app").style.display = "";
+      $("loginStatus").textContent = "";
+      await refreshConversations();
+      startPolling();
+    } catch (e) {
+      $("loginStatus").textContent = "Login failed.";
+    }
+  }
+
+  async function logout() {
+    try { await api("/api/admin/logout", { method: "POST" }); } catch {}
+    location.reload();
+  }
+
+  function fmt(iso) {
+    try { return new Date(iso).toLocaleString(); } catch { return iso; }
+  }
+
+  async function refreshConversations() {
+    const data = await api("/api/admin/conversations");
+    const list = $("convList");
+    list.innerHTML = "";
+
+    data.conversations.forEach(c => {
+      const el = document.createElement("div");
+      el.className = "conv" + (c.id === activeSid ? " active" : "");
+      el.innerHTML = `
+        <div class="title">${escapeHtml(c.title || c.id)}</div>
+        <div class="small">${escapeHtml(c.lastMsg || "")}</div>
+        <div class="small" style="margin-top:6px">Last: ${escapeHtml(fmt(c.lastAt))}</div>
+      `;
+      el.onclick = () => selectConversation(c.id, c.title);
+      list.appendChild(el);
+    });
+  }
+
+  async function selectConversation(sid, title) {
+    activeSid = sid;
+    lastIso = "";
+    $("chatTitle").textContent = title || sid;
+    $("chatSub").textContent = sid;
+    $("reply").disabled = false;
+    $("sendBtn").disabled = false;
+    $("chat").innerHTML = "";
+    await pullMessages(true);
+    await refreshConversations();
+  }
+
+  function appendMessage(m) {
+    const chat = $("chat");
+    const box = document.createElement("div");
+    box.className = "msg " + (m.from === "admin" ? "admin" : "visitor");
+    box.innerHTML = `
+      <div class="meta">${escapeHtml(m.from)} • ${escapeHtml(fmt(m.at))}</div>
+      <div>${escapeHtml(m.text)}</div>
+    `;
+    chat.appendChild(box);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function pullMessages(forceAll=false) {
+    if (!activeSid) return;
+    const qs = new URLSearchParams({ sid: activeSid });
+    if (!forceAll && lastIso) qs.set("since", lastIso);
+
+    const data = await api("/api/admin/conversation?" + qs.toString());
+    data.messages.forEach(m => {
+      appendMessage(m);
+      lastIso = m.at;
+    });
+  }
+
+  async function sendReply() {
+    const text = $("reply").value.trim();
+    if (!text || !activeSid) return;
+
+    $("reply").value = "";
+    await api("/api/chat/message", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ sid: activeSid, from: "admin", text })
+    });
+    await pullMessages();
+    await refreshConversations();
+  }
+
+  function startPolling() {
+    setInterval(async () => {
+      try {
+        await refreshConversations();
+        await pullMessages();
+      } catch {}
+    }, 2000);
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  $("loginBtn").onclick = login;
+  $("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+  $("logoutBtn").onclick = logout;
+  $("refreshBtn").onclick = async () => { await refreshConversations(); await pullMessages(); };
+  $("sendBtn").onclick = sendReply;
+  $("reply").addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") sendReply();
+  });
+
+  // If already logged in (cookie exists), auto-enter app by probing conversations:
+  (async () => {
+    try {
+      await refreshConversations();
+      $("login").style.display = "none";
+      $("app").style.display = "";
+      startPolling();
+    } catch {
+      // remain on login
+    }
+  })();
+</script>
+
+</body>
+</html>
