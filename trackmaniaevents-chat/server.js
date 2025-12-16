@@ -1,6 +1,5 @@
 // server.js (ESM)
 import express from "express";
-import cookieParser from "cookie-parser";
 import crypto from "crypto";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,38 +13,26 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 const AUTH_SECRET = process.env.AUTH_SECRET || "";
 
-// Basic sanity: fail loud in logs (but still start so you can see it)
 if (!ADMIN_PASSWORD) console.warn("[WARN] ADMIN_PASSWORD is not set");
 if (!AUTH_SECRET) console.warn("[WARN] AUTH_SECRET is not set");
 
-// ---- In-memory store (note: resets only if the Render instance restarts) ----
-/**
- * conversations: Map<sid, {
- *   sid: string,
- *   status: "open"|"closed",
- *   createdAt: number,
- *   updatedAt: number,
- *   messages: Array<{ from:"visitor"|"admin"|"system", text:string, ts:number }>
- * }>
- */
+// ===========================
+// In-memory store
+// ===========================
 const conversations = new Map();
 
-// ---- middleware ----
+// ===========================
+// Middleware
+// ===========================
 app.disable("x-powered-by");
 app.use(express.json({ limit: "256kb" }));
-app.use(cookieParser());
 
 // Serve admin UI
 app.use("/admin", express.static(path.join(__dirname, "admin"), { extensions: ["html"] }));
 
 // ===========================
-// CORS (CRITICAL FIX)
+// CORS (FIXED)
 // ===========================
-//
-// Your public site origin is different from Render, so the browser sends
-// a preflight OPTIONS request before POSTs. If that OPTIONS response does
-// not include Access-Control-Allow-Origin, the browser blocks the request.
-//
 const ALLOWED_ORIGINS = new Set([
   "https://trackmaniaevents.com",
   "https://www.trackmaniaevents.com",
@@ -63,62 +50,75 @@ function applyChatCors(req, res) {
   res.setHeader("Access-Control-Max-Age", "86400");
 }
 
-// Handle preflight for ALL chat endpoints
 app.options("/api/chat/*", (req, res) => {
   applyChatCors(req, res);
   return res.sendStatus(204);
 });
 
-// Apply CORS headers for ALL chat responses
 app.use("/api/chat", (req, res, next) => {
   applyChatCors(req, res);
   next();
 });
 
-// ---- utilities ----
+// ===========================
+// Utilities
+// ===========================
 function now() {
   return Date.now();
 }
 
 function newSid() {
-  // short, URL-safe id
   return crypto.randomBytes(16).toString("hex");
 }
 
 function safeText(input) {
   const t = String(input ?? "").trim();
-  if (t.length > 2000) return t.slice(0, 2000);
-  return t;
+  return t.length > 2000 ? t.slice(0, 2000) : t;
 }
 
-// ---- CORS for public widget endpoints (no cookies needed) ----
-// NOTE: This is now redundant with the global /api/chat CORS above,
-// but keeping it is fine; it won't break anything.
-function publicCors(req, res, next) {
-  // CORS headers are already applied by app.use("/api/chat", ...)
-  // but we still support returning 204 for OPTIONS here too.
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
+// ===========================
+// Cookie helpers (NO cookie-parser)
+// ===========================
+function getCookie(req, name) {
+  const header = req.headers.cookie || "";
+  const parts = header.split(";").map(p => p.trim());
+  for (const p of parts) {
+    if (p.startsWith(name + "=")) {
+      return decodeURIComponent(p.slice(name.length + 1));
+    }
+  }
+  return null;
 }
 
-// ---- simple signed cookie auth for admin ----
+// ===========================
+// Admin auth
+// ===========================
 const ADMIN_COOKIE_NAME = "tme_admin";
+
 function signToken(payload) {
-  const h = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
-  return `${payload}.${h}`;
+  const sig = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
+  return `${payload}.${sig}`;
 }
+
 function verifyToken(token) {
-  if (!token || typeof token !== "string") return null;
-  const idx = token.lastIndexOf(".");
-  if (idx <= 0) return null;
-  const payload = token.slice(0, idx);
-  const sig = token.slice(idx + 1);
-  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
+  if (!token) return null;
+  const i = token.lastIndexOf(".");
+  if (i < 0) return null;
+
+  const payload = token.slice(0, i);
+  const sig = token.slice(i + 1);
+  const expected = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
+
   try {
-    const a = Buffer.from(sig, "hex");
-    const b = Buffer.from(expected, "hex");
-    if (a.length !== b.length) return null;
-    if (!crypto.timingSafeEqual(a, b)) return null;
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+      return null;
+    }
   } catch {
     return null;
   }
@@ -126,25 +126,25 @@ function verifyToken(token) {
 }
 
 function requireAdmin(req, res, next) {
-  if (!AUTH_SECRET) return res.status(500).json({ ok: false, error: "AUTH_SECRET not configured" });
-  const token = req.cookies?.[ADMIN_COOKIE_NAME];
+  const token = getCookie(req, ADMIN_COOKIE_NAME);
   const payload = verifyToken(token);
-  if (!payload) return res.status(401).json({ ok: false, error: "Unauthorized" });
-  if (!payload.startsWith("v1:")) return res.status(401).json({ ok: false, error: "Unauthorized" });
+  if (!payload || !payload.startsWith("v1:")) {
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
+  }
   next();
 }
 
-// ---- helpers to shape responses consistently ----
+// ===========================
+// Helpers
+// ===========================
 function convoSummary(c) {
   const last = c.messages[c.messages.length - 1];
   return {
     sid: c.sid,
     status: c.status,
-    createdAt: c.createdAt,
     updatedAt: c.updatedAt,
-    lastMessageAt: last?.ts ?? c.updatedAt,
     lastFrom: last?.from ?? null,
-    lastTextPreview: last?.text ? String(last.text).slice(0, 80) : "",
+    lastTextPreview: last?.text?.slice(0, 80) ?? "",
     messageCount: c.messages.length,
   };
 }
@@ -152,128 +152,99 @@ function convoSummary(c) {
 function getConvoOr404(sid, res) {
   const c = conversations.get(sid);
   if (!c) {
-    res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
+    res.status(404).json({ ok: false, error: "Conversation not found" });
     return null;
   }
   return c;
 }
 
 // ===========================
-// Public Chat API (widget)
+// Public Chat API
 // ===========================
-
-app.post("/api/chat/init", publicCors, (req, res) => {
+app.post("/api/chat/init", (req, res) => {
   const sid = newSid();
   const ts = now();
-  const convo = {
+
+  conversations.set(sid, {
     sid,
     status: "open",
     createdAt: ts,
     updatedAt: ts,
     messages: [{ from: "system", text: "Chat started.", ts }],
-  };
-  conversations.set(sid, convo);
-  res.json({ ok: true, sid, status: convo.status });
+  });
+
+  res.json({ ok: true, sid, status: "open" });
 });
 
-app.get("/api/chat/poll", publicCors, (req, res) => {
-  const sid = String(req.query.sid || "").trim();
+app.get("/api/chat/poll", (req, res) => {
+  const sid = String(req.query.sid || "");
   const since = Number(req.query.since || 0);
-
-  if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
 
   const convo = conversations.get(sid);
   if (!convo) {
-    return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
+    return res.status(404).json({ ok: false, status: "missing" });
   }
 
-  const msgs = since > 0 ? convo.messages.filter(m => m.ts > since) : convo.messages;
+  const msgs = since
+    ? convo.messages.filter(m => m.ts > since)
+    : convo.messages;
 
   res.json({
     ok: true,
-    sid: convo.sid,
     status: convo.status,
-    serverTime: now(),
     messages: msgs,
   });
 });
 
-app.post("/api/chat/send", publicCors, (req, res) => {
+app.post("/api/chat/send", (req, res) => {
   const sid = safeText(req.body?.sid);
   const text = safeText(req.body?.text);
 
-  if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
-  if (!text) return res.status(400).json({ ok: false, error: "Missing text" });
-
   const convo = conversations.get(sid);
-  if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
+  if (!convo) return res.status(404).json({ ok: false });
 
   if (convo.status === "closed") {
-    return res.status(409).json({ ok: false, error: "Chat is closed", status: convo.status });
+    return res.status(409).json({ ok: false, status: "closed" });
   }
 
   const ts = now();
   convo.messages.push({ from: "visitor", text, ts });
   convo.updatedAt = ts;
 
-  res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: ts });
+  res.json({ ok: true });
 });
 
 // ===========================
-// Admin Auth + Admin API
+// Admin API
 // ===========================
-
 app.post("/api/admin/login", (req, res) => {
-  if (!AUTH_SECRET) return res.status(500).json({ ok: false, error: "AUTH_SECRET not configured" });
-
-  const password = safeText(req.body?.password);
-  if (!password) return res.status(400).json({ ok: false, error: "Missing password" });
-
-  if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ ok: false, error: "Invalid password" });
+  if (safeText(req.body?.password) !== ADMIN_PASSWORD) {
+    return res.status(401).json({ ok: false });
   }
 
-  const payload = `v1:${now()}:${crypto.randomBytes(12).toString("hex")}`;
+  const payload = `v1:${now()}:${crypto.randomBytes(8).toString("hex")}`;
   const token = signToken(payload);
 
-  res.cookie(ADMIN_COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: true,
-    path: "/",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  });
+  res.setHeader(
+    "Set-Cookie",
+    `${ADMIN_COOKIE_NAME}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/`
+  );
 
   res.json({ ok: true });
 });
 
 app.post("/api/admin/logout", requireAdmin, (req, res) => {
-  res.clearCookie(ADMIN_COOKIE_NAME, { path: "/" });
+  res.setHeader(
+    "Set-Cookie",
+    `${ADMIN_COOKIE_NAME}=; Max-Age=0; Path=/`
+  );
   res.json({ ok: true });
 });
 
 app.get("/api/admin/conversations", requireAdmin, (req, res) => {
-  const list = [...conversations.values()]
-    .sort((a, b) => b.updatedAt - a.updatedAt)
-    .map(convoSummary);
-
-  res.json({ ok: true, conversations: list });
-});
-
-app.get("/api/admin/conversation", requireAdmin, (req, res) => {
-  const sid = String(req.query.sid || "").trim();
-  if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
-
-  const convo = getConvoOr404(sid, res);
-  if (!convo) return;
-
   res.json({
     ok: true,
-    sid: convo.sid,
-    status: convo.status,
-    createdAt: convo.createdAt,
-    updatedAt: convo.updatedAt,
-    messages: convo.messages,
+    conversations: [...conversations.values()].map(convoSummary),
   });
 });
 
@@ -281,43 +252,34 @@ app.post("/api/admin/send", requireAdmin, (req, res) => {
   const sid = safeText(req.body?.sid);
   const text = safeText(req.body?.text);
 
-  if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
-  if (!text) return res.status(400).json({ ok: false, error: "Missing text" });
-
   const convo = getConvoOr404(sid, res);
   if (!convo) return;
-
-  if (convo.status === "closed") {
-    return res.status(409).json({ ok: false, error: "Chat is closed", status: convo.status });
-  }
 
   const ts = now();
   convo.messages.push({ from: "admin", text, ts });
   convo.updatedAt = ts;
 
-  res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: ts });
+  res.json({ ok: true });
 });
 
 app.post("/api/admin/close", requireAdmin, (req, res) => {
   const sid = safeText(req.body?.sid);
-  if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
-
   const convo = getConvoOr404(sid, res);
   if (!convo) return;
 
-  if (convo.status === "closed") {
-    return res.json({ ok: true, sid: convo.sid, status: convo.status });
-  }
-
-  const ts = now();
   convo.status = "closed";
-  convo.messages.push({ from: "system", text: "[Chat ended by admin]", ts });
-  convo.updatedAt = ts;
+  convo.messages.push({
+    from: "system",
+    text: "[Chat ended by admin]",
+    ts: now(),
+  });
 
-  res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: ts });
+  res.json({ ok: true });
 });
 
-// ---- simple health ----
+// ===========================
+// Health
+// ===========================
 app.get("/", (req, res) => {
   res.type("text").send("Trackmania Events chat service is running.");
 });
