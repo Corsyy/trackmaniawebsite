@@ -161,6 +161,8 @@ app.post("/api/chat/init", (req, res) => {
   const store = readStore();
 
   let sid = safeText(req.body?.sid);
+
+  // If sid is missing or unknown -> create
   if (!sid || !store.conversations[sid]) {
     sid = makeId("c_");
     store.conversations[sid] = {
@@ -168,11 +170,14 @@ app.post("/api/chat/init", (req, res) => {
       createdAt: nowIso(),
       lastAt: nowIso(),
       title: "Visitor",
+      status: "open",
       messages: [],
     };
     writeStore(store);
   }
 
+  // If sid exists but was closed, we still return it here;
+  // your website widget should detect status via /poll and create a new sid.
   res.json({ sid });
 });
 
@@ -207,6 +212,11 @@ app.post("/api/chat/message", (req, res) => {
   const conv = store.conversations[sid];
   if (!conv) return res.status(404).json({ error: "unknown_conversation" });
 
+  // Don’t allow messages into closed chats (keeps the “end chat” behavior clean)
+  if ((conv.status || "open").toLowerCase() === "closed") {
+    return res.status(409).json({ error: "conversation_closed" });
+  }
+
   const msg = {
     id: makeId("m_"),
     at: nowIso(),
@@ -240,6 +250,7 @@ app.get("/api/chat/poll", (req, res) => {
 
   res.json({
     sid,
+    status: conv.status || "open",
     messages: msgs,
     lastAt: conv.lastAt,
   });
@@ -290,12 +301,37 @@ app.post("/api/admin/logout", (req, res) => {
   res.json({ ok: true });
 });
 
+// End a chat (admin only)
+app.post("/api/admin/close", requireAdmin, (req, res) => {
+  const sid = safeText(req.body?.sid);
+  if (!sid) return res.status(400).json({ error: "missing_sid" });
+
+  const store = readStore();
+  const conv = store.conversations[sid];
+  if (!conv) return res.status(404).json({ error: "unknown_conversation" });
+
+  conv.status = "closed";
+  conv.closedAt = nowIso();
+  conv.lastAt = nowIso();
+
+  conv.messages.push({
+    id: makeId("m_"),
+    at: nowIso(),
+    from: "admin",
+    text: "[Chat ended by admin]",
+  });
+
+  writeStore(store);
+  res.json({ ok: true });
+});
+
 app.get("/api/admin/conversations", requireAdmin, (req, res) => {
   const store = readStore();
   const list = Object.values(store.conversations)
     .map((c) => ({
       id: c.id,
       title: c.title,
+      status: c.status || "open",
       createdAt: c.createdAt,
       lastAt: c.lastAt,
       lastMsg: c.messages[c.messages.length - 1]?.text?.slice(0, 80) || "",
@@ -319,6 +355,7 @@ app.get("/api/admin/conversation", requireAdmin, (req, res) => {
   res.json({
     id: conv.id,
     title: conv.title,
+    status: conv.status || "open",
     createdAt: conv.createdAt,
     lastAt: conv.lastAt,
     messages: msgs,
