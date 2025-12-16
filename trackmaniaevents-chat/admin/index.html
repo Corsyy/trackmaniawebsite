@@ -8,6 +8,9 @@
     :root{
       --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff;
       --accent:#3aa0ff; --accent2:#6dfbff; --border:rgba(109,251,255,.22);
+      --danger:#ff4d4d;
+      --ok:#29d98f;
+      --warn:#ffb02e;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
@@ -17,11 +20,16 @@
     header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;justify-content:space-between}
     .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#001220;font-weight:800;border-radius:10px;padding:8px 10px;cursor:pointer}
     .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text);font-weight:700}
+    .btn.danger{background:transparent;border:1px solid rgba(255,77,77,.55);color:#ffd0d0;font-weight:800}
+    .btn.danger:hover{border-color:rgba(255,77,77,.85)}
     .list{padding:10px;display:flex;flex-direction:column;gap:10px}
     .conv{border:1px solid var(--border);border-radius:12px;padding:10px;cursor:pointer;background:rgba(12,16,32,.55)}
     .conv.active{outline:2px solid rgba(61,165,255,.35)}
     .small{color:var(--muted);font-size:.85rem}
     .title{font-weight:900;margin:0 0 6px}
+    .pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(12,16,32,.55)}
+    .pill.open{border-color:rgba(41,217,143,.35);color:#bff5e0}
+    .pill.closed{border-color:rgba(255,176,46,.35);color:#ffe5b8}
     .chat{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
     .msg{max-width:70ch;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(12,16,32,.55)}
     .msg.admin{margin-left:auto;background:rgba(58,160,255,.14)}
@@ -57,10 +65,17 @@
   <div class="right">
     <header>
       <div>
-        <div style="font-weight:900" id="chatTitle">Select a conversation</div>
+        <div style="font-weight:900;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span id="chatTitle">Select a conversation</span>
+          <span id="chatStatusPill" class="pill" style="display:none"></span>
+        </div>
         <div class="small" id="chatSub"></div>
       </div>
-      <button class="btn ghost" id="refreshBtn">Refresh</button>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn danger" id="closeBtn" disabled>End chat</button>
+        <button class="btn ghost" id="refreshBtn">Refresh</button>
+      </div>
     </header>
 
     <div class="chat" id="chat"></div>
@@ -77,10 +92,10 @@
 
   let activeSid = null;
   let lastIso = "";
+  let activeStatus = "open";
 
   async function api(path, opts = {}) {
     const res = await fetch(path, {
-      // IMPORTANT: send cookies (admin_session) with every request
       credentials: "include",
       ...opts,
       headers: {
@@ -89,14 +104,12 @@
     });
 
     if (!res.ok) {
-      // make debugging clearer
       const txt = await res.text().catch(() => "");
       const err = new Error(txt || `Request failed: ${res.status}`);
       err.status = res.status;
       throw err;
     }
 
-    // some endpoints may return empty; guard just in case
     const ct = res.headers.get("content-type") || "";
     if (ct.includes("application/json")) return res.json();
     return {};
@@ -106,6 +119,40 @@
     $("app").style.display = "none";
     $("login").style.display = "";
     $("loginStatus").textContent = message;
+  }
+
+  function fmt(iso) {
+    try { return new Date(iso).toLocaleString(); }
+    catch { return iso; }
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function setStatusPill(status) {
+    const pill = $("chatStatusPill");
+    if (!activeSid) {
+      pill.style.display = "none";
+      pill.className = "pill";
+      pill.textContent = "";
+      return;
+    }
+    pill.style.display = "inline-flex";
+    const st = (status || "open").toLowerCase();
+    pill.className = "pill " + (st === "closed" ? "closed" : "open");
+    pill.textContent = st === "closed" ? "Closed" : "Open";
+  }
+
+  function setComposerEnabled(enabled) {
+    $("reply").disabled = !enabled;
+    $("sendBtn").disabled = !enabled;
+    $("closeBtn").disabled = !activeSid; // close requires selected conversation
   }
 
   async function login() {
@@ -129,18 +176,8 @@
   }
 
   async function logout() {
-    try {
-      await api("/api/admin/logout", { method: "POST" });
-    } catch {}
+    try { await api("/api/admin/logout", { method: "POST" }); } catch {}
     location.reload();
-  }
-
-  function fmt(iso) {
-    try {
-      return new Date(iso).toLocaleString();
-    } catch {
-      return iso;
-    }
   }
 
   async function refreshConversations() {
@@ -159,9 +196,15 @@
       data.conversations.forEach((c) => {
         const el = document.createElement("div");
         el.className = "conv" + (c.id === activeSid ? " active" : "");
+        const st = (c.status || "open").toLowerCase();
+        const pill = `<span class="pill ${st === "closed" ? "closed" : "open"}">${st === "closed" ? "Closed" : "Open"}</span>`;
+
         el.innerHTML = `
-          <div class="title">${escapeHtml(c.title || c.id)}</div>
-          <div class="small">${escapeHtml(c.lastMsg || "")}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <div class="title" style="margin:0">${escapeHtml(c.title || c.id)}</div>
+            ${pill}
+          </div>
+          <div class="small" style="margin-top:6px">${escapeHtml(c.lastMsg || "")}</div>
           <div class="small" style="margin-top:6px">Last: ${escapeHtml(fmt(c.lastAt))}</div>
         `;
         el.onclick = () => selectConversation(c.id, c.title);
@@ -176,11 +219,15 @@
   async function selectConversation(sid, title) {
     activeSid = sid;
     lastIso = "";
+    activeStatus = "open";
+
     $("chatTitle").textContent = title || sid;
     $("chatSub").textContent = sid;
-    $("reply").disabled = false;
-    $("sendBtn").disabled = false;
     $("chat").innerHTML = "";
+
+    setComposerEnabled(true);
+    setStatusPill("open");
+
     await pullMessages(true);
     await refreshConversations();
   }
@@ -205,6 +252,19 @@
 
     try {
       const data = await api("/api/admin/conversation?" + qs.toString());
+
+      activeStatus = (data.status || "open").toLowerCase();
+      setStatusPill(activeStatus);
+
+      // If closed, disable sending (you can still view)
+      if (activeStatus === "closed") {
+        $("reply").disabled = true;
+        $("sendBtn").disabled = true;
+      } else {
+        $("reply").disabled = false;
+        $("sendBtn").disabled = false;
+      }
+
       (data.messages || []).forEach((m) => {
         appendMessage(m);
         lastIso = m.at;
@@ -218,6 +278,7 @@
   async function sendReply() {
     const text = $("reply").value.trim();
     if (!text || !activeSid) return;
+    if (activeStatus === "closed") return;
 
     $("reply").value = "";
 
@@ -235,6 +296,24 @@
     }
   }
 
+  async function closeChat() {
+    if (!activeSid) return;
+    if (!confirm("End this chat? The visitor will start a new chat after you close it.")) return;
+
+    try {
+      await api("/api/admin/close", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid: activeSid }),
+      });
+      await pullMessages(true);
+      await refreshConversations();
+    } catch (e) {
+      if (e.status === 401) return showLogin("Session expired. Please log in.");
+      alert("Close failed. Check server logs.");
+    }
+  }
+
   function startPolling() {
     setInterval(async () => {
       try {
@@ -244,25 +323,12 @@
     }, 2000);
   }
 
-  function escapeHtml(s) {
-    return String(s ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
   $("loginBtn").onclick = login;
-  $("pw").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") login();
-  });
+  $("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
   $("logoutBtn").onclick = logout;
-  $("refreshBtn").onclick = async () => {
-    await refreshConversations();
-    await pullMessages();
-  };
+  $("refreshBtn").onclick = async () => { await refreshConversations(); await pullMessages(); };
   $("sendBtn").onclick = sendReply;
+  $("closeBtn").onclick = closeChat;
   $("reply").addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") sendReply();
   });
@@ -279,7 +345,6 @@
     }
   })();
 </script>
-
 
 </body>
 </html>
