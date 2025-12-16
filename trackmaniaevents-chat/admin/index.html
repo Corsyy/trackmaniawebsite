@@ -78,10 +78,34 @@
   let activeSid = null;
   let lastIso = "";
 
-  async function api(path, opts) {
-    const res = await fetch(path, opts);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+  async function api(path, opts = {}) {
+    const res = await fetch(path, {
+      // IMPORTANT: send cookies (admin_session) with every request
+      credentials: "include",
+      ...opts,
+      headers: {
+        ...(opts.headers || {}),
+      },
+    });
+
+    if (!res.ok) {
+      // make debugging clearer
+      const txt = await res.text().catch(() => "");
+      const err = new Error(txt || `Request failed: ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+
+    // some endpoints may return empty; guard just in case
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("application/json")) return res.json();
+    return {};
+  }
+
+  function showLogin(message = "") {
+    $("app").style.display = "none";
+    $("login").style.display = "";
+    $("loginStatus").textContent = message;
   }
 
   async function login() {
@@ -89,12 +113,14 @@
     try {
       await api("/api/admin/login", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ password: $("pw").value })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: $("pw").value }),
       });
+
       $("login").style.display = "none";
       $("app").style.display = "";
       $("loginStatus").textContent = "";
+
       await refreshConversations();
       startPolling();
     } catch (e) {
@@ -103,30 +129,48 @@
   }
 
   async function logout() {
-    try { await api("/api/admin/logout", { method: "POST" }); } catch {}
+    try {
+      await api("/api/admin/logout", { method: "POST" });
+    } catch {}
     location.reload();
   }
 
   function fmt(iso) {
-    try { return new Date(iso).toLocaleString(); } catch { return iso; }
+    try {
+      return new Date(iso).toLocaleString();
+    } catch {
+      return iso;
+    }
   }
 
   async function refreshConversations() {
-    const data = await api("/api/admin/conversations");
-    const list = $("convList");
-    list.innerHTML = "";
+    try {
+      const data = await api("/api/admin/conversations");
+      const list = $("convList");
+      list.innerHTML = "";
 
-    data.conversations.forEach(c => {
-      const el = document.createElement("div");
-      el.className = "conv" + (c.id === activeSid ? " active" : "");
-      el.innerHTML = `
-        <div class="title">${escapeHtml(c.title || c.id)}</div>
-        <div class="small">${escapeHtml(c.lastMsg || "")}</div>
-        <div class="small" style="margin-top:6px">Last: ${escapeHtml(fmt(c.lastAt))}</div>
-      `;
-      el.onclick = () => selectConversation(c.id, c.title);
-      list.appendChild(el);
-    });
+      if (!data.conversations || !data.conversations.length) {
+        list.innerHTML = `<div class="small" style="padding:10px;opacity:.9">
+          No conversations yet. Send a test message from your website chat widget first.
+        </div>`;
+        return;
+      }
+
+      data.conversations.forEach((c) => {
+        const el = document.createElement("div");
+        el.className = "conv" + (c.id === activeSid ? " active" : "");
+        el.innerHTML = `
+          <div class="title">${escapeHtml(c.title || c.id)}</div>
+          <div class="small">${escapeHtml(c.lastMsg || "")}</div>
+          <div class="small" style="margin-top:6px">Last: ${escapeHtml(fmt(c.lastAt))}</div>
+        `;
+        el.onclick = () => selectConversation(c.id, c.title);
+        list.appendChild(el);
+      });
+    } catch (e) {
+      if (e.status === 401) return showLogin("Session expired. Please log in.");
+      throw e;
+    }
   }
 
   async function selectConversation(sid, title) {
@@ -153,16 +197,22 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
-  async function pullMessages(forceAll=false) {
+  async function pullMessages(forceAll = false) {
     if (!activeSid) return;
+
     const qs = new URLSearchParams({ sid: activeSid });
     if (!forceAll && lastIso) qs.set("since", lastIso);
 
-    const data = await api("/api/admin/conversation?" + qs.toString());
-    data.messages.forEach(m => {
-      appendMessage(m);
-      lastIso = m.at;
-    });
+    try {
+      const data = await api("/api/admin/conversation?" + qs.toString());
+      (data.messages || []).forEach((m) => {
+        appendMessage(m);
+        lastIso = m.at;
+      });
+    } catch (e) {
+      if (e.status === 401) return showLogin("Session expired. Please log in.");
+      throw e;
+    }
   }
 
   async function sendReply() {
@@ -170,13 +220,19 @@
     if (!text || !activeSid) return;
 
     $("reply").value = "";
-    await api("/api/chat/message", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ sid: activeSid, from: "admin", text })
-    });
-    await pullMessages();
-    await refreshConversations();
+
+    try {
+      await api("/api/chat/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid: activeSid, from: "admin", text }),
+      });
+      await pullMessages();
+      await refreshConversations();
+    } catch (e) {
+      if (e.status === 401) return showLogin("Session expired. Please log in.");
+      $("chatSub").textContent = "Send failed. Check server logs.";
+    }
   }
 
   function startPolling() {
@@ -190,17 +246,22 @@
 
   function escapeHtml(s) {
     return String(s ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
   $("loginBtn").onclick = login;
-  $("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+  $("pw").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") login();
+  });
   $("logoutBtn").onclick = logout;
-  $("refreshBtn").onclick = async () => { await refreshConversations(); await pullMessages(); };
+  $("refreshBtn").onclick = async () => {
+    await refreshConversations();
+    await pullMessages();
+  };
   $("sendBtn").onclick = sendReply;
   $("reply").addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") sendReply();
@@ -218,6 +279,7 @@
     }
   })();
 </script>
+
 
 </body>
 </html>
