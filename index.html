@@ -600,6 +600,117 @@
 
     #schedule{--section-img:none !important}
     #schedule::before{background:none !important}
+  #tmeChatBtn{
+    position:fixed;
+    right:22px;
+    bottom:22px;
+    z-index:999999;
+    width:58px;height:58px;
+    border-radius:16px;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    box-shadow:var(--accent-glow);
+    color:#001220;
+    font-weight:900;
+    cursor:pointer;
+    display:grid;
+    place-items:center;
+    user-select:none;
+  }
+  #tmeChatBtn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  #tmeChatBtn:active{transform:translateY(0)}
+
+  #tmeChatPanel{
+    position:fixed;
+    right:22px;
+    bottom:92px;
+    z-index:999999;
+    width:min(360px, calc(100vw - 44px));
+    height:420px;
+    border-radius:18px;
+    border:1px solid rgba(109,251,255,.25);
+    background:rgba(15,21,36,.92);
+    backdrop-filter: blur(12px) saturate(180%);
+    box-shadow:0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(61,165,255,.25);
+    overflow:hidden;
+    display:none;
+  }
+
+  #tmeChatHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:.8rem .9rem;
+    border-bottom:1px dashed rgba(109,251,255,.2);
+    background:linear-gradient(180deg, rgba(10,15,26,.65), rgba(10,15,26,.25));
+  }
+  #tmeChatHeader strong{font-weight:900;letter-spacing:.2px}
+  #tmeChatClose{
+    border:1px solid rgba(109,251,255,.2);
+    background:rgba(16,24,44,.65);
+    color:var(--text);
+    border-radius:10px;
+    padding:.35rem .6rem;
+    cursor:pointer;
+  }
+
+  #tmeChatLog{
+    height:calc(420px - 54px - 64px);
+    padding:.85rem;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:.55rem;
+  }
+  .tmeMsg{
+    max-width:85%;
+    padding:.6rem .7rem;
+    border-radius:14px;
+    border:1px solid rgba(109,251,255,.18);
+    background:rgba(16,24,44,.55);
+    color:var(--text);
+    line-height:1.25;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .tmeMsg.me{
+    margin-left:auto;
+    background:linear-gradient(135deg, rgba(58,160,255,.35), rgba(109,251,255,.22));
+    border-color:rgba(109,251,255,.25);
+  }
+  .tmeMeta{
+    font-size:.75rem;
+    color:rgba(155,176,255,.9);
+    margin-top:.25rem;
+  }
+
+  #tmeChatInputWrap{
+    height:64px;
+    padding:.7rem;
+    border-top:1px dashed rgba(109,251,255,.2);
+    display:flex;
+    gap:.6rem;
+    background:rgba(10,15,26,.45);
+  }
+  #tmeChatInput{
+    flex:1;
+    border-radius:12px;
+    border:1px solid rgba(109,251,255,.22);
+    background:#0c1224;
+    color:var(--text);
+    padding:.6rem .75rem;
+    outline:none;
+  }
+  #tmeChatSend{
+    border-radius:12px;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#001220;
+    font-weight:900;
+    padding:.6rem .9rem;
+    cursor:pointer;
+  }
+  #tmeChatSend:hover{filter:brightness(1.08)}
 
   </style>
 </head>
@@ -782,6 +893,19 @@
   </div>
 </footer>
 
+<button id="tmeChatBtn" aria-label="Open chat">💬</button>
+
+<div id="tmeChatPanel" role="dialog" aria-label="Trackmania Events Chat">
+  <div id="tmeChatHeader">
+    <strong>Chat</strong>
+    <button id="tmeChatClose" type="button">Close</button>
+  </div>
+  <div id="tmeChatLog" aria-live="polite"></div>
+  <div id="tmeChatInputWrap">
+    <input id="tmeChatInput" type="text" placeholder="Type a message…" autocomplete="off" />
+    <button id="tmeChatSend" type="button">Send</button>
+  </div>
+</div>
 <script>
   const TTV_CHANNEL = "C0rsy";
   const d = document.getElementById("d");
@@ -1443,19 +1567,89 @@
   };
 </script>
 
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6940f23ef220871986c46743/1jcir4h14';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
+<script>
+  // ===== CONFIG =====
+  const CHAT_HTTP = "https://YOUR-CHAT-SERVICE.onrender.com";
+  const CHAT_WS   = "wss://YOUR-CHAT-SERVICE.onrender.com";
+
+  // ===== UI =====
+  const btn = document.getElementById("tmeChatBtn");
+  const panel = document.getElementById("tmeChatPanel");
+  const closeBtn = document.getElementById("tmeChatClose");
+  const log = document.getElementById("tmeChatLog");
+  const input = document.getElementById("tmeChatInput");
+  const sendBtn = document.getElementById("tmeChatSend");
+
+  function showPanel(){ panel.style.display = "block"; connect(); input.focus(); }
+  function hidePanel(){ panel.style.display = "none"; }
+
+  btn.addEventListener("click", () => {
+    if (panel.style.display === "block") hidePanel();
+    else showPanel();
+  });
+  closeBtn.addEventListener("click", hidePanel);
+
+  function addMsg(text, who="me"){
+    const wrap = document.createElement("div");
+    wrap.className = "tmeMsg " + (who === "me" ? "me" : "them");
+    wrap.textContent = text;
+    log.appendChild(wrap);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  // ===== Identity (simple visitor id) =====
+  const VID_KEY = "tme_vid";
+  const vid = localStorage.getItem(VID_KEY) || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
+  localStorage.setItem(VID_KEY, vid);
+
+  // ===== WebSocket =====
+  let ws = null;
+
+  function connect(){
+    if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+
+    const url = CHAT_WS.replace(/\/$/, "") + "/ws?vid=" + encodeURIComponent(vid);
+    ws = new WebSocket(url);
+
+    ws.addEventListener("open", () => {
+      addMsg("Connected. An operator will reply here.", "them");
+    });
+
+    ws.addEventListener("message", (ev) => {
+      try{
+        const msg = JSON.parse(ev.data);
+        if (msg && msg.type === "message") addMsg(msg.text || "", "them");
+      }catch{
+        // fallback
+        addMsg(String(ev.data || ""), "them");
+      }
+    });
+
+    ws.addEventListener("close", () => {
+      // silent; reconnect happens when user opens panel again
+    });
+  }
+
+  function send(){
+    const text = (input.value || "").trim();
+    if (!text) return;
+    addMsg(text, "me");
+    input.value = "";
+
+    if (!ws || ws.readyState !== 1) connect();
+
+    const payload = JSON.stringify({ type:"message", vid, text });
+    try{ ws.send(payload); }catch{}
+  }
+
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") send();
+  });
+
+  // Optional: wake the service so first message doesn't feel laggy on free tier
+  fetch(CHAT_HTTP + "/health").catch(()=>{});
 </script>
-<!--End of Tawk.to Script-->
 
 </body>
 </html>
