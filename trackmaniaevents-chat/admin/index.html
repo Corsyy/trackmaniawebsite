@@ -2,349 +2,406 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Trackmania Events — Admin Chat</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trackmania Events — Chat Admin</title>
+  <meta name="theme-color" content="#0a0f1a" />
   <style>
     :root{
-      --bg:#0a0f1a; --panel:#0f1524; --text:#e6ecff; --muted:#9bb0ff;
-      --accent:#3aa0ff; --accent2:#6dfbff; --border:rgba(109,251,255,.22);
-      --danger:#ff4d4d;
-      --ok:#29d98f;
-      --warn:#ffb02e;
+      --bg:#0a0f1a; --panel:#0f1524; --panel2:#101a30;
+      --text:#e6ecff; --muted:#9bb0ff;
+      --accent:#3aa0ff; --accent2:#6dfbff;
+      --border:rgba(109,251,255,.22);
+      --good:#2ee59d; --warn:#ffcf5a;
+      --bad:#ff5a7a;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    .wrap{display:grid;grid-template-columns:340px 1fr;min-height:100vh}
-    .left{border-right:1px solid var(--border);background:rgba(15,21,36,.6)}
-    .right{display:flex;flex-direction:column}
-    header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;justify-content:space-between}
-    .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#001220;font-weight:800;border-radius:10px;padding:8px 10px;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text);font-weight:700}
-    .btn.danger{background:transparent;border:1px solid rgba(255,77,77,.55);color:#ffd0d0;font-weight:800}
-    .btn.danger:hover{border-color:rgba(255,77,77,.85)}
-    .list{padding:10px;display:flex;flex-direction:column;gap:10px}
-    .conv{border:1px solid var(--border);border-radius:12px;padding:10px;cursor:pointer;background:rgba(12,16,32,.55)}
-    .conv.active{outline:2px solid rgba(61,165,255,.35)}
-    .small{color:var(--muted);font-size:.85rem}
-    .title{font-weight:900;margin:0 0 6px}
-    .pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(12,16,32,.55)}
-    .pill.open{border-color:rgba(41,217,143,.35);color:#bff5e0}
-    .pill.closed{border-color:rgba(255,176,46,.35);color:#ffe5b8}
-    .chat{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-    .msg{max-width:70ch;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(12,16,32,.55)}
-    .msg.admin{margin-left:auto;background:rgba(58,160,255,.14)}
-    .msg .meta{font-size:.8rem;color:var(--muted);margin-bottom:4px}
-    .composer{border-top:1px solid var(--border);padding:12px;display:flex;gap:10px}
-    textarea{flex:1;min-height:44px;max-height:160px;resize:vertical;border-radius:12px;border:1px solid var(--border);background:#0c1224;color:var(--text);padding:10px}
-    .login{max-width:420px;margin:10vh auto;border:1px solid var(--border);border-radius:16px;background:rgba(15,21,36,.6);padding:18px}
-    input{width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:#0c1224;color:var(--text)}
-    @media(max-width:900px){ .wrap{grid-template-columns:1fr} .left{display:none} }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg, rgba(15,21,36,.95), rgba(15,21,36,.70));backdrop-filter: blur(6px);border-bottom:1px solid var(--border)}
+    .head{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-weight:900;letter-spacing:.3px}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px;display:grid;grid-template-columns:360px 1fr;gap:14px}
+    .card{border:1px solid var(--border);background:rgba(15,21,36,.65);border-radius:16px;overflow:hidden}
+    .card h2{margin:0;padding:12px 14px;font-size:14px;color:var(--muted);border-bottom:1px solid rgba(109,251,255,.12)}
+    .pane{padding:12px 14px}
+    .row{display:flex;gap:10px;align-items:center}
+    input,button,textarea{
+      font:inherit;color:var(--text);background:rgba(16,26,48,.75);
+      border:1px solid rgba(109,251,255,.18);border-radius:12px;padding:10px 12px;outline:none
+    }
+    input:focus,textarea:focus{border-color:rgba(109,251,255,.45)}
+    button{
+      cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#001220;font-weight:900;border:none
+    }
+    button.secondary{background:rgba(16,26,48,.75);color:var(--text);border:1px solid rgba(109,251,255,.18)}
+    button.danger{background:linear-gradient(135deg,#ff5a7a,#ffcf5a);color:#1a0b10}
+    .muted{color:var(--muted);font-size:12px}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{
+      padding:10px 12px;border-radius:14px;border:1px solid rgba(109,251,255,.14);
+      background:rgba(16,26,48,.55);cursor:pointer
+    }
+    .item:hover{border-color:rgba(109,251,255,.35)}
+    .itemTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .sid{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:12px;color:var(--muted)}
+    .preview{margin-top:6px;font-size:13px;opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .pill{
+      font-size:11px;font-weight:900;letter-spacing:.2px;padding:4px 8px;border-radius:999px;
+      border:1px solid rgba(109,251,255,.22)
+    }
+    .pill.open{background:rgba(46,229,157,.12);border-color:rgba(46,229,157,.35);color:var(--good)}
+    .pill.closed{background:rgba(255,90,122,.10);border-color:rgba(255,90,122,.35);color:var(--bad)}
+    .chatBox{height:520px;overflow:auto;padding:12px 14px;background:rgba(10,15,26,.35)}
+    .msg{max-width:78%;padding:10px 12px;border-radius:14px;margin:8px 0;border:1px solid rgba(109,251,255,.16)}
+    .msg .meta{font-size:11px;color:var(--muted);margin-bottom:6px}
+    .msg.visitor{margin-right:auto;background:rgba(16,26,48,.70)}
+    .msg.admin{margin-left:auto;background:rgba(58,160,255,.18);border-color:rgba(58,160,255,.35)}
+    .msg.system{margin-left:auto;margin-right:auto;max-width:92%;background:rgba(255,207,90,.10);border-color:rgba(255,207,90,.25)}
+    .compose{display:flex;gap:10px;padding:12px 14px;border-top:1px solid rgba(109,251,255,.12);background:rgba(15,21,36,.65)}
+    .compose input{flex:1}
+    .topActions{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .rightActions{display:flex;gap:10px;align-items:center}
+    .notice{padding:10px 12px;border-radius:14px;border:1px solid rgba(109,251,255,.18);background:rgba(16,26,48,.55);margin-bottom:10px}
   </style>
 </head>
 <body>
-
-<div id="login" class="login">
-  <h2 style="margin:0 0 8px">Admin Login</h2>
-  <div class="small" style="margin-bottom:12px">Enter your admin password.</div>
-  <input id="pw" type="password" placeholder="Password" />
-  <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-    <button class="btn" id="loginBtn">Login</button>
-    <span class="small" id="loginStatus"></span>
+<header>
+  <div class="head">
+    <div class="brand">Trackmania Events — Chat Admin</div>
+    <div class="row">
+      <button class="secondary" id="btnRefresh">Refresh</button>
+      <button class="secondary" id="btnLogout">Logout</button>
+    </div>
   </div>
-</div>
+</header>
 
-<div id="app" style="display:none" class="wrap">
-  <div class="left">
-    <header>
-      <strong>Conversations</strong>
-      <button class="btn ghost" id="logoutBtn">Logout</button>
-    </header>
-    <div class="list" id="convList"></div>
+<div class="wrap">
+  <div class="card">
+    <h2>Login</h2>
+    <div class="pane">
+      <div class="notice muted">
+        Open this admin panel from the chat service host (this page). Cookie auth requires <b>credentials: include</b>.
+      </div>
+      <div class="row">
+        <input id="password" type="password" placeholder="Admin password" style="flex:1" />
+        <button id="btnLogin">Login</button>
+      </div>
+      <div id="loginStatus" class="muted" style="margin-top:10px"></div>
+    </div>
   </div>
 
-  <div class="right">
-    <header>
-      <div>
-        <div style="font-weight:900;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <span id="chatTitle">Select a conversation</span>
-          <span id="chatStatusPill" class="pill" style="display:none"></span>
-        </div>
-        <div class="small" id="chatSub"></div>
+  <div class="card">
+    <h2>Conversations</h2>
+    <div class="pane">
+      <div id="convList" class="list"></div>
+      <div id="convEmpty" class="muted" style="display:none;margin-top:10px">No conversations yet.</div>
+    </div>
+  </div>
+
+  <div class="card" style="grid-column: 1 / span 2;">
+    <h2>
+      Active Conversation
+      <span id="activeMeta" class="muted"></span>
+    </h2>
+    <div class="topActions pane">
+      <div class="row" style="gap:12px">
+        <div id="activeSid" class="sid">No conversation selected</div>
+        <div id="activePill" class="pill" style="display:none"></div>
       </div>
-
-      <div style="display:flex;gap:10px;align-items:center">
-        <button class="btn danger" id="closeBtn" disabled>End chat</button>
-        <button class="btn ghost" id="refreshBtn">Refresh</button>
+      <div class="rightActions">
+        <button id="btnEndChat" class="danger" disabled>End chat</button>
       </div>
-    </header>
+    </div>
 
-    <div class="chat" id="chat"></div>
+    <div id="chatBox" class="chatBox"></div>
 
-    <div class="composer">
-      <textarea id="reply" placeholder="Type your reply…" disabled></textarea>
-      <button class="btn" id="sendBtn" disabled>Send</button>
+    <div class="compose">
+      <input id="replyText" placeholder="Type a reply…" disabled />
+      <button id="btnSend" disabled>Send</button>
     </div>
   </div>
 </div>
 
 <script>
-  const $ = (id) => document.getElementById(id);
+  // Admin runs on same origin as API
+  const API_BASE = "";
 
-  let activeSid = null;
-  let lastIso = "";
-  let activeStatus = "open";
+  const el = (id) => document.getElementById(id);
 
-  async function api(path, opts = {}) {
-    const res = await fetch(path, {
-      credentials: "include",
+  const state = {
+    authed: false,
+    activeSid: null,
+    activeStatus: null,
+    pollTimer: null,
+    lastTs: 0,
+  };
+
+  function fmtTime(ts){
+    try { return new Date(ts).toLocaleString(); } catch { return String(ts); }
+  }
+
+  function pill(status){
+    const p = el("activePill");
+    p.style.display = "inline-block";
+    p.className = "pill " + (status === "open" ? "open" : "closed");
+    p.textContent = status === "open" ? "OPEN" : "CLOSED";
+  }
+
+  function setLoginStatus(msg){
+    el("loginStatus").textContent = msg || "";
+  }
+
+  async function api(path, opts = {}){
+    const res = await fetch(API_BASE + path, {
       ...opts,
-      headers: {
-        ...(opts.headers || {}),
-      },
+      headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
+      credentials: "include",
     });
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      const err = new Error(txt || `Request failed: ${res.status}`);
-      err.status = res.status;
-      throw err;
-    }
-
-    const ct = res.headers.get("content-type") || "";
-    if (ct.includes("application/json")) return res.json();
-    return {};
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, data };
   }
 
-  function showLogin(message = "") {
-    $("app").style.display = "none";
-    $("login").style.display = "";
-    $("loginStatus").textContent = message;
-  }
-
-  function fmt(iso) {
-    try { return new Date(iso).toLocaleString(); }
-    catch { return iso; }
-  }
-
-  function escapeHtml(s) {
-    return String(s ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function setStatusPill(status) {
-    const pill = $("chatStatusPill");
-    if (!activeSid) {
-      pill.style.display = "none";
-      pill.className = "pill";
-      pill.textContent = "";
+  async function login(){
+    setLoginStatus("Logging in…");
+    const password = el("password").value;
+    const r = await api("/api/admin/login", {
+      method: "POST",
+      body: JSON.stringify({ password })
+    });
+    if (!r.ok){
+      state.authed = false;
+      setLoginStatus(r.data?.error || "Login failed");
       return;
     }
-    pill.style.display = "inline-flex";
-    const st = (status || "open").toLowerCase();
-    pill.className = "pill " + (st === "closed" ? "closed" : "open");
-    pill.textContent = st === "closed" ? "Closed" : "Open";
+    state.authed = true;
+    setLoginStatus("Logged in.");
+    await loadConversations();
   }
 
-  function setComposerEnabled(enabled) {
-    $("reply").disabled = !enabled;
-    $("sendBtn").disabled = !enabled;
-    $("closeBtn").disabled = !activeSid; // close requires selected conversation
+  async function logout(){
+    await api("/api/admin/logout", { method:"POST", body:"{}" });
+    state.authed = false;
+    state.activeSid = null;
+    state.activeStatus = null;
+    el("convList").innerHTML = "";
+    el("chatBox").innerHTML = "";
+    el("activeSid").textContent = "No conversation selected";
+    el("activePill").style.display = "none";
+    el("btnEndChat").disabled = true;
+    el("btnSend").disabled = true;
+    el("replyText").disabled = true;
+    setLoginStatus("Logged out.");
+    stopPolling();
   }
 
-  async function login() {
-    $("loginStatus").textContent = "Signing in…";
-    try {
-      await api("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: $("pw").value }),
-      });
+  async function loadConversations(){
+    if (!state.authed) return;
+    const r = await api("/api/admin/conversations");
+    if (!r.ok){
+      setLoginStatus(r.data?.error || "Failed to load conversations");
+      if (r.status === 401) state.authed = false;
+      return;
+    }
 
-      $("login").style.display = "none";
-      $("app").style.display = "";
-      $("loginStatus").textContent = "";
+    const list = r.data.conversations || [];
+    const container = el("convList");
+    container.innerHTML = "";
 
-      await refreshConversations();
-      startPolling();
-    } catch (e) {
-      $("loginStatus").textContent = "Login failed.";
+    el("convEmpty").style.display = list.length ? "none" : "block";
+
+    for (const c of list){
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="itemTop">
+          <div class="sid">${c.sid}</div>
+          <div class="pill ${c.status === "open" ? "open" : "closed"}">${c.status === "open" ? "OPEN" : "CLOSED"}</div>
+        </div>
+        <div class="preview">${(c.lastTextPreview || "").replace(/</g,"&lt;")}</div>
+        <div class="muted" style="margin-top:6px">
+          Updated: ${fmtTime(c.updatedAt)} • Messages: ${c.messageCount}
+        </div>
+      `;
+      div.addEventListener("click", () => selectConversation(c.sid));
+      container.appendChild(div);
     }
   }
 
-  async function logout() {
-    try { await api("/api/admin/logout", { method: "POST" }); } catch {}
-    location.reload();
+  function renderMessages(msgs){
+    const box = el("chatBox");
+    box.innerHTML = "";
+    for (const m of msgs){
+      const div = document.createElement("div");
+      div.className = "msg " + m.from;
+      div.innerHTML = `
+        <div class="meta">${m.from.toUpperCase()} • ${fmtTime(m.ts)}</div>
+        <div>${String(m.text).replace(/</g,"&lt;")}</div>
+      `;
+      box.appendChild(div);
+      state.lastTs = Math.max(state.lastTs, Number(m.ts || 0));
+    }
+    box.scrollTop = box.scrollHeight;
   }
 
-  async function refreshConversations() {
-    try {
-      const data = await api("/api/admin/conversations");
-      const list = $("convList");
-      list.innerHTML = "";
+  function appendMessages(msgs){
+    const box = el("chatBox");
+    let stickToBottom = (box.scrollTop + box.clientHeight) >= (box.scrollHeight - 40);
 
-      if (!data.conversations || !data.conversations.length) {
-        list.innerHTML = `<div class="small" style="padding:10px;opacity:.9">
-          No conversations yet. Send a test message from your website chat widget first.
-        </div>`;
-        return;
+    for (const m of msgs){
+      const div = document.createElement("div");
+      div.className = "msg " + m.from;
+      div.innerHTML = `
+        <div class="meta">${m.from.toUpperCase()} • ${fmtTime(m.ts)}</div>
+        <div>${String(m.text).replace(/</g,"&lt;")}</div>
+      `;
+      box.appendChild(div);
+      state.lastTs = Math.max(state.lastTs, Number(m.ts || 0));
+    }
+
+    if (stickToBottom) box.scrollTop = box.scrollHeight;
+  }
+
+  async function selectConversation(sid){
+    if (!state.authed) return;
+
+    state.activeSid = sid;
+    state.lastTs = 0;
+
+    el("activeSid").textContent = sid;
+    el("activeMeta").textContent = "";
+
+    const r = await api("/api/admin/conversation?sid=" + encodeURIComponent(sid));
+    if (!r.ok){
+      setLoginStatus(r.data?.error || "Failed to load conversation");
+      return;
+    }
+
+    state.activeStatus = r.data.status;
+    pill(state.activeStatus);
+
+    const statusOpen = state.activeStatus === "open";
+    el("btnEndChat").disabled = !statusOpen;
+    el("btnSend").disabled = !statusOpen;
+    el("replyText").disabled = !statusOpen;
+
+    renderMessages(r.data.messages || []);
+    startPolling();
+  }
+
+  async function sendReply(){
+    if (!state.authed || !state.activeSid) return;
+    const text = el("replyText").value.trim();
+    if (!text) return;
+
+    const r = await api("/api/admin/send", {
+      method: "POST",
+      body: JSON.stringify({ sid: state.activeSid, text })
+    });
+
+    if (!r.ok){
+      setLoginStatus(r.data?.error || "Send failed");
+      if (r.status === 409){
+        state.activeStatus = "closed";
+        pill("closed");
+        el("btnEndChat").disabled = true;
+        el("btnSend").disabled = true;
+        el("replyText").disabled = true;
       }
+      return;
+    }
 
-      data.conversations.forEach((c) => {
-        const el = document.createElement("div");
-        el.className = "conv" + (c.id === activeSid ? " active" : "");
-        const st = (c.status || "open").toLowerCase();
-        const pill = `<span class="pill ${st === "closed" ? "closed" : "open"}">${st === "closed" ? "Closed" : "Open"}</span>`;
+    el("replyText").value = "";
+    // Poll will pick it up quickly; do a fast refresh
+    await pollActiveOnce();
+  }
 
-        el.innerHTML = `
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-            <div class="title" style="margin:0">${escapeHtml(c.title || c.id)}</div>
-            ${pill}
-          </div>
-          <div class="small" style="margin-top:6px">${escapeHtml(c.lastMsg || "")}</div>
-          <div class="small" style="margin-top:6px">Last: ${escapeHtml(fmt(c.lastAt))}</div>
-        `;
-        el.onclick = () => selectConversation(c.id, c.title);
-        list.appendChild(el);
-      });
-    } catch (e) {
-      if (e.status === 401) return showLogin("Session expired. Please log in.");
-      throw e;
+  async function endChat(){
+    if (!state.authed || !state.activeSid) return;
+
+    const r = await api("/api/admin/close", {
+      method: "POST",
+      body: JSON.stringify({ sid: state.activeSid })
+    });
+
+    if (!r.ok){
+      setLoginStatus(r.data?.error || "Close failed");
+      return;
+    }
+
+    state.activeStatus = "closed";
+    pill("closed");
+    el("btnEndChat").disabled = true;
+    el("btnSend").disabled = true;
+    el("replyText").disabled = true;
+
+    await pollActiveOnce();
+    await loadConversations();
+  }
+
+  function startPolling(){
+    stopPolling();
+    state.pollTimer = setInterval(pollActiveOnce, 1500);
+  }
+
+  function stopPolling(){
+    if (state.pollTimer){
+      clearInterval(state.pollTimer);
+      state.pollTimer = null;
     }
   }
 
-  async function selectConversation(sid, title) {
-    activeSid = sid;
-    lastIso = "";
-    activeStatus = "open";
+  async function pollActiveOnce(){
+    if (!state.authed || !state.activeSid) return;
 
-    $("chatTitle").textContent = title || sid;
-    $("chatSub").textContent = sid;
-    $("chat").innerHTML = "";
-
-    setComposerEnabled(true);
-    setStatusPill("open");
-
-    await pullMessages(true);
-    await refreshConversations();
-  }
-
-  function appendMessage(m) {
-    const chat = $("chat");
-    const box = document.createElement("div");
-    box.className = "msg " + (m.from === "admin" ? "admin" : "visitor");
-    box.innerHTML = `
-      <div class="meta">${escapeHtml(m.from)} • ${escapeHtml(fmt(m.at))}</div>
-      <div>${escapeHtml(m.text)}</div>
-    `;
-    chat.appendChild(box);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  async function pullMessages(forceAll = false) {
-    if (!activeSid) return;
-
-    const qs = new URLSearchParams({ sid: activeSid });
-    if (!forceAll && lastIso) qs.set("since", lastIso);
-
-    try {
-      const data = await api("/api/admin/conversation?" + qs.toString());
-
-      activeStatus = (data.status || "open").toLowerCase();
-      setStatusPill(activeStatus);
-
-      // If closed, disable sending (you can still view)
-      if (activeStatus === "closed") {
-        $("reply").disabled = true;
-        $("sendBtn").disabled = true;
-      } else {
-        $("reply").disabled = false;
-        $("sendBtn").disabled = false;
-      }
-
-      (data.messages || []).forEach((m) => {
-        appendMessage(m);
-        lastIso = m.at;
-      });
-    } catch (e) {
-      if (e.status === 401) return showLogin("Session expired. Please log in.");
-      throw e;
+    const r = await api("/api/admin/conversation?sid=" + encodeURIComponent(state.activeSid));
+    if (!r.ok){
+      // conversation may have been purged/restarted; just stop polling
+      stopPolling();
+      return;
     }
+
+    // Update status + controls live
+    state.activeStatus = r.data.status;
+    pill(state.activeStatus);
+
+    const statusOpen = state.activeStatus === "open";
+    el("btnEndChat").disabled = !statusOpen;
+    el("btnSend").disabled = !statusOpen;
+    el("replyText").disabled = !statusOpen;
+
+    // Efficient append: only add newer messages
+    const msgs = r.data.messages || [];
+    const newer = msgs.filter(m => Number(m.ts || 0) > state.lastTs);
+    if (newer.length) appendMessages(newer);
   }
 
-  async function sendReply() {
-    const text = $("reply").value.trim();
-    if (!text || !activeSid) return;
-    if (activeStatus === "closed") return;
+  // bindings
+  el("btnLogin").addEventListener("click", login);
+  el("password").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
 
-    $("reply").value = "";
-
-    try {
-      await api("/api/chat/message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sid: activeSid, from: "admin", text }),
-      });
-      await pullMessages();
-      await refreshConversations();
-    } catch (e) {
-      if (e.status === 401) return showLogin("Session expired. Please log in.");
-      $("chatSub").textContent = "Send failed. Check server logs.";
-    }
-  }
-
-  async function closeChat() {
-    if (!activeSid) return;
-    if (!confirm("End this chat? The visitor will start a new chat after you close it.")) return;
-
-    try {
-      await api("/api/admin/close", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sid: activeSid }),
-      });
-      await pullMessages(true);
-      await refreshConversations();
-    } catch (e) {
-      if (e.status === 401) return showLogin("Session expired. Please log in.");
-      alert("Close failed. Check server logs.");
-    }
-  }
-
-  function startPolling() {
-    setInterval(async () => {
-      try {
-        await refreshConversations();
-        await pullMessages();
-      } catch {}
-    }, 2000);
-  }
-
-  $("loginBtn").onclick = login;
-  $("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
-  $("logoutBtn").onclick = logout;
-  $("refreshBtn").onclick = async () => { await refreshConversations(); await pullMessages(); };
-  $("sendBtn").onclick = sendReply;
-  $("closeBtn").onclick = closeChat;
-  $("reply").addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") sendReply();
+  el("btnLogout").addEventListener("click", logout);
+  el("btnRefresh").addEventListener("click", async () => {
+    await loadConversations();
+    if (state.activeSid) await pollActiveOnce();
   });
 
-  // If already logged in (cookie exists), auto-enter app by probing conversations:
+  el("btnSend").addEventListener("click", sendReply);
+  el("replyText").addEventListener("keydown", (e) => { if (e.key === "Enter") sendReply(); });
+
+  el("btnEndChat").addEventListener("click", endChat);
+
+  // initial load (if already authed, this will succeed; otherwise shows error silently)
   (async () => {
-    try {
-      await refreshConversations();
-      $("login").style.display = "none";
-      $("app").style.display = "";
-      startPolling();
-    } catch {
-      // remain on login
+    const r = await api("/api/admin/conversations");
+    if (r.ok){
+      state.authed = true;
+      setLoginStatus("Logged in.");
+      await loadConversations();
+    } else {
+      state.authed = false;
+      setLoginStatus("Not logged in.");
     }
   })();
 </script>
-
 </body>
 </html>
