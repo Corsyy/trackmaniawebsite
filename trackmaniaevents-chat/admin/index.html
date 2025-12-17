@@ -425,6 +425,13 @@
       setLoginStatus("Not logged in.");
     }
   })();
+  setInterval(() => {
+  fetch("/api/admin/presence", {
+    method: "POST",
+    credentials: "include"
+  }).catch(() => {});
+}, 30_000);
+
 </script>
 </body>
 </html>
