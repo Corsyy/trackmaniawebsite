@@ -1595,7 +1595,6 @@
   const NAME_KEY = "tme_chat_name";
   const POLL_MS = 1200;
 
-  // Client-side defaults (used if server doesn't return participants)
   const DEFAULT_OPERATOR_NAME = "Trackmania Events Support";
   const DEFAULT_OPERATOR_AVATAR = "https://trackmaniaevents.com/assets/chat-operator.png";
   const DEFAULT_VISITOR_AVATAR = "https://trackmaniaevents.com/assets/chat-visitor.png";
@@ -1612,46 +1611,34 @@
   let lastTs = 0;
   let pollTimer = null;
 
-  // Filled from server participants (preferred), else defaults
   let participants = {
     visitor: { name: visitorName || "Visitor", avatarUrl: DEFAULT_VISITOR_AVATAR },
     operator: { name: DEFAULT_OPERATOR_NAME, avatarUrl: DEFAULT_OPERATOR_AVATAR }
   };
 
-  function escapeText(s) {
-    return String(s ?? "");
-  }
-
-  function ensureName() {
-    if (visitorName && visitorName.trim()) return true;
-
-    const name = prompt("Enter a name to start chatting (e.g., Corsy):", "") || "";
-    const cleaned = name.trim().replace(/\s+/g, " ").slice(0, 32);
-    if (!cleaned) return false;
-
-    visitorName = cleaned;
-    localStorage.setItem(NAME_KEY, visitorName);
-    participants.visitor.name = visitorName;
-    return true;
-  }
-
   function setParticipantsFromServer(p) {
-    if (!p || typeof p !== "object") return;
-
+    if (!p) return;
     if (p.visitor) {
-      if (typeof p.visitor.name === "string" && p.visitor.name.trim()) participants.visitor.name = p.visitor.name;
-      if (typeof p.visitor.avatarUrl === "string" && p.visitor.avatarUrl.trim()) participants.visitor.avatarUrl = p.visitor.avatarUrl;
+      if (p.visitor.name) participants.visitor.name = p.visitor.name;
+      if (p.visitor.avatarUrl) participants.visitor.avatarUrl = p.visitor.avatarUrl;
     }
     if (p.operator) {
-      if (typeof p.operator.name === "string" && p.operator.name.trim()) participants.operator.name = p.operator.name;
-      if (typeof p.operator.avatarUrl === "string" && p.operator.avatarUrl.trim()) participants.operator.avatarUrl = p.operator.avatarUrl;
+      if (p.operator.name) participants.operator.name = p.operator.name;
+      if (p.operator.avatarUrl) participants.operator.avatarUrl = p.operator.avatarUrl;
     }
   }
 
   function addMsg({ text, from }) {
     const who = (from === "visitor") ? "me" : "them";
-    const name = (who === "me") ? (participants.visitor.name || "You") : (participants.operator.name || "Support");
-    const avatarUrl = (who === "me") ? participants.visitor.avatarUrl : participants.operator.avatarUrl;
+    const isAI = (from === "ai");
+
+    const name = (who === "me")
+      ? (participants.visitor.name || "You")
+      : (participants.operator.name || "Support");
+
+    const avatarUrl = (who === "me")
+      ? participants.visitor.avatarUrl
+      : participants.operator.avatarUrl;
 
     const row = document.createElement("div");
     row.className = "tmeMsgRow " + who;
@@ -1665,11 +1652,21 @@
 
     const label = document.createElement("div");
     label.className = "tmeMsgName";
-    label.textContent = name;
+
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = name;
+    label.appendChild(nameSpan);
+
+    if (isAI) {
+      const badge = document.createElement("span");
+      badge.className = "tmeBadge tmeBadge-ai";
+      badge.textContent = "AI";
+      label.appendChild(badge);
+    }
 
     const bubble = document.createElement("div");
     bubble.className = "tmeMsg " + who;
-    bubble.textContent = escapeText(text);
+    bubble.textContent = String(text ?? "");
 
     bubbleWrap.appendChild(label);
     bubbleWrap.appendChild(bubble);
@@ -1690,104 +1687,81 @@
     if (!log.childElementCount) addMsg({ text, from: "ai" });
   }
 
-  // ===== UI message: Email capture =====
-  function renderEmailCapture() {
-    // prevent duplicates
-    if (document.getElementById("tmeEmailCaptureRow")) return;
+  function renderNameCapture() {
+    if (document.getElementById("tmeNameCapture")) return;
 
     const row = document.createElement("div");
-    row.id = "tmeEmailCaptureRow";
+    row.id = "tmeNameCapture";
     row.className = "tmeMsgRow them";
 
     const avatar = document.createElement("div");
     avatar.className = "tmeAvatar";
     avatar.style.backgroundImage = `url("${participants.operator.avatarUrl}")`;
 
-    const bubbleWrap = document.createElement("div");
-    bubbleWrap.className = "tmeBubbleWrap";
+    const wrap = document.createElement("div");
+    wrap.className = "tmeBubbleWrap";
 
     const label = document.createElement("div");
     label.className = "tmeMsgName";
-    label.textContent = participants.operator.name || "Support";
+    label.textContent = participants.operator.name;
 
     const card = document.createElement("div");
-    card.className = "tmeMsg them tmeEmailCard";
+    card.className = "tmeMsg them";
 
     const title = document.createElement("div");
-    title.className = "tmeEmailTitle";
-    title.textContent = "Enter your email and an operator will follow up:";
+    title.textContent = "Want to add a name? (optional)";
 
-    const formRow = document.createElement("div");
-    formRow.className = "tmeEmailRow";
+    const inputName = document.createElement("input");
+    inputName.type = "text";
+    inputName.placeholder = "Corsy";
+    inputName.maxLength = 32;
+    inputName.style.marginTop = "6px";
 
-    const email = document.createElement("input");
-    email.className = "tmeEmailInput";
-    email.type = "email";
-    email.placeholder = "email@email.com";
-    email.autocomplete = "email";
+    const btnSave = document.createElement("button");
+    btnSave.textContent = "Save";
 
-    const submit = document.createElement("button");
-    submit.className = "tmeEmailBtn";
-    submit.type = "button";
-    submit.textContent = "Submit";
+    const btnSkip = document.createElement("button");
+    btnSkip.textContent = "Skip";
+    btnSkip.className = "secondary";
 
-    async function submitEmail() {
-      const value = (email.value || "").trim();
-      if (!value || !sid) return;
+    btnSave.onclick = async () => {
+      const v = inputName.value.trim();
+      if (!v) return;
+      visitorName = v;
+      localStorage.setItem(NAME_KEY, v);
+      participants.visitor.name = v;
 
-      submit.disabled = true;
-      email.disabled = true;
-
-      const r = await fetch(CHAT_API_BASE + "/api/chat/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sid, visitorEmail: value })
-      }).catch(() => null);
-
-      if (!r || !r.ok) {
-        submit.disabled = false;
-        email.disabled = false;
-        addMsg({ text: "Sorry—couldn’t save that email. Please try again.", from: "ai" });
-        return;
+      if (sid) {
+        await fetch(CHAT_API_BASE + "/api/chat/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sid, visitorName: v })
+        }).catch(() => null);
       }
 
-      addMsg({ text: "Thanks. We’ll get back to you as soon as an operator is available.", from: "ai" });
+      addMsg({ text: `Name saved as "${v}".`, from: "ai" });
       row.remove();
-    }
+    };
 
-    submit.addEventListener("click", submitEmail);
-    email.addEventListener("keydown", (e) => { if (e.key === "Enter") submitEmail(); });
+    btnSkip.onclick = () => row.remove();
 
-    formRow.appendChild(email);
-    formRow.appendChild(submit);
-
-    card.appendChild(title);
-    card.appendChild(formRow);
-
-    bubbleWrap.appendChild(label);
-    bubbleWrap.appendChild(card);
-
-    row.appendChild(avatar);
-    row.appendChild(bubbleWrap);
-
+    card.append(title, inputName, btnSave, btnSkip);
+    wrap.append(label, card);
+    row.append(avatar, wrap);
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
-    email.focus();
   }
 
   async function initChat() {
-    if (!ensureName()) return false;
+    const nameForInit = visitorName || "Visitor";
 
     const res = await fetch(CHAT_API_BASE + "/api/chat/init", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ visitorName })
+      body: JSON.stringify({ visitorName: nameForInit })
     }).catch(() => null);
 
-    if (!res) {
-      addMsg({ text: "Network error starting chat.", from: "ai" });
-      return false;
-    }
+    if (!res) { addMsg({ text: "Network error starting chat.", from: "ai" }); return false; }
 
     const data = await res.json().catch(() => null);
     if (!data || !data.ok || !data.sid) {
@@ -1797,119 +1771,59 @@
 
     sid = data.sid;
     localStorage.setItem(SID_KEY, sid);
-
     if (data.participants) setParticipantsFromServer(data.participants);
 
     lastTs = 0;
     log.innerHTML = "";
     addMsg({ text: "Connected. Ask anything about Trackmania Events.", from: "ai" });
 
-    // Set profile (safe if endpoint missing)
-    fetch(CHAT_API_BASE + "/api/chat/profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sid, visitorName })
-    }).catch(() => null);
-
+    if (!visitorName) renderNameCapture();
     return true;
   }
 
   async function pollOnce() {
     if (!sid) return;
 
-    const url = `${CHAT_API_BASE}/api/chat/poll?sid=${encodeURIComponent(sid)}&since=${encodeURIComponent(lastTs)}`;
-    const res = await fetch(url).catch(() => null);
+    const res = await fetch(`${CHAT_API_BASE}/api/chat/poll?sid=${sid}&since=${lastTs}`).catch(() => null);
     if (!res) return;
-
-    if (res.status === 404) {
-      localStorage.removeItem(SID_KEY);
-      sid = "";
-      lastTs = 0;
-      await initChat();
-      return;
-    }
 
     const data = await res.json().catch(() => null);
     if (!data || !data.ok) return;
 
     if (data.participants) setParticipantsFromServer(data.participants);
 
-    if (data.status === "closed") {
-      localStorage.removeItem(SID_KEY);
-      sid = "";
-      lastTs = 0;
-      await initChat();
-      return;
-    }
-
-    const msgs = data.messages || [];
-    for (const m of msgs) {
-      const ts = Number(m.ts || 0);
-      if (ts <= lastTs) continue;
-
-      // Handle UI messages (email capture)
-      if ((m.kind === "ui" && m.ui?.kind === "email_capture") || (m.type === "ui" && m.ui?.kind === "email_capture")) {
-        renderEmailCapture();
-      } else {
-        addMsg({ text: m.text || "", from: m.from || "ai" });
+    for (const m of (data.messages || [])) {
+      if (m.ts > lastTs) {
+        if (m.kind === "ui" && m.ui?.kind === "email_capture") {
+          renderEmailCapture();
+        } else {
+          addMsg({ text: m.text || "", from: m.from || "ai" });
+        }
+        lastTs = Math.max(lastTs, m.ts);
       }
-
-      lastTs = Math.max(lastTs, ts);
     }
   }
 
   async function send() {
-    const text = (input.value || "").trim();
+    const text = input.value.trim();
     if (!text) return;
 
-    if (!ensureName()) return;
-
-    if (!sid) {
-      const ok = await initChat();
-      if (!ok) return;
-    }
+    if (!sid && !(await initChat())) return;
 
     input.value = "";
-
-    const res = await fetch(CHAT_API_BASE + "/api/chat/send", {
+    await fetch(CHAT_API_BASE + "/api/chat/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sid, text }),
+      body: JSON.stringify({ sid, text })
     }).catch(() => null);
-
-    if (!res) {
-      addMsg({ text: "Network error sending message.", from: "ai" });
-      return;
-    }
-
-    if (res.status === 409) {
-      localStorage.removeItem(SID_KEY);
-      sid = "";
-      lastTs = 0;
-      await initChat();
-      return;
-    }
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => null);
-      addMsg({ text: (data && data.error) ? data.error : "Send failed.", from: "ai" });
-      return;
-    }
 
     await pollOnce();
   }
 
-  function startPolling() {
-    stopPolling();
-    pollTimer = setInterval(pollOnce, POLL_MS);
-  }
+  function startPolling(){ stopPolling(); pollTimer = setInterval(pollOnce, POLL_MS); }
+  function stopPolling(){ if (pollTimer) clearInterval(pollTimer); pollTimer = null; }
 
-  function stopPolling() {
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = null;
-  }
-
-  function showPanel() {
+  function showPanel(){
     panel.style.display = "block";
     input.focus();
     addSystem("Connecting…");
@@ -1920,65 +1834,23 @@
     })();
   }
 
-  function hidePanel() {
-    panel.style.display = "none";
-    stopPolling();
-  }
+  function hidePanel(){ panel.style.display = "none"; stopPolling(); }
 
-  btn.addEventListener("click", () => {
-    if (panel.style.display === "block") hidePanel();
-    else showPanel();
-  });
+  btn.onclick = () => panel.style.display === "block" ? hidePanel() : showPanel();
+  closeBtn.onclick = hidePanel;
+  sendBtn.onclick = send;
+  input.onkeydown = e => e.key === "Enter" && send();
 
-  closeBtn.addEventListener("click", hidePanel);
-  sendBtn.addEventListener("click", send);
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") send();
-  });
-
-  // Inject minimal CSS (plus email UI styles)
   const style = document.createElement("style");
   style.textContent = `
-  .tmeMsgRow{display:flex;gap:10px;align-items:flex-end;margin:10px 0}
-  .tmeMsgRow.me{justify-content:flex-end}
-  .tmeAvatar{
-    width:30px;height:30px;border-radius:50%;
-    background-size:cover;background-position:center;
-    border:1px solid rgba(109,251,255,.25);
-    box-shadow:0 0 12px rgba(61,165,255,.25);
-    flex:0 0 auto;
-  }
-  .tmeBubbleWrap{max-width: calc(100% - 44px); min-width:0;}
-  .tmeMsgName{font-size:11px;opacity:.75;margin:0 8px 4px}
-  .tmeMsg{white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;}
-
-  .tmeEmailCard{width:min(380px,100%); padding:12px 12px 10px;}
-  .tmeEmailTitle{font-weight:800; margin-bottom:8px;}
-  .tmeEmailRow{display:flex; gap:8px; align-items:center;}
-  .tmeEmailInput{
-    flex:1; min-width:0;
-    padding:10px 12px;
-    border-radius:10px;
-    border:1px solid rgba(109,251,255,.25);
-    background:rgba(16,26,48,.75);
-    color:#e6ecff;
-    outline:none;
-  }
-  .tmeEmailBtn{
-    padding:10px 12px;
-    border-radius:10px;
-    border:0;
-    cursor:pointer;
-    font-weight:900;
-    background:linear-gradient(135deg, #3aa0ff, #6dfbff);
-    color:#001220;
-  }
-  .tmeEmailBtn:disabled{opacity:.65; cursor:default;}
+    .tmeMsgName{display:flex;gap:6px;align-items:center}
+    .tmeBadge{font-size:10px;font-weight:900;padding:2px 6px;border-radius:999px;border:1px solid rgba(109,251,255,.25)}
+    .tmeBadge-ai{background:rgba(58,160,255,.18);color:#9bb0ff}
   `;
   document.head.appendChild(style);
 })();
 </script>
+
 
 </body>
 </html>
