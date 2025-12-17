@@ -1570,8 +1570,16 @@
 <script>
 (() => {
   const CHAT_API_BASE = "https://trackmaniaevents-chat.onrender.com";
+
   const SID_KEY = "tme_chat_sid";
+  const NAME_KEY = "tme_chat_name";
+
   const POLL_MS = 1200;
+
+  // Client-side defaults (used if server doesn't return participants)
+  const DEFAULT_OPERATOR_NAME = "Trackmania Events Support";
+  const DEFAULT_OPERATOR_AVATAR = "https://trackmaniaevents.com/assets/chat-operator.png"; // <-- you will create this
+  const DEFAULT_VISITOR_AVATAR = "https://trackmaniaevents.com/assets/chat-visitor.png";   // optional (or use same as operator)
 
   const btn = document.getElementById("tmeChatBtn");
   const panel = document.getElementById("tmeChatPanel");
@@ -1581,45 +1589,131 @@
   const sendBtn = document.getElementById("tmeChatSend");
 
   let sid = localStorage.getItem(SID_KEY) || "";
+  let visitorName = localStorage.getItem(NAME_KEY) || "";
   let lastTs = 0;
   let pollTimer = null;
 
-  function addMsg(text, who = "them") {
-    const wrap = document.createElement("div");
-    wrap.className = "tmeMsg " + (who === "me" ? "me" : "them");
-    wrap.textContent = text;
-    log.appendChild(wrap);
+  // Filled from server participants (preferred), else defaults
+  let participants = {
+    visitor: { name: visitorName || "Visitor", avatarUrl: DEFAULT_VISITOR_AVATAR },
+    operator: { name: DEFAULT_OPERATOR_NAME, avatarUrl: DEFAULT_OPERATOR_AVATAR }
+  };
+
+  function escapeText(s) {
+    return String(s ?? "");
+  }
+
+  function ensureName() {
+    if (visitorName && visitorName.trim()) return true;
+
+    // Simple prompt; can be replaced with a nicer modal later
+    const name = prompt("Enter a name to start chatting (e.g., Corsy):", "") || "";
+    const cleaned = name.trim().replace(/\s+/g, " ").slice(0, 32);
+    if (!cleaned) return false;
+
+    visitorName = cleaned;
+    localStorage.setItem(NAME_KEY, visitorName);
+    participants.visitor.name = visitorName;
+    return true;
+  }
+
+  function setParticipantsFromServer(p) {
+    if (!p || typeof p !== "object") return;
+
+    if (p.visitor) {
+      if (typeof p.visitor.name === "string" && p.visitor.name.trim()) participants.visitor.name = p.visitor.name;
+      if (typeof p.visitor.avatarUrl === "string" && p.visitor.avatarUrl.trim()) participants.visitor.avatarUrl = p.visitor.avatarUrl;
+    }
+    if (p.operator) {
+      if (typeof p.operator.name === "string" && p.operator.name.trim()) participants.operator.name = p.operator.name;
+      if (typeof p.operator.avatarUrl === "string" && p.operator.avatarUrl.trim()) participants.operator.avatarUrl = p.operator.avatarUrl;
+    }
+  }
+
+  function addMsg({ text, from }) {
+    const who = (from === "visitor") ? "me" : "them";
+    const name = (who === "me") ? (participants.visitor.name || "You") : (participants.operator.name || "Support");
+    const avatarUrl = (who === "me") ? participants.visitor.avatarUrl : participants.operator.avatarUrl;
+
+    const row = document.createElement("div");
+    row.className = "tmeMsgRow " + who;
+
+    const avatar = document.createElement("div");
+    avatar.className = "tmeAvatar";
+    avatar.style.backgroundImage = `url("${avatarUrl}")`;
+
+    const bubbleWrap = document.createElement("div");
+    bubbleWrap.className = "tmeBubbleWrap";
+
+    const label = document.createElement("div");
+    label.className = "tmeMsgName";
+    label.textContent = name;
+
+    const bubble = document.createElement("div");
+    bubble.className = "tmeMsg " + who;
+    bubble.textContent = escapeText(text);
+
+    bubbleWrap.appendChild(label);
+    bubbleWrap.appendChild(bubble);
+
+    if (who === "me") {
+      row.appendChild(bubbleWrap);
+      row.appendChild(avatar);
+    } else {
+      row.appendChild(avatar);
+      row.appendChild(bubbleWrap);
+    }
+
+    log.appendChild(row);
     log.scrollTop = log.scrollHeight;
   }
 
-  function setSystem(text) {
-    // lightweight status line
-    if (!log.childElementCount) addMsg(text, "them");
+  function addSystem(text) {
+    // lightweight status line only if empty
+    if (!log.childElementCount) {
+      addMsg({ text, from: "ai" });
+    }
   }
 
   async function initChat() {
+    if (!ensureName()) return false;
+
     const res = await fetch(CHAT_API_BASE + "/api/chat/init", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: "{}",
+      // send name if server supports it; harmless if ignored
+      body: JSON.stringify({ visitorName })
     }).catch(() => null);
 
     if (!res) {
-      addMsg("Network error starting chat.", "them");
+      addMsg({ text: "Network error starting chat.", from: "ai" });
       return false;
     }
 
     const data = await res.json().catch(() => null);
     if (!data || !data.ok || !data.sid) {
-      addMsg("Failed to start chat.", "them");
+      addMsg({ text: "Failed to start chat.", from: "ai" });
       return false;
     }
 
     sid = data.sid;
     localStorage.setItem(SID_KEY, sid);
+
+    // If server returns participants, use them
+    if (data.participants) setParticipantsFromServer(data.participants);
+
     lastTs = 0;
     log.innerHTML = "";
-    addMsg("Connected. An operator will reply here.", "them");
+
+    addMsg({ text: "Connected. Ask anything about Trackmania Events.", from: "ai" });
+
+    // If server has /api/chat/profile, set name explicitly (safe if 404)
+    fetch(CHAT_API_BASE + "/api/chat/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sid, visitorName })
+    }).catch(() => null);
+
     return true;
   }
 
@@ -1631,7 +1725,6 @@
     if (!res) return;
 
     if (res.status === 404) {
-      // sid unknown on server
       localStorage.removeItem(SID_KEY);
       sid = "";
       lastTs = 0;
@@ -1641,6 +1734,8 @@
 
     const data = await res.json().catch(() => null);
     if (!data || !data.ok) return;
+
+    if (data.participants) setParticipantsFromServer(data.participants);
 
     if (data.status === "closed") {
       localStorage.removeItem(SID_KEY);
@@ -1653,9 +1748,8 @@
     const msgs = data.messages || [];
     for (const m of msgs) {
       const ts = Number(m.ts || 0);
-      // only append messages we haven't seen
       if (ts > lastTs) {
-        addMsg(m.text || "", m.from === "visitor" ? "me" : "them");
+        addMsg({ text: m.text || "", from: m.from || "ai" });
         lastTs = Math.max(lastTs, ts);
       }
     }
@@ -1664,6 +1758,8 @@
   async function send() {
     const text = (input.value || "").trim();
     if (!text) return;
+
+    if (!ensureName()) return;
 
     if (!sid) {
       const ok = await initChat();
@@ -1679,12 +1775,11 @@
     }).catch(() => null);
 
     if (!res) {
-      addMsg("Network error sending message.", "them");
+      addMsg({ text: "Network error sending message.", from: "ai" });
       return;
     }
 
     if (res.status === 409) {
-      // closed on server
       localStorage.removeItem(SID_KEY);
       sid = "";
       lastTs = 0;
@@ -1694,11 +1789,13 @@
 
     if (!res.ok) {
       const data = await res.json().catch(() => null);
-      addMsg(data?.error || "Send failed.", "them");
+      addMsg({ text: (data && data.error) ? data.error : "Send failed.", from: "ai" });
       return;
     }
 
-    // Sync immediately after send
+    // Optimistic append of visitor message (so it feels instant)
+    addMsg({ text, from: "visitor" });
+
     await pollOnce();
   }
 
@@ -1706,6 +1803,7 @@
     stopPolling();
     pollTimer = setInterval(pollOnce, POLL_MS);
   }
+
   function stopPolling() {
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = null;
@@ -1714,13 +1812,14 @@
   function showPanel() {
     panel.style.display = "block";
     input.focus();
-    setSystem("Connecting…");
+    addSystem("Connecting…");
     (async () => {
       if (!sid) await initChat();
       else await pollOnce();
       startPolling();
     })();
   }
+
   function hidePanel() {
     panel.style.display = "none";
     stopPolling();
@@ -1730,14 +1829,35 @@
     if (panel.style.display === "block") hidePanel();
     else showPanel();
   });
-  closeBtn.addEventListener("click", hidePanel);
 
+  closeBtn.addEventListener("click", hidePanel);
   sendBtn.addEventListener("click", send);
+
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") send();
   });
+
+  // Inject minimal CSS for avatar rows (won't conflict with your theme)
+  const style = document.createElement("style");
+  style.textContent = `
+    .tmeMsgRow{display:flex;gap:10px;align-items:flex-end;margin:10px 0}
+    .tmeMsgRow.me{justify-content:flex-end}
+    .tmeAvatar{
+      width:30px;height:30px;border-radius:50%;
+      background-size:cover;background-position:center;
+      border:1px solid rgba(109,251,255,.25);
+      box-shadow:0 0 12px rgba(61,165,255,.25);
+      flex:0 0 auto;
+    }
+    .tmeBubbleWrap{max-width:78%}
+    .tmeMsgName{font-size:11px;opacity:.75;margin:0 8px 4px}
+    .tmeMsg.me{margin-left:auto}
+    .tmeMsg.them{margin-right:auto}
+  `;
+  document.head.appendChild(style);
 })();
 </script>
+
 
 
 </body>
