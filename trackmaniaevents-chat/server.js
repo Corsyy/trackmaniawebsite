@@ -15,12 +15,14 @@ const AUTH_SECRET = process.env.AUTH_SECRET || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 
 const SITE_BASE = process.env.SITE_BASE || "https://trackmaniaevents.com";
-const SITEMAP_URL = process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/,"")}/sitemap.xml`;
+const SITEMAP_URL =
+  process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/, "")}/sitemap.xml`;
 const AI_MODEL = process.env.AI_MODEL || "gpt-4.1-mini";
 
 if (!ADMIN_PASSWORD) console.warn("[WARN] ADMIN_PASSWORD is not set");
 if (!AUTH_SECRET) console.warn("[WARN] AUTH_SECRET is not set");
-if (!OPENAI_API_KEY) console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-replies disabled)");
+if (!OPENAI_API_KEY)
+  console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-replies disabled)");
 
 // ===========================
 // In-memory store
@@ -49,7 +51,10 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "256kb" }));
 
 // Serve admin UI
-app.use("/admin", express.static(path.join(__dirname, "admin"), { extensions: ["html"] }));
+app.use(
+  "/admin",
+  express.static(path.join(__dirname, "admin"), { extensions: ["html"] })
+);
 
 // ===========================
 // CORS (public widget endpoints only)
@@ -84,22 +89,29 @@ app.use("/api/chat", (req, res, next) => {
 // ===========================
 // Utilities
 // ===========================
-function now() { return Date.now(); }
-function newSid() { return crypto.randomBytes(16).toString("hex"); }
+function now() {
+  return Date.now();
+}
+function newSid() {
+  return crypto.randomBytes(16).toString("hex");
+}
 function safeText(input) {
   const t = String(input ?? "").trim();
   return t.length > 2000 ? t.slice(0, 2000) : t;
 }
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
 // ===========================
 // Cookie helpers (NO cookie-parser)
 // ===========================
 function getCookie(req, name) {
   const header = req.headers.cookie || "";
-  const parts = header.split(";").map(p => p.trim());
+  const parts = header.split(";").map((p) => p.trim());
   for (const p of parts) {
-    if (p.startsWith(name + "=")) return decodeURIComponent(p.slice(name.length + 1));
+    if (p.startsWith(name + "="))
+      return decodeURIComponent(p.slice(name.length + 1));
   }
   return null;
 }
@@ -110,7 +122,10 @@ function getCookie(req, name) {
 const ADMIN_COOKIE_NAME = "tme_admin";
 
 function signToken(payload) {
-  const sig = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
+  const sig = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
   return `${payload}.${sig}`;
 }
 
@@ -120,9 +135,13 @@ function verifyToken(token) {
   if (i < 0) return null;
   const payload = token.slice(0, i);
   const sig = token.slice(i + 1);
-  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
+  const expected = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
   try {
-    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected)))
+      return null;
   } catch {
     return null;
   }
@@ -130,11 +149,13 @@ function verifyToken(token) {
 }
 
 function requireAdmin(req, res, next) {
-  if (!AUTH_SECRET) return res.status(500).json({ ok:false, error:"AUTH_SECRET not configured" });
+  if (!AUTH_SECRET)
+    return res.status(500).json({ ok: false, error: "AUTH_SECRET not configured" });
+
   const token = getCookie(req, ADMIN_COOKIE_NAME);
   const payload = verifyToken(token);
   if (!payload || !payload.startsWith("v1:")) {
-    return res.status(401).json({ ok:false, error:"Unauthorized" });
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
   }
   next();
 }
@@ -166,16 +187,15 @@ function stripHtml(html) {
 
 function extractTitle(html) {
   const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  return m ? m[1].replace(/\s+/g," ").trim().slice(0,120) : "";
+  return m ? m[1].replace(/\s+/g, " ").trim().slice(0, 120) : "";
 }
 
 function chunkText(text) {
   const out = [];
   let i = 0;
   while (i < text.length) {
-    const slice = text.slice(i, i + KB_CHUNK_SIZE);
-    out.push(slice);
-    i += (KB_CHUNK_SIZE - KB_CHUNK_OVERLAP);
+    out.push(text.slice(i, i + KB_CHUNK_SIZE));
+    i += KB_CHUNK_SIZE - KB_CHUNK_OVERLAP;
   }
   return out;
 }
@@ -193,18 +213,17 @@ function parseSitemapLocs(xml) {
   while ((m = re.exec(xml))) {
     try {
       const u = new URL(m[1]);
-      // Only crawl SITE_BASE host
       const base = new URL(SITE_BASE);
       if (u.host === base.host) locs.push(u.toString());
     } catch {}
   }
-  // de-dupe
   return [...new Set(locs)];
 }
 
 async function refreshKnowledge() {
   kbStatus.lastError = "";
   const started = now();
+
   const xml = await fetchText(SITEMAP_URL);
   const urls = parseSitemapLocs(xml).slice(0, KB_MAX_PAGES);
 
@@ -217,23 +236,21 @@ async function refreshKnowledge() {
       const title = extractTitle(html);
       const text = stripHtml(html);
 
-      // Skip pages that are basically empty
       if (text.length < 200) continue;
 
       const chunks = chunkText(text);
       for (let idx = 0; idx < chunks.length; idx++) {
         newChunks.push({
-          id: `${crypto.createHash("sha1").update(url + ":" + idx).digest("hex")}`,
+          id: crypto.createHash("sha1").update(url + ":" + idx).digest("hex"),
           url,
           title,
           text: chunks[idx],
         });
       }
+
       pageCount++;
-      // small politeness delay
       await sleep(60);
     } catch (e) {
-      // keep going; record last error
       kbStatus.lastError = String(e?.message || e);
     }
   }
@@ -248,12 +265,12 @@ async function refreshKnowledge() {
 }
 
 function tokenize(s) {
-  return String(s||"")
+  return String(s || "")
     .toLowerCase()
-    .replace(/https?:\/\/\S+/g," ")
-    .replace(/[^a-z0-9\s]/g," ")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter(w => w.length >= 3)
+    .filter((w) => w.length >= 3)
     .slice(0, 30);
 }
 
@@ -261,8 +278,8 @@ function searchKB(query, k = 6) {
   if (!kbChunks.length) return [];
   const q = tokenize(query);
   if (!q.length) return [];
-  const scores = [];
 
+  const scores = [];
   for (const c of kbChunks) {
     let score = 0;
     const hay = (c.title + " " + c.text).toLowerCase();
@@ -273,8 +290,8 @@ function searchKB(query, k = 6) {
     if (score > 0) scores.push({ c, score });
   }
 
-  scores.sort((a,b)=>b.score-a.score);
-  return scores.slice(0, k).map(x => x.c);
+  scores.sort((a, b) => b.score - a.score);
+  return scores.slice(0, k).map((x) => x.c);
 }
 
 // ===========================
@@ -283,37 +300,53 @@ function searchKB(query, k = 6) {
 const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
 
 function shouldEscalateHeuristics(text) {
-  const t = String(text||"").toLowerCase();
+  const t = String(text || "").toLowerCase();
   if (t.includes("human") || t.includes("operator") || t.includes("admin") || t.includes("real person")) return true;
   if (t.includes("payment") || t.includes("billing") || t.includes("credit card")) return true;
   if (t.includes("password") || t.includes("token") || t.includes("api key")) return true;
   return false;
 }
 
+function isGreeting(text) {
+  const t = String(text || "").toLowerCase().trim();
+  return /^(hi|hello|hey|yo|sup|good morning|good afternoon|good evening)\b/.test(t);
+}
+
 async function callOpenAI({ question, contextChunks, convo }) {
-  // If no key, behave as "unsure"
   if (!OPENAI_API_KEY) {
     return { reply: "", escalate: true, confidence: 0.0, reason: "no_api_key" };
   }
 
-  const context = contextChunks.map((c, i) => {
-    const title = c.title ? `Title: ${c.title}\n` : "";
-    return `[#${i+1}] ${title}URL: ${c.url}\n${c.text}`;
-  }).join("\n\n");
+  const context = (contextChunks || [])
+    .map((c, i) => {
+      const title = c.title ? `Title: ${c.title}\n` : "";
+      return `[#${i + 1}] ${title}URL: ${c.url}\n${c.text}`;
+    })
+    .join("\n\n");
 
   const recent = convo.messages
     .slice(-12)
-    .map(m => `${m.from.toUpperCase()}: ${m.text}`)
+    .map((m) => `${m.from.toUpperCase()}: ${m.text}`)
     .join("\n");
 
   const system = `
-You are the Trackmania Events site assistant for trackmaniaevents.com.
-You must answer using ONLY the provided CONTEXT snippets. If the answer is not clearly in context, you must escalate.
-Return STRICT JSON with keys: reply (string), escalate (boolean), confidence (0-1 number).
-If escalating, reply should be either:
+You are the Trackmania Events website assistant for trackmaniaevents.com.
+
+Use CONTEXT snippets when available. If CONTEXT is empty or not relevant:
+- You may answer with a brief generic description of Trackmania Events and ask a clarifying question.
+- If the user requests a human/operator, you must escalate.
+- If the user asks for sensitive info (passwords/tokens/api keys) you must escalate.
+
+Return STRICT JSON with keys:
+- reply (string)
+- escalate (boolean)
+- confidence (number 0..1)
+
+If escalating, reply MUST be exactly one of:
 - "Transferring you to an operator right now."
 - "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later."
 Pick based on the operatorsOnline flag provided.
+
 Keep replies concise and helpful. If you include links, only use URLs from CONTEXT.
 `.trim();
 
@@ -342,33 +375,35 @@ ${question}
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_API_KEY}`,
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify(body),
   });
 
   if (!r.ok) {
-    const txt = await r.text().catch(()=> "");
-    return { reply: "", escalate: true, confidence: 0.0, reason: `openai_${r.status}:${txt.slice(0,200)}` };
+    const txt = await r.text().catch(() => "");
+    return {
+      reply: "",
+      escalate: true,
+      confidence: 0.0,
+      reason: `openai_${r.status}:${txt.slice(0, 200)}`,
+    };
   }
 
   const data = await r.json();
 
-  // Responses API returns output in different shapes; safest: pull all text parts.
   let text = "";
   try {
-    const parts = data.output?.flatMap(o => o.content || []) || [];
-    text = parts.map(p => p.text || "").join("").trim();
+    const parts = data.output?.flatMap((o) => o.content || []) || [];
+    text = parts.map((p) => p.text || "").join("").trim();
   } catch {}
 
-  // Fallback: if nothing found
   if (!text) return { reply: "", escalate: true, confidence: 0.0, reason: "empty_response" };
 
-  // Parse JSON response
   try {
     const jsonStart = text.indexOf("{");
     const jsonEnd = text.lastIndexOf("}");
-    const raw = (jsonStart >= 0 && jsonEnd > jsonStart) ? text.slice(jsonStart, jsonEnd + 1) : text;
+    const raw = jsonStart >= 0 && jsonEnd > jsonStart ? text.slice(jsonStart, jsonEnd + 1) : text;
     const parsed = JSON.parse(raw);
 
     const reply = String(parsed.reply ?? "").trim();
@@ -377,7 +412,6 @@ ${question}
 
     return { reply, escalate, confidence };
   } catch {
-    // If the model fails format, escalate.
     return { reply: "", escalate: true, confidence: 0.0, reason: "bad_json" };
   }
 }
@@ -459,7 +493,7 @@ app.get("/api/chat/poll", (req, res) => {
     return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
   }
 
-  const msgs = since > 0 ? convo.messages.filter(m => m.ts > since) : convo.messages;
+  const msgs = since > 0 ? convo.messages.filter((m) => m.ts > since) : convo.messages;
 
   res.json({
     ok: true,
@@ -506,7 +540,7 @@ app.post("/api/chat/send", (req, res) => {
 
   (async () => {
     try {
-      // quick heuristic escalation (human request, sensitive topics)
+      // Human request / sensitive topics => escalate
       if (shouldEscalateHeuristics(text)) {
         const msg = operatorsOnline
           ? "Transferring you to an operator right now."
@@ -516,21 +550,19 @@ app.post("/api/chat/send", (req, res) => {
         return;
       }
 
-      const hits = searchKB(text, 6);
-
-      // If we don't have KB loaded or no matches, escalate
-      if (!kbChunks.length || hits.length === 0) {
-        const msg = operatorsOnline
-          ? "Transferring you to an operator right now."
-          : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
-        pushAI(convo, msg);
-        escalate(convo);
+      // Greetings should never escalate
+      if (isGreeting(text)) {
+        pushAI(convo, "Hey! How can I help you with Trackmania Events today?");
         return;
       }
 
+      const hits = searchKB(text, 6);
+
+      // IMPORTANT CHANGE:
+      // Even if hits is empty, still attempt AI (it can answer generic questions),
+      // and escalate only if the model is unsure.
       const result = await callOpenAI({ question: text, contextChunks: hits, convo });
 
-      // decide escalation based on model output / confidence
       const mustEscalate = result.escalate || result.confidence < 0.55;
 
       if (mustEscalate) {
@@ -542,11 +574,9 @@ app.post("/api/chat/send", (req, res) => {
         return;
       }
 
-      // good answer
       if (result.reply) {
         pushAI(convo, result.reply);
       } else {
-        // if empty, escalate
         const msg = operatorsOnline
           ? "Transferring you to an operator right now."
           : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
@@ -554,7 +584,6 @@ app.post("/api/chat/send", (req, res) => {
         escalate(convo);
       }
     } catch (e) {
-      // on any failure, escalate
       const msg = operatorsOnline
         ? "Transferring you to an operator right now."
         : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
@@ -582,7 +611,9 @@ app.post("/api/admin/login", (req, res) => {
 
   res.setHeader(
     "Set-Cookie",
-    `${ADMIN_COOKIE_NAME}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 7}`
+    `${ADMIN_COOKIE_NAME}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${
+      60 * 60 * 24 * 7
+    }`
   );
 
   res.json({ ok: true });
@@ -639,7 +670,6 @@ app.post("/api/admin/send", requireAdmin, (req, res) => {
   convo.messages.push({ from: "admin", text, ts });
   convo.updatedAt = ts;
 
-  // If admin replies, keep assignedTo admin
   convo.assignedTo = "admin";
   convo.needsAdmin = false;
 
@@ -697,7 +727,18 @@ app.get("/", (req, res) => {
   res.type("text").send("Trackmania Events chat service is running.");
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`Chat service listening on port ${PORT}`);
   console.log(`SITEMAP_URL=${SITEMAP_URL}`);
 });
+
+// Auto-refresh KB on startup (best-effort)
+(async () => {
+  try {
+    await refreshKnowledge();
+    console.log("[KB] initial refresh complete", kbStatus);
+  } catch (e) {
+    console.warn("[KB] initial refresh failed", e?.message || e);
+  }
+})();
