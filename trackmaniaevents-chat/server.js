@@ -1,7 +1,7 @@
-// server.js (ESM)
 import express from "express";
 import crypto from "crypto";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,29 +15,18 @@ const AUTH_SECRET = process.env.AUTH_SECRET || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 
 const SITE_BASE = process.env.SITE_BASE || "https://trackmaniaevents.com";
-const SITEMAP_URL = process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/,"")}/sitemap.xml`;
+const SITEMAP_URL = process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/, "")}/sitemap.xml`;
 const AI_MODEL = process.env.AI_MODEL || "gpt-4.1-mini";
 
 const OPERATOR_NAME = process.env.OPERATOR_NAME || "Trackmania Events Support";
-const OPERATOR_AVATAR_URL =
-  process.env.OPERATOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/,"")}/logo.png`;
-
-const VISITOR_AVATAR_URL =
-  process.env.VISITOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/,"")}/logo.png`;
-
-if (!ADMIN_PASSWORD) console.warn("[WARN] ADMIN_PASSWORD is not set");
-if (!AUTH_SECRET) console.warn("[WARN] AUTH_SECRET is not set");
-if (!OPENAI_API_KEY) console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-replies disabled)");
+const OPERATOR_AVATAR_URL = process.env.OPERATOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/, "")}/logo.png`;
+const VISITOR_AVATAR_URL = process.env.VISITOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/, "")}/logo.png`;
 
 app.disable("x-powered-by");
 app.use(express.json({ limit: "256kb" }));
 
-// Serve admin UI
 app.use("/admin", express.static(path.join(__dirname, "admin"), { extensions: ["html"] }));
 
-// ===========================
-// CORS for public site widget
-// ===========================
 const ALLOWED_ORIGINS = new Set([
   "https://trackmaniaevents.com",
   "https://www.trackmaniaevents.com",
@@ -57,7 +46,7 @@ function applyChatCors(req, res) {
 
 app.options("/api/chat/*", (req, res) => {
   applyChatCors(req, res);
-  return res.sendStatus(204);
+  res.sendStatus(204);
 });
 
 app.use("/api/chat", (req, res, next) => {
@@ -65,45 +54,41 @@ app.use("/api/chat", (req, res, next) => {
   next();
 });
 
-// ===========================
-// In-memory store
-// ===========================
-const conversations = new Map();
-
-// Admin presence (online if heartbeat within window)
-const ADMIN_ONLINE_WINDOW_MS = 90_000; // 90 seconds
-let lastAdminPingAt = 0;
-
-function isAdminOnline() {
-  return (Date.now() - lastAdminPingAt) <= ADMIN_ONLINE_WINDOW_MS;
+function now() {
+  return Date.now();
 }
 
-let operatorStatus = "offline"; // "online" | "busy" | "offline"
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
+function newSid() {
+  return crypto.randomBytes(16).toString("hex");
+}
 
-// ===========================
-// Helpers
-// ===========================
-function now() { return Date.now(); }
-function newSid() { return crypto.randomBytes(16).toString("hex"); }
-function newMsgId() { return `${Date.now()}_${crypto.randomBytes(6).toString("hex")}`; }
+function newMsgId() {
+  return `${Date.now()}_${crypto.randomBytes(6).toString("hex")}`;
+}
 
 function safeText(input) {
   const t = String(input ?? "").trim();
   return t.length > 2000 ? t.slice(0, 2000) : t;
 }
+
 function safeName(input) {
-  const t = String(input ?? "").trim().replace(/\s+/g, " ");
-  const clipped = t.slice(0, 32);
-  return clipped || "Visitor";
+  const t = String(input ?? "").trim().replace(/\s+/g, " ").slice(0, 32);
+  return t || "Visitor";
 }
+
 function safeUrl(input) {
   const t = String(input ?? "").trim();
   if (!t) return "";
-  try { return new URL(t).toString(); } catch { return ""; }
+  try {
+    return new URL(t).toString();
+  } catch {
+    return "";
+  }
 }
-
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 function nextTs(convo) {
   const t = now();
@@ -111,16 +96,52 @@ function nextTs(convo) {
   return t <= prev ? prev + 1 : t;
 }
 
+const conversations = new Map();
+
+function pushMsg(convo, m) {
+  convo.messages.push(m);
+  convo.updatedAt = m.ts;
+}
+
+function pushAI(convo, text) {
+  const ts = nextTs(convo);
+  pushMsg(convo, { id: newMsgId(), from: "ai", text, ts });
+}
+
+function pushSystem(convo, text) {
+  const ts = nextTs(convo);
+  pushMsg(convo, { id: newMsgId(), from: "system", text, ts });
+}
+
+function pushUI(convo, ui) {
+  const ts = nextTs(convo);
+  pushMsg(convo, { id: newMsgId(), from: "system", text: "", ts, kind: "ui", ui });
+}
+
+function participantsPayload(convo) {
+  return {
+    visitor: {
+      name: convo.visitorName || "Visitor",
+      avatarUrl: convo.visitorAvatarUrl || VISITOR_AVATAR_URL,
+      email: convo.visitorEmail || "",
+    },
+    operator: {
+      name: OPERATOR_NAME,
+      avatarUrl: OPERATOR_AVATAR_URL,
+    },
+  };
+}
+
+const ADMIN_COOKIE_NAME = "tme_admin";
+
 function getCookie(req, name) {
   const header = req.headers.cookie || "";
-  const parts = header.split(";").map(p => p.trim());
+  const parts = header.split(";").map((p) => p.trim());
   for (const p of parts) {
     if (p.startsWith(name + "=")) return decodeURIComponent(p.slice(name.length + 1));
   }
   return null;
 }
-
-const ADMIN_COOKIE_NAME = "tme_admin";
 
 function signToken(payload) {
   const sig = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
@@ -143,53 +164,32 @@ function verifyToken(token) {
 }
 
 function requireAdmin(req, res, next) {
-  if (!AUTH_SECRET) return res.status(500).json({ ok:false, error:"AUTH_SECRET not configured" });
+  if (!AUTH_SECRET) return res.status(500).json({ ok: false, error: "AUTH_SECRET not configured" });
   const token = getCookie(req, ADMIN_COOKIE_NAME);
   const payload = verifyToken(token);
-  if (!payload || !payload.startsWith("v1:")) {
-    return res.status(401).json({ ok:false, error:"Unauthorized" });
-  }
+  if (!payload || !payload.startsWith("v1:")) return res.status(401).json({ ok: false, error: "Unauthorized" });
   next();
 }
 
-function participantsPayload(convo){
-  return {
-    visitor: {
-      name: convo.visitorName || "Visitor",
-      avatarUrl: convo.visitorAvatarUrl || VISITOR_AVATAR_URL,
-      email: convo.visitorEmail || "",
-    },
-    operator: {
-      name: OPERATOR_NAME,
-      avatarUrl: OPERATOR_AVATAR_URL,
-    }
-  };
+const OP_STATUS_FILE = path.join(__dirname, "operator_status.json");
+
+function loadOperatorStatus() {
+  try {
+    const raw = fs.readFileSync(OP_STATUS_FILE, "utf8");
+    const data = JSON.parse(raw);
+    const s = String(data?.status || "").toLowerCase();
+    if (s === "online" || s === "busy" || s === "offline") return s;
+  } catch {}
+  return "offline";
 }
 
-function pushMsg(convo, m){
-  convo.messages.push(m);
-  convo.updatedAt = m.ts;
+function saveOperatorStatus(status) {
+  try {
+    fs.writeFileSync(OP_STATUS_FILE, JSON.stringify({ status, updatedAt: now() }, null, 2));
+  } catch {}
 }
 
-function pushAI(convo, text){
-  const ts = nextTs(convo);
-  pushMsg(convo, { id: newMsgId(), from: "ai", text, ts });
-}
-
-function pushSystem(convo, text){
-  const ts = nextTs(convo);
-  pushMsg(convo, { id: newMsgId(), from: "system", text, ts });
-}
-
-function pushUI(convo, ui){
-  const ts = nextTs(convo);
-  pushMsg(convo, { id: newMsgId(), from: "system", text: "", ts, kind: "ui", ui });
-}
-
-function escalate(convo){
-  convo.assignedTo = "admin";
-  convo.needsAdmin = true;
-}
+let operatorStatus = loadOperatorStatus();
 
 function agentsAvailable() {
   return operatorStatus === "online";
@@ -201,38 +201,31 @@ function operatorAutoMessage() {
   return "There are no agents online at the moment. Please enter your email and we’ll follow up as soon as possible.";
 }
 
-// ===========================
-// AI heuristics (your plan)
-// ===========================
 const ESCALATE_CONFIDENCE_THRESHOLD = 0.40;
 
-function isGreeting(text){
+function isGreeting(text) {
   const t = String(text || "").toLowerCase().trim();
   return /^(hi|hello|hey|yo|sup|good (morning|afternoon|evening))[\s!.]*$/.test(t);
 }
 
-function greetingReply(){
+function greetingReply() {
   return "Hi. What can I help with—events schedule, TOTD, Kacky, world records, or the chat widget?";
 }
 
-function requestsHuman(text){
+function requestsHuman(text) {
   const t = String(text || "").toLowerCase();
-  return /(operator|human|agent|staff|support|admin|moderator|mod|talk to a person)/.test(t);
+  return /(operator|human|agent|staff|support|admin|moderator|mod|talk to a person|real person)/.test(t);
 }
 
-function shouldEscalateHeuristics(text){
-  // Keep this conservative; only obvious cases.
+function shouldEscalateHeuristics(text) {
   const t = String(text || "").toLowerCase();
-  return /(payment|billing|charge|refund|legal|dmca|harass|abuse|ban appeal)/.test(t);
+  return /(billing|refund|charge|payment|legal|dmca|harass|abuse)/.test(t);
 }
 
-function buildClarifyingQuestion(){
-  return "I can help—what page are you on and what are you trying to do (events, TOTD, Kacky, world records, or chat)?";
+function buildClarifyingQuestion() {
+  return "I can help—what page are you on and what are you trying to do (events, TOTD, Kacky, world records, or chat widget)?";
 }
 
-// ===========================
-// Knowledge base (kept from your existing design)
-// ===========================
 let kbChunks = [];
 let kbStatus = { lastRefreshAt: 0, pageCount: 0, chunkCount: 0, lastError: "" };
 
@@ -241,7 +234,7 @@ const KB_CHUNK_SIZE = 1000;
 const KB_CHUNK_OVERLAP = 180;
 
 function stripHtml(html) {
-  return html
+  return String(html || "")
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
@@ -253,8 +246,8 @@ function stripHtml(html) {
 }
 
 function extractTitle(html) {
-  const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  return m ? m[1].replace(/\s+/g," ").trim().slice(0,120) : "";
+  const m = String(html || "").match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return m ? m[1].replace(/\s+/g, " ").trim().slice(0, 120) : "";
 }
 
 function chunkText(text) {
@@ -262,7 +255,7 @@ function chunkText(text) {
   let i = 0;
   while (i < text.length) {
     out.push(text.slice(i, i + KB_CHUNK_SIZE));
-    i += (KB_CHUNK_SIZE - KB_CHUNK_OVERLAP);
+    i += KB_CHUNK_SIZE - KB_CHUNK_OVERLAP;
   }
   return out;
 }
@@ -277,7 +270,7 @@ function parseSitemapLocs(xml) {
   const locs = [];
   const re = /<loc>\s*([^<\s]+)\s*<\/loc>/gi;
   let m;
-  while ((m = re.exec(xml))) {
+  while ((m = re.exec(String(xml || "")))) {
     try {
       const u = new URL(m[1]);
       const base = new URL(SITE_BASE);
@@ -288,8 +281,8 @@ function parseSitemapLocs(xml) {
 }
 
 async function refreshKnowledge() {
-  kbStatus.lastError = "";
   const started = now();
+  kbStatus.lastError = "";
   const xml = await fetchText(SITEMAP_URL);
   const urls = parseSitemapLocs(xml).slice(0, KB_MAX_PAGES);
 
@@ -301,7 +294,6 @@ async function refreshKnowledge() {
       const html = await fetchText(url);
       const title = extractTitle(html);
       const text = stripHtml(html);
-
       if (text.length < 200) continue;
 
       const chunks = chunkText(text);
@@ -330,12 +322,12 @@ async function refreshKnowledge() {
 }
 
 function tokenize(s) {
-  return String(s||"")
+  return String(s || "")
     .toLowerCase()
-    .replace(/https?:\/\/\S+/g," ")
-    .replace(/[^a-z0-9\s]/g," ")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter(w => w.length >= 3)
+    .filter((w) => w.length >= 3)
     .slice(0, 30);
 }
 
@@ -355,48 +347,41 @@ function searchKB(query, k = 6) {
     if (score > 0) scores.push({ c, score });
   }
 
-  scores.sort((a,b)=>b.score-a.score);
-  return scores.slice(0, k).map(x => x.c);
+  scores.sort((a, b) => b.score - a.score);
+  return scores.slice(0, k).map((x) => x.c);
 }
 
-// Minimal OpenAI call stub (kept simple; you can paste your existing one here)
 async function callOpenAI({ question, contextChunks }) {
-  // If no key, behave like “no confidence”: ask clarifying question.
   if (!OPENAI_API_KEY) return { reply: buildClarifyingQuestion(), confidence: 0.0, escalate: false };
 
-  const context = contextChunks.map(c => `Title: ${c.title}\nURL: ${c.url}\n${c.text}`).join("\n\n---\n\n");
+  const context = contextChunks
+    .map((c) => `Title: ${c.title}\nURL: ${c.url}\n${c.text}`)
+    .join("\n\n---\n\n");
 
   const payload = {
     model: AI_MODEL,
     messages: [
       { role: "system", content: "You are the Trackmania Events website assistant. Be concise, accurate, and ask a clarifying question if unsure." },
-      { role: "user", content: `Question: ${question}\n\nContext:\n${context}` }
+      { role: "user", content: `Question: ${question}\n\nContext:\n${context}` },
     ],
     temperature: 0.2,
   };
 
   const r = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${OPENAI_API_KEY}` },
     body: JSON.stringify(payload),
   });
 
-  if (!r.ok) {
-    return { reply: buildClarifyingQuestion(), confidence: 0.0, escalate: false };
-  }
+  if (!r.ok) return { reply: buildClarifyingQuestion(), confidence: 0.0, escalate: false };
 
   const data = await r.json().catch(() => null);
   const reply = data?.choices?.[0]?.message?.content?.trim() || "";
-  // You can compute confidence better later; keep stable for now.
   return { reply, confidence: 0.7, escalate: false };
 }
 
-// ===========================
-// Chat API
-// ===========================
+const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
+
 app.post("/api/chat/init", (req, res) => {
   const sid = newSid();
   const visitorName = safeName(req.body?.visitorName);
@@ -405,7 +390,7 @@ app.post("/api/chat/init", (req, res) => {
   const convo = {
     sid,
     status: "open",
-    assignedTo: "ai",       // IMPORTANT: default to AI so it responds
+    assignedTo: "ai",
     needsAdmin: false,
     visitorName,
     visitorEmail: "",
@@ -415,9 +400,7 @@ app.post("/api/chat/init", (req, res) => {
     messages: [],
   };
 
-  // welcome
   pushAI(convo, "Connected. Ask anything about Trackmania Events.");
-
   conversations.set(sid, convo);
 
   res.json({
@@ -426,18 +409,16 @@ app.post("/api/chat/init", (req, res) => {
     status: convo.status,
     serverTime: convo.updatedAt,
     participants: participantsPayload(convo),
+    operatorStatus,
   });
 });
 
-// Profile endpoint: used by widget to set name/email/avatar cleanly
-const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
-
 app.post("/api/chat/profile", (req, res) => {
   const sid = safeText(req.body?.sid);
-  if (!sid) return res.status(400).json({ ok:false, error:"Missing sid" });
+  if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
 
   const convo = conversations.get(sid);
-  if (!convo) return res.status(404).json({ ok:false, error:"Conversation not found" });
+  if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found" });
 
   const name = req.body?.visitorName != null ? safeName(req.body.visitorName) : null;
   const email = req.body?.visitorEmail != null ? safeText(req.body.visitorEmail) : null;
@@ -461,7 +442,13 @@ app.post("/api/chat/profile", (req, res) => {
     pushSystem(convo, `[Visitor avatar updated]`);
   }
 
-  res.json({ ok:true, sid: convo.sid, status: convo.status, participants: participantsPayload(convo) });
+  res.json({
+    ok: true,
+    sid: convo.sid,
+    status: convo.status,
+    participants: participantsPayload(convo),
+    operatorStatus,
+  });
 });
 
 app.get("/api/chat/poll", (req, res) => {
@@ -471,11 +458,9 @@ app.get("/api/chat/poll", (req, res) => {
   if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
 
   const convo = conversations.get(sid);
-  if (!convo) {
-    return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
-  }
+  if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
 
-  const msgs = since > 0 ? convo.messages.filter(m => Number(m.ts || 0) > since) : convo.messages;
+  const msgs = since > 0 ? convo.messages.filter((m) => Number(m.ts || 0) > since) : convo.messages;
 
   res.json({
     ok: true,
@@ -485,6 +470,7 @@ app.get("/api/chat/poll", (req, res) => {
     needsAdmin: convo.needsAdmin,
     serverTime: now(),
     participants: participantsPayload(convo),
+    operatorStatus,
     messages: msgs,
   });
 });
@@ -499,16 +485,14 @@ app.post("/api/chat/send", (req, res) => {
   const convo = conversations.get(sid);
   if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
 
-  if (convo.status === "closed") {
-    return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
-  }
+  if (convo.status === "closed") return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
 
-  // If escalated and waiting for email, capture it if they typed it
   if (convo.needsAdmin && !convo.visitorEmail) {
     const m = text.match(EMAIL_RE);
     if (m) {
       convo.visitorEmail = m[1];
       pushSystem(convo, `[Visitor email captured: ${convo.visitorEmail}]`);
+      pushAI(convo, "Thanks. An operator will reach out as soon as possible.");
     }
   }
 
@@ -521,24 +505,24 @@ app.post("/api/chat/send", (req, res) => {
     status: convo.status,
     serverTime: ts,
     participants: participantsPayload(convo),
+    operatorStatus,
   });
 
-  // ---- AI auto-reply (fire-and-forget) ----
   if (convo.assignedTo !== "ai" || convo.needsAdmin) return;
 
   (async () => {
     try {
-      // Operator request handling (presence-aware)
       if (requestsHuman(text) || shouldEscalateHeuristics(text)) {
-        if (operatorsOnline && isAdminOnline()) {
+        if (agentsAvailable()) {
           pushAI(convo, "Transferring you to an agent right now.");
-          escalate(convo);
-        } else {
-          pushAI(convo, "There are no agents online at the moment. Please enter your email address and we’ll get back to you as soon as possible.");
           convo.assignedTo = "admin";
           convo.needsAdmin = true;
-          pushUI(convo, { kind: "email_capture" });
+          return;
         }
+        pushAI(convo, operatorAutoMessage());
+        convo.assignedTo = "admin";
+        convo.needsAdmin = true;
+        if (!convo.visitorEmail) pushUI(convo, { kind: "email_capture" });
         return;
       }
 
@@ -554,8 +538,8 @@ app.post("/api/chat/send", (req, res) => {
       }
 
       const result = await callOpenAI({ question: text, contextChunks: hits });
+      const lowConfidence = Boolean(result.escalate) || Number(result.confidence || 0) < ESCALATE_CONFIDENCE_THRESHOLD;
 
-      const lowConfidence = (result.escalate || result.confidence < ESCALATE_CONFIDENCE_THRESHOLD);
       if (lowConfidence) {
         pushAI(convo, buildClarifyingQuestion());
         return;
@@ -563,16 +547,14 @@ app.post("/api/chat/send", (req, res) => {
 
       pushAI(convo, result.reply || buildClarifyingQuestion());
     } catch {
-      pushAI(convo, "Sorry—something hiccupped on my end. What page/feature is this about (events, TOTD, Kacky, world records, or chat widget)?");
+      pushAI(convo, buildClarifyingQuestion());
     }
   })();
 });
 
-// ===========================
-// Admin API
-// ===========================
-function convoSummary(convo){
+function convoSummary(convo) {
   const last = convo.messages.slice(-1)[0];
+  const previewText = last?.text ? String(last.text).slice(0, 120) : (last?.kind === "ui" ? "[UI]" : "");
   return {
     sid: convo.sid,
     status: convo.status,
@@ -581,14 +563,15 @@ function convoSummary(convo){
     visitorName: convo.visitorName || "Visitor",
     visitorEmail: convo.visitorEmail || "",
     updatedAt: convo.updatedAt,
-    preview: last?.text ? String(last.text).slice(0, 120) : (last?.kind === "ui" ? "[UI]" : ""),
+    lastTextPreview: previewText,
+    messageCount: convo.messages.length,
   };
 }
 
-function getConvoOr404(sid, res){
+function getConvoOr404(sid, res) {
   const convo = conversations.get(sid);
   if (!convo) {
-    res.status(404).json({ ok:false, error:"Conversation not found" });
+    res.status(404).json({ ok: false, error: "Conversation not found" });
     return null;
   }
   return convo;
@@ -600,9 +583,7 @@ app.post("/api/admin/login", (req, res) => {
   const password = safeText(req.body?.password);
   if (!password) return res.status(400).json({ ok: false, error: "Missing password" });
 
-  if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ ok: false, error: "Invalid password" });
-  }
+  if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) return res.status(401).json({ ok: false, error: "Invalid password" });
 
   const payload = `v1:${now()}:${crypto.randomBytes(8).toString("hex")}`;
   const token = signToken(payload);
@@ -620,12 +601,6 @@ app.post("/api/admin/logout", requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// Presence heartbeat (admin page calls this every 30s)
-app.post("/api/admin/presence", requireAdmin, (req, res) => {
-  lastAdminPingAt = Date.now();
-  res.json({ ok: true, adminOnline: true, lastAdminPingAt });
-});
-
 app.get("/api/admin/conversations", requireAdmin, (req, res) => {
   const list = [...conversations.values()]
     .sort((a, b) => b.updatedAt - a.updatedAt)
@@ -634,11 +609,10 @@ app.get("/api/admin/conversations", requireAdmin, (req, res) => {
   res.json({
     ok: true,
     conversations: list,
-    operatorStatus, // "online" | "busy" | "offline"
-    kbStatus
+    operatorStatus,
+    kbStatus,
   });
 });
-
 
 app.get("/api/admin/conversation", requireAdmin, (req, res) => {
   const sid = String(req.query.sid || "").trim();
@@ -672,13 +646,10 @@ app.post("/api/admin/send", requireAdmin, (req, res) => {
   const convo = getConvoOr404(sid, res);
   if (!convo) return;
 
-  if (convo.status === "closed") {
-    return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
-  }
+  if (convo.status === "closed") return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
 
   const ts = nextTs(convo);
   pushMsg(convo, { id: newMsgId(), from: "admin", text, ts });
-
   convo.assignedTo = "admin";
   convo.needsAdmin = false;
 
@@ -692,9 +663,7 @@ app.post("/api/admin/close", requireAdmin, (req, res) => {
   const convo = getConvoOr404(sid, res);
   if (!convo) return;
 
-  if (convo.status === "closed") {
-    return res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: now() });
-  }
+  if (convo.status === "closed") return res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: now() });
 
   const ts = nextTs(convo);
   convo.status = "closed";
@@ -703,20 +672,17 @@ app.post("/api/admin/close", requireAdmin, (req, res) => {
   res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: ts });
 });
 
-// Operators toggle (manual)
 app.get("/api/admin/operators", requireAdmin, (req, res) => {
   res.json({ ok: true, operatorStatus });
 });
 
 app.post("/api/admin/operators", requireAdmin, (req, res) => {
   const status = String(req.body?.status || "").toLowerCase();
-  if (!["online", "busy", "offline"].includes(status)) {
-    return res.status(400).json({ ok: false, error: "Invalid status" });
-  }
+  if (!["online", "busy", "offline"].includes(status)) return res.status(400).json({ ok: false, error: "Invalid status" });
   operatorStatus = status;
+  saveOperatorStatus(operatorStatus);
   res.json({ ok: true, operatorStatus });
 });
-
 
 app.get("/api/admin/kb/status", requireAdmin, (req, res) => {
   res.json({ ok: true, kbStatus });
@@ -732,16 +698,19 @@ app.post("/api/admin/kb/refresh", requireAdmin, async (req, res) => {
   }
 });
 
-// Health
 app.get("/", (req, res) => {
   res.type("text").send("Trackmania Events chat service is running.");
 });
 
 app.listen(PORT, () => {
+  if (!ADMIN_PASSWORD) console.warn("[WARN] ADMIN_PASSWORD is not set");
+  if (!AUTH_SECRET) console.warn("[WARN] AUTH_SECRET is not set");
+  if (!OPENAI_API_KEY) console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-replies will use clarifying questions)");
   console.log(`Chat service listening on port ${PORT}`);
   console.log(`SITEMAP_URL=${SITEMAP_URL}`);
   console.log(`OPERATOR_NAME=${OPERATOR_NAME}`);
   console.log(`OPERATOR_AVATAR_URL=${OPERATOR_AVATAR_URL}`);
+  console.log(`operatorStatus=${operatorStatus}`);
 
   (async () => {
     try {
