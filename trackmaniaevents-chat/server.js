@@ -78,8 +78,8 @@ function isAdminOnline() {
   return (Date.now() - lastAdminPingAt) <= ADMIN_ONLINE_WINDOW_MS;
 }
 
-// Optional operator toggle (manual override)
-let operatorsOnline = true;
+let operatorStatus = "offline"; // "online" | "busy" | "offline"
+
 
 // ===========================
 // Helpers
@@ -189,6 +189,16 @@ function pushUI(convo, ui){
 function escalate(convo){
   convo.assignedTo = "admin";
   convo.needsAdmin = true;
+}
+
+function agentsAvailable() {
+  return operatorStatus === "online";
+}
+
+function operatorAutoMessage() {
+  if (operatorStatus === "online") return "Transferring you to an agent right now.";
+  if (operatorStatus === "busy") return "All agents are currently busy. Please enter your email and we’ll follow up as soon as possible.";
+  return "There are no agents online at the moment. Please enter your email and we’ll follow up as soon as possible.";
 }
 
 // ===========================
@@ -617,18 +627,18 @@ app.post("/api/admin/presence", requireAdmin, (req, res) => {
 });
 
 app.get("/api/admin/conversations", requireAdmin, (req, res) => {
-  const list = [...conversations.values()]   // FIXED (was broken in your file) :contentReference[oaicite:4]{index=4}
+  const list = [...conversations.values()]
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .map(convoSummary);
 
   res.json({
     ok: true,
     conversations: list,
-    operatorsOnline,
-    adminOnline: isAdminOnline(),
+    operatorStatus, // "online" | "busy" | "offline"
     kbStatus
   });
 });
+
 
 app.get("/api/admin/conversation", requireAdmin, (req, res) => {
   const sid = String(req.query.sid || "").trim();
@@ -695,13 +705,18 @@ app.post("/api/admin/close", requireAdmin, (req, res) => {
 
 // Operators toggle (manual)
 app.get("/api/admin/operators", requireAdmin, (req, res) => {
-  res.json({ ok: true, operatorsOnline });
+  res.json({ ok: true, operatorStatus });
 });
 
 app.post("/api/admin/operators", requireAdmin, (req, res) => {
-  operatorsOnline = Boolean(req.body?.online);
-  res.json({ ok: true, operatorsOnline });
+  const status = String(req.body?.status || "").toLowerCase();
+  if (!["online", "busy", "offline"].includes(status)) {
+    return res.status(400).json({ ok: false, error: "Invalid status" });
+  }
+  operatorStatus = status;
+  res.json({ ok: true, operatorStatus });
 });
+
 
 app.get("/api/admin/kb/status", requireAdmin, (req, res) => {
   res.json({ ok: true, kbStatus });
