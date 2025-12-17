@@ -713,7 +713,25 @@
   #tmeChatSend:hover{filter:brightness(1.08)}
 .tmeBubbleWrap{max-width: calc(100% - 44px);}
 .tmeMsg{white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;}
+#tmeChatLog .tmeMsgRow { display:flex; gap:10px; align-items:flex-end; margin:10px 0; }
+#tmeChatLog .tmeMsgRow.me { justify-content:flex-end; }
 
+#tmeChatLog .tmeBubbleWrap { max-width: calc(100% - 44px); min-width: 0; }
+
+#tmeChatLog .tmeMsg {
+  display: inline-block;
+  max-width: 100%;
+  width: fit-content;
+  padding: 10px 12px;              /* keep your look */
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+/* Optional: prevent “micro bubbles” on short messages */
+#tmeChatLog .tmeMsg.me, 
+#tmeChatLog .tmeMsg.them { min-width: 48px; }
   </style>
 </head>
 
