@@ -727,6 +727,30 @@
 
   #tmeChatLog .tmeMsg.me,
   #tmeChatLog .tmeMsg.them { min-width: 48px; }
+  #tmeChatLog .tmeMsgName{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+
+#tmeChatLog .tmeBadge{
+  display:inline-flex !important;
+  align-items:center !important;
+  font-size:10px !important;
+  font-weight:900 !important;
+  letter-spacing:.2px !important;
+  padding:2px 6px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(109,251,255,.22) !important;
+  background:rgba(16,26,48,.45) !important;
+  opacity:.95 !important;
+  line-height:1.2 !important;
+}
+
+#tmeChatLog .tmeBadge-ai{
+  border-color:rgba(109,251,255,.28) !important;
+  background:linear-gradient(135deg, rgba(58,160,255,.18), rgba(109,251,255,.12)) !important;
+}
 </style>
 </head>
 
@@ -1644,59 +1668,65 @@
   }
 
   function addMsg({ text, from }) {
-    const who = (from === "visitor") ? "me" : "them";
-    const isAI = (from === "ai");
+  const sender = String(from || "ai").toLowerCase();
+  const who = (sender === "visitor") ? "me" : "them";
+  const isAI = (sender === "ai");
 
-    const name = (who === "me")
-      ? (participants.visitor.name || "You")
-      : (participants.operator.name || "Support");
+  const displayName =
+    (who === "me")
+      ? (participants.visitor?.name || "You")
+      : (participants.operator?.name || "Support");
 
-    const avatarUrl = (who === "me")
-      ? participants.visitor.avatarUrl
-      : participants.operator.avatarUrl;
+  const avatarUrl =
+    (who === "me")
+      ? (participants.visitor?.avatarUrl || DEFAULT_VISITOR_AVATAR)
+      : (participants.operator?.avatarUrl || DEFAULT_OPERATOR_AVATAR);
 
-    const row = document.createElement("div");
-    row.className = "tmeMsgRow " + who;
+  const row = document.createElement("div");
+  row.className = "tmeMsgRow " + who;
 
-    const avatar = document.createElement("div");
-    avatar.className = "tmeAvatar";
-    avatar.style.backgroundImage = `url("${avatarUrl}")`;
+  const avatar = document.createElement("div");
+  avatar.className = "tmeAvatar";
+  avatar.style.backgroundImage = `url("${avatarUrl}")`;
 
-    const bubbleWrap = document.createElement("div");
-    bubbleWrap.className = "tmeBubbleWrap";
+  const bubbleWrap = document.createElement("div");
+  bubbleWrap.className = "tmeBubbleWrap";
 
-    const label = document.createElement("div");
-    label.className = "tmeMsgName";
+  const label = document.createElement("div");
+  label.className = "tmeMsgName";
 
-    const nameSpan = document.createElement("span");
-    nameSpan.textContent = name;
-    label.appendChild(nameSpan);
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "tmeNameText";
+  nameSpan.textContent = displayName;
 
-    if (isAI) {
-      const badge = document.createElement("span");
-      badge.className = "tmeBadge tmeBadge-ai";
-      badge.textContent = "AI";
-      label.appendChild(badge);
-    }
+  label.appendChild(nameSpan);
 
-    const bubble = document.createElement("div");
-    bubble.className = "tmeMsg " + who;
-    bubble.textContent = String(text ?? "");
-
-    bubbleWrap.appendChild(label);
-    bubbleWrap.appendChild(bubble);
-
-    if (who === "me") {
-      row.appendChild(bubbleWrap);
-      row.appendChild(avatar);
-    } else {
-      row.appendChild(avatar);
-      row.appendChild(bubbleWrap);
-    }
-
-    log.appendChild(row);
-    log.scrollTop = log.scrollHeight;
+  if (isAI) {
+    const badge = document.createElement("span");
+    badge.className = "tmeBadge tmeBadge-ai";
+    badge.textContent = "AI";
+    label.appendChild(badge);
   }
+
+  const bubble = document.createElement("div");
+  bubble.className = "tmeMsg " + who;
+  bubble.textContent = String(text ?? "");
+
+  bubbleWrap.appendChild(label);
+  bubbleWrap.appendChild(bubble);
+
+  if (who === "me") {
+    row.appendChild(bubbleWrap);
+    row.appendChild(avatar);
+  } else {
+    row.appendChild(avatar);
+    row.appendChild(bubbleWrap);
+  }
+
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
+
 
   function addSystemLine(text) {
     if (!log.childElementCount) addMsg({ text, from: "ai" });
