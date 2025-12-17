@@ -15,14 +15,26 @@ const AUTH_SECRET = process.env.AUTH_SECRET || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 
 const SITE_BASE = process.env.SITE_BASE || "https://trackmaniaevents.com";
-const SITEMAP_URL =
-  process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/, "")}/sitemap.xml`;
+const SITEMAP_URL = process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/,"")}/sitemap.xml`;
 const AI_MODEL = process.env.AI_MODEL || "gpt-4.1-mini";
+
+/**
+ * New (for chat “pfp/name” UI)
+ * Put your operator image somewhere public (recommended: on trackmaniaevents.com)
+ * Example:
+ *   OPERATOR_AVATAR_URL=https://trackmaniaevents.com/assets/chat-operator.png
+ */
+const OPERATOR_NAME = process.env.OPERATOR_NAME || "Trackmania Events Support";
+const OPERATOR_AVATAR_URL =
+  process.env.OPERATOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/,"")}/logo.png`;
+
+// Optional “default” visitor icon (also a URL)
+const VISITOR_AVATAR_URL =
+  process.env.VISITOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/,"")}/logo.png`;
 
 if (!ADMIN_PASSWORD) console.warn("[WARN] ADMIN_PASSWORD is not set");
 if (!AUTH_SECRET) console.warn("[WARN] AUTH_SECRET is not set");
-if (!OPENAI_API_KEY)
-  console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-replies disabled)");
+if (!OPENAI_API_KEY) console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-replies disabled)");
 
 // ===========================
 // In-memory store
@@ -36,6 +48,10 @@ if (!OPENAI_API_KEY)
  *   assignedTo: "ai"|"admin",
  *   needsAdmin: boolean,
  *   visitorEmail: string|null,
+ *   visitorName: string,
+ *   visitorAvatarUrl: string,
+ *   operatorName: string,
+ *   operatorAvatarUrl: string,
  *   messages: Array<{ from:"visitor"|"admin"|"system"|"ai", text:string, ts:number }>
  * }>
  */
@@ -51,10 +67,7 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "256kb" }));
 
 // Serve admin UI
-app.use(
-  "/admin",
-  express.static(path.join(__dirname, "admin"), { extensions: ["html"] })
-);
+app.use("/admin", express.static(path.join(__dirname, "admin"), { extensions: ["html"] }));
 
 // ===========================
 // CORS (public widget endpoints only)
@@ -89,29 +102,43 @@ app.use("/api/chat", (req, res, next) => {
 // ===========================
 // Utilities
 // ===========================
-function now() {
-  return Date.now();
-}
-function newSid() {
-  return crypto.randomBytes(16).toString("hex");
-}
+function now() { return Date.now(); }
+function newSid() { return crypto.randomBytes(16).toString("hex"); }
+
 function safeText(input) {
   const t = String(input ?? "").trim();
   return t.length > 2000 ? t.slice(0, 2000) : t;
 }
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+
+function safeName(input) {
+  const t = String(input ?? "").trim().replace(/\s+/g, " ");
+  // Keep it short + reasonable for UI
+  const clipped = t.slice(0, 32);
+  // Prevent empty
+  return clipped || "Visitor";
 }
+
+function safeUrl(input) {
+  const t = String(input ?? "").trim();
+  if (!t) return "";
+  try {
+    const u = new URL(t);
+    return u.toString();
+  } catch {
+    return "";
+  }
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 // ===========================
 // Cookie helpers (NO cookie-parser)
 // ===========================
 function getCookie(req, name) {
   const header = req.headers.cookie || "";
-  const parts = header.split(";").map((p) => p.trim());
+  const parts = header.split(";").map(p => p.trim());
   for (const p of parts) {
-    if (p.startsWith(name + "="))
-      return decodeURIComponent(p.slice(name.length + 1));
+    if (p.startsWith(name + "=")) return decodeURIComponent(p.slice(name.length + 1));
   }
   return null;
 }
@@ -122,10 +149,7 @@ function getCookie(req, name) {
 const ADMIN_COOKIE_NAME = "tme_admin";
 
 function signToken(payload) {
-  const sig = crypto
-    .createHmac("sha256", AUTH_SECRET)
-    .update(payload)
-    .digest("hex");
+  const sig = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
   return `${payload}.${sig}`;
 }
 
@@ -135,13 +159,9 @@ function verifyToken(token) {
   if (i < 0) return null;
   const payload = token.slice(0, i);
   const sig = token.slice(i + 1);
-  const expected = crypto
-    .createHmac("sha256", AUTH_SECRET)
-    .update(payload)
-    .digest("hex");
+  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
   try {
-    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected)))
-      return null;
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
   } catch {
     return null;
   }
@@ -149,13 +169,11 @@ function verifyToken(token) {
 }
 
 function requireAdmin(req, res, next) {
-  if (!AUTH_SECRET)
-    return res.status(500).json({ ok: false, error: "AUTH_SECRET not configured" });
-
+  if (!AUTH_SECRET) return res.status(500).json({ ok:false, error:"AUTH_SECRET not configured" });
   const token = getCookie(req, ADMIN_COOKIE_NAME);
   const payload = verifyToken(token);
   if (!payload || !payload.startsWith("v1:")) {
-    return res.status(401).json({ ok: false, error: "Unauthorized" });
+    return res.status(401).json({ ok:false, error:"Unauthorized" });
   }
   next();
 }
@@ -163,9 +181,6 @@ function requireAdmin(req, res, next) {
 // ===========================
 // Knowledge Base (Sitemap ingestion)
 // ===========================
-/**
- * kbChunks: Array<{ id:string, url:string, title:string, text:string }>
- */
 let kbChunks = [];
 let kbStatus = { lastRefreshAt: 0, pageCount: 0, chunkCount: 0, lastError: "" };
 
@@ -187,15 +202,16 @@ function stripHtml(html) {
 
 function extractTitle(html) {
   const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  return m ? m[1].replace(/\s+/g, " ").trim().slice(0, 120) : "";
+  return m ? m[1].replace(/\s+/g," ").trim().slice(0,120) : "";
 }
 
 function chunkText(text) {
   const out = [];
   let i = 0;
   while (i < text.length) {
-    out.push(text.slice(i, i + KB_CHUNK_SIZE));
-    i += KB_CHUNK_SIZE - KB_CHUNK_OVERLAP;
+    const slice = text.slice(i, i + KB_CHUNK_SIZE);
+    out.push(slice);
+    i += (KB_CHUNK_SIZE - KB_CHUNK_OVERLAP);
   }
   return out;
 }
@@ -223,7 +239,6 @@ function parseSitemapLocs(xml) {
 async function refreshKnowledge() {
   kbStatus.lastError = "";
   const started = now();
-
   const xml = await fetchText(SITEMAP_URL);
   const urls = parseSitemapLocs(xml).slice(0, KB_MAX_PAGES);
 
@@ -241,13 +256,12 @@ async function refreshKnowledge() {
       const chunks = chunkText(text);
       for (let idx = 0; idx < chunks.length; idx++) {
         newChunks.push({
-          id: crypto.createHash("sha1").update(url + ":" + idx).digest("hex"),
+          id: `${crypto.createHash("sha1").update(url + ":" + idx).digest("hex")}`,
           url,
           title,
           text: chunks[idx],
         });
       }
-
       pageCount++;
       await sleep(60);
     } catch (e) {
@@ -265,12 +279,12 @@ async function refreshKnowledge() {
 }
 
 function tokenize(s) {
-  return String(s || "")
+  return String(s||"")
     .toLowerCase()
-    .replace(/https?:\/\/\S+/g, " ")
-    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/https?:\/\/\S+/g," ")
+    .replace(/[^a-z0-9\s]/g," ")
     .split(/\s+/)
-    .filter((w) => w.length >= 3)
+    .filter(w => w.length >= 3)
     .slice(0, 30);
 }
 
@@ -278,8 +292,8 @@ function searchKB(query, k = 6) {
   if (!kbChunks.length) return [];
   const q = tokenize(query);
   if (!q.length) return [];
-
   const scores = [];
+
   for (const c of kbChunks) {
     let score = 0;
     const hay = (c.title + " " + c.text).toLowerCase();
@@ -290,8 +304,8 @@ function searchKB(query, k = 6) {
     if (score > 0) scores.push({ c, score });
   }
 
-  scores.sort((a, b) => b.score - a.score);
-  return scores.slice(0, k).map((x) => x.c);
+  scores.sort((a,b)=>b.score-a.score);
+  return scores.slice(0, k).map(x => x.c);
 }
 
 // ===========================
@@ -300,16 +314,11 @@ function searchKB(query, k = 6) {
 const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
 
 function shouldEscalateHeuristics(text) {
-  const t = String(text || "").toLowerCase();
+  const t = String(text||"").toLowerCase();
   if (t.includes("human") || t.includes("operator") || t.includes("admin") || t.includes("real person")) return true;
   if (t.includes("payment") || t.includes("billing") || t.includes("credit card")) return true;
   if (t.includes("password") || t.includes("token") || t.includes("api key")) return true;
   return false;
-}
-
-function isGreeting(text) {
-  const t = String(text || "").toLowerCase().trim();
-  return /^(hi|hello|hey|yo|sup|good morning|good afternoon|good evening)\b/.test(t);
 }
 
 async function callOpenAI({ question, contextChunks, convo }) {
@@ -317,38 +326,26 @@ async function callOpenAI({ question, contextChunks, convo }) {
     return { reply: "", escalate: true, confidence: 0.0, reason: "no_api_key" };
   }
 
-  const context = (contextChunks || [])
-    .map((c, i) => {
-      const title = c.title ? `Title: ${c.title}\n` : "";
-      return `[#${i + 1}] ${title}URL: ${c.url}\n${c.text}`;
-    })
-    .join("\n\n");
+  const context = contextChunks.map((c, i) => {
+    const title = c.title ? `Title: ${c.title}\n` : "";
+    return `[#${i+1}] ${title}URL: ${c.url}\n${c.text}`;
+  }).join("\n\n");
 
   const recent = convo.messages
     .slice(-12)
-    .map((m) => `${m.from.toUpperCase()}: ${m.text}`)
+    .map(m => `${m.from.toUpperCase()}: ${m.text}`)
     .join("\n");
 
   const system = `
-You are the Trackmania Events website assistant for trackmaniaevents.com.
-
-Use CONTEXT snippets when available. If CONTEXT is empty or not relevant:
-- You may answer with a brief generic description of Trackmania Events and ask a clarifying question.
-- If the user requests a human/operator, you must escalate.
-- If the user asks for sensitive info (passwords/tokens/api keys) you must escalate.
-
-Return STRICT JSON with keys:
-- reply (string)
-- escalate (boolean)
-- confidence (number 0..1)
-
-If escalating, reply MUST be exactly one of:
+You are the Trackmania Events site assistant for trackmaniaevents.com.
+You must answer using ONLY the provided CONTEXT snippets. If the answer is not clearly in context, you must escalate.
+Return STRICT JSON with keys: reply (string), escalate (boolean), confidence (0-1 number).
+If escalating, reply should be either:
 - "Transferring you to an operator right now."
 - "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later."
 Pick based on the operatorsOnline flag provided.
-
 Keep replies concise and helpful. If you include links, only use URLs from CONTEXT.
-`.trim();
+  `.trim();
 
   const user = `
 operatorsOnline: ${operatorsOnline ? "true" : "false"}
@@ -361,7 +358,7 @@ ${recent}
 
 QUESTION:
 ${question}
-`.trim();
+  `.trim();
 
   const body = {
     model: AI_MODEL,
@@ -375,27 +372,22 @@ ${question}
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      "Authorization": `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify(body),
   });
 
   if (!r.ok) {
-    const txt = await r.text().catch(() => "");
-    return {
-      reply: "",
-      escalate: true,
-      confidence: 0.0,
-      reason: `openai_${r.status}:${txt.slice(0, 200)}`,
-    };
+    const txt = await r.text().catch(()=> "");
+    return { reply: "", escalate: true, confidence: 0.0, reason: `openai_${r.status}:${txt.slice(0,200)}` };
   }
 
   const data = await r.json();
 
   let text = "";
   try {
-    const parts = data.output?.flatMap((o) => o.content || []) || [];
-    text = parts.map((p) => p.text || "").join("").trim();
+    const parts = data.output?.flatMap(o => o.content || []) || [];
+    text = parts.map(p => p.text || "").join("").trim();
   } catch {}
 
   if (!text) return { reply: "", escalate: true, confidence: 0.0, reason: "empty_response" };
@@ -403,7 +395,7 @@ ${question}
   try {
     const jsonStart = text.indexOf("{");
     const jsonEnd = text.lastIndexOf("}");
-    const raw = jsonStart >= 0 && jsonEnd > jsonStart ? text.slice(jsonStart, jsonEnd + 1) : text;
+    const raw = (jsonStart >= 0 && jsonEnd > jsonStart) ? text.slice(jsonStart, jsonEnd + 1) : text;
     const parsed = JSON.parse(raw);
 
     const reply = String(parsed.reply ?? "").trim();
@@ -433,9 +425,28 @@ function escalate(convo) {
   convo.needsAdmin = true;
 }
 
+function escalationMessage() {
+  return operatorsOnline
+    ? "Transferring you to an operator right now."
+    : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
+}
+
 // ===========================
 // Helpers
 // ===========================
+function participantsPayload(convo) {
+  return {
+    visitor: {
+      name: convo.visitorName || "Visitor",
+      avatarUrl: convo.visitorAvatarUrl || VISITOR_AVATAR_URL,
+    },
+    operator: {
+      name: convo.operatorName || OPERATOR_NAME,
+      avatarUrl: convo.operatorAvatarUrl || OPERATOR_AVATAR_URL,
+    },
+  };
+}
+
 function convoSummary(c) {
   const last = c.messages[c.messages.length - 1];
   return {
@@ -444,6 +455,7 @@ function convoSummary(c) {
     assignedTo: c.assignedTo,
     needsAdmin: c.needsAdmin,
     visitorEmail: c.visitorEmail,
+    visitorName: c.visitorName,
     createdAt: c.createdAt,
     updatedAt: c.updatedAt,
     lastMessageAt: last?.ts ?? c.updatedAt,
@@ -468,6 +480,10 @@ function getConvoOr404(sid, res) {
 app.post("/api/chat/init", (req, res) => {
   const sid = newSid();
   const ts = now();
+
+  const requestedName = safeName(req.body?.visitorName);
+  const requestedVisitorAvatar = safeUrl(req.body?.visitorAvatarUrl) || VISITOR_AVATAR_URL;
+
   const convo = {
     sid,
     status: "open",
@@ -476,10 +492,57 @@ app.post("/api/chat/init", (req, res) => {
     assignedTo: "ai",
     needsAdmin: false,
     visitorEmail: null,
+
+    visitorName: requestedName,
+    visitorAvatarUrl: requestedVisitorAvatar,
+    operatorName: OPERATOR_NAME,
+    operatorAvatarUrl: OPERATOR_AVATAR_URL,
+
     messages: [{ from: "system", text: "Chat started.", ts }],
   };
+
   conversations.set(sid, convo);
-  res.json({ ok: true, sid, status: convo.status });
+
+  res.json({
+    ok: true,
+    sid,
+    status: convo.status,
+    participants: participantsPayload(convo),
+  });
+});
+
+/**
+ * NEW: Update visitor profile (name/email) without resetting chat.
+ * Widget can call this right after init or when user edits their name.
+ */
+app.post("/api/chat/profile", (req, res) => {
+  const sid = safeText(req.body?.sid);
+  if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
+
+  const convo = conversations.get(sid);
+  if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
+
+  if (convo.status === "closed") {
+    return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
+  }
+
+  const name = req.body?.visitorName != null ? safeName(req.body.visitorName) : null;
+  const email = req.body?.visitorEmail != null ? safeText(req.body.visitorEmail) : null;
+
+  if (name) {
+    convo.visitorName = name;
+    pushSystem(convo, `[Visitor set name: ${name}]`);
+  }
+
+  if (email) {
+    const m = String(email).match(EMAIL_RE);
+    if (m) {
+      convo.visitorEmail = m[1];
+      pushSystem(convo, `[Visitor email captured: ${convo.visitorEmail}]`);
+    }
+  }
+
+  res.json({ ok: true, sid: convo.sid, status: convo.status, participants: participantsPayload(convo) });
 });
 
 app.get("/api/chat/poll", (req, res) => {
@@ -493,7 +556,7 @@ app.get("/api/chat/poll", (req, res) => {
     return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
   }
 
-  const msgs = since > 0 ? convo.messages.filter((m) => m.ts > since) : convo.messages;
+  const msgs = since > 0 ? convo.messages.filter(m => m.ts > since) : convo.messages;
 
   res.json({
     ok: true,
@@ -502,6 +565,7 @@ app.get("/api/chat/poll", (req, res) => {
     assignedTo: convo.assignedTo,
     needsAdmin: convo.needsAdmin,
     serverTime: now(),
+    participants: participantsPayload(convo),
     messages: msgs,
   });
 });
@@ -520,7 +584,7 @@ app.post("/api/chat/send", (req, res) => {
     return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
   }
 
-  // capture email only after escalation prompt
+  // If escalated and waiting for email, capture it if present
   if (convo.needsAdmin && !convo.visitorEmail) {
     const m = text.match(EMAIL_RE);
     if (m) {
@@ -533,43 +597,39 @@ app.post("/api/chat/send", (req, res) => {
   convo.messages.push({ from: "visitor", text, ts });
   convo.updatedAt = ts;
 
-  res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: ts });
+  res.json({
+    ok: true,
+    sid: convo.sid,
+    status: convo.status,
+    serverTime: ts,
+    participants: participantsPayload(convo),
+  });
 
   // ---- AI auto-reply (fire-and-forget) ----
   if (convo.assignedTo !== "ai" || convo.needsAdmin) return;
 
   (async () => {
     try {
-      // Human request / sensitive topics => escalate
       if (shouldEscalateHeuristics(text)) {
-        const msg = operatorsOnline
-          ? "Transferring you to an operator right now."
-          : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
-        pushAI(convo, msg);
+        pushAI(convo, escalationMessage());
         escalate(convo);
-        return;
-      }
-
-      // Greetings should never escalate
-      if (isGreeting(text)) {
-        pushAI(convo, "Hey! How can I help you with Trackmania Events today?");
         return;
       }
 
       const hits = searchKB(text, 6);
 
-      // IMPORTANT CHANGE:
-      // Even if hits is empty, still attempt AI (it can answer generic questions),
-      // and escalate only if the model is unsure.
+      if (!kbChunks.length || hits.length === 0) {
+        pushAI(convo, escalationMessage());
+        escalate(convo);
+        return;
+      }
+
       const result = await callOpenAI({ question: text, contextChunks: hits, convo });
 
       const mustEscalate = result.escalate || result.confidence < 0.55;
 
       if (mustEscalate) {
-        const msg = operatorsOnline
-          ? "Transferring you to an operator right now."
-          : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
-        pushAI(convo, msg);
+        pushAI(convo, escalationMessage());
         escalate(convo);
         return;
       }
@@ -577,17 +637,11 @@ app.post("/api/chat/send", (req, res) => {
       if (result.reply) {
         pushAI(convo, result.reply);
       } else {
-        const msg = operatorsOnline
-          ? "Transferring you to an operator right now."
-          : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
-        pushAI(convo, msg);
+        pushAI(convo, escalationMessage());
         escalate(convo);
       }
-    } catch (e) {
-      const msg = operatorsOnline
-        ? "Transferring you to an operator right now."
-        : "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later.";
-      pushAI(convo, msg);
+    } catch {
+      pushAI(convo, escalationMessage());
       escalate(convo);
     }
   })();
@@ -611,9 +665,7 @@ app.post("/api/admin/login", (req, res) => {
 
   res.setHeader(
     "Set-Cookie",
-    `${ADMIN_COOKIE_NAME}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${
-      60 * 60 * 24 * 7
-    }`
+    `${ADMIN_COOKIE_NAME}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 7}`
   );
 
   res.json({ ok: true });
@@ -646,6 +698,8 @@ app.get("/api/admin/conversation", requireAdmin, (req, res) => {
     assignedTo: convo.assignedTo,
     needsAdmin: convo.needsAdmin,
     visitorEmail: convo.visitorEmail,
+    visitorName: convo.visitorName,
+    participants: participantsPayload(convo),
     createdAt: convo.createdAt,
     updatedAt: convo.updatedAt,
     messages: convo.messages,
@@ -670,6 +724,7 @@ app.post("/api/admin/send", requireAdmin, (req, res) => {
   convo.messages.push({ from: "admin", text, ts });
   convo.updatedAt = ts;
 
+  // If admin replies, keep assignedTo admin
   convo.assignedTo = "admin";
   convo.needsAdmin = false;
 
@@ -727,18 +782,18 @@ app.get("/", (req, res) => {
   res.type("text").send("Trackmania Events chat service is running.");
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Chat service listening on port ${PORT}`);
   console.log(`SITEMAP_URL=${SITEMAP_URL}`);
-});
+  console.log(`OPERATOR_NAME=${OPERATOR_NAME}`);
+  console.log(`OPERATOR_AVATAR_URL=${OPERATOR_AVATAR_URL}`);
 
-// Auto-refresh KB on startup (best-effort)
-(async () => {
-  try {
-    await refreshKnowledge();
-    console.log("[KB] initial refresh complete", kbStatus);
-  } catch (e) {
-    console.warn("[KB] initial refresh failed", e?.message || e);
-  }
-})();
+  (async () => {
+    try {
+      await refreshKnowledge();
+      console.log("[KB] initial refresh complete", kbStatus);
+    } catch (e) {
+      console.warn("[KB] initial refresh failed", e?.message || e);
+    }
+  })();
+});
