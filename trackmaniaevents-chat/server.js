@@ -52,7 +52,7 @@ if (!OPENAI_API_KEY) console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-rep
  *   visitorAvatarUrl: string,
  *   operatorName: string,
  *   operatorAvatarUrl: string,
- *   messages: Array<{ from:"visitor"|"admin"|"system"|"ai", text:string, ts:number }>
+ *   messages: Array<{ id:string, from:"visitor"|"admin"|"system"|"ai", text:string, ts:number }>
  * }>
  */
 const conversations = new Map();
@@ -112,9 +112,7 @@ function safeText(input) {
 
 function safeName(input) {
   const t = String(input ?? "").trim().replace(/\s+/g, " ");
-  // Keep it short + reasonable for UI
   const clipped = t.slice(0, 32);
-  // Prevent empty
   return clipped || "Visitor";
 }
 
@@ -130,6 +128,17 @@ function safeUrl(input) {
 }
 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// Monotonic per-conversation timestamp: ensures poll `m.ts > since` can never miss messages.
+function nextTs(convo) {
+  const t = now();
+  const prev = Number(convo?.updatedAt || 0);
+  return t <= prev ? prev + 1 : t;
+}
+
+function newMsgId() {
+  return `${Date.now()}_${crypto.randomBytes(6).toString("hex")}`;
+}
 
 // ===========================
 // Cookie helpers (NO cookie-parser)
@@ -313,12 +322,48 @@ function searchKB(query, k = 6) {
 // ===========================
 const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
 
+const ESCALATE_CONFIDENCE_THRESHOLD = 0.40;
+
+// Existing heuristic escalation triggers (keep)
 function shouldEscalateHeuristics(text) {
   const t = String(text||"").toLowerCase();
   if (t.includes("human") || t.includes("operator") || t.includes("admin") || t.includes("real person")) return true;
   if (t.includes("payment") || t.includes("billing") || t.includes("credit card")) return true;
   if (t.includes("password") || t.includes("token") || t.includes("api key")) return true;
   return false;
+}
+
+function normText(s = "") {
+  return String(s).trim().toLowerCase();
+}
+
+function isGreeting(text = "") {
+  const t = normText(text);
+  if (!t) return false;
+
+  const stripped = t.replace(/[!.?,;:]+$/g, "");
+  const greetings = new Set([
+    "hi","hey","hello","yo","sup","hiya","howdy",
+    "good morning","good afternoon","good evening",
+    "test","testing","ping"
+  ]);
+
+  if (greetings.has(stripped)) return true;
+  if (stripped.length <= 3 && (stripped === "hi" || stripped === "hey" || stripped === "yo")) return true;
+  return false;
+}
+
+function requestsHuman(text = "") {
+  const t = normText(text);
+  return /\b(human|operator|admin|staff|support|agent|real person|someone|talk to a person|live chat|transfer|escalate)\b/.test(t);
+}
+
+function buildClarifyingQuestion() {
+  return "Quick question so I can help: is this about (1) events/schedule, (2) world records/TOTD/Kacky pages, or (3) site/chat widget tech?";
+}
+
+function greetingReply() {
+  return "Hey! How can I help today—events/schedule, world records/TOTD/Kacky, or something technical on the site?";
 }
 
 async function callOpenAI({ question, contextChunks, convo }) {
@@ -338,13 +383,20 @@ async function callOpenAI({ question, contextChunks, convo }) {
 
   const system = `
 You are the Trackmania Events site assistant for trackmaniaevents.com.
-You must answer using ONLY the provided CONTEXT snippets. If the answer is not clearly in context, you must escalate.
-Return STRICT JSON with keys: reply (string), escalate (boolean), confidence (0-1 number).
-If escalating, reply should be either:
-- "Transferring you to an operator right now."
-- "There are no operators online at the moment. Leave your email address and we’ll reply as soon as possible, or come back later."
-Pick based on the operatorsOnline flag provided.
-Keep replies concise and helpful. If you include links, only use URLs from CONTEXT.
+You must answer using ONLY the provided CONTEXT snippets.
+
+If the answer is NOT clearly in the context, DO NOT escalate by default.
+Instead, ask ONE short clarifying question that would help you find the right page/topic.
+
+Only escalate if the user explicitly asks for a human/operator/admin.
+
+Return STRICT JSON with keys:
+- reply (string)
+- escalate (boolean)
+- confidence (0-1 number)
+
+Keep replies concise and helpful.
+If you include links, only use URLs that appear in CONTEXT.
   `.trim();
 
   const user = `
@@ -409,14 +461,14 @@ ${question}
 }
 
 function pushSystem(convo, text) {
-  const ts = now();
-  convo.messages.push({ from: "system", text, ts });
+  const ts = nextTs(convo);
+  convo.messages.push({ id: newMsgId(), from: "system", text, ts });
   convo.updatedAt = ts;
 }
 
 function pushAI(convo, text) {
-  const ts = now();
-  convo.messages.push({ from: "ai", text, ts });
+  const ts = nextTs(convo);
+  convo.messages.push({ id: newMsgId(), from: "ai", text, ts });
   convo.updatedAt = ts;
 }
 
@@ -479,7 +531,6 @@ function getConvoOr404(sid, res) {
 // ===========================
 app.post("/api/chat/init", (req, res) => {
   const sid = newSid();
-  const ts = now();
 
   const requestedName = safeName(req.body?.visitorName);
   const requestedVisitorAvatar = safeUrl(req.body?.visitorAvatarUrl) || VISITOR_AVATAR_URL;
@@ -487,8 +538,8 @@ app.post("/api/chat/init", (req, res) => {
   const convo = {
     sid,
     status: "open",
-    createdAt: ts,
-    updatedAt: ts,
+    createdAt: now(),
+    updatedAt: 0,
     assignedTo: "ai",
     needsAdmin: false,
     visitorEmail: null,
@@ -498,8 +549,14 @@ app.post("/api/chat/init", (req, res) => {
     operatorName: OPERATOR_NAME,
     operatorAvatarUrl: OPERATOR_AVATAR_URL,
 
-    messages: [{ from: "system", text: "Chat started.", ts }],
+    messages: [],
   };
+
+  // Use monotonic ts for first message too
+  pushSystem(convo, "Chat started.");
+
+  // Align createdAt with first message ts for consistency
+  convo.createdAt = convo.messages[0]?.ts || now();
 
   conversations.set(sid, convo);
 
@@ -593,8 +650,8 @@ app.post("/api/chat/send", (req, res) => {
     }
   }
 
-  const ts = now();
-  convo.messages.push({ from: "visitor", text, ts });
+  const ts = nextTs(convo);
+  convo.messages.push({ id: newMsgId(), from: "visitor", text, ts });
   convo.updatedAt = ts;
 
   res.json({
@@ -610,39 +667,46 @@ app.post("/api/chat/send", (req, res) => {
 
   (async () => {
     try {
-      if (shouldEscalateHeuristics(text)) {
+      // 1) Explicit human request: escalate immediately
+      if (requestsHuman(text) || shouldEscalateHeuristics(text)) {
         pushAI(convo, escalationMessage());
         escalate(convo);
         return;
       }
 
+      // 2) Greetings/tests: never escalate; reply normally
+      if (isGreeting(text)) {
+        pushAI(convo, greetingReply());
+        return;
+      }
+
+      // 3) If KB empty or no hits: clarify (do NOT escalate)
       const hits = searchKB(text, 6);
-
       if (!kbChunks.length || hits.length === 0) {
-        pushAI(convo, escalationMessage());
-        escalate(convo);
+        pushAI(convo, buildClarifyingQuestion());
         return;
       }
 
+      // 4) Ask OpenAI with context; treat low confidence as "clarify", not "handoff"
       const result = await callOpenAI({ question: text, contextChunks: hits, convo });
 
-      const mustEscalate = result.escalate || result.confidence < 0.55;
+      // Only escalate if the user asked for human (handled above).
+      // Otherwise: low confidence -> clarifying question.
+      const lowConfidence = (result.escalate || result.confidence < ESCALATE_CONFIDENCE_THRESHOLD);
 
-      if (mustEscalate) {
-        pushAI(convo, escalationMessage());
-        escalate(convo);
+      if (lowConfidence) {
+        pushAI(convo, buildClarifyingQuestion());
         return;
       }
 
       if (result.reply) {
         pushAI(convo, result.reply);
       } else {
-        pushAI(convo, escalationMessage());
-        escalate(convo);
+        pushAI(convo, buildClarifyingQuestion());
       }
     } catch {
-      pushAI(convo, escalationMessage());
-      escalate(convo);
+      // On any failure, prefer clarify over escalate (keeps chat responsive)
+      pushAI(convo, "Sorry—something hiccupped on my end. What page/feature is this about (events, TOTD, Kacky, world records, or chat widget)?");
     }
   })();
 });
@@ -720,8 +784,8 @@ app.post("/api/admin/send", requireAdmin, (req, res) => {
     return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
   }
 
-  const ts = now();
-  convo.messages.push({ from: "admin", text, ts });
+  const ts = nextTs(convo);
+  convo.messages.push({ id: newMsgId(), from: "admin", text, ts });
   convo.updatedAt = ts;
 
   // If admin replies, keep assignedTo admin
@@ -742,9 +806,9 @@ app.post("/api/admin/close", requireAdmin, (req, res) => {
     return res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: now() });
   }
 
-  const ts = now();
+  const ts = nextTs(convo);
   convo.status = "closed";
-  convo.messages.push({ from: "system", text: "[Chat ended by admin]", ts });
+  convo.messages.push({ id: newMsgId(), from: "system", text: "[Chat ended by admin]", ts });
   convo.updatedAt = ts;
 
   res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: ts });
