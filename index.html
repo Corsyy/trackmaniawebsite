@@ -1593,13 +1593,12 @@
 
   const SID_KEY = "tme_chat_sid";
   const NAME_KEY = "tme_chat_name";
-
   const POLL_MS = 1200;
 
   // Client-side defaults (used if server doesn't return participants)
   const DEFAULT_OPERATOR_NAME = "Trackmania Events Support";
-  const DEFAULT_OPERATOR_AVATAR = "https://trackmaniaevents.com/assets/chat-operator.png"; // <-- you will create this
-  const DEFAULT_VISITOR_AVATAR = "https://trackmaniaevents.com/assets/chat-visitor.png";   // optional (or use same as operator)
+  const DEFAULT_OPERATOR_AVATAR = "https://trackmaniaevents.com/assets/chat-operator.png";
+  const DEFAULT_VISITOR_AVATAR = "https://trackmaniaevents.com/assets/chat-visitor.png";
 
   const btn = document.getElementById("tmeChatBtn");
   const panel = document.getElementById("tmeChatPanel");
@@ -1626,7 +1625,6 @@
   function ensureName() {
     if (visitorName && visitorName.trim()) return true;
 
-    // Simple prompt; can be replaced with a nicer modal later
     const name = prompt("Enter a name to start chatting (e.g., Corsy):", "") || "";
     const cleaned = name.trim().replace(/\s+/g, " ").slice(0, 32);
     if (!cleaned) return false;
@@ -1689,10 +1687,92 @@
   }
 
   function addSystem(text) {
-    // lightweight status line only if empty
-    if (!log.childElementCount) {
-      addMsg({ text, from: "ai" });
+    if (!log.childElementCount) addMsg({ text, from: "ai" });
+  }
+
+  // ===== UI message: Email capture =====
+  function renderEmailCapture() {
+    // prevent duplicates
+    if (document.getElementById("tmeEmailCaptureRow")) return;
+
+    const row = document.createElement("div");
+    row.id = "tmeEmailCaptureRow";
+    row.className = "tmeMsgRow them";
+
+    const avatar = document.createElement("div");
+    avatar.className = "tmeAvatar";
+    avatar.style.backgroundImage = `url("${participants.operator.avatarUrl}")`;
+
+    const bubbleWrap = document.createElement("div");
+    bubbleWrap.className = "tmeBubbleWrap";
+
+    const label = document.createElement("div");
+    label.className = "tmeMsgName";
+    label.textContent = participants.operator.name || "Support";
+
+    const card = document.createElement("div");
+    card.className = "tmeMsg them tmeEmailCard";
+
+    const title = document.createElement("div");
+    title.className = "tmeEmailTitle";
+    title.textContent = "Enter your email and an operator will follow up:";
+
+    const formRow = document.createElement("div");
+    formRow.className = "tmeEmailRow";
+
+    const email = document.createElement("input");
+    email.className = "tmeEmailInput";
+    email.type = "email";
+    email.placeholder = "email@email.com";
+    email.autocomplete = "email";
+
+    const submit = document.createElement("button");
+    submit.className = "tmeEmailBtn";
+    submit.type = "button";
+    submit.textContent = "Submit";
+
+    async function submitEmail() {
+      const value = (email.value || "").trim();
+      if (!value || !sid) return;
+
+      submit.disabled = true;
+      email.disabled = true;
+
+      const r = await fetch(CHAT_API_BASE + "/api/chat/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid, visitorEmail: value })
+      }).catch(() => null);
+
+      if (!r || !r.ok) {
+        submit.disabled = false;
+        email.disabled = false;
+        addMsg({ text: "Sorry—couldn’t save that email. Please try again.", from: "ai" });
+        return;
+      }
+
+      addMsg({ text: "Thanks. We’ll get back to you as soon as an operator is available.", from: "ai" });
+      row.remove();
     }
+
+    submit.addEventListener("click", submitEmail);
+    email.addEventListener("keydown", (e) => { if (e.key === "Enter") submitEmail(); });
+
+    formRow.appendChild(email);
+    formRow.appendChild(submit);
+
+    card.appendChild(title);
+    card.appendChild(formRow);
+
+    bubbleWrap.appendChild(label);
+    bubbleWrap.appendChild(card);
+
+    row.appendChild(avatar);
+    row.appendChild(bubbleWrap);
+
+    log.appendChild(row);
+    log.scrollTop = log.scrollHeight;
+    email.focus();
   }
 
   async function initChat() {
@@ -1701,7 +1781,6 @@
     const res = await fetch(CHAT_API_BASE + "/api/chat/init", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // send name if server supports it; harmless if ignored
       body: JSON.stringify({ visitorName })
     }).catch(() => null);
 
@@ -1719,15 +1798,13 @@
     sid = data.sid;
     localStorage.setItem(SID_KEY, sid);
 
-    // If server returns participants, use them
     if (data.participants) setParticipantsFromServer(data.participants);
 
     lastTs = 0;
     log.innerHTML = "";
-
     addMsg({ text: "Connected. Ask anything about Trackmania Events.", from: "ai" });
 
-    // If server has /api/chat/profile, set name explicitly (safe if 404)
+    // Set profile (safe if endpoint missing)
     fetch(CHAT_API_BASE + "/api/chat/profile", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1768,10 +1845,16 @@
     const msgs = data.messages || [];
     for (const m of msgs) {
       const ts = Number(m.ts || 0);
-      if (ts > lastTs) {
+      if (ts <= lastTs) continue;
+
+      // Handle UI messages (email capture)
+      if ((m.kind === "ui" && m.ui?.kind === "email_capture") || (m.type === "ui" && m.ui?.kind === "email_capture")) {
+        renderEmailCapture();
+      } else {
         addMsg({ text: m.text || "", from: m.from || "ai" });
-        lastTs = Math.max(lastTs, ts);
       }
+
+      lastTs = Math.max(lastTs, ts);
     }
   }
 
@@ -1854,7 +1937,7 @@
     if (e.key === "Enter") send();
   });
 
-  // Inject minimal CSS for avatar rows (won't conflict with your theme)
+  // Inject minimal CSS (plus email UI styles)
   const style = document.createElement("style");
   style.textContent = `
   .tmeMsgRow{display:flex;gap:10px;align-items:flex-end;margin:10px 0}
@@ -1866,16 +1949,36 @@
     box-shadow:0 0 12px rgba(61,165,255,.25);
     flex:0 0 auto;
   }
-  .tmeBubbleWrap{max-width: calc(100% - 44px)}
+  .tmeBubbleWrap{max-width: calc(100% - 44px); min-width:0;}
   .tmeMsgName{font-size:11px;opacity:.75;margin:0 8px 4px}
   .tmeMsg{white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;}
-`;
 
+  .tmeEmailCard{width:min(380px,100%); padding:12px 12px 10px;}
+  .tmeEmailTitle{font-weight:800; margin-bottom:8px;}
+  .tmeEmailRow{display:flex; gap:8px; align-items:center;}
+  .tmeEmailInput{
+    flex:1; min-width:0;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(109,251,255,.25);
+    background:rgba(16,26,48,.75);
+    color:#e6ecff;
+    outline:none;
+  }
+  .tmeEmailBtn{
+    padding:10px 12px;
+    border-radius:10px;
+    border:0;
+    cursor:pointer;
+    font-weight:900;
+    background:linear-gradient(135deg, #3aa0ff, #6dfbff);
+    color:#001220;
+  }
+  .tmeEmailBtn:disabled{opacity:.65; cursor:default;}
+  `;
   document.head.appendChild(style);
 })();
 </script>
-
-
 
 </body>
 </html>
