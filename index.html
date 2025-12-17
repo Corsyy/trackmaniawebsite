@@ -711,6 +711,8 @@
     cursor:pointer;
   }
   #tmeChatSend:hover{filter:brightness(1.08)}
+.tmeBubbleWrap{max-width: calc(100% - 44px);}
+.tmeMsg{white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;}
 
   </style>
 </head>
@@ -1793,9 +1795,6 @@
       return;
     }
 
-    // Optimistic append of visitor message (so it feels instant)
-    addMsg({ text, from: "visitor" });
-
     await pollOnce();
   }
 
@@ -1840,20 +1839,20 @@
   // Inject minimal CSS for avatar rows (won't conflict with your theme)
   const style = document.createElement("style");
   style.textContent = `
-    .tmeMsgRow{display:flex;gap:10px;align-items:flex-end;margin:10px 0}
-    .tmeMsgRow.me{justify-content:flex-end}
-    .tmeAvatar{
-      width:30px;height:30px;border-radius:50%;
-      background-size:cover;background-position:center;
-      border:1px solid rgba(109,251,255,.25);
-      box-shadow:0 0 12px rgba(61,165,255,.25);
-      flex:0 0 auto;
-    }
-    .tmeBubbleWrap{max-width:78%}
-    .tmeMsgName{font-size:11px;opacity:.75;margin:0 8px 4px}
-    .tmeMsg.me{margin-left:auto}
-    .tmeMsg.them{margin-right:auto}
-  `;
+  .tmeMsgRow{display:flex;gap:10px;align-items:flex-end;margin:10px 0}
+  .tmeMsgRow.me{justify-content:flex-end}
+  .tmeAvatar{
+    width:30px;height:30px;border-radius:50%;
+    background-size:cover;background-position:center;
+    border:1px solid rgba(109,251,255,.25);
+    box-shadow:0 0 12px rgba(61,165,255,.25);
+    flex:0 0 auto;
+  }
+  .tmeBubbleWrap{max-width: calc(100% - 44px)}
+  .tmeMsgName{font-size:11px;opacity:.75;margin:0 8px 4px}
+  .tmeMsg{white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;}
+`;
+
   document.head.appendChild(style);
 })();
 </script>
