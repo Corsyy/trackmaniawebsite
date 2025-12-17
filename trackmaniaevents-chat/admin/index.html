@@ -35,6 +35,7 @@
     }
     button.secondary{background:rgba(16,26,48,.75);color:var(--text);border:1px solid rgba(109,251,255,.18)}
     button.danger{background:linear-gradient(135deg,#ff5a7a,#ffcf5a);color:#1a0b10}
+    button:disabled{opacity:.55;cursor:not-allowed}
     .muted{color:var(--muted);font-size:12px}
     .list{display:flex;flex-direction:column;gap:10px}
     .item{
@@ -123,9 +124,7 @@
 </div>
 
 <script>
-  // Admin runs on same origin as API
   const API_BASE = "";
-
   const el = (id) => document.getElementById(id);
 
   const state = {
@@ -140,15 +139,43 @@
     try { return new Date(ts).toLocaleString(); } catch { return String(ts); }
   }
 
-  function pill(status){
+  function setLoginStatus(msg){
+    el("loginStatus").textContent = msg || "";
+  }
+
+  function setActiveUI({ sid = null, status = null } = {}){
+    state.activeSid = sid;
+    state.activeStatus = status;
+    state.lastTs = 0;
+
+    el("activeSid").textContent = sid || "No conversation selected";
+    el("activeMeta").textContent = "";
+    el("chatBox").innerHTML = "";
+
     const p = el("activePill");
+    if (!sid || !status){
+      p.style.display = "none";
+      el("btnEndChat").disabled = true;
+      el("btnSend").disabled = true;
+      el("replyText").disabled = true;
+      return;
+    }
+
     p.style.display = "inline-block";
     p.className = "pill " + (status === "open" ? "open" : "closed");
     p.textContent = status === "open" ? "OPEN" : "CLOSED";
+
+    const statusOpen = status === "open";
+    el("btnEndChat").disabled = !statusOpen;
+    el("btnSend").disabled = !statusOpen;
+    el("replyText").disabled = !statusOpen;
   }
 
-  function setLoginStatus(msg){
-    el("loginStatus").textContent = msg || "";
+  function onUnauthorized(where){
+    state.authed = false;
+    stopPolling();
+    setActiveUI({ sid: null, status: null });
+    setLoginStatus(`Not logged in. (${where})`);
   }
 
   async function api(path, opts = {}){
@@ -157,7 +184,13 @@
       headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
       credentials: "include",
     });
+
     const data = await res.json().catch(() => ({}));
+
+    if (res.status === 401) {
+      onUnauthorized(path);
+    }
+
     return { ok: res.ok, status: res.status, data };
   }
 
@@ -168,11 +201,13 @@
       method: "POST",
       body: JSON.stringify({ password })
     });
+
     if (!r.ok){
       state.authed = false;
-      setLoginStatus(r.data?.error || "Login failed");
+      setLoginStatus((r.data && r.data.error) ? r.data.error : `Login failed (HTTP ${r.status})`);
       return;
     }
+
     state.authed = true;
     setLoginStatus("Logged in.");
     await loadConversations();
@@ -181,25 +216,19 @@
   async function logout(){
     await api("/api/admin/logout", { method:"POST", body:"{}" });
     state.authed = false;
-    state.activeSid = null;
-    state.activeStatus = null;
-    el("convList").innerHTML = "";
-    el("chatBox").innerHTML = "";
-    el("activeSid").textContent = "No conversation selected";
-    el("activePill").style.display = "none";
-    el("btnEndChat").disabled = true;
-    el("btnSend").disabled = true;
-    el("replyText").disabled = true;
-    setLoginStatus("Logged out.");
     stopPolling();
+    el("convList").innerHTML = "";
+    el("convEmpty").style.display = "none";
+    setActiveUI({ sid: null, status: null });
+    setLoginStatus("Logged out.");
   }
 
   async function loadConversations(){
     if (!state.authed) return;
+
     const r = await api("/api/admin/conversations");
     if (!r.ok){
-      setLoginStatus(r.data?.error || "Failed to load conversations");
-      if (r.status === 401) state.authed = false;
+      setLoginStatus((r.data && r.data.error) ? r.data.error : `Failed to load conversations (HTTP ${r.status})`);
       return;
     }
 
@@ -230,12 +259,14 @@
   function renderMessages(msgs){
     const box = el("chatBox");
     box.innerHTML = "";
+    state.lastTs = 0;
+
     for (const m of msgs){
       const div = document.createElement("div");
       div.className = "msg " + m.from;
       div.innerHTML = `
-        <div class="meta">${m.from.toUpperCase()} • ${fmtTime(m.ts)}</div>
-        <div>${String(m.text).replace(/</g,"&lt;")}</div>
+        <div class="meta">${String(m.from || "").toUpperCase()} • ${fmtTime(m.ts)}</div>
+        <div>${String(m.text || "").replace(/</g,"&lt;")}</div>
       `;
       box.appendChild(div);
       state.lastTs = Math.max(state.lastTs, Number(m.ts || 0));
@@ -245,14 +276,14 @@
 
   function appendMessages(msgs){
     const box = el("chatBox");
-    let stickToBottom = (box.scrollTop + box.clientHeight) >= (box.scrollHeight - 40);
+    const stickToBottom = (box.scrollTop + box.clientHeight) >= (box.scrollHeight - 40);
 
     for (const m of msgs){
       const div = document.createElement("div");
       div.className = "msg " + m.from;
       div.innerHTML = `
-        <div class="meta">${m.from.toUpperCase()} • ${fmtTime(m.ts)}</div>
-        <div>${String(m.text).replace(/</g,"&lt;")}</div>
+        <div class="meta">${String(m.from || "").toUpperCase()} • ${fmtTime(m.ts)}</div>
+        <div>${String(m.text || "").replace(/</g,"&lt;")}</div>
       `;
       box.appendChild(div);
       state.lastTs = Math.max(state.lastTs, Number(m.ts || 0));
@@ -264,32 +295,24 @@
   async function selectConversation(sid){
     if (!state.authed) return;
 
-    state.activeSid = sid;
-    state.lastTs = 0;
-
-    el("activeSid").textContent = sid;
-    el("activeMeta").textContent = "";
+    stopPolling();
+    setLoginStatus("");
 
     const r = await api("/api/admin/conversation?sid=" + encodeURIComponent(sid));
     if (!r.ok){
-      setLoginStatus(r.data?.error || "Failed to load conversation");
+      setLoginStatus((r.data && r.data.error) ? r.data.error : `Failed to load conversation (HTTP ${r.status})`);
       return;
     }
 
-    state.activeStatus = r.data.status;
-    pill(state.activeStatus);
-
-    const statusOpen = state.activeStatus === "open";
-    el("btnEndChat").disabled = !statusOpen;
-    el("btnSend").disabled = !statusOpen;
-    el("replyText").disabled = !statusOpen;
-
+    setActiveUI({ sid, status: r.data.status });
     renderMessages(r.data.messages || []);
     startPolling();
   }
 
   async function sendReply(){
     if (!state.authed || !state.activeSid) return;
+    if (el("btnSend").disabled) return;
+
     const text = el("replyText").value.trim();
     if (!text) return;
 
@@ -299,24 +322,21 @@
     });
 
     if (!r.ok){
-      setLoginStatus(r.data?.error || "Send failed");
+      setLoginStatus((r.data && r.data.error) ? r.data.error : `Send failed (HTTP ${r.status})`);
       if (r.status === 409){
-        state.activeStatus = "closed";
-        pill("closed");
-        el("btnEndChat").disabled = true;
-        el("btnSend").disabled = true;
-        el("replyText").disabled = true;
+        setActiveUI({ sid: state.activeSid, status: "closed" });
       }
       return;
     }
 
     el("replyText").value = "";
-    // Poll will pick it up quickly; do a fast refresh
     await pollActiveOnce();
+    await loadConversations();
   }
 
   async function endChat(){
     if (!state.authed || !state.activeSid) return;
+    if (el("btnEndChat").disabled) return;
 
     const r = await api("/api/admin/close", {
       method: "POST",
@@ -324,16 +344,11 @@
     });
 
     if (!r.ok){
-      setLoginStatus(r.data?.error || "Close failed");
+      setLoginStatus((r.data && r.data.error) ? r.data.error : `Close failed (HTTP ${r.status})`);
       return;
     }
 
-    state.activeStatus = "closed";
-    pill("closed");
-    el("btnEndChat").disabled = true;
-    el("btnSend").disabled = true;
-    el("replyText").disabled = true;
-
+    setActiveUI({ sid: state.activeSid, status: "closed" });
     await pollActiveOnce();
     await loadConversations();
   }
@@ -355,21 +370,24 @@
 
     const r = await api("/api/admin/conversation?sid=" + encodeURIComponent(state.activeSid));
     if (!r.ok){
-      // conversation may have been purged/restarted; just stop polling
+      // If conversation deleted or auth lost, stop polling and keep UI consistent
       stopPolling();
+      if (r.status === 404) {
+        setLoginStatus("Conversation not found (may have been restarted).");
+        setActiveUI({ sid: null, status: null });
+        await loadConversations();
+      } else if (r.status !== 401) {
+        setLoginStatus((r.data && r.data.error) ? r.data.error : `Polling failed (HTTP ${r.status})`);
+      }
       return;
     }
 
     // Update status + controls live
-    state.activeStatus = r.data.status;
-    pill(state.activeStatus);
+    if (r.data.status !== state.activeStatus) {
+      setActiveUI({ sid: state.activeSid, status: r.data.status });
+    }
 
-    const statusOpen = state.activeStatus === "open";
-    el("btnEndChat").disabled = !statusOpen;
-    el("btnSend").disabled = !statusOpen;
-    el("replyText").disabled = !statusOpen;
-
-    // Efficient append: only add newer messages
+    // Efficient append
     const msgs = r.data.messages || [];
     const newer = msgs.filter(m => Number(m.ts || 0) > state.lastTs);
     if (newer.length) appendMessages(newer);
@@ -386,18 +404,23 @@
   });
 
   el("btnSend").addEventListener("click", sendReply);
-  el("replyText").addEventListener("keydown", (e) => { if (e.key === "Enter") sendReply(); });
+  el("replyText").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendReply();
+    }
+  });
 
   el("btnEndChat").addEventListener("click", endChat);
 
-  // initial load (if already authed, this will succeed; otherwise shows error silently)
+  // initial load: if cookie already valid, this will succeed
   (async () => {
     const r = await api("/api/admin/conversations");
     if (r.ok){
       state.authed = true;
       setLoginStatus("Logged in.");
       await loadConversations();
-    } else {
+    } else if (r.status !== 401) {
       state.authed = false;
       setLoginStatus("Not logged in.");
     }
