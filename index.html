@@ -1668,6 +1668,9 @@
   }
 
   function addMsg({ text, from }) {
+  const cleanText = String(text ?? "").trim();
+  if (!cleanText) return; // ← prevents empty ghost messages
+
   const sender = String(from || "ai").toLowerCase();
   const who = (sender === "visitor") ? "me" : "them";
   const isAI = (sender === "ai");
@@ -1675,7 +1678,7 @@
   const displayName =
     (who === "me")
       ? (participants.visitor?.name || "You")
-      : (participants.operator?.name || "Support");
+      : (participants.operator?.name || "Trackmania Events Support");
 
   const avatarUrl =
     (who === "me")
@@ -1696,9 +1699,7 @@
   label.className = "tmeMsgName";
 
   const nameSpan = document.createElement("span");
-  nameSpan.className = "tmeNameText";
   nameSpan.textContent = displayName;
-
   label.appendChild(nameSpan);
 
   if (isAI) {
@@ -1710,7 +1711,7 @@
 
   const bubble = document.createElement("div");
   bubble.className = "tmeMsg " + who;
-  bubble.textContent = String(text ?? "");
+  bubble.textContent = cleanText;
 
   bubbleWrap.appendChild(label);
   bubbleWrap.appendChild(bubble);
@@ -1726,7 +1727,6 @@
   log.appendChild(row);
   log.scrollTop = log.scrollHeight;
 }
-
 
   function addSystemLine(text) {
     if (!log.childElementCount) addMsg({ text, from: "ai" });
