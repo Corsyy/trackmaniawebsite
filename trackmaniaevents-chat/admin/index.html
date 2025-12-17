@@ -122,316 +122,149 @@
     </div>
   </div>
 </div>
+<div style="display:flex;gap:10px;align-items:center;margin:10px 0;">
+  <label style="opacity:.85;font-weight:700;">Operator status:</label>
+  <select id="opStatus">
+    <option value="online">Online</option>
+    <option value="busy">Busy</option>
+    <option value="offline">Offline</option>
+  </select>
+  <button id="opSave">Save</button>
+  <span id="opState" style="opacity:.8;"></span>
+</div>
 
 <script>
-  const API_BASE = "";
-  const el = (id) => document.getElementById(id);
+(() => {
+  const API = "https://trackmaniaevents-chat.onrender.com";
+  const SID_KEY = "tme_chat_sid";
+  const NAME_KEY = "tme_chat_name";
+  const POLL_MS = 1200;
 
-  const state = {
-    authed: false,
-    activeSid: null,
-    activeStatus: null,
-    pollTimer: null,
-    lastTs: 0,
-  };
+  const btn = document.getElementById("tmeChatBtn");
+  const panel = document.getElementById("tmeChatPanel");
+  const closeBtn = document.getElementById("tmeChatClose");
+  const log = document.getElementById("tmeChatLog");
+  const input = document.getElementById("tmeChatInput");
+  const sendBtn = document.getElementById("tmeChatSend");
 
-  function fmtTime(ts){
-    try { return new Date(ts).toLocaleString(); } catch { return String(ts); }
+  let sid = localStorage.getItem(SID_KEY) || "";
+  let name = localStorage.getItem(NAME_KEY) || "";
+  let lastTs = 0;
+  let timer = null;
+
+  function msg(text, from) {
+    const d = document.createElement("div");
+    d.className = "tmeMsg " + (from === "me" ? "me" : "them");
+    d.textContent = text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
   }
 
-  function setLoginStatus(msg){
-    el("loginStatus").textContent = msg || "";
+  function ensureName() {
+    if (name) return true;
+    const n = prompt("Enter your name:", "")?.trim();
+    if (!n) return false;
+    name = n.slice(0, 32);
+    localStorage.setItem(NAME_KEY, name);
+    return true;
   }
 
-  function setActiveUI({ sid = null, status = null } = {}){
-    state.activeSid = sid;
-    state.activeStatus = status;
-    state.lastTs = 0;
-
-    el("activeSid").textContent = sid || "No conversation selected";
-    el("activeMeta").textContent = "";
-    el("chatBox").innerHTML = "";
-
-    const p = el("activePill");
-    if (!sid || !status){
-      p.style.display = "none";
-      el("btnEndChat").disabled = true;
-      el("btnSend").disabled = true;
-      el("replyText").disabled = true;
-      return;
-    }
-
-    p.style.display = "inline-block";
-    p.className = "pill " + (status === "open" ? "open" : "closed");
-    p.textContent = status === "open" ? "OPEN" : "CLOSED";
-
-    const statusOpen = status === "open";
-    el("btnEndChat").disabled = !statusOpen;
-    el("btnSend").disabled = !statusOpen;
-    el("replyText").disabled = !statusOpen;
-  }
-
-  function onUnauthorized(where){
-    state.authed = false;
-    stopPolling();
-    setActiveUI({ sid: null, status: null });
-    setLoginStatus(`Not logged in. (${where})`);
-  }
-
-  async function api(path, opts = {}){
-    const res = await fetch(API_BASE + path, {
-      ...opts,
-      headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
-      credentials: "include",
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (res.status === 401) {
-      onUnauthorized(path);
-    }
-
-    return { ok: res.ok, status: res.status, data };
-  }
-
-  async function login(){
-    setLoginStatus("Logging in…");
-    const password = el("password").value;
-    const r = await api("/api/admin/login", {
+  async function init() {
+    if (!ensureName()) return false;
+    const r = await fetch(API + "/api/chat/init", {
       method: "POST",
-      body: JSON.stringify({ password })
-    });
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ visitorName: name })
+    }).catch(() => null);
+    if (!r) return false;
+    const d = await r.json().catch(() => null);
+    if (!d?.ok) return false;
+    sid = d.sid;
+    localStorage.setItem(SID_KEY, sid);
+    lastTs = 0;
+    log.innerHTML = "";
+    msg("Connected. Ask us anything.", "them");
+    return true;
+  }
 
-    if (!r.ok){
-      state.authed = false;
-      setLoginStatus((r.data && r.data.error) ? r.data.error : `Login failed (HTTP ${r.status})`);
+  async function poll() {
+    if (!sid) return;
+    const r = await fetch(`${API}/api/chat/poll?sid=${sid}&since=${lastTs}`).catch(() => null);
+    if (!r) return;
+    if (r.status === 404) {
+      localStorage.removeItem(SID_KEY);
+      sid = "";
       return;
     }
-
-    state.authed = true;
-    setLoginStatus("Logged in.");
-    await loadConversations();
-  }
-
-  async function logout(){
-    await api("/api/admin/logout", { method:"POST", body:"{}" });
-    state.authed = false;
-    stopPolling();
-    el("convList").innerHTML = "";
-    el("convEmpty").style.display = "none";
-    setActiveUI({ sid: null, status: null });
-    setLoginStatus("Logged out.");
-  }
-
-  async function loadConversations(){
-    if (!state.authed) return;
-
-    const r = await api("/api/admin/conversations");
-    if (!r.ok){
-      setLoginStatus((r.data && r.data.error) ? r.data.error : `Failed to load conversations (HTTP ${r.status})`);
-      return;
-    }
-
-    const list = r.data.conversations || [];
-    const container = el("convList");
-    container.innerHTML = "";
-
-    el("convEmpty").style.display = list.length ? "none" : "block";
-
-    for (const c of list){
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <div class="itemTop">
-          <div class="sid">${c.sid}</div>
-          <div class="pill ${c.status === "open" ? "open" : "closed"}">${c.status === "open" ? "OPEN" : "CLOSED"}</div>
-        </div>
-        <div class="preview">${(c.lastTextPreview || "").replace(/</g,"&lt;")}</div>
-        <div class="muted" style="margin-top:6px">
-          Updated: ${fmtTime(c.updatedAt)} • Messages: ${c.messageCount}
-        </div>
-      `;
-      div.addEventListener("click", () => selectConversation(c.sid));
-      container.appendChild(div);
-    }
-  }
-
-  function renderMessages(msgs){
-    const box = el("chatBox");
-    box.innerHTML = "";
-    state.lastTs = 0;
-
-    for (const m of msgs){
-      const div = document.createElement("div");
-      div.className = "msg " + m.from;
-      div.innerHTML = `
-        <div class="meta">${String(m.from || "").toUpperCase()} • ${fmtTime(m.ts)}</div>
-        <div>${String(m.text || "").replace(/</g,"&lt;")}</div>
-      `;
-      box.appendChild(div);
-      state.lastTs = Math.max(state.lastTs, Number(m.ts || 0));
-    }
-    box.scrollTop = box.scrollHeight;
-  }
-
-  function appendMessages(msgs){
-    const box = el("chatBox");
-    const stickToBottom = (box.scrollTop + box.clientHeight) >= (box.scrollHeight - 40);
-
-    for (const m of msgs){
-      const div = document.createElement("div");
-      div.className = "msg " + m.from;
-      div.innerHTML = `
-        <div class="meta">${String(m.from || "").toUpperCase()} • ${fmtTime(m.ts)}</div>
-        <div>${String(m.text || "").replace(/</g,"&lt;")}</div>
-      `;
-      box.appendChild(div);
-      state.lastTs = Math.max(state.lastTs, Number(m.ts || 0));
-    }
-
-    if (stickToBottom) box.scrollTop = box.scrollHeight;
-  }
-
-  async function selectConversation(sid){
-    if (!state.authed) return;
-
-    stopPolling();
-    setLoginStatus("");
-
-    const r = await api("/api/admin/conversation?sid=" + encodeURIComponent(sid));
-    if (!r.ok){
-      setLoginStatus((r.data && r.data.error) ? r.data.error : `Failed to load conversation (HTTP ${r.status})`);
-      return;
-    }
-
-    setActiveUI({ sid, status: r.data.status });
-    renderMessages(r.data.messages || []);
-    startPolling();
-  }
-
-  async function sendReply(){
-    if (!state.authed || !state.activeSid) return;
-    if (el("btnSend").disabled) return;
-
-    const text = el("replyText").value.trim();
-    if (!text) return;
-
-    const r = await api("/api/admin/send", {
-      method: "POST",
-      body: JSON.stringify({ sid: state.activeSid, text })
-    });
-
-    if (!r.ok){
-      setLoginStatus((r.data && r.data.error) ? r.data.error : `Send failed (HTTP ${r.status})`);
-      if (r.status === 409){
-        setActiveUI({ sid: state.activeSid, status: "closed" });
+    const d = await r.json().catch(() => null);
+    if (!d?.ok) return;
+    for (const m of d.messages || []) {
+      if (m.ts > lastTs) {
+        if (m.type === "ui" && m.ui?.kind === "email_capture") {
+          emailUI();
+        } else {
+          msg(m.text || "", m.from === "visitor" ? "me" : "them");
+        }
+        lastTs = Math.max(lastTs, m.ts);
       }
-      return;
     }
-
-    el("replyText").value = "";
-    await pollActiveOnce();
-    await loadConversations();
   }
 
-  async function endChat(){
-    if (!state.authed || !state.activeSid) return;
-    if (el("btnEndChat").disabled) return;
-
-    const r = await api("/api/admin/close", {
+  async function send() {
+    const t = input.value.trim();
+    if (!t) return;
+    if (!sid && !(await init())) return;
+    input.value = "";
+    await fetch(API + "/api/chat/send", {
       method: "POST",
-      body: JSON.stringify({ sid: state.activeSid })
-    });
-
-    if (!r.ok){
-      setLoginStatus((r.data && r.data.error) ? r.data.error : `Close failed (HTTP ${r.status})`);
-      return;
-    }
-
-    setActiveUI({ sid: state.activeSid, status: "closed" });
-    await pollActiveOnce();
-    await loadConversations();
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sid, text: t })
+    }).catch(() => null);
+    await poll();
   }
 
-  function startPolling(){
-    stopPolling();
-    state.pollTimer = setInterval(pollActiveOnce, 1500);
+  function emailUI() {
+    if (document.getElementById("emailUI")) return;
+    const w = document.createElement("div");
+    w.id = "emailUI";
+    const i = document.createElement("input");
+    i.type = "email";
+    i.placeholder = "email@email.com";
+    const b = document.createElement("button");
+    b.textContent = "Submit";
+    b.onclick = async () => {
+      await fetch(API + "/api/chat/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid, visitorEmail: i.value })
+      }).catch(() => null);
+      msg("Thanks! We’ll be in touch.", "them");
+      w.remove();
+    };
+    w.append(i, b);
+    log.appendChild(w);
+    log.scrollTop = log.scrollHeight;
   }
 
-  function stopPolling(){
-    if (state.pollTimer){
-      clearInterval(state.pollTimer);
-      state.pollTimer = null;
-    }
+  function open() {
+    panel.style.display = "block";
+    (async () => {
+      if (!sid) await init();
+      timer = setInterval(poll, POLL_MS);
+    })();
   }
 
-  async function pollActiveOnce(){
-    if (!state.authed || !state.activeSid) return;
-
-    const r = await api("/api/admin/conversation?sid=" + encodeURIComponent(state.activeSid));
-    if (!r.ok){
-      // If conversation deleted or auth lost, stop polling and keep UI consistent
-      stopPolling();
-      if (r.status === 404) {
-        setLoginStatus("Conversation not found (may have been restarted).");
-        setActiveUI({ sid: null, status: null });
-        await loadConversations();
-      } else if (r.status !== 401) {
-        setLoginStatus((r.data && r.data.error) ? r.data.error : `Polling failed (HTTP ${r.status})`);
-      }
-      return;
-    }
-
-    // Update status + controls live
-    if (r.data.status !== state.activeStatus) {
-      setActiveUI({ sid: state.activeSid, status: r.data.status });
-    }
-
-    // Efficient append
-    const msgs = r.data.messages || [];
-    const newer = msgs.filter(m => Number(m.ts || 0) > state.lastTs);
-    if (newer.length) appendMessages(newer);
+  function close() {
+    panel.style.display = "none";
+    clearInterval(timer);
   }
 
-  // bindings
-  el("btnLogin").addEventListener("click", login);
-  el("password").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
-
-  el("btnLogout").addEventListener("click", logout);
-  el("btnRefresh").addEventListener("click", async () => {
-    await loadConversations();
-    if (state.activeSid) await pollActiveOnce();
-  });
-
-  el("btnSend").addEventListener("click", sendReply);
-  el("replyText").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      sendReply();
-    }
-  });
-
-  el("btnEndChat").addEventListener("click", endChat);
-
-  // initial load: if cookie already valid, this will succeed
-  (async () => {
-    const r = await api("/api/admin/conversations");
-    if (r.ok){
-      state.authed = true;
-      setLoginStatus("Logged in.");
-      await loadConversations();
-    } else if (r.status !== 401) {
-      state.authed = false;
-      setLoginStatus("Not logged in.");
-    }
-  })();
-  setInterval(() => {
-  fetch("/api/admin/presence", {
-    method: "POST",
-    credentials: "include"
-  }).catch(() => {});
-}, 30_000);
-
+  btn.onclick = open;
+  closeBtn.onclick = close;
+  sendBtn.onclick = send;
+  input.onkeydown = e => e.key === "Enter" && send();
+})();
 </script>
+
 </body>
 </html>
