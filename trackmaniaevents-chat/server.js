@@ -24,7 +24,9 @@ const VISITOR_AVATAR_URL = process.env.VISITOR_AVATAR_URL || `${SITE_BASE.replac
 
 app.disable("x-powered-by");
 app.use(express.json({ limit: "256kb" }));
-
+app.get("/health", (req, res) => {
+  res.status(200).send("ok");
+});
 app.use("/admin", express.static(path.join(__dirname, "admin"), { extensions: ["html"] }));
 
 const ALLOWED_ORIGINS = new Set([
