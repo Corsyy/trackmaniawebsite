@@ -261,6 +261,17 @@ function chunkText(text) {
   }
   return out;
 }
+async function fetchWithTimeout(url, opts = {}, ms = 8000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { ...opts, signal: ctrl.signal });
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(t);
+  }
+}
 
 async function fetchText(url) {
   const r = await fetch(url, { redirect: "follow" });
@@ -714,12 +725,9 @@ app.listen(PORT, () => {
   console.log(`OPERATOR_AVATAR_URL=${OPERATOR_AVATAR_URL}`);
   console.log(`operatorStatus=${operatorStatus}`);
 
-  (async () => {
-    try {
-      await refreshKnowledge();
-      console.log("[KB] initial refresh complete", kbStatus);
-    } catch (e) {
-      console.warn("[KB] initial refresh failed", e?.message || e);
-    }
-  })();
+
 });
+/* ---- background KB refresh (non-blocking) ---- */
+setTimeout(() => {
+  refreshKnowledge().catch(() => {});
+}, 60_000);
