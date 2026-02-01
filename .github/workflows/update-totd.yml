@@ -7,7 +7,7 @@ on:
     - cron: "0 18 * * *"
 
 concurrency:
-  group: update-totd
+  group: update-data
   cancel-in-progress: true
 
 jobs:
@@ -42,8 +42,22 @@ jobs:
           echo "Root snapshot:"
           ls -l totd.json || true
 
-      # Compute a stable content hash across your generated files
-      - name: Compute new content hash
+      # NEW: Weekly Shorts updater
+      - name: Run Weekly Shorts updater
+        run: |
+          echo "Running Weekly Shorts updater..."
+          node -v
+          node scripts/weekly-shorts-update.js
+          echo ""
+          echo "Listing generated files:"
+          ls -R data/weekly-shorts || true
+
+      # ==========================
+      # TOTD hash + commit gating
+      # ==========================
+
+      # Compute a stable content hash across your generated TOTD files
+      - name: Compute new TOTD content hash
         id: newhash
         shell: bash
         run: |
@@ -66,7 +80,7 @@ jobs:
 
           echo "new=$HASH" >> "$GITHUB_OUTPUT"
 
-      - name: Read previous hash (if any)
+      - name: Read previous TOTD hash (if any)
         id: prevhash
         shell: bash
         run: |
@@ -85,7 +99,7 @@ jobs:
           git add .totd.hash totd.json data/totd/*.json 2>/dev/null || true
 
           if ! git diff --cached --quiet; then
-            echo "Changes detected — committing updates."
+            echo "Changes detected — committing TOTD updates."
             git commit -m "data: refresh TOTD [skip ci]"
             # Rebase-pull to avoid non-fast-forward in busy repos
             git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
@@ -94,6 +108,60 @@ jobs:
             echo "No staged changes (hash matched)."
           fi
 
-      - name: No changes — skip
+      - name: No TOTD changes — skip
         if: steps.newhash.outputs.new == steps.prevhash.outputs.prev
-        run: echo "No content changes detected; nothing to push."
+        run: echo "No TOTD content changes detected; nothing to push."
+
+      # =======================================
+      # NEW: Weekly Shorts hash + commit gating
+      # =======================================
+
+      - name: Compute Weekly Shorts content hash
+        id: wshash
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmplist=$(mktemp)
+
+          if [ -d data/weekly-shorts ]; then
+            find data/weekly-shorts -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+          fi
+
+          if [ -s "$tmplist" ]; then
+            HASH=$(xargs -a "$tmplist" -I{} sha256sum "{}" | sort | sha256sum | cut -d' ' -f1)
+          else
+            HASH="none"
+          fi
+
+          echo "new=$HASH" >> "$GITHUB_OUTPUT"
+
+      - name: Read previous Weekly Shorts hash (if any)
+        id: wsprevious
+        shell: bash
+        run: |
+          PREV=$(git show HEAD:.weeklyshorts.hash 2>/dev/null || true)
+          echo "prev=${PREV:-none}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit updated Weekly Shorts data (only if changed)
+        if: steps.wshash.outputs.new != steps.wsprevious.outputs.prev
+        run: |
+          echo "${{ steps.wshash.outputs.new }}" > .weeklyshorts.hash
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stage Weekly Shorts files + hash
+          git add .weeklyshorts.hash data/weekly-shorts/**/*.json 2>/dev/null || true
+
+          if ! git diff --cached --quiet; then
+            echo "Weekly Shorts changes detected — committing updates."
+            git commit -m "data: refresh Weekly Shorts [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
+            git push
+          else
+            echo "No staged Weekly Shorts changes (hash matched)."
+          fi
+
+      - name: No Weekly Shorts changes — skip
+        if: steps.wshash.outputs.new == steps.wsprevious.outputs.prev
+        run: echo "No Weekly Shorts content changes detected; nothing to push."
