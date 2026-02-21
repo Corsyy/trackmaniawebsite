@@ -45,6 +45,7 @@ jobs:
           ls -l totd.json || true
 
       - name: Run Weekly Shorts updater
+        continue-on-error: true
         run: |
           echo "Running Weekly Shorts updater..."
           node -v
