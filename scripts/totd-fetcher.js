@@ -1,274 +1,126 @@
-// scripts/totd-fetcher.js — TOTD + TMX medal times & difficulty (keeps manual downloadUrl)
-// Node 18+ (global fetch).
+name: Update Data (TOTD + Weekly Shorts)
 
-import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
-import { constants as FS } from "node:fs";
-import path from "node:path";
+on:
+  workflow_dispatch:
+  schedule:
+    # 18:00 UTC = 1:00 PM EST (no DST auto-switch)
+    - cron: "0 18 * * *"
 
-/* ----------------------------- config/constants ---------------------------- */
-const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
-const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
-const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
-const TMIO        = "https://trackmania.io";
-const TMX_API     = "https://trackmania.exchange/api";
-const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
-const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.2 (github action)";
+concurrency:
+  group: update-data
+  cancel-in-progress: true
 
-const DEBUG = process.env.DEBUG === "1";
-const dlog  = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
-/* -------------------------------- fs helpers ------------------------------- */
-const ensureDir = (p)=>mkdir(p,{recursive:true});
-const exists = async(p)=>{ try{ await access(p,FS.F_OK); return true; } catch { return false; } };
-const loadJson = async(p,f)=>(await exists(p))?JSON.parse(await readFile(p,"utf8")):f;
-const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
+    env:
+      PUBLIC_DIR: .
+      DEBUG: "0"
 
-/* --------------------------------- utils ----------------------------------- */
-const pad2=(n)=>String(n).padStart(2,"0");
-const monthKey=(y,m1)=>`${y}-${pad2(m1)}`;
-const dateKey=(y,m1,d)=>`${y}-${pad2(m1)}-${pad2(d)}`;
+      # ===== REQUIRED for Weekly Shorts names + live leaderboard =====
+      REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
+      CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
 
-function daysInMonthUTC(y, m1) {
-  // m1 is 1..12
-  return new Date(Date.UTC(y, m1, 0)).getUTCDate();
-}
+      # Optional: helps discovery if the campaign name differs slightly
+      # WS_MATCH: "weekly shorts"
 
-function monthFromIndexUTC(index=0){
-  // index 0 = current UTC month, 1 = previous, etc.
-  const now = new Date();
-  const base = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-  base.setUTCMonth(base.getUTCMonth() - Number(index || 0));
-  return { y: base.getUTCFullYear(), m1: base.getUTCMonth() + 1 };
-}
+      # Optional (BEST): pin the campaign so it can never pick the wrong one
+      # WS_CLUB_ID: ${{ secrets.WS_CLUB_ID }}
+      # WS_CAMPAIGN_ID: ${{ secrets.WS_CAMPAIGN_ID }}
 
-function stripTmFormatting(input){
-  if(!input || typeof input!=="string") return input;
-  const D="\uFFF0";
-  let s=input.replace(/\$\$/g,D);
-  s=s.replace(/\$[0-9a-fA-F]{1,3}|\$[a-zA-Z]|\$[<>\[\]\(\)]/g,"");
-  return s.replace(new RegExp(D,"g"),"$");
-}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-function tmioDayNumber(dayObj,idx){
-  return dayObj?.day ?? dayObj?.dayIndex ?? dayObj?.monthDay ?? dayObj?.dayInMonth ?? (idx+1);
-}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+      - name: Run TOTD fetcher
+        run: |
+          echo "Running TOTD fetcher..."
+          node -v
+          node scripts/totd-fetcher.js
+          echo ""
+          echo "TOTD outputs:"
+          ls -R data/totd || true
+          ls -l totd.json || true
 
-async function fetchRetry(url,opts={},retries=5,baseDelay=500){
-  let lastErr;
-  for(let i=0;i<=retries;i++){
-    try{
-      const r=await fetch(url,{ ...opts, headers:{ "User-Agent":USER_AGENT, ...(opts.headers||{}) }});
-      if(r.status===429 || (r.status>=500 && r.status<=599)){
-        const wait=Math.min(baseDelay*Math.pow(2,i),8000);
-        if (DEBUG) dlog(`retry ${i} ${r.status} ${url} wait=${wait}ms`);
-        await sleep(wait);
-        continue;
-      }
-      return r;
-    }catch(e){
-      lastErr=e;
-      const wait=Math.min(baseDelay*Math.pow(2,i),8000);
-      if (DEBUG) dlog(`retry ${i} err ${e?.message||e} wait=${wait}ms`);
-      await sleep(wait);
-    }
-  }
-  throw lastErr || new Error(`fetch failed for ${url}`);
-}
+      - name: Run Weekly Shorts updater
+        run: |
+          echo "Running Weekly Shorts updater..."
+          node -v
+          node scripts/weekly-shorts-update.js
+          echo ""
+          echo "Weekly Shorts outputs:"
+          ls -R data/weekly-shorts || true
+          echo ""
+          echo "Weeks index preview:"
+          cat data/weekly-shorts/weeks.json || true
 
-/* ------------------------------ tm.io helpers ------------------------------ */
-async function fetchTmioMonth(index=0){
-  const r=await fetchRetry(`${TMIO}/api/totd/${index}`);
-  if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
-  return r.json();
-}
+      - name: Compute combined content hash
+        id: newhash
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmplist=$(mktemp)
 
-/* ------------------------------ TMX helpers -------------------------------- */
-async function fetchTmxInfoByUid(uid){
-  if (!uid) return null;
-  const url = `${TMX_API}/maps/get_map_info/uid/${encodeURIComponent(uid)}`;
-  const r = await fetchRetry(url);
-  if (!r.ok) { dlog("TMX uid lookup failed", uid, r.status); return null; }
-  try {
-    const j = await r.json();
-    if (!j || typeof j !== "object") return null;
-    if (j.TrackUID && j.TrackUID !== uid) return null;
-    return j;
-  } catch { return null; }
-}
+          # TOTD outputs
+          if [ -f totd.json ]; then
+            echo "totd.json" >> "$tmplist"
+          fi
+          if [ -d data/totd ]; then
+            find data/totd -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+          fi
 
-async function fetchTmxInfoById(trackId){
-  if (!trackId) return null;
-  const url = `${TMX_API}/maps/get_map_info/id/${encodeURIComponent(trackId)}`;
-  const r = await fetchRetry(url);
-  if (!r.ok) return null;
-  try {
-    const j = await r.json();
-    if (!j || typeof j !== "object") return null;
-    if (!j.TrackID || String(j.TrackID) !== String(trackId)) return null;
-    return j;
-  } catch { return null; }
-}
+          # Weekly Shorts outputs
+          if [ -d data/weekly-shorts ]; then
+            find data/weekly-shorts -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+          fi
 
-function tmxDownloadUrl(trackId, shortName){
-  const base = `${TMX_DL_BASE}/${encodeURIComponent(trackId)}`;
-  return shortName ? `${base}?shortName=${encodeURIComponent(shortName)}` : base;
-}
+          if [ -s "$tmplist" ]; then
+            HASH=$(xargs -a "$tmplist" -I{} sha256sum "{}" | sort | sha256sum | cut -d' ' -f1)
+          else
+            HASH="none"
+          fi
 
-function pickMedalFields(tmx){
-  const toInt = v => (v==null ? null : Number(v));
-  const diff  = v => (v==null ? null : Number(v));
-  return {
-    authorTime : toInt(tmx?.AuthorTime),
-    goldTime   : toInt(tmx?.GoldTime),
-    silverTime : toInt(tmx?.SilverTime),
-    bronzeTime : toInt(tmx?.BronzeTime),
-    difficulty : diff(tmx?.Difficulty)
-  };
-}
+          echo "new=$HASH" >> "$GITHUB_OUTPUT"
 
-async function fetchMapDetails(mapUid){
-  if (!mapUid) return { downloadUrl:null, medals:null };
+      - name: Read previous combined hash (if any)
+        id: prevhash
+        shell: bash
+        run: |
+          PREV=$(git show HEAD:.data.hash 2>/dev/null || true)
+          echo "prev=${PREV:-none}" >> "$GITHUB_OUTPUT"
 
-  // 1) Try TMX
-  try {
-    const tmx = await fetchTmxInfoByUid(mapUid);
-    if (tmx && tmx.TrackID) {
-      let shortName = tmx.ShortName || tmx.shortName || null;
+      - name: Commit updated data (only if changed)
+        if: steps.newhash.outputs.new != steps.prevhash.outputs.prev
+        shell: bash
+        run: |
+          echo "${{ steps.newhash.outputs.new }}" > .data.hash
 
-      if ((tmx.Unlisted === true || tmx.Unlisted === 1) && !shortName) {
-        const tmxById = await fetchTmxInfoById(tmx.TrackID);
-        shortName = tmxById?.ShortName || tmxById?.shortName || null;
-      }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      const downloadable = (tmx.Downloadable ?? true);
-      const downloadUrl = downloadable ? tmxDownloadUrl(tmx.TrackID, shortName) : null;
-      const medals = pickMedalFields(tmx);
+          # Stage BOTH sets of outputs
+          git add .data.hash totd.json data/totd/*.json data/weekly-shorts/**/*.json 2>/dev/null || true
 
-      return { downloadUrl, medals };
-    }
-  } catch (e) {
-    dlog("TMX resolver err", mapUid, e?.message || e);
-  }
+          if ! git diff --cached --quiet; then
+            echo "Changes detected — committing updates."
+            git commit -m "data: refresh TOTD + Weekly Shorts [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
+            git push
+          else
+            echo "No staged changes."
+          fi
 
-  // 2) Fallback to trackmania.io map detail
-  try {
-    const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
-    if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return { downloadUrl:null, medals:null }; }
-    const j = await r.json();
-    return { downloadUrl: j?.file || j?.download || null, medals:null };
-  } catch (e) {
-    dlog("tm.io resolver err", mapUid, e?.message || e);
-    return { downloadUrl:null, medals:null };
-  }
-}
-
-/* ------------------------------ month writing ------------------------------ */
-async function rebuildMonthIndex(dir){
-  await ensureDir(dir);
-  const items=await readdir(dir,{withFileTypes:true});
-  const months=items
-    .filter(e=>e.isFile()&&e.name.endsWith(".json")&&e.name!=="months.json"&&!e.name.startsWith("_"))
-    .map(e=>e.name.replace(/\.json$/,""))
-    .sort().reverse();
-  await writeJson(path.join(dir,"months.json"),{ months });
-}
-
-function baseDayRecord(y,m1,entry,idx){
-  const m=entry.map||entry;
-  const uid=m.mapUid??entry.mapUid??null;
-  let name=m.name??m.mapName??entry.name??"(unknown map)";
-  let authorDisplayName=m.authorPlayer?.name??m.authorplayer?.name??m.authorName??m.author??entry.authorPlayer?.name??entry.authorplayer?.name??"(unknown)";
-  const thumb=m.thumbnail??m.thumbnailUrl??entry.thumbnail??entry.thumbnailUrl??"";
-  const authorAccountId=m.authorPlayer?.accountId??m.authorplayer?.accountid??entry.authorPlayer?.accountId??entry.authorplayer?.accountid??null;
-  const d=tmioDayNumber(entry,idx);
-
-  name=stripTmFormatting(name);
-  authorDisplayName=stripTmFormatting(authorDisplayName);
-
-  return {
-    date: dateKey(y,m1,d),
-    day: d,
-    map: {
-      uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb,
-      downloadUrl: null,
-      authorTime:null, goldTime:null, silverTime:null, bronzeTime:null, difficulty:null
-    }
-  };
-}
-
-async function writeTotdMonth(index=0){
-  const j=await fetchTmioMonth(index);
-
-  // ✅ Authoritative month labeling comes from index, not resp.month
-  const { y, m1 } = monthFromIndexUTC(index);
-  const mKey = monthKey(y,m1);
-
-  const dim = daysInMonthUTC(y, m1);
-  dlog(`index=${index} => ${mKey} (daysInMonth=${dim}) tm.io days=${Array.isArray(j.days)?j.days.length:0}`);
-
-  const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
-  const prev = await loadJson(monthPath, { month:mKey, days:{} });
-  const prevDays = prev?.days || {};
-
-  const rawDaysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
-
-  // ✅ Hard guard: never allow impossible days for the month
-  const daysArr = rawDaysArr.filter(rec => Number(rec.day) >= 1 && Number(rec.day) <= dim);
-
-  for (const rec of daysArr){
-    const prevRec = prevDays[rec.date]?.map || {};
-
-    // preserve any manual downloadUrl
-    if (prevRec.downloadUrl) rec.map.downloadUrl = prevRec.downloadUrl;
-
-    if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime==null)){
-      const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
-      if (!rec.map.downloadUrl) rec.map.downloadUrl = downloadUrl || null;
-      if (medals){
-        rec.map.authorTime = medals.authorTime;
-        rec.map.goldTime   = medals.goldTime;
-        rec.map.silverTime = medals.silverTime;
-        rec.map.bronzeTime = medals.bronzeTime;
-        rec.map.difficulty = medals.difficulty;
-      }
-      await sleep(120);
-    }else{
-      rec.map.authorTime = prevRec.authorTime ?? rec.map.authorTime;
-      rec.map.goldTime   = prevRec.goldTime   ?? rec.map.goldTime;
-      rec.map.silverTime = prevRec.silverTime ?? rec.map.silverTime;
-      rec.map.bronzeTime = prevRec.bronzeTime ?? rec.map.bronzeTime;
-      rec.map.difficulty = prevRec.difficulty ?? rec.map.difficulty;
-    }
-  }
-
-  const daysOut={}; for (const rec of daysArr){ daysOut[rec.date]={ date: rec.date, map: rec.map }; }
-  await ensureDir(TOTD_DIR);
-  await writeJson(monthPath,{ month:mKey, days:daysOut });
-  await rebuildMonthIndex(TOTD_DIR);
-
-  // latest snapshot from this month only (if it has any days)
-  const keys=Object.keys(daysOut).sort();
-  const latestKey=keys[keys.length-1]||null;
-  if(latestKey){
-    const latest=daysOut[latestKey];
-    await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
-  }
-
-  return mKey;
-}
-
-/* ----------------------------------- main ---------------------------------- */
-async function main(){
-  await ensureDir(TOTD_DIR);
-
-  // Write current + previous + two months back (safe now because labeling is index-based)
-  await writeTotdMonth(0);
-  await writeTotdMonth(1);
-  await writeTotdMonth(2);
-
-  console.log("[DONE] TOTD updated with TMX medal times + difficulty.");
-}
-
-main().catch(err=>{ console.error(err); process.exit(1); });
+      - name: No changes — skip
+        if: steps.newhash.outputs.new == steps.prevhash.outputs.prev
+        run: echo "No content changes detected; nothing to push."
