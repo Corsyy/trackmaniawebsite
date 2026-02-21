@@ -42,9 +42,13 @@ jobs:
           echo "Root snapshot:"
           ls -l totd.json || true
 
-      # Weekly Shorts updater should NOT be able to block TOTD commits
+      # Weekly Shorts updater (non-blocking) + correct secret mapping
       - name: Run Weekly Shorts updater
         continue-on-error: true
+        env:
+          REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
+          CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
         run: |
           echo "Running Weekly Shorts updater..."
           node -v
@@ -64,7 +68,6 @@ jobs:
           set -euo pipefail
           tmplist=$(mktemp)
 
-          # Hash totd.json (if present) + all JSONs under data/totd in stable order
           if [ -f totd.json ]; then
             echo "totd.json" >> "$tmplist"
           fi
@@ -95,7 +98,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stage TOTD-related files + hash (include months.json so new months appear)
+          # Include months.json so new months (Feb) appear properly
           git add .totd.hash totd.json data/totd/*.json data/totd/months.json 2>/dev/null || true
 
           if ! git diff --cached --quiet; then
