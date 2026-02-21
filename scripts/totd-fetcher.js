@@ -27,6 +27,7 @@ const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
 const pad2=(n)=>String(n).padStart(2,"0");
 const monthKey=(y,m1)=>`${y}-${pad2(m1)}`;
 const dateKey=(y,m1,d)=>`${y}-${pad2(m1)}-${pad2(d)}`;
+
 function stripTmFormatting(input){
   if(!input || typeof input!=="string") return input;
   const D="\uFFF0";
@@ -34,9 +35,13 @@ function stripTmFormatting(input){
   s=s.replace(/\$[0-9a-fA-F]{1,3}|\$[a-zA-Z]|\$[<>\[\]\(\)]/g,"");
   return s.replace(new RegExp(D,"g"),"$");
 }
-function tmioDayNumber(dayObj,idx){ return dayObj?.day??dayObj?.dayIndex??dayObj?.monthDay??dayObj?.dayInMonth??(idx+1); }
+
+function tmioDayNumber(dayObj,idx){
+  return dayObj?.day ?? dayObj?.dayIndex ?? dayObj?.monthDay ?? dayObj?.dayInMonth ?? (idx+1);
+}
 
 async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
 async function fetchRetry(url,opts={},retries=5,baseDelay=500){
   let lastErr;
   for(let i=0;i<=retries;i++){
@@ -65,16 +70,32 @@ async function fetchTmioMonth(index=0){
   if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
+
+/**
+ * tm.io sometimes returns month.month as 0–11, but it may also come back 1–12.
+ * This parser supports both:
+ * - if month is 1..12, use as-is
+ * - if month is 0..11, add 1
+ */
 function tmioMonthYear(resp){
-  const y=resp?.month?.year??new Date().getUTCFullYear();
-  const m1=(resp?.month?.month??new Date().getUTCMonth())+1;
-  return { y,m1 };
+  const yRaw = resp?.month?.year;
+  const mRaw = resp?.month?.month;
+
+  const now = new Date();
+  const y = Number.isFinite(Number(yRaw)) ? Number(yRaw) : now.getUTCFullYear();
+
+  let m1;
+  if (Number.isFinite(Number(mRaw))) {
+    const mNum = Number(mRaw);
+    if (mNum >= 1 && mNum <= 12) m1 = mNum;      // 1-based
+    else if (mNum >= 0 && mNum <= 11) m1 = mNum + 1; // 0-based
+  }
+  if (!m1) m1 = now.getUTCMonth() + 1;
+
+  return { y, m1 };
 }
 
-/* ------------------------------ TMX helpers --------------------------------
-   We try TMX first: UID -> TMX map info (TrackID, medal times, difficulty, etc).
-   If TMX lacks the map, we fall back to trackmania.io for a download.
------------------------------------------------------------------------------*/
+/* ------------------------------ TMX helpers -------------------------------- */
 async function fetchTmxInfoByUid(uid){
   if (!uid) return null;
   const url = `${TMX_API}/maps/get_map_info/uid/${encodeURIComponent(uid)}`;
@@ -106,9 +127,7 @@ function tmxDownloadUrl(trackId, shortName){
   return shortName ? `${base}?shortName=${encodeURIComponent(shortName)}` : base;
 }
 
-/* --------------------------- download & medals ----------------------------- */
 function pickMedalFields(tmx){
-  // TMX returns ms times; Difficulty is an integer-ish category (0–5+).
   const toInt = v => (v==null ? null : Number(v));
   const diff  = v => (v==null ? null : Number(v));
   return {
@@ -123,7 +142,7 @@ function pickMedalFields(tmx){
 async function fetchMapDetails(mapUid){
   if (!mapUid) return { downloadUrl:null, medals:null };
 
-  // 1) Try TMX (prefer — gives us medals + difficulty + often a valid download)
+  // 1) Try TMX
   try {
     const tmx = await fetchTmxInfoByUid(mapUid);
     if (tmx && tmx.TrackID) {
@@ -144,7 +163,7 @@ async function fetchMapDetails(mapUid){
     dlog("TMX resolver err", mapUid, e?.message || e);
   }
 
-  // 2) Fallback to trackmania.io for a file URL (no medals here)
+  // 2) Fallback to trackmania.io map file URL
   try {
     const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
     if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return { downloadUrl:null, medals:null }; }
@@ -175,7 +194,10 @@ function baseDayRecord(y,m1,entry,idx){
   const thumb=m.thumbnail??m.thumbnailUrl??entry.thumbnail??entry.thumbnailUrl??"";
   const authorAccountId=m.authorPlayer?.accountId??m.authorplayer?.accountid??entry.authorPlayer?.accountId??entry.authorplayer?.accountid??null;
   const d=tmioDayNumber(entry,idx);
-  name=stripTmFormatting(name); authorDisplayName=stripTmFormatting(authorDisplayName);
+
+  name=stripTmFormatting(name);
+  authorDisplayName=stripTmFormatting(authorDisplayName);
+
   return {
     date: dateKey(y,m1,d),
     map: {
@@ -187,27 +209,25 @@ function baseDayRecord(y,m1,entry,idx){
 }
 
 async function writeTotdMonth(index=0){
-  // 0) load remote list
   const j=await fetchTmioMonth(index);
   const {y,m1}=tmioMonthYear(j);
   const mKey=monthKey(y,m1);
 
-  // 1) load existing month file (so manual overrides are preserved)
+  dlog(`tm.io index=${index} -> month=${mKey}`);
+
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
   const prev = await loadJson(monthPath, { month:mKey, days:{} });
   const prevDays = prev?.days || {};
 
-  // 2) normalize remote -> day records
   const daysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
 
-  // 3) hydrate each day with TMX medals/difficulty + download, preserving any manual downloadUrl
   for (const rec of daysArr){
     const prevRec = prevDays[rec.date]?.map || {};
-    // keep any manual/previous link
+
     if (prevRec.downloadUrl) {
       rec.map.downloadUrl = prevRec.downloadUrl;
     }
-    // only fetch if we have a UID and no preserved link/medals yet
+
     if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime==null)){
       const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
       if (!rec.map.downloadUrl) rec.map.downloadUrl = downloadUrl || null;
@@ -218,9 +238,8 @@ async function writeTotdMonth(index=0){
         rec.map.bronzeTime = medals.bronzeTime;
         rec.map.difficulty = medals.difficulty;
       }
-      await sleep(120); // be nice to public APIs
+      await sleep(120);
     }else{
-      // carry forward previously stored medals/difficulty if present
       rec.map.authorTime = prevRec.authorTime ?? rec.map.authorTime;
       rec.map.goldTime   = prevRec.goldTime   ?? rec.map.goldTime;
       rec.map.silverTime = prevRec.silverTime ?? rec.map.silverTime;
@@ -229,13 +248,11 @@ async function writeTotdMonth(index=0){
     }
   }
 
-  // 4) write month file
   const daysOut={}; for (const rec of daysArr){ daysOut[rec.date]=rec; }
   await ensureDir(TOTD_DIR);
   await writeJson(monthPath,{ month:mKey, days:daysOut });
   await rebuildMonthIndex(TOTD_DIR);
 
-  // 5) write latest snapshot
   const keys=Object.keys(daysOut).sort();
   const latestKey=keys[keys.length-1]||null;
   if(latestKey){
@@ -246,12 +263,44 @@ async function writeTotdMonth(index=0){
   }else{
     dlog("no days found for", mKey);
   }
+
+  return mKey;
+}
+
+/**
+ * Ensure the current UTC month file exists (even if tm.io is lagging behind on rollover).
+ * This prevents your UI from getting "stuck" without a month entry.
+ * When tm.io starts returning the new month, it will overwrite this file with real days.
+ */
+async function ensureCurrentMonthFile(){
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const m1 = now.getUTCMonth() + 1;
+  const mKey = monthKey(y, m1);
+  const monthPath = path.join(TOTD_DIR, `${mKey}.json`);
+
+  if (!(await exists(monthPath))) {
+    dlog(`Creating empty current-month placeholder: ${mKey}.json`);
+    await ensureDir(TOTD_DIR);
+    await writeJson(monthPath, { month: mKey, days: {} });
+    await rebuildMonthIndex(TOTD_DIR);
+  }
 }
 
 /* ----------------------------------- main ---------------------------------- */
 async function main(){
   await ensureDir(TOTD_DIR);
-  await writeTotdMonth(0); // current month (index 0)
+
+  // Write multiple indices to handle month rollover reliably
+  // index 0 = current, 1 = previous, 2 = two months back
+  await writeTotdMonth(0);
+  await writeTotdMonth(1);
+  await writeTotdMonth(2);
+
+  // If tm.io is lagging and doesn't expose the new month yet, ensure the file exists anyway
+  await ensureCurrentMonthFile();
+
   console.log("[DONE] TOTD updated with TMX medal times + difficulty.");
 }
+
 main().catch(err=>{ console.error(err); process.exit(1); });
