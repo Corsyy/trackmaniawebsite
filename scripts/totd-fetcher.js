@@ -10,9 +10,9 @@ const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
 const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
 const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
 const TMIO        = "https://trackmania.io";
-const TMX_API     = "https://trackmania.exchange/api"; // base for TMX API
+const TMX_API     = "https://trackmania.exchange/api";
 const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
-const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.1 (github action)";
+const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.2 (github action)";
 
 const DEBUG = process.env.DEBUG === "1";
 const dlog  = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
@@ -27,6 +27,19 @@ const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
 const pad2=(n)=>String(n).padStart(2,"0");
 const monthKey=(y,m1)=>`${y}-${pad2(m1)}`;
 const dateKey=(y,m1,d)=>`${y}-${pad2(m1)}-${pad2(d)}`;
+
+function daysInMonthUTC(y, m1) {
+  // m1 is 1..12
+  return new Date(Date.UTC(y, m1, 0)).getUTCDate();
+}
+
+function monthFromIndexUTC(index=0){
+  // index 0 = current UTC month, 1 = previous, etc.
+  const now = new Date();
+  const base = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  base.setUTCMonth(base.getUTCMonth() - Number(index || 0));
+  return { y: base.getUTCFullYear(), m1: base.getUTCMonth() + 1 };
+}
 
 function stripTmFormatting(input){
   if(!input || typeof input!=="string") return input;
@@ -69,30 +82,6 @@ async function fetchTmioMonth(index=0){
   const r=await fetchRetry(`${TMIO}/api/totd/${index}`);
   if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
-}
-
-/**
- * tm.io sometimes returns month.month as 0–11, but it may also come back 1–12.
- * This parser supports both:
- * - if month is 1..12, use as-is
- * - if month is 0..11, add 1
- */
-function tmioMonthYear(resp){
-  const yRaw = resp?.month?.year;
-  const mRaw = resp?.month?.month;
-
-  const now = new Date();
-  const y = Number.isFinite(Number(yRaw)) ? Number(yRaw) : now.getUTCFullYear();
-
-  let m1;
-  if (Number.isFinite(Number(mRaw))) {
-    const mNum = Number(mRaw);
-    if (mNum >= 1 && mNum <= 12) m1 = mNum;      // 1-based
-    else if (mNum >= 0 && mNum <= 11) m1 = mNum + 1; // 0-based
-  }
-  if (!m1) m1 = now.getUTCMonth() + 1;
-
-  return { y, m1 };
 }
 
 /* ------------------------------ TMX helpers -------------------------------- */
@@ -163,7 +152,7 @@ async function fetchMapDetails(mapUid){
     dlog("TMX resolver err", mapUid, e?.message || e);
   }
 
-  // 2) Fallback to trackmania.io map file URL
+  // 2) Fallback to trackmania.io map detail
   try {
     const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
     if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return { downloadUrl:null, medals:null }; }
@@ -200,6 +189,7 @@ function baseDayRecord(y,m1,entry,idx){
 
   return {
     date: dateKey(y,m1,d),
+    day: d,
     map: {
       uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb,
       downloadUrl: null,
@@ -210,23 +200,28 @@ function baseDayRecord(y,m1,entry,idx){
 
 async function writeTotdMonth(index=0){
   const j=await fetchTmioMonth(index);
-  const {y,m1}=tmioMonthYear(j);
-  const mKey=monthKey(y,m1);
 
-  dlog(`tm.io index=${index} -> month=${mKey}`);
+  // ✅ Authoritative month labeling comes from index, not resp.month
+  const { y, m1 } = monthFromIndexUTC(index);
+  const mKey = monthKey(y,m1);
+
+  const dim = daysInMonthUTC(y, m1);
+  dlog(`index=${index} => ${mKey} (daysInMonth=${dim}) tm.io days=${Array.isArray(j.days)?j.days.length:0}`);
 
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
   const prev = await loadJson(monthPath, { month:mKey, days:{} });
   const prevDays = prev?.days || {};
 
-  const daysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
+  const rawDaysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
+
+  // ✅ Hard guard: never allow impossible days for the month
+  const daysArr = rawDaysArr.filter(rec => Number(rec.day) >= 1 && Number(rec.day) <= dim);
 
   for (const rec of daysArr){
     const prevRec = prevDays[rec.date]?.map || {};
 
-    if (prevRec.downloadUrl) {
-      rec.map.downloadUrl = prevRec.downloadUrl;
-    }
+    // preserve any manual downloadUrl
+    if (prevRec.downloadUrl) rec.map.downloadUrl = prevRec.downloadUrl;
 
     if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime==null)){
       const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
@@ -248,57 +243,30 @@ async function writeTotdMonth(index=0){
     }
   }
 
-  const daysOut={}; for (const rec of daysArr){ daysOut[rec.date]=rec; }
+  const daysOut={}; for (const rec of daysArr){ daysOut[rec.date]={ date: rec.date, map: rec.map }; }
   await ensureDir(TOTD_DIR);
   await writeJson(monthPath,{ month:mKey, days:daysOut });
   await rebuildMonthIndex(TOTD_DIR);
 
+  // latest snapshot from this month only (if it has any days)
   const keys=Object.keys(daysOut).sort();
   const latestKey=keys[keys.length-1]||null;
   if(latestKey){
     const latest=daysOut[latestKey];
     await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
-    dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "", "medals?",
-         latest.map?.authorTime!=null);
-  }else{
-    dlog("no days found for", mKey);
   }
 
   return mKey;
-}
-
-/**
- * Ensure the current UTC month file exists (even if tm.io is lagging behind on rollover).
- * This prevents your UI from getting "stuck" without a month entry.
- * When tm.io starts returning the new month, it will overwrite this file with real days.
- */
-async function ensureCurrentMonthFile(){
-  const now = new Date();
-  const y = now.getUTCFullYear();
-  const m1 = now.getUTCMonth() + 1;
-  const mKey = monthKey(y, m1);
-  const monthPath = path.join(TOTD_DIR, `${mKey}.json`);
-
-  if (!(await exists(monthPath))) {
-    dlog(`Creating empty current-month placeholder: ${mKey}.json`);
-    await ensureDir(TOTD_DIR);
-    await writeJson(monthPath, { month: mKey, days: {} });
-    await rebuildMonthIndex(TOTD_DIR);
-  }
 }
 
 /* ----------------------------------- main ---------------------------------- */
 async function main(){
   await ensureDir(TOTD_DIR);
 
-  // Write multiple indices to handle month rollover reliably
-  // index 0 = current, 1 = previous, 2 = two months back
+  // Write current + previous + two months back (safe now because labeling is index-based)
   await writeTotdMonth(0);
   await writeTotdMonth(1);
   await writeTotdMonth(2);
-
-  // If tm.io is lagging and doesn't expose the new month yet, ensure the file exists anyway
-  await ensureCurrentMonthFile();
 
   console.log("[DONE] TOTD updated with TMX medal times + difficulty.");
 }
