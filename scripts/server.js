@@ -350,7 +350,17 @@ function sanitizeRow(row) {
   if (!row.accountId || typeof row.accountId !== "string") return null;
   return { ...row, timeMs: ms };
 }
+app.get("/api/ws-debug", async (req,res)=>{
+ const access = await getLiveAccessToken();
+ const list = await getAllOfficialCampaigns(access);
 
+ res.json(
+   list.map(c=>({
+     id:c.id,
+     name:c.name
+   }))
+ );
+});
 async function getMapWR(accessToken, mapUid) {
   const groupUid = "Personal_Best";
   const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
