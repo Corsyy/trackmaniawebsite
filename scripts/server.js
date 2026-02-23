@@ -1058,7 +1058,166 @@ app.get("/api/debug-clubs", async (_req, res) => {
     res.status(500).json({ error: e?.message || String(e) });
   }
 });
+/* ========================= WEEKLY SHORTS (Live) =========================
+   Goal:
+   - /api/weekly-shorts/weeks  -> list available weeks + mapUids
+   - /api/weekly-shorts/week/:week -> maps + WR-ish top times (world #1 PB)
+   Notes:
+   - We discover weekly-shorts campaigns from official campaign list and cache it.
+   - If Nadeo changes naming, update WEEKLY_SHORTS_NAME_HINTS.
+========================================================================= */
 
+const WS_CACHE_TTL_MS = 10 * 60 * 1000; // 10 min
+let wsCache = { ts: 0, weeks: [] }; // [{ week, name, startAt, endAt, mapUids:[] }]
+
+const WEEKLY_SHORTS_NAME_HINTS = [
+  "weekly shorts",
+  "weeklyshorts",
+  "weekly short",
+  "weekly",
+];
+
+function norm(s) {
+  return String(s || "").trim().toLowerCase();
+}
+
+function pickCampaignName(c) {
+  return c?.name || c?.campaignName || c?.campaign?.name || "";
+}
+
+function pickPlaylistUids(c) {
+  const pl = c?.playlist || c?.campaign?.playlist || [];
+  return Array.isArray(pl) ? pl.map(p => p?.mapUid).filter(Boolean) : [];
+}
+
+function inferWeekIndexFromName(name) {
+  // Tries to find a number in the title, e.g. "Weekly Shorts - Week 12"
+  const m = String(name || "").match(/(?:week|wk)\s*#?\s*(\d{1,4})/i);
+  if (m) return Number(m[1]);
+  return null;
+}
+
+async function buildWeeklyShortsWeeks(accessToken) {
+  // Pull official campaigns and try to find weekly shorts items.
+  // NOTE: This depends on how Nadeo labels them; we do fuzzy matching.
+  const list = await getAllOfficialCampaigns(accessToken); // already exists above :contentReference[oaicite:4]{index=4}
+  const candidates = (list || []).filter(c => {
+    const n = norm(pickCampaignName(c));
+    return WEEKLY_SHORTS_NAME_HINTS.some(h => n.includes(h));
+  });
+
+  // Convert to weeks
+  const weeks = candidates.map((c, idx) => {
+    const name = pickCampaignName(c);
+    const mapUids = pickPlaylistUids(c);
+    const weekFromName = inferWeekIndexFromName(name);
+
+    // Some campaign objects have id, seasonUid, start/end timestamps; keep what exists.
+    return {
+      week: weekFromName ?? (idx + 1),
+      name,
+      campaignId: c?.id ?? c?.campaignId ?? null,
+      seasonUid: c?.seasonUid ?? null,
+      startAt: c?.startAt ?? c?.start ?? null,
+      endAt: c?.endAt ?? c?.end ?? null,
+      mapUids,
+    };
+  });
+
+  // Sort by week (if numeric) else newest-ish
+  weeks.sort((a, b) => (Number(a.week) || 0) - (Number(b.week) || 0));
+  return weeks;
+}
+
+async function getWeeklyShortsWeeksCached() {
+  if (wsCache.weeks.length && Date.now() - wsCache.ts < WS_CACHE_TTL_MS) return wsCache.weeks;
+
+  const access = await getLiveAccessToken();
+  const weeks = await buildWeeklyShortsWeeks(access);
+
+  wsCache = { ts: Date.now(), weeks };
+  return weeks;
+}
+
+app.get("/api/weekly-shorts/weeks", async (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+  try {
+    const cached = getCached(req);
+    if (cached) return res.json(cached);
+
+    const weeks = await getWeeklyShortsWeeksCached();
+
+    const payload = {
+      weeks: weeks.map(w => ({
+        week: w.week,
+        name: w.name,
+        startAt: w.startAt,
+        endAt: w.endAt,
+        mapCount: (w.mapUids || []).length,
+      })),
+      fetchedAt: wsCache.ts,
+    };
+
+    setCached(req, payload);
+    return res.json(payload);
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to load Weekly Shorts weeks", detail: e?.message || String(e) });
+  }
+});
+
+app.get("/api/weekly-shorts/week/:week", async (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+  try {
+    const cached = getCached(req);
+    if (cached) return res.json(cached);
+
+    const weekNum = Number(req.params.week);
+    if (!Number.isFinite(weekNum) || weekNum <= 0) {
+      return res.status(400).json({ error: "Invalid week number" });
+    }
+
+    const weeks = await getWeeklyShortsWeeksCached();
+    const w = weeks.find(x => Number(x.week) === weekNum);
+    if (!w) return res.status(404).json({ error: "Week not found", availableWeeks: weeks.map(x => x.week) });
+    if (!w.mapUids?.length) return res.status(404).json({ error: "Week has no maps", week: weekNum });
+
+    const access = await getLiveAccessToken();
+
+    // Fetch top world time for each map (like WR)
+    const rows = [];
+    for (let i = 0; i < w.mapUids.length; i++) {
+      const uid = w.mapUids[i];
+      const r = await getMapWR(access, uid); // already exists above :contentReference[oaicite:5]{index=5}
+      rows.push(r);
+      // small delay to avoid rate issues
+      if (i % 5 === 4) await new Promise(r => setTimeout(r, 60));
+    }
+
+    // Resolve display names for the week’s winners
+    const ids = rows.map(r => r?.accountId).filter(Boolean);
+    await resolveDisplayNames(access, ids); // already exists above :contentReference[oaicite:6]{index=6}
+    for (const r of rows) {
+      if (r?.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
+    }
+
+    const payload = {
+      week: w.week,
+      name: w.name,
+      startAt: w.startAt,
+      endAt: w.endAt,
+      maps: w.mapUids.map((uid, idx) => ({
+        mapUid: uid,
+        top: rows[idx] || { mapUid: uid, empty: true },
+      })),
+      fetchedAt: Date.now(),
+    };
+
+    setCached(req, payload);
+    return res.json(payload);
+  } catch (e) {
+    return res.status(500).json({ error: "Failed to load Weekly Shorts week", detail: e?.message || String(e) });
+  }
+});
 /* ------------------------- Start --------------------------- */
 process.on("unhandledRejection", (err) => console.error("UNHANDLED_REJECTION:", err));
 process.on("uncaughtException", (err) => console.error("UNCAUGHT_EXCEPTION:", err));
