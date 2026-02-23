@@ -27,19 +27,29 @@ import https from "https";
  *   CLUB_UID_TTL_HOURS      = 24
  *   MAX_WR_MS               = (defaults to 24h in ms)
  *   RESPONSE_TTL_SECONDS    = 3  (small LRU TTL for route responses)
+ *
+ * Weekly Shorts optional ENV:
+ *   WS_CAMPAIGN_ID          = pin official campaign id for Weekly Shorts discovery
+ *   WS_NAME_MATCH           = fallback name matcher (default: "weekly shorts")
+ *   WS_CACHE_TTL_SECONDS    = seconds for WS cached computations (default: 600)
+ *   WS_CHANGELOG_PATH       = disk path for changelog persistence (default: /tmp/ws_changelog.json)
  */
 
 const app = express();
 
 /* ------------------------------ Perf -------------------------------- */
-// gzip/br compression
 app.use(compression({ level: 6 }));
 
-// HTTP/HTTPS keep-alive for node-fetch
+/* --------------------- HTTP/HTTPS keep-alive ------------------------ */
 const keepAliveHttpAgent = new http.Agent({ keepAlive: true, maxSockets: 50 });
 const keepAliveHttpsAgent = new https.Agent({ keepAlive: true, maxSockets: 50 });
+
 const baseFetch = (url, opts = {}) =>
-  fetch(url, { agent: (parsedUrl => (String(parsedUrl).startsWith("https:") ? keepAliveHttpsAgent : keepAliveHttpAgent))(url), ...opts });
+  fetch(url, {
+    agent: ((parsedUrl) =>
+      String(parsedUrl).startsWith("https:") ? keepAliveHttpsAgent : keepAliveHttpAgent)(url),
+    ...opts,
+  });
 
 /* --------------------------- CORS --------------------------- */
 const DEFAULT_ORIGINS = new Set([
@@ -80,7 +90,8 @@ function cleanToken(s) {
   if (!s) return "";
   let t = s.trim();
   if (t.toLowerCase().startsWith("nadeo_v1 t=")) t = t.slice("nadeo_v1 t=".length).trim();
-  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) t = t.slice(1, -1);
+  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
+    t = t.slice(1, -1);
   return t;
 }
 const REFRESH_TOKEN_FILE = process.env.REFRESH_TOKEN_FILE || "/data/nadeo_refresh_token.txt";
@@ -100,48 +111,54 @@ function persistRefreshToken(rt) {
     if (!rt) return;
     fs.mkdirSync(path.dirname(REFRESH_TOKEN_FILE), { recursive: true });
     fs.writeFileSync(REFRESH_TOKEN_FILE, rt, "utf8");
-    runtimeRefreshToken = rt; // update in-memory immediately
+    runtimeRefreshToken = rt;
   } catch (e) {
     console.error("⚠️ Failed to persist refresh token:", e?.message || e);
   }
 }
 
 /* -------------------- Auth (refresh -> access) -------------- */
-const CORE_REFRESH_URL = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
+const CORE_REFRESH_URL =
+  "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
 let cachedAccess = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
   const now = Date.now();
-  if (cachedAccess.token && now < cachedAccess.expAt - 30_000)
-    return cachedAccess.token;
+  if (cachedAccess.token && now < cachedAccess.expAt - 30_000) return cachedAccess.token;
 
   const refresh = getRefreshToken();
   if (!refresh) throw new Error("Missing REFRESH_TOKEN");
 
-  const r = await fetchWithTimeout(CORE_REFRESH_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `nadeo_v1 t=${refresh}`,
-      "Content-Type": "application/json",
-      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+  const r = await fetchWithTimeout(
+    CORE_REFRESH_URL,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `nadeo_v1 t=${refresh}`,
+        "Content-Type": "application/json",
+        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+      },
+      body: "{}",
     },
-    body: "{}",
-  }, 15000);
+    15000
+  );
 
   if (!r.ok) {
     const body = await r.text().catch(() => "");
-    throw new Error(`refresh failed ${r.status} ${body || "(no body)"} [len=${refresh.length}]`);
+    throw new Error(
+      `refresh failed ${r.status} ${body || "(no body)"} [len=${refresh.length}]`
+    );
   }
 
   const j = await r.json();
-  const accessToken  = j.accessToken  || j.access_token;
-  const expiresIn    = j.expiresIn    || j.expires_in || 3600;
-  const newRefresh   = j.refreshToken || j.refresh_token;
+  const accessToken = j.accessToken || j.access_token;
+  const expiresIn = j.expiresIn || j.expires_in || 3600;
+  const newRefresh = j.refreshToken || j.refresh_token;
 
   if (!accessToken) throw new Error("no accessToken in refresh response");
 
   if (typeof newRefresh === "string" && newRefresh.trim()) {
-    persistRefreshToken(cleanToken(newRefresh)); // ✅ auto-rotate refresh
+    persistRefreshToken(cleanToken(newRefresh));
   }
 
   cachedAccess = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
@@ -155,23 +172,26 @@ let cachedOAuth = { token: null, expAt: 0 };
 
 async function getOAuthToken() {
   const now = Date.now();
-  if (cachedOAuth.token && now < cachedOAuth.expAt - 30_000)
-    return cachedOAuth.token;
+  if (cachedOAuth.token && now < cachedOAuth.expAt - 30_000) return cachedOAuth.token;
   if (!OAUTH_CLIENT_ID || !OAUTH_CLIENT_SECRET)
     throw new Error("Missing CLIENT_ID / CLIENT_SECRET");
 
-  const r = await fetchWithTimeout("https://api.trackmania.com/api/access_token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+  const r = await fetchWithTimeout(
+    "https://api.trackmania.com/api/access_token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+      },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: OAUTH_CLIENT_ID,
+        client_secret: OAUTH_CLIENT_SECRET,
+      }).toString(),
     },
-    body: new URLSearchParams({
-      grant_type: "client_credentials",
-      client_id: OAUTH_CLIENT_ID,
-      client_secret: OAUTH_CLIENT_SECRET,
-    }).toString(),
-  }, 15000);
+    15000
+  );
   if (!r.ok) throw new Error(`oauth token failed ${r.status} ${await r.text()}`);
   const j = await r.json();
   const accessToken = j.access_token || j.accessToken;
@@ -185,13 +205,17 @@ async function getOAuthToken() {
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 
 async function jget(url, accessToken) {
-  const r = await fetchWithTimeout(url, {
-    headers: {
-      Authorization: `nadeo_v1 t=${accessToken}`,
-      "User-Agent": "trackmaniaevents.com/1.0 (Render)",
-      Accept: "application/json",
+  const r = await fetchWithTimeout(
+    url,
+    {
+      headers: {
+        Authorization: `nadeo_v1 t=${accessToken}`,
+        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+        Accept: "application/json",
+      },
     },
-  }, 15000);
+    15000
+  );
   if (!r.ok) throw new Error(`${url} -> ${r.status}`);
   return r.json();
 }
@@ -209,7 +233,12 @@ function countMonthsFrom2020July() {
   const now = new Date();
   const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
   let count = 0;
-  for (let d = start; d <= end; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))) count++;
+  for (
+    let d = start;
+    d <= end;
+    d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))
+  )
+    count++;
   return count;
 }
 
@@ -256,7 +285,8 @@ async function listAllClubCampaignRefsWithPlaylists(accessToken) {
       const campaignId = it?.id ?? it?.campaignId ?? it?.campaign?.id;
       const updatedAt = new Date(it?.updated || it?.updatedAt || 0).getTime() || 0;
       const playlist = (it?.campaign?.playlist || it?.playlist || [])
-        .map((p) => p?.mapUid).filter(Boolean);
+        .map((p) => p?.mapUid)
+        .filter(Boolean);
       if (clubId && campaignId) out.push({ clubId, campaignId, updatedAt, playlist });
     }
 
@@ -268,7 +298,9 @@ async function listAllClubCampaignRefsWithPlaylists(accessToken) {
 }
 
 async function fetchClubCampaignPlaylist(accessToken, clubId, campaignId) {
-  const url = `${LIVE_BASE}/api/token/club/${encodeURIComponent(clubId)}/campaign/${encodeURIComponent(campaignId)}`;
+  const url = `${LIVE_BASE}/api/token/club/${encodeURIComponent(
+    clubId
+  )}/campaign/${encodeURIComponent(campaignId)}`;
   try {
     const j = await jget(url, accessToken);
     const playlist = j?.campaign?.playlist || j?.playlist || [];
@@ -307,8 +339,7 @@ function normalizeToSeconds(val) {
   return 0;
 }
 
-/* ---- sanity for WR times ---- */
-const MAX_WR_MS = Number(process.env.MAX_WR_MS || 24 * 3600 * 1000); // cap at 24h by default
+const MAX_WR_MS = Number(process.env.MAX_WR_MS || 24 * 3600 * 1000);
 function isValidTimeMs(ms) {
   return Number.isFinite(ms) && ms > 0 && ms < MAX_WR_MS;
 }
@@ -338,7 +369,7 @@ async function getMapWR(accessToken, mapUid) {
 }
 
 /* ---------------------- Display names ---------------------- */
-const nameCache = new Map(); // accountId -> displayName
+const nameCache = new Map();
 
 async function resolveDisplayNames(_liveAccessToken, ids) {
   const all = Array.from(new Set((ids || []).filter(Boolean)));
@@ -368,7 +399,7 @@ async function resolveDisplayNames(_liveAccessToken, ids) {
         for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
         continue;
       }
-      const j = await r.json(); // { "<accountId>": "DisplayName" }
+      const j = await r.json();
       for (const id of batch) {
         const dn = j?.[id];
         nameCache.set(id, (typeof dn === "string" && dn) || id);
@@ -388,8 +419,7 @@ let metaCache = { officialSet: new Set(), clubSet: new Set(), allMapUids: [] };
 const WR_CONCURRENCY = Number(process.env.WR_CONCURRENCY || 8);
 const CLUB_UID_TTL = Number(process.env.CLUB_UID_TTL_HOURS || 24) * 3600 * 1000;
 const QUICK_REFRESH_COUNT = Number(process.env.QUICK_REFRESH_COUNT || 100);
-const AUTO_UID_REFRESH =
-  (process.env.AUTO_UID_REFRESH ?? "true").toLowerCase() === "true";
+const AUTO_UID_REFRESH = (process.env.AUTO_UID_REFRESH ?? "true").toLowerCase() === "true";
 
 const DISK_WR = process.env.CACHE_PATH_WR || "/tmp/wr_cache.json";
 const DISK_CLUB = process.env.CACHE_PATH_CLUB || "/tmp/club_uids.json";
@@ -408,7 +438,6 @@ function saveJson(pathname, obj) {
   } catch {}
 }
 
-/* --------------------- Build utilities --------------------- */
 function includeClubByDefault() {
   return (process.env.INCLUDE_CLUB_BY_DEFAULT ?? "true").toLowerCase() === "true";
 }
@@ -454,7 +483,7 @@ async function fetchAllWRs(access, allMapUids, officialSet, clubSet) {
           row = sanitizeRow(await getMapWR(access, uid));
         }
         if (!row) return null;
-        row.sourceType = officialSet.has(uid) ? "official" : (clubSet.has(uid) ? "club" : "totd");
+        row.sourceType = officialSet.has(uid) ? "official" : clubSet.has(uid) ? "club" : "totd";
         return row;
       })
     );
@@ -469,7 +498,6 @@ function swapCache(rows) {
   saveJson(DISK_WR, wrCache);
 }
 
-/* ---------------------- Full build (one-shot) -------------- */
 async function buildAllWRs({ includeClub = true } = {}) {
   const access = await getLiveAccessToken();
   const { officialSet, clubSet, allMapUids } = await computeAllMapUids(access, { includeClub });
@@ -484,7 +512,6 @@ async function buildAllWRs({ includeClub = true } = {}) {
   return wrCache.rows;
 }
 
-/* ------------- Rebuild but only apply actual changes ------- */
 function diffAndMergeByMap(oldRows, newRows) {
   const byOld = new Map(oldRows.map((r) => [r.mapUid, r]));
   const byNew = new Map(newRows.map((r) => [r.mapUid, r]));
@@ -492,7 +519,12 @@ function diffAndMergeByMap(oldRows, newRows) {
 
   for (const [uid, n] of byNew) {
     const o = byOld.get(uid);
-    if (!o || o.accountId !== n.accountId || o.timeMs !== n.timeMs || (o.timestamp || 0) !== (n.timestamp || 0)) {
+    if (
+      !o ||
+      o.accountId !== n.accountId ||
+      o.timeMs !== n.timeMs ||
+      (o.timestamp || 0) !== (n.timestamp || 0)
+    ) {
       updated.push(n);
     }
   }
@@ -538,7 +570,6 @@ async function rebuildNow({ includeClub }) {
   };
 }
 
-/* ----------- Quick refresh (only when requested) ----------- */
 async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
   if (!wrCache.rows.length) return;
   const access = await getLiveAccessToken();
@@ -558,7 +589,12 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
   let changed = 0;
   for (const r of fresh) {
     const prev = byMap.get(r.mapUid);
-    if (!prev || prev.accountId !== r.accountId || prev.timeMs !== r.timeMs || (prev.timestamp || 0) !== (r.timestamp || 0)) {
+    if (
+      !prev ||
+      prev.accountId !== r.accountId ||
+      prev.timeMs !== r.timeMs ||
+      (prev.timestamp || 0) !== (r.timestamp || 0)
+    ) {
       byMap.set(r.mapUid, r);
       changed++;
     }
@@ -573,7 +609,6 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
   wrCache = { ts: Date.now(), rows: merged };
 }
 
-/* --- Auto-discover NEW map UIDs on requests (cheap) -------- */
 async function maybeRefreshUidUniverse() {
   if (!AUTO_UID_REFRESH) return;
   if (!metaCache.allMapUids.length) return;
@@ -616,7 +651,7 @@ async function maybeRefreshUidUniverse() {
           row = sanitizeRow(await getMapWR(access, uid));
         }
         if (!row) return null;
-        row.sourceType = officialSet.has(uid) ? "official" : (clubSet.has(uid) ? "club" : "totd");
+        row.sourceType = officialSet.has(uid) ? "official" : clubSet.has(uid) ? "club" : "totd";
         return row;
       })
     );
@@ -662,16 +697,21 @@ async function warmBuildInBackground() {
 }
 warmBuildInBackground();
 setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
-
-// keep auth warm
-setInterval(() => { getLiveAccessToken().catch(() => {}); }, 6 * 60 * 60 * 1000);
+setInterval(() => {
+  getLiveAccessToken().catch(() => {});
+}, 6 * 60 * 60 * 1000);
 
 /* -------------------- Debounced refresh guards ------------- */
 function makeDebounced(fn, waitMs) {
-  let last = 0, running = false, pending = false;
+  let last = 0,
+    running = false,
+    pending = false;
   return async function wrapped(...args) {
     const now = Date.now();
-    if (running) { pending = true; return; }
+    if (running) {
+      pending = true;
+      return;
+    }
     if (now - last < waitMs) return;
     running = true;
     try {
@@ -679,28 +719,38 @@ function makeDebounced(fn, waitMs) {
     } finally {
       last = Date.now();
       running = false;
-      if (pending) { pending = false; wrapped(...args); }
+      if (pending) {
+        pending = false;
+        wrapped(...args);
+      }
     }
   };
 }
-const debouncedQuickRefresh = makeDebounced(() => quickRefreshRecent({ count: QUICK_REFRESH_COUNT }), 15_000);
-const debouncedUidRefresh   = makeDebounced(() => maybeRefreshUidUniverse(), 60_000);
+const debouncedQuickRefresh = makeDebounced(
+  () => quickRefreshRecent({ count: QUICK_REFRESH_COUNT }),
+  15_000
+);
+const debouncedUidRefresh = makeDebounced(() => maybeRefreshUidUniverse(), 60_000);
 
 /* -------------------- Small response cache ----------------- */
 const RESPONSE_TTL_SECONDS = Number(process.env.RESPONSE_TTL_SECONDS || 3);
-const respCache = new Map(); // key -> { ts, body }
-function cacheKey(req) { return req.originalUrl || req.url; }
+const respCache = new Map();
+function cacheKey(req) {
+  return req.originalUrl || req.url;
+}
 function getCached(req) {
   const k = cacheKey(req);
   const v = respCache.get(k);
   if (!v) return null;
-  if (Date.now() - v.ts > RESPONSE_TTL_SECONDS * 1000) { respCache.delete(k); return null; }
+  if (Date.now() - v.ts > RESPONSE_TTL_SECONDS * 1000) {
+    respCache.delete(k);
+    return null;
+  }
   return v.body;
 }
 function setCached(req, payload) {
   const k = cacheKey(req);
   respCache.set(k, { ts: Date.now(), body: payload });
-  // simple LRU bound
   if (respCache.size > 200) {
     const first = respCache.keys().next().value;
     if (first) respCache.delete(first);
@@ -712,8 +762,14 @@ function setCached(req, payload) {
 // Readiness & auth probes
 app.get("/api/ready", (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
-  res.json({ ok: !!wrCache.rows.length, building, rows: wrCache.rows.length, fetchedAt: wrCache.ts || null });
+  res.json({
+    ok: !!wrCache.rows.length,
+    building,
+    rows: wrCache.rows.length,
+    fetchedAt: wrCache.ts || null,
+  });
 });
+
 app.get("/api/debug-auth", async (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
   try {
@@ -755,9 +811,7 @@ async function ensureCacheOnce(_req, res, next) {
     }
     return next();
   } catch (e) {
-    const s = String(e || "");
-    // Serve empty but valid structure for instant paint; client can retry
-    return res.status(503).json({ error: "AuthUnavailable", detail: s });
+    return res.status(503).json({ error: "AuthUnavailable", detail: String(e || "") });
   }
 }
 
@@ -768,9 +822,12 @@ const detroitDate = (tsMs) =>
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(new Date(tsMs)).replaceAll("/", "-");
+  })
+    .format(new Date(tsMs))
+    .replaceAll("/", "-");
 
-// Latest WRs (instant, cached)
+/* ---------------- WR endpoints ---------------- */
+
 app.get("/api/wr-latest", ensureCacheOnce, async (req, res) => {
   const cached = getCached(req);
   if (cached) {
@@ -779,7 +836,6 @@ app.get("/api/wr-latest", ensureCacheOnce, async (req, res) => {
   }
 
   try {
-    // trigger background refreshers without blocking
     debouncedUidRefresh();
     debouncedQuickRefresh();
 
@@ -816,11 +872,13 @@ app.get("/api/wr-latest", ensureCacheOnce, async (req, res) => {
     res.json(payload);
   } catch (err) {
     console.error("wr-latest:", err);
-    res.status(500).json({ error: "Failed to load latest world records", detail: err?.message || String(err) });
+    res.status(500).json({
+      error: "Failed to load latest world records",
+      detail: err?.message || String(err),
+    });
   }
 });
 
-// Players leaderboard (instant, cached)
 app.get("/api/wr-players", ensureCacheOnce, async (req, res) => {
   const cached = getCached(req);
   if (cached) {
@@ -834,7 +892,7 @@ app.get("/api/wr-players", ensureCacheOnce, async (req, res) => {
 
     const safeRows = (wrCache.rows || []).filter((r) => isValidTimeMs(Number(r.timeMs)));
 
-    const tally = new Map(); // accountId -> { accountId, displayName, wrCount, latestTs }
+    const tally = new Map();
     for (const r of safeRows) {
       if (!r.accountId) continue;
       const rec = tally.get(r.accountId) || {
@@ -853,8 +911,7 @@ app.get("/api/wr-players", ensureCacheOnce, async (req, res) => {
     if (q) {
       list = list.filter(
         (p) =>
-          p.displayName?.toLowerCase().includes(q) ||
-          p.accountId?.toLowerCase().includes(q)
+          p.displayName?.toLowerCase().includes(q) || p.accountId?.toLowerCase().includes(q)
       );
     }
 
@@ -871,7 +928,6 @@ app.get("/api/wr-players", ensureCacheOnce, async (req, res) => {
   }
 });
 
-// Top players in last N days (instant, cached)
 app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
   const cached = getCached(req);
   if (cached) {
@@ -889,7 +945,7 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
 
     const safeRows = (wrCache.rows || []).filter((r) => isValidTimeMs(Number(r.timeMs)));
 
-    const tally = new Map(); // accountId -> { accountId, displayName, wrs, bySource, latestTs }
+    const tally = new Map();
     for (const r of safeRows) {
       if (!r.accountId) continue;
       if (!r.timestamp || r.timestamp < cutoff) continue;
@@ -920,76 +976,15 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
   }
 });
 
-// NEW: Monthly podium (instant, cached)
-// GET /api/top-monthly?ym=YYYY-MM  (defaults to current month in America/Detroit)
-// Response: { ym, top:[{accountId, displayName, wrs}], generatedAt }
-app.get("/api/top-monthly", ensureCacheOnce, async (req, res) => {
-  const cached = getCached(req);
-  if (cached) {
-    res.setHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
-    return res.json(cached);
-  }
-
-  try {
-    debouncedUidRefresh();
-    debouncedQuickRefresh();
-
-    const tz = "America/Detroit";
-    const ymRaw = (req.query.ym || "").toString().trim();
-    const now = new Date();
-
-    const ym = /^\d{4}-\d{2}$/.test(ymRaw)
-      ? ymRaw
-      : new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit" })
-          .format(now).replace("/", "-"); // YYYY-MM from en-CA gives "YYYY/MM", normalize
-
-    const [Y, M] = ym.split("-").map(n => Number(n));
-    const start = new Date(Date.UTC(Y, M - 1, 1, 0, 0, 0));
-    const end   = new Date(Date.UTC(Y, M - 1 + 1, 1, 0, 0, 0));
-
-    // Convert Detroit-local first/last day to UTC bounds (approx by month)
-    const detroitStart = new Date(new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(start) + " 00:00:00");
-    const detroitEnd   = new Date(new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(end)   + " 00:00:00");
-    const fromEpoch = Math.floor(start.getTime() / 1000);
-    const toEpoch   = Math.floor(end.getTime() / 1000);
-
-    const safeRows = (wrCache.rows || []).filter((r) =>
-      isValidTimeMs(Number(r.timeMs)) &&
-      r.timestamp && r.timestamp >= fromEpoch && r.timestamp < toEpoch
-    );
-
-    const tally = new Map(); // accountId -> { accountId, displayName, wrs, latestTs }
-    for (const r of safeRows) {
-      if (!r.accountId) continue;
-      const rec = tally.get(r.accountId) || {
-        accountId: r.accountId,
-        displayName: r.displayName || r.accountId,
-        wrs: 0,
-        latestTs: 0,
-      };
-      rec.wrs += 1;
-      if (r.timestamp > rec.latestTs) rec.latestTs = r.timestamp;
-      tally.set(r.accountId, rec);
-    }
-
-    const top = Array.from(tally.values())
-      .sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs)
-      .slice(0, 3);
-
-    const payload = { ym, top, generatedAt: Date.now() };
-    setCached(req, payload);
-    res.setHeader("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
-    res.json(payload);
-  } catch (e) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-
 /* ---------------- Debug & control ---------------- */
+
 app.get("/api/debug-names", async (req, res) => {
   res.setHeader("Cache-Control", "public, max-age=120");
   try {
-    const ids = String(req.query.ids || "").split(",").map((s) => s.trim()).filter(Boolean);
+    const ids = String(req.query.ids || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     await resolveDisplayNames(null, ids);
     const data = ids.map((id) => ({ id, name: nameCache.get(id) || null }));
     res.json({ data });
@@ -1018,18 +1013,18 @@ app.get("/api/debug-stats", async (_req, res) => {
   }
 });
 
-// Force a full diff-based rebuild (non-blocking for reads)
 app.post("/api/rebuild-now", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   try {
     const includeClubParam = (req.query.includeClub ?? "").toString().toLowerCase();
     const includeClub =
-      includeClubParam === "true" ? true :
-      includeClubParam === "false" ? false :
-      includeClubByDefault();
+      includeClubParam === "true"
+        ? true
+        : includeClubParam === "false"
+        ? false
+        : includeClubByDefault();
 
     const result = await rebuildNow({ includeClub });
-    // clear small response cache so next requests see fresh counts
     respCache.clear();
     res.json({ ok: true, fetchedAt: wrCache.ts, ...result });
   } catch (e) {
@@ -1037,187 +1032,338 @@ app.post("/api/rebuild-now", async (req, res) => {
   }
 });
 
-// Quick club check
-app.get("/api/debug-clubs", async (_req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+/* ========================= WEEKLY SHORTS (AUTO / LIVE) =========================
+   These endpoints match the shapes your weekly-shorts-stats.html expects:
+     GET /api/weekly-shorts/weeks
+     GET /api/weekly-shorts/week/:week
+     GET /api/weekly-shorts/aggregate
+     GET /api/weekly-shorts/changelog
+=============================================================================== */
+
+const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
+const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
+
+const WS_CAMPAIGN_ID = (process.env.WS_CAMPAIGN_ID || "").trim();
+const WS_NAME_MATCH = (process.env.WS_NAME_MATCH || "weekly shorts").trim().toLowerCase();
+
+const WS_CHANGELOG_PATH = process.env.WS_CHANGELOG_PATH || "/tmp/ws_changelog.json";
+
+// in-memory cache
+let ws = {
+  ts: 0,
+  weeksIndex: null, // { generatedAt, weeks:[{week,mapUid,mapName,endedAt}] }
+  weekCache: new Map(), // weekNum -> weekJson
+  aggregate: null, // { generatedAt, players:[...] }
+  changelog: { items: [] }, // { items:[...] }
+  snapshot: new Map(), // weekNum -> { player, timeMs } for ended weeks
+};
+
+// load changelog from disk once (best-effort)
+(function loadWsChangelog() {
   try {
-    const access = await getLiveAccessToken();
-    const refs = await listAllClubCampaignRefsWithPlaylists(access);
-    const uids = await getAllClubMapUids(access);
-    const disk = loadJson(DISK_CLUB);
-    res.json({
-      campaignsListed: refs.length,
-      mapUidsFound: uids.length,
-      cachedClubUids: {
-        count: disk?.uids?.length || 0,
-        ageMs: disk?.ts ? Date.now() - disk.ts : null,
-      },
-      sampleUid: uids[0] || null,
-    });
-  } catch (e) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-/* ========================= WEEKLY SHORTS (Live) =========================
-   Goal:
-   - /api/weekly-shorts/weeks  -> list available weeks + mapUids
-   - /api/weekly-shorts/week/:week -> maps + WR-ish top times (world #1 PB)
-   Notes:
-   - We discover weekly-shorts campaigns from official campaign list and cache it.
-   - If Nadeo changes naming, update WEEKLY_SHORTS_NAME_HINTS.
-========================================================================= */
+    if (fs.existsSync(WS_CHANGELOG_PATH)) {
+      const j = JSON.parse(fs.readFileSync(WS_CHANGELOG_PATH, "utf8"));
+      if (j && Array.isArray(j.items)) ws.changelog = { items: j.items };
+    }
+  } catch {}
+})();
 
-const WS_CACHE_TTL_MS = 10 * 60 * 1000; // 10 min
-let wsCache = { ts: 0, weeks: [] }; // [{ week, name, startAt, endAt, mapUids:[] }]
+function saveWsChangelog() {
+  try {
+    fs.mkdirSync(path.dirname(WS_CHANGELOG_PATH), { recursive: true });
+    fs.writeFileSync(WS_CHANGELOG_PATH, JSON.stringify(ws.changelog), "utf8");
+  } catch {}
+}
 
-const WEEKLY_SHORTS_NAME_HINTS = [
-  "weekly shorts",
-  "weeklyshorts",
-  "weekly short",
-  "weekly",
-];
+function wsExpired() {
+  return !ws.ts || Date.now() - ws.ts > WS_CACHE_TTL_MS;
+}
 
 function norm(s) {
   return String(s || "").trim().toLowerCase();
 }
 
-function pickCampaignName(c) {
-  return c?.name || c?.campaignName || c?.campaign?.name || "";
+function pickWeeklyShortsCampaign(list) {
+  if (!Array.isArray(list)) return null;
+
+  if (WS_CAMPAIGN_ID) {
+    const byId = list.find((c) => String(c?.id || "") === WS_CAMPAIGN_ID);
+    if (byId) return byId;
+  }
+
+  // strict match only (no "weekly" generic)
+  const byName = list.find((c) => norm(c?.name).includes(WS_NAME_MATCH));
+  return byName || null;
 }
 
-function pickPlaylistUids(c) {
-  const pl = c?.playlist || c?.campaign?.playlist || [];
-  return Array.isArray(pl) ? pl.map(p => p?.mapUid).filter(Boolean) : [];
+function campaignPlaylist(c) {
+  const pl = c?.playlist;
+  return Array.isArray(pl) ? pl : [];
 }
 
-function inferWeekIndexFromName(name) {
-  // Tries to find a number in the title, e.g. "Weekly Shorts - Week 12"
-  const m = String(name || "").match(/(?:week|wk)\s*#?\s*(\d{1,4})/i);
-  if (m) return Number(m[1]);
-  return null;
+function mapNameFromPlaylistItem(p, weekNum) {
+  return (
+    p?.name ||
+    p?.mapName ||
+    p?.map?.name ||
+    `Week ${weekNum}`
+  );
+}
+function endedAtFromPlaylistItem(p) {
+  return p?.endedAt || p?.endAt || p?.end || null;
 }
 
-async function buildWeeklyShortsWeeks(accessToken) {
-  // Pull official campaigns and try to find weekly shorts items.
-  // NOTE: This depends on how Nadeo labels them; we do fuzzy matching.
-  const list = await getAllOfficialCampaigns(accessToken); // already exists above :contentReference[oaicite:4]{index=4}
-  const candidates = (list || []).filter(c => {
-    const n = norm(pickCampaignName(c));
-    return WEEKLY_SHORTS_NAME_HINTS.some(h => n.includes(h));
-  });
-
-  // Convert to weeks
-  const weeks = candidates.map((c, idx) => {
-    const name = pickCampaignName(c);
-    const mapUids = pickPlaylistUids(c);
-    const weekFromName = inferWeekIndexFromName(name);
-
-    // Some campaign objects have id, seasonUid, start/end timestamps; keep what exists.
+async function fetchWsWeeksIndex(access) {
+  const list = await getAllOfficialCampaigns(access);
+  const campaign = pickWeeklyShortsCampaign(list);
+  if (!campaign) {
     return {
-      week: weekFromName ?? (idx + 1),
-      name,
-      campaignId: c?.id ?? c?.campaignId ?? null,
-      seasonUid: c?.seasonUid ?? null,
-      startAt: c?.startAt ?? c?.start ?? null,
-      endAt: c?.endAt ?? c?.end ?? null,
-      mapUids,
+      generatedAt: new Date().toISOString(),
+      weeks: [],
+      note: WS_CAMPAIGN_ID
+        ? `WS_CAMPAIGN_ID=${WS_CAMPAIGN_ID} not found in official campaigns`
+        : `No official campaign matched "${WS_NAME_MATCH}"`,
     };
-  });
+  }
 
-  // Sort by week (if numeric) else newest-ish
-  weeks.sort((a, b) => (Number(a.week) || 0) - (Number(b.week) || 0));
-  return weeks;
+  const pl = campaignPlaylist(campaign);
+
+  const weeks = pl
+    .map((p, idx) => {
+      const week = idx + 1;
+      const mapUid = p?.mapUid;
+      if (!mapUid) return null;
+      return {
+        week,
+        mapUid,
+        mapName: mapNameFromPlaylistItem(p, week),
+        endedAt: endedAtFromPlaylistItem(p),
+      };
+    })
+    .filter(Boolean);
+
+  return { generatedAt: new Date().toISOString(), weeks, campaignId: campaign?.id, campaignName: campaign?.name };
 }
 
-async function getWeeklyShortsWeeksCached() {
-  if (wsCache.weeks.length && Date.now() - wsCache.ts < WS_CACHE_TTL_MS) return wsCache.weeks;
+async function fetchWsTop10(access, mapUid) {
+  const url =
+    `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
+    `/top?onlyWorld=true&length=10&offset=0`;
+
+  const j = await jget(url, access);
+  const rows = j?.tops?.[0]?.top;
+  const topArr = Array.isArray(rows) ? rows : [];
+
+  const parsed = topArr
+    .map((x, idx) => {
+      const rank = Number(x.position ?? (idx + 1));
+      const accountId = x.accountId;
+      const timeMs = Number(x.score);
+      if (!accountId || !isValidTimeMs(timeMs)) return null;
+      return { rank, accountId, timeMs };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.rank - b.rank);
+
+  await resolveDisplayNames(access, parsed.map((r) => r.accountId));
+
+  return parsed.map((r) => ({
+    rank: r.rank,
+    player: nameCache.get(r.accountId) || r.accountId,
+    timeMs: r.timeMs,
+    isWr: r.rank === 1,
+    isWinner: r.rank === 1,
+  }));
+}
+
+function buildWsAggregate(allWeekJson) {
+  // players aggregated by wins/top5/wrs across ALL weeks
+  const by = new Map();
+
+  for (const w of allWeekJson) {
+    const weekNum = Number(w.week);
+    const mapUid = w.mapUid;
+    const entries = Array.isArray(w.entries) ? w.entries : [];
+    for (const e of entries) {
+      const player = e.player;
+      if (!player) continue;
+
+      const rec =
+        by.get(player) || {
+          player,
+          wins: 0,
+          wrs: 0,
+          top5: 0,
+          weeksWon: [],
+          wrWeeks: [],
+          top5Weeks: [],
+        };
+
+      if (e.rank === 1) {
+        rec.wins += 1;
+        rec.wrs += 1;
+        rec.weeksWon.push(weekNum);
+        rec.wrWeeks.push({ week: weekNum, mapUid, timeMs: e.timeMs });
+      }
+      if (e.rank <= 5) {
+        rec.top5 += 1;
+        rec.top5Weeks.push({ week: weekNum, mapUid, rank: e.rank, timeMs: e.timeMs });
+      }
+
+      by.set(player, rec);
+    }
+  }
+
+  const players = Array.from(by.values()).map((p) => ({
+    ...p,
+    weeksWon: Array.from(new Set(p.weeksWon)).sort((a, b) => a - b),
+  }));
+
+  players.sort(
+    (a, b) =>
+      b.wins - a.wins ||
+      b.wrs - a.wrs ||
+      b.top5 - a.top5 ||
+      a.player.localeCompare(b.player)
+  );
+
+  return { generatedAt: new Date().toISOString(), players };
+}
+
+function updateWsChangelogIfEndedWeek(weekJson) {
+  const weekNum = Number(weekJson?.week);
+  const endedAt = weekJson?.endedAt;
+  if (!weekNum || !endedAt) return;
+
+  const endedMs = Date.parse(endedAt);
+  if (!Number.isFinite(endedMs)) return;
+  if (Date.now() < endedMs) return; // not ended yet
+
+  const winner = (weekJson.entries || []).find((e) => e.rank === 1);
+  if (!winner) return;
+
+  const prev = ws.snapshot.get(weekNum);
+  if (!prev) {
+    ws.snapshot.set(weekNum, { player: winner.player, timeMs: winner.timeMs });
+    return;
+  }
+
+  // WR improved after end
+  if (Number(winner.timeMs) < Number(prev.timeMs)) {
+    ws.changelog.items.push({
+      at: new Date().toISOString(),
+      type: "WR_IMPROVED_AFTER_WEEK",
+      week: weekNum,
+      mapUid: weekJson.mapUid,
+      playerNew: winner.player,
+      timeNewMs: winner.timeMs,
+      playerPrev: prev.player,
+      timePrevMs: prev.timeMs,
+    });
+    ws.snapshot.set(weekNum, { player: winner.player, timeMs: winner.timeMs });
+
+    // keep newest first
+    ws.changelog.items.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+    saveWsChangelog();
+  }
+}
+
+async function rebuildWsCacheIfNeeded() {
+  if (!wsExpired() && ws.weeksIndex) return;
 
   const access = await getLiveAccessToken();
-  const weeks = await buildWeeklyShortsWeeks(access);
+  const weeksIndex = await fetchWsWeeksIndex(access);
 
-  wsCache = { ts: Date.now(), weeks };
-  return weeks;
+  // build week json for all weeks (cached for aggregate)
+  const allWeekJson = [];
+  const newWeekCache = new Map();
+
+  for (const w of weeksIndex.weeks || []) {
+    const entries = await fetchWsTop10(access, w.mapUid);
+    const weekJson = {
+      week: w.week,
+      mapUid: w.mapUid,
+      mapName: w.mapName,
+      endedAt: w.endedAt || null,
+      entries,
+    };
+    allWeekJson.push(weekJson);
+    newWeekCache.set(String(w.week), weekJson);
+
+    updateWsChangelogIfEndedWeek(weekJson);
+    await new Promise((r) => setTimeout(r, 70));
+  }
+
+  ws.weeksIndex = { generatedAt: weeksIndex.generatedAt, weeks: weeksIndex.weeks || [] };
+  ws.weekCache = newWeekCache;
+  ws.aggregate = buildWsAggregate(allWeekJson);
+  ws.ts = Date.now();
 }
 
+// WS endpoints
 app.get("/api/weekly-shorts/weeks", async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
+  const cached = getCached(req);
+  if (cached) return res.json(cached);
+
   try {
-    const cached = getCached(req);
-    if (cached) return res.json(cached);
-
-    const weeks = await getWeeklyShortsWeeksCached();
-
-    const payload = {
-      weeks: weeks.map(w => ({
-        week: w.week,
-        name: w.name,
-        startAt: w.startAt,
-        endAt: w.endAt,
-        mapCount: (w.mapUids || []).length,
-      })),
-      fetchedAt: wsCache.ts,
-    };
-
+    await rebuildWsCacheIfNeeded();
+    const payload = ws.weeksIndex || { generatedAt: new Date().toISOString(), weeks: [] };
     setCached(req, payload);
-    return res.json(payload);
+    res.json(payload);
   } catch (e) {
-    return res.status(500).json({ error: "Failed to load Weekly Shorts weeks", detail: e?.message || String(e) });
+    res.status(500).json({ error: "Failed to load weeks", detail: e?.message || String(e) });
   }
 });
 
 app.get("/api/weekly-shorts/week/:week", async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
+  const cached = getCached(req);
+  if (cached) return res.json(cached);
+
   try {
-    const cached = getCached(req);
-    if (cached) return res.json(cached);
+    await rebuildWsCacheIfNeeded();
+    const weekNum = String(req.params.week || "").trim();
+    const w = ws.weekCache.get(weekNum);
+    if (!w) return res.status(404).json({ error: "Week not found" });
 
-    const weekNum = Number(req.params.week);
-    if (!Number.isFinite(weekNum) || weekNum <= 0) {
-      return res.status(400).json({ error: "Invalid week number" });
-    }
-
-    const weeks = await getWeeklyShortsWeeksCached();
-    const w = weeks.find(x => Number(x.week) === weekNum);
-    if (!w) return res.status(404).json({ error: "Week not found", availableWeeks: weeks.map(x => x.week) });
-    if (!w.mapUids?.length) return res.status(404).json({ error: "Week has no maps", week: weekNum });
-
-    const access = await getLiveAccessToken();
-
-    // Fetch top world time for each map (like WR)
-    const rows = [];
-    for (let i = 0; i < w.mapUids.length; i++) {
-      const uid = w.mapUids[i];
-      const r = await getMapWR(access, uid); // already exists above :contentReference[oaicite:5]{index=5}
-      rows.push(r);
-      // small delay to avoid rate issues
-      if (i % 5 === 4) await new Promise(r => setTimeout(r, 60));
-    }
-
-    // Resolve display names for the week’s winners
-    const ids = rows.map(r => r?.accountId).filter(Boolean);
-    await resolveDisplayNames(access, ids); // already exists above :contentReference[oaicite:6]{index=6}
-    for (const r of rows) {
-      if (r?.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
-    }
-
-    const payload = {
-      week: w.week,
-      name: w.name,
-      startAt: w.startAt,
-      endAt: w.endAt,
-      maps: w.mapUids.map((uid, idx) => ({
-        mapUid: uid,
-        top: rows[idx] || { mapUid: uid, empty: true },
-      })),
-      fetchedAt: Date.now(),
-    };
-
-    setCached(req, payload);
-    return res.json(payload);
+    setCached(req, w);
+    res.json(w);
   } catch (e) {
-    return res.status(500).json({ error: "Failed to load Weekly Shorts week", detail: e?.message || String(e) });
+    res.status(500).json({ error: "Failed to load week", detail: e?.message || String(e) });
   }
 });
+
+app.get("/api/weekly-shorts/aggregate", async (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
+  const cached = getCached(req);
+  if (cached) return res.json(cached);
+
+  try {
+    await rebuildWsCacheIfNeeded();
+    const payload = ws.aggregate || { generatedAt: new Date().toISOString(), players: [] };
+    setCached(req, payload);
+    res.json(payload);
+  } catch (e) {
+    res.status(500).json({ error: "Failed to load aggregate", detail: e?.message || String(e) });
+  }
+});
+
+app.get("/api/weekly-shorts/changelog", async (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
+  const cached = getCached(req);
+  if (cached) return res.json(cached);
+
+  try {
+    // no need to rebuild weekly data just to read changelog
+    const payload = ws.changelog || { items: [] };
+    setCached(req, payload);
+    res.json(payload);
+  } catch (e) {
+    res.status(500).json({ error: "Failed to load changelog", detail: e?.message || String(e) });
+  }
+});
+
 /* ------------------------- Start --------------------------- */
 process.on("unhandledRejection", (err) => console.error("UNHANDLED_REJECTION:", err));
 process.on("uncaughtException", (err) => console.error("UNCAUGHT_EXCEPTION:", err));
