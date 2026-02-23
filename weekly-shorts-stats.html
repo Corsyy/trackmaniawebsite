@@ -206,13 +206,14 @@
   <script>
     // Adjust to match your existing data hosting pattern.
     // If you host JSON under /public/data/... then this is correct.
-    const DATA_BASE = "/data/weekly-shorts";
-    const PATHS = {
-      weeksIndex: `${DATA_BASE}/weeks.json`,
-      aggregate: `${DATA_BASE}/aggregate.json`,
-      changelog: `${DATA_BASE}/changelog.json`,
-      weekFile: (weekNum) => `${DATA_BASE}/weeks/${weekNum}.json`
-    };
+    const API = "https://trackmaniawebsite.onrender.com";
+
+const PATHS = {
+  weeksIndex: `${API}/api/weekly-shorts/weeks`,
+  aggregate: `${API}/api/weekly-shorts/aggregate`,
+  changelog: `${API}/api/weekly-shorts/changelog`,
+  weekFile: (weekNum) => `${API}/api/weekly-shorts/week/${weekNum}`
+};
 
     const $ = (id) => document.getElementById(id);
 
