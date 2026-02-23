@@ -12,7 +12,7 @@ const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
 const TMIO        = "https://trackmania.io";
 const TMX_API     = "https://trackmania.exchange/api"; // base for TMX API
 const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
-const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.1 (github action)";
+const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.2 (github action)";
 
 const DEBUG = process.env.DEBUG === "1";
 const dlog  = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
@@ -27,6 +27,7 @@ const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
 const pad2=(n)=>String(n).padStart(2,"0");
 const monthKey=(y,m1)=>`${y}-${pad2(m1)}`;
 const dateKey=(y,m1,d)=>`${y}-${pad2(m1)}-${pad2(d)}`;
+
 function stripTmFormatting(input){
   if(!input || typeof input!=="string") return input;
   const D="\uFFF0";
@@ -34,25 +35,65 @@ function stripTmFormatting(input){
   s=s.replace(/\$[0-9a-fA-F]{1,3}|\$[a-zA-Z]|\$[<>\[\]\(\)]/g,"");
   return s.replace(new RegExp(D,"g"),"$");
 }
-function tmioDayNumber(dayObj,idx){ return dayObj?.day??dayObj?.dayIndex??dayObj?.monthDay??dayObj?.dayInMonth??(idx+1); }
+
+/**
+ * trackmania.io has used multiple shapes over time:
+ * - monthday (lowercase) is common
+ * - monthDay (camel) also seen
+ * - day / dayIndex / dayInMonth etc.
+ */
+function tmioDayNumber(dayObj, idx){
+  return (
+    dayObj?.day ??
+    dayObj?.dayIndex ??
+    dayObj?.monthday ??      // <-- IMPORTANT
+    dayObj?.monthDay ??
+    dayObj?.dayInMonth ??
+    dayObj?.monthDayIndex ??
+    (idx + 1)
+  );
+}
+
+function parseIsoMonth(ts){
+  // returns {y,m1} or null
+  if (!ts || typeof ts !== "string") return null;
+  const d = new Date(ts);
+  if (Number.isNaN(d.getTime())) return null;
+  return { y: d.getUTCFullYear(), m1: d.getUTCMonth() + 1 };
+}
+
+function normalizeDaysPayload(j){
+  // Accept array payloads OR object payloads with known keys.
+  if (Array.isArray(j)) return j;
+  if (!j || typeof j !== "object") return [];
+  if (Array.isArray(j.days)) return j.days;
+  if (Array.isArray(j.totd)) return j.totd;
+  if (Array.isArray(j.tracks)) return j.tracks;
+  if (Array.isArray(j.results)) return j.results;
+  return [];
+}
 
 async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-async function fetchRetry(url,opts={},retries=5,baseDelay=500){
+
+async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 500){
   let lastErr;
-  for(let i=0;i<=retries;i++){
+  for (let i = 0; i <= retries; i++){
     try{
-      const r=await fetch(url,{ ...opts, headers:{ "User-Agent":USER_AGENT, ...(opts.headers||{}) }});
-      if(r.status===429 || (r.status>=500 && r.status<=599)){
-        const wait=Math.min(baseDelay*Math.pow(2,i),8000);
+      const r = await fetch(url, {
+        ...opts,
+        headers: { "User-Agent": USER_AGENT, ...(opts.headers || {}) },
+      });
+      if (r.status === 429 || (r.status >= 500 && r.status <= 599)){
+        const wait = Math.min(baseDelay * Math.pow(2, i), 8000);
         if (DEBUG) dlog(`retry ${i} ${r.status} ${url} wait=${wait}ms`);
         await sleep(wait);
         continue;
       }
       return r;
     }catch(e){
-      lastErr=e;
-      const wait=Math.min(baseDelay*Math.pow(2,i),8000);
-      if (DEBUG) dlog(`retry ${i} err ${e?.message||e} wait=${wait}ms`);
+      lastErr = e;
+      const wait = Math.min(baseDelay * Math.pow(2, i), 8000);
+      if (DEBUG) dlog(`retry ${i} err ${e?.message || e} wait=${wait}ms`);
       await sleep(wait);
     }
   }
@@ -61,14 +102,35 @@ async function fetchRetry(url,opts={},retries=5,baseDelay=500){
 
 /* ------------------------------ tm.io helpers ------------------------------ */
 async function fetchTmioMonth(index=0){
-  const r=await fetchRetry(`${TMIO}/api/totd/${index}`);
+  const r = await fetchRetry(`${TMIO}/api/totd/${index}`);
   if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
-function tmioMonthYear(resp){
-  const y=resp?.month?.year??new Date().getUTCFullYear();
-  const m1=(resp?.month?.month??new Date().getUTCMonth())+1;
-  return { y,m1 };
+
+function tmioMonthYear(resp, daysArr){
+  // Prefer resp.month.* if present; otherwise infer from first day's timestamp; otherwise fallback to current UTC.
+  const fromMonthObj = (resp && typeof resp === "object" && resp.month && typeof resp.month === "object")
+    ? {
+        y: resp.month.year,
+        // trackmania.io historically used 0-based month in some shapes;
+        // we treat it as 0-based only if it looks like 0..11
+        m1: (typeof resp.month.month === "number" && resp.month.month >= 0 && resp.month.month <= 11)
+          ? resp.month.month + 1
+          : (typeof resp.month.month === "number" ? resp.month.month : null),
+      }
+    : null;
+
+  if (fromMonthObj?.y && fromMonthObj?.m1) return { y: fromMonthObj.y, m1: fromMonthObj.m1 };
+
+  // infer from first day timestamp if possible
+  const first = Array.isArray(daysArr) && daysArr.length ? daysArr[0] : null;
+  const ts = first?.timestamp ?? first?.map?.timestamp ?? first?.date ?? first?.map?.date ?? null;
+  const inferred = parseIsoMonth(ts);
+  if (inferred) return inferred;
+
+  // fallback: current month in UTC
+  const now = new Date();
+  return { y: now.getUTCFullYear(), m1: now.getUTCMonth() + 1 };
 }
 
 /* ------------------------------ TMX helpers --------------------------------
@@ -108,7 +170,6 @@ function tmxDownloadUrl(trackId, shortName){
 
 /* --------------------------- download & medals ----------------------------- */
 function pickMedalFields(tmx){
-  // TMX returns ms times; Difficulty is an integer-ish category (0–5+).
   const toInt = v => (v==null ? null : Number(v));
   const diff  = v => (v==null ? null : Number(v));
   return {
@@ -149,7 +210,7 @@ async function fetchMapDetails(mapUid){
     const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
     if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return { downloadUrl:null, medals:null }; }
     const j = await r.json();
-    return { downloadUrl: j?.file || j?.download || null, medals:null };
+    return { downloadUrl: j?.file || j?.download || j?.fileUrl || null, medals:null };
   } catch (e) {
     dlog("tm.io resolver err", mapUid, e?.message || e);
     return { downloadUrl:null, medals:null };
@@ -159,38 +220,84 @@ async function fetchMapDetails(mapUid){
 /* ------------------------------ month writing ------------------------------ */
 async function rebuildMonthIndex(dir){
   await ensureDir(dir);
-  const items=await readdir(dir,{withFileTypes:true});
-  const months=items
-    .filter(e=>e.isFile()&&e.name.endsWith(".json")&&e.name!=="months.json"&&!e.name.startsWith("_"))
+  const items = await readdir(dir,{withFileTypes:true});
+  const months = items
+    .filter(e=>e.isFile() && e.name.endsWith(".json") && e.name!=="months.json" && !e.name.startsWith("_"))
     .map(e=>e.name.replace(/\.json$/,""))
-    .sort().reverse();
+    .sort()
+    .reverse();
   await writeJson(path.join(dir,"months.json"),{ months });
 }
 
 function baseDayRecord(y,m1,entry,idx){
-  const m=entry.map||entry;
-  const uid=m.mapUid??entry.mapUid??null;
-  let name=m.name??m.mapName??entry.name??"(unknown map)";
-  let authorDisplayName=m.authorPlayer?.name??m.authorplayer?.name??m.authorName??m.author??entry.authorPlayer?.name??entry.authorplayer?.name??"(unknown)";
-  const thumb=m.thumbnail??m.thumbnailUrl??entry.thumbnail??entry.thumbnailUrl??"";
-  const authorAccountId=m.authorPlayer?.accountId??m.authorplayer?.accountid??entry.authorPlayer?.accountId??entry.authorplayer?.accountid??null;
-  const d=tmioDayNumber(entry,idx);
-  name=stripTmFormatting(name); authorDisplayName=stripTmFormatting(authorDisplayName);
+  const m = entry?.map || entry;
+  const uid = m?.mapUid ?? entry?.mapUid ?? null;
+
+  let name =
+    m?.name ?? m?.mapName ?? entry?.name ?? "(unknown map)";
+
+  let authorDisplayName =
+    m?.authorPlayer?.name ??
+    m?.authorplayer?.name ??
+    m?.authorName ??
+    m?.author ??
+    entry?.authorPlayer?.name ??
+    entry?.authorplayer?.name ??
+    "(unknown)";
+
+  const thumb =
+    m?.thumbnail ??
+    m?.thumbnailUrl ??
+    m?.thumbnailURL ??
+    entry?.thumbnail ??
+    entry?.thumbnailUrl ??
+    entry?.thumbnailURL ??
+    "";
+
+  const authorAccountId =
+    m?.authorPlayer?.accountId ??
+    m?.authorplayer?.accountid ??
+    m?.authorplayer?.id ??
+    entry?.authorPlayer?.accountId ??
+    entry?.authorplayer?.accountid ??
+    entry?.authorplayer?.id ??
+    null;
+
+  const d = tmioDayNumber(entry, idx);
+
+  name = stripTmFormatting(name);
+  authorDisplayName = stripTmFormatting(authorDisplayName);
+
   return {
     date: dateKey(y,m1,d),
     map: {
-      uid, name, authorAccountId, authorDisplayName, thumbnailUrl: thumb,
+      uid,
+      name,
+      authorAccountId,
+      authorDisplayName,
+      thumbnailUrl: thumb,
       downloadUrl: null,
-      authorTime:null, goldTime:null, silverTime:null, bronzeTime:null, difficulty:null
+
+      authorTime:null,
+      goldTime:null,
+      silverTime:null,
+      bronzeTime:null,
+      difficulty:null
     }
   };
 }
 
 async function writeTotdMonth(index=0){
   // 0) load remote list
-  const j=await fetchTmioMonth(index);
-  const {y,m1}=tmioMonthYear(j);
-  const mKey=monthKey(y,m1);
+  const j = await fetchTmioMonth(index);
+
+  // Normalize days first so we can infer month if needed
+  const remoteDays = normalizeDaysPayload(j);
+
+  const { y, m1 } = tmioMonthYear(j, remoteDays);
+  const mKey = monthKey(y,m1);
+
+  dlog("month resolved:", mKey, "remoteDays:", Array.isArray(remoteDays) ? remoteDays.length : "n/a");
 
   // 1) load existing month file (so manual overrides are preserved)
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
@@ -198,19 +305,22 @@ async function writeTotdMonth(index=0){
   const prevDays = prev?.days || {};
 
   // 2) normalize remote -> day records
-  const daysArr = (Array.isArray(j.days)?j.days:[]).map((entry,i)=>baseDayRecord(y,m1,entry,i));
+  const daysArr = (Array.isArray(remoteDays) ? remoteDays : [])
+    .map((entry,i)=>baseDayRecord(y,m1,entry,i));
 
   // 3) hydrate each day with TMX medals/difficulty + download, preserving any manual downloadUrl
   for (const rec of daysArr){
     const prevRec = prevDays[rec.date]?.map || {};
+
     // keep any manual/previous link
-    if (prevRec.downloadUrl) {
-      rec.map.downloadUrl = prevRec.downloadUrl;
-    }
+    if (prevRec.downloadUrl) rec.map.downloadUrl = prevRec.downloadUrl;
+
     // only fetch if we have a UID and no preserved link/medals yet
-    if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime==null)){
+    if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime == null)){
       const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
+
       if (!rec.map.downloadUrl) rec.map.downloadUrl = downloadUrl || null;
+
       if (medals){
         rec.map.authorTime = medals.authorTime;
         rec.map.goldTime   = medals.goldTime;
@@ -218,6 +328,7 @@ async function writeTotdMonth(index=0){
         rec.map.bronzeTime = medals.bronzeTime;
         rec.map.difficulty = medals.difficulty;
       }
+
       await sleep(120); // be nice to public APIs
     }else{
       // carry forward previously stored medals/difficulty if present
@@ -230,28 +341,36 @@ async function writeTotdMonth(index=0){
   }
 
   // 4) write month file
-  const daysOut={}; for (const rec of daysArr){ daysOut[rec.date]=rec; }
+  const daysOut = {};
+  for (const rec of daysArr) daysOut[rec.date] = rec;
+
   await ensureDir(TOTD_DIR);
   await writeJson(monthPath,{ month:mKey, days:daysOut });
   await rebuildMonthIndex(TOTD_DIR);
 
   // 5) write latest snapshot
-  const keys=Object.keys(daysOut).sort();
-  const latestKey=keys[keys.length-1]||null;
-  if(latestKey){
-    const latest=daysOut[latestKey];
+  const keys = Object.keys(daysOut).sort();
+  const latestKey = keys[keys.length-1] || null;
+
+  if (latestKey){
+    const latest = daysOut[latestKey];
     await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
+
     dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "", "medals?",
-         latest.map?.authorTime!=null);
+         latest.map?.authorTime != null);
   }else{
-    dlog("no days found for", mKey);
+    dlog("no days found for", mKey, "(API shape changed or month empty)");
   }
 }
 
 /* ----------------------------------- main ---------------------------------- */
 async function main(){
   await ensureDir(TOTD_DIR);
-  await writeTotdMonth(0); // current month (index 0)
+
+  // Current month
+  await writeTotdMonth(0);
+
   console.log("[DONE] TOTD updated with TMX medal times + difficulty.");
 }
+
 main().catch(err=>{ console.error(err); process.exit(1); });
