@@ -3,305 +3,435 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Weekly Shorts Stats</title>
+  <title>Weekly Shorts Stats — Trackmania 2020</title>
+  <meta name="description" content="Trackmania 2020 Weekly Shorts campaign stats: wins, WRs, top 5s, per-week leaderboards, and WR improvement changelog." />
+
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#0b0d10;color:#e9eef7}
-    header{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;gap:12px;align-items:center;justify-content:space-between}
-    h1{font-size:18px;margin:0}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px 20px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    select,input{background:#121722;border:1px solid rgba(255,255,255,.14);color:#e9eef7;border-radius:10px;padding:9px 10px}
-    .card{background:#0f141d;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:14px;margin-top:14px}
-    .muted{color:rgba(233,238,247,.68)}
+    :root{
+      --bg:#0a0f1a; --panel:rgba(15,21,36,.55);
+      --text:#e6ecff; --muted:#9bb0ff;
+      --accent:#3aa0ff; --accent2:#6dfbff;
+      --border:rgba(109,251,255,.22);
+      --shadow:0 10px 30px rgba(0,0,0,.4), 0 0 20px rgba(61,165,255,.18);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1200px;margin:0 auto;padding:22px 16px 60px}
+    h1{margin:0 0 8px;font-size:28px}
+    .sub{color:var(--muted);margin:0 0 18px;line-height:1.35}
+
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .back a{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:12px;
+      border:1px solid rgba(109,251,255,.25);
+      background:rgba(10,15,26,.35);
+    }
+    .back a:hover{border-color:rgba(109,251,255,.45)}
+
+    .grid{display:grid;gap:12px}
+    .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .row2{grid-template-columns:1.35fr .65fr}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card-h{
+      padding:12px 14px;
+      border-bottom:1px dashed rgba(109,251,255,.18);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .card-h .t{font-weight:900}
+    .card-b{padding:12px 14px}
+
+    .kpi{font-size:12px;color:var(--muted)}
+    .big{font-size:22px;font-weight:900;letter-spacing:.2px}
+
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    input, select, button{
+      background:rgba(10,15,26,.35);
+      border:1px solid rgba(109,251,255,.25);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+    }
+    input::placeholder{color:rgba(155,176,255,.65)}
+    button{cursor:pointer}
+    button:hover{border-color:rgba(109,251,255,.45)}
+
     table{width:100%;border-collapse:collapse}
-    th,td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;font-size:14px}
-    th{color:rgba(233,238,247,.78);font-weight:600}
-    .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.10);font-size:12px}
-    .error{color:#ff9aa2}
-    .ok{color:#9dffb0}
-    a{color:#9ad5ff}
+    th, td{padding:10px 10px;border-bottom:1px solid rgba(109,251,255,.12);text-align:left;font-size:14px}
+    th{color:var(--muted);font-weight:900;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+    tr:hover td{background:rgba(10,15,26,.25)}
+    .right{text-align:right}
+    .muted{color:var(--muted)}
+    .mini{font-size:12px}
+    .logitem{padding:10px 0;border-bottom:1px solid rgba(109,251,255,.12)}
+    .tag{
+      font-size:11px;
+      padding:3px 8px;border-radius:999px;
+      border:1px solid rgba(109,251,255,.25);
+      color:var(--muted);
+      margin-right:8px;
+    }
+    .highlight{outline:2px solid rgba(58,160,255,.35);outline-offset:-2px}
+
+    @media (max-width: 980px){
+      .cards{grid-template-columns:1fr}
+      .row2{grid-template-columns:1fr}
+      .topbar{flex-direction:column;align-items:flex-start}
+    }
   </style>
 </head>
+
 <body>
-<header>
-  <h1>Weekly Shorts Stats</h1>
-  <div class="row">
-    <span class="muted" id="status">Loading…</span>
-  </div>
-</header>
-
-<div class="wrap">
-
-  <div class="row">
-    <label class="muted">Week:</label>
-    <select id="weekSel"></select>
-
-    <label class="muted">Search player:</label>
-    <input id="search" placeholder="type to filter (aggregate)" />
-  </div>
-
-  <div class="card">
-    <div class="row" style="justify-content:space-between">
+  <div class="wrap">
+    <div class="topbar">
       <div>
-        <div class="muted">Selected week</div>
-        <div id="weekTitle" style="font-size:16px;font-weight:700;margin-top:2px">—</div>
-        <div class="muted" id="weekMeta" style="margin-top:4px">—</div>
+        <h1>Weekly Shorts — Campaign Stats</h1>
+        <p class="sub">
+          Trackmania 2020 Weekly Shorts overview: who has the most <b>wins</b>, <b>WRs</b>, and <b>Top 5s</b>.
+          Search players, review per-week leaderboards, and see post-week WR improvements in the changelog.
+        </p>
       </div>
-      <div class="muted" id="weekGenerated">—</div>
-    </div>
 
-    <div style="margin-top:12px">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:70px">Rank</th>
-            <th>Player</th>
-            <th style="width:140px">Time</th>
-            <th style="width:80px">WR</th>
-          </tr>
-        </thead>
-        <tbody id="weekBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="row" style="justify-content:space-between">
-      <div>
-        <div class="muted">Aggregate</div>
-        <div class="muted" style="margin-top:4px">wins / wrs / top5</div>
-      </div>
-      <div class="muted" id="aggGenerated">—</div>
-    </div>
-
-    <div style="margin-top:12px">
-      <table>
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th style="width:90px">Wins</th>
-            <th style="width:90px">WRs</th>
-            <th style="width:90px">Top5</th>
-          </tr>
-        </thead>
-        <tbody id="aggBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="row" style="justify-content:space-between">
-      <div>
-        <div class="muted">Changelog</div>
-        <div class="muted" style="margin-top:4px">WR improvements after week ended</div>
+      <div class="back">
+        <a href="index.html" aria-label="Back to home">← Back</a>
       </div>
     </div>
 
-    <div style="margin-top:12px">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:180px">When</th>
-            <th style="width:90px">Week</th>
-            <th>Change</th>
-          </tr>
-        </thead>
-        <tbody id="chgBody"></tbody>
-      </table>
+    <div class="grid cards">
+      <div class="card">
+        <div class="card-h"><div class="t">Most Wins</div><div class="muted mini" id="genAt"></div></div>
+        <div class="card-b">
+          <div class="big" id="kpiWinsName">—</div>
+          <div class="kpi" id="kpiWinsVal">—</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">Most WRs</div><div class="muted mini" id="weekCount"></div></div>
+        <div class="card-b">
+          <div class="big" id="kpiWrsName">—</div>
+          <div class="kpi" id="kpiWrsVal">—</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="t">Most Top 5s</div><div class="muted mini"></div></div>
+        <div class="card-b">
+          <div class="big" id="kpiTop5Name">—</div>
+          <div class="kpi" id="kpiTop5Val">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="grid row2">
+      <div class="card" id="overallCard">
+        <div class="card-h">
+          <div class="t">Overall Leaderboard</div>
+          <div class="controls">
+            <label class="mini muted">Sort</label>
+            <select id="sortBy">
+              <option value="wins">Wins</option>
+              <option value="wrs">WRs</option>
+              <option value="top5">Top 5s</option>
+              <option value="name">Name</option>
+            </select>
+            <input id="playerSearch" type="text" placeholder="Search player..." />
+            <button id="clearSearch">Clear</button>
+          </div>
+        </div>
+        <div class="card-b" style="padding:0">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:54px">#</th>
+                <th>Player</th>
+                <th class="right">Wins</th>
+                <th class="right">WRs</th>
+                <th class="right">Top 5s</th>
+                <th class="right">Weeks Won</th>
+              </tr>
+            </thead>
+            <tbody id="overallBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Week Leaderboard</div>
+          <div class="controls">
+            <select id="weekSelect"></select>
+          </div>
+        </div>
+        <div class="card-b" id="weekMeta">
+          <div class="muted mini" id="weekMap">—</div>
+          <div class="muted mini" id="weekEnded">—</div>
+        </div>
+        <div class="card-b" style="padding:0">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:54px">#</th>
+                <th>Player</th>
+                <th class="right">Time</th>
+              </tr>
+            </thead>
+            <tbody id="weekBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="card">
+      <div class="card-h">
+        <div class="t">Changelog</div>
+        <div class="muted mini">Post-week WR improvements</div>
+      </div>
+      <div class="card-b" id="changelog">
+        <div class="muted">Loading…</div>
+      </div>
     </div>
   </div>
 
-</div>
+  <script>
+    // ✅ Render API base (this is the ONLY thing the website needs)
+    const API = "https://trackmaniawebsite.onrender.com";
 
-<script>
-  const API_BASE = "https://trackmaniawebsite.onrender.com";
-  const PATHS = {
-    weeksIndex: `${API_BASE}/api/weekly-shorts/weeks`,
-    aggregate:  `${API_BASE}/api/weekly-shorts/aggregate`,
-    changelog:  `${API_BASE}/api/weekly-shorts/changelog`,
-    weekFile:   (weekNum) => `${API_BASE}/api/weekly-shorts/week/${weekNum}`
-  };
+    // ✅ Correct endpoints (NOT /weeks.json etc)
+    const PATHS = {
+      weeksIndex: `${API}/api/weekly-shorts/weeks`,
+      aggregate:  `${API}/api/weekly-shorts/aggregate`,
+      changelog:  `${API}/api/weekly-shorts/changelog`,
+      weekFile:   (weekNum) => `${API}/api/weekly-shorts/week/${weekNum}`
+    };
 
-  const $ = (id) => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
 
-  function fmtMs(ms) {
-    ms = Number(ms);
-    if (!Number.isFinite(ms) || ms <= 0) return "—";
-    const total = Math.floor(ms / 1000);
-    const m = Math.floor(total / 60);
-    const s = total % 60;
-    const mm = ms % 1000;
-    return `${m}:${String(s).padStart(2,"0")}.${String(mm).padStart(3,"0")}`;
-  }
+    function fmtTime(ms){
+      if (ms == null || isNaN(ms)) return "—";
+      const total = Math.max(0, Math.floor(ms));
+      const m = Math.floor(total / 60000);
+      const s = Math.floor((total % 60000) / 1000);
+      const t = total % 1000;
+      return `${m}:${String(s).padStart(2,"0")}.${String(t).padStart(3,"0")}`;
+    }
 
-  async function fetchJsonWithRetry(url, tries = 3) {
-    let lastErr;
-    for (let i = 0; i < tries; i++) {
-      try {
-        const r = await fetch(url, { cache: "no-store" });
-        if (!r.ok) throw new Error(`${r.status} ${url}`);
-        return await r.json();
-      } catch (e) {
-        lastErr = e;
-        // Render cold start: brief backoff
-        await new Promise(r => setTimeout(r, 700 + i * 700));
+    function fmtIso(iso){
+      if (!iso) return "—";
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleString(undefined, { year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+    }
+
+    async function fetchJson(url){
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) throw new Error(`Failed ${r.status} ${url}`);
+      return r.json();
+    }
+
+    function pickLeader(players, key){
+      let best = null;
+      for (const p of players){
+        if (!best) best = p;
+        else if ((p[key] ?? 0) > (best[key] ?? 0)) best = p;
+        else if ((p[key] ?? 0) === (best[key] ?? 0)) {
+          if ((p.player || "").toLowerCase() < (best.player || "").toLowerCase()) best = p;
+        }
+      }
+      return best;
+    }
+
+    function renderKpis(agg, weeksCount){
+      const players = agg.players || [];
+      $("genAt").textContent = agg.generatedAt ? `Updated ${fmtIso(agg.generatedAt)}` : "";
+      $("weekCount").textContent = weeksCount ? `${weeksCount} weeks` : "";
+
+      const w = pickLeader(players, "wins");
+      const r = pickLeader(players, "wrs");
+      const t = pickLeader(players, "top5");
+
+      $("kpiWinsName").textContent = w ? w.player : "—";
+      $("kpiWinsVal").textContent = w ? `${w.wins} wins` : "—";
+
+      $("kpiWrsName").textContent = r ? r.player : "—";
+      $("kpiWrsVal").textContent = r ? `${r.wrs} WRs` : "—";
+
+      $("kpiTop5Name").textContent = t ? t.player : "—";
+      $("kpiTop5Val").textContent = t ? `${t.top5} Top 5s` : "—";
+    }
+
+    function sortPlayers(players, sortBy){
+      const arr = [...players];
+      const byNumDesc = (k) => (a,b) => (b[k]??0) - (a[k]??0) || (a.player||"").localeCompare(b.player||"");
+      if (sortBy === "wins") return arr.sort(byNumDesc("wins"));
+      if (sortBy === "wrs") return arr.sort(byNumDesc("wrs"));
+      if (sortBy === "top5") return arr.sort(byNumDesc("top5"));
+      return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
+    }
+
+    function renderOverall(players, sortBy, search){
+      const el = $("overallBody");
+      el.innerHTML = "";
+
+      const q = (search || "").trim().toLowerCase();
+      let list = players || [];
+      if (q) list = list.filter(p => (p.player || "").toLowerCase().includes(q));
+
+      list = sortPlayers(list, sortBy);
+
+      if (!list.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="6" class="muted">No players match.</td>`;
+        el.appendChild(tr);
+        return;
+      }
+
+      list.forEach((p, idx) => {
+        const tr = document.createElement("tr");
+        const weeksWon = Array.isArray(p.weeksWon) ? p.weeksWon.join(", ") : "";
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><b>${p.player}</b></td>
+          <td class="right">${p.wins ?? 0}</td>
+          <td class="right">${p.wrs ?? 0}</td>
+          <td class="right">${p.top5 ?? 0}</td>
+          <td class="right">${weeksWon}</td>
+        `;
+        el.appendChild(tr);
+      });
+    }
+
+    function populateWeeksDropdown(weeks){
+      const sel = $("weekSelect");
+      sel.innerHTML = "";
+      if (!weeks.length){
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "No weeks";
+        sel.appendChild(opt);
+        return null;
+      }
+
+      // newest first
+      const sorted = [...weeks].sort((a,b) => Number(b.week) - Number(a.week));
+      for (const w of sorted){
+        const opt = document.createElement("option");
+        opt.value = String(w.week);
+        opt.textContent = `Week ${w.week}`;
+        sel.appendChild(opt);
+      }
+      return sorted[0].week;
+    }
+
+    function renderWeekTable(w){
+      $("weekMap").textContent = w?.mapName ? `Map: ${w.mapName} (UID: ${w.mapUid || "—"})` : `Map UID: ${w?.mapUid || "—"}`;
+      $("weekEnded").textContent = w?.endedAt ? `Ended: ${fmtIso(w.endedAt)}` : `Ended: —`;
+
+      const el = $("weekBody");
+      el.innerHTML = "";
+
+      const entries = w?.entries || [];
+      if (!entries.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="3" class="muted">No entries</td>`;
+        el.appendChild(tr);
+        return;
+      }
+
+      for (const e of entries){
+        const tr = document.createElement("tr");
+        const badge = e.isWr ? `<span class="tag">WR</span>` : "";
+        tr.innerHTML = `
+          <td>${e.rank ?? ""}</td>
+          <td>${badge}<b>${e.player || "—"}</b></td>
+          <td class="right">${fmtTime(e.timeMs)}</td>
+        `;
+        el.appendChild(tr);
       }
     }
-    throw lastErr;
-  }
 
-  function setStatus(text, ok = true) {
-    const el = $("status");
-    el.textContent = text;
-    el.className = ok ? "ok" : "error";
-  }
+    function renderChangelog(items){
+      const el = $("changelog");
+      el.innerHTML = "";
 
-  function renderWeeksSelect(weeks) {
-    const sel = $("weekSel");
-    sel.innerHTML = "";
-    for (const w of weeks) {
-      const opt = document.createElement("option");
-      opt.value = String(w.week);
-      opt.textContent = `Week ${w.week} — ${w.mapName || "Weekly Shorts"}`;
-      sel.appendChild(opt);
-    }
-  }
-
-  function renderWeek(weekJson) {
-    $("weekTitle").textContent = `Week ${weekJson.week} — ${weekJson.mapName || "Weekly Shorts"}`;
-    $("weekMeta").textContent = `Map UID: ${weekJson.mapUid || "—"}${weekJson.endedAt ? ` • Ended: ${weekJson.endedAt}` : ""}`;
-    $("weekGenerated").textContent = "";
-
-    const body = $("weekBody");
-    body.innerHTML = "";
-
-    const entries = Array.isArray(weekJson.entries) ? weekJson.entries : [];
-    if (!entries.length) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="4" class="muted">No entries</td>`;
-      body.appendChild(tr);
-      return;
-    }
-
-    for (const e of entries) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${e.rank ?? "—"}</td>
-        <td>${e.player ?? "—"}</td>
-        <td>${fmtMs(e.timeMs)}</td>
-        <td>${e.isWr ? `<span class="badge">WR</span>` : ""}</td>
-      `;
-      body.appendChild(tr);
-    }
-  }
-
-  function renderAggregate(agg, filterText) {
-    $("aggGenerated").textContent = agg?.generatedAt ? `Generated: ${agg.generatedAt}` : "";
-
-    const body = $("aggBody");
-    body.innerHTML = "";
-
-    const rows = Array.isArray(agg.players) ? agg.players : [];
-    const q = (filterText || "").trim().toLowerCase();
-    const filtered = q ? rows.filter(r => String(r.player||"").toLowerCase().includes(q)) : rows;
-
-    if (!filtered.length) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="4" class="muted">No players</td>`;
-      body.appendChild(tr);
-      return;
-    }
-
-    for (const p of filtered.slice(0, 250)) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${p.player}</td>
-        <td>${p.wins ?? 0}</td>
-        <td>${p.wrs ?? 0}</td>
-        <td>${p.top5 ?? 0}</td>
-      `;
-      body.appendChild(tr);
-    }
-  }
-
-  function renderChangelog(chg) {
-    const body = $("chgBody");
-    body.innerHTML = "";
-
-    const items = Array.isArray(chg.items) ? chg.items : [];
-    if (!items.length) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="3" class="muted">No changelog entries yet</td>`;
-      body.appendChild(tr);
-      return;
-    }
-
-    for (const it of items.slice(0, 200)) {
-      const tr = document.createElement("tr");
-      const msg = it.type === "WR_IMPROVED_AFTER_WEEK"
-        ? `${it.playerNew} improved WR (${fmtMs(it.timePrevMs)} → ${fmtMs(it.timeNewMs)})`
-        : JSON.stringify(it);
-
-      tr.innerHTML = `
-        <td>${it.at || "—"}</td>
-        <td>${it.week ?? "—"}</td>
-        <td>${msg}</td>
-      `;
-      body.appendChild(tr);
-    }
-  }
-
-  async function loadAll() {
-    setStatus("Loading…", true);
-
-    const weeksIndex = await fetchJsonWithRetry(PATHS.weeksIndex);
-    const weeks = Array.isArray(weeksIndex.weeks) ? weeksIndex.weeks : [];
-
-    if (!weeks.length) {
-      setStatus("No weeks found (check WS campaign discovery on server).", false);
-      renderWeeksSelect([]);
-      renderWeek({ week: "—", entries: [] });
-      renderAggregate({ players: [] }, "");
-      renderChangelog({ items: [] });
-      return;
-    }
-
-    // Latest week auto-select
-    const latest = weeks.reduce((a, b) => (Number(a.week) > Number(b.week) ? a : b), weeks[0]);
-
-    renderWeeksSelect(weeks);
-    $("weekSel").value = String(latest.week);
-
-    const [weekJson, agg, chg] = await Promise.all([
-      fetchJsonWithRetry(PATHS.weekFile(latest.week)),
-      fetchJsonWithRetry(PATHS.aggregate),
-      fetchJsonWithRetry(PATHS.changelog),
-    ]);
-
-    renderWeek(weekJson);
-    renderAggregate(agg, $("search").value);
-    renderChangelog(chg);
-
-    setStatus("OK", true);
-
-    $("weekSel").addEventListener("change", async () => {
-      try {
-        setStatus("Loading week…", true);
-        const w = $("weekSel").value;
-        const weekJson = await fetchJsonWithRetry(PATHS.weekFile(w));
-        renderWeek(weekJson);
-        setStatus("OK", true);
-      } catch (e) {
-        setStatus(`Week load failed: ${e?.message || e}`, false);
+      const sorted = [...(items || [])].sort((a,b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+      if (!sorted.length){
+        el.innerHTML = `<div class="muted">No changelog entries yet</div>`;
+        return;
       }
+
+      for (const it of sorted){
+        if (it.type === "WR_IMPROVED_AFTER_WEEK"){
+          const msg = `<b>${it.playerNew}</b> improved <b>Week ${it.week}</b> WR (previously held by <b>${it.playerPrev}</b>)
+                      — <b>${fmtTime(it.timeNewMs)}</b> (prev ${fmtTime(it.timePrevMs)})`;
+          const div = document.createElement("div");
+          div.className = "logitem";
+          div.innerHTML = `<div class="mini muted">${fmtIso(it.at)}</div><div>${msg}</div>`;
+          el.appendChild(div);
+        } else {
+          const div = document.createElement("div");
+          div.className = "logitem";
+          div.innerHTML = `<div class="mini muted">${fmtIso(it.at)}</div><div class="muted">Unknown changelog item.</div>`;
+          el.appendChild(div);
+        }
+      }
+    }
+
+    async function main(){
+      const [weeksIndex, agg, changelog] = await Promise.all([
+        fetchJson(PATHS.weeksIndex),
+        fetchJson(PATHS.aggregate),
+        fetchJson(PATHS.changelog).catch(() => ({ items: [] }))
+      ]);
+
+      const weeks = weeksIndex.weeks || [];
+      renderKpis(agg, weeks.length);
+
+      const sortBy = $("sortBy");
+      const search = $("playerSearch");
+
+      function rerenderOverall(){
+        renderOverall(agg.players || [], sortBy.value, search.value);
+      }
+
+      sortBy.addEventListener("change", rerenderOverall);
+      search.addEventListener("input", rerenderOverall);
+      $("clearSearch").addEventListener("click", () => { search.value = ""; rerenderOverall(); });
+
+      rerenderOverall();
+      renderChangelog(changelog.items || []);
+
+      const defaultWeek = populateWeeksDropdown(weeks);
+
+      async function loadWeek(weekNum){
+        if (!weekNum) return;
+        const w = await fetchJson(PATHS.weekFile(weekNum));
+        renderWeekTable(w);
+      }
+
+      $("weekSelect").addEventListener("change", (e) => loadWeek(e.target.value));
+      if (defaultWeek != null) await loadWeek(defaultWeek);
+    }
+
+    main().catch(err => {
+      console.error(err);
+      document.body.innerHTML = `
+        <div style="max-width:900px;margin:40px auto;padding:16px;color:#e6ecff;font-family:system-ui">
+          <h2 style="margin:0 0 8px">Weekly Shorts Stats</h2>
+          <div style="opacity:.8">Failed to load data. Check console + API paths.</div>
+          <pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(109,251,255,.22)">${String(err)}</pre>
+        </div>`;
     });
-
-    $("search").addEventListener("input", () => renderAggregate(agg, $("search").value));
-  }
-
-  loadAll().catch((e) => {
-    setStatus(`Load failed: ${e?.message || e}`, false);
-  });
-</script>
+  </script>
 </body>
 </html>
