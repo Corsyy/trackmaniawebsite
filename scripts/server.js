@@ -6,38 +6,6 @@ import compression from "compression";
 import http from "http";
 import https from "https";
 
-/**
- * Required ENV:
- *   REFRESH_TOKEN         = <Nadeo refresh token>  (raw token only; no "nadeo_v1 t=")
- *   CLIENT_ID             = <api.trackmania.com client_id>
- *   CLIENT_SECRET         = <api.trackmania.com client_secret>
- *
- * Optional ENV (recommended):
- *   ADMIN_SECRET            = <random string to secure /api/admin/set-refresh>
- *   REFRESH_TOKEN_FILE      = /data/nadeo_refresh_token.txt
- *   CACHE_PATH_WR           = /data/wr_cache.json
- *   CACHE_PATH_CLUB         = /data/club_uids.json
- *   CORS_ORIGINS            = comma-separated list of extra allowed origins
- *   INCLUDE_CLUB_BY_DEFAULT = true|false (default true)
- *   AUTO_UID_REFRESH        = true|false (default true)
- *   WR_CONCURRENCY          = 8
- *   QUICK_REFRESH_COUNT     = 100
- *   CLUB_MAX_CAMPAIGNS      = 200
- *   CLUB_DETAIL_CONC        = 4
- *   CLUB_UID_TTL_HOURS      = 24
- *   MAX_WR_MS               = (defaults to 24h in ms)
- *   RESPONSE_TTL_SECONDS    = 3  (small LRU TTL for route responses)
- *
- * Weekly Shorts ENV (required for WS to work):
- *   WS_CLUB_ID              = club id hosting Weekly Shorts (ex: 24231)
- *   WS_CAMPAIGN_ID          = club campaign id for Weekly Shorts (ex: 691919)
- *
- * Weekly Shorts optional ENV:
- *   WS_START_ISO            = ISO timestamp for Week 1 start (default: 2025-01-01T00:00:00Z)
- *   WS_MAPS_PER_WEEK        = maps per week (default: 5)
- *   WS_CACHE_TTL_SECONDS    = seconds for WS cached computations (default: 600)
- *   WS_CHANGELOG_PATH       = disk path for changelog persistence (default: /tmp/ws_changelog.json)
- */
 
 const app = express();
 
@@ -972,6 +940,7 @@ app.get("/api/wr-players", ensureCacheOnce, async (req, res) => {
   }
 });
 
+// Top players in last N days (weekly podium) — backward compatible
 app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
   const cached = getCached(req);
   if (cached) {
@@ -989,7 +958,7 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
 
     const safeRows = (wrCache.rows || []).filter((r) => isValidTimeMs(Number(r.timeMs)));
 
-    const tally = new Map();
+    const tally = new Map(); // accountId -> { accountId, displayName, wrs, bySource, latestTs }
     for (const r of safeRows) {
       if (!r.accountId) continue;
       if (!r.timestamp || r.timestamp < cutoff) continue;
@@ -1001,17 +970,37 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
         bySource: { official: 0, totd: 0, club: 0 },
         latestTs: 0,
       };
+
       rec.wrs += 1;
       rec.bySource[r.sourceType] = (rec.bySource[r.sourceType] || 0) + 1;
       if (r.timestamp > rec.latestTs) rec.latestTs = r.timestamp;
+
       tally.set(r.accountId, rec);
     }
 
     const top = Array.from(tally.values())
       .sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs)
-      .slice(0, limit);
+      .slice(0, limit)
+      .map((x, i) => ({
+        ...x,
 
-    const payload = { rangeDays: days, top, generatedAt: Date.now() };
+        // --- compatibility aliases (so older frontends don't break) ---
+        rank: i + 1,
+        player: x.displayName,     // some pages use "player"
+        name: x.displayName,       // some pages use "name"
+        count: x.wrs,              // some pages use "count"
+        wrCount: x.wrs,            // some pages use "wrCount"
+      }));
+
+    const payload = {
+      rangeDays: days,
+      days,                         // alias
+      top,                          // your current shape
+      podium: top.slice(0, 3),      // common UI expects podium[]
+      generatedAt: Date.now(),
+      fetchedAt: wrCache.ts,
+    };
+
     setCached(req, payload);
     res.setHeader("Cache-Control", "public, max-age=5, stale-while-revalidate=60");
     res.json(payload);
@@ -1076,13 +1065,7 @@ app.post("/api/rebuild-now", async (req, res) => {
   }
 });
 
-/* ========================= WEEKLY SHORTS (AUTO / LIVE) =========================
-   Endpoints:
-     GET /api/weekly-shorts/weeks
-     GET /api/weekly-shorts/week/:week
-     GET /api/weekly-shorts/aggregate
-     GET /api/weekly-shorts/changelog
-=============================================================================== */
+
 
 const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
 const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
