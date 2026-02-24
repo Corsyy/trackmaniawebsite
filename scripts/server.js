@@ -28,9 +28,13 @@ import https from "https";
  *   MAX_WR_MS               = (defaults to 24h in ms)
  *   RESPONSE_TTL_SECONDS    = 3  (small LRU TTL for route responses)
  *
+ * Weekly Shorts ENV (required for WS to work):
+ *   WS_CLUB_ID              = club id hosting Weekly Shorts (ex: 24231)
+ *   WS_CAMPAIGN_ID          = club campaign id for Weekly Shorts (ex: 691919)
+ *
  * Weekly Shorts optional ENV:
- *   WS_CAMPAIGN_ID          = pin official campaign id for Weekly Shorts discovery
- *   WS_NAME_MATCH           = fallback name matcher (default: "weekly shorts")
+ *   WS_START_ISO            = ISO timestamp for Week 1 start (default: 2025-01-01T00:00:00Z)
+ *   WS_MAPS_PER_WEEK        = maps per week (default: 5)
  *   WS_CACHE_TTL_SECONDS    = seconds for WS cached computations (default: 600)
  *   WS_CHANGELOG_PATH       = disk path for changelog persistence (default: /tmp/ws_changelog.json)
  */
@@ -350,17 +354,47 @@ function sanitizeRow(row) {
   if (!row.accountId || typeof row.accountId !== "string") return null;
   return { ...row, timeMs: ms };
 }
-app.get("/api/ws-debug", async (req,res)=>{
- const access = await getLiveAccessToken();
- const list = await getAllOfficialCampaigns(access);
 
- res.json(
-   list.map(c=>({
-     id:c.id,
-     name:c.name
-   }))
- );
+// (keep) your original official-campaign debug endpoint (handy)
+app.get("/api/ws-debug", async (req, res) => {
+  const access = await getLiveAccessToken();
+  const list = await getAllOfficialCampaigns(access);
+  res.json(
+    list.map((c) => ({
+      id: c.id,
+      name: c.name,
+    }))
+  );
 });
+
+// NEW: debug your WS club campaign directly
+app.get("/api/ws-debug-club-campaign", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  try {
+    const clubId = String(process.env.WS_CLUB_ID || "").trim();
+    const campaignId = String(process.env.WS_CAMPAIGN_ID || "").trim();
+    if (!clubId || !campaignId) {
+      return res.status(400).json({ error: "Missing WS_CLUB_ID / WS_CAMPAIGN_ID" });
+    }
+    const access = await getLiveAccessToken();
+    const url = `${LIVE_BASE}/api/token/club/${encodeURIComponent(clubId)}/campaign/${encodeURIComponent(
+      campaignId
+    )}`;
+    const j = await jget(url, access);
+    const playlist = j?.campaign?.playlist || j?.playlist || [];
+    res.json({
+      ok: true,
+      clubId,
+      campaignId,
+      campaignName: j?.campaign?.name || j?.name || null,
+      playlistCount: Array.isArray(playlist) ? playlist.length : 0,
+      sample: (playlist || []).slice(0, 5).map((p) => ({ mapUid: p?.mapUid || null })),
+    });
+  } catch (e) {
+    res.status(500).json({ error: "debug failed", detail: e?.message || String(e) });
+  }
+});
+
 async function getMapWR(accessToken, mapUid) {
   const groupUid = "Personal_Best";
   const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${mapUid}/top?onlyWorld=true&length=1`;
@@ -1043,7 +1077,7 @@ app.post("/api/rebuild-now", async (req, res) => {
 });
 
 /* ========================= WEEKLY SHORTS (AUTO / LIVE) =========================
-   These endpoints match the shapes your weekly-shorts-stats.html expects:
+   Endpoints:
      GET /api/weekly-shorts/weeks
      GET /api/weekly-shorts/week/:week
      GET /api/weekly-shorts/aggregate
@@ -1053,19 +1087,22 @@ app.post("/api/rebuild-now", async (req, res) => {
 const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
 const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
 
-const WS_CAMPAIGN_ID = (process.env.WS_CAMPAIGN_ID || "").trim();
-const WS_NAME_MATCH = (process.env.WS_NAME_MATCH || "weekly shorts").trim().toLowerCase();
+const WS_CLUB_ID = String(process.env.WS_CLUB_ID || "").trim();
+const WS_CAMPAIGN_ID = String(process.env.WS_CAMPAIGN_ID || "").trim();
+
+const WS_START_ISO = String(process.env.WS_START_ISO || "2025-01-01T00:00:00Z").trim();
+const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 
 const WS_CHANGELOG_PATH = process.env.WS_CHANGELOG_PATH || "/tmp/ws_changelog.json";
 
 // in-memory cache
 let ws = {
   ts: 0,
-  weeksIndex: null, // { generatedAt, weeks:[{week,mapUid,mapName,endedAt}] }
+  weeksIndex: null, // { generatedAt, weeks:[{week,mapUids[],endedAt,weekStart}] }
   weekCache: new Map(), // weekNum -> weekJson
   aggregate: null, // { generatedAt, players:[...] }
   changelog: { items: [] }, // { items:[...] }
-  snapshot: new Map(), // weekNum -> { player, timeMs } for ended weeks
+  snapshot: new Map(), // weekNum -> { byMapUid: Map(mapUid -> {player,timeMs}) }
 };
 
 // load changelog from disk once (best-effort)
@@ -1089,70 +1126,53 @@ function wsExpired() {
   return !ws.ts || Date.now() - ws.ts > WS_CACHE_TTL_MS;
 }
 
-function norm(s) {
-  return String(s || "").trim().toLowerCase();
+function parseStartMs() {
+  const ms = Date.parse(WS_START_ISO);
+  if (!Number.isFinite(ms)) throw new Error(`Invalid WS_START_ISO: ${WS_START_ISO}`);
+  return ms;
 }
 
-function pickWeeklyShortsCampaign(list) {
-  if (!Array.isArray(list)) return null;
+async function fetchWeeklyShortsPlaylistMapUids(access) {
+  if (!WS_CLUB_ID || !WS_CAMPAIGN_ID) {
+    throw new Error("Weekly Shorts missing WS_CLUB_ID / WS_CAMPAIGN_ID env vars");
+  }
+  const url = `${LIVE_BASE}/api/token/club/${encodeURIComponent(WS_CLUB_ID)}/campaign/${encodeURIComponent(
+    WS_CAMPAIGN_ID
+  )}`;
+  const j = await jget(url, access);
+  const playlist = j?.campaign?.playlist || j?.playlist || [];
+  return playlist.map((p) => p?.mapUid).filter(Boolean);
+}
 
-  if (WS_CAMPAIGN_ID) {
-    const byId = list.find((c) => String(c?.id || "") === WS_CAMPAIGN_ID);
-    if (byId) return byId;
+function buildWsWeeksFromPlaylist(mapUids) {
+  const startMs = parseStartMs();
+  if (!Number.isFinite(WS_MAPS_PER_WEEK) || WS_MAPS_PER_WEEK <= 0) {
+    throw new Error(`Invalid WS_MAPS_PER_WEEK: ${WS_MAPS_PER_WEEK}`);
   }
 
-  // strict match only (no "weekly" generic)
-  const byName = list.find((c) => norm(c?.name).includes(WS_NAME_MATCH));
-  return byName || null;
-}
+  const weeks = [];
+  const now = Date.now();
 
-function campaignPlaylist(c) {
-  const pl = c?.playlist;
-  return Array.isArray(pl) ? pl : [];
-}
+  // each week spans 7 days from startMs
+  for (let w = 0; ; w++) {
+    const weekStart = startMs + w * 7 * 24 * 3600 * 1000;
+    const weekEndExclusive = startMs + (w + 1) * 7 * 24 * 3600 * 1000;
 
-function mapNameFromPlaylistItem(p, weekNum) {
-  return (
-    p?.name ||
-    p?.mapName ||
-    p?.map?.name ||
-    `Week ${weekNum}`
-  );
-}
-function endedAtFromPlaylistItem(p) {
-  return p?.endedAt || p?.endAt || p?.end || null;
-}
+    const idx0 = w * WS_MAPS_PER_WEEK;
+    const chunk = mapUids.slice(idx0, idx0 + WS_MAPS_PER_WEEK);
 
-async function fetchWsWeeksIndex(access) {
-  const list = await getAllOfficialCampaigns(access);
-  const campaign = pickWeeklyShortsCampaign(list);
-  if (!campaign) {
-    return {
-      generatedAt: new Date().toISOString(),
-      weeks: [],
-      note: WS_CAMPAIGN_ID
-        ? `WS_CAMPAIGN_ID=${WS_CAMPAIGN_ID} not found in official campaigns`
-        : `No official campaign matched "${WS_NAME_MATCH}"`,
-    };
+    // stop when we're far into the future and no maps exist there
+    if (!chunk.length && weekStart > now + 21 * 24 * 3600 * 1000) break;
+
+    weeks.push({
+      week: w + 1,
+      weekStart: new Date(weekStart).toISOString(),
+      endedAt: new Date(weekEndExclusive - 1).toISOString(),
+      mapUids: chunk, // usually 5
+    });
   }
 
-  const pl = campaignPlaylist(campaign);
-
-  const weeks = pl
-    .map((p, idx) => {
-      const week = idx + 1;
-      const mapUid = p?.mapUid;
-      if (!mapUid) return null;
-      return {
-        week,
-        mapUid,
-        mapName: mapNameFromPlaylistItem(p, week),
-        endedAt: endedAtFromPlaylistItem(p),
-      };
-    })
-    .filter(Boolean);
-
-  return { generatedAt: new Date().toISOString(), weeks, campaignId: campaign?.id, campaignName: campaign?.name };
+  return weeks;
 }
 
 async function fetchWsTop10(access, mapUid) {
@@ -1187,40 +1207,44 @@ async function fetchWsTop10(access, mapUid) {
 }
 
 function buildWsAggregate(allWeekJson) {
-  // players aggregated by wins/top5/wrs across ALL weeks
+  // Aggregate across ALL maps in ALL weeks
   const by = new Map();
 
   for (const w of allWeekJson) {
     const weekNum = Number(w.week);
-    const mapUid = w.mapUid;
-    const entries = Array.isArray(w.entries) ? w.entries : [];
-    for (const e of entries) {
-      const player = e.player;
-      if (!player) continue;
+    const maps = Array.isArray(w.maps) ? w.maps : [];
 
-      const rec =
-        by.get(player) || {
-          player,
-          wins: 0,
-          wrs: 0,
-          top5: 0,
-          weeksWon: [],
-          wrWeeks: [],
-          top5Weeks: [],
-        };
+    for (const m of maps) {
+      const mapUid = m.mapUid;
+      const entries = Array.isArray(m.entries) ? m.entries : [];
+      for (const e of entries) {
+        const player = e.player;
+        if (!player) continue;
 
-      if (e.rank === 1) {
-        rec.wins += 1;
-        rec.wrs += 1;
-        rec.weeksWon.push(weekNum);
-        rec.wrWeeks.push({ week: weekNum, mapUid, timeMs: e.timeMs });
+        const rec =
+          by.get(player) || {
+            player,
+            wins: 0,
+            wrs: 0,
+            top5: 0,
+            weeksWon: [],
+            wrWeeks: [],
+            top5Weeks: [],
+          };
+
+        if (e.rank === 1) {
+          rec.wins += 1;
+          rec.wrs += 1;
+          rec.weeksWon.push(weekNum);
+          rec.wrWeeks.push({ week: weekNum, mapUid, timeMs: e.timeMs });
+        }
+        if (e.rank <= 5) {
+          rec.top5 += 1;
+          rec.top5Weeks.push({ week: weekNum, mapUid, rank: e.rank, timeMs: e.timeMs });
+        }
+
+        by.set(player, rec);
       }
-      if (e.rank <= 5) {
-        rec.top5 += 1;
-        rec.top5Weeks.push({ week: weekNum, mapUid, rank: e.rank, timeMs: e.timeMs });
-      }
-
-      by.set(player, rec);
     }
   }
 
@@ -1249,30 +1273,40 @@ function updateWsChangelogIfEndedWeek(weekJson) {
   if (!Number.isFinite(endedMs)) return;
   if (Date.now() < endedMs) return; // not ended yet
 
-  const winner = (weekJson.entries || []).find((e) => e.rank === 1);
-  if (!winner) return;
+  // snapshot per map
+  const snap = ws.snapshot.get(weekNum) || { byMapUid: new Map() };
 
-  const prev = ws.snapshot.get(weekNum);
-  if (!prev) {
-    ws.snapshot.set(weekNum, { player: winner.player, timeMs: winner.timeMs });
-    return;
+  for (const m of weekJson.maps || []) {
+    const mapUid = m.mapUid;
+    const winner = (m.entries || []).find((e) => e.rank === 1);
+    if (!mapUid || !winner) continue;
+
+    const prev = snap.byMapUid.get(mapUid);
+    if (!prev) {
+      snap.byMapUid.set(mapUid, { player: winner.player, timeMs: winner.timeMs });
+      continue;
+    }
+
+    // WR improved after end (on this map)
+    if (Number(winner.timeMs) < Number(prev.timeMs)) {
+      ws.changelog.items.push({
+        at: new Date().toISOString(),
+        type: "WR_IMPROVED_AFTER_WEEK",
+        week: weekNum,
+        mapUid,
+        playerNew: winner.player,
+        timeNewMs: winner.timeMs,
+        playerPrev: prev.player,
+        timePrevMs: prev.timeMs,
+      });
+
+      snap.byMapUid.set(mapUid, { player: winner.player, timeMs: winner.timeMs });
+    }
   }
 
-  // WR improved after end
-  if (Number(winner.timeMs) < Number(prev.timeMs)) {
-    ws.changelog.items.push({
-      at: new Date().toISOString(),
-      type: "WR_IMPROVED_AFTER_WEEK",
-      week: weekNum,
-      mapUid: weekJson.mapUid,
-      playerNew: winner.player,
-      timeNewMs: winner.timeMs,
-      playerPrev: prev.player,
-      timePrevMs: prev.timeMs,
-    });
-    ws.snapshot.set(weekNum, { player: winner.player, timeMs: winner.timeMs });
+  ws.snapshot.set(weekNum, snap);
 
-    // keep newest first
+  if (ws.changelog.items.length) {
     ws.changelog.items.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
     saveWsChangelog();
   }
@@ -1282,29 +1316,59 @@ async function rebuildWsCacheIfNeeded() {
   if (!wsExpired() && ws.weeksIndex) return;
 
   const access = await getLiveAccessToken();
-  const weeksIndex = await fetchWsWeeksIndex(access);
+  const playlistMapUids = await fetchWeeklyShortsPlaylistMapUids(access);
+  const weeks = buildWsWeeksFromPlaylist(playlistMapUids);
 
-  // build week json for all weeks (cached for aggregate)
   const allWeekJson = [];
   const newWeekCache = new Map();
 
-  for (const w of weeksIndex.weeks || []) {
-    const entries = await fetchWsTop10(access, w.mapUid);
+  for (const w of weeks) {
+    const maps = [];
+    for (const mapUid of w.mapUids || []) {
+      const entries = await fetchWsTop10(access, mapUid);
+      maps.push({
+        mapUid,
+        mapName: null,
+        entries,
+      });
+      await new Promise((r) => setTimeout(r, 70));
+    }
+
     const weekJson = {
       week: w.week,
-      mapUid: w.mapUid,
-      mapName: w.mapName,
-      endedAt: w.endedAt || null,
-      entries,
+      weekStart: w.weekStart,
+      endedAt: w.endedAt,
+      mapUids: w.mapUids || [],
+      maps,
+      // compatibility: expose the first map in old shape so the current UI doesn't crash
+      mapUid: (w.mapUids || [])[0] || null,
+      mapName: `Week ${w.week}`,
+      entries: (maps[0]?.entries || []),
     };
-    allWeekJson.push(weekJson);
-    newWeekCache.set(String(w.week), weekJson);
 
     updateWsChangelogIfEndedWeek(weekJson);
-    await new Promise((r) => setTimeout(r, 70));
+
+    allWeekJson.push(weekJson);
+    newWeekCache.set(String(w.week), weekJson);
   }
 
-  ws.weeksIndex = { generatedAt: weeksIndex.generatedAt, weeks: weeksIndex.weeks || [] };
+  ws.weeksIndex = {
+    generatedAt: new Date().toISOString(),
+    clubId: WS_CLUB_ID,
+    campaignId: WS_CAMPAIGN_ID,
+    mapsPerWeek: WS_MAPS_PER_WEEK,
+    startIso: WS_START_ISO,
+    weeks: weeks.map((x) => ({
+      week: x.week,
+      weekStart: x.weekStart,
+      endedAt: x.endedAt,
+      mapUids: x.mapUids || [],
+      // compatibility fields
+      mapUid: (x.mapUids || [])[0] || null,
+      mapName: `Week ${x.week}`,
+    })),
+  };
+
   ws.weekCache = newWeekCache;
   ws.aggregate = buildWsAggregate(allWeekJson);
   ws.ts = Date.now();
@@ -1365,7 +1429,6 @@ app.get("/api/weekly-shorts/changelog", async (req, res) => {
   if (cached) return res.json(cached);
 
   try {
-    // no need to rebuild weekly data just to read changelog
     const payload = ws.changelog || { items: [] };
     setCached(req, payload);
     res.json(payload);
