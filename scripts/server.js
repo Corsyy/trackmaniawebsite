@@ -1419,6 +1419,31 @@ app.get("/api/weekly-shorts/changelog", async (req, res) => {
     res.status(500).json({ error: "Failed to load changelog", detail: e?.message || String(e) });
   }
 });
+app.get("/api/ws-debug-club-search", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  try {
+    const access = await getLiveAccessToken();
+    const q = String(req.query.q || "weekly shorts").toLowerCase();
+
+    const url = `${LIVE_BASE}/api/token/club/campaign?length=300&offset=0`;
+    const j = await jget(url, access);
+    const list = j?.clubCampaignList || j?.campaignList || [];
+
+    const matches = list
+      .map((it) => ({
+        id: it?.id ?? it?.campaignId ?? it?.campaign?.id ?? null,
+        clubId: it?.clubId ?? it?.campaign?.clubId ?? null,
+        name: it?.campaign?.name ?? it?.name ?? "",
+      }))
+      .filter((x) => x.id && x.name.toLowerCase().includes(q))
+      .slice(0, 50);
+
+    res.json({ q, matchesCount: matches.length, matches });
+  } catch (e) {
+    res.status(500).json({ error: "debug failed", detail: e?.message || String(e) });
+  }
+});
+
 
 /* ------------------------- Start --------------------------- */
 process.on("unhandledRejection", (err) => console.error("UNHANDLED_REJECTION:", err));
