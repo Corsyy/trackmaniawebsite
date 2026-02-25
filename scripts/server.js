@@ -6,7 +6,6 @@ import compression from "compression";
 import http from "http";
 import https from "https";
 
-
 const app = express();
 
 /* ------------------------------ Perf -------------------------------- */
@@ -335,29 +334,35 @@ app.get("/api/ws-debug", async (req, res) => {
   );
 });
 
-// NEW: debug your WS club campaign directly
-app.get("/api/ws-debug-club-campaign", async (_req, res) => {
+// (keep) club debug (optional)
+app.get("/api/ws-debug-club-24231", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   try {
-    const clubId = String(process.env.WS_CLUB_ID || "").trim();
-    const campaignId = String(process.env.WS_CAMPAIGN_ID || "").trim();
-    if (!clubId || !campaignId) {
-      return res.status(400).json({ error: "Missing WS_CLUB_ID / WS_CAMPAIGN_ID" });
-    }
     const access = await getLiveAccessToken();
-    const url = `${LIVE_BASE}/api/token/club/${encodeURIComponent(clubId)}/campaign/${encodeURIComponent(
-      campaignId
-    )}`;
-    const j = await jget(url, access);
-    const playlist = j?.campaign?.playlist || j?.playlist || [];
-    res.json({
-      ok: true,
-      clubId,
-      campaignId,
-      campaignName: j?.campaign?.name || j?.name || null,
-      playlistCount: Array.isArray(playlist) ? playlist.length : 0,
-      sample: (playlist || []).slice(0, 5).map((p) => ({ mapUid: p?.mapUid || null })),
-    });
+    const clubId = "24231"; // Altered Nadeo
+    const q = String(req.query.q || "shorts").toLowerCase();
+
+    const matches = [];
+    const LENGTH = 100;
+
+    for (let offset = 0; offset <= 1000; offset += LENGTH) {
+      const url = `${LIVE_BASE}/api/token/club/${clubId}/campaign?length=${LENGTH}&offset=${offset}`;
+      const j = await jget(url, access);
+      const list = j?.campaignList || j?.clubCampaignList || [];
+      if (!list.length) break;
+
+      for (const it of list) {
+        const id = it?.id ?? it?.campaignId ?? it?.campaign?.id ?? null;
+        const name = (it?.name ?? it?.campaign?.name ?? "").toString();
+        if (id && name.toLowerCase().includes(q)) {
+          matches.push({ id, clubId, name });
+        }
+      }
+
+      if (list.length < LENGTH) break;
+    }
+
+    res.json({ q, matchesCount: matches.length, matches });
   } catch (e) {
     res.status(500).json({ error: "debug failed", detail: e?.message || String(e) });
   }
@@ -615,7 +620,8 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
 
   const ids = fresh.map((r) => r.accountId).filter(Boolean);
   await resolveDisplayNames(null, ids);
-  for (const r of byMap.values()) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
+  for (const r of byMap.values())
+    if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
   const merged = Array.from(byMap.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   wrCache = { ts: Date.now(), rows: merged };
@@ -628,7 +634,9 @@ async function maybeRefreshUidUniverse() {
   const access = await getLiveAccessToken();
 
   const official = await getAllOfficialCampaigns(access);
-  const latestOfficialSet = new Set(official.flatMap((c) => (c.playlist || []).map((p) => p.mapUid)));
+  const latestOfficialSet = new Set(
+    official.flatMap((c) => (c.playlist || []).map((p) => p.mapUid))
+  );
 
   const months = await getTotdMonthsFromLive(access);
   const last2 = months.slice(-2);
@@ -641,7 +649,9 @@ async function maybeRefreshUidUniverse() {
   const recentClubRefs = await listAllClubCampaignRefsWithPlaylists(access);
   const latestClubSet = new Set();
   for (const r of recentClubRefs.slice(0, 100)) {
-    const list = r.playlist?.length ? r.playlist : await fetchClubCampaignPlaylist(access, r.clubId, r.campaignId);
+    const list = r.playlist?.length
+      ? r.playlist
+      : await fetchClubCampaignPlaylist(access, r.clubId, r.campaignId);
     for (const uid of list || []) latestClubSet.add(uid);
   }
 
@@ -922,8 +932,7 @@ app.get("/api/wr-players", ensureCacheOnce, async (req, res) => {
     const q = (req.query.q || "").toString().trim().toLowerCase();
     if (q) {
       list = list.filter(
-        (p) =>
-          p.displayName?.toLowerCase().includes(q) || p.accountId?.toLowerCase().includes(q)
+        (p) => p.displayName?.toLowerCase().includes(q) || p.accountId?.toLowerCase().includes(q)
       );
     }
 
@@ -958,7 +967,7 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
 
     const safeRows = (wrCache.rows || []).filter((r) => isValidTimeMs(Number(r.timeMs)));
 
-    const tally = new Map(); // accountId -> { accountId, displayName, wrs, bySource, latestTs }
+    const tally = new Map();
     for (const r of safeRows) {
       if (!r.accountId) continue;
       if (!r.timestamp || r.timestamp < cutoff) continue;
@@ -983,20 +992,18 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
       .slice(0, limit)
       .map((x, i) => ({
         ...x,
-
-        // --- compatibility aliases (so older frontends don't break) ---
         rank: i + 1,
-        player: x.displayName,     // some pages use "player"
-        name: x.displayName,       // some pages use "name"
-        count: x.wrs,              // some pages use "count"
-        wrCount: x.wrs,            // some pages use "wrCount"
+        player: x.displayName,
+        name: x.displayName,
+        count: x.wrs,
+        wrCount: x.wrs,
       }));
 
     const payload = {
       rangeDays: days,
-      days,                         // alias
-      top,                          // your current shape
-      podium: top.slice(0, 3),      // common UI expects podium[]
+      days,
+      top,
+      podium: top.slice(0, 3),
       generatedAt: Date.now(),
       fetchedAt: wrCache.ts,
     };
@@ -1038,7 +1045,9 @@ app.get("/api/debug-stats", async (_req, res) => {
       rows: rows.length,
       counts,
       nameCacheSize: nameCache.size,
-      resolvedNamesCount: Array.from(nameCache.values()).filter((v) => v && typeof v === "string" && v !== "").length,
+      resolvedNamesCount: Array.from(nameCache.values()).filter(
+        (v) => v && typeof v === "string" && v !== ""
+      ).length,
       allMapsTracked: metaCache.allMapUids.length,
     });
   } catch (e) {
@@ -1065,13 +1074,18 @@ app.post("/api/rebuild-now", async (req, res) => {
   }
 });
 
-
+/* ========================= WEEKLY SHORTS (REAL WEEKLY TRACKS FEED) =========================
+   Uses: GET /api/campaign/weekly-shorts
+   Endpoints:
+     GET /api/weekly-shorts/weeks
+     GET /api/weekly-shorts/week/:week
+     GET /api/weekly-shorts/aggregate
+     GET /api/weekly-shorts/changelog
+     GET /api/ws-debug-weekly-shorts
+========================================================================================== */
 
 const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
 const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
-
-const WS_CLUB_ID = String(process.env.WS_CLUB_ID || "").trim();
-const WS_CAMPAIGN_ID = String(process.env.WS_CAMPAIGN_ID || "").trim();
 
 const WS_START_ISO = String(process.env.WS_START_ISO || "2025-01-01T00:00:00Z").trim();
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
@@ -1081,11 +1095,11 @@ const WS_CHANGELOG_PATH = process.env.WS_CHANGELOG_PATH || "/tmp/ws_changelog.js
 // in-memory cache
 let ws = {
   ts: 0,
-  weeksIndex: null, // { generatedAt, weeks:[{week,mapUids[],endedAt,weekStart}] }
-  weekCache: new Map(), // weekNum -> weekJson
-  aggregate: null, // { generatedAt, players:[...] }
-  changelog: { items: [] }, // { items:[...] }
-  snapshot: new Map(), // weekNum -> { byMapUid: Map(mapUid -> {player,timeMs}) }
+  weeksIndex: null,
+  weekCache: new Map(),
+  aggregate: null,
+  changelog: { items: [] },
+  snapshot: new Map(),
 };
 
 // load changelog from disk once (best-effort)
@@ -1115,47 +1129,79 @@ function parseStartMs() {
   return ms;
 }
 
-async function fetchWeeklyShortsPlaylistMapUids(access) {
-  if (!WS_CLUB_ID || !WS_CAMPAIGN_ID) {
-    throw new Error("Weekly Shorts missing WS_CLUB_ID / WS_CAMPAIGN_ID env vars");
+/**
+ * Fetch Weekly Shorts "weeks" from the real weekly tracks feed.
+ * Each item is effectively a weekly campaign with:
+ * - year, week, startTimestamp, endTimestamp, playlist (5 maps)
+ */
+async function fetchWeeklyShortsCampaignWeeks(access) {
+  const out = [];
+  const LENGTH = 100;
+
+  for (let offset = 0; offset <= 5000; offset += LENGTH) {
+    const url = `${LIVE_BASE}/api/campaign/weekly-shorts?length=${LENGTH}&offset=${offset}`;
+    const j = await jget(url, access);
+    const list = Array.isArray(j?.campaignList) ? j.campaignList : [];
+    if (!list.length) break;
+    out.push(...list);
+    if (list.length < LENGTH) break;
+    await new Promise((r) => setTimeout(r, 60));
   }
-  const url = `${LIVE_BASE}/api/token/club/${encodeURIComponent(WS_CLUB_ID)}/campaign/${encodeURIComponent(
-    WS_CAMPAIGN_ID
-  )}`;
-  const j = await jget(url, access);
-  const playlist = j?.campaign?.playlist || j?.playlist || [];
-  return playlist.map((p) => p?.mapUid).filter(Boolean);
+
+  return out;
 }
 
-function buildWsWeeksFromPlaylist(mapUids) {
+function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
   const startMs = parseStartMs();
-  if (!Number.isFinite(WS_MAPS_PER_WEEK) || WS_MAPS_PER_WEEK <= 0) {
-    throw new Error(`Invalid WS_MAPS_PER_WEEK: ${WS_MAPS_PER_WEEK}`);
-  }
 
-  const weeks = [];
-  const now = Date.now();
+  const normalized = (weeksRaw || [])
+    .map((w) => {
+      const startTs = Number(w?.startTimestamp) || 0; // seconds
+      const endTs = Number(w?.endTimestamp) || 0; // seconds
+      const mapUids = (Array.isArray(w?.playlist) ? w.playlist : [])
+        .map((p) => p?.mapUid)
+        .filter(Boolean);
 
-  // each week spans 7 days from startMs
-  for (let w = 0; ; w++) {
-    const weekStart = startMs + w * 7 * 24 * 3600 * 1000;
-    const weekEndExclusive = startMs + (w + 1) * 7 * 24 * 3600 * 1000;
+      return {
+        year: w?.year ?? null,
+        wsWeek: w?.week ?? null,
+        startTs,
+        endTs,
+        mapUids,
+      };
+    })
+    .filter((w) => w.startTs > 0 && w.endTs > 0)
+    .filter((w) => w.startTs * 1000 >= startMs)
+    .sort((a, b) => a.startTs - b.startTs);
 
-    const idx0 = w * WS_MAPS_PER_WEEK;
-    const chunk = mapUids.slice(idx0, idx0 + WS_MAPS_PER_WEEK);
+  const weeks = normalized.map((w, idx) => {
+    const weekStartIso = new Date(w.startTs * 1000).toISOString();
+    const endedAtIso = new Date(w.endTs * 1000 - 1).toISOString();
 
-    // stop when we're far into the future and no maps exist there
-    if (!chunk.length && weekStart > now + 21 * 24 * 3600 * 1000) break;
+    // sanity: WS is usually 5 maps/week; don't hard-fail if Nadeo changes it
+    if (WS_MAPS_PER_WEEK > 0 && w.mapUids.length && w.mapUids.length !== WS_MAPS_PER_WEEK) {
+      // no throw; just accept it
+    }
 
-    weeks.push({
-      week: w + 1,
-      weekStart: new Date(weekStart).toISOString(),
-      endedAt: new Date(weekEndExclusive - 1).toISOString(),
-      mapUids: chunk, // usually 5
-    });
-  }
+    return {
+      week: idx + 1, // internal sequential week number for your UI
+      year: w.year,
+      wsWeek: w.wsWeek,
+      weekStart: weekStartIso,
+      endedAt: endedAtIso,
+      mapUids: w.mapUids,
+      // compatibility fields (if any old UI expects single map)
+      mapUid: w.mapUids?.[0] || null,
+      mapName: `Week ${idx + 1}`,
+    };
+  });
 
-  return weeks;
+  return {
+    generatedAt: new Date().toISOString(),
+    startIso: WS_START_ISO,
+    mapsPerWeek: WS_MAPS_PER_WEEK,
+    weeks,
+  };
 }
 
 async function fetchWsTop10(access, mapUid) {
@@ -1190,7 +1236,6 @@ async function fetchWsTop10(access, mapUid) {
 }
 
 function buildWsAggregate(allWeekJson) {
-  // Aggregate across ALL maps in ALL weeks
   const by = new Map();
 
   for (const w of allWeekJson) {
@@ -1254,9 +1299,8 @@ function updateWsChangelogIfEndedWeek(weekJson) {
 
   const endedMs = Date.parse(endedAt);
   if (!Number.isFinite(endedMs)) return;
-  if (Date.now() < endedMs) return; // not ended yet
+  if (Date.now() < endedMs) return;
 
-  // snapshot per map
   const snap = ws.snapshot.get(weekNum) || { byMapUid: new Map() };
 
   for (const m of weekJson.maps || []) {
@@ -1270,7 +1314,6 @@ function updateWsChangelogIfEndedWeek(weekJson) {
       continue;
     }
 
-    // WR improved after end (on this map)
     if (Number(winner.timeMs) < Number(prev.timeMs)) {
       ws.changelog.items.push({
         at: new Date().toISOString(),
@@ -1299,14 +1342,15 @@ async function rebuildWsCacheIfNeeded() {
   if (!wsExpired() && ws.weeksIndex) return;
 
   const access = await getLiveAccessToken();
-  const playlistMapUids = await fetchWeeklyShortsPlaylistMapUids(access);
-  const weeks = buildWsWeeksFromPlaylist(playlistMapUids);
+  const weeksRaw = await fetchWeeklyShortsCampaignWeeks(access);
+  const weeksIndex = buildWeeksIndexFromWeeklyShortsFeed(weeksRaw);
 
   const allWeekJson = [];
   const newWeekCache = new Map();
 
-  for (const w of weeks) {
+  for (const w of weeksIndex.weeks || []) {
     const maps = [];
+
     for (const mapUid of w.mapUids || []) {
       const entries = await fetchWsTop10(access, mapUid);
       maps.push({
@@ -1319,14 +1363,17 @@ async function rebuildWsCacheIfNeeded() {
 
     const weekJson = {
       week: w.week,
+      year: w.year,
+      wsWeek: w.wsWeek,
       weekStart: w.weekStart,
       endedAt: w.endedAt,
       mapUids: w.mapUids || [],
       maps,
-      // compatibility: expose the first map in old shape so the current UI doesn't crash
+
+      // compatibility (old UI won’t crash)
       mapUid: (w.mapUids || [])[0] || null,
       mapName: `Week ${w.week}`,
-      entries: (maps[0]?.entries || []),
+      entries: maps[0]?.entries || [],
     };
 
     updateWsChangelogIfEndedWeek(weekJson);
@@ -1335,23 +1382,7 @@ async function rebuildWsCacheIfNeeded() {
     newWeekCache.set(String(w.week), weekJson);
   }
 
-  ws.weeksIndex = {
-    generatedAt: new Date().toISOString(),
-    clubId: WS_CLUB_ID,
-    campaignId: WS_CAMPAIGN_ID,
-    mapsPerWeek: WS_MAPS_PER_WEEK,
-    startIso: WS_START_ISO,
-    weeks: weeks.map((x) => ({
-      week: x.week,
-      weekStart: x.weekStart,
-      endedAt: x.endedAt,
-      mapUids: x.mapUids || [],
-      // compatibility fields
-      mapUid: (x.mapUids || [])[0] || null,
-      mapName: `Week ${x.week}`,
-    })),
-  };
-
+  ws.weeksIndex = weeksIndex;
   ws.weekCache = newWeekCache;
   ws.aggregate = buildWsAggregate(allWeekJson);
   ws.ts = Date.now();
@@ -1419,31 +1450,28 @@ app.get("/api/weekly-shorts/changelog", async (req, res) => {
     res.status(500).json({ error: "Failed to load changelog", detail: e?.message || String(e) });
   }
 });
-app.get("/api/ws-debug-club-search", async (req, res) => {
+
+// NEW debug endpoint for the REAL weekly shorts feed
+app.get("/api/ws-debug-weekly-shorts", async (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
   try {
     const access = await getLiveAccessToken();
-    const q = String(req.query.q || "weekly shorts").toLowerCase();
-
-    const url = `${LIVE_BASE}/api/token/club/campaign?length=100&offset=0`;
-    const j = await jget(url, access);
-    const list = j?.clubCampaignList || j?.campaignList || [];
-
-    const matches = list
-      .map((it) => ({
-        id: it?.id ?? it?.campaignId ?? it?.campaign?.id ?? null,
-        clubId: it?.clubId ?? it?.campaign?.clubId ?? null,
-        name: it?.campaign?.name ?? it?.name ?? "",
-      }))
-      .filter((x) => x.id && x.name.toLowerCase().includes(q))
-      .slice(0, 50);
-
-    res.json({ q, matchesCount: matches.length, matches });
+    const raw = await fetchWeeklyShortsCampaignWeeks(access);
+    const idx = buildWeeksIndexFromWeeklyShortsFeed(raw);
+    const first = idx.weeks?.[0] || null;
+    const last = idx.weeks?.[idx.weeks.length - 1] || null;
+    res.json({
+      ok: true,
+      startIso: WS_START_ISO,
+      fetchedCount: raw.length,
+      weeksAfterFilter: idx.weeks.length,
+      first,
+      last,
+    });
   } catch (e) {
-    res.status(500).json({ error: "debug failed", detail: e?.message || String(e) });
+    res.status(500).json({ ok: false, error: "debug failed", detail: e?.message || String(e) });
   }
 });
-
 
 /* ------------------------- Start --------------------------- */
 process.on("unhandledRejection", (err) => console.error("UNHANDLED_REJECTION:", err));
