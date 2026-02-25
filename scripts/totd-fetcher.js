@@ -46,10 +46,12 @@ function tmioDayNumber(dayObj, idx){
   return (
     dayObj?.day ??
     dayObj?.dayIndex ??
-    dayObj?.monthday ??      // <-- IMPORTANT
+    dayObj?.monthday ??      // IMPORTANT
     dayObj?.monthDay ??
     dayObj?.dayInMonth ??
     dayObj?.monthDayIndex ??
+    dayObj?.day_number ??
+    dayObj?.dayNumber ??
     (idx + 1)
   );
 }
@@ -62,14 +64,55 @@ function parseIsoMonth(ts){
   return { y: d.getUTCFullYear(), m1: d.getUTCMonth() + 1 };
 }
 
+/**
+ * Normalize the /api/totd/{index} payload into an ARRAY of "day entries".
+ * trackmania.io has changed keys over time; this tries many common shapes.
+ */
 function normalizeDaysPayload(j){
-  // Accept array payloads OR object payloads with known keys.
   if (Array.isArray(j)) return j;
   if (!j || typeof j !== "object") return [];
-  if (Array.isArray(j.days)) return j.days;
-  if (Array.isArray(j.totd)) return j.totd;
-  if (Array.isArray(j.tracks)) return j.tracks;
-  if (Array.isArray(j.results)) return j.results;
+
+  // Common direct keys
+  const directKeys = [
+    "days",
+    "totd",
+    "tracks",
+    "results",
+    "data",
+    "items",
+    "monthDays",
+    "monthdays",
+    "month_days",
+    "entries",
+    "maps",
+  ];
+
+  for (const k of directKeys){
+    if (Array.isArray(j[k])) return j[k];
+  }
+
+  // Sometimes nested under "month" or "payload" etc.
+  const nestedKeys = ["payload", "body", "response", "result", "content"];
+  for (const nk of nestedKeys){
+    const v = j[nk];
+    if (v && typeof v === "object"){
+      for (const k of directKeys){
+        if (Array.isArray(v[k])) return v[k];
+      }
+    }
+  }
+
+  // Sometimes an object keyed by day ("1": {...}, "2": {...})
+  // e.g. { days: { "1": {...}, "2": {...} } } or { monthDays: { ... } }
+  const objectKeys = ["days", "monthDays", "monthdays", "totd"];
+  for (const ok of objectKeys){
+    const v = j[ok];
+    if (v && typeof v === "object" && !Array.isArray(v)){
+      const vals = Object.values(v);
+      if (vals.length && vals.every(x => x && typeof x === "object")) return vals;
+    }
+  }
+
   return [];
 }
 
@@ -113,7 +156,7 @@ function tmioMonthYear(resp, daysArr){
     ? {
         y: resp.month.year,
         // trackmania.io historically used 0-based month in some shapes;
-        // we treat it as 0-based only if it looks like 0..11
+        // treat as 0-based only if it looks like 0..11
         m1: (typeof resp.month.month === "number" && resp.month.month >= 0 && resp.month.month <= 11)
           ? resp.month.month + 1
           : (typeof resp.month.month === "number" ? resp.month.month : null),
@@ -303,6 +346,25 @@ async function writeTotdMonth(index=0){
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
   const prev = await loadJson(monthPath, { month:mKey, days:{} });
   const prevDays = prev?.days || {};
+  const prevCount = Object.keys(prevDays).length;
+
+  // If the API returned EMPTY but we already have data, don't overwrite good data.
+  if ((!remoteDays || remoteDays.length === 0) && prevCount > 0){
+    dlog("remoteDays empty; keeping existing month file intact:", mKey, "prevCount:", prevCount);
+    // Still ensure index exists
+    await ensureDir(TOTD_DIR);
+    await rebuildMonthIndex(TOTD_DIR);
+
+    // Still refresh latest snapshot from existing month file
+    const keys = Object.keys(prevDays).sort();
+    const latestKey = keys[keys.length-1] || null;
+    if (latestKey){
+      const latest = prevDays[latestKey];
+      await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
+      dlog("latest (from existing):", latest?.date, latest?.map?.name);
+    }
+    return;
+  }
 
   // 2) normalize remote -> day records
   const daysArr = (Array.isArray(remoteDays) ? remoteDays : [])
