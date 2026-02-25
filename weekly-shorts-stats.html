@@ -81,6 +81,24 @@
     }
     .highlight{outline:2px solid rgba(58,160,255,.35);outline-offset:-2px}
 
+    /* Pagination UI */
+    .pager{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-top:1px solid rgba(109,251,255,.12);
+      background:rgba(0,0,0,.08);
+    }
+    .pager button{
+      padding:6px 10px;
+      border-radius:10px;
+    }
+    .pager button[disabled]{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
     @media (max-width: 980px){
       .cards{grid-template-columns:1fr}
       .row2{grid-template-columns:1fr}
@@ -147,6 +165,7 @@
             <button id="clearSearch">Clear</button>
           </div>
         </div>
+
         <div class="card-b" style="padding:0">
           <table>
             <thead>
@@ -161,6 +180,23 @@
             </thead>
             <tbody id="overallBody"></tbody>
           </table>
+
+          <!-- Pagination controls -->
+          <div class="pager">
+            <button id="prevPage">← Prev</button>
+            <div class="mini muted" id="pageInfo">Page 1 / 1</div>
+            <button id="nextPage">Next →</button>
+
+            <div style="flex:1"></div>
+
+            <label class="mini muted">Per page</label>
+            <select id="pageSize">
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -204,15 +240,14 @@
   </div>
 
   <script>
-    // ✅ Render API base (this is the ONLY thing the website needs)
-    const API = "https://trackmaniawebsite.onrender.com";
-
-    // ✅ Correct endpoints (NOT /weeks.json etc)
+    // Adjust to match your existing data hosting pattern.
+    // If you host JSON under /public/data/... then this is correct.
+    const DATA_BASE = "https://trackmaniawebsite.onrender.com";
     const PATHS = {
-      weeksIndex: `${API}/api/weekly-shorts/weeks`,
-      aggregate:  `${API}/api/weekly-shorts/aggregate`,
-      changelog:  `${API}/api/weekly-shorts/changelog`,
-      weekFile:   (weekNum) => `${API}/api/weekly-shorts/week/${weekNum}`
+      weeksIndex: `${DATA_BASE}/weeks.json`,
+      aggregate: `${DATA_BASE}/aggregate.json`,
+      changelog: `${DATA_BASE}/changelog.json`,
+      weekFile: (weekNum) => `${DATA_BASE}/weeks/${weekNum}.json`
     };
 
     const $ = (id) => document.getElementById(id);
@@ -279,97 +314,104 @@
       return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
     }
 
-    function renderOverall(players, sortBy, search){
-      const el = $("overallBody");
-      el.innerHTML = "";
+    /* ---------------- Pagination state ---------------- */
+    let overallPage = 1;
 
-      const q = (search || "").trim().toLowerCase();
-      let list = players || [];
-      if (q) list = list.filter(p => (p.player || "").toLowerCase().includes(q));
+    function getOverallList(players, sortBy, searchTerm){
+      const term = (searchTerm || "").trim().toLowerCase();
+      let list = sortPlayers(players || [], sortBy);
+      if (term) list = list.filter(p => (p.player||"").toLowerCase().includes(term));
+      return list;
+    }
 
-      list = sortPlayers(list, sortBy);
+    function renderOverall(players, sortBy, searchTerm){
+      const body = $("overallBody");
+      body.innerHTML = "";
+
+      const list = getOverallList(players, sortBy, searchTerm);
+
+      const pageSize = Math.max(1, Number($("pageSize")?.value || 50));
+      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+
+      if (overallPage > totalPages) overallPage = totalPages;
+      if (overallPage < 1) overallPage = 1;
+
+      $("pageInfo").textContent = `Page ${overallPage} / ${totalPages} (${list.length} players)`;
+      $("prevPage").disabled = overallPage <= 1;
+      $("nextPage").disabled = overallPage >= totalPages;
 
       if (!list.length){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="6" class="muted">No players match.</td>`;
-        el.appendChild(tr);
+        body.innerHTML = `<tr><td colspan="6" class="muted">No players match.</td></tr>`;
         return;
       }
 
-      list.forEach((p, idx) => {
+      const start = (overallPage - 1) * pageSize;
+      const page = list.slice(start, start + pageSize);
+
+      page.forEach((p, i) => {
+        const weeksWon = Array.isArray(p.weeksWon) ? p.weeksWon.join(", ") : "—";
         const tr = document.createElement("tr");
-        const weeksWon = Array.isArray(p.weeksWon) ? p.weeksWon.join(", ") : "";
+        tr.dataset.player = (p.player||"").toLowerCase();
         tr.innerHTML = `
-          <td>${idx + 1}</td>
-          <td><b>${p.player}</b></td>
+          <td class="muted">${start + i + 1}</td>
+          <td><b>${p.player || "—"}</b></td>
           <td class="right">${p.wins ?? 0}</td>
           <td class="right">${p.wrs ?? 0}</td>
           <td class="right">${p.top5 ?? 0}</td>
-          <td class="right">${weeksWon}</td>
+          <td class="right">${weeksWon || "—"}</td>
         `;
-        el.appendChild(tr);
+        body.appendChild(tr);
       });
     }
 
     function populateWeeksDropdown(weeks){
       const sel = $("weekSelect");
       sel.innerHTML = "";
-      if (!weeks.length){
-        const opt = document.createElement("option");
-        opt.value = "";
-        opt.textContent = "No weeks";
-        sel.appendChild(opt);
-        return null;
-      }
-
-      // newest first
-      const sorted = [...weeks].sort((a,b) => Number(b.week) - Number(a.week));
+      const sorted = [...(weeks || [])].sort((a,b) => (b.week||0) - (a.week||0));
       for (const w of sorted){
         const opt = document.createElement("option");
         opt.value = String(w.week);
         opt.textContent = `Week ${w.week}`;
         sel.appendChild(opt);
       }
-      return sorted[0].week;
+      return sorted.length ? sorted[0].week : null;
     }
 
-    function renderWeekTable(w){
-      $("weekMap").textContent = w?.mapName ? `Map: ${w.mapName} (UID: ${w.mapUid || "—"})` : `Map UID: ${w?.mapUid || "—"}`;
-      $("weekEnded").textContent = w?.endedAt ? `Ended: ${fmtIso(w.endedAt)}` : `Ended: —`;
+    function renderWeekTable(weekJson){
+      $("weekMap").textContent = `Map: ${weekJson.mapName || "—"}` + (weekJson.mapUid ? ` (UID: ${weekJson.mapUid})` : "");
+      $("weekEnded").textContent = `Ended: ${fmtIso(weekJson.endedAt)}`;
 
-      const el = $("weekBody");
-      el.innerHTML = "";
+      const body = $("weekBody");
+      body.innerHTML = "";
 
-      const entries = w?.entries || [];
+      const entries = (weekJson.entries || []).slice(0, 10);
       if (!entries.length){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="3" class="muted">No entries</td>`;
-        el.appendChild(tr);
+        body.innerHTML = `<tr><td colspan="3" class="muted">No data for this week.</td></tr>`;
         return;
       }
 
-      for (const e of entries){
+      entries.forEach(e => {
+        const isWr = !!e.isWr;
+        const isWinner = !!e.isWinner || e.rank === 1;
+        const badge = isWr ? `<span class="tag">WR</span>` : (isWinner ? `<span class="tag">WIN</span>` : "");
         const tr = document.createElement("tr");
-        const badge = e.isWr ? `<span class="tag">WR</span>` : "";
         tr.innerHTML = `
-          <td>${e.rank ?? ""}</td>
+          <td class="muted">${e.rank ?? "—"}</td>
           <td>${badge}<b>${e.player || "—"}</b></td>
           <td class="right">${fmtTime(e.timeMs)}</td>
         `;
-        el.appendChild(tr);
-      }
+        body.appendChild(tr);
+      });
     }
 
     function renderChangelog(items){
       const el = $("changelog");
-      el.innerHTML = "";
-
-      const sorted = [...(items || [])].sort((a,b) => new Date(b.at).getTime() - new Date(a.at).getTime());
-      if (!sorted.length){
-        el.innerHTML = `<div class="muted">No changelog entries yet</div>`;
+      if (!items || !items.length){
+        el.innerHTML = `<div class="muted">No post-week WR improvements detected yet.</div>`;
         return;
       }
-
+      const sorted = [...items].sort((a,b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+      el.innerHTML = "";
       for (const it of sorted){
         if (it.type === "WR_IMPROVED_AFTER_WEEK"){
           const msg = `<b>${it.playerNew}</b> improved <b>Week ${it.week}</b> WR (previously held by <b>${it.playerPrev}</b>)
@@ -400,15 +442,20 @@
       const sortBy = $("sortBy");
       const search = $("playerSearch");
 
-      function rerenderOverall(){
+      function rerenderOverall(resetPage=false){
+        if (resetPage) overallPage = 1;
         renderOverall(agg.players || [], sortBy.value, search.value);
       }
 
-      sortBy.addEventListener("change", rerenderOverall);
-      search.addEventListener("input", rerenderOverall);
-      $("clearSearch").addEventListener("click", () => { search.value = ""; rerenderOverall(); });
+      sortBy.addEventListener("change", () => rerenderOverall(true));
+      search.addEventListener("input", () => rerenderOverall(true));
+      $("clearSearch").addEventListener("click", () => { search.value = ""; rerenderOverall(true); });
 
-      rerenderOverall();
+      $("prevPage").addEventListener("click", () => { overallPage--; rerenderOverall(false); });
+      $("nextPage").addEventListener("click", () => { overallPage++; rerenderOverall(false); });
+      $("pageSize").addEventListener("change", () => rerenderOverall(true));
+
+      rerenderOverall(true);
       renderChangelog(changelog.items || []);
 
       const defaultWeek = populateWeeksDropdown(weeks);
@@ -428,7 +475,7 @@
       document.body.innerHTML = `
         <div style="max-width:900px;margin:40px auto;padding:16px;color:#e6ecff;font-family:system-ui">
           <h2 style="margin:0 0 8px">Weekly Shorts Stats</h2>
-          <div style="opacity:.8">Failed to load data. Check console + API paths.</div>
+          <div style="opacity:.8">Failed to load data. Check console + JSON paths.</div>
           <pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(109,251,255,.22)">${String(err)}</pre>
         </div>`;
     });
