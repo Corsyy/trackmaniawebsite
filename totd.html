@@ -383,7 +383,7 @@
 
   async function init(){
     const sel=document.getElementById("month");
-    const monthsJ=await jget("data/totd/months.json");
+    const monthsJ=await jget("/data/totd/months.json");
     const months=(monthsJ?.months||[]).slice().sort().reverse();
     if(!months.length){ if(sel) sel.innerHTML=`<option>(no data yet)</option>`; return; }
     if(sel){
