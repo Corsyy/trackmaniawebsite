@@ -1425,7 +1425,7 @@ app.get("/api/ws-debug-club-search", async (req, res) => {
     const access = await getLiveAccessToken();
     const q = String(req.query.q || "weekly shorts").toLowerCase();
 
-    const url = `${LIVE_BASE}/api/token/club/campaign?length=300&offset=0`;
+    const url = `${LIVE_BASE}/api/token/club/campaign?length=100&offset=0`;
     const j = await jget(url, access);
     const list = j?.clubCampaignList || j?.campaignList || [];
 
