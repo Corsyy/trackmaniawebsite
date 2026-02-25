@@ -44,10 +44,40 @@ app.use((req, res, next) => {
   next();
 });
 
+/* ===================== STATIC: public files (TOTD JSON) ===================== */
+/**
+ * This makes:
+ *  - GET /totd.json
+ *  - GET /data/totd/2026-02.json
+ *  - GET /data/totd/months.json
+ * work from your backend.
+ *
+ * If using a Render Disk, set PUBLIC_DIR to that disk path, e.g. /data/public
+ */
+const PUBLIC_DIR = process.env.PUBLIC_DIR || path.join(process.cwd(), "public");
+
+// Avoid “stuck” cached TOTD JSON (especially while debugging)
+app.use((req, res, next) => {
+  if (req.path === "/totd.json" || req.path.startsWith("/data/totd/")) {
+    res.setHeader("Cache-Control", "no-store");
+  }
+  next();
+});
+
+app.use(express.static(PUBLIC_DIR));
+
+app.get("/totd.json", (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, "totd.json"));
+});
+
+app.get("/data/totd/:file", (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, "data", "totd", req.params.file));
+});
+/* =========================================================================== */
+
 /* ------------------------- Health -------------------------- */
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/healthz", (_req, res) => res.json({ ok: true }));
-app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
 /* -------------------- Helpers: timeouts -------------------- */
 function fetchWithTimeout(url, opts = {}, ms = 15000) {
@@ -65,6 +95,7 @@ function cleanToken(s) {
     t = t.slice(1, -1);
   return t;
 }
+
 const REFRESH_TOKEN_FILE = process.env.REFRESH_TOKEN_FILE || "/data/nadeo_refresh_token.txt";
 let runtimeRefreshToken = cleanToken(process.env.REFRESH_TOKEN || "");
 
@@ -77,6 +108,7 @@ function getRefreshToken() {
   } catch {}
   return runtimeRefreshToken;
 }
+
 function persistRefreshToken(rt) {
   try {
     if (!rt) return;
@@ -84,7 +116,7 @@ function persistRefreshToken(rt) {
     fs.writeFileSync(REFRESH_TOKEN_FILE, rt, "utf8");
     runtimeRefreshToken = rt;
   } catch (e) {
-    console.error("⚠️ Failed to persist refresh token:", e?.message || e);
+    console.error("Failed to persist refresh token:", e?.message || e);
   }
 }
 
@@ -116,9 +148,7 @@ async function getLiveAccessToken() {
 
   if (!r.ok) {
     const body = await r.text().catch(() => "");
-    throw new Error(
-      `refresh failed ${r.status} ${body || "(no body)"} [len=${refresh.length}]`
-    );
+    throw new Error(`refresh failed ${r.status} ${body || "(no body)"} [len=${refresh.length}]`);
   }
 
   const j = await r.json();
@@ -321,52 +351,6 @@ function sanitizeRow(row) {
   if (!row.accountId || typeof row.accountId !== "string") return null;
   return { ...row, timeMs: ms };
 }
-
-// (keep) your original official-campaign debug endpoint (handy)
-app.get("/api/ws-debug", async (req, res) => {
-  const access = await getLiveAccessToken();
-  const list = await getAllOfficialCampaigns(access);
-  res.json(
-    list.map((c) => ({
-      id: c.id,
-      name: c.name,
-    }))
-  );
-});
-
-// (keep) club debug (optional)
-app.get("/api/ws-debug-club-24231", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  try {
-    const access = await getLiveAccessToken();
-    const clubId = "24231"; // Altered Nadeo
-    const q = String(req.query.q || "shorts").toLowerCase();
-
-    const matches = [];
-    const LENGTH = 100;
-
-    for (let offset = 0; offset <= 1000; offset += LENGTH) {
-      const url = `${LIVE_BASE}/api/token/club/${clubId}/campaign?length=${LENGTH}&offset=${offset}`;
-      const j = await jget(url, access);
-      const list = j?.campaignList || j?.clubCampaignList || [];
-      if (!list.length) break;
-
-      for (const it of list) {
-        const id = it?.id ?? it?.campaignId ?? it?.campaign?.id ?? null;
-        const name = (it?.name ?? it?.campaign?.name ?? "").toString();
-        if (id && name.toLowerCase().includes(q)) {
-          matches.push({ id, clubId, name });
-        }
-      }
-
-      if (list.length < LENGTH) break;
-    }
-
-    res.json({ q, matchesCount: matches.length, matches });
-  } catch (e) {
-    res.status(500).json({ error: "debug failed", detail: e?.message || String(e) });
-  }
-});
 
 async function getMapWR(accessToken, mapUid) {
   const groupUid = "Personal_Best";
@@ -699,9 +683,6 @@ async function maybeRefreshUidUniverse() {
   const disk = loadJson(DISK_WR);
   if (disk && Array.isArray(disk.rows) && disk.rows.length) {
     wrCache = { ts: disk.ts || Date.now(), rows: disk.rows };
-    console.log(`♻️  Warm-started cache from disk: ${wrCache.rows.length} rows`);
-  } else {
-    console.log("⚠️  No disk cache found; a background build will prepare it.");
   }
 })();
 
@@ -781,7 +762,7 @@ function setCached(req, payload) {
 
 /* ------------------------ Endpoints ------------------------ */
 
-// Readiness & auth probes
+// Readiness
 app.get("/api/ready", (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
   res.json({
@@ -790,16 +771,6 @@ app.get("/api/ready", (_req, res) => {
     rows: wrCache.rows.length,
     fetchedAt: wrCache.ts || null,
   });
-});
-
-app.get("/api/debug-auth", async (_req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  try {
-    const token = await getLiveAccessToken();
-    res.json({ ok: true, accessTokenPreview: token?.slice(0, 12) || null });
-  } catch (e) {
-    res.status(503).json({ ok: false, error: String(e) });
-  }
 });
 
 // Admin: rotate refresh token live (no redeploy)
@@ -1016,44 +987,7 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
   }
 });
 
-/* ---------------- Debug & control ---------------- */
-
-app.get("/api/debug-names", async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=120");
-  try {
-    const ids = String(req.query.ids || "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    await resolveDisplayNames(null, ids);
-    const data = ids.map((id) => ({ id, name: nameCache.get(id) || null }));
-    res.json({ data });
-  } catch (e) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
-
-app.get("/api/debug-stats", async (_req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=10");
-  try {
-    if (!wrCache.rows.length) await buildAllWRs({ includeClub: includeClubByDefault() });
-    const rows = wrCache.rows || [];
-    const counts = { official: 0, totd: 0, club: 0 };
-    for (const r of rows) counts[r.sourceType] = (counts[r.sourceType] || 0) + 1;
-    res.json({
-      cacheTime: wrCache.ts,
-      rows: rows.length,
-      counts,
-      nameCacheSize: nameCache.size,
-      resolvedNamesCount: Array.from(nameCache.values()).filter(
-        (v) => v && typeof v === "string" && v !== ""
-      ).length,
-      allMapsTracked: metaCache.allMapUids.length,
-    });
-  } catch (e) {
-    res.status(500).json({ error: e?.message || String(e) });
-  }
-});
+/* ---------------- Control ---------------- */
 
 app.post("/api/rebuild-now", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
@@ -1074,15 +1008,7 @@ app.post("/api/rebuild-now", async (req, res) => {
   }
 });
 
-/* ========================= WEEKLY SHORTS (REAL WEEKLY TRACKS FEED) =========================
-   Uses: GET /api/campaign/weekly-shorts
-   Endpoints:
-     GET /api/weekly-shorts/weeks
-     GET /api/weekly-shorts/week/:week
-     GET /api/weekly-shorts/aggregate
-     GET /api/weekly-shorts/changelog
-     GET /api/ws-debug-weekly-shorts
-========================================================================================== */
+/* ========================= WEEKLY SHORTS (REAL WEEKLY TRACKS FEED) ========================= */
 
 const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
 const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
@@ -1129,11 +1055,6 @@ function parseStartMs() {
   return ms;
 }
 
-/**
- * Fetch Weekly Shorts "weeks" from the real weekly tracks feed.
- * Each item is effectively a weekly campaign with:
- * - year, week, startTimestamp, endTimestamp, playlist (5 maps)
- */
 async function fetchWeeklyShortsCampaignWeeks(access) {
   const out = [];
   const LENGTH = 100;
@@ -1178,19 +1099,13 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
     const weekStartIso = new Date(w.startTs * 1000).toISOString();
     const endedAtIso = new Date(w.endTs * 1000 - 1).toISOString();
 
-    // sanity: WS is usually 5 maps/week; don't hard-fail if Nadeo changes it
-    if (WS_MAPS_PER_WEEK > 0 && w.mapUids.length && w.mapUids.length !== WS_MAPS_PER_WEEK) {
-      // no throw; just accept it
-    }
-
     return {
-      week: idx + 1, // internal sequential week number for your UI
+      week: idx + 1,
       year: w.year,
       wsWeek: w.wsWeek,
       weekStart: weekStartIso,
       endedAt: endedAtIso,
       mapUids: w.mapUids,
-      // compatibility fields (if any old UI expects single map)
       mapUid: w.mapUids?.[0] || null,
       mapName: `Week ${idx + 1}`,
     };
@@ -1370,7 +1285,6 @@ async function rebuildWsCacheIfNeeded() {
       mapUids: w.mapUids || [],
       maps,
 
-      // compatibility (old UI won’t crash)
       mapUid: (w.mapUids || [])[0] || null,
       mapName: `Week ${w.week}`,
       entries: maps[0]?.entries || [],
@@ -1448,28 +1362,6 @@ app.get("/api/weekly-shorts/changelog", async (req, res) => {
     res.json(payload);
   } catch (e) {
     res.status(500).json({ error: "Failed to load changelog", detail: e?.message || String(e) });
-  }
-});
-
-// NEW debug endpoint for the REAL weekly shorts feed
-app.get("/api/ws-debug-weekly-shorts", async (_req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  try {
-    const access = await getLiveAccessToken();
-    const raw = await fetchWeeklyShortsCampaignWeeks(access);
-    const idx = buildWeeksIndexFromWeeklyShortsFeed(raw);
-    const first = idx.weeks?.[0] || null;
-    const last = idx.weeks?.[idx.weeks.length - 1] || null;
-    res.json({
-      ok: true,
-      startIso: WS_START_ISO,
-      fetchedCount: raw.length,
-      weeksAfterFilter: idx.weeks.length,
-      first,
-      last,
-    });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: "debug failed", detail: e?.message || String(e) });
   }
 });
 
