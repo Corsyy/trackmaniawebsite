@@ -44,6 +44,35 @@ jobs:
           ls -R data/totd || true
           ls -l totd.json || true
 
+      # ✅ NEW: Always rebuild months.json from actual files on disk
+      - name: Rebuild TOTD months index from files
+        shell: bash
+        run: |
+          echo "Rebuilding data/totd/months.json from existing month files..."
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+
+          const dir = path.join(process.cwd(), "data", "totd");
+          if (!fs.existsSync(dir)) {
+            console.log("No data/totd directory; skipping months.json rebuild.");
+            process.exit(0);
+          }
+
+          const months = fs.readdirSync(dir)
+            .filter(f => /^\d{4}-\d{2}\.json$/.test(f))
+            .map(f => f.replace(/\.json$/, ""))
+            .sort()
+            .reverse();
+
+          const outPath = path.join(dir, "months.json");
+          fs.writeFileSync(outPath, JSON.stringify({ months }, null, 2) + "\n", "utf8");
+          console.log("Wrote", outPath, "with", months.length, "months. Newest:", months[0] || "(none)");
+          NODE
+
+          echo ""
+          cat data/totd/months.json || true
+
       - name: Run Weekly Shorts updater
         continue-on-error: true
         run: |
