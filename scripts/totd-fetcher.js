@@ -1,438 +1,417 @@
-// scripts/totd-fetcher.js — TOTD + TMX medal times & difficulty (keeps manual downloadUrl)
-// Node 18+ (global fetch).
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="shortcut icon" href="/logo.png">
+<title>Track of the Day</title>
+<style>
+ :root{
+  --bg:#0a0f1a;--text:#e6ecff;--muted:#9bb0ff;
+  --accent:#3aa0ff;--accent-2:#6dfbff;--border:rgba(109,251,255,.22);
+  --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)
+ }
+ *{box-sizing:border-box}
+ html,body{height:100%}
+ body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;color:var(--text)}
+ a{color:inherit;text-decoration:none}
+ .container{width:min(1100px,92vw);margin:0 auto;padding:1rem}
 
-import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
-import { constants as FS } from "node:fs";
-import path from "node:path";
+ body.bg-track-curves{
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
+    linear-gradient(180deg, #07101c, #0a0f1a 40%, #060a14 100%);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+ }
+ body.bg-track-curves::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+  background-size:cover;background-position:center;background-repeat:no-repeat;opacity:.6;mix-blend-mode:screen;
+ }
+ body.bg-track-curves::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
+  background-size:280px 280px; animation:noiseShift 6s steps(2,end) infinite;
+ }
+ @keyframes noiseShift{50%{transform:translate3d(0,0,0)}50.01%{transform:translate3d(.5px,.5px,0)}}
 
-/* ----------------------------- config/constants ---------------------------- */
-const PUBLIC_DIR  = process.env.PUBLIC_DIR || ".";
-const TOTD_DIR    = `${PUBLIC_DIR.replace(/\/+$/,"")}/data/totd`;
-const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/,"")}/totd.json`;
-const TMIO        = "https://trackmania.io";
-const TMX_API     = "https://trackmania.exchange/api"; // base for TMX API
-const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
-const USER_AGENT  = process.env.USER_AGENT || "tm-totd/1.2 (github action)";
-
-const DEBUG = process.env.DEBUG === "1";
-const dlog  = (...a)=>{ if (DEBUG) console.log("[TOTD]", ...a); };
-
-/* -------------------------------- fs helpers ------------------------------- */
-const ensureDir = (p)=>mkdir(p,{recursive:true});
-const exists = async(p)=>{ try{ await access(p,FS.F_OK); return true; } catch { return false; } };
-const loadJson = async(p,f)=>(await exists(p))?JSON.parse(await readFile(p,"utf8")):f;
-const writeJson=(p,obj)=>writeFile(p,JSON.stringify(obj,null,2),"utf8");
-
-/* --------------------------------- utils ----------------------------------- */
-const pad2=(n)=>String(n).padStart(2,"0");
-const monthKey=(y,m1)=>`${y}-${pad2(m1)}`;
-const dateKey=(y,m1,d)=>`${y}-${pad2(m1)}-${pad2(d)}`;
-
-function stripTmFormatting(input){
-  if(!input || typeof input!=="string") return input;
-  const D="\uFFF0";
-  let s=input.replace(/\$\$/g,D);
-  s=s.replace(/\$[0-9a-fA-F]{1,3}|\$[a-zA-Z]|\$[<>\[\]\(\)]/g,"");
-  return s.replace(new RegExp(D,"g"),"$");
+ header{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(109,251,255,.12);
+ }
+ .month-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* change to center if you want it centered */
+  padding: 0 1rem .75rem;
+  font-size: .95rem;
+  color: var(--muted);
 }
 
-/**
- * trackmania.io has used multiple shapes over time:
- * - monthday (lowercase) is common
- * - monthDay (camel) also seen
- * - day / dayIndex / dayInMonth etc.
- */
-function tmioDayNumber(dayObj, idx){
-  return (
-    dayObj?.day ??
-    dayObj?.dayIndex ??
-    dayObj?.monthday ??      // IMPORTANT
-    dayObj?.monthDay ??
-    dayObj?.dayInMonth ??
-    dayObj?.monthDayIndex ??
-    dayObj?.day_number ??
-    dayObj?.dayNumber ??
-    (idx + 1)
-  );
+.month-row .select {
+  margin: 0;
 }
 
-function parseIsoMonth(ts){
-  // returns {y,m1} or null
-  if (!ts || typeof ts !== "string") return null;
-  const d = new Date(ts);
-  if (Number.isNaN(d.getTime())) return null;
-  return { y: d.getUTCFullYear(), m1: d.getUTCMonth() + 1 };
+.month-row select {
+  background: #0c1322;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: .45rem .65rem;
+  border-radius: 10px;
+  font-weight: 500;
 }
 
-/**
- * Normalize the /api/totd/{index} payload into an ARRAY of "day entries".
- * trackmania.io has changed keys over time; this tries many common shapes.
- */
-function normalizeDaysPayload(j){
-  if (Array.isArray(j)) return j;
-  if (!j || typeof j !== "object") return [];
-
-  // Common direct keys
-  const directKeys = [
-    "days",
-    "totd",
-    "tracks",
-    "results",
-    "data",
-    "items",
-    "monthDays",
-    "monthdays",
-    "month_days",
-    "entries",
-    "maps",
-  ];
-
-  for (const k of directKeys){
-    if (Array.isArray(j[k])) return j[k];
+ h1{margin:0 0 .25rem}
+ .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:.9rem 0;
+  }
+  .navlinks{
+    display:flex;
+    gap:1.25rem;
   }
 
-  // Sometimes nested under "month" or "payload" etc.
-  const nestedKeys = ["payload", "body", "response", "result", "content"];
-  for (const nk of nestedKeys){
-    const v = j[nk];
-    if (v && typeof v === "object"){
-      for (const k of directKeys){
-        if (Array.isArray(v[k])) return v[k];
-      }
-    }
+  .navlinks a{
+    color:var(--muted);
+    text-decoration:none;
+    white-space:nowrap;
+    font-weight:500;
+    opacity:.85;
+    transition:color .2s ease, opacity .2s ease;
   }
 
-  // Sometimes an object keyed by day ("1": {...}, "2": {...})
-  // e.g. { days: { "1": {...}, "2": {...} } } or { monthDays: { ... } }
-  const objectKeys = ["days", "monthDays", "monthdays", "totd"];
-  for (const ok of objectKeys){
-    const v = j[ok];
-    if (v && typeof v === "object" && !Array.isArray(v)){
-      const vals = Object.values(v);
-      if (vals.length && vals.every(x => x && typeof x === "object")) return vals;
-    }
+  .navlinks a:hover{
+    opacity:1;
+    color:var(--accent-2);
   }
 
-  return [];
-}
-
-async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 500){
-  let lastErr;
-  for (let i = 0; i <= retries; i++){
-    try{
-      const r = await fetch(url, {
-        ...opts,
-        headers: { "User-Agent": USER_AGENT, ...(opts.headers || {}) },
-      });
-      if (r.status === 429 || (r.status >= 500 && r.status <= 599)){
-        const wait = Math.min(baseDelay * Math.pow(2, i), 8000);
-        if (DEBUG) dlog(`retry ${i} ${r.status} ${url} wait=${wait}ms`);
-        await sleep(wait);
-        continue;
-      }
-      return r;
-    }catch(e){
-      lastErr = e;
-      const wait = Math.min(baseDelay * Math.pow(2, i), 8000);
-      if (DEBUG) dlog(`retry ${i} err ${e?.message || e} wait=${wait}ms`);
-      await sleep(wait);
-    }
+  .navlinks a.active{
+    opacity:1;
+    color:var(--accent-2);
+    position:relative;
   }
-  throw lastErr || new Error(`fetch failed for ${url}`);
+
+  .navlinks a.active::after{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-6px;
+    height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    border-radius:2px;
+  }
+
+  .cta{
+    display:flex;
+    gap:.6rem;
+  }
+  .nav-toggle{
+    display:none;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
+    color:var(--text);
+    border-radius:10px;
+    padding:.4rem .6rem;
+    cursor:pointer;
+  }
+
+ .btn{
+  padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;
+  background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
+  color:var(--text);font-weight:700;transition:.2s
+ }
+ .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
+
+ .card{
+  background:rgba(15,21,36,.55);
+  border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  backdrop-filter:blur(10px) saturate(160%);
+  box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
+  transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  display:flex;flex-direction:column;
+ }
+ .card:hover{transform:translateY(-3px);box-shadow:0 0 18px rgba(61,165,255,.35);filter:brightness(1.03)}
+
+ .thumb{aspect-ratio:16/9;background:#08101c}
+ .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+ .meta{padding:.9rem;display:flex;flex-direction:column;flex:1}
+ .date{opacity:.85;font-size:.92rem;color:var(--muted)}
+ .badge{border:1px solid var(--border);padding:.25rem .55rem;border-radius:999px;font-size:.85rem;background:rgba(109,251,255,.08)}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
+
+ .hero{
+  display:flex;gap:1rem;margin:1rem 0;
+  background:rgba(15,21,36,.55);border:1px solid var(--border);
+  border-radius:14px;padding:1rem;backdrop-filter:blur(10px) saturate(160%);
+  box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
+ }
+ .hero .thumb{width:360px;flex:0 0 auto;border-radius:10px;overflow:hidden}
+ .hero h2{margin:.2rem 0 .35rem}
+ .hero .badge{background:rgba(109,251,255,.12)}
+ .hero .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
+  @media(max-width:640px){
+   .nav-toggle{display:block;}
+
+   .navlinks{
+     display:none;
+     position:absolute;
+     top:58px;
+     left:0;
+     right:0;
+     padding:.75rem;
+     background:linear-gradient(180deg,rgba(10,15,26,.98),rgba(10,15,26,.92));
+     backdrop-filter:blur(8px);
+     border-bottom:1px solid rgba(109,251,255,.12);
+     flex-direction:column;
+     gap:.6rem;
+   }
+
+   .navlinks.show{display:flex;}
+ }
+
+ .select{margin-top:.6rem}
+ select{
+  background:#0c1322;border:1px solid var(--border);color:var(--text);
+  padding:.5rem .7rem;border-radius:10px;box-shadow:inset 0 0 0 999px rgba(255,255,255,0);
+ }
+
+ .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+ .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+
+ .medals{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem}
+ .medal{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.25rem .55rem;border-radius:999px;font-size:.9rem;
+  background:rgba(15,21,36,.7);border:1px solid var(--border);
+  box-shadow:0 0 12px rgba(61,165,255,.08) inset;
+ }
+ .medal svg,
+.medal .medal-icon {
+  width:16px;
+  height:16px;
+  display:block;
+  object-fit:contain;
+  image-rendering:auto;
+}
+.medal.author {
+  box-shadow:0 0 0 1px rgba(255,154,59,.25) inset;
+  background:rgba(255,206,106,.08);
+  border-color:rgba(255,154,59,.35);
 }
 
-/* ------------------------------ tm.io helpers ------------------------------ */
-async function fetchTmioMonth(index=0){
-  const r = await fetchRetry(`${TMIO}/api/totd/${index}`);
-  if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
-  return r.json();
-}
 
-function tmioMonthYear(resp, daysArr){
-  // Prefer resp.month.* if present; otherwise infer from first day's timestamp; otherwise fallback to current UTC.
-  const fromMonthObj = (resp && typeof resp === "object" && resp.month && typeof resp.month === "object")
-    ? {
-        y: resp.month.year,
-        // trackmania.io historically used 0-based month in some shapes;
-        // treat as 0-based only if it looks like 0..11
-        m1: (typeof resp.month.month === "number" && resp.month.month >= 0 && resp.month.month <= 11)
-          ? resp.month.month + 1
-          : (typeof resp.month.month === "number" ? resp.month.month : null),
-      }
-    : null;
+ .medal b{font-weight:800;letter-spacing:.2px}
+ .medal.author{box-shadow:0 0 0 1px rgba(255,154,59,.25) inset}
 
-  if (fromMonthObj?.y && fromMonthObj?.m1) return { y: fromMonthObj.y, m1: fromMonthObj.m1 };
+ .card .meta{display:flex;flex-direction:column;flex:1}
+ .card .meta .medals{margin-top:auto}
+ .card .meta-footer{margin-top:0;padding-top:.4rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+ .card{height:100%}
+ .grid{align-items:stretch}
 
-  // infer from first day timestamp if possible
-  const first = Array.isArray(daysArr) && daysArr.length ? daysArr[0] : null;
-  const ts = first?.timestamp ?? first?.map?.timestamp ?? first?.date ?? first?.map?.date ?? null;
-  const inferred = parseIsoMonth(ts);
-  if (inferred) return inferred;
+</style>
+</head>
+<body class="bg-track-curves">
+<header>
+  <div class="container nav">
+    <h1>Track of the Day</h1>
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="/kacky">Kacky Finishes</a>
+      <a href="/recentwrs">Recent WRs</a>
+      <a href="/highlights">Community Highlights</a>
+    </nav>
+    <div class="cta">
+      <a href="/" class="btn">Home</a>
+    </div>
+  </div>
 
-  // fallback: current month in UTC
-  const now = new Date();
-  return { y: now.getUTCFullYear(), m1: now.getUTCMonth() + 1 };
-}
+  <!-- Month selector row BELOW header -->
+  <div class="container month-row">
+    <div class="select">
+      Month: <select id="month"></select>
+    </div>
+  </div>
+</header>
+<script>
+  (function(){
+    const btn = document.getElementById('navToggle');
+    const nav = document.getElementById('primary-nav');
+    if (!btn || !nav) return;
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('show');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  })();
+</script>
 
-/* ------------------------------ TMX helpers --------------------------------
-   We try TMX first: UID -> TMX map info (TrackID, medal times, difficulty, etc).
-   If TMX lacks the map, we fall back to trackmania.io for a download.
------------------------------------------------------------------------------*/
-async function fetchTmxInfoByUid(uid){
-  if (!uid) return null;
-  const url = `${TMX_API}/maps/get_map_info/uid/${encodeURIComponent(uid)}`;
-  const r = await fetchRetry(url);
-  if (!r.ok) { dlog("TMX uid lookup failed", uid, r.status); return null; }
-  try {
-    const j = await r.json();
-    if (!j || typeof j !== "object") return null;
-    if (j.TrackUID && j.TrackUID !== uid) return null;
-    return j;
-  } catch { return null; }
-}
+<main class="container">
+  <section id="today" class="hero">
+    <div class="thumb" id="t-thumb"></div>
+    <div>
+      <h2 id="t-name">(loading…)</h2>
+      <p>Author: <span class="badge" id="t-author">—</span></p>
+      <p id="t-date" class="date"></p>
 
-async function fetchTmxInfoById(trackId){
-  if (!trackId) return null;
-  const url = `${TMX_API}/maps/get_map_info/id/${encodeURIComponent(trackId)}`;
-  const r = await fetchRetry(url);
-  if (!r.ok) return null;
-  try {
-    const j = await r.json();
-    if (!j || typeof j !== "object") return null;
-    if (!j.TrackID || String(j.TrackID) !== String(trackId)) return null;
-    return j;
-  } catch { return null; }
-}
+      <!-- author medal row -->
+      <div id="t-medals"></div>
 
-function tmxDownloadUrl(trackId, shortName){
-  const base = `${TMX_DL_BASE}/${encodeURIComponent(trackId)}`;
-  return shortName ? `${base}?shortName=${encodeURIComponent(shortName)}` : base;
-}
+      <!-- only local actions -->
+      <div class="actions" id="t-actions"></div>
+    </div>
+  </section>
 
-/* --------------------------- download & medals ----------------------------- */
-function pickMedalFields(tmx){
-  const toInt = v => (v==null ? null : Number(v));
-  const diff  = v => (v==null ? null : Number(v));
-  return {
-    authorTime : toInt(tmx?.AuthorTime),
-    goldTime   : toInt(tmx?.GoldTime),
-    silverTime : toInt(tmx?.SilverTime),
-    bronzeTime : toInt(tmx?.BronzeTime),
-    difficulty : diff(tmx?.Difficulty)
+  <section class="grid" id="grid"></section>
+</main>
+
+<script>
+(function(){
+  const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const bust=()=>`?t=${Date.now()}`;
+  const label=(ym)=>{const [y,m]=ym.split("-");return `${MONTHS[+m-1]} ${y}`;}
+  const maxKey=(obj)=>Object.keys(obj||{}).sort().pop();
+
+  const jget = async (url)=>{
+    const r=await fetch(url+bust(),{cache:"no-store"});
+    if(!r.ok) throw new Error(`${url} -> ${r.status}`);
+    return r.json();
   };
+
+  const set=(id,html)=>{const el=document.getElementById(id); if(el) el.innerHTML=html;}
+  const setText=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt??"";}
+
+  function fmtMs(ms){
+    if(ms==null) return null;
+    const t=Math.max(0,Number(ms)|0);
+    const m=Math.floor(t/60000);
+    const s=Math.floor((t%60000)/1000);
+    const ms3=(t%1000).toString().padStart(3,"0");
+    return `${m}:${s.toString().padStart(2,"0")}.${ms3}`;
+  }
+  function medalSvg(c1,c2){
+    return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/>
+      </linearGradient></defs>
+      <polygon points="12,2 20,7 20,17 12,22 4,17 4,7" fill="url(#g)"/>
+      <circle cx="12" cy="12" r="4.2" fill="rgba(0,0,0,.15)"/>
+    </svg>`;
+  }
+ function authorMedal(msVal){
+  if (msVal == null || Number(msVal) <= 0) return "";
+  return `
+    <span class="medal author">
+      <img class="medal-icon" src="/img/author.png" alt="Author Medal" loading="lazy">
+      <b>AT</b> <span class="mono">${fmtMs(msVal)}</span>
+    </span>
+  `;
 }
 
-async function fetchMapDetails(mapUid){
-  if (!mapUid) return { downloadUrl:null, medals:null };
+  function buildMedals(map){
+    if(!map) return "";
+    const at = authorMedal(map.authorTime);
+    return at ? `<div class="medals">${at}</div>` : "";
+  }
 
-  // 1) Try TMX (prefer — gives us medals + difficulty + often a valid download)
-  try {
-    const tmx = await fetchTmxInfoByUid(mapUid);
-    if (tmx && tmx.TrackID) {
-      let shortName = tmx.ShortName || tmx.shortName || null;
+  const button = (label, href, extra='')=>`<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
+  function actionsFromMap(map){
+    const acts=[];
+    if(map?.downloadUrl){ acts.push(button("⬇️ Download", map.downloadUrl)); }
+    if(map?.uid){ acts.push(`<button class="btn ghost" data-copy-uid="${map.uid}">Copy UID</button>`); }
+    return acts.join("");
+  }
 
-      if ((tmx.Unlisted === true || tmx.Unlisted === 1) && !shortName) {
-        const tmxById = await fetchTmxInfoById(tmx.TrackID);
-        shortName = tmxById?.ShortName || tmxById?.shortName || null;
+  function renderHero(rec){
+    if(!rec) return;
+    const m = rec.map||{};
+    set("t-thumb",
+      m.thumbnailUrl
+        ? `<img src="${m.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">`
+        : `<div class="thumb" style="display:grid;place-items:center;color:var(--muted)">No image</div>`
+    );
+    setText("t-name",   m.name || "(unknown map)");
+    setText("t-author", m.authorDisplayName || "—");
+    setText("t-date",   rec.date || "");
+    set("t-medals", buildMedals(m));
+    set("t-actions", actionsFromMap(m));
+  }
+
+  function renderGrid(days){
+    const grid=document.getElementById("grid");
+    if(!grid) return;
+    grid.innerHTML="";
+    const keys=Object.keys(days).sort();
+    for(const k of keys){
+      const d=days[k]; const m=d.map||{};
+      const card=document.createElement("article");
+      card.className="card";
+      card.innerHTML=`
+        <div class="thumb">
+          ${m.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${m.thumbnailUrl}" alt="">` : ""}
+        </div>
+        <div class="meta">
+          <div class="date">${d.date}</div>
+          <h3 style="margin:.35rem 0 .25rem">${m.name || "(unknown map)"}</h3>
+          <div>Author: <span class="badge">${m.authorDisplayName || "—"}</span></div>
+          <div style="margin-top:.45rem">${buildMedals(m)}</div>
+          <div class="meta-footer">
+            ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank" rel="noopener">⬇️ Download</a>` : ""}
+            ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    }
+  }
+
+  async function loadMonth(ym){
+    const month=await jget(`/data/totd/${ym}.json`);
+    const latest=month.days[Object.keys(month.days).sort().pop()];
+    renderHero(latest);
+    renderGrid(month.days);
+  }
+
+  async function init(){
+    const sel=document.getElementById("month");
+    const monthsJ=await jget("/data/totd/months.json");
+    const months=(monthsJ?.months||[]).slice().sort().reverse();
+    if(!months.length){ if(sel) sel.innerHTML=`<option>(no data yet)</option>`; return; }
+    if(sel){
+      sel.innerHTML=months.map(k=>`<option value="${k}">${(m=>{const [y,mm]=m.split("-");return ["January","February","March","April","May","June","July","August","September","October","November","December"][+mm-1]+" "+y})(k)}</option>`).join("");
+      sel.value=months[0];
+      sel.onchange=()=>loadMonth(sel.value);
+    }
+    await loadMonth(months[0]);
+  }
+
+  document.addEventListener("click",(e)=>{
+    const t=e.target;
+    if(t && t.matches("[data-copy-uid]")){
+      const uid=t.getAttribute("data-copy-uid");
+      if(uid){
+        navigator.clipboard?.writeText(uid).then(()=>{
+          t.textContent="Copied!";
+          setTimeout(()=>t.textContent="Copy UID",1200);
+        }).catch(()=>{ t.textContent="Copy failed"; setTimeout(()=>t.textContent="Copy UID",1200); });
       }
-
-      const downloadable = (tmx.Downloadable ?? true);
-      const downloadUrl = downloadable ? tmxDownloadUrl(tmx.TrackID, shortName) : null;
-      const medals = pickMedalFields(tmx);
-
-      return { downloadUrl, medals };
     }
-  } catch (e) {
-    dlog("TMX resolver err", mapUid, e?.message || e);
-  }
+  });
 
-  // 2) Fallback to trackmania.io for a file URL (no medals here)
-  try {
-    const r = await fetchRetry(`${TMIO}/api/map/${encodeURIComponent(mapUid)}`);
-    if (!r.ok) { dlog("tm.io map detail failed", mapUid, r.status); return { downloadUrl:null, medals:null }; }
-    const j = await r.json();
-    return { downloadUrl: j?.file || j?.download || j?.fileUrl || null, medals:null };
-  } catch (e) {
-    dlog("tm.io resolver err", mapUid, e?.message || e);
-    return { downloadUrl:null, medals:null };
-  }
-}
-
-/* ------------------------------ month writing ------------------------------ */
-async function rebuildMonthIndex(dir){
-  await ensureDir(dir);
-  const items = await readdir(dir,{withFileTypes:true});
-  const months = items
-    .filter(e=>e.isFile() && e.name.endsWith(".json") && e.name!=="months.json" && !e.name.startsWith("_"))
-    .map(e=>e.name.replace(/\.json$/,""))
-    .sort()
-    .reverse();
-  await writeJson(path.join(dir,"months.json"),{ months });
-}
-
-function baseDayRecord(y,m1,entry,idx){
-  const m = entry?.map || entry;
-  const uid = m?.mapUid ?? entry?.mapUid ?? null;
-
-  let name =
-    m?.name ?? m?.mapName ?? entry?.name ?? "(unknown map)";
-
-  let authorDisplayName =
-    m?.authorPlayer?.name ??
-    m?.authorplayer?.name ??
-    m?.authorName ??
-    m?.author ??
-    entry?.authorPlayer?.name ??
-    entry?.authorplayer?.name ??
-    "(unknown)";
-
-  const thumb =
-    m?.thumbnail ??
-    m?.thumbnailUrl ??
-    m?.thumbnailURL ??
-    entry?.thumbnail ??
-    entry?.thumbnailUrl ??
-    entry?.thumbnailURL ??
-    "";
-
-  const authorAccountId =
-    m?.authorPlayer?.accountId ??
-    m?.authorplayer?.accountid ??
-    m?.authorplayer?.id ??
-    entry?.authorPlayer?.accountId ??
-    entry?.authorplayer?.accountid ??
-    entry?.authorplayer?.id ??
-    null;
-
-  const d = tmioDayNumber(entry, idx);
-
-  name = stripTmFormatting(name);
-  authorDisplayName = stripTmFormatting(authorDisplayName);
-
-  return {
-    date: dateKey(y,m1,d),
-    map: {
-      uid,
-      name,
-      authorAccountId,
-      authorDisplayName,
-      thumbnailUrl: thumb,
-      downloadUrl: null,
-
-      authorTime:null,
-      goldTime:null,
-      silverTime:null,
-      bronzeTime:null,
-      difficulty:null
-    }
-  };
-}
-
-async function writeTotdMonth(index=0){
-  // 0) load remote list
-  const j = await fetchTmioMonth(index);
-
-  // Normalize days first so we can infer month if needed
-  const remoteDays = normalizeDaysPayload(j);
-
-  const { y, m1 } = tmioMonthYear(j, remoteDays);
-  const mKey = monthKey(y,m1);
-
-  dlog("month resolved:", mKey, "remoteDays:", Array.isArray(remoteDays) ? remoteDays.length : "n/a");
-
-  // 1) load existing month file (so manual overrides are preserved)
-  const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
-  const prev = await loadJson(monthPath, { month:mKey, days:{} });
-  const prevDays = prev?.days || {};
-  const prevCount = Object.keys(prevDays).length;
-
-  // If the API returned EMPTY but we already have data, don't overwrite good data.
-  if ((!remoteDays || remoteDays.length === 0) && prevCount > 0){
-    dlog("remoteDays empty; keeping existing month file intact:", mKey, "prevCount:", prevCount);
-    // Still ensure index exists
-    await ensureDir(TOTD_DIR);
-    await rebuildMonthIndex(TOTD_DIR);
-
-    // Still refresh latest snapshot from existing month file
-    const keys = Object.keys(prevDays).sort();
-    const latestKey = keys[keys.length-1] || null;
-    if (latestKey){
-      const latest = prevDays[latestKey];
-      await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
-      dlog("latest (from existing):", latest?.date, latest?.map?.name);
-    }
-    return;
-  }
-
-  // 2) normalize remote -> day records
-  const daysArr = (Array.isArray(remoteDays) ? remoteDays : [])
-    .map((entry,i)=>baseDayRecord(y,m1,entry,i));
-
-  // 3) hydrate each day with TMX medals/difficulty + download, preserving any manual downloadUrl
-  for (const rec of daysArr){
-    const prevRec = prevDays[rec.date]?.map || {};
-
-    // keep any manual/previous link
-    if (prevRec.downloadUrl) rec.map.downloadUrl = prevRec.downloadUrl;
-
-    // only fetch if we have a UID and no preserved link/medals yet
-    if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime == null)){
-      const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
-
-      if (!rec.map.downloadUrl) rec.map.downloadUrl = downloadUrl || null;
-
-      if (medals){
-        rec.map.authorTime = medals.authorTime;
-        rec.map.goldTime   = medals.goldTime;
-        rec.map.silverTime = medals.silverTime;
-        rec.map.bronzeTime = medals.bronzeTime;
-        rec.map.difficulty = medals.difficulty;
-      }
-
-      await sleep(120); // be nice to public APIs
-    }else{
-      // carry forward previously stored medals/difficulty if present
-      rec.map.authorTime = prevRec.authorTime ?? rec.map.authorTime;
-      rec.map.goldTime   = prevRec.goldTime   ?? rec.map.goldTime;
-      rec.map.silverTime = prevRec.silverTime ?? rec.map.silverTime;
-      rec.map.bronzeTime = prevRec.bronzeTime ?? rec.map.bronzeTime;
-      rec.map.difficulty = prevRec.difficulty ?? rec.map.difficulty;
-    }
-  }
-
-  // 4) write month file
-  const daysOut = {};
-  for (const rec of daysArr) daysOut[rec.date] = rec;
-
-  await ensureDir(TOTD_DIR);
-  await writeJson(monthPath,{ month:mKey, days:daysOut });
-  await rebuildMonthIndex(TOTD_DIR);
-
-  // 5) write latest snapshot
-  const keys = Object.keys(daysOut).sort();
-  const latestKey = keys[keys.length-1] || null;
-
-  if (latestKey){
-    const latest = daysOut[latestKey];
-    await writeJson(TOTD_LATEST,{ generatedAt:new Date().toISOString(), ...latest });
-
-    dlog("latest:", latest.date, latest.map?.name, latest.map?.downloadUrl ? "[dl]" : "", "medals?",
-         latest.map?.authorTime != null);
-  }else{
-    dlog("no days found for", mKey, "(API shape changed or month empty)");
-  }
-}
-
-/* ----------------------------------- main ---------------------------------- */
-async function main(){
-  await ensureDir(TOTD_DIR);
-
-  // Current month
-  await writeTotdMonth(0);
-
-  console.log("[DONE] TOTD updated with TMX medal times + difficulty.");
-}
-
-main().catch(err=>{ console.error(err); process.exit(1); });
+  init().catch(err=>{
+    console.error("[TOTD] init failed:",err);
+    const n=document.getElementById("t-name"); if(n) n.textContent="(failed to load)";
+  });
+})();
+</script>
+</body>
+</html>
