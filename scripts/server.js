@@ -229,15 +229,33 @@ async function getAllOfficialCampaigns(accessToken) {
   return j?.campaignList || [];
 }
 
-function sendJsonWithEtag(res, obj, cacheSeconds = 60) {
+/* -------------------- JSON ETag helper (fixes WS error) ----- */
+/**
+ * sendJsonETag(req,res,obj,{maxAge,stale,noStore})
+ * - Adds ETag and Cache-Control, supports 304 on If-None-Match.
+ * - stale uses "stale-while-revalidate" seconds.
+ */
+function sendJsonETag(req, res, obj, opts = {}) {
+  const { maxAge = 60, stale = 300, noStore = false } = opts || {};
   const body = JSON.stringify(obj);
+
+  // Strong ETag is fine here because body is deterministic JSON string
   const etag = crypto.createHash("sha1").update(body).digest("hex");
+  const quoted = `"${etag}"`;
 
-  res.setHeader("ETag", `"${etag}"`);
-  res.setHeader("Cache-Control", `public, max-age=${cacheSeconds}`);
+  res.setHeader("ETag", quoted);
 
-  const inm = res.req.headers["if-none-match"];
-  if (inm && inm === `"${etag}"`) {
+  if (noStore) {
+    res.setHeader("Cache-Control", "no-store");
+  } else {
+    const cc = [`public`, `max-age=${Math.max(0, Number(maxAge) || 0)}`];
+    const swr = Math.max(0, Number(stale) || 0);
+    if (swr) cc.push(`stale-while-revalidate=${swr}`);
+    res.setHeader("Cache-Control", cc.join(", "));
+  }
+
+  const inm = req.headers["if-none-match"];
+  if (inm && inm === quoted) {
     res.status(304).end();
     return;
   }
@@ -1221,8 +1239,8 @@ function buildWsAggregate(allWeekJson) {
         const rec =
           by.get(player) || {
             player,
-            wins: 0,      // weeks won (overall)
-            wrs: 0,       // total map WRs (rank 1s)
+            wins: 0, // weeks won (overall)
+            wrs: 0, // total map WRs (rank 1s)
             top5: 0,
             weeksWon: [], // list of week numbers where overall winner
             wrWeeks: [],
