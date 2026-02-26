@@ -65,10 +65,25 @@ async function fetchTmioMonth(index=0){
   if(!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
   return r.json();
 }
+
+/**
+ * FIXED:
+ * tm.io may return month as 1–12 (human) OR 0–11 (JS-style).
+ * Old code always +1 which breaks Feb -> Mar.
+ */
 function tmioMonthYear(resp){
-  const y=resp?.month?.year??new Date().getUTCFullYear();
-  const m1=(resp?.month?.month??new Date().getUTCMonth())+1;
-  return { y,m1 };
+  const y = resp?.month?.year ?? new Date().getUTCFullYear();
+  const raw = resp?.month?.month;
+
+  let m1;
+  if (typeof raw === "number") {
+    // if already 1-12, use it. else assume 0-11 and convert.
+    m1 = (raw >= 1 && raw <= 12) ? raw : (raw + 1);
+  } else {
+    m1 = new Date().getUTCMonth() + 1;
+  }
+
+  return { y, m1 };
 }
 
 /* ------------------------------ TMX helpers --------------------------------
@@ -191,6 +206,9 @@ async function writeTotdMonth(index=0){
   const j=await fetchTmioMonth(index);
   const {y,m1}=tmioMonthYear(j);
   const mKey=monthKey(y,m1);
+
+  // Helpful debug log so you can see what month tm.io actually returned
+  dlog("tm.io month resolved:", { index, rawMonth: j?.month?.month, year: y, m1, key: mKey });
 
   // 1) load existing month file (so manual overrides are preserved)
   const monthPath = path.join(TOTD_DIR,`${mKey}.json`);
