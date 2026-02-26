@@ -5,6 +5,7 @@ import path from "path";
 import compression from "compression";
 import http from "http";
 import https from "https";
+import crypto from "crypto";
 
 const app = express();
 
@@ -226,6 +227,22 @@ async function getAllOfficialCampaigns(accessToken) {
   const url = `${LIVE_BASE}/api/campaign/official?offset=0&length=200`;
   const j = await jget(url, accessToken);
   return j?.campaignList || [];
+}
+
+function sendJsonWithEtag(res, obj, cacheSeconds = 60) {
+  const body = JSON.stringify(obj);
+  const etag = crypto.createHash("sha1").update(body).digest("hex");
+
+  res.setHeader("ETag", `"${etag}"`);
+  res.setHeader("Cache-Control", `public, max-age=${cacheSeconds}`);
+
+  const inm = res.req.headers["if-none-match"];
+  if (inm && inm === `"${etag}"`) {
+    res.status(304).end();
+    return;
+  }
+
+  res.type("application/json").send(body);
 }
 
 /* -------------------- TOTD via Live API -------------------- */
@@ -1302,66 +1319,61 @@ async function rebuildWsCacheIfNeeded() {
   ws.ts = Date.now();
 }
 
-// WS endpoints
+// WS endpoints (ETag/304 enabled)
 app.get("/api/weekly-shorts/weeks", async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
-  const cached = getCached(req);
-  if (cached) return res.json(cached);
-
   try {
     await rebuildWsCacheIfNeeded();
-    const payload = ws.weeksIndex || { generatedAt: new Date().toISOString(), weeks: [] };
-    setCached(req, payload);
-    res.json(payload);
+    const payload = ws.weeksIndex || {
+      generatedAt: new Date().toISOString(),
+      weeks: [],
+    };
+    return sendJsonETag(req, res, payload, { maxAge: 30, stale: 300 });
   } catch (e) {
-    res.status(500).json({ error: "Failed to load weeks", detail: e?.message || String(e) });
+    return res
+      .status(500)
+      .json({ error: "Failed to load weeks", detail: e?.message || String(e) });
   }
 });
 
 app.get("/api/weekly-shorts/week/:week", async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
-  const cached = getCached(req);
-  if (cached) return res.json(cached);
-
   try {
     await rebuildWsCacheIfNeeded();
+
     const weekNum = String(req.params.week || "").trim();
     const w = ws.weekCache.get(weekNum);
     if (!w) return res.status(404).json({ error: "Week not found" });
 
-    setCached(req, w);
-    res.json(w);
+    return sendJsonETag(req, res, w, { maxAge: 30, stale: 300 });
   } catch (e) {
-    res.status(500).json({ error: "Failed to load week", detail: e?.message || String(e) });
+    return res
+      .status(500)
+      .json({ error: "Failed to load week", detail: e?.message || String(e) });
   }
 });
 
 app.get("/api/weekly-shorts/aggregate", async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
-  const cached = getCached(req);
-  if (cached) return res.json(cached);
-
   try {
     await rebuildWsCacheIfNeeded();
-    const payload = ws.aggregate || { generatedAt: new Date().toISOString(), players: [] };
-    setCached(req, payload);
-    res.json(payload);
+    const payload = ws.aggregate || {
+      generatedAt: new Date().toISOString(),
+      players: [],
+    };
+    return sendJsonETag(req, res, payload, { maxAge: 30, stale: 300 });
   } catch (e) {
-    res.status(500).json({ error: "Failed to load aggregate", detail: e?.message || String(e) });
+    return res
+      .status(500)
+      .json({ error: "Failed to load aggregate", detail: e?.message || String(e) });
   }
 });
 
 app.get("/api/weekly-shorts/changelog", async (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=120");
-  const cached = getCached(req);
-  if (cached) return res.json(cached);
-
   try {
     const payload = ws.changelog || { items: [] };
-    setCached(req, payload);
-    res.json(payload);
+    return sendJsonETag(req, res, payload, { maxAge: 30, stale: 300 });
   } catch (e) {
-    res.status(500).json({ error: "Failed to load changelog", detail: e?.message || String(e) });
+    return res
+      .status(500)
+      .json({ error: "Failed to load changelog", detail: e?.message || String(e) });
   }
 });
 
