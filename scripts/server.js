@@ -1048,7 +1048,7 @@ app.post("/api/rebuild-now", async (req, res) => {
 const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
 const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
 
-const WS_START_ISO = String(process.env.WS_START_ISO || "1970-01-01T00:00:00Z").trim();
+const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 
 const WS_CHANGELOG_PATH = process.env.WS_CHANGELOG_PATH || "/tmp/ws_changelog.json";
