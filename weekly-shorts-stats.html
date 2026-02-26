@@ -33,12 +33,14 @@
     .grid{display:grid;gap:12px}
     .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
     .row2{grid-template-columns:1.35fr .65fr}
+
     .card{
       background:var(--panel);
       border:1px solid var(--border);
       border-radius:16px;
       box-shadow:var(--shadow);
       overflow:hidden;
+      min-width:0;
     }
     .card-h{
       padding:12px 14px;
@@ -71,6 +73,27 @@
     .right{text-align:right}
     .muted{color:var(--muted)}
     .mini{font-size:12px}
+
+    /* Fix the "TOP 5S" confusion: allow mixed-case on specific header */
+    th.no-upper{ text-transform:none !important; }
+
+    /* Weeks-won truncation */
+    .weeks-cell{
+      display:inline-block;
+      max-width: 360px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
+    }
+
+    /* Make wide tables usable on small screens */
+    .table-scroll{
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .table-scroll table{min-width:720px}
+
     .logitem{padding:10px 0;border-bottom:1px solid rgba(109,251,255,.12)}
     .tag{
       font-size:11px;
@@ -103,6 +126,13 @@
       .cards{grid-template-columns:1fr}
       .row2{grid-template-columns:1fr}
       .topbar{flex-direction:column;align-items:flex-start}
+      .weeks-cell{ max-width: 240px; }
+    }
+
+    @media (max-width: 520px){
+      .wrap{ padding:18px 12px 48px; }
+      th, td{ padding:9px 8px; }
+      .big{ font-size:20px; }
     }
   </style>
 </head>
@@ -166,7 +196,7 @@
           </div>
         </div>
 
-        <div class="card-b" style="padding:0">
+        <div class="card-b table-scroll" style="padding:0">
           <table>
             <thead>
               <tr>
@@ -174,7 +204,7 @@
                 <th>Player</th>
                 <th class="right">Wins</th>
                 <th class="right">WRs</th>
-                <th class="right">Top 5s</th>
+                <th class="right no-upper">Top 5s</th>
                 <th class="right">Weeks Won</th>
               </tr>
             </thead>
@@ -244,12 +274,12 @@
     // If you host JSON under /public/data/... then this is correct.
     const API_BASE = "https://trackmaniawebsite.onrender.com";
 
-const PATHS = {
-  weeksIndex: `${API_BASE}/api/weekly-shorts/weeks`,
-  aggregate:  `${API_BASE}/api/weekly-shorts/aggregate`,
-  changelog:  `${API_BASE}/api/weekly-shorts/changelog`,
-  weekFile:   (weekNum) => `${API_BASE}/api/weekly-shorts/week/${weekNum}`,
-};
+    const PATHS = {
+      weeksIndex: `${API_BASE}/api/weekly-shorts/weeks`,
+      aggregate:  `${API_BASE}/api/weekly-shorts/aggregate`,
+      changelog:  `${API_BASE}/api/weekly-shorts/changelog`,
+      weekFile:   (weekNum) => `${API_BASE}/api/weekly-shorts/week/${weekNum}`,
+    };
 
     const $ = (id) => document.getElementById(id);
 
@@ -315,6 +345,27 @@ const PATHS = {
       return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
     }
 
+    /* ---------------- Weeks list formatting (avoid overflow) ---------------- */
+
+    function formatWeeksWonList(weeksArr){
+      const weeks = Array.isArray(weeksArr) ? weeksArr.filter(n => Number.isFinite(Number(n))).map(n => Number(n)) : [];
+      if (!weeks.length) return { text: "—", title: "" };
+
+      const full = weeks.join(", ");
+      const MAX_SHOW = 10;
+
+      if (weeks.length <= MAX_SHOW) {
+        return { text: full, title: full };
+      }
+
+      const shown = weeks.slice(0, MAX_SHOW).join(", ");
+      const remaining = weeks.length - MAX_SHOW;
+      return {
+        text: `${shown} … (+${remaining})`,
+        title: full
+      };
+    }
+
     /* ---------------- Pagination state ---------------- */
     let overallPage = 1;
 
@@ -350,7 +401,7 @@ const PATHS = {
       const page = list.slice(start, start + pageSize);
 
       page.forEach((p, i) => {
-        const weeksWon = Array.isArray(p.weeksWon) ? p.weeksWon.join(", ") : "—";
+        const wk = formatWeeksWonList(p.weeksWon);
         const tr = document.createElement("tr");
         tr.dataset.player = (p.player||"").toLowerCase();
         tr.innerHTML = `
@@ -359,7 +410,7 @@ const PATHS = {
           <td class="right">${p.wins ?? 0}</td>
           <td class="right">${p.wrs ?? 0}</td>
           <td class="right">${p.top5 ?? 0}</td>
-          <td class="right">${weeksWon || "—"}</td>
+          <td class="right"><span class="weeks-cell" title="${(wk.title || "").replaceAll('"','&quot;')}">${wk.text}</span></td>
         `;
         body.appendChild(tr);
       });
@@ -379,8 +430,12 @@ const PATHS = {
     }
 
     function renderWeekTable(weekJson){
-      $("weekMap").textContent = `Map: ${weekJson.mapName || "—"}` + (weekJson.mapUid ? ` (UID: ${weekJson.mapUid})` : "");
-      $("weekEnded").textContent = `Ended: ${fmtIso(weekJson.endedAt)}`;
+      $("weekMap").textContent =
+        `Map: ${weekJson.mapName || "—"}` + (weekJson.mapUid ? ` (UID: ${weekJson.mapUid})` : "");
+
+      const endedMs = Date.parse(weekJson.endedAt || "");
+      const isCurrentWeek = Number.isFinite(endedMs) ? (Date.now() < endedMs) : false;
+      $("weekEnded").textContent = `${isCurrentWeek ? "Ends" : "Ended"}: ${fmtIso(weekJson.endedAt)}`;
 
       const body = $("weekBody");
       body.innerHTML = "";
