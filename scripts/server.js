@@ -1030,7 +1030,7 @@ app.post("/api/rebuild-now", async (req, res) => {
 const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
 const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
 
-const WS_START_ISO = String(process.env.WS_START_ISO || "2025-01-01T00:00:00Z").trim();
+const WS_START_ISO = String(process.env.WS_START_ISO || "1970-01-01T00:00:00Z").trim();
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 
 const WS_CHANGELOG_PATH = process.env.WS_CHANGELOG_PATH || "/tmp/ws_changelog.json";
@@ -1170,6 +1170,42 @@ async function fetchWsTop10(access, mapUid) {
 function buildWsAggregate(allWeekJson) {
   const by = new Map();
 
+  // Determine ONE overall winner per week:
+  // winner = most WRs across maps that week; tie-break by lower sum of WR times; then name.
+  const weekWinner = new Map(); // weekNum -> player
+
+  for (const w of allWeekJson) {
+    const weekNum = Number(w.week);
+    if (!weekNum) continue;
+
+    const maps = Array.isArray(w.maps) ? w.maps : [];
+    const tally = new Map(); // player -> { wrs, sumTime }
+
+    for (const m of maps) {
+      const entries = Array.isArray(m.entries) ? m.entries : [];
+      const wr = entries.find((e) => e && e.rank === 1 && e.player);
+      if (!wr) continue;
+
+      const p = wr.player;
+      const timeMs = Number(wr.timeMs);
+      const rec = tally.get(p) || { player: p, wrs: 0, sumTime: 0 };
+      rec.wrs += 1;
+      if (Number.isFinite(timeMs)) rec.sumTime += timeMs;
+      tally.set(p, rec);
+    }
+
+    if (tally.size) {
+      const winner = Array.from(tally.values()).sort((a, b) =>
+        b.wrs - a.wrs ||
+        a.sumTime - b.sumTime ||
+        String(a.player).localeCompare(String(b.player))
+      )[0];
+
+      weekWinner.set(weekNum, winner.player);
+    }
+  }
+
+  // Build per-player aggregates
   for (const w of allWeekJson) {
     const weekNum = Number(w.week);
     const maps = Array.isArray(w.maps) ? w.maps : [];
@@ -1177,6 +1213,7 @@ function buildWsAggregate(allWeekJson) {
     for (const m of maps) {
       const mapUid = m.mapUid;
       const entries = Array.isArray(m.entries) ? m.entries : [];
+
       for (const e of entries) {
         const player = e.player;
         if (!player) continue;
@@ -1184,18 +1221,16 @@ function buildWsAggregate(allWeekJson) {
         const rec =
           by.get(player) || {
             player,
-            wins: 0,
-            wrs: 0,
+            wins: 0,      // weeks won (overall)
+            wrs: 0,       // total map WRs (rank 1s)
             top5: 0,
-            weeksWon: [],
+            weeksWon: [], // list of week numbers where overall winner
             wrWeeks: [],
             top5Weeks: [],
           };
 
         if (e.rank === 1) {
-          rec.wins += 1;
           rec.wrs += 1;
-          rec.weeksWon.push(weekNum);
           rec.wrWeeks.push({ week: weekNum, mapUid, timeMs: e.timeMs });
         }
         if (e.rank <= 5) {
@@ -1206,6 +1241,24 @@ function buildWsAggregate(allWeekJson) {
         by.set(player, rec);
       }
     }
+  }
+
+  // Apply week winners (wins + weeksWon)
+  for (const [weekNum, winnerPlayer] of weekWinner.entries()) {
+    const rec =
+      by.get(winnerPlayer) || {
+        player: winnerPlayer,
+        wins: 0,
+        wrs: 0,
+        top5: 0,
+        weeksWon: [],
+        wrWeeks: [],
+        top5Weeks: [],
+      };
+
+    rec.wins += 1;
+    rec.weeksWon.push(weekNum);
+    by.set(winnerPlayer, rec);
   }
 
   const players = Array.from(by.values()).map((p) => ({
