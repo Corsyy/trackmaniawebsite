@@ -44,7 +44,7 @@ jobs:
           ls -R data/totd || true
           ls -l totd.json || true
 
-      # ✅ NEW: Always rebuild months.json from actual files on disk
+      # ✅ Always rebuild months.json from actual files on disk
       - name: Rebuild TOTD months index from files
         shell: bash
         run: |
@@ -85,15 +85,20 @@ jobs:
       - name: Commit updates
         shell: bash
         run: |
+          set -e
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # stage both datasets (include months.json!)
-          git add totd.json data/totd/*.json data/totd/months.json data/weekly-shorts/**/*.json 2>/dev/null || true
+          # Pull first to reduce push/rebase issues
+          git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
+
+          # Stage outputs (avoid ** glob surprises by staging folder)
+          git add totd.json data/totd/*.json data/totd/months.json 2>/dev/null || true
+          git add data/weekly-shorts 2>/dev/null || true
 
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh TOTD + Weekly Shorts [skip ci]"
-            git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
             git push
           else
             echo "No changes."
