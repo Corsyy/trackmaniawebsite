@@ -275,7 +275,7 @@
     }
 
     async function fetchJson(url){
-      const r = await fetch(url, { cache: "no-store" });
+      const r = await fetch(url, { cache: "default" });
       if (!r.ok) throw new Error(`Failed ${r.status} ${url}`);
       return r.json();
     }
