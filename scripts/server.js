@@ -1048,7 +1048,7 @@ app.post("/api/rebuild-now", async (req, res) => {
 const WS_CACHE_TTL_SECONDS = Number(process.env.WS_CACHE_TTL_SECONDS || 600);
 const WS_CACHE_TTL_MS = WS_CACHE_TTL_SECONDS * 1000;
 
-const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
+const WS_START_ISO = String(process.env.WS_START_ISO || "1970-01-01T00:00:00Z").trim();
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 
 const WS_CHANGELOG_PATH = process.env.WS_CHANGELOG_PATH || "/tmp/ws_changelog.json";
@@ -1118,12 +1118,22 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
         .map((p) => p?.mapUid)
         .filter(Boolean);
 
+      // Campaign leaderboard group UID (points leaderboard for the whole week)
+      const leaderboardGroupUid =
+        w?.leaderboardGroupUid ||
+        w?.leaderboardUid ||
+        w?.leaderboardGroupId ||
+        w?.leaderboardGroup?.uid ||
+        w?.leaderboardGroup?.id ||
+        null;
+
       return {
         year: w?.year ?? null,
         wsWeek: w?.week ?? null,
         startTs,
         endTs,
         mapUids,
+        leaderboardGroupUid,
       };
     })
     .filter((w) => w.startTs > 0 && w.endTs > 0)
@@ -1140,9 +1150,12 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
       wsWeek: w.wsWeek,
       weekStart: weekStartIso,
       endedAt: endedAtIso,
-      mapUids: w.mapUids,
-      mapUid: w.mapUids?.[0] || null,
-      mapName: `Week ${idx + 1}`,
+
+      // Used by the backend to fetch the points-based weekly leaderboard
+      leaderboardGroupUid: w.leaderboardGroupUid || null,
+
+      // Keep mapUids for changelog / per-map stats (not used for the week leaderboard)
+      mapUids: w.mapUids || [],
     };
   });
 
@@ -1182,6 +1195,37 @@ async function fetchWsTop10(access, mapUid) {
     timeMs: r.timeMs,
     isWr: r.rank === 1,
     isWinner: r.rank === 1,
+  }));
+}
+
+async function fetchWsWeekPointsTop10(access, leaderboardGroupUid) {
+  if (!leaderboardGroupUid) return [];
+
+  const url =
+    `${LIVE_BASE}/api/token/leaderboard/group/${encodeURIComponent(leaderboardGroupUid)}` +
+    `/top?onlyWorld=true&offset=0&length=10`;
+
+  const j = await jget(url, access);
+  const rows = j?.tops?.[0]?.top;
+  const topArr = Array.isArray(rows) ? rows : [];
+
+  const parsed = topArr
+    .map((x, idx) => {
+      const rank = Number(x.position ?? (idx + 1));
+      const accountId = x.accountId;
+      const score = Number(x.score); // weekly points
+      if (!accountId || !Number.isFinite(score)) return null;
+      return { rank, accountId, score };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.rank - b.rank);
+
+  await resolveDisplayNames(access, parsed.map((r) => r.accountId));
+
+  return parsed.map((r) => ({
+    rank: r.rank,
+    player: nameCache.get(r.accountId) || r.accountId,
+    score: r.score,
   }));
 }
 
@@ -1364,18 +1408,23 @@ async function rebuildWsCacheIfNeeded() {
       await new Promise((r) => setTimeout(r, 70));
     }
 
+    // Points-based weekly leaderboard (what tm.io shows)
+    const pointsEntries = await fetchWsWeekPointsTop10(access, w.leaderboardGroupUid);
+
     const weekJson = {
       week: w.week,
       year: w.year,
       wsWeek: w.wsWeek,
       weekStart: w.weekStart,
       endedAt: w.endedAt,
+
+      // Week leaderboard entries: rank 1-10 with points score
+      entries: pointsEntries,
+
+      // Keep map data internally for changelog / other stats (not returned by the week endpoint)
       mapUids: w.mapUids || [],
       maps,
-
-      mapUid: (w.mapUids || [])[0] || null,
-      mapName: `Week ${w.week}`,
-      entries: maps[0]?.entries || [],
+      leaderboardGroupUid: w.leaderboardGroupUid || null,
     };
 
     updateWsChangelogIfEndedWeek(weekJson);
@@ -1414,7 +1463,16 @@ app.get("/api/weekly-shorts/week/:week", async (req, res) => {
     const w = ws.weekCache.get(weekNum);
     if (!w) return res.status(404).json({ error: "Week not found" });
 
-    return sendJsonETag(req, res, w, { maxAge: 30, stale: 300 });
+    const payload = {
+      week: w.week,
+      year: w.year,
+      wsWeek: w.wsWeek,
+      weekStart: w.weekStart,
+      endedAt: w.endedAt,
+      entries: Array.isArray(w.entries) ? w.entries : [],
+    };
+
+    return sendJsonETag(req, res, payload, { maxAge: 30, stale: 300 });
   } catch (e) {
     return res
       .status(500)
