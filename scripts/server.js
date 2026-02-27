@@ -1053,6 +1053,119 @@ const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 
 const WS_CHANGELOG_PATH = process.env.WS_CHANGELOG_PATH || "/tmp/ws_changelog.json";
 
+
+
+// JSON response helper with ETag + 304 support
+function sendJsonETag(req, res, obj, opts = {}) {
+  const { maxAge = 30, stale = 300, noStore = false } = opts || {};
+  const body = JSON.stringify(obj);
+  const etag = crypto.createHash("sha1").update(body).digest("hex");
+  const quoted = `"${etag}"`;
+
+  res.setHeader("ETag", quoted);
+
+  if (noStore) {
+    res.setHeader("Cache-Control", "no-store");
+  } else {
+    const cc = [`public`, `max-age=${Math.max(0, Number(maxAge) || 0)}`];
+    const swr = Math.max(0, Number(stale) || 0);
+    if (swr) cc.push(`stale-while-revalidate=${swr}`);
+    res.setHeader("Cache-Control", cc.join(", "));
+  }
+
+  const inm = req.headers["if-none-match"];
+  if (inm && inm === quoted) return res.status(304).end();
+
+  return res.type("application/json").send(body);
+}
+
+// ---------- Official campaign lookup for Weekly Shorts points leaderboard ----------
+function normalizeStr(s) {
+  return String(s || "").toLowerCase();
+}
+
+function overlaps(aStart, aEnd, bStart, bEnd, toleranceSec = 6 * 3600) {
+  return aStart <= bEnd + toleranceSec && bStart <= aEnd + toleranceSec;
+}
+
+async function getOfficialWeeklyShortsCampaigns(access) {
+  const campaigns = await getAllOfficialCampaigns(access);
+  return (campaigns || []).filter((c) => {
+    const name = normalizeStr(c?.name);
+    return name.includes("weekly") && name.includes("short");
+  });
+}
+
+function pickOfficialCampaignForWeek(officialWS, weekObj) {
+  const wStart = Math.floor(Date.parse(weekObj.weekStart) / 1000);
+  const wEnd = Math.floor(Date.parse(weekObj.endedAt) / 1000);
+
+  const overlap = (officialWS || []).filter((c) => {
+    const cStart = Number(c?.startTimestamp || c?.start || 0);
+    const cEnd = Number(c?.endTimestamp || c?.end || 0);
+    if (!cStart || !cEnd) return false;
+    return overlaps(cStart, cEnd, wStart, wEnd);
+  });
+
+  if (overlap.length) {
+    overlap.sort((a, b) => {
+      const as = Number(a?.startTimestamp || a?.start || 0);
+      const bs = Number(b?.startTimestamp || b?.start || 0);
+      return Math.abs(as - wStart) - Math.abs(bs - wStart);
+    });
+    return overlap[0];
+  }
+
+  const wNum = weekObj.wsWeek ?? weekObj.week;
+  if (wNum != null) {
+    const needle = `week ${String(wNum)}`;
+    const byName = (officialWS || []).find((c) =>
+      normalizeStr(c?.name).includes(needle)
+    );
+    if (byName) return byName;
+  }
+
+  return null;
+}
+
+// Points leaderboard (campaign leaderboard group)
+async function fetchWsWeekPointsTop10(access, leaderboardGroupUid) {
+  if (!leaderboardGroupUid) return [];
+
+  const url =
+    `${LIVE_BASE}/api/token/leaderboard/group/${encodeURIComponent(leaderboardGroupUid)}` +
+    `/top?onlyWorld=true&offset=0&length=10`;
+
+  const j = await jget(url, access);
+
+  const rows =
+    j?.tops?.[0]?.top ??
+    j?.top ??
+    j?.tops ??
+    [];
+
+  const topArr = Array.isArray(rows) ? rows : [];
+
+  const parsed = topArr
+    .map((x, idx) => {
+      const rank = Number(x?.position ?? (idx + 1));
+      const accountId = x?.accountId;
+      const score = Number(x?.score);
+      if (!accountId || !Number.isFinite(score)) return null;
+      return { rank, accountId, score };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.rank - b.rank);
+
+  await resolveDisplayNames(access, parsed.map((r) => r.accountId));
+
+  return parsed.map((r) => ({
+    rank: r.rank,
+    player: nameCache.get(r.accountId) || r.accountId,
+    score: r.score,
+  }));
+}
+
 // in-memory cache
 let ws = {
   ts: 0,
@@ -1385,12 +1498,15 @@ function updateWsChangelogIfEndedWeek(weekJson) {
   }
 }
 
+
 async function rebuildWsCacheIfNeeded() {
   if (!wsExpired() && ws.weeksIndex) return;
 
   const access = await getLiveAccessToken();
   const weeksRaw = await fetchWeeklyShortsCampaignWeeks(access);
   const weeksIndex = buildWeeksIndexFromWeeklyShortsFeed(weeksRaw);
+
+  const officialWS = await getOfficialWeeklyShortsCampaigns(access);
 
   const allWeekJson = [];
   const newWeekCache = new Map();
@@ -1408,8 +1524,17 @@ async function rebuildWsCacheIfNeeded() {
       await new Promise((r) => setTimeout(r, 70));
     }
 
-    // Points-based weekly leaderboard (what tm.io shows)
-    const pointsEntries = await fetchWsWeekPointsTop10(access, w.leaderboardGroupUid);
+    let groupUid = w.leaderboardGroupUid || null;
+    if (!groupUid) {
+      const match = pickOfficialCampaignForWeek(officialWS, w);
+      groupUid =
+        match?.leaderboardGroupUid ||
+        match?.leaderboardGroup?.uid ||
+        match?.leaderboardGroup?.id ||
+        null;
+    }
+
+    const pointsEntries = await fetchWsWeekPointsTop10(access, groupUid);
 
     const weekJson = {
       week: w.week,
@@ -1417,14 +1542,15 @@ async function rebuildWsCacheIfNeeded() {
       wsWeek: w.wsWeek,
       weekStart: w.weekStart,
       endedAt: w.endedAt,
+      leaderboardGroupUid: groupUid,
 
-      // Week leaderboard entries: rank 1-10 with points score
-      entries: pointsEntries,
-
-      // Keep map data internally for changelog / other stats (not returned by the week endpoint)
       mapUids: w.mapUids || [],
       maps,
-      leaderboardGroupUid: w.leaderboardGroupUid || null,
+
+      mapUid: (w.mapUids || [])[0] || null,
+      mapName: `Week ${w.week}`,
+
+      entries: pointsEntries,
     };
 
     updateWsChangelogIfEndedWeek(weekJson);
@@ -1454,6 +1580,7 @@ app.get("/api/weekly-shorts/weeks", async (req, res) => {
       .json({ error: "Failed to load weeks", detail: e?.message || String(e) });
   }
 });
+
 
 app.get("/api/weekly-shorts/week/:week", async (req, res) => {
   try {
