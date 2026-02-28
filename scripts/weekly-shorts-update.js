@@ -1,4 +1,11 @@
-
+// scripts/weekly-shorts-update.js
+// Generates static JSON for Weekly Shorts page (GitHub Pages friendly)
+// - weeks index: data/weekly-shorts/weeks.json
+// - per-week file: data/weekly-shorts/weeks/<week>.json   (contains points leaderboard as `entries`)
+// - aggregate: data/weekly-shorts/aggregate.json          (wins from points, WRs/top5 from map leaderboards)
+// - changelog: data/weekly-shorts/changelog.json          (optional; keeps prior format)
+//
+// Node 18+ (global fetch). ESM module.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -244,6 +251,7 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
 
       // Campaign leaderboard group UID (points leaderboard for the whole week)
       const leaderboardGroupUid =
+        w?.seasonUid ||
         w?.leaderboardGroupUid ||
         w?.leaderboardUid ||
         w?.leaderboardGroupId ||
