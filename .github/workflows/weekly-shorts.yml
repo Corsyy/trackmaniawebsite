@@ -1,0 +1,72 @@
+name: Update Weekly Shorts (static JSON)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every hour at :12 UTC (adjust if you want)
+    - cron: "12 * * * *"
+
+concurrency:
+  group: weekly-shorts
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    env:
+      # Write output into repo (GitHub Pages serves it)
+      PUBLIC_DIR: .
+      DEBUG: "0"
+
+      # Nadeo Live refresh token
+      REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
+
+      # Trackmania OAuth (display names)
+      CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
+
+      # Optional tuning (safe defaults)
+      WS_MATCH: "weekly shorts"
+      # Optional pins (use once you know them)
+      # WS_OFFICIAL_CAMPAIGN_ID: ""
+      # WS_OFFICIAL_PLAYLIST_ID: ""
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps (if package-lock exists)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "No package-lock.json, skipping npm ci"
+          fi
+
+      - name: Run Weekly Shorts updater
+        run: node scripts/weekly-shorts-update.js
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/weekly-shorts
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update Weekly Shorts data"
+          git push
