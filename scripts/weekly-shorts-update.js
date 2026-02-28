@@ -1,10 +1,11 @@
 // scripts/weekly-shorts-update.js
-// Weekly Shorts campaign stats generator (auto-discover official campaign + auto names + auto changelog)
+// Weekly Shorts stats generator (Weekly Shorts feed + week points leaderboard + map tops)
 // Node 18+ (global fetch), ESM
 
 import { mkdir, writeFile, readFile, access } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 
 /* ----------------------------- config ----------------------------- */
 const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
@@ -18,14 +19,9 @@ const CHANGELOG_PATH = `${BASE_DIR}/changelog.json`;
 const AGG_PATH = `${BASE_DIR}/aggregate.json`;
 
 const DEBUG = process.env.DEBUG === "1";
-const dlog = (...a) => { if (DEBUG) console.log("[WS]", ...a); };
-
-// How we find the campaign:
-const WS_MATCH = (process.env.WS_MATCH || "weekly shorts").toLowerCase().trim();
-// Optional: pin an official campaign id if you want (recommended once you know it)
-const WS_OFFICIAL_CAMPAIGN_ID = (process.env.WS_OFFICIAL_CAMPAIGN_ID || "").trim();
-// Optional: pin a playlist id if the official list doesn’t include playlist (fallback)
-const WS_OFFICIAL_PLAYLIST_ID = (process.env.WS_OFFICIAL_PLAYLIST_ID || "").trim();
+const dlog = (...a) => {
+  if (DEBUG) console.log("[WS]", ...a);
+};
 
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 const CORE_REFRESH_URL = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
@@ -37,9 +33,30 @@ const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
 // Live refresh token (nadeo_v1 refresh)
 const REFRESH_TOKEN = cleanToken(process.env.REFRESH_TOKEN || "");
 
+/**
+ * Optional: if you want to exclude old weeks (or fix “start not changing” issues),
+ * set WS_START_ISO in GitHub Action env OR here.
+ * Note: env overrides code.
+ */
+const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
+
+/**
+ * Concurrency/tuning
+ */
+const MAP_TOP_LENGTH = Number(process.env.WS_MAP_TOP_LENGTH || 10); // per-map top length
+const POINTS_TOP_LENGTH = Number(process.env.WS_POINTS_TOP_LENGTH || 10); // weekly points top length
+const FETCH_SLEEP_MS = Number(process.env.WS_SLEEP_MS || 80);
+
 /* ----------------------------- fs helpers ----------------------------- */
 const ensureDir = (p) => mkdir(p, { recursive: true });
-const exists = async (p) => { try { await access(p, FS.F_OK); return true; } catch { return false; } };
+const exists = async (p) => {
+  try {
+    await access(p, FS.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 const loadJson = async (p, fallback) => (await exists(p)) ? JSON.parse(await readFile(p, "utf8")) : fallback;
 const writeJson = async (p, obj) => {
   await ensureDir(path.dirname(p));
@@ -54,9 +71,24 @@ function cleanToken(s) {
   if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) t = t.slice(1, -1);
   return t;
 }
+
 const isoNow = () => new Date().toISOString();
 
-async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function toIsoFromSeconds(sec) {
+  const n = Number(sec);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return new Date(n * 1000).toISOString();
+}
+
+function parseStartMs() {
+  const ms = Date.parse(WS_START_ISO);
+  if (!Number.isFinite(ms)) throw new Error(`Invalid WS_START_ISO: ${WS_START_ISO}`);
+  return ms;
+}
 
 async function fetchWithTimeout(url, opts = {}, ms = 15000) {
   const ac = new AbortController();
@@ -211,137 +243,89 @@ async function resolveDisplayNames(nameCacheObj, ids) {
   return nameCacheObj;
 }
 
-/* ---------------------- Weekly Shorts discovery (OFFICIAL) ---------------------- */
+/* ---------------------- Weekly Shorts discovery (WEEKLY-SHORTS FEED) ---------------------- */
 
-function getCampaignId(obj) {
-  return obj?.id || obj?.campaignId || obj?.campaign?.id || null;
-}
-function getCampaignName(obj) {
-  return obj?.name || obj?.campaignName || obj?.campaign?.name || "";
-}
-function getPlaylist(obj) {
-  // official list often includes playlist; support a few shapes
-  const pl =
-    obj?.playlist ||
-    obj?.campaign?.playlist ||
-    obj?.campaign?.campaignPlaylist ||
-    obj?.campaignPlaylist ||
-    null;
-  return Array.isArray(pl) ? pl : null;
-}
+async function fetchWeeklyShortsCampaignWeeks(liveToken) {
+  const out = [];
+  const LENGTH = 100;
 
-async function fetchOfficialCampaigns(liveToken) {
-  const url = `${LIVE_BASE}/api/campaign/official?offset=0&length=200`;
-  const j = await jget(url, liveToken);
-  const list = j?.campaignList || j?.campaigns || [];
-  return Array.isArray(list) ? list : [];
-}
-
-async function fetchPlaylistById(liveToken, playlistId) {
-  // Fallback endpoint — not always necessary. If this 404s in your environment, just rely on the list playlist.
-  const url = `${LIVE_BASE}/api/token/playlist/${encodeURIComponent(playlistId)}`;
-  const j = await jget(url, liveToken);
-  const pl = j?.playlist || j?.maps || j?.campaign?.playlist;
-  return Array.isArray(pl) ? pl : [];
-}
-
-function normalizePlaylistMaps(playlistArr) {
-  // Each item usually has mapUid; name can be missing
-  return (playlistArr || [])
-    .map((x) => ({
-      mapUid: x?.mapUid || x?.uid || x?.map?.mapUid || null,
-      mapName: x?.name || x?.mapName || x?.map?.name || null,
-    }))
-    .filter((x) => x.mapUid);
-}
-
-async function discoverWeeksIndex(liveToken) {
-  const official = await fetchOfficialCampaigns(liveToken);
-
-  let chosen = null;
-
-  if (WS_OFFICIAL_CAMPAIGN_ID) {
-    chosen = official.find((c) => String(getCampaignId(c)) === String(WS_OFFICIAL_CAMPAIGN_ID)) || null;
-    if (!chosen) {
-      throw new Error(`WS_OFFICIAL_CAMPAIGN_ID=${WS_OFFICIAL_CAMPAIGN_ID} was not found in official campaigns list.`);
-    }
-  } else {
-    // best-effort name match
-    const matches = official.filter((c) => getCampaignName(c).toLowerCase().includes(WS_MATCH));
-    chosen = matches[0] || null;
-    if (!chosen) {
-      const sample = official.slice(0, 10).map((c) => getCampaignName(c)).filter(Boolean);
-      throw new Error(
-        `Could not find an OFFICIAL campaign matching "${WS_MATCH}". ` +
-        `Set WS_OFFICIAL_CAMPAIGN_ID to pin it. Sample official names: ${sample.join(" | ")}`
-      );
-    }
+  for (let offset = 0; offset <= 5000; offset += LENGTH) {
+    const url = `${LIVE_BASE}/api/campaign/weekly-shorts?length=${LENGTH}&offset=${offset}`;
+    const j = await jget(url, liveToken);
+    const list = Array.isArray(j?.campaignList) ? j.campaignList : [];
+    if (!list.length) break;
+    out.push(...list);
+    if (list.length < LENGTH) break;
+    await sleep(40);
   }
-
-  let playlistArr = getPlaylist(chosen);
-
-  // If playlist isn't present in list response, optionally fetch by playlist id.
-  if ((!playlistArr || !playlistArr.length) && WS_OFFICIAL_PLAYLIST_ID) {
-    dlog("Official campaign list had no playlist; fetching playlist by id:", WS_OFFICIAL_PLAYLIST_ID);
-    playlistArr = await fetchPlaylistById(liveToken, WS_OFFICIAL_PLAYLIST_ID);
-  }
-
-  const maps = normalizePlaylistMaps(playlistArr);
-  if (!maps.length) {
-    throw new Error(
-      `Found official campaign "${getCampaignName(chosen)}" but could not read its playlist. ` +
-      `Try setting WS_OFFICIAL_PLAYLIST_ID, or paste a debug response so we can adapt the shape.`
-    );
-  }
-
-  // Merge with existing weeks.json so endedAt persists (and we can auto-end the previous last week)
-  const prev = await loadJson(WEEKS_INDEX_PATH, null);
-  const prevWeeks = Array.isArray(prev?.weeks) ? prev.weeks : [];
-
-  const prevByWeek = new Map(prevWeeks.map((w) => [Number(w.week), w]));
-  const prevMax = prevWeeks.reduce((m, w) => Math.max(m, Number(w.week) || 0), 0);
-
-  const nextWeeks = maps.map((m, idx) => {
-    const week = idx + 1;
-    const old = prevByWeek.get(week);
-    return {
-      week,
-      mapUid: m.mapUid,
-      mapName: m.mapName || old?.mapName || `Week ${week}`,
-      endedAt: old?.endedAt || null,
-    };
-  });
-
-  // If playlist grew, auto-set endedAt on the previous last week (first time we notice a new week exists)
-  const nextMax = nextWeeks.length;
-  if (prevMax > 0 && nextMax > prevMax) {
-    const lastPrev = nextWeeks.find((w) => Number(w.week) === prevMax);
-    if (lastPrev && !lastPrev.endedAt) {
-      lastPrev.endedAt = isoNow();
-      dlog(`Auto-ended week ${prevMax} at ${lastPrev.endedAt} because a new week appeared.`);
-    }
-  }
-
-  const out = {
-    generatedAt: isoNow(),
-    campaign: getCampaignName(chosen) || "Weekly Shorts",
-    game: "Trackmania 2020",
-    campaignId: String(getCampaignId(chosen) || ""),
-    weeks: nextWeeks,
-  };
-
-  await writeJson(WEEKS_INDEX_PATH, out);
   return out;
 }
 
-/* ----------------------------- weekly shorts fetch ----------------------------- */
+function normalizeWeekObj(w) {
+  const startTs = Number(w?.startTimestamp) || 0; // seconds
+  const endTs = Number(w?.endTimestamp) || 0; // seconds
+
+  const playlist = Array.isArray(w?.playlist) ? w.playlist : [];
+  const mapUids = playlist.map((p) => p?.mapUid).filter(Boolean);
+
+  // This is the important piece for weekly points leaderboard:
+  // some responses include seasonUid, some include a group uid field.
+  const groupUid =
+    w?.seasonUid ||
+    w?.leaderboardGroupUid ||
+    w?.leaderboardGroup?.uid ||
+    w?.leaderboard?.groupUid ||
+    null;
+
+  return {
+    year: w?.year ?? null,
+    wsWeek: w?.week ?? null,
+    startTs,
+    endTs,
+    weekStart: toIsoFromSeconds(startTs),
+    endedAt: endTs ? new Date(endTs * 1000 - 1).toISOString() : null,
+    mapUids,
+    pointsGroupUid: groupUid,
+  };
+}
+
+async function buildWeeksIndex(liveToken) {
+  const startMs = parseStartMs();
+  const raw = await fetchWeeklyShortsCampaignWeeks(liveToken);
+
+  const normalized = raw
+    .map(normalizeWeekObj)
+    .filter((w) => w.startTs > 0 && w.endTs > 0 && w.weekStart && w.endedAt)
+    .filter((w) => (w.startTs * 1000) >= startMs)
+    .sort((a, b) => a.startTs - b.startTs);
+
+  const weeks = normalized.map((w, idx) => ({
+    week: idx + 1,
+    year: w.year,
+    wsWeek: w.wsWeek,
+    weekStart: w.weekStart,
+    endedAt: w.endedAt,
+    mapUids: w.mapUids,
+    pointsGroupUid: w.pointsGroupUid || null,
+  }));
+
+  return {
+    generatedAt: isoNow(),
+    campaign: "Weekly Shorts",
+    game: "Trackmania 2020",
+    startIso: WS_START_ISO,
+    weeks,
+  };
+}
+
+/* ----------------------------- leaderboard fetch ----------------------------- */
 function isValidTimeMs(ms) {
   return Number.isFinite(ms) && ms > 0 && ms < 24 * 3600 * 1000;
 }
 
 async function fetchMapTop(liveToken, mapUid, length = 10) {
   const groupUid = "Personal_Best";
-  const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${encodeURIComponent(mapUid)}/top?onlyWorld=true&length=${length}`;
+  const url = `${LIVE_BASE}/api/token/leaderboard/group/${groupUid}/map/${encodeURIComponent(mapUid)}/top?onlyWorld=true&length=${length}&offset=0`;
   const j = await jget(url, liveToken);
 
   const rows = j?.tops?.[0]?.top;
@@ -349,7 +333,7 @@ async function fetchMapTop(liveToken, mapUid, length = 10) {
 
   return rows
     .map((x, idx) => {
-      const rank = (x.position ?? x.rank ?? x.pos ?? (idx + 1));
+      const rank = Number(x.position ?? x.rank ?? x.pos ?? (idx + 1));
       const accountId = x.accountId;
       const timeMs = Number(x.score);
       if (!accountId || !isValidTimeMs(timeMs)) return null;
@@ -359,19 +343,45 @@ async function fetchMapTop(liveToken, mapUid, length = 10) {
     .sort((a, b) => a.rank - b.rank);
 }
 
-function pickWinner(entries) {
-  return entries.find(e => e.rank === 1) || entries[0] || null;
+async function fetchWeekPointsTop(liveToken, groupUid, length = 10) {
+  if (!groupUid) return [];
+
+  const url = `${LIVE_BASE}/api/token/leaderboard/group/${encodeURIComponent(groupUid)}/top?onlyWorld=true&length=${length}&offset=0`;
+  const j = await jget(url, liveToken);
+
+  const rows = j?.tops?.[0]?.top;
+  if (!Array.isArray(rows) || !rows.length) return [];
+
+  return rows
+    .map((x, idx) => {
+      const rank = Number(x.position ?? (idx + 1));
+      const accountId = x.accountId;
+      const score = Number(x.score);
+      if (!accountId || !Number.isFinite(score)) return null;
+      return { rank, accountId, score };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.rank - b.rank);
 }
 
-/* ----------------------------- aggregation ----------------------------- */
-function buildAggregate(weeks) {
+function pickWinnerFromMapEntries(entries) {
+  return entries.find((e) => e.rank === 1) || entries[0] || null;
+}
+
+/* ----------------------------- aggregation (map-based stats) ----------------------------- */
+function buildAggregate(weekOutputs) {
   const by = new Map();
 
-  for (const w of weeks) {
+  for (const w of weekOutputs) {
     const weekNum = w.week;
-    const mapUid = w.mapUid;
 
-    for (const e of (w.entries || [])) {
+    // Use first map entries for “wins/top5/wrs” continuity (like your old version)
+    // You can change this to count across all maps if you want.
+    const firstMap = Array.isArray(w.maps) && w.maps.length ? w.maps[0] : null;
+    const entries = firstMap?.entries || [];
+    const mapUid = firstMap?.mapUid || null;
+
+    for (const e of entries) {
       const name = e.player;
       if (!name) continue;
 
@@ -395,34 +405,34 @@ function buildAggregate(weeks) {
     }
   }
 
-  const players = Array.from(by.values()).map(p => ({
+  const players = Array.from(by.values()).map((p) => ({
     ...p,
     weeksWon: Array.from(new Set(p.weeksWon)).sort((a, b) => a - b),
   }));
 
-  // Sort strongest first
-  players.sort((a, b) => (b.wins - a.wins) || (b.wrs - a.wrs) || (b.top5 - a.top5) || a.player.localeCompare(b.player));
+  players.sort(
+    (a, b) =>
+      (b.wins - a.wins) ||
+      (b.wrs - a.wrs) ||
+      (b.top5 - a.top5) ||
+      a.player.localeCompare(b.player)
+  );
 
   return { generatedAt: isoNow(), players };
 }
 
-/* ----------------------------- changelog logic ----------------------------- */
-function ensureArray(x) { return Array.isArray(x) ? x : []; }
+/* ----------------------------- changelog logic (WR improved after week ended) ----------------------------- */
+function ensureArray(x) {
+  return Array.isArray(x) ? x : [];
+}
 
 async function main() {
   await ensureDir(WEEKS_DIR);
 
   const liveToken = await getLiveAccessToken();
 
-  // ✅ Auto-create / refresh weeks.json if missing or invalid
-  let weeksIndex = await loadJson(WEEKS_INDEX_PATH, null);
-  if (!weeksIndex || !Array.isArray(weeksIndex.weeks) || !weeksIndex.weeks.length) {
-    dlog("weeks.json missing/invalid — discovering Weekly Shorts from OFFICIAL campaigns…");
-    weeksIndex = await discoverWeeksIndex(liveToken);
-  } else {
-    // Also refresh it every run so new weeks appear automatically
-    weeksIndex = await discoverWeeksIndex(liveToken);
-  }
+  // Build weeks index from Weekly Shorts feed (no “OFFICIAL” discovery)
+  const weeksIndex = await buildWeeksIndex(liveToken);
 
   // caches
   const nameCacheObj = await loadJson(NAME_CACHE_PATH, {});
@@ -434,52 +444,73 @@ async function main() {
 
   for (const w of weeksIndex.weeks) {
     const weekNum = Number(w.week);
-    const mapUid = w.mapUid;
-    const mapName = w.mapName || `Week ${weekNum}`;
     const endedAt = w.endedAt || null;
 
-    if (!weekNum || !mapUid) continue;
-
-    const rows = await fetchMapTop(liveToken, mapUid, 10);
-
-    // Resolve names (auto)
-    await resolveDisplayNames(nameCacheObj, rows.map(r => r.accountId));
-
-    const entries = rows.map(r => ({
+    // Fetch weekly points top10
+    const pointsRows = await fetchWeekPointsTop(liveToken, w.pointsGroupUid, POINTS_TOP_LENGTH);
+    await resolveDisplayNames(nameCacheObj, pointsRows.map((r) => r.accountId));
+    const points = pointsRows.map((r) => ({
       rank: r.rank,
       player: nameCacheObj[r.accountId] || r.accountId,
-      timeMs: r.timeMs,
-      isWr: r.rank === 1,
-      isWinner: r.rank === 1,
+      score: r.score,
     }));
+
+    // Fetch per-map top10 times (for the week’s maps)
+    const maps = [];
+    for (const mapUid of (w.mapUids || [])) {
+      const rows = await fetchMapTop(liveToken, mapUid, MAP_TOP_LENGTH);
+      await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
+
+      const entries = rows.map((r) => ({
+        rank: r.rank,
+        player: nameCacheObj[r.accountId] || r.accountId,
+        timeMs: r.timeMs,
+        isWr: r.rank === 1,
+        isWinner: r.rank === 1,
+      }));
+
+      maps.push({
+        mapUid,
+        mapName: null,
+        entries,
+      });
+
+      await sleep(40);
+    }
 
     const weekJson = {
       week: weekNum,
-      mapUid,
-      mapName,
+      year: w.year ?? null,
+      wsWeek: w.wsWeek ?? null,
+      weekStart: w.weekStart || null,
       endedAt,
-      entries,
+      pointsGroupUid: w.pointsGroupUid || null,
+
+      // This is what your website should use for the Week Leaderboard:
+      points, // [{rank, player, score}]
+
+      // Keep maps for the “Most WRs / Top5” style stats:
+      maps,
     };
 
     await writeJson(`${WEEKS_DIR}/${weekNum}.json`, weekJson);
     weekOutputs.push(weekJson);
 
-    // Post-week WR improvement detection (only runs if endedAt is known)
-    if (endedAt) {
+    // Post-week WR improvement detection (based on first map’s WR)
+    if (endedAt && maps.length) {
       const endedMs = new Date(endedAt).getTime();
       const now = Date.now();
-      const wrNow = pickWinner(entries);
+      const wrNow = pickWinnerFromMapEntries(maps[0].entries);
 
       if (wrNow && Number.isFinite(endedMs) && now >= endedMs) {
         const key = String(weekNum);
         const snap = snapshots[key];
 
         if (!snap) {
-          // First time we run AFTER endedAt -> capture WR at end
           snapshots[key] = {
             week: weekNum,
-            mapUid,
-            mapName,
+            mapUid: maps[0].mapUid,
+            mapName: maps[0].mapName || `Week ${weekNum} Map 1`,
             endedAt,
             player: wrNow.player,
             timeMs: wrNow.timeMs,
@@ -491,7 +522,7 @@ async function main() {
               at: isoNow(),
               type: "WR_IMPROVED_AFTER_WEEK",
               week: weekNum,
-              mapUid,
+              mapUid: maps[0].mapUid,
               playerNew: wrNow.player,
               timeNewMs: wrNow.timeMs,
               playerPrev: snap.player,
@@ -509,7 +540,7 @@ async function main() {
       }
     }
 
-    await sleep(80);
+    await sleep(FETCH_SLEEP_MS);
   }
 
   // Write caches
@@ -523,22 +554,32 @@ async function main() {
   changelog.items.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
   await writeJson(CHANGELOG_PATH, changelog);
 
-  // Normalize weeks index output
-  await writeJson(WEEKS_INDEX_PATH, {
+  // weeks.json (static index for website)
+  // Keep a compact shape, but include weekStart/endedAt (and mapUids)
+  const weeksOut = {
     generatedAt: isoNow(),
     campaign: weeksIndex.campaign || "Weekly Shorts",
     game: "Trackmania 2020",
-    campaignId: weeksIndex.campaignId || "",
-    weeks: weeksIndex.weeks,
-  });
+    startIso: WS_START_ISO,
+    weeks: weeksIndex.weeks.map((w) => ({
+      week: w.week,
+      year: w.year ?? null,
+      wsWeek: w.wsWeek ?? null,
+      weekStart: w.weekStart || null,
+      endedAt: w.endedAt || null,
+      mapUids: w.mapUids || [],
+    })),
+  };
+  await writeJson(WEEKS_INDEX_PATH, weeksOut);
 
   console.log("[DONE] Weekly Shorts stats updated.");
+  console.log("Wrote:", WEEKS_INDEX_PATH);
   console.log("Wrote:", AGG_PATH);
   console.log("Wrote:", CHANGELOG_PATH);
   console.log("Weeks:", weekOutputs.length);
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
