@@ -1,18 +1,5 @@
-// scripts/weekly-shorts-update.js
-// Weekly Shorts static generator (GitHub Pages compatible)
-//
-// Outputs:
-// - data/weekly-shorts/weeks.json
-// - data/weekly-shorts/weeks/<week>.json
-// - data/weekly-shorts/aggregate.json
-// - data/weekly-shorts/name-cache.json
-//
-// Node 18+ (global fetch). ESM module.
-
 import fs from "node:fs";
 import path from "node:path";
-
-/* ----------------------------- config ----------------------------- */
 
 const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
 const BASE_DIR = path.join(process.cwd(), PUBLIC_DIR, "data", "weekly-shorts");
@@ -25,28 +12,23 @@ const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
 const DEBUG = String(process.env.DEBUG || "0") === "1";
 const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
 
-// Nadeo Live
+
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 const CORE_REFRESH_URL =
   "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
 
-// OAuth (display names)
+
 const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-// Live refresh token (nadeo_v1 refresh)
 const REFRESH_TOKEN = cleanToken(process.env.REFRESH_TOKEN || "");
 
-// Optional: limit start date for weeks index (default: 2024 start)
 const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
 
-// Tuning
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 const MAP_TOP_LENGTH = Number(process.env.WS_MAP_TOP_LENGTH || 10);
 const POINTS_TOP_LENGTH = Number(process.env.WS_POINTS_TOP_LENGTH || 25);
 const SLEEP_MS = Number(process.env.WS_SLEEP_MS || 70);
-
-/* ----------------------------- helpers ----------------------------- */
 
 function isoNow() {
   return new Date().toISOString();
@@ -91,7 +73,6 @@ function isValidTimeMs(ms) {
   return Number.isFinite(ms) && ms > 0 && ms < 24 * 3600 * 1000;
 }
 
-// Robust number extraction (prevents NaN -> null in JSON)
 function extractNumber(v) {
   if (typeof v === "number") return v;
   if (typeof v === "string") {
@@ -129,8 +110,6 @@ async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
   }
   throw lastErr || new Error(`fetch failed for ${url}`);
 }
-
-/* ----------------------------- auth ----------------------------- */
 
 let cachedLive = { token: null, expAt: 0 };
 
@@ -175,8 +154,6 @@ async function jget(url, access) {
   if (!r.ok) throw new Error(`${url} -> ${r.status}`);
   return r.json();
 }
-
-/* ----------------------------- OAuth display names ----------------------------- */
 
 let cachedOAuth = { token: null, expAt: 0 };
 
@@ -253,8 +230,6 @@ async function resolveDisplayNames(nameCacheObj, ids) {
   return nameCacheObj;
 }
 
-/* ----------------------------- Weekly Shorts feed discovery ----------------------------- */
-
 async function fetchWeeklyShortsCampaignWeeks(access) {
   const out = [];
   const LENGTH = 100;
@@ -284,7 +259,6 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
         .map((p) => p?.mapUid)
         .filter(Boolean);
 
-      // Expanded UID discovery (fixes week 1 edge cases)
       const leaderboardGroupUid =
         w?.seasonUid ||
         w?.leaderboardGroupUid ||
@@ -346,8 +320,6 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
   };
 }
 
-/* ----------------------------- leaderboards ----------------------------- */
-
 async function fetchWsTop(access, mapUid, length = 10) {
   const url =
     `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
@@ -368,7 +340,6 @@ async function fetchWsTop(access, mapUid, length = 10) {
     .sort((a, b) => a.rank - b.rank);
 }
 
-// Weekly points leaderboard (sorted by points desc, rank recomputed)
 async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   if (!leaderboardGroupUid) return [];
 
@@ -379,39 +350,38 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   const j = await jget(url, access);
   const arr = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
 
-  // parse score robustly; NEVER output null (force 0)
-  const rows = arr
-    .map((x) => {
-      const accountId = x?.accountId;
-      const raw = x?.score;
-      let score = extractNumber(raw);
-      if (!Number.isFinite(score)) score = 0;
-      if (!accountId) return null;
-      return { accountId, score };
-    })
-    .filter(Boolean);
+ const rows = arr
+  .map((x) => {
+    const accountId = x?.accountId;
 
-  rows.sort((a, b) => b.score - a.score);
+ 
+    const raw = x?.sp ?? x?.score;
 
-  return rows.map((r, idx) => ({
-    rank: idx + 1,
-    accountId: r.accountId,
-    score: r.score,
-  }));
+    let score = extractNumber(raw);
+    if (!Number.isFinite(score)) score = 0;
+
+    if (!accountId) return null;
+    return { accountId, score };
+  })
+  .filter(Boolean);
+
+
+rows.sort((a, b) => b.score - a.score);
+
+return rows.map((r, idx) => ({
+  rank: idx + 1,
+  accountId: r.accountId,
+  score: r.score,
+}));
 }
 
-/* ----------------------------- aggregation ----------------------------- */
-
-// wins = points rank 1 per week
-// wrs = map rank 1
-// top5 = map rank <= 5
 function buildAggregate(allWeekJson) {
   const by = new Map();
 
   for (const w of allWeekJson) {
     const weekNum = Number(w.week);
 
-    // wins from points (rank 1)
+
     const points = Array.isArray(w.entries) ? w.entries : [];
     const winner = points.find((p) => Number(p.rank) === 1);
 
@@ -431,7 +401,6 @@ function buildAggregate(allWeekJson) {
       by.set(winner.player, rec);
     }
 
-    // map wr/top5
     for (const m of w.maps || []) {
       const mapUid = m.mapUid;
       for (const e of m.entries || []) {
@@ -479,8 +448,6 @@ function buildAggregate(allWeekJson) {
   return { generatedAt: isoNow(), players };
 }
 
-/* ----------------------------- main ----------------------------- */
-
 async function main() {
   ensureDir(WEEKS_DIR);
 
@@ -494,7 +461,6 @@ async function main() {
   for (const w of weeksIndex.weeks || []) {
     const maps = [];
 
-    // Per-map leaderboards
     for (const mapUid of w.mapUids || []) {
       const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
       await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
@@ -509,11 +475,9 @@ async function main() {
       await sleep(SLEEP_MS);
     }
 
-    // Weekly points leaderboard
     const pointsRows = await fetchWsWeekPointsTop(access, w.leaderboardGroupUid, POINTS_TOP_LENGTH);
     await resolveDisplayNames(nameCacheObj, pointsRows.map((r) => r.accountId));
 
-    // Output multiple aliases so your HTML WILL show it no matter what it expects
     const pointsEntries = pointsRows.map((r) => {
       const player = nameCacheObj[r.accountId] || r.accountId;
       const n = Number.isFinite(r.score) ? r.score : 0;
@@ -521,13 +485,11 @@ async function main() {
         rank: r.rank,
         player,
 
-        // numeric
         score: n,
         points: n,
         value: n,
         total: n,
 
-        // safe formatted text (avoids falsy 0 issues in some UIs)
         scoreText: String(n),
       };
     });
@@ -541,7 +503,6 @@ async function main() {
 
       entries: pointsEntries,
 
-      // extra
       maps,
       mapUids: w.mapUids || [],
       leaderboardGroupUid: w.leaderboardGroupUid || null,
