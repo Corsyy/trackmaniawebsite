@@ -22,8 +22,11 @@ const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REFRESH_TOKEN = cleanToken(process.env.REFRESH_TOKEN || "");
 
-const MAP_TOP_LENGTH = 10;
-const POINTS_TOP_LENGTH = 50;
+const DEBUG = String(process.env.DEBUG || "0") === "1";
+const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
+
+const MAP_TOP_LENGTH = Number(process.env.WS_MAP_TOP_LENGTH || 10);
+const POINTS_TOP_LENGTH = Number(process.env.WS_POINTS_TOP_LENGTH || 50);
 
 /* ========================= HELPERS ========================= */
 
@@ -56,6 +59,32 @@ function isoNow() {
   return new Date().toISOString();
 }
 
+/**
+ * Robust numeric extraction:
+ * - numbers stay numbers
+ * - numeric strings parsed
+ * - nested objects supported (common API shape changes)
+ * Returns NaN if nothing usable found.
+ */
+function extractNumber(v) {
+  if (typeof v === "number") return v;
+  if (typeof v === "string") {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : NaN;
+  }
+  if (v && typeof v === "object") {
+    // Try common keys
+    const keys = ["score", "points", "value", "val", "total", "rankedScore"];
+    for (const k of keys) {
+      if (k in v) {
+        const n = extractNumber(v[k]);
+        if (Number.isFinite(n)) return n;
+      }
+    }
+  }
+  return NaN;
+}
+
 /* ========================= AUTH ========================= */
 
 let cachedLive = { token: null, expAt: 0 };
@@ -75,7 +104,10 @@ async function getLiveAccessToken() {
     body: "{}",
   });
 
-  if (!r.ok) throw new Error("Token refresh failed");
+  if (!r.ok) {
+    const t = await r.text().catch(() => "");
+    throw new Error(`Token refresh failed: ${r.status} ${t}`);
+  }
 
   const j = await r.json();
 
@@ -99,13 +131,17 @@ async function jget(url, access) {
   return r.json();
 }
 
-/* ========================= OAUTH ========================= */
+/* ========================= OAUTH (display names) ========================= */
 
 let cachedOAuth = { token: null, expAt: 0 };
 
 async function getOAuthToken() {
   if (cachedOAuth.token && Date.now() < cachedOAuth.expAt - 30000)
     return cachedOAuth.token;
+
+  if (!OAUTH_CLIENT_ID || !OAUTH_CLIENT_SECRET) {
+    throw new Error("Missing CLIENT_ID / CLIENT_SECRET");
+  }
 
   const r = await fetch("https://api.trackmania.com/api/access_token", {
     method: "POST",
@@ -116,6 +152,11 @@ async function getOAuthToken() {
       client_secret: OAUTH_CLIENT_SECRET,
     }),
   });
+
+  if (!r.ok) {
+    const t = await r.text().catch(() => "");
+    throw new Error(`OAuth failed: ${r.status} ${t}`);
+  }
 
   const j = await r.json();
 
@@ -128,7 +169,8 @@ async function getOAuthToken() {
 }
 
 async function resolveDisplayNames(cache, ids) {
-  const missing = ids.filter((id) => !cache[id]);
+  const uniq = Array.from(new Set((ids || []).filter(Boolean)));
+  const missing = uniq.filter((id) => !cache[id]);
   if (!missing.length) return;
 
   const token = await getOAuthToken();
@@ -136,46 +178,65 @@ async function resolveDisplayNames(cache, ids) {
   for (const id of missing) params.append("accountId[]", id);
 
   const r = await fetch(
-    `https://api.trackmania.com/api/display-names?${params}`,
+    `https://api.trackmania.com/api/display-names?${params.toString()}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
-  if (!r.ok) return;
+  if (!r.ok) {
+    // fallback: keep ids
+    for (const id of missing) cache[id] = cache[id] || id;
+    return;
+  }
 
   const j = await r.json();
-  for (const id of missing) cache[id] = j[id] || id;
+  for (const id of missing) cache[id] = j?.[id] || id;
 }
 
 /* ========================= LEADERBOARDS ========================= */
 
 async function fetchMapTop(access, mapUid) {
   const url =
-    `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${mapUid}` +
+    `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
     `/top?onlyWorld=true&length=${MAP_TOP_LENGTH}&offset=0`;
 
   const j = await jget(url, access);
   const rows = j?.tops?.[0]?.top || [];
 
-  return rows.map((x) => ({
-    accountId: x.accountId,
-    timeMs: Number(x.score),
-  }));
+  // timeMs is usually numeric, but keep robust anyway
+  return rows
+    .map((x) => {
+      const timeMs = extractNumber(x?.score);
+      const accountId = x?.accountId;
+      if (!accountId || !Number.isFinite(timeMs)) return null;
+      return { accountId, timeMs };
+    })
+    .filter(Boolean);
 }
 
 async function fetchPointsTop(access, leaderboardGroupUid) {
   if (!leaderboardGroupUid) return [];
 
   const url =
-    `${LIVE_BASE}/api/token/leaderboard/group/${leaderboardGroupUid}` +
+    `${LIVE_BASE}/api/token/leaderboard/group/${encodeURIComponent(leaderboardGroupUid)}` +
     `/top?onlyWorld=true&offset=0&length=${POINTS_TOP_LENGTH}`;
 
   const j = await jget(url, access);
   const rows = j?.tops?.[0]?.top || [];
 
-  return rows.map((x) => ({
-    accountId: x.accountId,
-    score: Number(x.score),
-  }));
+  const mapped = rows
+    .map((x) => {
+      const accountId = x?.accountId;
+      const score = extractNumber(x?.score);
+      if (!accountId || !Number.isFinite(score)) return null;
+      return { accountId, score };
+    })
+    .filter(Boolean);
+
+  if (DEBUG && rows.length && !mapped.length) {
+    dlog("Points rows exist but all scores invalid. Sample row:", rows[0]);
+  }
+
+  return mapped;
 }
 
 /* ========================= AGGREGATE ========================= */
@@ -186,11 +247,8 @@ function buildAggregate(allWeeks) {
   for (const w of allWeeks) {
     const weekNum = Number(w.week);
 
-    // ---- WINS (highest weekly score)
-    const sortedPoints = [...(w.entries || [])].sort(
-      (a, b) => b.score - a.score
-    );
-
+    // Wins = highest weekly score
+    const sortedPoints = [...(w.entries || [])].sort((a, b) => b.score - a.score);
     const winner = sortedPoints[0];
 
     if (winner) {
@@ -210,7 +268,7 @@ function buildAggregate(allWeeks) {
       by.set(winner.player, rec);
     }
 
-    // ---- MAP STATS
+    // WR / Top5 from per-map leaderboards
     for (const m of w.maps || []) {
       for (const e of m.entries || []) {
         const rec =
@@ -226,13 +284,8 @@ function buildAggregate(allWeeks) {
 
         if (e.rank === 1) {
           rec.wrs += 1;
-          rec.wrWeeks.push({
-            week: weekNum,
-            mapUid: m.mapUid,
-            timeMs: e.timeMs,
-          });
+          rec.wrWeeks.push({ week: weekNum, mapUid: m.mapUid, timeMs: e.timeMs });
         }
-
         if (e.rank <= 5) {
           rec.top5 += 1;
           rec.top5Weeks.push({
@@ -261,10 +314,7 @@ function buildAggregate(allWeeks) {
       a.player.localeCompare(b.player)
   );
 
-  return {
-    generatedAt: isoNow(),
-    players,
-  };
+  return { generatedAt: isoNow(), players };
 }
 
 /* ========================= MAIN ========================= */
@@ -281,13 +331,15 @@ async function main() {
   for (const w of weeksIndex.weeks || []) {
     const maps = [];
 
+    // Map tops (WR/top5 stats)
     for (const mapUid of w.mapUids || []) {
       const rows = await fetchMapTop(access, mapUid);
       await resolveDisplayNames(nameCache, rows.map((r) => r.accountId));
 
-      const sorted = rows.sort((a, b) => a.timeMs - b.timeMs);
+      // sort best time first
+      rows.sort((a, b) => a.timeMs - b.timeMs);
 
-      const entries = sorted.map((r, idx) => ({
+      const entries = rows.map((r, idx) => ({
         rank: idx + 1,
         player: nameCache[r.accountId] || r.accountId,
         timeMs: r.timeMs,
@@ -296,15 +348,17 @@ async function main() {
       maps.push({ mapUid, entries });
     }
 
+    // Weekly points leaderboard
     const pointsRows = await fetchPointsTop(access, w.leaderboardGroupUid);
     await resolveDisplayNames(nameCache, pointsRows.map((r) => r.accountId));
 
+    // sort by points desc
     pointsRows.sort((a, b) => b.score - a.score);
 
     const pointsEntries = pointsRows.map((r, idx) => ({
       rank: idx + 1,
       player: nameCache[r.accountId] || r.accountId,
-      score: r.score,
+      score: r.score, // <- if your HTML expects "points", rename to points here
     }));
 
     const weekJson = {
