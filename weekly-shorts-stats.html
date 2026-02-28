@@ -241,15 +241,14 @@
   <script>
     // Adjust to match your existing data hosting pattern.
     // If you host JSON under /public/data/... then this is correct.
-    const API_BASE = "https://trackmaniawebsite.onrender.com";
+    const API_BASE = ""; // same-origin (GitHub Pages)
 
-    const PATHS = {
-      weeksIndex: `${API_BASE}/api/weekly-shorts/weeks`,
-      aggregate:  `${API_BASE}/api/weekly-shorts/aggregate`,
-      changelog:  `${API_BASE}/api/weekly-shorts/changelog`,
-      weekFile:   (weekNum) => `${API_BASE}/api/weekly-shorts/week/${weekNum}`,
-    };
-
+const PATHS = {
+  weeksIndex: `/data/weekly-shorts/weeks.json`,
+  aggregate:  `/data/weekly-shorts/aggregate.json`,
+  changelog:  `/data/weekly-shorts/changelog.json`,
+  weekFile:   (weekNum) => `/data/weekly-shorts/weeks/${weekNum}.json`,
+};
     const $ = (id) => document.getElementById(id);
 
     function fmtTime(ms){
