@@ -1,15 +1,19 @@
 // scripts/weekly-shorts-update.js
 // Weekly Shorts static generator (GitHub Pages compatible)
+//
 // Outputs:
 // - data/weekly-shorts/weeks.json
 // - data/weekly-shorts/weeks/<week>.json
 // - data/weekly-shorts/aggregate.json
 // - data/weekly-shorts/name-cache.json
+//
+// Node 18+ (global fetch). ESM module.
 
 import fs from "node:fs";
 import path from "node:path";
 
 /* ----------------------------- config ----------------------------- */
+
 const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
 const BASE_DIR = path.join(process.cwd(), PUBLIC_DIR, "data", "weekly-shorts");
 const WEEKS_DIR = path.join(BASE_DIR, "weeks");
@@ -33,19 +37,21 @@ const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
 // Live refresh token (nadeo_v1 refresh)
 const REFRESH_TOKEN = cleanToken(process.env.REFRESH_TOKEN || "");
 
-// Weeks indexing filter
+// Optional: limit start date for weeks index (default: 2024 start)
 const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
 
 // Tuning
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 const MAP_TOP_LENGTH = Number(process.env.WS_MAP_TOP_LENGTH || 10);
-const POINTS_TOP_LENGTH = Number(process.env.WS_POINTS_TOP_LENGTH || 10);
+const POINTS_TOP_LENGTH = Number(process.env.WS_POINTS_TOP_LENGTH || 25);
 const SLEEP_MS = Number(process.env.WS_SLEEP_MS || 70);
 
 /* ----------------------------- helpers ----------------------------- */
+
 function isoNow() {
   return new Date().toISOString();
 }
+
 function cleanToken(s) {
   if (!s) return "";
   let t = String(s).trim();
@@ -53,12 +59,15 @@ function cleanToken(s) {
   if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) t = t.slice(1, -1);
   return t;
 }
+
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
+
 function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
 }
+
 function readJson(p, fallback) {
   try {
     return JSON.parse(fs.readFileSync(p, "utf8"));
@@ -66,15 +75,18 @@ function readJson(p, fallback) {
     return fallback;
   }
 }
+
 function writeJson(p, obj) {
   ensureDir(path.dirname(p));
   fs.writeFileSync(p, JSON.stringify(obj, null, 2) + "\n", "utf8");
 }
+
 function parseStartMs() {
   const ms = Date.parse(WS_START_ISO);
   if (!Number.isFinite(ms)) throw new Error(`Invalid WS_START_ISO: ${WS_START_ISO}`);
   return ms;
 }
+
 function isValidTimeMs(ms) {
   return Number.isFinite(ms) && ms > 0 && ms < 24 * 3600 * 1000;
 }
@@ -119,6 +131,7 @@ async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
 }
 
 /* ----------------------------- auth ----------------------------- */
+
 let cachedLive = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
@@ -164,7 +177,9 @@ async function jget(url, access) {
 }
 
 /* ----------------------------- OAuth display names ----------------------------- */
+
 let cachedOAuth = { token: null, expAt: 0 };
+
 async function getOAuthToken() {
   const now = Date.now();
   if (cachedOAuth.token && now < cachedOAuth.expAt - 30_000) return cachedOAuth.token;
@@ -187,6 +202,7 @@ async function getOAuthToken() {
   });
 
   if (!r.ok) throw new Error(`oauth token failed ${r.status} ${await r.text().catch(() => "")}`);
+
   const j = await r.json();
   const accessToken = j.access_token || j.accessToken;
   const expiresIn = j.expires_in || 3600;
@@ -203,6 +219,7 @@ async function resolveDisplayNames(nameCacheObj, ids) {
 
   const token = await getOAuthToken();
   const CHUNK = 50;
+
   for (let i = 0; i < need.length; i += CHUNK) {
     const batch = need.slice(i, i + CHUNK);
     const params = new URLSearchParams();
@@ -229,6 +246,7 @@ async function resolveDisplayNames(nameCacheObj, ids) {
     } catch {
       for (const id of batch) if (!nameCacheObj[id]) nameCacheObj[id] = id;
     }
+
     await sleep(40);
   }
 
@@ -236,6 +254,7 @@ async function resolveDisplayNames(nameCacheObj, ids) {
 }
 
 /* ----------------------------- Weekly Shorts feed discovery ----------------------------- */
+
 async function fetchWeeklyShortsCampaignWeeks(access) {
   const out = [];
   const LENGTH = 100;
@@ -258,13 +277,14 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
 
   const normalized = (weeksRaw || [])
     .map((w) => {
-      const startTs = Number(w?.startTimestamp) || 0; // seconds
-      const endTs = Number(w?.endTimestamp) || 0; // seconds
+      const startTs = Number(w?.startTimestamp) || 0;
+      const endTs = Number(w?.endTimestamp) || 0;
+
       const mapUids = (Array.isArray(w?.playlist) ? w.playlist : [])
         .map((p) => p?.mapUid)
         .filter(Boolean);
 
-      // points leaderboard group uid for that week
+      // Expanded UID discovery (fixes week 1 edge cases)
       const leaderboardGroupUid =
         w?.seasonUid ||
         w?.leaderboardGroupUid ||
@@ -275,9 +295,29 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
         w?.campaignLeaderboardGroupUid ||
         w?.leaderboard?.groupUid ||
         w?.leaderboard?.group?.uid ||
+        w?.uid ||
+        w?.id ||
+        w?.campaignUid ||
+        w?.campaignId ||
+        w?.seasonId ||
         null;
 
-      return { year: w?.year ?? null, wsWeek: w?.week ?? null, startTs, endTs, mapUids, leaderboardGroupUid };
+      if (DEBUG && !leaderboardGroupUid) {
+        console.log("[WS] missing leaderboardGroupUid for feed item", {
+          year: w?.year,
+          week: w?.week,
+          keys: Object.keys(w || {}),
+        });
+      }
+
+      return {
+        year: w?.year ?? null,
+        wsWeek: w?.week ?? null,
+        startTs,
+        endTs,
+        mapUids,
+        leaderboardGroupUid,
+      };
     })
     .filter((w) => w.startTs > 0 && w.endTs > 0)
     .filter((w) => w.startTs * 1000 >= startMs)
@@ -286,6 +326,7 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
   const weeks = normalized.map((w, idx) => {
     const weekStartIso = new Date(w.startTs * 1000).toISOString();
     const endedAtIso = new Date(w.endTs * 1000 - 1).toISOString();
+
     return {
       week: idx + 1,
       year: w.year,
@@ -297,10 +338,16 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
     };
   });
 
-  return { generatedAt: isoNow(), startIso: WS_START_ISO, mapsPerWeek: WS_MAPS_PER_WEEK, weeks };
+  return {
+    generatedAt: isoNow(),
+    startIso: WS_START_ISO,
+    mapsPerWeek: WS_MAPS_PER_WEEK,
+    weeks,
+  };
 }
 
 /* ----------------------------- leaderboards ----------------------------- */
+
 async function fetchWsTop(access, mapUid, length = 10) {
   const url =
     `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
@@ -321,6 +368,7 @@ async function fetchWsTop(access, mapUid, length = 10) {
     .sort((a, b) => a.rank - b.rank);
 }
 
+// Weekly points leaderboard (sorted by points desc, rank recomputed)
 async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   if (!leaderboardGroupUid) return [];
 
@@ -331,37 +379,30 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   const j = await jget(url, access);
   const arr = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
 
-  if (DEBUG && arr.length) {
-    dlog("points row sample:", JSON.stringify(arr[0], null, 2));
-  }
-
+  // parse score robustly; NEVER output null (force 0)
   const rows = arr
     .map((x) => {
       const accountId = x?.accountId;
-      const rawScore = x?.score;
-      let score = extractNumber(rawScore);
-
-      // IMPORTANT: never write null; if unparseable, force 0 and keep debug value
+      const raw = x?.score;
+      let score = extractNumber(raw);
       if (!Number.isFinite(score)) score = 0;
-
       if (!accountId) return null;
-      return { accountId, score, rawScore };
+      return { accountId, score };
     })
     .filter(Boolean);
 
-  // sort by score desc and rerank locally
   rows.sort((a, b) => b.score - a.score);
 
   return rows.map((r, idx) => ({
     rank: idx + 1,
     accountId: r.accountId,
     score: r.score,
-    rawScore: r.rawScore,
   }));
 }
 
 /* ----------------------------- aggregation ----------------------------- */
-// wins = weekly points rank 1
+
+// wins = points rank 1 per week
 // wrs = map rank 1
 // top5 = map rank <= 5
 function buildAggregate(allWeekJson) {
@@ -370,7 +411,7 @@ function buildAggregate(allWeekJson) {
   for (const w of allWeekJson) {
     const weekNum = Number(w.week);
 
-    // wins from points
+    // wins from points (rank 1)
     const points = Array.isArray(w.entries) ? w.entries : [];
     const winner = points.find((p) => Number(p.rank) === 1);
 
@@ -391,12 +432,9 @@ function buildAggregate(allWeekJson) {
     }
 
     // map wr/top5
-    const maps = Array.isArray(w.maps) ? w.maps : [];
-    for (const m of maps) {
+    for (const m of w.maps || []) {
       const mapUid = m.mapUid;
-      const entries = Array.isArray(m.entries) ? m.entries : [];
-
-      for (const e of entries) {
+      for (const e of m.entries || []) {
         const player = e.player;
         if (!player) continue;
 
@@ -442,6 +480,7 @@ function buildAggregate(allWeekJson) {
 }
 
 /* ----------------------------- main ----------------------------- */
+
 async function main() {
   ensureDir(WEEKS_DIR);
 
@@ -455,7 +494,7 @@ async function main() {
   for (const w of weeksIndex.weeks || []) {
     const maps = [];
 
-    // Map tops (WR/top5)
+    // Per-map leaderboards
     for (const mapUid of w.mapUids || []) {
       const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
       await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
@@ -470,17 +509,28 @@ async function main() {
       await sleep(SLEEP_MS);
     }
 
-    // Points leaderboard (wins are based on rank 1 here)
+    // Weekly points leaderboard
     const pointsRows = await fetchWsWeekPointsTop(access, w.leaderboardGroupUid, POINTS_TOP_LENGTH);
     await resolveDisplayNames(nameCacheObj, pointsRows.map((r) => r.accountId));
 
-    const pointsEntries = pointsRows.map((r) => ({
-      rank: r.rank,
-      player: nameCacheObj[r.accountId] || r.accountId,
-      score: r.score,
-      points: r.score, // alias for frontends using points
-      // rawScore: r.rawScore, // enable temporarily if you want to inspect API shape
-    }));
+    // Output multiple aliases so your HTML WILL show it no matter what it expects
+    const pointsEntries = pointsRows.map((r) => {
+      const player = nameCacheObj[r.accountId] || r.accountId;
+      const n = Number.isFinite(r.score) ? r.score : 0;
+      return {
+        rank: r.rank,
+        player,
+
+        // numeric
+        score: n,
+        points: n,
+        value: n,
+        total: n,
+
+        // safe formatted text (avoids falsy 0 issues in some UIs)
+        scoreText: String(n),
+      };
+    });
 
     const weekJson = {
       week: w.week,
@@ -489,7 +539,9 @@ async function main() {
       weekStart: w.weekStart,
       endedAt: w.endedAt,
 
-      entries: pointsEntries, // weekly points leaderboard
+      entries: pointsEntries,
+
+      // extra
       maps,
       mapUids: w.mapUids || [],
       leaderboardGroupUid: w.leaderboardGroupUid || null,
