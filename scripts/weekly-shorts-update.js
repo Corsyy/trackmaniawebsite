@@ -375,43 +375,49 @@ function buildAggregate(weekOutputs) {
   for (const w of weekOutputs) {
     const weekNum = w.week;
 
-    // Use first map entries for “wins/top5/wrs” continuity (like your old version)
-    // You can change this to count across all maps if you want.
-    const firstMap = Array.isArray(w.maps) && w.maps.length ? w.maps[0] : null;
-    const entries = firstMap?.entries || [];
-    const mapUid = firstMap?.mapUid || null;
-
-    for (const e of entries) {
-      const name = e.player;
-      if (!name) continue;
-
+    // ----- WINS from weekly POINTS leaderboard -----
+    const points = Array.isArray(w.points) ? w.points : [];
+    const winner = points.find(p => p.rank === 1);
+    if (winner) {
+      const name = winner.player;
       if (!by.has(name)) {
-        by.set(name, { player: name, wins: 0, wrs: 0, top5: 0, weeksWon: [], wrWeeks: [], top5Weeks: [] });
+        by.set(name, { player: name, wins: 0, wrs: 0, top5: 0, weeksWon: [] });
       }
       const p = by.get(name);
+      p.wins += 1;
+      p.weeksWon.push(weekNum);
+    }
 
-      if (e.rank === 1) {
-        p.wins += 1;
-        p.weeksWon.push(weekNum);
-      }
-      if (e.isWr) {
-        p.wrs += 1;
-        p.wrWeeks.push({ week: weekNum, mapUid, timeMs: e.timeMs });
-      }
-      if (e.rank <= 5) {
-        p.top5 += 1;
-        p.top5Weeks.push({ week: weekNum, mapUid, rank: e.rank, timeMs: e.timeMs });
+    // ----- WRs + Top5s from MAP leaderboards -----
+    for (const map of (w.maps || [])) {
+      for (const e of (map.entries || [])) {
+        const name = e.player;
+        if (!name) continue;
+
+        if (!by.has(name)) {
+          by.set(name, { player: name, wins: 0, wrs: 0, top5: 0, weeksWon: [] });
+        }
+
+        const p = by.get(name);
+
+        if (e.rank === 1) {
+          p.wrs += 1;   // map WR
+        }
+
+        if (e.rank <= 5) {
+          p.top5 += 1;
+        }
       }
     }
   }
 
-  const players = Array.from(by.values()).map((p) => ({
+  const players = Array.from(by.values()).map(p => ({
     ...p,
-    weeksWon: Array.from(new Set(p.weeksWon)).sort((a, b) => a - b),
+    weeksWon: Array.from(new Set(p.weeksWon)).sort((a,b)=>a-b),
   }));
 
   players.sort(
-    (a, b) =>
+    (a,b) =>
       (b.wins - a.wins) ||
       (b.wrs - a.wrs) ||
       (b.top5 - a.top5) ||
