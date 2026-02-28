@@ -1,66 +1,57 @@
 // scripts/weekly-shorts-update.js
-// Generates static JSON for Weekly Shorts page (GitHub Pages friendly)
-// - weeks index: data/weekly-shorts/weeks.json
-// - per-week file: data/weekly-shorts/weeks/<week>.json   (contains points leaderboard as `entries`)
-// - aggregate: data/weekly-shorts/aggregate.json          (wins from points, WRs/top5 from map leaderboards)
-// - changelog: data/weekly-shorts/changelog.json          (optional; keeps prior format)
-//
-// Node 18+ (global fetch). ESM module.
+// GitHub Pages generator for Weekly Shorts JSON
+// - /data/weekly-shorts/weeks.json
+// - /data/weekly-shorts/weeks/<week>.json
+// - /data/weekly-shorts/aggregate.json
+// - /data/weekly-shorts/name-cache.json
 
 import fs from "node:fs";
 import path from "node:path";
 
-/* ----------------------------- config ----------------------------- */
+/* ========================= CONFIG ========================= */
+
 const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
 const BASE_DIR = path.join(process.cwd(), PUBLIC_DIR, "data", "weekly-shorts");
 const WEEKS_DIR = path.join(BASE_DIR, "weeks");
 
 const WEEKS_INDEX_PATH = path.join(BASE_DIR, "weeks.json");
 const AGG_PATH = path.join(BASE_DIR, "aggregate.json");
-const CHANGELOG_PATH = path.join(BASE_DIR, "changelog.json");
 const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
 
-const DEBUG = String(process.env.DEBUG || "0") === "1";
-const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
-
-// Nadeo Live
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 const CORE_REFRESH_URL =
   "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
 
-// OAuth (display names)
 const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
-
-// Live refresh token (nadeo_v1 refresh)
 const REFRESH_TOKEN = cleanToken(process.env.REFRESH_TOKEN || "");
 
-// Optional: limit start date for weeks index (default: 2024 start)
-const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
+const DEBUG = String(process.env.DEBUG || "0") === "1";
+const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
 
-// Tuning
+const WS_START_ISO = String(process.env.WS_START_ISO || "1970-01-01T00:00:00Z").trim();
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
+
 const MAP_TOP_LENGTH = Number(process.env.WS_MAP_TOP_LENGTH || 10);
 const POINTS_TOP_LENGTH = Number(process.env.WS_POINTS_TOP_LENGTH || 10);
+
 const SLEEP_MS = Number(process.env.WS_SLEEP_MS || 70);
 
-/* ----------------------------- helpers ----------------------------- */
-function isoNow() {
-  return new Date().toISOString();
-}
+/* ========================= HELPERS ========================= */
+
 function cleanToken(s) {
   if (!s) return "";
   let t = String(s).trim();
   if (t.toLowerCase().startsWith("nadeo_v1 t=")) t = t.slice("nadeo_v1 t=".length).trim();
-  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) t = t.slice(1, -1);
+  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
+    t = t.slice(1, -1);
   return t;
 }
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+
 function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
 }
+
 function readJson(p, fallback) {
   try {
     return JSON.parse(fs.readFileSync(p, "utf8"));
@@ -68,38 +59,35 @@ function readJson(p, fallback) {
     return fallback;
   }
 }
+
 function writeJson(p, obj) {
   ensureDir(path.dirname(p));
   fs.writeFileSync(p, JSON.stringify(obj, null, 2) + "\n", "utf8");
 }
+
+function isoNow() {
+  return new Date().toISOString();
+}
+
 function parseStartMs() {
   const ms = Date.parse(WS_START_ISO);
   if (!Number.isFinite(ms)) throw new Error(`Invalid WS_START_ISO: ${WS_START_ISO}`);
   return ms;
 }
-function isValidTimeMs(ms) {
-  return Number.isFinite(ms) && ms > 0 && ms < 24 * 3600 * 1000;
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
-/**
- * IMPORTANT:
- * Trackmania endpoints sometimes return score as:
- * - number
- * - numeric string
- * - or an object (varies by endpoint/version)
- *
- * If we do Number(x.score) and it isn't a plain number, we get NaN,
- * and JSON.stringify(NaN) becomes null => exactly what you're seeing.
- */
+// Robust number extraction (prevents NaN -> null in JSON)
 function extractNumber(v) {
   if (typeof v === "number") return v;
   if (typeof v === "string") {
-    // Remove commas if they exist, then parse
     const n = Number(v.replace(/,/g, ""));
     return Number.isFinite(n) ? n : NaN;
   }
   if (v && typeof v === "object") {
-    // Try common nested keys
+    // common nested shapes across endpoints/versions
     const keys = ["score", "points", "value", "val", "total", "result"];
     for (const k of keys) {
       if (k in v) {
@@ -111,36 +99,35 @@ function extractNumber(v) {
   return NaN;
 }
 
-async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
+function isValidTimeMs(ms) {
+  return Number.isFinite(ms) && ms > 0 && ms < 24 * 3600 * 1000;
+}
+
+async function fetchRetry(url, opts = {}, retries = 5) {
   let lastErr;
   for (let i = 0; i <= retries; i++) {
     try {
       const r = await fetch(url, opts);
       if (r.status === 429 || (r.status >= 500 && r.status <= 599)) {
-        const wait = Math.min(baseDelay * Math.pow(2, i), 8000);
-        dlog("retry", i, r.status, url, "wait", wait);
-        await sleep(wait);
+        await sleep(Math.min(400 * Math.pow(2, i), 8000));
         continue;
       }
       return r;
     } catch (e) {
       lastErr = e;
-      const wait = Math.min(baseDelay * Math.pow(2, i), 8000);
-      dlog("retry", i, "err", e?.message || e, url, "wait", wait);
-      await sleep(wait);
+      await sleep(Math.min(400 * Math.pow(2, i), 8000));
     }
   }
-  throw lastErr || new Error(`fetch failed for ${url}`);
+  throw lastErr || new Error(`fetch failed: ${url}`);
 }
 
-/* ----------------------------- auth ----------------------------- */
+/* ========================= AUTH ========================= */
+
 let cachedLive = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
-  const now = Date.now();
-  if (cachedLive.token && now < cachedLive.expAt - 30_000) return cachedLive.token;
-
-  if (!REFRESH_TOKEN) throw new Error("Missing REFRESH_TOKEN env (Nadeo refresh token).");
+  if (cachedLive.token && Date.now() < cachedLive.expAt - 30000) return cachedLive.token;
+  if (!REFRESH_TOKEN) throw new Error("Missing REFRESH_TOKEN");
 
   const r = await fetchRetry(CORE_REFRESH_URL, {
     method: "POST",
@@ -153,16 +140,16 @@ async function getLiveAccessToken() {
   });
 
   if (!r.ok) {
-    const body = await r.text().catch(() => "");
-    throw new Error(`refresh failed ${r.status} ${body || "(no body)"} [len=${REFRESH_TOKEN.length}]`);
+    const t = await r.text().catch(() => "");
+    throw new Error(`Token refresh failed: ${r.status} ${t}`);
   }
 
   const j = await r.json();
-  const accessToken = j.accessToken || j.access_token;
-  const expiresIn = j.expiresIn || j.expires_in || 3600;
-  if (!accessToken) throw new Error("no accessToken in refresh response");
+  cachedLive = {
+    token: j.accessToken,
+    expAt: Date.now() + (j.expiresIn || 3600) * 1000,
+  };
 
-  cachedLive = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
   return cachedLive.token;
 }
 
@@ -178,14 +165,15 @@ async function jget(url, access) {
   return r.json();
 }
 
-/* ----------------------------- OAuth display names ----------------------------- */
+/* ========================= OAUTH (display names) ========================= */
+
 let cachedOAuth = { token: null, expAt: 0 };
+
 async function getOAuthToken() {
-  const now = Date.now();
-  if (cachedOAuth.token && now < cachedOAuth.expAt - 30_000) return cachedOAuth.token;
+  if (cachedOAuth.token && Date.now() < cachedOAuth.expAt - 30000) return cachedOAuth.token;
 
   if (!OAUTH_CLIENT_ID || !OAUTH_CLIENT_SECRET) {
-    throw new Error("Missing CLIENT_ID / CLIENT_SECRET env (Trackmania OAuth).");
+    throw new Error("Missing CLIENT_ID / CLIENT_SECRET");
   }
 
   const r = await fetchRetry("https://api.trackmania.com/api/access_token", {
@@ -201,56 +189,52 @@ async function getOAuthToken() {
     }).toString(),
   });
 
-  if (!r.ok) throw new Error(`oauth token failed ${r.status} ${await r.text().catch(() => "")}`);
-  const j = await r.json();
-  const accessToken = j.access_token || j.accessToken;
-  const expiresIn = j.expires_in || 3600;
-  if (!accessToken) throw new Error("no OAuth access_token");
+  if (!r.ok) {
+    const t = await r.text().catch(() => "");
+    throw new Error(`OAuth failed: ${r.status} ${t}`);
+  }
 
-  cachedOAuth = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
+  const j = await r.json();
+  cachedOAuth = {
+    token: j.access_token,
+    expAt: Date.now() + (j.expires_in || 3600) * 1000,
+  };
+
   return cachedOAuth.token;
 }
 
-async function resolveDisplayNames(nameCacheObj, ids) {
-  const all = Array.from(new Set((ids || []).filter(Boolean)));
-  const need = all.filter((id) => !nameCacheObj[id]);
-  if (!need.length) return nameCacheObj;
+async function resolveDisplayNames(cacheObj, ids) {
+  const uniq = Array.from(new Set((ids || []).filter(Boolean)));
+  const missing = uniq.filter((id) => !cacheObj[id]);
+  if (!missing.length) return;
 
   const token = await getOAuthToken();
   const CHUNK = 50;
-  for (let i = 0; i < need.length; i += CHUNK) {
-    const batch = need.slice(i, i + CHUNK);
+
+  for (let i = 0; i < missing.length; i += CHUNK) {
+    const batch = missing.slice(i, i + CHUNK);
     const params = new URLSearchParams();
     for (const id of batch) params.append("accountId[]", id);
 
-    try {
-      const r = await fetchRetry(`https://api.trackmania.com/api/display-names?${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
-        },
-      });
+    const r = await fetchRetry(
+      `https://api.trackmania.com/api/display-names?${params.toString()}`,
+      { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
+    );
 
-      if (!r.ok) {
-        for (const id of batch) if (!nameCacheObj[id]) nameCacheObj[id] = id;
-      } else {
-        const j = await r.json(); // { "<accountId>": "DisplayName" }
-        for (const id of batch) {
-          const dn = j?.[id];
-          nameCacheObj[id] = (typeof dn === "string" && dn) ? dn : id;
-        }
-      }
-    } catch {
-      for (const id of batch) if (!nameCacheObj[id]) nameCacheObj[id] = id;
+    if (!r.ok) {
+      for (const id of batch) cacheObj[id] = cacheObj[id] || id;
+      continue;
     }
+
+    const j = await r.json();
+    for (const id of batch) cacheObj[id] = j?.[id] || id;
+
     await sleep(40);
   }
-
-  return nameCacheObj;
 }
 
-/* ----------------------------- Weekly Shorts feed discovery ----------------------------- */
+/* ========================= DISCOVER WEEKS ========================= */
+
 async function fetchWeeklyShortsCampaignWeeks(access) {
   const out = [];
   const LENGTH = 100;
@@ -273,13 +257,13 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
 
   const normalized = (weeksRaw || [])
     .map((w) => {
-      const startTs = Number(w?.startTimestamp) || 0; // seconds
-      const endTs = Number(w?.endTimestamp) || 0; // seconds
+      const startTs = Number(w?.startTimestamp) || 0;
+      const endTs = Number(w?.endTimestamp) || 0;
       const mapUids = (Array.isArray(w?.playlist) ? w.playlist : [])
         .map((p) => p?.mapUid)
         .filter(Boolean);
 
-      // Campaign leaderboard group UID (points leaderboard for the whole week)
+      // IMPORTANT: include seasonUid fallback (some weeks use it)
       const leaderboardGroupUid =
         w?.seasonUid ||
         w?.leaderboardGroupUid ||
@@ -328,74 +312,83 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
   };
 }
 
-/* ----------------------------- leaderboards ----------------------------- */
-async function fetchWsTop(access, mapUid, length = 10) {
+/* ========================= LEADERBOARDS ========================= */
+
+async function fetchMapTop(access, mapUid, length = 10) {
   const url =
     `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
     `/top?onlyWorld=true&length=${length}&offset=0`;
 
   const j = await jget(url, access);
-  const rows = j?.tops?.[0]?.top;
-  const topArr = Array.isArray(rows) ? rows : [];
+  const topArr = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
 
-  return topArr
+  const parsed = topArr
     .map((x, idx) => {
-      const rank = Number(x.position ?? (idx + 1));
-      const accountId = x.accountId;
-      const timeMs = extractNumber(x.score);
+      const rank = Number(x?.position ?? (idx + 1));
+      const accountId = x?.accountId;
+      const timeMs = extractNumber(x?.score);
       if (!accountId || !isValidTimeMs(timeMs)) return null;
       return { rank, accountId, timeMs };
     })
     .filter(Boolean)
     .sort((a, b) => a.rank - b.rank);
+
+  return parsed;
 }
 
 /**
- * FIXED: points score parsing now robust (no NaN->null)
- * + we recompute rank later based on sorted score
+ * Weekly points leaderboard (what trackmania.io shows)
+ * FIX: robust score extraction + we re-rank by score desc (don’t trust position)
  */
-async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
+async function fetchWeekPoints(access, leaderboardGroupUid, length = 10) {
   if (!leaderboardGroupUid) return [];
+
   const url =
     `${LIVE_BASE}/api/token/leaderboard/group/${encodeURIComponent(leaderboardGroupUid)}` +
     `/top?onlyWorld=true&offset=0&length=${length}`;
 
   const j = await jget(url, access);
-  const rows = j?.tops?.[0]?.top;
-  const arr = Array.isArray(rows) ? rows : [];
+  const arr = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
 
-  if (DEBUG && arr.length) {
-    // one-time visibility into shape
-    dlog("points row sample:", JSON.stringify(arr[0], null, 2));
-  }
+  if (DEBUG && arr.length) dlog("points row sample:", JSON.stringify(arr[0], null, 2));
 
-  return arr
+  const rows = arr
     .map((x) => {
-      const accountId = x.accountId;
-      const score = extractNumber(x.score);
+      const accountId = x?.accountId;
+      const score = extractNumber(x?.score);
       if (!accountId || !Number.isFinite(score)) return null;
       return { accountId, score };
     })
     .filter(Boolean);
+
+  // tm.io display = highest points first
+  rows.sort((a, b) => b.score - a.score);
+
+  // re-rank locally
+  return rows.map((r, idx) => ({ rank: idx + 1, accountId: r.accountId, score: r.score }));
 }
 
-/* ----------------------------- aggregation ----------------------------- */
-// wins: points leaderboard rank 1 per week
-// wrs/top5: per-map time leaderboards (rank 1 / rank<=5)
+/* ========================= AGGREGATE ========================= */
+/**
+ * Your REQUIRED rules:
+ * - Weekly leaderboard = points per week
+ * - Wins = weekly points rank 1
+ * - WRs = map rank 1
+ * - Top5 = map rank <= 5
+ */
 function buildAggregate(allWeekJson) {
   const by = new Map();
 
   for (const w of allWeekJson) {
     const weekNum = Number(w.week);
 
-    // wins from points (rank 1 after we re-rank by score)
+    // Wins from POINTS rank 1
     const points = Array.isArray(w.entries) ? w.entries : [];
     const winner = points.find((p) => Number(p.rank) === 1);
-    if (winner && winner.player) {
-      const name = winner.player;
+    if (winner?.player) {
       const rec =
-        by.get(name) || {
-          player: name,
+        by.get(winner.player) || {
+          player: winner.player,
           wins: 0,
           wrs: 0,
           top5: 0,
@@ -405,15 +398,13 @@ function buildAggregate(allWeekJson) {
         };
       rec.wins += 1;
       rec.weeksWon.push(weekNum);
-      by.set(name, rec);
+      by.set(winner.player, rec);
     }
 
-    // map WR/top5
-    const maps = Array.isArray(w.maps) ? w.maps : [];
-    for (const m of maps) {
+    // WR + Top5 from MAP leaderboards
+    for (const m of w.maps || []) {
       const mapUid = m.mapUid;
-      const entries = Array.isArray(m.entries) ? m.entries : [];
-      for (const e of entries) {
+      for (const e of m.entries || []) {
         const player = e.player;
         if (!player) continue;
 
@@ -458,7 +449,8 @@ function buildAggregate(allWeekJson) {
   return { generatedAt: isoNow(), players };
 }
 
-/* ----------------------------- main ----------------------------- */
+/* ========================= MAIN ========================= */
+
 async function main() {
   ensureDir(WEEKS_DIR);
 
@@ -467,16 +459,14 @@ async function main() {
   const weeksIndex = buildWeeksIndexFromWeeklyShortsFeed(weeksRaw);
 
   const nameCacheObj = readJson(NAME_CACHE_PATH, {});
-  const changelog = readJson(CHANGELOG_PATH, { items: [] });
-
   const allWeekJson = [];
 
   for (const w of weeksIndex.weeks || []) {
     const maps = [];
 
-    // Fetch map tops (for WR/top5 stats)
+    // Per-map leaderboards (WR / Top5)
     for (const mapUid of w.mapUids || []) {
-      const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
+      const rows = await fetchMapTop(access, mapUid, MAP_TOP_LENGTH);
       await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
 
       const entries = rows.map((r) => ({
@@ -489,24 +479,16 @@ async function main() {
       await sleep(SLEEP_MS);
     }
 
-    // Fetch points leaderboard
-    const pointsRowsRaw = await fetchWsWeekPointsTop(access, w.leaderboardGroupUid, POINTS_TOP_LENGTH);
-    await resolveDisplayNames(nameCacheObj, pointsRowsRaw.map((r) => r.accountId));
+    // Weekly points leaderboard (rank + score)
+    const points = await fetchWeekPoints(access, w.leaderboardGroupUid, POINTS_TOP_LENGTH);
+    await resolveDisplayNames(nameCacheObj, points.map((r) => r.accountId));
 
-    // Defensive: sort by score desc + recompute rank
-    const pointsRows = pointsRowsRaw
-      .slice()
-      .sort((a, b) => b.score - a.score);
-
-    const pointsEntries = pointsRows.map((r, idx) => {
-      const player = nameCacheObj[r.accountId] || r.accountId;
-      return {
-        rank: idx + 1,
-        player,
-        score: r.score,
-        points: r.score, // <-- keep both to match whatever your HTML uses
-      };
-    });
+    const pointsEntries = points.map((r) => ({
+      rank: r.rank,
+      player: nameCacheObj[r.accountId] || r.accountId,
+      score: r.score,   // your HTML can display this
+      points: r.score,  // also provide alias (some scripts used points)
+    }));
 
     const weekJson = {
       week: w.week,
@@ -515,12 +497,12 @@ async function main() {
       weekStart: w.weekStart,
       endedAt: w.endedAt,
 
-      // HTML expects `entries` as the points leaderboard
+      // This is the weekly points leaderboard your table uses:
       entries: pointsEntries,
 
       // extra fields
-      mapUids: w.mapUids || [],
       maps,
+      mapUids: w.mapUids || [],
       leaderboardGroupUid: w.leaderboardGroupUid || null,
     };
 
@@ -530,7 +512,6 @@ async function main() {
 
   writeJson(WEEKS_INDEX_PATH, weeksIndex);
   writeJson(AGG_PATH, buildAggregate(allWeekJson));
-  writeJson(CHANGELOG_PATH, changelog);
   writeJson(NAME_CACHE_PATH, nameCacheObj);
 
   console.log("[DONE] Weekly Shorts updated.");
