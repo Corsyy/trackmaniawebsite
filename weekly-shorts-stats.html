@@ -99,91 +99,167 @@
     }
 
     @media (max-width: 980px){
-      .cards{grid-template-columns:1fr}
-      .row2{grid-template-columns:1fr}
-      .topbar{flex-direction:column;align-items:flex-start}
-    }
+  .cards{grid-template-columns:1fr}
+  .row2{grid-template-columns:1fr}
+  .topbar{flex-direction:column;align-items:flex-start}
+}
 
-    /* ===================== RESPONSIVE TABLE (NO SCROLL) ===================== */
-    /* On ~720p devices and smaller: turn rows into clean “cards” */
-    @media (max-width: 900px) {
-      .leaderboard-table thead { display: none; }
+/* ===================== RESPONSIVE TABLE (NO SCROLL) ===================== */
+/* Compact “card rows” on ~720p devices and smaller */
+@media (max-width: 900px) {
+  /* Prevent iOS/table overflow */
+  .card-b{overflow-x:hidden}
+  .leaderboard-table{width:100%;max-width:100%;border-collapse:collapse;table-layout:fixed}
+  .leaderboard-table thead{display:none}
 
-      .leaderboard-table,
-      .leaderboard-table tbody,
-      .leaderboard-table tr,
-      .leaderboard-table td {
-        display: block;
-        width: 100%;
-      }
+  .leaderboard-table,
+  .leaderboard-table tbody,
+  .leaderboard-table tr,
+  .leaderboard-table td{
+    display:block;
+    width:100%;
+    max-width:100%;
+  }
 
-      .leaderboard-table tr {
-        margin: 10px 12px;
-        border: 1px solid rgba(109,251,255,.18);
-        background: rgba(10,15,26,.18);
-        border-radius: 14px;
-        overflow: hidden;
-        box-shadow: 0 10px 20px rgba(0,0,0,.25);
-      }
+  /* Card container */
+  .leaderboard-table tr{
+    margin:10px 10px;              /* tighter so it never exceeds the card */
+    border:1px solid rgba(109,251,255,.18);
+    background:rgba(10,15,26,.18);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 10px 20px rgba(0,0,0,.25);
+  }
 
-      .leaderboard-table td {
-        border: none;
-        border-bottom: 1px solid rgba(109,251,255,.10);
-        padding: 10px 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        white-space: normal;
-      }
+  /* Make TD behave like a normal block container (no “table cell” sizing quirks) */
+  .leaderboard-table td{
+    display:block;
+    padding:0;
+    border:none;
+    overflow:hidden;
+  }
 
-      .leaderboard-table td:last-child {
-        border-bottom: none;
-      }
+  /* If you are still using the label/value layout anywhere, disable its labels here */
+  .leaderboard-table td::before{content:none !important}
 
-      /* Label on the left, value on the right */
-      .leaderboard-table td::before {
-        content: attr(data-label);
-        color: var(--muted);
-        font-weight: 800;
-        font-size: 12px;
-        letter-spacing: .02em;
-        text-transform: uppercase;
-        flex: 0 0 auto;
-        max-width: 45%;
-      }
+  /* --- Compact card layout (works with the single <td> markup) --- */
+  .m-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 12px 10px;
+    background:rgba(58,160,255,.08);
+    border-bottom:1px solid rgba(109,251,255,.10);
+    min-width:0;
+  }
 
-      /* Make player name pop */
-      .leaderboard-table td.player-cell b {
-        font-size: 16px;
-      }
+  .m-rank{
+    color:var(--muted);
+    font-weight:900;
+    width:28px;
+    flex:0 0 28px;
+  }
 
-      /* Rank gets a subtle highlight row */
-      .leaderboard-table td.rank-cell {
-        background: rgba(58,160,255,.08);
-      }
+  .m-player{
+    font-weight:900;
+    font-size:16px;
+    flex:1 1 auto;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    min-width:0; /* critical for iOS */
+  }
 
-      /* Weeks Won should wrap nicely */
-      .leaderboard-table td.weeks-cell {
-        align-items: flex-start;
-      }
-      .leaderboard-table td.weeks-cell > span {
-        text-align: right;
-        word-break: break-word;
-      }
-    }
+  .m-wins-badge{
+    font-size:11px;
+    padding:5px 10px;
+    border-radius:999px;
+    border:1px solid rgba(109,251,255,.25);
+    color:var(--muted);
+    background:rgba(10,15,26,.35);
+    flex:0 0 auto;
+    white-space:nowrap;
+    max-width:40%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
 
-    @media (max-width: 420px) {
-      .leaderboard-table tr { margin: 8px 10px; }
-      .leaderboard-table td { padding: 9px 10px; }
-    }
+  .m-stats{
+    display:flex;
+    gap:10px;
+    padding:10px 12px;
+    border-bottom:1px solid rgba(109,251,255,.10);
+    min-width:0;
+  }
 
-    @media (max-width: 640px){
-      th, td{
-        padding:8px 8px;
-        font-size:13px;
-      }
-    }
+  .m-stat{
+    flex:1 1 0;
+    border:1px solid rgba(109,251,255,.18);
+    background:rgba(10,15,26,.25);
+    border-radius:12px;
+    padding:8px 10px;
+    text-align:center;
+    min-width:0;
+  }
+
+  .m-stat .k{
+    display:block;
+    font-size:11px;
+    color:var(--muted);
+    font-weight:800;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+
+  .m-stat .v{
+    display:block;
+    font-size:15px;
+    font-weight:900;
+  }
+
+  .m-weeks{
+    padding:10px 12px 12px;
+    min-width:0;
+  }
+
+  .m-weeks .k{
+    display:block;
+    font-size:11px;
+    color:var(--muted);
+    font-weight:800;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+
+  .m-weeks .v{
+    display:block;
+    font-size:13px;
+    line-height:1.35;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+    color:rgba(230,236,255,.92);
+    text-align:left;
+  }
+}
+
+@media (max-width: 640px){
+  th, td{
+    padding:8px 8px;
+    font-size:13px;
+  }
+}
+
+@media (max-width: 420px){
+  .leaderboard-table tr{margin:8px 8px}
+  .m-stats{gap:8px}
+  .m-stat{padding:8px 8px}
+  .m-head{padding:11px 10px 9px}
+  .m-stats{padding:9px 10px}
+  .m-weeks{padding:9px 10px 11px}
+}
   </style>
 </head>
 
