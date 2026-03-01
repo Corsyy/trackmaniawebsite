@@ -328,13 +328,20 @@ async function fetchWsTop(access, mapUid, length = 10) {
   const topArr = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
 
   return topArr
-    .map((x, idx) => {
-      const rank = Number(x?.position ?? (idx + 1));
-      const accountId = x?.accountId;
+    .map((x) => {
+      // Some endpoints use "position", others "rank"
+      const rankRaw = x?.position ?? x?.rank ?? x?.place ?? null;
+      const rank = Number(rankRaw);
+
+      // Account id can sometimes be under other keys
+      const accountId = x?.accountId ?? x?.account_id ?? x?.playerId ?? null;
       if (!accountId) return null;
 
       const extracted = extractNumber(x?.score);
       const timeMs = isValidTimeMs(extracted) ? extracted : null;
+
+      // If rank is missing, don't invent it from array index
+      if (!Number.isFinite(rank) || rank <= 0) return null;
 
       return { rank, accountId, timeMs };
     })
