@@ -109,7 +109,16 @@
 @media (max-width: 900px){
   /* Contain everything (fix iOS overflow outside border) */
   .card-b{overflow-x:hidden}
-  .leaderboard-table{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse}
+
+  /* IMPORTANT: add inner padding here instead of side-margins on rows */
+  .leaderboard-table{
+    width:100%;
+    max-width:100%;
+    table-layout:fixed;
+    border-collapse:collapse;
+    padding:0 12px;           /* ✅ shifts cards left/right inside border */
+    box-sizing:border-box;
+  }
   .leaderboard-table *{max-width:100%}
 
   .leaderboard-table thead{display:none}
@@ -123,7 +132,9 @@
   }
 
   .leaderboard-table tr{
-    margin:10px 10px; /* smaller so it never exceeds card */
+    margin:10px 0;            /* ✅ no side margins (prevents overflow) */
+    width:100%;
+    box-sizing:border-box;
     border:1px solid rgba(109,251,255,.18);
     background:rgba(10,15,26,.18);
     border-radius:14px;
@@ -190,7 +201,10 @@
 }
 
 @media (max-width: 420px){
-  .leaderboard-table tr{margin:8px 8px}
+  .leaderboard-table{
+    padding:0 8px;            /* slightly tighter on tiny screens */
+  }
+  .leaderboard-table tr{margin:8px 0}
   .leaderboard-table td{padding:9px 10px}
 }
 
