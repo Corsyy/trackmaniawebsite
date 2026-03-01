@@ -66,7 +66,7 @@
 
     table{width:100%;border-collapse:collapse}
     th, td{padding:10px 10px;border-bottom:1px solid rgba(109,251,255,.12);text-align:left;font-size:14px}
-    th{color:var(--muted);font-weight:900;font-size:12px;letter-spacing:.04em;}
+    th{color:var(--muted);font-weight:900;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
     tr:hover td{background:rgba(10,15,26,.25)}
     .right{text-align:right}
     .muted{color:var(--muted)}
@@ -99,10 +99,40 @@
       cursor:not-allowed;
     }
 
+    /* ================= MOBILE TABLE FIX ================= */
+    .table-scroll{
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .table-scroll table{
+      min-width:820px; /* prevents crushing on small phones */
+    }
+    .table-scroll th,
+    .table-scroll td{
+      white-space:nowrap;
+    }
+    /* Allow Weeks Won to wrap normally */
+    .weeks-col{
+      white-space:normal !important;
+      min-width:220px;
+    }
+    /* Stop uppercase forcing "5S" look */
+    th.no-upcase{
+      text-transform:none !important;
+    }
+
     @media (max-width: 980px){
       .cards{grid-template-columns:1fr}
       .row2{grid-template-columns:1fr}
       .topbar{flex-direction:column;align-items:flex-start}
+    }
+
+    @media (max-width: 640px){
+      th, td{
+        padding:8px 8px;
+        font-size:13px;
+      }
     }
   </style>
 </head>
@@ -111,14 +141,15 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h1>Weekly Shorts</h1>
+        <h1>Weekly Shorts — Campaign Stats</h1>
         <p class="sub">
-          TM2020 Weekly shorts stats overview of who has the most wins, world records, and the most top 5s within all of the weekly shorts.
+          Trackmania 2020 Weekly Shorts overview: who has the most <b>wins</b>, <b>WRs</b>, and <b>Top 5s</b>.
+          Search players, review per-week leaderboards, and see post-week WR improvements in the changelog.
         </p>
       </div>
 
       <div class="back">
-        <a href="index" aria-label="Back to home">← Back</a>
+        <a href="index.html" aria-label="Back to home">← Back</a>
       </div>
     </div>
 
@@ -166,19 +197,21 @@
         </div>
 
         <div class="card-b" style="padding:0">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:54px">#</th>
-                <th>Player</th>
-                <th class="right">Wins</th>
-                <th class="right">WRs</th>
-                <th class="right">Top 5s</th>
-                <th class="right">Weeks Won</th>
-              </tr>
-            </thead>
-            <tbody id="overallBody"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:54px">#</th>
+                  <th>Player</th>
+                  <th class="right">Wins</th>
+                  <th class="right">WRs</th>
+                  <th class="right no-upcase">Top 5s</th>
+                  <th class="right weeks-col">Weeks Won</th>
+                </tr>
+              </thead>
+              <tbody id="overallBody"></tbody>
+            </table>
+          </div>
 
           <!-- Pagination controls -->
           <div class="pager">
@@ -210,16 +243,18 @@
           <div class="muted mini" id="weekEnded">—</div>
         </div>
         <div class="card-b" style="padding:0">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:54px">#</th>
-                <th>Player</th>
-                <th class="right">Score</th>
-              </tr>
-            </thead>
-            <tbody id="weekBody"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:54px">#</th>
+                  <th>Player</th>
+                  <th class="right">Score</th>
+                </tr>
+              </thead>
+              <tbody id="weekBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -242,12 +277,13 @@
     // If you host JSON under /public/data/... then this is correct.
     const API_BASE = ""; // same-origin (GitHub Pages)
 
-const PATHS = {
-  weeksIndex: `/data/weekly-shorts/weeks.json`,
-  aggregate:  `/data/weekly-shorts/aggregate.json`,
-  changelog:  `/data/weekly-shorts/changelog.json`,
-  weekFile:   (weekNum) => `/data/weekly-shorts/weeks/${weekNum}.json`,
-};
+    const PATHS = {
+      weeksIndex: `/data/weekly-shorts/weeks.json`,
+      aggregate:  `/data/weekly-shorts/aggregate.json`,
+      changelog:  `/data/weekly-shorts/changelog.json`,
+      weekFile:   (weekNum) => `/data/weekly-shorts/weeks/${weekNum}.json`,
+    };
+
     const $ = (id) => document.getElementById(id);
 
     function fmtTime(ms){
@@ -362,7 +398,7 @@ const PATHS = {
           <td class="right">${p.wins ?? 0}</td>
           <td class="right">${p.wrs ?? 0}</td>
           <td class="right">${p.top5 ?? 0}</td>
-          <td class="right">${weeksWon || "—"}</td>
+          <td class="right weeks-col">${weeksWon || "—"}</td>
         `;
         body.appendChild(tr);
       });
