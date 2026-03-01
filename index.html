@@ -766,6 +766,7 @@
       <a href="#home">Home</a>
       <a href="/kacky">Kacky Finishes</a>
       <a href="/wrleaderboard">WR Leaderboard</a>
+      <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
       <a href="/totd">Track of the Day</a>
       <a href="/highlights">Community Highlights</a>
     </nav>
@@ -1615,7 +1616,47 @@
     renderCalendar();
   };
 </script>
+<script>
+  // ---------- MOBILE NAV TOGGLE ----------
+  (function () {
+    const btn = document.getElementById("navToggle");
+    const nav = document.getElementById("primary-nav");
+    if (!btn || !nav) return;
 
+    function setOpen(open) {
+      nav.classList.toggle("show", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setOpen(!nav.classList.contains("show"));
+    });
+
+    // Close when clicking a link
+    nav.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => setOpen(false));
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", (e) => {
+      if (nav.classList.contains("show") && !nav.contains(e.target) && e.target !== btn) {
+        setOpen(false);
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+
+    // If user rotates / resizes out of mobile, clean state
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 640) setOpen(false);
+    });
+  })();
+</script>
 <script>
 (() => {
   const CHAT_API_BASE = "https://trackmaniaevents-chat.onrender.com";
