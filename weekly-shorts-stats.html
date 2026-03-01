@@ -98,92 +98,108 @@
       cursor:not-allowed;
     }
 
-    @media (max-width: 980px){
-      .cards{grid-template-columns:1fr}
-      .row2{grid-template-columns:1fr}
-      .topbar{flex-direction:column;align-items:flex-start}
-    }
+   @media (max-width: 980px){
+  .cards{grid-template-columns:1fr}
+  .row2{grid-template-columns:1fr}
+  .topbar{flex-direction:column;align-items:flex-start}
+}
 
-    /* ===================== RESPONSIVE TABLE (NO SCROLL) ===================== */
-    /* On ~720p devices and smaller: turn rows into clean “cards” */
-    @media (max-width: 900px) {
-      .leaderboard-table thead { display: none; }
+/* ===================== RESPONSIVE TABLE (NO SCROLL) ===================== */
+/* On ~720p devices and smaller: label/value “cards” (NO horizontal scroll) */
+@media (max-width: 900px){
+  /* Contain everything (fix iOS overflow outside border) */
+  .card-b{overflow-x:hidden}
+  .leaderboard-table{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse}
+  .leaderboard-table *{max-width:100%}
 
-      .leaderboard-table,
-      .leaderboard-table tbody,
-      .leaderboard-table tr,
-      .leaderboard-table td {
-        display: block;
-        width: 100%;
-      }
+  .leaderboard-table thead{display:none}
 
-      .leaderboard-table tr {
-        margin: 10px 12px;
-        border: 1px solid rgba(109,251,255,.18);
-        background: rgba(10,15,26,.18);
-        border-radius: 14px;
-        overflow: hidden;
-        box-shadow: 0 10px 20px rgba(0,0,0,.25);
-      }
+  .leaderboard-table,
+  .leaderboard-table tbody,
+  .leaderboard-table tr,
+  .leaderboard-table td{
+    display:block;
+    width:100%;
+  }
 
-      .leaderboard-table td {
-        border: none;
-        border-bottom: 1px solid rgba(109,251,255,.10);
-        padding: 10px 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        white-space: normal;
-      }
+  .leaderboard-table tr{
+    margin:10px 10px; /* smaller so it never exceeds card */
+    border:1px solid rgba(109,251,255,.18);
+    background:rgba(10,15,26,.18);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 10px 20px rgba(0,0,0,.25);
+  }
 
-      .leaderboard-table td:last-child {
-        border-bottom: none;
-      }
+  .leaderboard-table td{
+    border:none;
+    border-bottom:1px solid rgba(109,251,255,.10);
+    padding:10px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    white-space:normal;
+    overflow:hidden; /* critical */
+  }
 
-      /* Label on the left, value on the right */
-      .leaderboard-table td::before {
-        content: attr(data-label);
-        color: var(--muted);
-        font-weight: 800;
-        font-size: 12px;
-        letter-spacing: .02em;
-        text-transform: uppercase;
-        flex: 0 0 auto;
-        max-width: 45%;
-      }
+  .leaderboard-table td:last-child{border-bottom:none}
 
-      /* Make player name pop */
-      .leaderboard-table td.player-cell b {
-        font-size: 16px;
-      }
+  /* Label on the left, value on the right */
+  .leaderboard-table td::before{
+    content:attr(data-label);
+    color:var(--muted);
+    font-weight:800;
+    font-size:12px;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    flex:0 0 auto;
+    max-width:45%;
+  }
 
-      /* Rank gets a subtle highlight row */
-      .leaderboard-table td.rank-cell {
-        background: rgba(58,160,255,.08);
-      }
+  /* Make the value side actually shrink (fixes “outside border”) */
+  .leaderboard-table td > *{
+    min-width:0;
+    max-width:55%;
+  }
 
-      /* Weeks Won should wrap nicely */
-      .leaderboard-table td.weeks-cell {
-        align-items: flex-start;
-      }
-      .leaderboard-table td.weeks-cell > span {
-        text-align: right;
-        word-break: break-word;
-      }
-    }
+  /* Player names: keep readable without pushing width */
+  .leaderboard-table td.player-cell b{
+    font-size:16px;
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
 
-    @media (max-width: 420px) {
-      .leaderboard-table tr { margin: 8px 10px; }
-      .leaderboard-table td { padding: 9px 10px; }
-    }
+  /* Rank highlight */
+  .leaderboard-table td.rank-cell{
+    background:rgba(58,160,255,.08);
+  }
 
-    @media (max-width: 640px){
-      th, td{
-        padding:8px 8px;
-        font-size:13px;
-      }
-    }
+  /* Weeks Won: wrap safely instead of forcing width */
+  .leaderboard-table td.weeks-cell{
+    align-items:flex-start;
+  }
+  .leaderboard-table td.weeks-cell > span{
+    text-align:right;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+    max-width:55%;
+  }
+}
+
+@media (max-width: 420px){
+  .leaderboard-table tr{margin:8px 8px}
+  .leaderboard-table td{padding:9px 10px}
+}
+
+@media (max-width: 640px){
+  th, td{
+    padding:8px 8px;
+    font-size:13px;
+  }
+}
   </style>
 </head>
 
