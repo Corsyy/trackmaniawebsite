@@ -7,16 +7,15 @@ const WEEKS_DIR = path.join(BASE_DIR, "weeks");
 
 const WEEKS_INDEX_PATH = path.join(BASE_DIR, "weeks.json");
 const AGG_PATH = path.join(BASE_DIR, "aggregate.json");
+const CHANGELOG_PATH = path.join(BASE_DIR, "changelog.json");
 const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
 
 const DEBUG = String(process.env.DEBUG || "0") === "1";
 const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
 
-
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 const CORE_REFRESH_URL =
   "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
-
 
 const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -340,6 +339,13 @@ async function fetchWsTop(access, mapUid, length = 10) {
     .sort((a, b) => a.rank - b.rank);
 }
 
+// Fetch *current* WR only (top 1) for changelog checks
+async function fetchCurrentWR(access, mapUid) {
+  const rows = await fetchWsTop(access, mapUid, 1);
+  return rows[0] || null;
+}
+
+// Weekly points leaderboard: score is in `sp` on this endpoint
 async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   if (!leaderboardGroupUid) return [];
 
@@ -350,29 +356,24 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   const j = await jget(url, access);
   const arr = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
 
- const rows = arr
-  .map((x) => {
-    const accountId = x?.accountId;
+  const rows = arr
+    .map((x) => {
+      const accountId = x?.accountId;
+      const raw = x?.sp ?? x?.score;
+      let score = extractNumber(raw);
+      if (!Number.isFinite(score)) score = 0;
+      if (!accountId) return null;
+      return { accountId, score };
+    })
+    .filter(Boolean);
 
- 
-    const raw = x?.sp ?? x?.score;
+  rows.sort((a, b) => b.score - a.score);
 
-    let score = extractNumber(raw);
-    if (!Number.isFinite(score)) score = 0;
-
-    if (!accountId) return null;
-    return { accountId, score };
-  })
-  .filter(Boolean);
-
-
-rows.sort((a, b) => b.score - a.score);
-
-return rows.map((r, idx) => ({
-  rank: idx + 1,
-  accountId: r.accountId,
-  score: r.score,
-}));
+  return rows.map((r, idx) => ({
+    rank: idx + 1,
+    accountId: r.accountId,
+    score: r.score,
+  }));
 }
 
 function buildAggregate(allWeekJson) {
@@ -380,7 +381,6 @@ function buildAggregate(allWeekJson) {
 
   for (const w of allWeekJson) {
     const weekNum = Number(w.week);
-
 
     const points = Array.isArray(w.entries) ? w.entries : [];
     const winner = points.find((p) => Number(p.rank) === 1);
@@ -448,6 +448,39 @@ function buildAggregate(allWeekJson) {
   return { generatedAt: isoNow(), players };
 }
 
+// ---------- CHANGELOG (post-week WR improvements) ----------
+
+function loadChangelog() {
+  const existing = readJson(CHANGELOG_PATH, { generatedAt: isoNow(), items: [] });
+  if (!existing || typeof existing !== "object") return { generatedAt: isoNow(), items: [] };
+  if (!Array.isArray(existing.items)) existing.items = [];
+  return existing;
+}
+
+function changelogKey(item) {
+  // Unique enough to prevent duplicates across runs
+  return `${item.week}|${item.mapUid}|${item.newTimeMs}|${item.newHolder}`;
+}
+
+function appendChangelogItem(changelog, item) {
+  const keys = new Set(changelog.items.map(changelogKey));
+  const key = changelogKey(item);
+  if (keys.has(key)) return false;
+  changelog.items.unshift(item); // newest first
+  return true;
+}
+
+function getBaselineWRFromWeekFile(weekJson, mapUid) {
+  const m = (weekJson.maps || []).find((x) => x.mapUid === mapUid);
+  if (!m) return null;
+  const wr = (m.entries || []).find((e) => Number(e.rank) === 1);
+  if (!wr) return null;
+  return {
+    holder: wr.player,
+    timeMs: wr.timeMs,
+  };
+}
+
 async function main() {
   ensureDir(WEEKS_DIR);
 
@@ -456,68 +489,146 @@ async function main() {
   const weeksIndex = buildWeeksIndexFromWeeklyShortsFeed(weeksRaw);
 
   const nameCacheObj = readJson(NAME_CACHE_PATH, {});
+  const changelog = loadChangelog();
   const allWeekJson = [];
 
+  const nowMs = Date.now();
+
   for (const w of weeksIndex.weeks || []) {
-    const maps = [];
+    const weekPath = path.join(WEEKS_DIR, `${w.week}.json`);
+    const endedMs = Date.parse(w.endedAt);
+    const isEnded = Number.isFinite(endedMs) && nowMs > endedMs;
 
-    for (const mapUid of w.mapUids || []) {
-      const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
-      await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
+    let weekJson = null;
 
-      const entries = rows.map((r) => ({
-        rank: r.rank,
-        player: nameCacheObj[r.accountId] || r.accountId,
-        timeMs: r.timeMs,
-      }));
-
-      maps.push({ mapUid, mapName: null, entries });
-      await sleep(SLEEP_MS);
+    // Freeze ended weeks: if week file already exists and week ended, DO NOT overwrite.
+    if (isEnded && fs.existsSync(weekPath)) {
+      weekJson = readJson(weekPath, null);
     }
 
-    const pointsRows = await fetchWsWeekPointsTop(access, w.leaderboardGroupUid, POINTS_TOP_LENGTH);
-    await resolveDisplayNames(nameCacheObj, pointsRows.map((r) => r.accountId));
+    // If no frozen file yet (or week not ended), we generate / overwrite.
+    if (!weekJson) {
+      const maps = [];
 
-    const pointsEntries = pointsRows.map((r) => {
-      const player = nameCacheObj[r.accountId] || r.accountId;
-      const n = Number.isFinite(r.score) ? r.score : 0;
-      return {
-        rank: r.rank,
-        player,
+      for (const mapUid of w.mapUids || []) {
+        const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
+        await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
 
-        score: n,
-        points: n,
-        value: n,
-        total: n,
+        const entries = rows.map((r) => ({
+          rank: r.rank,
+          player: nameCacheObj[r.accountId] || r.accountId,
+          timeMs: r.timeMs,
+        }));
 
-        scoreText: String(n),
+        maps.push({ mapUid, mapName: null, entries });
+        await sleep(SLEEP_MS);
+      }
+
+      const pointsRows = await fetchWsWeekPointsTop(access, w.leaderboardGroupUid, POINTS_TOP_LENGTH);
+      await resolveDisplayNames(nameCacheObj, pointsRows.map((r) => r.accountId));
+
+      const pointsEntries = pointsRows.map((r) => {
+        const player = nameCacheObj[r.accountId] || r.accountId;
+        const n = Number.isFinite(r.score) ? r.score : 0;
+        return {
+          rank: r.rank,
+          player,
+          score: n,
+          points: n,
+          value: n,
+          total: n,
+          scoreText: String(n),
+        };
+      });
+
+      weekJson = {
+        week: w.week,
+        year: w.year,
+        wsWeek: w.wsWeek,
+        weekStart: w.weekStart,
+        endedAt: w.endedAt,
+        entries: pointsEntries,
+        maps,
+        mapUids: w.mapUids || [],
+        leaderboardGroupUid: w.leaderboardGroupUid || null,
       };
-    });
 
-    const weekJson = {
-      week: w.week,
-      year: w.year,
-      wsWeek: w.wsWeek,
-      weekStart: w.weekStart,
-      endedAt: w.endedAt,
+      writeJson(weekPath, weekJson);
+    }
 
-      entries: pointsEntries,
-
-      maps,
-      mapUids: w.mapUids || [],
-      leaderboardGroupUid: w.leaderboardGroupUid || null,
-    };
-
+    // Always include the weekJson (frozen or generated) for aggregate
     allWeekJson.push(weekJson);
-    writeJson(path.join(WEEKS_DIR, `${w.week}.json`), weekJson);
+
+    // --------- Post-week WR changelog (ended weeks only) ----------
+    if (isEnded) {
+      // baseline is the frozen week file's WRs
+      for (let i = 0; i < (w.mapUids || []).length; i++) {
+        const mapUid = w.mapUids[i];
+        const mapIndex = i + 1; // 1-based ("3rd map")
+
+        const baseline = getBaselineWRFromWeekFile(weekJson, mapUid);
+        if (!baseline || !isValidTimeMs(baseline.timeMs) || !baseline.holder) continue;
+
+        const current = await fetchCurrentWR(access, mapUid);
+        if (!current) continue;
+
+        await resolveDisplayNames(nameCacheObj, [current.accountId]);
+        const currentHolder = nameCacheObj[current.accountId] || current.accountId;
+        const currentTimeMs = current.timeMs;
+
+        // Post-week improvement: strictly better time than baseline snapshot
+        if (isValidTimeMs(currentTimeMs) && currentTimeMs < baseline.timeMs) {
+          const item = {
+            ts: isoNow(),
+            week: Number(w.week),
+            mapIndex,
+            mapUid,
+            newHolder: currentHolder,
+            oldHolder: baseline.holder,
+            newTimeMs: currentTimeMs,
+            oldTimeMs: baseline.timeMs,
+            deltaMs: baseline.timeMs - currentTimeMs,
+
+            // Prebuilt sentence your UI can display immediately
+            text: `${currentHolder} has overtaken the world record for the ${mapIndex}${ordinalSuffix(
+              mapIndex
+            )} map of Week ${w.week}, previously held by ${baseline.holder}.`,
+          };
+
+          const added = appendChangelogItem(changelog, item);
+          if (added) dlog("changelog +", item.text);
+        }
+
+        await sleep(SLEEP_MS);
+      }
+    }
   }
 
   writeJson(WEEKS_INDEX_PATH, weeksIndex);
   writeJson(AGG_PATH, buildAggregate(allWeekJson));
   writeJson(NAME_CACHE_PATH, nameCacheObj);
 
+  changelog.generatedAt = isoNow();
+  writeJson(CHANGELOG_PATH, changelog);
+
   console.log("[DONE] Weekly Shorts updated.");
   console.log("Weeks:", allWeekJson.length);
+  console.log("Changelog items:", (changelog.items || []).length);
+}
+
+function ordinalSuffix(n) {
+  const v = n % 100;
+  if (v >= 11 && v <= 13) return "th";
+  switch (n % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
 }
 
 main().catch((e) => {
