@@ -329,10 +329,13 @@ async function fetchWsTop(access, mapUid, length = 10) {
 
   return topArr
     .map((x, idx) => {
-      const rank = Number(x.position ?? (idx + 1));
-      const accountId = x.accountId;
-      const timeMs = extractNumber(x.score);
-      if (!accountId || !isValidTimeMs(timeMs)) return null;
+      const rank = Number(x?.position ?? (idx + 1));
+      const accountId = x?.accountId;
+      if (!accountId) return null;
+
+      const extracted = extractNumber(x?.score);
+      const timeMs = isValidTimeMs(extracted) ? extracted : null;
+
       return { rank, accountId, timeMs };
     })
     .filter(Boolean)
