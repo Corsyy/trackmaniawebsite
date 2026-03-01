@@ -1,4 +1,4 @@
-name: Update Data (TOTD + Weekly Shorts)
+name: Update Data (TOTD)
 
 on:
   workflow_dispatch:
@@ -73,15 +73,6 @@ jobs:
           echo ""
           cat data/totd/months.json || true
 
-      - name: Run Weekly Shorts updater
-        continue-on-error: true
-        run: |
-          echo "Running Weekly Shorts updater..."
-          node -v
-          node scripts/weekly-shorts-update.js
-          echo ""
-          ls -R data/weekly-shorts || true
-
       - name: Commit updates
         shell: bash
         run: |
@@ -95,7 +86,6 @@ jobs:
 
           # Stage outputs (avoid ** glob surprises by staging folder)
           git add totd.json data/totd/*.json data/totd/months.json 2>/dev/null || true
-          git add data/weekly-shorts 2>/dev/null || true
 
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh TOTD + Weekly Shorts [skip ci]"
