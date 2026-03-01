@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Weekly Shorts Stats — Trackmania 2020</title>
-  <meta name="description" content="Trackmania 2020 Weekly Shorts campaign stats: wins, WRs, top 5s, per-week leaderboards, and WR improvement changelog." />
+  <meta name="description" content="Trackmania 2020 Weekly Shorts campaign stats: wins, WRs, top 5, per-week leaderboards, and WR improvement changelog." />
 
   <style>
     :root{
@@ -79,7 +79,6 @@
       color:var(--muted);
       margin-right:8px;
     }
-    .highlight{outline:2px solid rgba(58,160,255,.35);outline-offset:-2px}
 
     /* Pagination UI */
     .pager{
@@ -99,33 +98,84 @@
       cursor:not-allowed;
     }
 
-    /* ================= MOBILE TABLE FIX ================= */
-    .table-scroll{
-      width:100%;
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-    }
-    .table-scroll table{
-      min-width:820px; /* prevents crushing on small phones */
-    }
-    .table-scroll th,
-    .table-scroll td{
-      white-space:nowrap;
-    }
-    /* Allow Weeks Won to wrap normally */
-    .weeks-col{
-      white-space:normal !important;
-      min-width:220px;
-    }
-    /* Stop uppercase forcing "5S" look */
-    th.no-upcase{
-      text-transform:none !important;
-    }
-
     @media (max-width: 980px){
       .cards{grid-template-columns:1fr}
       .row2{grid-template-columns:1fr}
       .topbar{flex-direction:column;align-items:flex-start}
+    }
+
+    /* ===================== RESPONSIVE TABLE (NO SCROLL) ===================== */
+    /* On ~720p devices and smaller: turn rows into clean “cards” */
+    @media (max-width: 900px) {
+      .leaderboard-table thead { display: none; }
+
+      .leaderboard-table,
+      .leaderboard-table tbody,
+      .leaderboard-table tr,
+      .leaderboard-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .leaderboard-table tr {
+        margin: 10px 12px;
+        border: 1px solid rgba(109,251,255,.18);
+        background: rgba(10,15,26,.18);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0,0,0,.25);
+      }
+
+      .leaderboard-table td {
+        border: none;
+        border-bottom: 1px solid rgba(109,251,255,.10);
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        white-space: normal;
+      }
+
+      .leaderboard-table td:last-child {
+        border-bottom: none;
+      }
+
+      /* Label on the left, value on the right */
+      .leaderboard-table td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-weight: 800;
+        font-size: 12px;
+        letter-spacing: .02em;
+        text-transform: uppercase;
+        flex: 0 0 auto;
+        max-width: 45%;
+      }
+
+      /* Make player name pop */
+      .leaderboard-table td.player-cell b {
+        font-size: 16px;
+      }
+
+      /* Rank gets a subtle highlight row */
+      .leaderboard-table td.rank-cell {
+        background: rgba(58,160,255,.08);
+      }
+
+      /* Weeks Won should wrap nicely */
+      .leaderboard-table td.weeks-cell {
+        align-items: flex-start;
+      }
+      .leaderboard-table td.weeks-cell > span {
+        text-align: right;
+        word-break: break-word;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .leaderboard-table tr { margin: 8px 10px; }
+      .leaderboard-table td { padding: 9px 10px; }
     }
 
     @media (max-width: 640px){
@@ -143,7 +193,7 @@
       <div>
         <h1>Weekly Shorts — Campaign Stats</h1>
         <p class="sub">
-          Trackmania 2020 Weekly Shorts overview: who has the most <b>wins</b>, <b>WRs</b>, and <b>Top 5s</b>.
+          Trackmania 2020 Weekly Shorts overview: who has the most <b>wins</b>, <b>WRs</b>, and <b>Top 5</b>.
           Search players, review per-week leaderboards, and see post-week WR improvements in the changelog.
         </p>
       </div>
@@ -169,7 +219,7 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-h"><div class="t">Most Top 5s</div><div class="muted mini"></div></div>
+        <div class="card-h"><div class="t">Most Top 5</div><div class="muted mini"></div></div>
         <div class="card-b">
           <div class="big" id="kpiTop5Name">—</div>
           <div class="kpi" id="kpiTop5Val">—</div>
@@ -188,7 +238,7 @@
             <select id="sortBy">
               <option value="wins">Wins</option>
               <option value="wrs">WRs</option>
-              <option value="top5">Top 5s</option>
+              <option value="top5">Top 5</option>
               <option value="name">Name</option>
             </select>
             <input id="playerSearch" type="text" placeholder="Search player..." />
@@ -197,23 +247,20 @@
         </div>
 
         <div class="card-b" style="padding:0">
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:54px">#</th>
-                  <th>Player</th>
-                  <th class="right">Wins</th>
-                  <th class="right">WRs</th>
-                  <th class="right no-upcase">Top 5s</th>
-                  <th class="right weeks-col">Weeks Won</th>
-                </tr>
-              </thead>
-              <tbody id="overallBody"></tbody>
-            </table>
-          </div>
+          <table class="leaderboard-table overall-table">
+            <thead>
+              <tr>
+                <th style="width:54px">#</th>
+                <th>Player</th>
+                <th class="right">Wins</th>
+                <th class="right">WRs</th>
+                <th class="right">Top 5</th>
+                <th class="right">Weeks Won</th>
+              </tr>
+            </thead>
+            <tbody id="overallBody"></tbody>
+          </table>
 
-          <!-- Pagination controls -->
           <div class="pager">
             <button id="prevPage">← Prev</button>
             <div class="mini muted" id="pageInfo">Page 1 / 1</div>
@@ -243,18 +290,16 @@
           <div class="muted mini" id="weekEnded">—</div>
         </div>
         <div class="card-b" style="padding:0">
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:54px">#</th>
-                  <th>Player</th>
-                  <th class="right">Score</th>
-                </tr>
-              </thead>
-              <tbody id="weekBody"></tbody>
-            </table>
-          </div>
+          <table class="leaderboard-table week-table">
+            <thead>
+              <tr>
+                <th style="width:54px">#</th>
+                <th>Player</th>
+                <th class="right">Score</th>
+              </tr>
+            </thead>
+            <tbody id="weekBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -273,10 +318,6 @@
   </div>
 
   <script>
-    // Adjust to match your existing data hosting pattern.
-    // If you host JSON under /public/data/... then this is correct.
-    const API_BASE = ""; // same-origin (GitHub Pages)
-
     const PATHS = {
       weeksIndex: `/data/weekly-shorts/weeks.json`,
       aggregate:  `/data/weekly-shorts/aggregate.json`,
@@ -342,7 +383,7 @@
       $("kpiWrsVal").textContent = r ? `${r.wrs} WRs` : "—";
 
       $("kpiTop5Name").textContent = t ? t.player : "—";
-      $("kpiTop5Val").textContent = t ? `${t.top5} Top 5s` : "—";
+      $("kpiTop5Val").textContent = t ? `${t.top5} Top 5` : "—";
     }
 
     function sortPlayers(players, sortBy){
@@ -354,7 +395,6 @@
       return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
     }
 
-    /* ---------------- Pagination state ---------------- */
     let overallPage = 1;
 
     function getOverallList(players, sortBy, searchTerm){
@@ -369,7 +409,6 @@
       body.innerHTML = "";
 
       const list = getOverallList(players, sortBy, searchTerm);
-
       const pageSize = Math.max(1, Number($("pageSize")?.value || 50));
       const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
 
@@ -393,12 +432,12 @@
         const tr = document.createElement("tr");
         tr.dataset.player = (p.player||"").toLowerCase();
         tr.innerHTML = `
-          <td class="muted">${start + i + 1}</td>
-          <td><b>${p.player || "—"}</b></td>
-          <td class="right">${p.wins ?? 0}</td>
-          <td class="right">${p.wrs ?? 0}</td>
-          <td class="right">${p.top5 ?? 0}</td>
-          <td class="right weeks-col">${weeksWon || "—"}</td>
+          <td class="muted rank-cell" data-label="#">${start + i + 1}</td>
+          <td class="player-cell" data-label="Player"><b>${p.player || "—"}</b></td>
+          <td class="right" data-label="Wins">${p.wins ?? 0}</td>
+          <td class="right" data-label="WRs">${p.wrs ?? 0}</td>
+          <td class="right" data-label="Top 5">${p.top5 ?? 0}</td>
+          <td class="right weeks-cell" data-label="Weeks Won"><span>${weeksWon || "—"}</span></td>
         `;
         body.appendChild(tr);
       });
@@ -417,15 +456,9 @@
       return sorted.length ? sorted[0].week : null;
     }
 
-    // EXPECTED weekJson shape now:
-    // {
-    //   week, weekStart, endedAt,
-    //   entries: [{ rank, player, score }, ...]
-    // }
     function renderWeekTable(weekJson){
       const endedMs = Date.parse(weekJson?.endedAt || "");
       const isCurrent = Number.isFinite(endedMs) ? Date.now() < endedMs : false;
-
       $("weekEnded").textContent = `${isCurrent ? "Ends" : "Ended"}: ${fmtIso(weekJson.endedAt)}`;
 
       const body = $("weekBody");
@@ -442,9 +475,9 @@
         const badge = isWinner ? `<span class="tag">WIN</span>` : "";
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td class="muted">${e.rank ?? "—"}</td>
-          <td>${badge}<b>${e.player || "—"}</b></td>
-          <td class="right">${fmtScore(e.score)}</td>
+          <td class="muted rank-cell" data-label="#">${e.rank ?? "—"}</td>
+          <td class="player-cell" data-label="Player">${badge}<b>${e.player || "—"}</b></td>
+          <td class="right" data-label="Score">${fmtScore(e.score)}</td>
         `;
         body.appendChild(tr);
       });
@@ -456,22 +489,35 @@
         el.innerHTML = `<div class="muted">No post-week WR improvements detected yet.</div>`;
         return;
       }
-      const sorted = [...items].sort((a,b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+
+      // supports either:
+      // 1) { text, ts, week, mapIndex, ... }  (new)
+      // 2) { type:"WR_IMPROVED_AFTER_WEEK", at, playerNew, playerPrev, ... } (older)
+      const sorted = [...items].sort((a,b) => {
+        const ta = Date.parse(a.ts || a.at || "") || 0;
+        const tb = Date.parse(b.ts || b.at || "") || 0;
+        return tb - ta;
+      });
+
       el.innerHTML = "";
       for (const it of sorted){
-        if (it.type === "WR_IMPROVED_AFTER_WEEK"){
-          const msg = `<b>${it.playerNew}</b> improved <b>Week ${it.week}</b> WR (previously held by <b>${it.playerPrev}</b>)
-                      — <b>${fmtTime(it.timeNewMs)}</b> (prev ${fmtTime(it.timePrevMs)})`;
-          const div = document.createElement("div");
-          div.className = "logitem";
-          div.innerHTML = `<div class="mini muted">${fmtIso(it.at)}</div><div>${msg}</div>`;
-          el.appendChild(div);
+        const when = it.ts || it.at || "";
+        const div = document.createElement("div");
+        div.className = "logitem";
+
+        if (it.text) {
+          div.innerHTML = `<div class="mini muted">${fmtIso(when)}</div><div>${it.text}</div>`;
+        } else if (it.type === "WR_IMPROVED_AFTER_WEEK") {
+          const msg =
+            `<b>${it.playerNew}</b> improved <b>Week ${it.week}</b> WR ` +
+            `(previously held by <b>${it.playerPrev}</b>) — ` +
+            `<b>${fmtTime(it.timeNewMs)}</b> (prev ${fmtTime(it.timePrevMs)})`;
+          div.innerHTML = `<div class="mini muted">${fmtIso(when)}</div><div>${msg}</div>`;
         } else {
-          const div = document.createElement("div");
-          div.className = "logitem";
-          div.innerHTML = `<div class="mini muted">${fmtIso(it.at)}</div><div class="muted">Unknown changelog item.</div>`;
-          el.appendChild(div);
+          div.innerHTML = `<div class="mini muted">${fmtIso(when)}</div><div class="muted">Unknown changelog item.</div>`;
         }
+
+        el.appendChild(div);
       }
     }
 
