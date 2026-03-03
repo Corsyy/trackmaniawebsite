@@ -21,8 +21,9 @@ jobs:
       PUBLIC_DIR: .
       DEBUG: "0"
 
-      # Nadeo Live refresh token
-      REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
+      # Ubisoft login (used to mint NadeoLiveServices token each run)
+      UBI_EMAIL: ${{ secrets.UBI_EMAIL }}
+      UBI_PASSWORD: ${{ secrets.UBI_PASSWORD }}
 
       # Trackmania OAuth (display names)
       CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
