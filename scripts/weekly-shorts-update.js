@@ -14,13 +14,13 @@ const DEBUG = String(process.env.DEBUG || "0") === "1";
 const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
 
 const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
-const CORE_REFRESH_URL =
-  "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh";
 
 const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-const REFRESH_TOKEN = cleanToken(process.env.REFRESH_TOKEN || "");
+// NEW: Ubisoft credentials (GitHub Secrets)
+const UBI_EMAIL = String(process.env.UBI_EMAIL || "").trim();
+const UBI_PASSWORD = String(process.env.UBI_PASSWORD || "").trim();
 
 const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
 
@@ -31,14 +31,6 @@ const SLEEP_MS = Number(process.env.WS_SLEEP_MS || 70);
 
 function isoNow() {
   return new Date().toISOString();
-}
-
-function cleanToken(s) {
-  if (!s) return "";
-  let t = String(s).trim();
-  if (t.toLowerCase().startsWith("nadeo_v1 t=")) t = t.slice("nadeo_v1 t=".length).trim();
-  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) t = t.slice(1, -1);
-  return t;
 }
 
 function sleep(ms) {
@@ -110,33 +102,87 @@ async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
   throw lastErr || new Error(`fetch failed for ${url}`);
 }
 
+// ---------- LIVE SERVICES AUTH (Ubisoft login each run) ----------
+
 let cachedLive = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
   const now = Date.now();
   if (cachedLive.token && now < cachedLive.expAt - 30_000) return cachedLive.token;
 
-  if (!REFRESH_TOKEN) throw new Error("Missing REFRESH_TOKEN env (Nadeo refresh token).");
+  if (!UBI_EMAIL || !UBI_PASSWORD) {
+    throw new Error("Missing UBI_EMAIL / UBI_PASSWORD env (Ubisoft login).");
+  }
 
-  const r = await fetchRetry(CORE_REFRESH_URL, {
+  // 1) Ubisoft ticket
+  const basic = Buffer.from(`${UBI_EMAIL}:${UBI_PASSWORD}`, "utf8").toString("base64");
+  const ticketRes = await fetchRetry("https://public-ubiservices.ubi.com/v3/profiles/sessions", {
     method: "POST",
     headers: {
-      Authorization: `nadeo_v1 t=${REFRESH_TOKEN}`,
+      Authorization: `Basic ${basic}`,
+      "Ubi-AppId": "86263886-327a-4328-ac69-527f0d20a237",
       "Content-Type": "application/json",
       "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
     },
     body: "{}",
   });
 
-  if (!r.ok) {
-    const body = await r.text().catch(() => "");
-    throw new Error(`refresh failed ${r.status} ${body || "(no body)"}`);
+  if (!ticketRes.ok) {
+    const body = await ticketRes.text().catch(() => "");
+    throw new Error(`ubisoft ticket failed ${ticketRes.status} ${body || "(no body)"}`);
   }
 
-  const j = await r.json();
-  const accessToken = j.accessToken || j.access_token;
-  const expiresIn = j.expiresIn || j.expires_in || 3600;
-  if (!accessToken) throw new Error("no accessToken in refresh response");
+  const ticketJson = await ticketRes.json();
+  const ticket = ticketJson?.ticket;
+  if (!ticket) throw new Error("No ticket in Ubisoft response");
+
+  // 2) Nadeo ubiservices token (core)
+  const ubiServicesRes = await fetchRetry(
+    "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `ubi_v1 t=${ticket}`,
+        "Content-Type": "application/json",
+        "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
+      },
+      body: "{}",
+    }
+  );
+
+  if (!ubiServicesRes.ok) {
+    const body = await ubiServicesRes.text().catch(() => "");
+    throw new Error(`ubiservices token failed ${ubiServicesRes.status} ${body || "(no body)"}`);
+  }
+
+  const ubiServicesJson = await ubiServicesRes.json();
+  const lvl1Access = ubiServicesJson?.accessToken || ubiServicesJson?.access_token;
+  if (!lvl1Access) throw new Error("No accessToken from ubiservices");
+
+  // 3) Nadeo nadeoservices token for Live Services audience
+  const liveRes = await fetchRetry(
+    "https://prod.trackmania.core.nadeo.online/v2/authentication/token/nadeoservices",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `nadeo_v1 t=${lvl1Access}`,
+        "Content-Type": "application/json",
+        "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
+      },
+      body: JSON.stringify({ audience: "NadeoLiveServices" }),
+    }
+  );
+
+  if (!liveRes.ok) {
+    const body = await liveRes.text().catch(() => "");
+    throw new Error(`nadeoservices token failed ${liveRes.status} ${body || "(no body)"}`);
+  }
+
+  const liveJson = await liveRes.json();
+  const accessToken = liveJson?.accessToken || liveJson?.access_token;
+  const expiresIn = Number(liveJson?.expiresIn || liveJson?.expires_in || 3600);
+
+  if (!accessToken) throw new Error("No NadeoLiveServices accessToken");
 
   cachedLive = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
   return cachedLive.token;
@@ -153,6 +199,8 @@ async function jget(url, access) {
   if (!r.ok) throw new Error(`${url} -> ${r.status}`);
   return r.json();
 }
+
+// ---------- Trackmania OAuth (display names) ----------
 
 let cachedOAuth = { token: null, expAt: 0 };
 
@@ -228,6 +276,8 @@ async function resolveDisplayNames(nameCacheObj, ids) {
 
   return nameCacheObj;
 }
+
+// ---------- Weekly Shorts discovery ----------
 
 async function fetchWeeklyShortsCampaignWeeks(access) {
   const out = [];
@@ -319,6 +369,8 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
   };
 }
 
+// ---------- Leaderboards ----------
+
 async function fetchWsTop(access, mapUid, length = 10) {
   const url =
     `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
@@ -385,6 +437,8 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
     score: r.score,
   }));
 }
+
+// ---------- Aggregate ----------
 
 function buildAggregate(allWeekJson) {
   const by = new Map();
