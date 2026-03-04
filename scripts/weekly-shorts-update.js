@@ -18,7 +18,7 @@ const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-// NEW: Ubisoft credentials (GitHub Secrets)
+// Ubisoft credentials (GitHub Secrets)
 const UBI_EMAIL = String(process.env.UBI_EMAIL || "").trim();
 const UBI_PASSWORD = String(process.env.UBI_PASSWORD || "").trim();
 
@@ -28,6 +28,21 @@ const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
 const MAP_TOP_LENGTH = Number(process.env.WS_MAP_TOP_LENGTH || 10);
 const POINTS_TOP_LENGTH = Number(process.env.WS_POINTS_TOP_LENGTH || 25);
 const SLEEP_MS = Number(process.env.WS_SLEEP_MS || 70);
+
+const WR_BUG_OVERRIDES = {
+  "54xEJ7qhTQpgsigg_l3xU35xZ5j": {
+    ignorePlayers: ["awi.uwu"],
+    ignoreTimeMs: [11480],
+  },
+};
+
+// If true, we will refuse to count WR when the map leaderboard looks broken.
+const STRICT_TRUST_CHECKS = true;
+
+// Heuristic: if rank1 is *absurdly* faster than rank2, treat it as bugged.
+// (Won’t trigger for normal close times like 11480 vs 11869.)
+const BUGGED_RATIO_THRESHOLD = 0.5; // rank1 < rank2 * 0.5
+const BUGGED_ABSOLUTE_FLOOR_MS = 2500; // below this is almost certainly impossible in WS context
 
 function isoNow() {
   return new Date().toISOString();
@@ -381,33 +396,27 @@ async function fetchWsTop(access, mapUid, length = 10) {
 
   return topArr
     .map((x) => {
-      // Some endpoints use "position", others "rank"
       const rankRaw = x?.position ?? x?.rank ?? x?.place ?? null;
       const rank = Number(rankRaw);
 
-      // Account id can sometimes be under other keys
       const accountId = x?.accountId ?? x?.account_id ?? x?.playerId ?? null;
       if (!accountId) return null;
 
       const extracted = extractNumber(x?.score);
       const timeMs = isValidTimeMs(extracted) ? extracted : null;
 
-      // If rank is missing, don't invent it from array index
       if (!Number.isFinite(rank) || rank <= 0) return null;
-
       return { rank, accountId, timeMs };
     })
     .filter(Boolean)
     .sort((a, b) => a.rank - b.rank);
 }
 
-// Fetch *current* WR only (top 1) for changelog checks
 async function fetchCurrentWR(access, mapUid) {
   const rows = await fetchWsTop(access, mapUid, 1);
   return rows[0] || null;
 }
 
-// Weekly points leaderboard: score is in `sp` on this endpoint
 async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   if (!leaderboardGroupUid) return [];
 
@@ -436,6 +445,64 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
     accountId: r.accountId,
     score: r.score,
   }));
+}
+
+/**
+ * Clean map entries:
+ * - Removes known-bugged entries (by mapUid override list)
+ * - Optionally removes clearly bugged WR (heuristic)
+ * - Returns { entriesClean, trusted, dropped }
+ */
+function cleanMapEntries(mapUid, entriesIn) {
+  const entries = Array.isArray(entriesIn) ? entriesIn.slice() : [];
+  entries.sort((a, b) => Number(a.rank) - Number(b.rank));
+
+  const dropped = [];
+
+  // 1) Known overrides
+  const ov = WR_BUG_OVERRIDES[mapUid];
+  let cleaned = entries.filter((e) => {
+    const player = String(e?.player || "");
+    const timeMs = e?.timeMs;
+
+    const hitPlayer = ov?.ignorePlayers?.includes(player) || false;
+    const hitTime = ov?.ignoreTimeMs?.includes(timeMs) || false;
+
+    const hit = Boolean(hitPlayer || hitTime);
+    if (hit) dropped.push({ reason: "override", entry: e });
+    return !hit;
+  });
+
+  cleaned.sort((a, b) => Number(a.rank) - Number(b.rank));
+
+  // 2) Heuristic: if the best visible time is absurdly low vs #2, drop it
+  const rank1 = cleaned.find((e) => Number(e.rank) === 1) || cleaned[0] || null;
+  const rank2 = cleaned.find((e) => Number(e.rank) === 2) || cleaned[1] || null;
+
+  if (
+    rank1 &&
+    rank2 &&
+    isValidTimeMs(rank1.timeMs) &&
+    isValidTimeMs(rank2.timeMs) &&
+    (rank1.timeMs < BUGGED_ABSOLUTE_FLOOR_MS || rank1.timeMs < rank2.timeMs * BUGGED_RATIO_THRESHOLD)
+  ) {
+    dropped.push({ reason: "heuristic_bugged_wr", entry: rank1 });
+    cleaned = cleaned.filter((e) => e !== rank1);
+    cleaned.sort((a, b) => Number(a.rank) - Number(b.rank));
+  }
+
+  // 3) Trust check: leaderboard should include ranks 1 and 2 (unless "secret" rows)
+  let trusted = true;
+  if (STRICT_TRUST_CHECKS) {
+    const ranks = new Set(cleaned.map((e) => Number(e.rank)));
+    const has1 = ranks.has(1);
+    const has2 = ranks.has(2);
+    // If we don't have rank 1, it's still potentially OK if the first entry has rank 1 after cleaning,
+    // but in practice, missing 1 is a sign the feed is broken.
+    trusted = has1 && has2;
+  }
+
+  return { entriesClean: cleaned, trusted, dropped };
 }
 
 // ---------- Aggregate ----------
@@ -467,10 +534,13 @@ function buildAggregate(allWeekJson) {
 
     for (const m of w.maps || []) {
       const mapUid = m.mapUid;
-      for (const e of m.entries || []) {
-        const player = e.player;
-        if (!player) continue;
+      const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
 
+      // Define "WR" as best valid entry after cleaning. If untrusted, do not count.
+      const best = entriesClean[0] || null;
+
+      if (trusted && best?.player) {
+        const player = best.player;
         const rec =
           by.get(player) || {
             player,
@@ -482,16 +552,32 @@ function buildAggregate(allWeekJson) {
             top5Weeks: [],
           };
 
-        if (Number(e.rank) === 1) {
-          rec.wrs += 1;
-          rec.wrWeeks.push({ week: weekNum, mapUid, timeMs: e.timeMs });
-        }
-        if (Number(e.rank) <= 5) {
-          rec.top5 += 1;
-          rec.top5Weeks.push({ week: weekNum, mapUid, rank: e.rank, timeMs: e.timeMs });
-        }
-
+        rec.wrs += 1;
+        rec.wrWeeks.push({ week: weekNum, mapUid, timeMs: best.timeMs, rawRank: best.rank });
         by.set(player, rec);
+      }
+
+      // Top5: use top 5 entries *after cleaning*, but only if trusted
+      if (trusted) {
+        for (let i = 0; i < Math.min(5, entriesClean.length); i++) {
+          const e = entriesClean[i];
+          if (!e?.player) continue;
+
+          const rec =
+            by.get(e.player) || {
+              player: e.player,
+              wins: 0,
+              wrs: 0,
+              top5: 0,
+              weeksWon: [],
+              wrWeeks: [],
+              top5Weeks: [],
+            };
+
+          rec.top5 += 1;
+          rec.top5Weeks.push({ week: weekNum, mapUid, rank: i + 1, timeMs: e.timeMs, rawRank: e.rank });
+          by.set(e.player, rec);
+        }
       }
     }
   }
@@ -522,7 +608,6 @@ function loadChangelog() {
 }
 
 function changelogKey(item) {
-  // Unique enough to prevent duplicates across runs
   return `${item.week}|${item.mapUid}|${item.newTimeMs}|${item.newHolder}`;
 }
 
@@ -530,18 +615,23 @@ function appendChangelogItem(changelog, item) {
   const keys = new Set(changelog.items.map(changelogKey));
   const key = changelogKey(item);
   if (keys.has(key)) return false;
-  changelog.items.unshift(item); // newest first
+  changelog.items.unshift(item);
   return true;
 }
 
 function getBaselineWRFromWeekFile(weekJson, mapUid) {
   const m = (weekJson.maps || []).find((x) => x.mapUid === mapUid);
   if (!m) return null;
-  const wr = (m.entries || []).find((e) => Number(e.rank) === 1);
-  if (!wr) return null;
+
+  // baseline WR = best valid from snapshot after cleaning (trusted only)
+  const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
+  if (!trusted) return null;
+  const best = entriesClean[0] || null;
+  if (!best) return null;
+
   return {
-    holder: wr.player,
-    timeMs: wr.timeMs,
+    holder: best.player,
+    timeMs: best.timeMs,
   };
 }
 
@@ -570,7 +660,6 @@ async function main() {
       weekJson = readJson(weekPath, null);
     }
 
-    // If no frozen file yet (or week not ended), we generate / overwrite.
     if (!weekJson) {
       const maps = [];
 
@@ -578,13 +667,25 @@ async function main() {
         const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
         await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
 
-        const entries = rows.map((r) => ({
+        // Raw entries
+        let entries = rows.map((r) => ({
           rank: r.rank,
           player: nameCacheObj[r.accountId] || r.accountId,
           timeMs: r.timeMs,
         }));
 
-        maps.push({ mapUid, mapName: null, entries });
+        // Clean bugged entries for this map (write cleaned list into week json)
+        const cleaned = cleanMapEntries(mapUid, entries);
+        entries = cleaned.entriesClean;
+
+        maps.push({
+          mapUid,
+          mapName: null,
+          trusted: cleaned.trusted,
+          entries,
+          dropped: DEBUG ? cleaned.dropped : undefined,
+        });
+
         await sleep(SLEEP_MS);
       }
 
@@ -620,15 +721,13 @@ async function main() {
       writeJson(weekPath, weekJson);
     }
 
-    // Always include the weekJson (frozen or generated) for aggregate
     allWeekJson.push(weekJson);
 
     // --------- Post-week WR changelog (ended weeks only) ----------
     if (isEnded) {
-      // baseline is the frozen week file's WRs
       for (let i = 0; i < (w.mapUids || []).length; i++) {
         const mapUid = w.mapUids[i];
-        const mapIndex = i + 1; // 1-based ("3rd map")
+        const mapIndex = i + 1;
 
         const baseline = getBaselineWRFromWeekFile(weekJson, mapUid);
         if (!baseline || !isValidTimeMs(baseline.timeMs) || !baseline.holder) continue;
@@ -640,7 +739,6 @@ async function main() {
         const currentHolder = nameCacheObj[current.accountId] || current.accountId;
         const currentTimeMs = current.timeMs;
 
-        // Post-week improvement: strictly better time than baseline snapshot
         if (isValidTimeMs(currentTimeMs) && currentTimeMs < baseline.timeMs) {
           const item = {
             ts: isoNow(),
@@ -652,8 +750,6 @@ async function main() {
             newTimeMs: currentTimeMs,
             oldTimeMs: baseline.timeMs,
             deltaMs: baseline.timeMs - currentTimeMs,
-
-            // Prebuilt sentence your UI can display immediately
             text: `${currentHolder} has overtaken the world record for the ${mapIndex}${ordinalSuffix(
               mapIndex
             )} map of Week ${w.week}, previously held by ${baseline.holder}.`,
