@@ -447,19 +447,15 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   }));
 }
 
-/**
- * Clean map entries:
- * - Removes known-bugged entries (by mapUid override list)
- * - Optionally removes clearly bugged WR (heuristic)
- * - Returns { entriesClean, trusted, dropped }
- */
+{ entriesClean, trusted, dropped }
+
 function cleanMapEntries(mapUid, entriesIn) {
   const entries = Array.isArray(entriesIn) ? entriesIn.slice() : [];
   entries.sort((a, b) => Number(a.rank) - Number(b.rank));
 
   const dropped = [];
 
-  // 1) Known overrides
+  // 1) Known overrides (remove known-bugged entries)
   const ov = WR_BUG_OVERRIDES[mapUid];
   let cleaned = entries.filter((e) => {
     const player = String(e?.player || "");
@@ -484,25 +480,31 @@ function cleanMapEntries(mapUid, entriesIn) {
     rank2 &&
     isValidTimeMs(rank1.timeMs) &&
     isValidTimeMs(rank2.timeMs) &&
-    (rank1.timeMs < BUGGED_ABSOLUTE_FLOOR_MS || rank1.timeMs < rank2.timeMs * BUGGED_RATIO_THRESHOLD)
+    (rank1.timeMs < BUGGED_ABSOLUTE_FLOOR_MS ||
+      rank1.timeMs < rank2.timeMs * BUGGED_RATIO_THRESHOLD)
   ) {
     dropped.push({ reason: "heuristic_bugged_wr", entry: rank1 });
     cleaned = cleaned.filter((e) => e !== rank1);
     cleaned.sort((a, b) => Number(a.rank) - Number(b.rank));
   }
 
-  // 3) Trust check: leaderboard should include ranks 1 and 2 (unless "secret" rows)
+  // 3) Trust check
   let trusted = true;
   if (STRICT_TRUST_CHECKS) {
     const ranks = new Set(cleaned.map((e) => Number(e.rank)));
-    const has1 = ranks.has(1);
-    const has2 = ranks.has(2);
-    // If we don't have rank 1, it's still potentially OK if the first entry has rank 1 after cleaning,
-    // but in practice, missing 1 is a sign the feed is broken.
-    trusted = has1 && has2;
+    trusted = ranks.has(1) && ranks.has(2);
   }
 
-  return { entriesClean: cleaned, trusted, dropped };
+  // 4) Re-rank after cleaning so the rightful "best valid" becomes rank 1,
+  // while preserving original leaderboard rank in rawRank.
+  const reRanked = cleaned.map((e, idx) => ({
+    rank: idx + 1,
+    rawRank: e.rank, // original rank from Nadeo before cleaning
+    player: e.player,
+    timeMs: e.timeMs,
+  }));
+
+  return { entriesClean: reRanked, trusted, dropped };
 }
 
 // ---------- Aggregate ----------
@@ -674,17 +676,24 @@ async function main() {
           timeMs: r.timeMs,
         }));
 
-        // Clean bugged entries for this map (write cleaned list into week json)
         const cleaned = cleanMapEntries(mapUid, entries);
-        entries = cleaned.entriesClean;
 
-        maps.push({
-          mapUid,
-          mapName: null,
-          trusted: cleaned.trusted,
-          entries,
-          dropped: DEBUG ? cleaned.dropped : undefined,
-        });
+// Re-rank after cleaning so "best valid" becomes rank 1,
+// but preserve original leaderboard rank in rawRank.
+const reRanked = cleaned.entriesClean.map((e, idx) => ({
+  rank: idx + 1,
+  rawRank: e.rank,
+  player: e.player,
+  timeMs: e.timeMs,
+}));
+
+maps.push({
+  mapUid,
+  mapName: null,
+  trusted: cleaned.trusted,
+  entries: reRanked,
+  dropped: DEBUG ? cleaned.dropped : undefined,
+});
 
         await sleep(SLEEP_MS);
       }
