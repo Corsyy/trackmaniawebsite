@@ -447,7 +447,7 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
   }));
 }
 
-{ entriesClean, trusted, dropped }
+return { entriesClean, trusted, dropped }
 
 function cleanMapEntries(mapUid, entriesIn) {
   const entries = Array.isArray(entriesIn) ? entriesIn.slice() : [];
