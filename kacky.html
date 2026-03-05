@@ -3,661 +3,2104 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kacky Finishes — Trackmania Events</title>
-  <meta name="description" content="Upload and view Trackmania Kacky finish clips. Community submissions, moderated for quality." />
-  <meta name="referrer" content="no-referrer" />
-  <link rel="icon" type="image/png" href="/logo.png">
+  <title>Trackmania Events — Official Site</title>
+  <meta name="description" content="Live Trackmania events, schedule, and stream hub. Watch live on Twitch, see upcoming events, and get in touch." />
+  <meta name="theme-color" content="#0a0f1a" />
+  <meta property="og:title" content="Trackmania Events — Official Site" />
+  <meta property="og:description" content="Live Trackmania events, schedule, and stream hub." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://trackmaniaevents.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script id="event-jsonld" type="application/ld+json">{}</script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="shortcut icon" href="/logo.png">
-<style>
+  <style>
   :root{
-    --bg:#0a0f1a; --text:#e6ecff; --muted:#9bb0ff;
-    --accent:#3aa0ff; --accent-2:#6dfbff;
-    --border:rgba(109,251,255,.22);
-    --accent-glow:0 0 24px rgba(61,165,255,.35),0 0 48px rgba(61,165,255,.2)
+    --bg:#0a0f1a;
+    --panel:#0f1524;
+    --panel-2:#0c1020;
+    --text:#e6ecff;
+    --muted:#9bb0ff;
+    --accent:#3aa0ff;
+    --accent-2:#6dfbff;
+    --ok:#29d98f;
+    --warn:#ffb02e;
+    --ring:0 0 0 3px rgba(61,165,255,.25);
+    --accent-glow:0 0 24px rgba(61,165,255,.35), 0 0 48px rgba(61,165,255,.2);
+    --heroCardH: 420px;
   }
+
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0;
-    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+  html{scroll-behavior:smooth}
+
+  /* THEME BACKGROUND */
+  body.bg-track-curves {
     background:
       radial-gradient(1200px 600px at 20% -10%, rgba(58,160,255,.10), transparent 60%),
       radial-gradient(900px 500px at 110% 10%, rgba(109,251,255,.08), transparent 70%),
       linear-gradient(180deg,#07101c,#0a0f1a 40%,#060a14 100%);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
+
+  body.bg-track-curves::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.6;
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%236DAFFF' stop-opacity='.10'/><stop offset='100%' stop-color='%233AE0FF' stop-opacity='.06'/></linearGradient><filter id='blur'><feGaussianBlur stdDeviation='1.4'/></filter></defs><g fill='none' stroke='url(%23g)' stroke-width='2' filter='url(%23blur)'><path d='M-100 700 C300 620 450 480 900 520 C1100 540 1300 620 1400 680'/><path d='M-120 520 C260 460 520 390 940 420 C1180 440 1320 520 1420 600' stroke-width='1.5'/><path d='M-140 350 C220 330 520 300 900 330 C1180 350 1360 420 1500 520' stroke-width='1'/></g></svg>");
+    background-size: cover;
+    background-repeat: no-repeat;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  body.bg-track-curves::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==");
+    opacity: 0.09;
+    background-size: 120px 120px;
+  }
+
+  a{color:inherit;text-decoration:none}
+  .container{width:min(1200px,92vw);margin:0 auto}
+
+  /* NAV */
   header{
-    background:linear-gradient(180deg, rgba(10,15,26,.92), rgba(10,15,26,.72) 60%, rgba(10,15,26,0));
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(180deg, rgba(10,15,26,.9), rgba(10,15,26,.65) 60%, rgba(10,15,26,0));
     backdrop-filter:blur(8px);
-    position:sticky;
-    top:0;
-    z-index:50;
-    border-bottom:1px solid rgba(109,251,255,.18);
+    border-bottom:1px solid rgba(109,251,255,.12)
   }
-  .nav{
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+  .brand{display:flex;align-items:center;gap:.6rem;font-weight:800;letter-spacing:.2px}
+  .brand-badge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow);animation:pulseAccent 2.5s infinite ease-in-out;transition:transform .4s ease}
+  .brand-badge:hover{transform:rotate(360deg)}
+  .brand span:last-child{opacity:.95}
+  .navlinks{display:flex;gap:1.25rem}
+  .nav a{opacity:.85}
+  .nav a:hover,.nav a:focus{opacity:1}
+  .nav a.active{opacity:1;position:relative}
+  .nav a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:2px}
+  .cta{display:flex;gap:.6rem}
+  .btn{padding:.6rem .95rem;border:1px solid rgba(109,251,255,.25);border-radius:12px;background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));color:var(--text);font-weight:700;transition:transform .2s ease, box-shadow .2s ease, filter .2s ease}
+  .btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#001220;box-shadow:var(--accent-glow);animation:pulseAccent 3s infinite ease-in-out}
+  .btn:focus{outline:none;box-shadow:var(--ring)}
+  .btn:hover{transform:translateY(-1px) scale(1.02);filter:brightness(1.06)}
+
+  /* HERO */
+  .hero{
+    position:relative;
+    padding:clamp(2rem,5vw,4rem) 0 2.5rem;
+    border-radius:16px;
+    overflow:visible;
+    isolation:isolate;
+    mask-image:radial-gradient(white,black);
+    -webkit-mask-image:-webkit-radial-gradient(white,black);
+    background-clip:padding-box;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 60% 80%,rgba(61,165,255,.2),transparent 70%);
+    mix-blend-mode:screen;
+    opacity:.25;
+    pointer-events:none;
+    border-radius:inherit;
+  }
+  .hero-grid{display:block}
+  .hero-top{display:flex;flex-direction:column;gap:1rem}
+  .hero-row{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:start;margin-top:1rem}
+  .hero-row>div:first-child{margin-top:0}
+
+  .chip{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .65rem;border-radius:999px;font-size:.8rem;color:#001220;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--accent-glow);animation:pulseAccent 3s infinite ease-in-out}
+  #hero-chip,#live-chip{display:inline-block;width:auto;max-width:fit-content;padding:.4rem .9rem;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#001220;font-weight:800;box-shadow:var(--accent-glow)}
+  .h1{font-size:clamp(2.1rem,3.8vw,3rem);line-height:1.1;margin:.8rem 0 0;font-weight:900;letter-spacing:.4px;text-shadow:0 0 12px rgba(61,165,255,.25)}
+  .lead{color:var(--muted);max-width:60ch;margin-top:.85rem}
+  .keyfacts{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.2rem 0}
+  .pill{padding:.5rem .75rem;border-radius:999px;border:1px solid rgba(109,251,255,.25);background:linear-gradient(180deg,rgba(12,16,32,.7),rgba(12,16,32,.45))}
+  .hero .countdown{
+    position:static;
+    z-index:auto;
+    pointer-events:auto;
+    margin-top:0;
+  }
+
+  /* GLASS CARDS */
+  .card{
+    border:1px solid rgba(109,251,255,.25);
+    background:rgba(15,21,36,.5);
+    backdrop-filter:blur(12px) saturate(180%);
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 20px rgba(61,165,255,.2)
+  }
+  .card-header{padding:1rem 1rem .6rem;border-bottom:1px dashed rgba(109,251,255,.2)}
+  .card-body{padding:1rem}
+
+  #live .card{
+    min-height: var(--heroCardH);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  /* --- MINI CALENDAR TOOLTIP FIX --- */
+  #miniCalendar {
+    position: relative;
+    overflow: visible !important;
+  }
+
+  #cal-tooltip {
+    position: absolute;
+    display: none;
+    padding: 12px 16px;
+    background: rgba(15,21,36,0.95);
+    border: 1px solid rgba(109,251,255,0.25);
+    border-radius: 12px;
+    max-width: 260px;
+    color: var(--text);
+    font-size: 0.85rem;
+    line-height: 1.3;
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+  }
+
+  .cal-popup-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+
+  .cal-popup-date {
+    opacity: .85;
+    margin-bottom: 4px;
+  }
+
+  .cal-popup-desc {
+    opacity: .75;
+  }
+
+  .cal-popup-spacer {
+    height: 10px;
+  }
+
+  /* Make countdown card behave like the event cards, but let it grow naturally */
+  #countdown-card{
+    position: relative;
+    border-radius: 18px;
+    display:flex;
+    flex-direction:column;
+    background-image:
+      linear-gradient(
+        180deg,
+        rgba(15,21,36,.88) 0%,
+        rgba(15,21,36,.82) 40%,
+        rgba(15,21,36,.94) 100%
+      ),
+      var(--cd-img, none);
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-clip: padding-box;
+  }
+
+  #countdown-card::after{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:inherit;
+    background:linear-gradient(
+      180deg,
+      rgba(8,12,22,.45) 0%,
+      rgba(8,12,22,.55) 55%,
+      rgba(8,12,22,.72) 100%
+    );
+    z-index:0;
+    pointer-events:none;
+  }
+
+  #countdown-card > *{
+    position: relative;
+    z-index:1;
+  }
+
+  #countdown-card .card-header{
+    background: linear-gradient(180deg, rgba(10,15,26,.55), rgba(10,15,26,.25));
+    border-bottom: 1px dashed rgba(109,251,255,.20);
+  }
+
+  #countdown-card .card-body{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  #countdown{
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: .75rem;
+    align-items: stretch;
+    justify-content: center;
+    margin-top: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .timebox{
+    padding: .9rem .5rem;
+    min-height: 72px;
+    border-radius: 12px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(16,24,44,.85), rgba(16,24,44,.55));
+    border: 1px solid rgba(109,251,255,.18);
+  }
+  .timebox strong{ display:block; font-size: clamp(1.5rem, 2.6vw, 2rem); }
+  .timebox span{ font-size: .85rem; color: var(--muted); }
+
+  #live .card-body {
+    flex: 1;
+    display: grid;
+    padding: 0;
+  }
+  #live .player {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+    border-radius: 0 0 18px 18px;
+    overflow: hidden;
+  }
+
+  /* CALENDAR POPUP */
+  .cal-popup {
+    position: absolute;
+    min-width: 220px;
+    max-width: 260px;
+    background: rgba(15, 21, 36, 0.97);
+    border: 1px solid rgba(109,251,255,0.30);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    box-shadow: 0 0 20px rgba(61,165,255,.35);
+    backdrop-filter: blur(10px);
+    display: none;
+    animation: calPopFade 0.18s ease-out;
+  }
+
+  @keyframes calPopFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .calendar-container {
+    margin-top: 1.2rem;
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    background: rgba(16,24,44,0.90);
+    border: 1px solid rgba(109,251,255,0.28);
+    box-shadow: 0 0 18px rgba(61,165,255,0.18);
+    position:relative;
+    z-index: 2;
+    overflow: visible !important;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    color: var(--text);
+  }
+
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: .6rem;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .cal-header button {
+    background: rgba(16,24,44,0.7);
+    border: 1px solid rgba(109,251,255,0.22);
+    color: var(--accent-2);
+    padding: .25rem .6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .9rem;
+    transition: .15s ease;
+  }
+
+  .cal-header button:hover {
+    background: rgba(16,24,44,0.9);
+    transform: scale(1.05);
+  }
+
+  #cal-grid {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    overflow: visible !important;
+  }
+
+  #cal-grid th {
+    color: var(--muted);
+    padding-bottom: .4rem;
+    font-size: .8rem;
+    overflow: visible !important;
+  }
+
+  #cal-grid td {
+    padding: .35rem 0;
+    border-radius: 8px;
+    transition: .15s ease;
+    overflow: visible !important;
+  }
+
+  .cal-event-day {
+    position: relative;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .cal-event-day div:first-child {
+    padding: 3px 6px;
+    border: 2px solid #00ff73;
+    border-radius: 6px;
+    box-shadow: 0 0 8px #00ff73a0;
+    display: inline-block;
+  }
+
+  #cal-grid td.today {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #001220;
+    font-weight: 800;
+    box-shadow: var(--accent-glow);
+  }
+  /* SECTIONS */
+  .section{padding:3rem 0}
+  .title{font-size:1.8rem;font-weight:900;margin:0 0 1rem;display:inline-block;position:relative}
+  .title::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:100%;background:linear-gradient(90deg, var(--accent), var(--accent-2));animation:lineSwipe 3s linear infinite}
+
+  /* EVENTS GRID + CARDS */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+  .event{
+    position:relative;
+    padding:1rem;
+    padding-top:3.25rem;
+    border-radius:18px;
+    overflow:hidden;
+    background:linear-gradient(180deg, rgba(20,28,46,.8), rgba(20,28,46,.5));
+    border:1px solid rgba(109,251,255,.18);
+    transition:transform .25s ease, box-shadow .25s ease, filter .25s ease
+  }
+  .event h4{
+    margin:.35rem 0 .25rem;
+    letter-spacing:.2px;
+    color:#fff;
+    text-shadow:0 2px 8px rgba(0,0,0,.7), 0 0 4px rgba(61,165,255,.25);
+  }
+  .event .meta{
+    color:#d5deff;
+    font-size:.9rem;
+    text-shadow:0 1px 5px rgba(0,0,0,.6), 0 0 3px rgba(61,165,255,.2);
+  }
+  .event .tag{
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:5;
+    font-size:.7rem;
+    padding:.25rem .5rem;
+    border-radius:999px;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#001220;
+    animation:pulseAccent 3s infinite ease-in-out
+  }
+  .event::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:radial-gradient(400px circle at var(--x,-100px) var(--y,-100px), rgba(61,165,255,.14), transparent 40%);
+    opacity:0;
+    transition:opacity .25s ease;
+    z-index:1
+  }
+  .event:hover::before{opacity:1}
+  .event>.meta:first-of-type{padding-right:120px}
+
+  .event.with-bg{
+    background-image:
+      linear-gradient(180deg,rgba(15,21,36,.72),rgba(15,21,36,.45)),
+      var(--event-img);
+    background-size:contain,cover;
+    background-position:center,center;
+    background-repeat:no-repeat,no-repeat;
+    overflow:hidden;
+    background-clip:padding-box,padding-box;
+    min-height:180px;
+    border-radius:16px
+  }
+  .event.with-bg:hover{
+    background-image:
+      linear-gradient(180deg, rgba(15,21,36,.64), rgba(15,21,36,.40)),
+      var(--event-img);
+    background-size:contain;
+    background-position:center;
+    background-repeat:no-repeat;
+  }
+  .event.with-bg::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    background:linear-gradient(180deg, rgba(8,12,22,.45) 0%, rgba(8,12,22,.55) 55%, rgba(8,12,22,.72) 100%);
+    z-index:0;
+    pointer-events:none;
+  }
+  .event.with-bg > :not(.tag){position:relative; z-index:2;}
+
+  .event-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+  .event-link:hover .event,
+  .event-link:focus-visible .event {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(61,165,255,.35);
+  }
+  .event-link:focus-visible {
+    outline: none;
+  }
+  .event-link:focus-visible .event {
+    box-shadow: 0 0 0 3px rgba(61,165,255,.35), 0 10px 30px rgba(0,0,0,.45);
+  }
+
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+  .shot{overflow:hidden;border-radius:18px;border:1px solid rgba(109,251,255,.16);background:linear-gradient(180deg, rgba(12,16,32,.7), rgba(12,16,32,.45))}
+  .shot .media{aspect-ratio:4/3;display:grid;place-items:center;color:var(--muted)}
+  .shot .text{padding:1rem}
+
+  footer{border-top:1px solid rgba(109,251,255,.12);padding:1.5rem 0;font-size:.95rem;color:var(--muted)}
+
+  .tm-stripes{display:none !important}
+
+  .reveal{opacity:0;transform:translateY(30px) scale(.98);transition:opacity .8s ease, transform .8s ease}
+  .reveal.show{opacity:1;transform:none}
+
+  #toTop {
+    position: fixed;
+    bottom: 26px;
+    right: 26px;
+    width: 65px;
+    height: 55px;
+    border-radius: 12px;
+    background: rgba(15, 21, 36, 0.55);
+    backdrop-filter: blur(10px) saturate(160%);
+    border: 1px solid rgba(109, 251, 255, 0.25);
+    box-shadow: 0 0 18px rgba(61, 165, 255, 0.35);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #6dfbff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.1;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 50;
+  }
+
+  #toTop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #toTop:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 25px rgba(61, 165, 255, 0.75);
+    filter: brightness(1.15);
+  }
+
+  #toTop::before {
+    content: "↑";
+    display: block;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: #6dfbff;
+    margin-bottom: 2px;
+    text-shadow: 0 0 8px rgba(61,165,255,0.4);
+  }
+
+  #toTop span {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-shadow: 0 0 6px rgba(61,165,255,0.4);
+  }
+
+  /* FORMS */
+  .form .field{display:flex;flex-direction:column;gap:.35rem}
+  .form .twocol{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+  .input,.textarea{width:100%;padding:.7rem .85rem;border-radius:12px;border:1px solid rgba(109,251,255,.22);background:#0c1224;color:var(--text)}
+  .input::placeholder,.textarea::placeholder{color:rgba(155,176,255,.8)}
+  .help{font-size:.85rem;color:var(--muted)}
+
+  @keyframes pulseAccent{0%,100%{box-shadow:0 0 8px rgba(61,165,255,.5)}50%{box-shadow:0 0 20px rgba(61,165,255,.9)}}
+  @keyframes lineSwipe{0%{opacity:0;transform:scaleX(0)}10%,90%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(0)}}
+
+  /* MOBILE */
+  .nav-toggle{display:none}
+  @media (max-width:960px){
+    .grid{grid-template-columns:1fr 1fr}
+    .cards{grid-template-columns:1fr 1fr}
+    .hero-row{grid-template-columns:1fr}
+  }
+  @media (max-width:640px){
+    .nav-toggle{display:block;border:1px solid rgba(109,251,255,.25);background:linear-gradient(180deg, rgba(16,24,44,.9), rgba(16,24,44,.6));color:var(--text);border-radius:10px;padding:.4rem .6rem}
+    .navlinks{display:none;position:absolute;top:58px;left:0;right:0;padding:.75rem;background:linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));backdrop-filter:blur(8px);border-bottom:1px solid rgba(109,251,255,.12);flex-direction:column;gap:.6rem}
+    .navlinks.show{display:flex}
+    .grid,.cards{grid-template-columns:1fr}
+    .event{padding-top:3.6rem}
+    #countdown{
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
+  }
+
+  @media (max-width: 640px){
+    :root { --heroCardH: 400px; }
+    #countdown-card{
+      background-size: 100% 100%, auto 65%;
+      background-position: center, center 70%;
+      background-image:
+        linear-gradient(180deg, rgba(10,15,26,.82), rgba(10,15,26,.60)),
+        var(--cd-img, none);
+    }
+  }
+
+  #schedule{--section-img:none !important}
+  #schedule::before{background:none !important}
+
+  #tmeChatBtn{
+    position:fixed;
+    right:22px;
+    bottom:96px;
+    z-index:999999;
+    width:58px;height:58px;
+    border-radius:16px;
+    border:1px solid rgba(109,251,255,.25);
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    box-shadow:var(--accent-glow);
+    color:#001220;
+    font-weight:900;
+    cursor:pointer;
+    display:grid;
+    place-items:center;
+    user-select:none;
+  }
+  #tmeChatBtn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  #tmeChatBtn:active{transform:translateY(0)}
+
+  #tmeChatPanel{
+    position:fixed;
+    right:22px;
+    bottom:166px;
+    z-index:999999;
+    width:min(420px, calc(100vw - 44px));
+    height:min(640px, 85vh);
+    border-radius:18px;
+    border:1px solid rgba(109,251,255,.25);
+    background:rgba(15,21,36,.92);
+    backdrop-filter: blur(12px) saturate(180%);
+    box-shadow:0 10px 30px rgba(0,0,0,.5), 0 0 24px rgba(61,165,255,.25);
+    overflow:hidden;
+    display:none;
+  }
+
+  #tmeChatHeader{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:1rem;
-    padding:.9rem 0;
+    padding:.8rem .9rem;
+    border-bottom:1px dashed rgba(109,251,255,.2);
+    background:linear-gradient(180deg, rgba(10,15,26,.65), rgba(10,15,26,.25));
   }
-  .navlinks { display:flex; gap:1.25rem; }
-  .navlinks a{ color:var(--muted); text-decoration:none; white-space:nowrap; font-weight:500; opacity:.85; transition:color .2s, opacity .2s; }
-  .navlinks a:hover{ opacity:1; color:var(--accent-2); }
-  .navlinks a.active{ opacity:1; color:var(--accent-2); position:relative; }
-  .navlinks a.active::after{ content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); border-radius:2px; }
-  .cta{ display:flex; gap:.6rem; }
-  .nav-toggle{
-    display:none;
+  #tmeChatHeader strong{font-weight:900;letter-spacing:.2px}
+  #tmeChatClose{
+    border:1px solid rgba(109,251,255,.2);
+    background:rgba(16,24,44,.65);
+    color:var(--text);
+    border-radius:10px;
+    padding:.35rem .6rem;
+    cursor:pointer;
+  }
+
+  #tmeChatLog{
+    height:calc(min(640px, 85vh) - 54px - 64px);
+    padding:.85rem;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:.55rem;
+  }
+  .tmeMsg{
+    max-width:85%;
+    padding:.6rem .7rem;
+    border-radius:14px;
+    border:1px solid rgba(109,251,255,.18);
+    background:rgba(16,24,44,.55);
+    color:var(--text);
+    line-height:1.25;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .tmeMsg.me{
+    margin-left:auto;
+    background:linear-gradient(135deg, rgba(58,160,255,.35), rgba(109,251,255,.22));
+    border-color:rgba(109,251,255,.25);
+  }
+  .tmeMeta{
+    font-size:.75rem;
+    color:rgba(155,176,255,.9);
+    margin-top:.25rem;
+  }
+
+  #tmeChatInputWrap{
+    height:64px;
+    padding:.7rem;
+    border-top:1px dashed rgba(109,251,255,.2);
+    display:flex;
+    gap:.6rem;
+    background:rgba(10,15,26,.45);
+  }
+  #tmeChatInput{
+    flex:1;
+    border-radius:12px;
+    border:1px solid rgba(109,251,255,.22);
+    background:#0c1224;
+    color:var(--text);
+    padding:.6rem .75rem;
+    outline:none;
+  }
+  #tmeChatSend{
+    border-radius:12px;
     border:1px solid rgba(109,251,255,.25);
-    background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
-    color:var(--text); border-radius:10px; padding:.4rem .6rem; cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#001220;
+    font-weight:900;
+    padding:.6rem .9rem;
+    cursor:pointer;
   }
-  @media (max-width: 640px) {
-    .cta {display:none !important;}
-    .nav-toggle {display:block !important;}
-    .nav-toggle { display:block; }
-    .navlinks {
-        display: none;
-        position: absolute;
-        top: 58px;
-        left: 0;
-        right: 0;
-        padding: .75rem;
-        background: linear-gradient(180deg, rgba(10,15,26,.98), rgba(10,15,26,.92));
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid rgba(109,251,255,.12);
-        flex-direction: column;
-        gap: .8rem;
-    }
-    .navlinks.show { display:flex !important;}
-  }
-  .brand{
-    font-weight:800; font-size:1.1rem; letter-spacing:.3px; display:flex; align-items:center; gap:.5rem; color:var(--accent-2)
-  }
-  .btn{
-    padding:.6rem .95rem; border:1px solid rgba(109,251,255,.25); border-radius:12px;
-    background:linear-gradient(180deg,rgba(16,24,44,.9),rgba(16,24,44,.6));
-    color:var(--text); font-weight:700; transition:.2s; text-decoration:none; cursor:pointer;
-  }
-  .btn:hover{ transform:translateY(-1px) scale(1.02); filter:brightness(1.06); }
-  .container{ width:min(1200px,92vw); margin:0 auto; padding:1.4rem 0 2.2rem; }
-  h1{ font-size:2rem; margin:.2rem 0 1rem; text-shadow:0 0 12px rgba(61,165,255,.25); }
-  .hint{ font-size:.95rem; color:var(--muted) }
-  .grid{
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-    gap:1rem; align-items:stretch;
-  }
-  .card{
-    background:rgba(15,21,36,.55); border:1px solid var(--border); border-radius:16px; padding:1rem;
-    display:flex; flex-direction:column; gap:.6rem; overflow:hidden;
-    backdrop-filter:blur(10px) saturate(160%);
-    box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(61,165,255,.18);
-    transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
-  }
-  .card:hover{ transform:translateY(-3px); box-shadow:0 0 18px rgba(61,165,255,.35); filter:brightness(1.03); }
-  .card .slot{ opacity:.85; font-size:.9rem; color:var(--muted); }
-  .card strong{ font-size:1rem }
-  .thumb-wrap{
-    position:relative; width:100%; margin:0; aspect-ratio:16/9; overflow:hidden;
-    background:linear-gradient(180deg, rgba(15,21,36,.9), rgba(15,21,36,.6));
-    border:none; border-radius:14px;
-  }
-  .thumb-wrap img{ display:block; width:100%; height:100%; object-fit:cover; object-position:center; border-radius:inherit; }
-  .thumb-center{
-    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    width:68px; height:68px; border-radius:999px; border:2px solid rgba(255,255,255,.25);
-    display:grid; place-items:center; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
-  }
-  .thumb-center::after{ content:"▶"; font-size:1.4rem; }
-  .play-badge{ display:none!important }
+  #tmeChatSend:hover{filter:brightness(1.08)}
 
-  .modal{
-    position:fixed; inset:0; background:rgba(0,0,0,.65); display:none;
-    align-items:center; justify-content:center; z-index:100; padding:1rem;
-  }
-  .modal.open{ display:flex }
-  .modal-card{
-    background:rgba(15,21,36,.85); border:1px solid rgba(109,251,255,.25); border-radius:16px;
-    box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 28px rgba(61,165,255,.25);
-    width:min(950px,94vw); max-height:90vh; overflow:auto; backdrop-filter:blur(12px) saturate(160%);
-  }
-  .modal-head{ display:flex; align-items:center; justify-content:space-between; padding:.9rem 1rem; border-bottom:1px dashed rgba(255,255,255,.12); }
-  .modal-body{ padding:1rem 1.25rem 1.3rem; }
-  .player-frame{ aspect-ratio:16/9; width:100%; border:0; border-radius:16px; background:#000; }
-  .title-line{ position:relative; display:inline-block }
-  .title-line::after{ content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); }
+  .tmeBubbleWrap{max-width: calc(100% - 44px);}
+  .tmeMsg{white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;}
+  #tmeChatLog .tmeMsgRow { display:flex; gap:10px; align-items:flex-end; margin:10px 0; }
+  #tmeChatLog .tmeMsgRow.me { justify-content:flex-end; }
 
-  /* form */
-  #submitForm{ display:flex; flex-direction:column; gap:.75rem; max-width:640px }
-  .row{ display:flex; gap:.75rem; margin-bottom:.25rem }
-  .row:last-child{ margin-bottom:0; margin-top:.25rem }
-  .input{
-    flex:1; width:100%; padding:.55rem .75rem; border-radius:10px;
-    border:1px solid rgba(109,251,255,.32); background:rgba(4,8,18,.95); color:var(--text); font-size:.9rem; outline:none;
-  }
-  .input::placeholder{ color:var(--muted); opacity:.85 }
-  .input:focus{ border-color:var(--accent-2); box-shadow:0 0 0 1px rgba(109,251,255,.55) }
-  #submitStatus{ font-size:.85rem }
+  #tmeChatLog .tmeBubbleWrap { max-width: calc(100% - 44px); min-width: 0; }
 
-  @media (max-width: 640px) {
-    .mobile-only { display: block !important; }
+  #tmeChatLog .tmeMsg {
+    display: inline-block;
+    max-width: 100%;
+    width: fit-content;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
   }
-  .mobile-only { display: none; }
 
-  @media (max-width:640px){ .row{ flex-direction:column } }
+  #tmeChatLog .tmeMsg.me,
+  #tmeChatLog .tmeMsg.them { min-width: 48px; }
+  #tmeChatLog .tmeMsgName{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+
+#tmeChatLog .tmeBadge{
+  display:inline-flex !important;
+  align-items:center !important;
+  font-size:10px !important;
+  font-weight:900 !important;
+  letter-spacing:.2px !important;
+  padding:2px 6px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(109,251,255,.22) !important;
+  background:rgba(16,26,48,.45) !important;
+  opacity:.95 !important;
+  line-height:1.2 !important;
+}
+
+#tmeChatLog .tmeBadge-ai{
+  border-color:rgba(109,251,255,.28) !important;
+  background:linear-gradient(135deg, rgba(58,160,255,.18), rgba(109,251,255,.12)) !important;
+}
 </style>
 </head>
-<body>
-  <header>
-    <div class="container nav">
-      <div class="brand">🏎️ Kacky Reloaded 6 finishes</div>
-      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-      <nav id="primary-nav" class="navlinks" aria-label="Primary">
 
-  <!-- Mobile-only extra links -->
-  <a href="/" class="mobile-only">Home</a>
-  <a href="https://kacky.gg/leaderboard" class="mobile-only" target="_blank" rel="noopener">Kacky Leaderboard</a>
+<body class="bg-track-curves">
+<header>
+  <div class="container nav">
+    <a class="brand" href="#" aria-label="Trackmania Events Home">
+      <span class="brand-badge" aria-hidden="true">🎮</span>
+      <span>Trackmania Events</span>
+    </a>
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="#home">Home</a>
+      <a href="/kacky">Kacky Finishes</a>
+      <a href="/wrleaderboard">WR Leaderboard</a>
+      <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+      <a href="/totd">Track of the Day</a>
+      <a href="/highlights">Community Highlights</a>
+    </nav>
+    <div class="cta">
+      <a class="btn" href="#contact">Contact</a>
+    </div>
+  </div>
+</header>
 
-  <!-- Normal site pages -->
-  <a href="/wrleaderboard">WR Leaderboard</a>
-  <a href="/totd">Track of the Day</a>
-  <a href="/highlights">Community Highlights</a>
-</nav>
+<section class="hero" id="home">
+  <div class="container hero-grid">
+    <div class="hero-top">
+      <span class="chip" id="hero-chip">Next Event</span>
+      <h1 class="h1">Live Trackmania events and community races</h1>
+      <p class="lead">Your central hub for upcoming events, live streams, and highlights.</p>
 
-      <div class="cta">
-        <a href="/" class="btn">Home</a>
-        <a href="https://kacky.gg/leaderboard" target="_blank" rel="noopener" class="btn">Kacky Leaderboard</a>
+      <div class="keyfacts" id="hero-pills">
+        <div class="pill">🗓️ TBA</div>
+        <div class="pill">📍 Online</div>
+        <div class="pill">🏁 Community races</div>
       </div>
     </div>
-  </header>
 
-  <script>
-(function() {
-  const btn = document.getElementById('navToggle');
-  const nav = document.getElementById('primary-nav');
-  if (!btn || !nav) return;
+    <div class="hero-row">
+      <div>
+        <div class="card" id="countdown-card" aria-live="polite">
+          <div class="card-header">
+            <strong id="countdown-title">Countdown to green light</strong>
+          </div>
+          <div class="card-body">
+            <div class="countdown" id="countdown">
+              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+            </div>
 
-  btn.addEventListener('click', () => {
-    const open = nav.classList.toggle('show');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-})();
-</script>
+            <div id="miniCalendar" class="calendar-container">
+              <div class="cal-header">
+                <button id="cal-prev" type="button">←</button>
+                <div id="cal-title"></div>
+                <button id="cal-next" type="button">→</button>
+              </div>
+              <table id="cal-grid"></table>
+            </div>
 
+          </div>
+        </div>
+      </div>
+
+      <div id="live" class="live">
+        <div class="card reveal">
+          <div class="card-header"><strong>Live on Twitch</strong></div>
+          <div class="card-body">
+            <div id="twitch-embed"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="live-events" class="section">
+  <div class="container">
+    <h2 class="title">Live Now</h2>
+    <div class="grid" id="live-events-grid"></div>
+  </div>
+</section>
+
+<section id="schedule" class="section">
+  <div class="container">
+    <h2 class="title">Main Events (click cards for discord invites for event info)</h2>
+    <div class="grid" id="main-events-grid">
+      <article class="event"><div class="meta">Loading schedule…</div></article>
+    </div>
+
+    <h3 class="title" style="margin-top:2rem;font-size:1.8rem">Fun / Weekly Events (click cards for discord invites for event info)</h3>
+    <div class="grid" id="weekly-events-grid">
+      <article class="event"><div class="meta">Loading schedule…</div></article>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="showcase" class="section">
+  <div class="container">
+    <h2 class="title">Highlights</h2>
+    <div class="cards">
+      <article class="shot reveal">
+        <div class="media">Clip / Screenshot</div>
+        <div class="text"><strong></strong><div class="meta">N/A</div></div>
+      </article>
+      <article class="shot reveal">
+        <div class="media">Clip / Screenshot</div>
+        <div class="text"><strong></strong><div class="meta">N/A</div></div>
+      </article>
+      <article class="shot reveal">
+        <div class="media">Clip / Screenshot</div>
+        <div class="text"><strong></strong><div class="meta">N/A</div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="section">
+  <div class="container">
+    <h2 class="title">About</h2>
+    <div class="card reveal">
+      <div class="card-body">
+        <p>Trackmania Events is a central hub for everything happening in the Trackmania community — bringing together live leaderboards, campaign world-records, Track of the Day archives, and player statistics in one clean interface. The goal is to give fans, players, and creators a single place to explore records, follow seasonal updates, and connect with ongoing competitive and creative events across Trackmania.</p>
+        <div class="keyfacts" style="margin-top:1rem">
+          <a class="btn" href="https://twitch.tv/C0rsy" target="_blank" rel="noreferrer">Follow on Twitch</a>
+          <a class="btn" href="#contact">Business / Collabs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="section">
+  <div class="container">
+    <h2 class="title">Contact</h2>
+    <div class="grid" style="grid-template-columns:2fr 1fr">
+      <form action="https://formspree.io/f/xjkazybj" method="POST" class="card form reveal" id="contact-form">
+        <div class="card-body">
+          <div class="twocol">
+            <div class="field">
+              <label for="name">Name</label>
+              <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
+            </div>
+          </div>
+          <div class="field" style="margin-top:.8rem">
+            <label for="message">Message</label>
+            <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?" required></textarea>
+          </div>
+          <div style="margin-top:1rem;display:flex;gap:.6rem;align-items:center">
+            <button class="btn primary" type="submit">Send</button>
+            <span id="formStatus" style="font-size:0.9rem;" aria-live="polite"></span>
+          </div>
+        </div>
+      </form>
+      <aside class="card reveal">
+        <div class="card-body">
+          <strong>Discord</strong>
+          <div class="meta"><a href="https://discord.gg/9bDcTTbTGJ" target="_blank" rel="noreferrer">You can join the discord server or fill out the contact form if you have any questions related to adding your events to the website!</a></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<button id="toTop" aria-label="Back to top"><span>Top</span></button>
+
+<footer>
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+    <div>© <span id="year"></span> Trackmania Events</div>
+    <div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a> • <a href="#contact">Contact</a></div>
+  </div>
+</footer>
+
+<button id="tmeChatBtn" aria-label="Open chat">💬</button>
+
+<div id="tmeChatPanel" role="dialog" aria-label="Trackmania Events Chat">
+  <div id="tmeChatHeader">
+    <div class="tmeHeadLeft">
+      <div class="tmeTitleRow">
+        <strong>Chat</strong>
+        <span id="tmeAgentPill" class="tmeAgentPill offline">0 agents online</span>
+      </div>
+      <div class="tmeSubRow">
+        <span id="tmeAgentSub" class="tmeMeta">Ask anything — AI can help instantly.</span>
+      </div>
+    </div>
+    <button id="tmeChatClose" type="button">Close</button>
+  </div>
+
+  <div id="tmeChatLog" aria-live="polite"></div>
+
+  <div id="tmeChatInputWrap">
+    <input id="tmeChatInput" type="text" placeholder="Type a message…" autocomplete="off" />
+    <button id="tmeChatSend" type="button">Send</button>
+  </div>
+</div>
 <script>
-(function () {
-  const current = location.pathname.replace(/\/+$/, "") || "/";
-  const nav = document.getElementById("primary-nav");
+  const TTV_CHANNEL = "C0rsy";
+  const d = document.getElementById("d");
+  const h = document.getElementById("h");
+  const m = document.getElementById("m");
+  const s = document.getElementById("s");
 
-  if (!nav) return;
+  // ---------- COUNTDOWN HELPERS ----------
+  const fmtDate = (iso) => {
+    const dt = new Date(iso);
+    return dt.toLocaleString(undefined, {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
 
-  function updateMobileNav() {
-    const isMobile = window.innerWidth <= 640;
+  function setCountdown(dd, hh, mm, ss) {
+    if (d) d.textContent = dd;
+    if (h) h.textContent = hh;
+    if (m) m.textContent = mm;
+    if (s) s.textContent = ss;
+  }
 
-    nav.querySelectorAll("a").forEach(a => {
-      const href = a.getAttribute("href").replace(/\/+$/, "") || "/";
+  function startCountdown(iso, titleEl) {
+    function tick() {
+      const now = new Date();
+      const then = new Date(iso);
+      let diff = then - now;
 
-      if (isMobile) {
-        if (href === current) {
-          a.style.display = "none";
-        } else {
-          a.style.display = "block";
-        }
-      } else {
-        a.style.display = "";
+      if (diff <= 0) {
+        setCountdown(0, 0, 0, 0);
+        if (titleEl) titleEl.textContent = "Live now!";
+        return;
       }
+
+      const days = Math.floor(diff / 86400000);
+      diff %= 86400000;
+      const hrs = Math.floor(diff / 3600000);
+      diff %= 3600000;
+      const mins = Math.floor(diff / 60000);
+      diff %= 60000;
+      const secs = Math.floor(diff / 1000);
+      setCountdown(days, hrs, mins, secs);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  // ---------- HOVER GLOW ON EVENT CARDS ----------
+  function attachHoverGlow() {
+    document.querySelectorAll(".event").forEach((e) => {
+      e.addEventListener("mousemove", (ev) => {
+        const r = e.getBoundingClientRect();
+        e.style.setProperty("--x", `${ev.clientX - r.left}px`);
+        e.style.setProperty("--y", `${ev.clientY - r.top}px`);
+      });
     });
   }
 
-  updateMobileNav();
-  window.addEventListener("resize", updateMobileNav);
-})();
-</script>
-
-
-  <div class="container">
-    <h1 class="title-line">Kacky Finishes</h1>
-    <p class="hint">Upload your kacky finishes, try to keep them in order when you are submitting finishes. If they are not in order it will be denied and you will have to reupload it once again.</p>
-
-    <!-- Live search toolbar -->
-    <div class="toolbar" style="display:flex;gap:.5rem;align-items:center;margin:.6rem 0 1rem">
-      <input id="search" class="input" type="search" placeholder="Search slot # or title…" autocomplete="off" style="max-width:360px">
-      <button id="searchClear" class="btn" type="button" aria-label="Clear">Clear</button>
-    </div>
-
-    <div id="clipsGrid" class="grid"></div>
-  </div>
-
-  <!-- Submit modal -->
-  <div class="modal" id="submit-modal" aria-hidden="true">
-    <div class="modal-card">
-      <div class="modal-head">
-        <strong>Submit Kacky Clip</strong>
-      </div>
-      <div class="modal-body">
-        <form id="submitForm">
-          <div class="row">
-            <input class="input" name="slot" id="slotField" type="number" min="376" max="450" placeholder="Slot # (376–450)" required />
-            <input class="input" name="title" placeholder="Title" required />
-          </div>
-
-          <!-- Either paste a URL OR choose an .mp4 file -->
-          <input class="input" name="url" id="urlField" placeholder="Twitch clip / YouTube / Streamable URL (or leave blank if you upload .mp4)" />
-          <div class="row">
-            <input class="input" type="file" id="fileField" accept="video/mp4" />
-          </div>
-
-          <div class="row">
-            <input class="input" name="map" placeholder="Map (optional)" />
-            <input class="input" name="thumb" placeholder="(optional) Override thumbnail URL" />
-          </div>
-          <input class="input" name="date" type="datetime-local" />
-
-          <div class="row" style="align-items:center">
-            <button class="btn" type="submit">Send</button>
-            <span id="submitStatus" class="hint"></span>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Player modal -->
-  <div class="modal" id="player-modal" aria-hidden="true">
-    <div class="modal-card" style="width:min(1280px,96vw)">
-      <div class="modal-head">
-        <strong>Player</strong>
-        <button class="btn" data-close-player>Close</button>
-      </div>
-      <div class="modal-body">
-        <iframe id="playerFrame" class="player-frame" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
-    </div>
-  </div>
-
-<script>
-  const KACKY_THUMB_BASE = "/kacky-thumbs/";
-  const KACKY_THUMB_EXT  = "jpg";
-
-  const SUPABASE_URL = "https://lertzsobphopkoyaxrwk.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
-  const H = { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } };
-
-  // ---- tiny helper
-  function normalizeUrl(raw){
-    if (!raw) return raw;
-    const has = /^[a-z]+:\/\//i.test(raw);
-    try { return new URL(has ? raw : `https://${raw}`).toString(); } catch { return has ? raw : `https://${raw}`; }
-  }
-  function escapeHtml(s){
-    return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+  // ---------- LINK NORMALIZER ----------
+  function normalizeHref(raw) {
+    if (!raw) return "";
+    const t = String(raw).trim();
+    if (!t) return "";
+    if (/^https?:\/\//i.test(t)) return t;
+    return `https://${t.replace(/^\/+/, "")}`;
   }
 
-  function twitchParents(){
-    const set = new Set(["trackmaniaevents.com","www.trackmaniaevents.com", location.hostname]);
-    return [...set].map(p=>`parent=${encodeURIComponent(p)}`).join('&');
-  }
-  function extractYouTubeId(uLike){
-    try{
-      const u = new URL(normalizeUrl(uLike)); const h=u.hostname.replace(/^www\./,''); const p=u.pathname; const q=u.searchParams;
-      if ((/^(youtube\.com|m\.youtube\.com|music\.youtube\.com)$/).test(h) && q.get('v')) return q.get('v');
-      if (h==='youtu.be'){const id=(p||'').slice(1).split('/')[0]; if(id) return id;}
-      const m = u.href.match(/(?:(?:v=|\/)([a-zA-Z0-9_-]{11}))(?:[&?/]|$)/) || p.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/) || p.match(/\/live\/([a-zA-Z0-9_-]{6,})/) || p.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
-      return m ? m[1] : null;
-    }catch{ return null; }
-  }
-  function parseTwitchClipSlug(raw){
-    try{
-      const u=new URL(normalizeUrl(raw)); const host=u.hostname.replace(/^www\./,'').toLowerCase(); const parts=u.pathname.split('/').filter(Boolean);
-      if (host==='clips.twitch.tv' && parts[0]) return parts[0];
-      const idx = parts.findIndex(p=>p.toLowerCase()==='clip'); if (idx!==-1 && parts[idx+1]) return parts[idx+1];
-      if (host==='m.twitch.tv' && parts[0]==='clip' && parts[1]) return parts[1];
-    }catch{}
-    return null;
-  }
-  function getStreamableId(raw){
-    try{
-      const u=new URL(normalizeUrl(raw)); const host=u.hostname.replace(/^www\./,'').toLowerCase(); if(host!=='streamable.com') return null;
-      const p=u.pathname.split('/').filter(Boolean); return (p[0]==='e'||p[0]==='o')?p[1]:p[0];
-    }catch{}
-    return null;
-  }
-  function buildEmbedURL(raw){
-    try{
-      const u=new URL(normalizeUrl(raw)); const host=u.hostname.replace(/^www\./,'').toLowerCase();
-      const yid=extractYouTubeId(u); if (yid) return `https://www.youtube.com/embed/${encodeURIComponent(yid)}?modestbranding=1&rel=0&playsinline=1`;
-      const tslug=parseTwitchClipSlug(u.toString()); if (tslug) return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(tslug)}&${twitchParents()}&autoplay=false`;
-      if (host==='streamable.com'){ const id=getStreamableId(u.toString()); if(id) return `https://streamable.com/e/${encodeURIComponent(id)}`; }
-      return u.toString();
-    }catch{ return raw; }
-  }
+  // ---------- EVENT CARD FACTORY ----------
+  function makeEventElement(e, options = {}) {
+    const article = document.createElement("article");
+    article.className = "event reveal";
 
-  const PLACEHOLDER_SVG = `
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675' width="100%" height="100%">
-      <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#0f1524'/><stop offset='100%' stop-color='#101a2e'/></linearGradient></defs>
-      <rect width='1200' height='675' fill='url(#g)'/>
-      <circle cx='600' cy='337' r='56' fill='none' stroke='rgba(255,255,255,.22)' stroke-width='6'/>
-      <polygon points='580,305 630,337 580,369' fill='rgba(255,255,255,.65)'/>
-    </svg>`;
+    const tag = options.tagText || e.tag || "Event";
+    const subline =
+      options.subline === "location"
+        ? e.location || ""
+        : e.description || "";
 
-  async function loadClips(){
-    try{
-      const [approvedRes, allRes] = await Promise.all([
-        fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?approved=eq.true&select=id,slot,title,url,map,date,thumb`, H),
-        fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?select=slot`, H)
-      ]);
-      const approved = await approvedRes.json();
-      const all = await allRes.json();
-      const occupied = new Set(all.map(r => Number(r.slot)));
-      render(approved, occupied);
-    }catch(e){
-      console.error(e);
-      document.getElementById('clipsGrid').innerHTML = '<p>Failed to load clips.</p>';
+    article.innerHTML = `
+      <span class="tag">${tag}</span>
+      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${subline}</div>
+    `;
+
+    if (e.image) {
+      article.classList.add("with-bg");
+      article.style.setProperty("--event-img", `url("${e.image}")`);
     }
+
+    const href =
+      normalizeHref(e.discordUrl) ||
+      normalizeHref(e.url) ||
+      "";
+
+    if (href) {
+      const a = document.createElement("a");
+      a.className = "event-link";
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.setAttribute("aria-label", `${e.title} — more info on Discord`);
+      a.appendChild(article);
+      return a;
+    }
+
+    return article;
   }
 
-  function render(clips, occupied){
-    const grid = document.getElementById('clipsGrid');
-    grid.innerHTML = '';
-    for(let i=376;i<=450;i++){
-      const clip = clips.find(c => Number(c.slot)===i);
-      const isOccupied = occupied.has(i);
-      const card = document.createElement('div');
-      card.className = 'card';
+  // ---------- MINI CALENDAR STATE ----------
+  let calYear, calMonth;
+  let allEventRanges = []; // [{start: Date, end: Date, index: number}]
+  let calendarInitialized = false;
 
-      if(clip){
-        const embed = buildEmbedURL(clip.url);
-        const title = escapeHtml(clip.title||'Kacky Finish');
-        const mapTxt = clip.map ? ` · ${escapeHtml(clip.map)}` : '';
-        const hardThumb = `${KACKY_THUMB_BASE}${i}.${KACKY_THUMB_EXT}`;
-        const overrideThumb = clip.thumb || null;
+  function loadMiniCalendar(dateIso) {
+    const dd = new Date(dateIso);
+    calYear = dd.getFullYear();
+    calMonth = dd.getMonth();
+    renderCalendar();
+  }
 
-        card.innerHTML = `
-          <div class="slot">Slot ${i}${mapTxt}</div>
-          <strong>${title}</strong>
-          <button class="thumb-wrap thumb-bleed openPlayer" data-url="${encodeURIComponent(embed)}" aria-label="Play ${title}">
-            <img src="${hardThumb}" alt="${title}" loading="lazy"
-                 onerror="this.onerror=null; ${overrideThumb ? `this.src='${overrideThumb}'` : `this.outerHTML=\`<div style=&quot;width:100%;height:100%;display:grid;place-items:center;opacity:.9&quot;>${PLACEHOLDER_SVG}</div>\``}">
-            <div class="thumb-center"></div>
-          </button>
+  function renderCalendar() {
+    const title = document.getElementById("cal-title");
+    const grid = document.getElementById("cal-grid");
+    if (!title || !grid || calYear == null || calMonth == null) return;
+
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+
+    title.textContent = new Date(calYear, calMonth, 1).toLocaleString("default", {
+      month: "long",
+      year: "numeric",
+    });
+
+    let html = `
+      <tr>
+        <th>Sun</th><th>Mon</th><th>Tue</th>
+        <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+      </tr><tr>
+    `;
+
+    for (let i = 0; i < firstDay; i++) html += "<td></td>";
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let day = 1; day <= lastDate; day++) {
+      const dayObj = new Date(calYear, calMonth, day);
+      const isToday = dayObj.getTime() === today.getTime();
+
+      const matches = allEventRanges
+        .filter((o) => dayObj >= o.start && dayObj <= o.end)
+        .map((o) => window.__eventsCache[o.index]);
+
+      const isEventDay = matches.length > 0;
+
+      html += `
+        <td data-day="${day}" class="${isToday ? "today" : ""} ${isEventDay ? "cal-event-day" : ""}">
+          <div>${day}</div>
+        </td>
+      `;
+
+      if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
+    }
+
+    html += "</tr>";
+    grid.innerHTML = html;
+
+    attachCalendarTooltips();
+  }
+
+  function attachCalendarTooltips() {
+  const container = document.getElementById("miniCalendar");
+  const grid = document.getElementById("cal-grid");
+  if (!container || !grid) return;
+
+  // Create tooltip ONCE on <body> so it's never clipped by hero mask/overflow
+  let tooltip = document.getElementById("cal-tooltip");
+  if (!tooltip) {
+    tooltip = document.createElement("div");
+    tooltip.id = "cal-tooltip";
+    document.body.appendChild(tooltip);
+  }
+
+  // Ensure tooltip styling still applies (your CSS already targets #cal-tooltip)
+  tooltip.style.display = "none";
+
+  function hideTooltip() {
+    tooltip.style.display = "none";
+  }
+
+  grid.querySelectorAll("td[data-day]").forEach((td) => {
+    td.addEventListener("mouseenter", () => {
+      const day = parseInt(td.dataset.day, 10);
+      const dayObj = new Date(calYear, calMonth, day);
+
+      const matches = allEventRanges
+        .filter((o) => dayObj >= o.start && dayObj <= o.end)
+        .map((o) => window.__eventsCache[o.index]);
+
+      if (!matches.length) {
+        hideTooltip();
+        return;
+      }
+
+      let html = "";
+      matches.forEach((ev, idx) => {
+        if (idx > 0) html += `<div class="cal-popup-spacer"></div>`;
+        html += `
+          <div class="cal-popup-title">${ev.title}</div>
+          <div class="cal-popup-date">
+            ${new Date(ev.start_iso).toLocaleDateString()} –
+            ${new Date(ev.end_iso).toLocaleDateString()}
+          </div>
+          <div class="cal-popup-desc">${ev.location || ""}</div>
         `;
-        // data for live filtering
-        card.dataset.slot  = String(i);
-        card.dataset.title = (clip.title || '').toLowerCase();
-        card.dataset.map   = (clip.map   || '').toLowerCase();
-      } else if(isOccupied){
-        card.innerHTML = `
-          <div class="slot">Slot ${i}</div>
-          <em>Submission pending review</em>
-          <div class="row">
-            <button class='btn' disabled>Upload disabled</button>
-            <span class="badge">1 per slot</span>
-          </div>`;
-        card.dataset.slot  = String(i);
-        card.dataset.title = '';
-        card.dataset.map   = '';
-      } else {
-        card.innerHTML = `
-          <div class="slot">Slot ${i}</div>
-          <em>No clip yet</em>
-          <div class="row">
-            <button class='btn upload' data-slot='${i}'>Upload for Slot ${i}</button>
-          </div>`;
-        card.dataset.slot  = String(i);
-        card.dataset.title = '';
-        card.dataset.map   = '';
+      });
+
+      tooltip.innerHTML = html;
+      tooltip.style.display = "block";
+      tooltip.style.position = "fixed";
+      tooltip.style.zIndex = "9999";
+      tooltip.style.pointerEvents = "none";
+
+      const tdRect = td.getBoundingClientRect();
+
+      // Measure after showing
+      const popRect = tooltip.getBoundingClientRect();
+
+      // Prefer above, otherwise below
+      let top = tdRect.top - popRect.height - 10;
+      if (top < 10) top = tdRect.bottom + 10;
+
+      // Center horizontally on the cell, clamp to viewport
+      let left = tdRect.left + tdRect.width / 2 - popRect.width / 2;
+      const pad = 12;
+
+      if (left < pad) left = pad;
+      if (left + popRect.width > window.innerWidth - pad) {
+        left = window.innerWidth - popRect.width - pad;
       }
-      grid.appendChild(card);
+
+      // Also clamp bottom edge (in case it's near the bottom)
+      if (top + popRect.height > window.innerHeight - pad) {
+        top = Math.max(pad, window.innerHeight - popRect.height - pad);
+      }
+
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.transform = "none";
+    });
+
+    td.addEventListener("mouseleave", hideTooltip);
+  });
+
+  container.addEventListener("mouseleave", hideTooltip);
+
+  // Optional: hide on scroll (prevents "floating" tooltip)
+  window.addEventListener("scroll", hideTooltip, { passive: true });
+}
+
+
+  // ---------- RECURRENCE (WEEKLY) ----------
+  // events.json weekly template example:
+  // "recurrence": { "freq":"weekly", "byDay":["TH"], "time":"15:00", "durationMinutes":60, "count":12 }
+  function getOffsetFromIso(iso) {
+    if (!iso) return "";
+    const m = String(iso).match(/([+-]\d{2}:\d{2}|Z)$/);
+    return m ? m[1] : "";
+  }
+
+  function pad2(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function buildIsoWithOffset(y, mo, d, hh, mm, offset) {
+    // YYYY-MM-DDTHH:mm:00-04:00
+    return `${y}-${pad2(mo)}-${pad2(d)}T${pad2(hh)}:${pad2(mm)}:00${offset || ""}`;
+  }
+
+  function expandRecurringEvents(events) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+  const out = [];
+
+  for (const e of events) {
+    const rec = e && e.recurrence;
+    const isWeekly =
+      rec &&
+      String(rec.freq || "").toLowerCase() === "weekly" &&
+      Array.isArray(rec.byDay) &&
+      rec.byDay.length;
+
+    // Non-recurring events pass straight through
+    if (!isWeekly) {
+      out.push(e);
+      continue;
+    }
+
+    // Use start_iso ONLY as a timezone anchor
+    const offset = (String(e.start_iso || "").match(/([+-]\d{2}:\d{2}|Z)$/) || [])[1] || "";
+
+    const durationMinutes = Number(rec.durationMinutes || 60);
+    const [HH, MM] = String(rec.time || "19:00")
+      .split(":")
+      .map((v) => parseInt(v, 10));
+
+    let found = false;
+
+    // Look ahead up to 14 days to find the next occurrence
+    for (let i = 0; i < 14 && !found; i++) {
+      const candidate = new Date(today);
+      candidate.setDate(today.getDate() + i);
+
+      const dow = candidate.getDay();
+      const want = rec.byDay.some((code) => dayMap[code] === dow);
+      if (!want) continue;
+
+      const startIso = `${candidate.getFullYear()}-${String(
+        candidate.getMonth() + 1
+      ).padStart(2, "0")}-${String(candidate.getDate()).padStart(2, "0")}T${String(
+        HH
+      ).padStart(2, "0")}:${String(MM).padStart(2, "0")}:00${offset}`;
+
+      const startDt = new Date(startIso);
+      const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
+
+      // Skip if it already ended
+      if (endDt <= now) continue;
+
+      out.push({
+        ...e,
+        start_iso: startIso,
+        end_iso: endDt.toISOString(),
+        _generated: true,
+      });
+
+      found = true;
     }
   }
 
-  const submitModal = document.getElementById('submit-modal');
-  const playerModal = document.getElementById('player-modal');
-  const slotField   = document.getElementById('slotField');
-  const playerFrame = document.getElementById('playerFrame');
+  return out;
+}
 
-  function openSubmit(slot){ if(slot){ slotField.value = slot; } submitModal.classList.add('open'); submitModal.setAttribute('aria-hidden','false'); }
-  function closeSubmit(){ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true'); }
-  function openPlayer(url) {
-  try {
-    let u = decodeURIComponent(url);
+  // ---------- RENDER EVENTS + HOOK CALENDAR ----------
+  function renderFromData(rawEvents) {
+    // Expand weekly templates into dated occurrences
+    const events = expandRecurringEvents(Array.isArray(rawEvents) ? rawEvents : []);
 
-    // If it's a direct MP4 (Supabase or anywhere)
-    if (u.endsWith(".mp4") || u.includes(".mp4?")) {
-      playerFrame.style.display = "none";
+    window.__eventsCache = events;
+    const now = Date.now();
 
-      // Create a video element if not exists
-      let v = document.getElementById("playerVideo");
-      if (!v) {
-        v = document.createElement("video");
-        v.id = "playerVideo";
-        v.className = "player-frame";
-        v.controls = true;
-        v.style.borderRadius = "16px";
-        v.style.width = "100%";
-        v.style.height = "100%";
-        document.querySelector("#player-modal .modal-body").appendChild(v);
+    const live = events
+      .filter((e) => new Date(e.start_iso) <= now && now <= new Date(e.end_iso))
+      .sort((a, b) => new Date(a.start_iso) - new Date(b.start_iso));
+
+    const upcoming = events
+      .filter((e) => new Date(e.start_iso) > now)
+      .sort((a, b) => new Date(a.start_iso) - new Date(b.start_iso));
+
+    const past = events
+      .filter((e) => new Date(e.end_iso) <= now)
+      .sort((a, b) => new Date(b.end_iso) - new Date(a.end_iso))
+      .slice(0, 6);
+
+    // Category split
+    const normCat = (e) => String(e.category || "main").toLowerCase().trim();
+    const isWeekly = (e) => ["weekly", "fun", "casual"].includes(normCat(e));
+    const isMain = (e) => !isWeekly(e);
+
+    const upcomingMain = upcoming.filter(isMain);
+    const upcomingWeekly = upcoming.filter(isWeekly);
+
+    // Live section
+    const liveSection = document.getElementById("live-events");
+    const liveGrid = document.getElementById("live-events-grid");
+    if (live.length) {
+      liveSection.style.display = "";
+      liveGrid.innerHTML = "";
+      live.forEach((e) => {
+        const el = makeEventElement(e, { tagText: "LIVE NOW", subline: "description" });
+        liveGrid.appendChild(el);
+      });
+    } else {
+      liveSection.style.display = "none";
+    }
+
+    // Upcoming grids (Main / Weekly)
+    const mainGrid = document.getElementById("main-events-grid");
+    const weeklyGrid = document.getElementById("weekly-events-grid");
+
+    if (mainGrid) {
+      mainGrid.innerHTML = "";
+      if (upcomingMain.length) {
+        upcomingMain.forEach((e) => {
+          mainGrid.appendChild(makeEventElement(e, { subline: "description" }));
+        });
+      } else {
+        mainGrid.innerHTML =
+          '<article class="event"><div class="meta">No main events scheduled.</div></article>';
       }
+    }
 
-      v.style.display = "block";
-      v.src = u;
-      v.play().catch(()=>{});
+    if (weeklyGrid) {
+      weeklyGrid.innerHTML = "";
+      if (upcomingWeekly.length) {
+        upcomingWeekly.forEach((e) => {
+          weeklyGrid.appendChild(makeEventElement(e, { subline: "description" }));
+        });
+      } else {
+        weeklyGrid.innerHTML =
+          '<article class="event"><div class="meta">No fun/weekly events scheduled.</div></article>';
+      }
+    }
 
-      playerModal.classList.add("open");
-      playerModal.setAttribute("aria-hidden", "false");
+    // Past section
+    let pastWrap = document.getElementById("past-events");
+    if (!pastWrap) {
+      pastWrap = document.createElement("div");
+      pastWrap.id = "past-events";
+      pastWrap.innerHTML = `
+        <h3 class="title" style="margin-top:2rem">Past Events</h3>
+        <div class="grid" id="past-grid"></div>
+      `;
+      document.querySelector("#schedule .container").appendChild(pastWrap);
+    }
+    const pastGrid = document.getElementById("past-grid");
+    pastGrid.innerHTML = "";
+    past.forEach((e) => {
+      const el = document.createElement("article");
+      el.className = "event reveal";
+      el.innerHTML = `
+        <span class="tag">${e.tag || "Event"}</span>
+        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+        <h4>${e.title}</h4>
+        <div class="meta">${e.location || ""}</div>
+      `;
+      if (e.image) {
+        el.classList.add("with-bg");
+        el.style.setProperty("--event-img", `url("${e.image}")`);
+      }
+      pastGrid.appendChild(el);
+    });
+
+    // Build date ranges for calendar
+    allEventRanges = events.map((e, idx) => {
+      const start = new Date(e.start_iso);
+      const end = new Date(e.end_iso);
+      return {
+        start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
+        end: new Date(end.getFullYear(), end.getMonth(), end.getDate()),
+        index: idx,
+      };
+    });
+
+    // Hero / countdown content (prefer MAIN event as "Next Event")
+    const next = upcomingMain[0] || upcoming[0] || null;
+
+    const chip = document.getElementById("hero-chip");
+    const pills = document.getElementById("hero-pills");
+    const header = document.getElementById("countdown-title");
+    const cdCard = document.getElementById("countdown-card");
+
+    if (live.length) {
+      const cur = live[0];
+      chip.textContent =
+        live.length > 1 ? `🟢 ${live.length} events live — ${cur.title}` : `Live now • ${cur.title}`;
+
+      pills.innerHTML = `
+        <div class="pill">🟢 Live</div>
+        <div class="pill">📍 ${cur.location || "Online"}</div>
+        <div class="pill">🏁 ${cur.description || ""}</div>
+      `;
+
+      header.textContent = "Live now!";
+      setCountdown(0, 0, 0, 0);
+      cdCard?.style.removeProperty("--cd-img");
+
+      if (cur.twitch && typeof setTwitchChannel === "function") {
+        setTwitchChannel(cur.twitch);
+      }
+    } else if (next) {
+      chip.textContent = `Next Event • ${next.title}`;
+      pills.innerHTML = `
+        <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+        <div class="pill">📍 ${next.location || "Online"}</div>
+        <div class="pill">🏁 ${next.description || ""}</div>
+      `;
+
+      startCountdown(next.start_iso, header);
+      cdCard?.style.removeProperty("--cd-img");
+    } else {
+      chip.textContent = "No upcoming event";
+      pills.innerHTML = '<div class="pill">Check back soon</div>';
+      header.textContent = "Countdown";
+      setCountdown(0, 0, 0, 0);
+      cdCard?.style.removeProperty("--cd-img");
+    }
+
+    // Init calendar once we have events
+    if (!calendarInitialized) {
+      const initialMonth = live[0]?.start_iso || next?.start_iso || new Date().toISOString();
+      loadMiniCalendar(initialMonth);
+      calendarInitialized = true;
+    } else {
+      renderCalendar();
+    }
+
+    updateJSONLD(live[0] || next || null);
+    attachReveals();
+    attachHoverGlow();
+  }
+
+  // ---------- STRUCTURED DATA ----------
+  function updateJSONLD(next) {
+    const el = document.getElementById("event-jsonld");
+    if (!next) {
+      el.textContent = "{}";
       return;
     }
-
-    // Otherwise fallback to iframe embeds (YT/Twitch/etc)
-    const parsed = new URL(normalizeUrl(u));
-
-    if (parsed.host.includes("youtube.com")) {
-      parsed.searchParams.set("autoplay", "1");
-      parsed.searchParams.set("playsinline", "1");
-    } else if (parsed.host.includes("twitch.tv")) {
-      parsed.searchParams.set("autoplay", "true");
-    } else if (parsed.host.includes("streamable.com")) {
-      parsed.searchParams.set("autoplay", "1");
-    }
-
-    playerFrame.style.display = "block";
-    playerFrame.src = parsed.toString();
-
-  } catch (err) {
-    console.error(err);
-    playerFrame.style.display = "block";
-    playerFrame.src = url;
-  }
-
-  playerModal.classList.add("open");
-  playerModal.setAttribute("aria-hidden", "false");
-}
-
-  function closePlayer() {
-  playerFrame.src = '';
-  let v = document.getElementById("playerVideo");
-  if (v) {
-    v.pause();
-    v.currentTime = 0;
-    v.src = '';       
-    v.style.display = "none";
-  }
-
-  // Close modal visually
-  playerModal.classList.remove('open'); 
-  playerModal.setAttribute('aria-hidden','true'); 
-}
-
-
-  document.addEventListener('click', (e)=>{
-    const t = e.target;
-    const openBtn = t.closest?.('.openPlayer');
-    if (openBtn) { const url = openBtn.getAttribute('data-url'); if (url) openPlayer(url); return; }
-    if(t.matches('.upload')){ const slot = t.getAttribute('data-slot'); openSubmit(slot); return; }
-    if(t.matches('[data-close-submit]')) { closeSubmit(); return; }
-    if(t.matches('[data-close-player]')) { closePlayer(); return; }
-    if(t.classList.contains('modal')){
-      if(t.id==='submit-modal') closeSubmit();
-      if(t.id==='player-modal') closePlayer();
-    }
-  });
-
-  // ---------- Upload + submit ----------
-  async function uploadMp4(file, slot){
-    // You must have a public storage bucket named "kacky-uploads"
-    const path = `slot-${slot}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g,'_')}`;
-    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/kacky-uploads/${encodeURIComponent(path)}`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'x-upsert': 'true', 'Content-Type': file.type || 'video/mp4' },
-      body: file
+    el.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: next.title,
+      startDate: next.start_iso,
+      endDate: next.end_iso,
+      eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+      eventStatus: "https://schema.org/EventScheduled",
+      location: { "@type": "VirtualLocation", url: "https://trackmaniaevents.com" },
+      description: next.description || "",
+      image: next.image || undefined,
+      organizer: { "@type": "Organization", name: "Trackmania Events", url: "https://trackmaniaevents.com" },
     });
-    if(!res.ok){
-      const txt = await res.text().catch(()=>res.statusText);
-      throw new Error(`Upload failed (${res.status}) ${txt}`);
-    }
-    // If the bucket is public, the public URL is:
-    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/kacky-uploads/${path}`;
-    return publicUrl;
   }
 
-  (function(){
-    const form   = document.getElementById('submitForm');
-    const status = document.getElementById('submitStatus');
-    const urlEl  = document.getElementById('urlField');
-    const fileEl = document.getElementById('fileField');
+  // ---------- LOAD EVENTS.JSON ----------
+  async function loadEvents() {
+    try {
+      const res = await fetch("/events.json?cb=" + Date.now());
+      if (!res.ok) throw new Error("Failed to fetch events.json");
+      const data = await res.json();
+      renderFromData(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
 
-    function isValidClipUrl(u){
-      if(!u) return false;
-      try{
-        const url = new URL(normalizeUrl(u));
-        const h = url.hostname.replace(/^www\./,'').toLowerCase();
-        const parts = url.pathname.split('/').filter(Boolean).map(s=>s.toLowerCase());
-        if (/youtube\.com|youtu\.be|streamable\.com/.test(h)) return true;
-        if (h === 'clips.twitch.tv') return true;
-        if (h.endsWith('twitch.tv') && parts.includes('clip')) return true;
-        return false;
-      } catch { return false; }
-    }
-    function clampSlot(n){ n=Number(n||0); return Math.min(450, Math.max(376, n)); }
+      const mainGrid = document.getElementById("main-events-grid");
+      const weeklyGrid = document.getElementById("weekly-events-grid");
 
-    form?.addEventListener('submit', async e => {
-      e.preventDefault();
-      status.textContent='Checking slot…';
-
-      const fd = new FormData(form);
-      const dateRaw = (fd.get('date')||'').toString().trim();
-      const slotNum = clampSlot(fd.get('slot'));
-      let   url     = (fd.get('url')||'').toString().trim();
-      const map     = (fd.get('map')||'').toString().trim() || null;
-      const thumb   = (fd.get('thumb')||'').toString().trim() || null;
-      const title   = (fd.get('title')||'').toString().trim();
-
-      // Check slot availability
-      try{
-        const existsRes = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?slot=eq.${encodeURIComponent(slotNum)}&select=slot`, H);
-        const exists = await existsRes.json();
-        if(Array.isArray(exists) && exists.length){ status.textContent='❌ This slot already has a submission.'; return; }
-      }catch{}
-
-      // If a file is picked, upload it and use its public URL.
-      const file = fileEl?.files?.[0] || null;
-      if (file){
-        if(file.type !== 'video/mp4'){ status.textContent='❌ Only .mp4 files are allowed.'; return; }
-        status.textContent='Uploading .mp4…';
-        try{
-          url = await uploadMp4(file, slotNum);
-        }catch(err){
-          console.error(err);
-          status.textContent = `❌ ${err.message || 'Upload failed'}`;
-          return;
-        }
-      } else {
-        // No file, must have a valid external clip URL
-        if(!isValidClipUrl(url)){
-          status.textContent='Please upload an .mp4 or enter a YouTube, Streamable, or Twitch *clip* URL.';
-          return;
-        }
+      if (mainGrid) {
+        mainGrid.innerHTML =
+          '<article class="event"><div class="meta">Could not load events.</div></article>';
+      }
+      if (weeklyGrid) {
+        weeklyGrid.innerHTML = "";
       }
 
-      // Submit DB row
-      status.textContent='Sending…';
-      const payload = {
-        title,
-        url,
-        slot: slotNum,
-        map,
-        thumb,
-        date:  dateRaw ? new Date(dateRaw).toISOString() : null,
-        approved: false
-      };
+      const t = document.getElementById("countdown-title");
+      if (t) t.textContent = "Countdown";
+      setCountdown(0, 0, 0, 0);
+    }
+  }
 
-      try{
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...H.headers, Prefer:'return=minimal' },
-          body: JSON.stringify(payload)
-        });
+  // ---------- TWITCH EMBED ----------
+  function setTwitchChannel(ch) {
+    // placeholder if you want dynamic channel switching later
+  }
 
-        if(!res.ok){
-          const txt = await res.text();
-          status.textContent = `⚠️ ${res.status} ${txt || 'Submission failed'}`;
-          console.error('Supabase insert error:', res.status, txt);
-          return;
-        }
-
-        status.textContent='✅ Submitted! Awaiting approval.';
-        form.reset();
-        setTimeout(()=>{ closeSubmit(); status.textContent=''; loadClips(); }, 800);
-      }catch(err){
-        console.error(err);
-        status.textContent='⚠️ Network error. Please try again later.';
-      }
-    });
+  (function () {
+    const parents = ["trackmaniaevents.com", "www.trackmaniaevents.com"];
+    const embed = document.getElementById("twitch-embed");
+    const iframe = document.createElement("iframe");
+    iframe.className = "player";
+    iframe.allowFullscreen = true;
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+    iframe.src =
+      `https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&autoplay=false` +
+      parents.map((p) => `&parent=${encodeURIComponent(p)}`).join("") +
+      `&muted=true`;
+    embed.appendChild(iframe);
   })();
 
-  // ---------- Live search (auto) ----------
-  const searchInput  = document.getElementById('search');
-  const searchClear  = document.getElementById('searchClear');
-  const debounce = (fn, ms = 200) => { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; };
-  function normalize(s){ return (s||'').toString().toLowerCase().trim(); }
+  // ---------- NAV ACTIVE LINK ----------
+  (function () {
+    const sections = [...document.querySelectorAll("section[id]")];
+    const links = [...document.querySelectorAll(".navlinks a")];
+    const byId = (id) => links.find((a) => a.getAttribute("href") === `#${id}`);
 
-  function applyFilter(q){
-    q = normalize(q);
-    const cards = Array.from(document.querySelectorAll('#clipsGrid .card'));
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            links.forEach((a) => a.classList.remove("active"));
+            const a = byId(e.target.id);
+            if (a) a.classList.add("active");
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
 
-    if (!q){
-      cards.forEach(c => c.style.display = '');
-      return;
+    sections.forEach((s) => io.observe(s));
+  })();
+
+  // ---------- SCROLL REVEALS ----------
+  function attachReveals() {
+    const reveals = document.querySelectorAll(".reveal:not(.show)");
+    const io2 = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("show");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    reveals.forEach((el) => io2.observe(el));
+  }
+  attachReveals();
+
+  // ---------- BACK TO TOP ----------
+  (function () {
+    const btn = document.getElementById("toTop");
+    addEventListener("scroll", () => btn.classList.toggle("show", scrollY > 600));
+    btn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  })();
+
+  // ---------- KICK IT ALL OFF ----------
+  loadEvents();
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // calendar next/prev buttons
+  document.getElementById("cal-prev").onclick = () => {
+    if (calYear == null || calMonth == null) return;
+    calMonth--;
+    if (calMonth < 0) {
+      calMonth = 11;
+      calYear--;
     }
-    const isSlot = /^\d{3}$/.test(q);
-    cards.forEach(c => {
-      const slot  = c.dataset.slot  || '';
-      const title = c.dataset.title || '';
-      const map   = c.dataset.map   || '';
-      const match = isSlot ? (slot === q) : (title.includes(q) || map.includes(q) || slot.includes(q));
-      c.style.display = match ? '' : 'none';
+    renderCalendar();
+  };
+
+  document.getElementById("cal-next").onclick = () => {
+    if (calYear == null || calMonth == null) return;
+    calMonth++;
+    if (calMonth > 11) {
+      calMonth = 0;
+      calYear++;
+    }
+    renderCalendar();
+  };
+</script>
+<script>
+  // ---------- MOBILE NAV TOGGLE ----------
+  (function () {
+    const btn = document.getElementById("navToggle");
+    const nav = document.getElementById("primary-nav");
+    if (!btn || !nav) return;
+
+    function setOpen(open) {
+      nav.classList.toggle("show", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setOpen(!nav.classList.contains("show"));
     });
 
-    const first = document.querySelector('#clipsGrid .card:not([style*="display: none"])');
-    if (first){
-      first.scrollIntoView({ behavior:'smooth', block:'center' });
-      first.animate(
-        [{ boxShadow:'0 0 0 0 rgba(109,251,255,0)' }, { boxShadow:'0 0 0 6px rgba(109,251,255,.35)' }, { boxShadow:'0 0 0 0 rgba(109,251,255,0)' }],
-        { duration:600, easing:'ease' }
-      );
+    // Close when clicking a link
+    nav.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => setOpen(false));
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", (e) => {
+      if (nav.classList.contains("show") && !nav.contains(e.target) && e.target !== btn) {
+        setOpen(false);
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+
+    // If user rotates / resizes out of mobile, clean state
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 640) setOpen(false);
+    });
+  })();
+</script>
+<script>
+(() => {
+  const CHAT_API_BASE = "https://trackmaniaevents-chat.onrender.com";
+  const SID_KEY = "tme_chat_sid";
+  const NAME_KEY = "tme_chat_name";
+  const POLL_MS = 1200;
+
+  const DEFAULT_OPERATOR_NAME = "Trackmania Events Support";
+  const DEFAULT_OPERATOR_AVATAR = "https://trackmaniaevents.com/assets/chat-operator.png";
+  const DEFAULT_VISITOR_AVATAR = "https://trackmaniaevents.com/assets/chat-visitor.png";
+
+  const btn = document.getElementById("tmeChatBtn");
+  const panel = document.getElementById("tmeChatPanel");
+  const closeBtn = document.getElementById("tmeChatClose");
+  const log = document.getElementById("tmeChatLog");
+  const input = document.getElementById("tmeChatInput");
+  const sendBtn = document.getElementById("tmeChatSend");
+
+  const agentPill = document.getElementById("tmeAgentPill");
+  const agentSub = document.getElementById("tmeAgentSub");
+
+  let sid = localStorage.getItem(SID_KEY) || "";
+  let visitorName = localStorage.getItem(NAME_KEY) || "";
+  let lastTs = 0;
+  let pollTimer = null;
+  let connecting = false;
+
+  let participants = {
+    visitor: { name: visitorName || "Visitor", avatarUrl: DEFAULT_VISITOR_AVATAR },
+    operator: { name: DEFAULT_OPERATOR_NAME, avatarUrl: DEFAULT_OPERATOR_AVATAR }
+  };
+
+  function setInputEnabled(on) {
+    input.disabled = !on;
+    sendBtn.disabled = !on;
+    input.placeholder = on ? "Type a message…" : "Connecting…";
+  }
+
+  function setParticipantsFromServer(p) {
+    if (!p || typeof p !== "object") return;
+
+    if (p.visitor) {
+      if (typeof p.visitor.name === "string" && p.visitor.name.trim()) participants.visitor.name = p.visitor.name;
+      if (typeof p.visitor.avatarUrl === "string" && p.visitor.avatarUrl.trim()) participants.visitor.avatarUrl = p.visitor.avatarUrl;
+    }
+    if (p.operator) {
+      if (typeof p.operator.name === "string" && p.operator.name.trim()) participants.operator.name = p.operator.name;
+      if (typeof p.operator.avatarUrl === "string" && p.operator.avatarUrl.trim()) participants.operator.avatarUrl = p.operator.avatarUrl;
     }
   }
-  searchInput?.addEventListener('input', debounce(() => applyFilter(searchInput.value), 150));
-  searchInput?.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ searchInput.value = ''; applyFilter(''); } });
-  searchClear?.addEventListener('click', () => { searchInput.value = ''; applyFilter(''); searchInput.focus(); });
 
-  // initial
-  loadClips();
+  function addMsg({ text, from }) {
+  const cleanText = String(text ?? "").trim();
+  if (!cleanText) return; // ← prevents empty ghost messages
+
+  const sender = String(from || "ai").toLowerCase();
+  const who = (sender === "visitor") ? "me" : "them";
+  const isAI = (sender === "ai");
+
+  const displayName =
+    (who === "me")
+      ? (participants.visitor?.name || "You")
+      : (participants.operator?.name || "Trackmania Events Support");
+
+  const avatarUrl =
+    (who === "me")
+      ? (participants.visitor?.avatarUrl || DEFAULT_VISITOR_AVATAR)
+      : (participants.operator?.avatarUrl || DEFAULT_OPERATOR_AVATAR);
+
+  const row = document.createElement("div");
+  row.className = "tmeMsgRow " + who;
+
+  const avatar = document.createElement("div");
+  avatar.className = "tmeAvatar";
+  avatar.style.backgroundImage = `url("${avatarUrl}")`;
+
+  const bubbleWrap = document.createElement("div");
+  bubbleWrap.className = "tmeBubbleWrap";
+
+  const label = document.createElement("div");
+  label.className = "tmeMsgName";
+
+  const nameSpan = document.createElement("span");
+  nameSpan.textContent = displayName;
+  label.appendChild(nameSpan);
+
+  if (isAI) {
+    const badge = document.createElement("span");
+    badge.className = "tmeBadge tmeBadge-ai";
+    badge.textContent = "AI";
+    label.appendChild(badge);
+  }
+
+  const bubble = document.createElement("div");
+  bubble.className = "tmeMsg " + who;
+  bubble.textContent = cleanText;
+
+  bubbleWrap.appendChild(label);
+  bubbleWrap.appendChild(bubble);
+
+  if (who === "me") {
+    row.appendChild(bubbleWrap);
+    row.appendChild(avatar);
+  } else {
+    row.appendChild(avatar);
+    row.appendChild(bubbleWrap);
+  }
+
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
+
+  function addSystemLine(text) {
+    if (!log.childElementCount) addMsg({ text, from: "ai" });
+  }
+
+  function renderNameCapture() {
+    if (document.getElementById("tmeNameCapture")) return;
+
+    const card = document.createElement("div");
+    card.id = "tmeNameCapture";
+    card.className = "tmeInlineCard";
+
+    const hint = document.createElement("div");
+    hint.className = "tmeInlineHint";
+    hint.textContent = "Want to add a name? (Optional) This helps the operator know who they’re chatting with.";
+    card.appendChild(hint);
+
+    const row = document.createElement("div");
+    row.className = "tmeInlineRow";
+
+    const inp = document.createElement("input");
+    inp.type = "text";
+    inp.placeholder = "Your name (optional)";
+    inp.value = visitorName || "";
+    row.appendChild(inp);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Save";
+    row.appendChild(btn);
+
+    const saved = document.createElement("div");
+    saved.className = "tmeMeta";
+    saved.style.marginTop = "8px";
+    saved.textContent = "";
+    card.appendChild(row);
+    card.appendChild(saved);
+
+    btn.addEventListener("click", async () => {
+      const v = String(inp.value || "").trim().replace(/\s+/g, " ").slice(0, 32);
+      visitorName = v;
+      localStorage.setItem(NAME_KEY, visitorName);
+      participants.visitor.name = visitorName || "Visitor";
+
+      saved.textContent = visitorName ? `Saved as "${visitorName}".` : "Name cleared.";
+
+      if (!sid) return;
+
+      await fetch(CHAT_API_BASE + "/api/chat/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid, visitorName })
+      }).catch(() => null);
+    });
+
+    log.appendChild(card);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function renderEmailCapture() {
+    if (document.getElementById("tmeEmailCapture")) return;
+
+    const card = document.createElement("div");
+    card.id = "tmeEmailCapture";
+    card.className = "tmeInlineCard";
+
+    const hint = document.createElement("div");
+    hint.className = "tmeInlineHint";
+    hint.textContent = "No agents are online right now. Leave your email and we’ll get back to you.";
+    card.appendChild(hint);
+
+    const row = document.createElement("div");
+    row.className = "tmeInlineRow";
+
+    const inp = document.createElement("input");
+    inp.type = "email";
+    inp.placeholder = "email@example.com";
+    row.appendChild(inp);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Submit";
+    row.appendChild(btn);
+
+    const status = document.createElement("div");
+    status.className = "tmeMeta";
+    status.style.marginTop = "8px";
+    status.textContent = "";
+    card.appendChild(row);
+    card.appendChild(status);
+
+    async function submitEmail() {
+      const email = String(inp.value || "").trim();
+      if (!email || !email.includes("@")) {
+        status.textContent = "Please enter a valid email.";
+        return;
+      }
+      if (!sid) {
+        status.textContent = "Connecting…";
+        const ok = await initChat();
+        if (!ok) { status.textContent = "Could not start chat."; return; }
+      }
+
+      const r = await fetch(CHAT_API_BASE + "/api/chat/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid, email })
+      }).catch(() => null);
+
+      if (r && r.ok) {
+        status.textContent = "Thanks — we’ll reach out as soon as possible.";
+        inp.disabled = true;
+        btn.disabled = true;
+        return;
+      }
+
+      await fetch(CHAT_API_BASE + "/api/chat/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid, text: `My email is: ${email}` })
+      }).catch(() => null);
+
+      status.textContent = "Thanks — we’ll reach out as soon as possible.";
+      inp.disabled = true;
+      btn.disabled = true;
+    }
+
+    btn.addEventListener("click", submitEmail);
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") submitEmail(); });
+
+    log.appendChild(card);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setAgentUI(count, status) {
+    const n = Number(count || 0);
+    const s = String(status || (n > 0 ? "online" : "offline"));
+
+    if (agentPill) {
+      agentPill.className = "tmeAgentPill " + (s === "busy" ? "busy" : (s === "online" ? "online" : "offline"));
+      agentPill.textContent = `${n} agent${n === 1 ? "" : "s"} online`;
+    }
+
+    if (agentSub) {
+      agentSub.textContent = (n > 0)
+        ? "An operator can join if you ask."
+        : "AI can help instantly — leave email for follow-up if needed.";
+    }
+  }
+
+  async function refreshStatus() {
+    const r = await fetch(CHAT_API_BASE + "/api/chat/status", { method: "GET" }).catch(() => null);
+    if (!r) return;
+    const d = await r.json().catch(() => null);
+    if (!d || !d.ok) return;
+
+    setAgentUI(d.agentsOnline ?? d.operatorsOnline ?? 0, d.operatorStatus ?? d.status);
+  }
+
+  async function initChat() {
+    if (connecting) return false;
+    connecting = true;
+    setInputEnabled(false);
+
+    const res = await fetch(CHAT_API_BASE + "/api/chat/init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ visitorName: visitorName || "" })
+    }).catch(() => null);
+
+    connecting = false;
+
+    if (!res) {
+      addMsg({ text: "Network error starting chat.", from: "ai" });
+      setInputEnabled(true);
+      return false;
+    }
+
+    const data = await res.json().catch(() => null);
+    if (!data || !data.ok || !data.sid) {
+      addMsg({ text: "Failed to start chat.", from: "ai" });
+      setInputEnabled(true);
+      return false;
+    }
+
+    sid = data.sid;
+    localStorage.setItem(SID_KEY, sid);
+    lastTs = 0;
+
+    if (data.participants) setParticipantsFromServer(data.participants);
+
+    log.innerHTML = "";
+    addMsg({ text: "Connected. Ask anything about Trackmania Events.", from: "ai" });
+
+    renderNameCapture();
+    setInputEnabled(true);
+    await refreshStatus();
+
+    return true;
+  }
+
+  async function pollOnce() {
+    if (!sid) return;
+
+    const url = `${CHAT_API_BASE}/api/chat/poll?sid=${encodeURIComponent(sid)}&since=${encodeURIComponent(lastTs)}`;
+    const res = await fetch(url).catch(() => null);
+    if (!res) return;
+
+    if (res.status === 404) {
+      localStorage.removeItem(SID_KEY);
+      sid = "";
+      lastTs = 0;
+      await initChat();
+      return;
+    }
+
+    const data = await res.json().catch(() => null);
+    if (!data || !data.ok) return;
+
+    if (data.participants) setParticipantsFromServer(data.participants);
+
+    if (data.status === "closed") {
+      localStorage.removeItem(SID_KEY);
+      sid = "";
+      lastTs = 0;
+      await initChat();
+      return;
+    }
+
+    if (typeof data.agentsOnline !== "undefined" || typeof data.operatorsOnline !== "undefined") {
+      setAgentUI(data.agentsOnline ?? data.operatorsOnline ?? 0, data.operatorStatus ?? data.status);
+    }
+
+    const msgs = data.messages || [];
+    for (const m of msgs) {
+      const ts = Number(m.ts || 0);
+      if (ts <= lastTs) continue;
+
+      if (m.type === "ui" && m.ui && m.ui.kind === "email_capture") {
+        renderEmailCapture();
+      } else {
+        addMsg({ text: m.text || "", from: m.from || "ai" });
+      }
+
+      lastTs = Math.max(lastTs, ts);
+    }
+  }
+
+  async function send() {
+    const text = (input.value || "").trim();
+    if (!text) return;
+
+    if (!sid) {
+      const ok = await initChat();
+      if (!ok) return;
+    }
+
+    input.value = "";
+
+    const res = await fetch(CHAT_API_BASE + "/api/chat/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sid, text })
+    }).catch(() => null);
+
+    if (!res) {
+      addMsg({ text: "Network error sending message.", from: "ai" });
+      return;
+    }
+
+    if (res.status === 409) {
+      localStorage.removeItem(SID_KEY);
+      sid = "";
+      lastTs = 0;
+      await initChat();
+      return;
+    }
+
+    if (!res.ok) {
+      const d = await res.json().catch(() => null);
+      addMsg({ text: (d && d.error) ? d.error : "Send failed.", from: "ai" });
+      return;
+    }
+
+    await pollOnce();
+  }
+
+  function startPolling() {
+    stopPolling();
+    pollTimer = setInterval(() => {
+      pollOnce();
+      refreshStatus();
+    }, POLL_MS);
+  }
+
+  function stopPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = null;
+  }
+
+  function showPanel() {
+    panel.style.display = "block";
+    setInputEnabled(false);
+    addSystemLine("Connecting…");
+
+    (async () => {
+      await refreshStatus();
+      if (!sid) await initChat();
+      else {
+        setInputEnabled(true);
+        await pollOnce();
+        renderNameCapture();
+      }
+      startPolling();
+      input.focus();
+    })();
+  }
+
+  function hidePanel() {
+    panel.style.display = "none";
+    stopPolling();
+  }
+
+  btn.addEventListener("click", () => {
+    if (panel.style.display === "block") hidePanel();
+    else showPanel();
+  });
+
+  closeBtn.addEventListener("click", hidePanel);
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+})();
 </script>
+
 </body>
 </html>
-
