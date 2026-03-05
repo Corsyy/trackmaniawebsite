@@ -249,11 +249,15 @@ th{
 .mini{ font-size:12px; }
 
 .table-wrap{ padding: 0; }
-.table-wrap table tbody tr:nth-child(odd) td{
-  background: rgba(255,255,255,.018);
+
+.table-wrap table tbody tr td{
+  background: transparent;
 }
+
+
 .table-wrap table tbody tr:hover td{
-  background: rgba(83,166,255,.07);
+  background: rgba(83,166,255,.05);
+  box-shadow: inset 0 0 0 1px rgba(83,166,255,.12);
 }
 
 .player-cell b{
