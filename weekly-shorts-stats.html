@@ -8,275 +8,484 @@
 
   <style>
     :root{
-      --bg:#0a0f1a; --panel:rgba(15,21,36,.55);
-      --text:#e6ecff; --muted:#9bb0ff;
-      --accent:#3aa0ff; --accent2:#6dfbff;
-      --border:rgba(109,251,255,.22);
-      --shadow:0 10px 30px rgba(0,0,0,.4), 0 0 20px rgba(61,165,255,.18);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1200px;margin:0 auto;padding:22px 16px 60px}
-    h1{margin:0 0 8px;font-size:28px}
-    .sub{color:var(--muted);margin:0 0 18px;line-height:1.35}
+      /* calmer, more “human” palette */
+      --bg0:#070A12;
+      --bg1:#0B1020;
+      --card: rgba(255,255,255,.045);
+      --card2: rgba(255,255,255,.06);
+      --text:#EAF0FF;
+      --muted:rgba(234,240,255,.72);
+      --muted2:rgba(234,240,255,.55);
+      --line: rgba(255,255,255,.10);
+      --line2: rgba(255,255,255,.14);
 
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+      --accent:#53A6FF;
+      --accent2:#68F0FF;
+
+      --radius:18px;
+      --radius2:14px;
+
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --shadow2: 0 8px 24px rgba(0,0,0,.35);
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:
+        radial-gradient(1100px 700px at 20% 0%, rgba(83,166,255,.14), transparent 55%),
+        radial-gradient(900px 600px at 90% 15%, rgba(104,240,255,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration:underline; text-decoration-color:rgba(255,255,255,.28); }
+
+    .wrap{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 16px 72px;
+    }
+
+    /* Header */
+    .header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    h1{
+      margin:0;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+    }
+    .subtitle{
+      margin:0;
+      color: var(--muted);
+      max-width: 72ch;
+      line-height:1.4;
+      font-size: 14px;
+    }
+
+    .header-actions{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:10px;
+      min-width: 210px;
+    }
     .back a{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:12px;
-      border:1px solid rgba(109,251,255,.25);
-      background:rgba(10,15,26,.35);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      box-shadow: var(--shadow2);
     }
-    .back a:hover{border-color:rgba(109,251,255,.45)}
+    .back a:hover{
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.055);
+    }
+    .meta{
+      color: var(--muted2);
+      font-size: 12px;
+      line-height:1.2;
+      text-align:right;
+    }
 
-    .grid{display:grid;gap:12px}
-    .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .row2{grid-template-columns:1.35fr .65fr}
+    /* Layout sections */
+    .grid{ display:grid; gap:14px; }
+    .kpis{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .row2{ grid-template-columns: 1.4fr .6fr; }
+
     .card{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:16px;
-      box-shadow:var(--shadow);
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.03));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       overflow:hidden;
     }
     .card-h{
-      padding:12px 14px;
-      border-bottom:1px dashed rgba(109,251,255,.18);
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background: rgba(255,255,255,.02);
     }
-    .card-h .t{font-weight:900}
-    .card-b{padding:12px 14px}
+    .card-h .t{
+      font-weight: 800;
+      letter-spacing: .01em;
+      font-size: 13px;
+      color: rgba(234,240,255,.90);
+      text-transform: uppercase;
+    }
+    .card-b{ padding: 14px 16px; }
 
-    .kpi{font-size:12px;color:var(--muted)}
-    .big{font-size:22px;font-weight:900;letter-spacing:.2px}
+    .kpi-label{ color: var(--muted2); font-size: 12px; }
+    .kpi-main{
+      font-size: 22px;
+      font-weight: 850;
+      letter-spacing: -0.01em;
+      margin-top: 2px;
+      line-height:1.15;
+    }
+    .kpi-sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
 
-    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    /* Controls */
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+    .controls .label{
+      font-size: 12px;
+      color: var(--muted2);
+      margin-right: 2px;
+    }
+
     input, select, button{
-      background:rgba(10,15,26,.35);
-      border:1px solid rgba(109,251,255,.25);
-      color:var(--text);
-      border-radius:12px;
-      padding:10px 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
       outline:none;
+      box-shadow: none;
     }
-    input::placeholder{color:rgba(155,176,255,.65)}
-    button{cursor:pointer}
-    button:hover{border-color:rgba(109,251,255,.45)}
+    input::placeholder{ color: rgba(234,240,255,.45); }
 
-    table{width:100%;border-collapse:collapse}
-    th, td{padding:10px 10px;border-bottom:1px solid rgba(109,251,255,.12);text-align:left;font-size:14px}
-    th{color:var(--muted);font-weight:900;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
-    tr:hover td{background:rgba(10,15,26,.25)}
-    .right{text-align:right}
-    .muted{color:var(--muted)}
-    .mini{font-size:12px}
-    .logitem{padding:10px 0;border-bottom:1px solid rgba(109,251,255,.12)}
+    input:focus, select:focus, button:focus{
+      border-color: rgba(83,166,255,.6);
+      box-shadow: 0 0 0 3px rgba(83,166,255,.18);
+    }
+
+    button{
+      cursor:pointer;
+      background: rgba(255,255,255,.05);
+    }
+    button:hover{
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.07);
+    }
+
+    .help{
+      color: var(--muted2);
+      font-size: 12px;
+      line-height:1.35;
+    }
+    .help code{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color: rgba(234,240,255,.86);
+    }
+
+    /* Tables */
+    table{ width:100%; border-collapse: collapse; }
+    th, td{
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      text-align:left;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+    th{
+      color: var(--muted2);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .right{ text-align:right; }
+    .muted{ color: var(--muted2); }
+    .mini{ font-size:12px; }
+
+    .table-wrap{ padding: 0; }
+    .table-wrap table tbody tr:nth-child(odd) td{
+      background: rgba(255,255,255,.018);
+    }
+    .table-wrap table tbody tr:hover td{
+      background: rgba(83,166,255,.07);
+    }
+
+    .player-cell b{
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
     .tag{
-      font-size:11px;
-      padding:3px 8px;border-radius:999px;
-      border:1px solid rgba(109,251,255,.25);
-      color:var(--muted);
-      margin-right:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(234,240,255,.78);
+      margin-right: 8px;
+    }
+    .tag.win{
+      border-color: rgba(104,240,255,.25);
+      background: rgba(104,240,255,.07);
+      color: rgba(234,240,255,.90);
     }
 
-    /* Pagination UI */
+    /* Pager */
     .pager{
       display:flex;
       align-items:center;
       gap:10px;
-      padding:10px 12px;
-      border-top:1px solid rgba(109,251,255,.12);
-      background:rgba(0,0,0,.08);
+      padding: 12px 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.14);
     }
     .pager button{
-      padding:6px 10px;
-      border-radius:10px;
+      padding: 8px 10px;
+      border-radius: 12px;
     }
-    .pager button[disabled]{
-      opacity:.45;
-      cursor:not-allowed;
+    .pager button[disabled]{ opacity:.45; cursor:not-allowed; }
+    .spacer{ flex:1; }
+
+    /* Changelog */
+    .logitem{
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .logitem:last-child{ border-bottom:none; }
+    .logwhen{
+      color: var(--muted2);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .logtext{
+      line-height: 1.35;
+      color: rgba(234,240,255,.92);
     }
 
-   @media (max-width: 980px){
-  .cards{grid-template-columns:1fr}
-  .row2{grid-template-columns:1fr}
-  .topbar{flex-direction:column;align-items:flex-start}
-}
+    /* Footer */
+    .footer{
+      margin-top: 18px;
+      color: var(--muted2);
+      font-size: 12px;
+      line-height:1.45;
+      padding: 12px 2px 0;
+    }
+    .footer b{ color: rgba(234,240,255,.86); }
 
-/* ===================== RESPONSIVE TABLE (NO SCROLL) ===================== */
-/* On ~720p devices and smaller: label/value “cards” (NO horizontal scroll) */
-@media (max-width: 900px){
-  /* Contain everything (fix iOS overflow outside border) */
-  .card-b{overflow-x:hidden}
+    /* Responsive */
+    @media (max-width: 980px){
+      .header{ flex-direction:column; align-items:flex-start; }
+      .header-actions{ align-items:flex-start; min-width:unset; }
+      .kpis{ grid-template-columns: 1fr; }
+      .row2{ grid-template-columns: 1fr; }
+      .meta{ text-align:left; }
+    }
 
-  /* IMPORTANT: add inner padding here instead of side-margins on rows */
-  .leaderboard-table{
-    width:100%;
-    max-width:100%;
-    table-layout:fixed;
-    border-collapse:collapse;
-    padding:0 12px;           /* ✅ shifts cards left/right inside border */
-    box-sizing:border-box;
-  }
-  .leaderboard-table *{max-width:100%}
+    /* Your existing “responsive table as cards” rules (kept, just lightly tuned) */
+    @media (max-width: 900px){
+      .card-b{ overflow-x:hidden; }
 
-  .leaderboard-table thead{display:none}
+      .leaderboard-table{
+        width:100%;
+        max-width:100%;
+        table-layout:fixed;
+        border-collapse:collapse;
+        padding:0 12px;
+        box-sizing:border-box;
+      }
+      .leaderboard-table *{ max-width:100%; }
 
-  .leaderboard-table,
-  .leaderboard-table tbody,
-  .leaderboard-table tr,
-  .leaderboard-table td{
-    display:block;
-    width:100%;
-  }
+      .leaderboard-table thead{ display:none; }
 
-  .leaderboard-table tr{
-    margin:10px 0;            /* ✅ no side margins (prevents overflow) */
-    width:100%;
-    box-sizing:border-box;
-    border:1px solid rgba(109,251,255,.18);
-    background:rgba(10,15,26,.18);
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 10px 20px rgba(0,0,0,.25);
-  }
+      .leaderboard-table,
+      .leaderboard-table tbody,
+      .leaderboard-table tr,
+      .leaderboard-table td{
+        display:block;
+        width:100%;
+      }
 
-  .leaderboard-table td{
-    border:none;
-    border-bottom:1px solid rgba(109,251,255,.10);
-    padding:10px 12px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    white-space:normal;
-    overflow:hidden; /* critical */
-  }
+      .leaderboard-table tr{
+        margin:10px 0;
+        width:100%;
+        box-sizing:border-box;
+        border:1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.035);
+        border-radius:14px;
+        overflow:hidden;
+        box-shadow: 0 10px 20px rgba(0,0,0,.25);
+      }
 
-  .leaderboard-table td:last-child{border-bottom:none}
+      .leaderboard-table td{
+        border:none;
+        border-bottom:1px solid rgba(255,255,255,.08);
+        padding:10px 12px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        white-space:normal;
+        overflow:hidden;
+      }
+      .leaderboard-table td:last-child{ border-bottom:none; }
 
-  /* Label on the left, value on the right */
-  .leaderboard-table td::before{
-    content:attr(data-label);
-    color:var(--muted);
-    font-weight:800;
-    font-size:12px;
-    letter-spacing:.02em;
-    text-transform:uppercase;
-    flex:0 0 auto;
-    max-width:45%;
-  }
+      .leaderboard-table td::before{
+        content:attr(data-label);
+        color: var(--muted2);
+        font-weight:800;
+        font-size:12px;
+        letter-spacing:.02em;
+        text-transform:uppercase;
+        flex:0 0 auto;
+        max-width:45%;
+      }
 
-  /* Make the value side actually shrink (fixes “outside border”) */
-  .leaderboard-table td > *{
-    min-width:0;
-    max-width:55%;
-  }
+      .leaderboard-table td > *{
+        min-width:0;
+        max-width:55%;
+      }
 
-  /* Player names: keep readable without pushing width */
-  .leaderboard-table td.player-cell b{
-    font-size:16px;
-    display:block;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
+      .leaderboard-table td.player-cell b{
+        font-size:16px;
+        display:block;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+      }
 
-  /* Rank highlight */
-  .leaderboard-table td.rank-cell{
-    background:rgba(58,160,255,.08);
-  }
+      .leaderboard-table td.rank-cell{
+        background: rgba(83,166,255,.08);
+      }
 
-  /* Weeks Won: wrap safely instead of forcing width */
-  .leaderboard-table td.weeks-cell{
-    align-items:flex-start;
-  }
-  .leaderboard-table td.weeks-cell > span{
-    text-align:right;
-    word-break:break-word;
-    overflow-wrap:anywhere;
-    max-width:55%;
-  }
-}
+      .leaderboard-table td.weeks-cell{
+        align-items:flex-start;
+      }
+      .leaderboard-table td.weeks-cell > span{
+        text-align:right;
+        word-break:break-word;
+        overflow-wrap:anywhere;
+        max-width:55%;
+      }
+    }
 
-@media (max-width: 420px){
-  .leaderboard-table{
-    padding:0 8px;            /* slightly tighter on tiny screens */
-  }
-  .leaderboard-table tr{margin:8px 0}
-  .leaderboard-table td{padding:9px 10px}
-}
-
-@media (max-width: 640px){
-  th, td{
-    padding:8px 8px;
-    font-size:13px;
-  }
-}
+    @media (max-width: 420px){
+      .leaderboard-table{ padding:0 8px; }
+      .leaderboard-table tr{ margin:8px 0; }
+      .leaderboard-table td{ padding:9px 10px; }
+    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div>
-        <h1>Weekly Shorts — Campaign Stats</h1>
-        <p class="sub">
-          Trackmania 2020 Weekly Shorts overview: who has the most <b>wins</b>, <b>WRs</b>, and <b>Top 5</b>.
-          Search players, review per-week leaderboards, and see post-week WR improvements in the changelog.
+    <div class="header">
+      <div class="title">
+        <h1>Weekly Shorts</h1>
+        <p class="subtitle">
+          A quick look at who’s been farming <b>wins</b>, <b>world records</b>, and <b>Top 5s</b> across the Weekly Shorts campaign.
+          Use search + sorting to find players, and check the changelog for post-week WR improvements.
         </p>
       </div>
 
-      <div class="back">
-        <a href="/" aria-label="Back to home">← Back</a>
-      </div>
-    </div>
-
-    <div class="grid cards">
-      <div class="card">
-        <div class="card-h"><div class="t">Most Wins</div><div class="muted mini" id="genAt"></div></div>
-        <div class="card-b">
-          <div class="big" id="kpiWinsName">—</div>
-          <div class="kpi" id="kpiWinsVal">—</div>
+      <div class="header-actions">
+        <div class="back">
+          <a href="/" aria-label="Back to home">← Back</a>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-h"><div class="t">Most WRs</div><div class="muted mini" id="weekCount"></div></div>
-        <div class="card-b">
-          <div class="big" id="kpiWrsName">—</div>
-          <div class="kpi" id="kpiWrsVal">—</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-h"><div class="t">Most Top 5</div><div class="muted mini"></div></div>
-        <div class="card-b">
-          <div class="big" id="kpiTop5Name">—</div>
-          <div class="kpi" id="kpiTop5Val">—</div>
+        <div class="meta">
+          <div id="genAt">—</div>
+          <div id="weekCount">—</div>
         </div>
       </div>
     </div>
 
-    <div style="height:12px"></div>
+    <div class="grid kpis">
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Most wins</div>
+          <div class="help">overall</div>
+        </div>
+        <div class="card-b">
+          <div class="kpi-label">Player</div>
+          <div class="kpi-main" id="kpiWinsName">—</div>
+          <div class="kpi-sub" id="kpiWinsVal">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Most WRs</div>
+          <div class="help">maps</div>
+        </div>
+        <div class="card-b">
+          <div class="kpi-label">Player</div>
+          <div class="kpi-main" id="kpiWrsName">—</div>
+          <div class="kpi-sub" id="kpiWrsVal">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <div class="t">Most Top 5</div>
+          <div class="help">consistency</div>
+        </div>
+        <div class="card-b">
+          <div class="kpi-label">Player</div>
+          <div class="kpi-main" id="kpiTop5Name">—</div>
+          <div class="kpi-sub" id="kpiTop5Val">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
 
     <div class="grid row2">
       <div class="card" id="overallCard">
         <div class="card-h">
-          <div class="t">Overall Leaderboard</div>
+          <div class="t">Overall leaderboard</div>
           <div class="controls">
-            <label class="mini muted">Sort</label>
-            <select id="sortBy">
+            <span class="label">Sort</span>
+            <select id="sortBy" aria-label="Sort leaderboard">
               <option value="wins">Wins</option>
               <option value="wrs">WRs</option>
               <option value="top5">Top 5</option>
               <option value="name">Name</option>
             </select>
-            <input id="playerSearch" type="text" placeholder="Search player..." />
-            <button id="clearSearch">Clear</button>
+
+            <input id="playerSearch" type="text" placeholder="Search player…" aria-label="Search player" />
+            <button id="clearSearch" aria-label="Clear search">Clear</button>
           </div>
         </div>
 
-        <div class="card-b" style="padding:0">
+        <div class="card-b help" style="padding-top:10px; padding-bottom:10px;">
+          Tip: WRs here are counted per-map. If a bugged leaderboard entry is filtered server-side, the next valid time becomes the WR (and the raw rank is preserved).
+        </div>
+
+        <div class="card-b table-wrap" style="padding:0">
           <table class="leaderboard-table overall-table">
             <thead>
               <tr>
@@ -285,7 +494,7 @@
                 <th class="right">Wins</th>
                 <th class="right">WRs</th>
                 <th class="right">Top 5</th>
-                <th class="right">Weeks Won</th>
+                <th class="right">Weeks won</th>
               </tr>
             </thead>
             <tbody id="overallBody"></tbody>
@@ -296,10 +505,10 @@
             <div class="mini muted" id="pageInfo">Page 1 / 1</div>
             <button id="nextPage">Next →</button>
 
-            <div style="flex:1"></div>
+            <div class="spacer"></div>
 
-            <label class="mini muted">Per page</label>
-            <select id="pageSize">
+            <span class="mini muted">Per page</span>
+            <select id="pageSize" aria-label="Page size">
               <option value="25">25</option>
               <option value="50" selected>50</option>
               <option value="100">100</option>
@@ -311,15 +520,15 @@
 
       <div class="card">
         <div class="card-h">
-          <div class="t">Week Leaderboard</div>
+          <div class="t">Week leaderboard</div>
           <div class="controls">
-            <select id="weekSelect"></select>
+            <select id="weekSelect" aria-label="Select week"></select>
           </div>
         </div>
         <div class="card-b" id="weekMeta">
           <div class="muted mini" id="weekEnded">—</div>
         </div>
-        <div class="card-b" style="padding:0">
+        <div class="card-b table-wrap" style="padding:0">
           <table class="leaderboard-table week-table">
             <thead>
               <tr>
@@ -334,16 +543,21 @@
       </div>
     </div>
 
-    <div style="height:12px"></div>
+    <div style="height:14px"></div>
 
     <div class="card">
       <div class="card-h">
         <div class="t">Changelog</div>
-        <div class="muted mini">Post-week WR improvements</div>
+        <div class="help">post-week WR improvements</div>
       </div>
       <div class="card-b" id="changelog">
         <div class="muted">Loading…</div>
       </div>
+    </div>
+
+    <div class="footer">
+      <div><b>Data source:</b> static JSON generated by your GitHub Action.</div>
+      <div>Paths: <code>/data/weekly-shorts/</code> • If something looks off, it’s usually a leaderboard edge case or a stale cached file.</div>
     </div>
   </div>
 
@@ -399,8 +613,8 @@
 
     function renderKpis(agg, weeksCount){
       const players = agg.players || [];
-      $("genAt").textContent = agg.generatedAt ? `Updated ${fmtIso(agg.generatedAt)}` : "";
-      $("weekCount").textContent = weeksCount ? `${weeksCount} weeks` : "";
+      $("genAt").textContent = agg.generatedAt ? `Updated ${fmtIso(agg.generatedAt)}` : "Updated —";
+      $("weekCount").textContent = weeksCount ? `${weeksCount} weeks indexed` : "—";
 
       const w = pickLeader(players, "wins");
       const r = pickLeader(players, "wrs");
@@ -502,7 +716,7 @@
 
       entries.forEach(e => {
         const isWinner = (e.rank === 1);
-        const badge = isWinner ? `<span class="tag">WIN</span>` : "";
+        const badge = isWinner ? `<span class="tag win">WIN</span>` : "";
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="muted rank-cell" data-label="#">${e.rank ?? "—"}</td>
@@ -520,9 +734,6 @@
         return;
       }
 
-      // supports either:
-      // 1) { text, ts, week, mapIndex, ... }  (new)
-      // 2) { type:"WR_IMPROVED_AFTER_WEEK", at, playerNew, playerPrev, ... } (older)
       const sorted = [...items].sort((a,b) => {
         const ta = Date.parse(a.ts || a.at || "") || 0;
         const tb = Date.parse(b.ts || b.at || "") || 0;
@@ -536,15 +747,15 @@
         div.className = "logitem";
 
         if (it.text) {
-          div.innerHTML = `<div class="mini muted">${fmtIso(when)}</div><div>${it.text}</div>`;
+          div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="logtext">${it.text}</div>`;
         } else if (it.type === "WR_IMPROVED_AFTER_WEEK") {
           const msg =
             `<b>${it.playerNew}</b> improved <b>Week ${it.week}</b> WR ` +
             `(previously held by <b>${it.playerPrev}</b>) — ` +
             `<b>${fmtTime(it.timeNewMs)}</b> (prev ${fmtTime(it.timePrevMs)})`;
-          div.innerHTML = `<div class="mini muted">${fmtIso(when)}</div><div>${msg}</div>`;
+          div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="logtext">${msg}</div>`;
         } else {
-          div.innerHTML = `<div class="mini muted">${fmtIso(when)}</div><div class="muted">Unknown changelog item.</div>`;
+          div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="muted">Unknown changelog item.</div>`;
         }
 
         el.appendChild(div);
@@ -596,9 +807,9 @@
       console.error(err);
       document.body.innerHTML = `
         <div style="max-width:900px;margin:40px auto;padding:16px;color:#e6ecff;font-family:system-ui">
-          <h2 style="margin:0 0 8px">Weekly Shorts Stats</h2>
+          <h2 style="margin:0 0 8px">Weekly Shorts</h2>
           <div style="opacity:.8">Failed to load data. Check console + JSON paths.</div>
-          <pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(109,251,255,.22)">${String(err)}</pre>
+          <pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12)">${String(err)}</pre>
         </div>`;
     });
   </script>
