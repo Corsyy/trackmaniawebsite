@@ -122,45 +122,60 @@ async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
 let cachedLive = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
-  const refreshToken = process.env.REFRESH_TOKEN;
+  const now = Date.now();
+  if (cachedLive.token && now < cachedLive.expAt - 30_000) return cachedLive.token;
 
+  const refreshToken = String(process.env.REFRESH_TOKEN || "").trim();
   if (!refreshToken) {
     throw new Error("REFRESH_TOKEN environment variable missing");
   }
 
-  const res = await fetch(
+  const res = await fetchRetry(
     "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh",
     {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          "Basic " +
-          Buffer.from(
-            `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
-          ).toString("base64"),
+        Authorization: `nadeo_v1 t=${refreshToken}`,
+        "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
+        Accept: "application/json",
       },
-      body: JSON.stringify({
-        refreshToken,
-      }),
     }
   );
 
   if (!res.ok) {
-    throw new Error(`refresh token failed ${res.status}`);
+    const txt = await res.text().catch(() => "");
+    throw new Error(`refresh token failed ${res.status} ${txt}`);
   }
 
   const data = await res.json();
 
-  const accessToken = data.accessToken;
-  const newRefreshToken = data.refreshToken;
+  const accessToken = data?.accessToken || null;
+  const newRefreshToken = data?.refreshToken || null;
 
-  // expose new token to GitHub Actions
-  if (process.env.GITHUB_OUTPUT) {
-    const fs = await import("fs");
+  if (!accessToken) {
+    throw new Error("refresh response missing accessToken");
+  }
+
+  try {
+    const payload = JSON.parse(
+      Buffer.from(accessToken.split(".")[1], "base64url").toString("utf8")
+    );
+    cachedLive = {
+      token: accessToken,
+      expAt: Number(payload?.exp || 0) * 1000 || Date.now() + 55 * 60 * 1000,
+    };
+  } catch {
+    cachedLive = {
+      token: accessToken,
+      expAt: Date.now() + 55 * 60 * 1000,
+    };
+  }
+
+  if (newRefreshToken && process.env.GITHUB_OUTPUT) {
     fs.appendFileSync(
       process.env.GITHUB_OUTPUT,
-      `new_refresh_token=${newRefreshToken}\n`
+      `new_refresh_token=${newRefreshToken}\n`,
+      "utf8"
     );
   }
 
