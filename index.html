@@ -72,6 +72,26 @@
   a{color:inherit;text-decoration:none}
   .container{width:min(1200px,92vw);margin:0 auto}
 
+  /* remove wide dark section bands */
+  section,
+  #live-events,
+  #schedule,
+  #showcase,
+  #about,
+  #contact{
+    background:transparent !important;
+    position:relative;
+    z-index:1;
+  }
+
+  #live-events .container,
+  #schedule .container,
+  #showcase .container,
+  #about .container,
+  #contact .container{
+    background:transparent !important;
+  }
+
   /* NAV */
   header{
     position:sticky;top:0;z-index:50;
@@ -204,7 +224,6 @@
     flex-direction:column;
     overflow:hidden;
   }
-
   /* --- MINI CALENDAR TOOLTIP FIX --- */
   #miniCalendar {
     position: relative;
@@ -437,7 +456,6 @@
     font-weight: 800;
     box-shadow: none;
   }
-
   /* SECTIONS */
   .section{padding:3rem 0}
   .title{
