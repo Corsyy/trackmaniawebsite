@@ -3,7 +3,6 @@ name: Update Weekly Shorts (static JSON)
 on:
   workflow_dispatch:
   schedule:
-    # Every hour at :12 UTC (adjust if you want)
     - cron: "12 * * * *"
 
 concurrency:
@@ -17,23 +16,15 @@ jobs:
       contents: write
 
     env:
-      # Write output into repo (GitHub Pages serves it)
       PUBLIC_DIR: .
       DEBUG: "0"
 
-      # Ubisoft login (used to mint NadeoLiveServices token each run)
-      UBI_EMAIL: ${{ secrets.UBI_EMAIL }}
-      UBI_PASSWORD: ${{ secrets.UBI_PASSWORD }}
+      # Live Services refresh-token auth
+      REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
 
       # Trackmania OAuth (display names)
       CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
-
-      # Optional tuning (safe defaults)
-      WS_MATCH: "weekly shorts"
-      # Optional pins (use once you know them)
-      # WS_OFFICIAL_CAMPAIGN_ID: ""
-      # WS_OFFICIAL_PLAYLIST_ID: ""
 
     steps:
       - name: Checkout
@@ -55,14 +46,28 @@ jobs:
           fi
 
       - name: Run Weekly Shorts updater
+        id: update
         run: node scripts/weekly-shorts-update.js
+
+      - name: Rotate NADEO refresh token
+        if: success() && steps.update.outputs.new_refresh_token != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_SECRET_ROTATION_PAT }}
+          NEW_REFRESH_TOKEN: ${{ steps.update.outputs.new_refresh_token }}
+        run: |
+          gh secret set NADEO_REFRESH_TOKEN --body "$NEW_REFRESH_TOKEN"
 
       - name: Commit & push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/weekly-shorts
+          git add \
+            data/weekly-shorts/weeks.json \
+            data/weekly-shorts/aggregate.json \
+            data/weekly-shorts/changelog.json \
+            data/weekly-shorts/weeks \
+            data/weekly-shorts/name-cache.json
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
