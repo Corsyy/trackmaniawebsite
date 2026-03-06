@@ -15,42 +15,33 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="shortcut icon" href="/logo.png">
- <style>
+<style>
 :root{
-  /* PROFESSIONAL DARK UI SYSTEM */
+  /* Your vibe, just refined */
   --bg0:#070A12;
   --bg1:#0B1020;
 
-  --surface:#0F172A;              /* main card */
-  --surface2:#0C1426;             /* deeper card */
-  --surface3:#0A1222;             /* nav/overlays */
-  --surfaceBorder: rgba(255,255,255,.10);
-
   --text:#EAF0FF;
-  --muted: rgba(234,240,255,.72);
-  --muted2: rgba(234,240,255,.52);
+  --muted:rgba(234,240,255,.72);
+  --muted2:rgba(234,240,255,.55);
 
   --accent:#3aa0ff;
   --accent2:#6dfbff;
 
-  --shadow: 0 18px 45px rgba(0,0,0,.55);
-  --shadow2: 0 10px 26px rgba(0,0,0,.42);
+  --panel: rgba(12,18,34,.86);
+  --panel2: rgba(12,18,34,.70);
+  --line: rgba(255,255,255,.10);
+  --line2: rgba(255,255,255,.16);
 
   --radius:18px;
   --radius2:14px;
 
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --shadow: 0 18px 50px rgba(0,0,0,.55);
+  --shadow2: 0 10px 28px rgba(0,0,0,.40);
 
-  /* Layout rhythm */
-  --space-1: 8px;
-  --space-2: 12px;
-  --space-3: 16px;
-  --space-4: 22px;
-  --space-5: 30px;
-  --space-6: 42px;
-
-  /* Focus ring */
   --ring: 0 0 0 3px rgba(58,160,255,.22);
+
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 *{ box-sizing:border-box; }
@@ -60,13 +51,13 @@ html{ background: var(--bg0); scroll-behavior:smooth; }
 body{
   margin:0;
   color:var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
   -webkit-font-smoothing: antialiased;
   overflow-x:hidden;
   background: transparent;
 }
 
-/* ===== Background: calm, not “neon template” ===== */
+/* ===== Background (banding-safe, no seams) ===== */
 body.bg-track-curves::before{
   content:"";
   position: fixed;
@@ -74,21 +65,21 @@ body.bg-track-curves::before{
   pointer-events:none;
   z-index: -2;
   background:
-    radial-gradient(1200px 720px at 18% -10%, rgba(58,160,255,.14), transparent 60%),
-    radial-gradient(900px 650px at 110% 10%, rgba(109,251,255,.10), transparent 64%),
-    radial-gradient(900px 700px at 50% 115%, rgba(255,255,255,.04), transparent 72%),
+    radial-gradient(1100px 700px at 20% 0%, rgba(58,160,255,.14), transparent 58%),
+    radial-gradient(900px 600px at 90% 12%, rgba(109,251,255,.10), transparent 62%),
+    radial-gradient(1200px 900px at 55% 115%, rgba(255,255,255,.03), transparent 70%),
     linear-gradient(180deg, var(--bg0), var(--bg1));
   transform: translateZ(0);
 }
 
-/* Subtle noise so gradients don’t band (NO mix-blend seam issues) */
+/* Subtle noise to kill banding (no mix-blend to avoid GPU seam lines) */
 body.bg-track-curves::after{
   content:"";
   position: fixed;
   inset: 0;
   pointer-events:none;
   z-index: -1;
-  opacity: .05;
+  opacity: .055;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
   background-size:160px 160px;
@@ -103,12 +94,12 @@ a:hover{ text-decoration:underline; text-decoration-color:rgba(255,255,255,.25);
   margin:0 auto;
 }
 
-/* ===== Header / Nav ===== */
+/* ===== Nav ===== */
 header{
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(7,10,18,.70);
+  background: rgba(7,10,18,.68);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
@@ -121,59 +112,47 @@ header{
 .brand{
   display:flex;
   align-items:center;
-  gap: 10px;
-  font-weight: 900;
-  letter-spacing: .2px;
+  gap:10px;
+  font-weight:900;
+  letter-spacing:.2px;
 }
 .brand-badge{
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  display:grid;
-  place-items:center;
+  width:34px;height:34px;
+  border-radius:12px;
+  display:grid;place-items:center;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color:#061021;
   box-shadow: 0 10px 22px rgba(0,0,0,.45);
 }
 .navlinks{
   display:flex;
-  gap: 18px;
+  gap:18px;
   align-items:center;
 }
-.nav a{
-  opacity:.86;
-  font-weight:700;
-  font-size: 14px;
-}
+.nav a{ opacity:.86; font-weight:800; font-size:13px; }
 .nav a:hover{ opacity:1; }
 .nav a.active{
   opacity:1;
-  position: relative;
+  position:relative;
 }
 .nav a.active::after{
   content:"";
   position:absolute;
-  left:0;
-  right:0;
-  bottom:-10px;
-  height:2px;
-  border-radius:2px;
+  left:0; right:0; bottom:-10px;
+  height:2px; border-radius:2px;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
-  opacity:.9;
 }
 
+/* Buttons */
 .cta{ display:flex; gap:10px; align-items:center; }
-
 .btn{
-  appearance:none;
-  border: 1px solid rgba(255,255,255,.14);
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.04);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 850;
+  color:var(--text);
+  font-weight:900;
   cursor:pointer;
-  transition: transform .14s ease, border-color .14s ease, background .14s ease, filter .14s ease;
+  transition: transform .14s ease, filter .14s ease, border-color .14s ease, background .14s ease;
 }
 .btn:hover{
   transform: translateY(-1px);
@@ -181,87 +160,51 @@ header{
   background: rgba(255,255,255,.06);
 }
 .btn:focus{ outline:none; box-shadow: var(--ring); }
-
 .btn.primary{
-  border-color: transparent;
+  border-color:transparent;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   color:#051021;
 }
-.btn.primary:hover{ filter: brightness(1.05); }
-
-/* Mobile nav toggle (keep if you use it) */
-.nav-toggle{ display:none; }
+.btn.primary:hover{ filter:brightness(1.05); }
 
 /* ===== Hero ===== */
 .hero{
-  padding: clamp(26px, 4.5vw, 44px) 0 18px;
+  padding: 30px 0 16px;
 }
-.hero-grid{ display:block; }
-
-.hero-top{
-  display:flex;
-  flex-direction:column;
-  gap: 14px;
-}
-
-#hero-chip, #live-chip, .chip{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .2px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.12);
-  color: rgba(234,240,255,.92);
-}
-
 .h1{
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   font-size: clamp(34px, 4.2vw, 54px);
   line-height: 1.06;
   letter-spacing: -0.02em;
   font-weight: 950;
 }
 .lead{
-  margin: 0;
+  margin: 10px 0 0;
   color: var(--muted);
   font-size: 15px;
   line-height: 1.55;
   max-width: 70ch;
 }
 
-.keyfacts{
-  display:flex;
-  flex-wrap:wrap;
-  gap: 10px;
-  margin: 14px 0 0;
-}
-.pill{
-  padding: 8px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.04);
-  font-size: 13px;
-  color: rgba(234,240,255,.86);
-}
-
-/* hero two column area */
-.hero-row{
-  margin-top: 18px;
-  display:grid;
-  grid-template-columns: 1.05fr .95fr;
-  gap: 16px;
-  align-items: stretch;
+/* chip row */
+#hero-chip, #live-chip, .chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:950;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(234,240,255,.92);
 }
 
-/* ===== Cards (main change: solid surfaces, less “glass”) ===== */
+/* ===== Cards ===== */
 .card{
-  border-radius: var(--radius);
+  background: var(--panel);
   border: 1px solid rgba(255,255,255,.10);
-  background: linear-gradient(180deg, rgba(15,23,42,.86), rgba(12,20,38,.82));
+  border-radius: var(--radius);
   box-shadow: var(--shadow2);
   overflow:hidden;
 }
@@ -270,75 +213,40 @@ header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap: 12px;
+  gap:12px;
   border-bottom: 1px solid rgba(255,255,255,.08);
   background: rgba(255,255,255,.02);
 }
 .card-body{ padding: 16px; }
 
-/* live embed card */
-#live .card{
-  min-height: 420px;
-  display:flex;
-  flex-direction:column;
-}
-#live .card-body{
-  flex:1;
-  padding:0;
-  display:block;
-}
-#live .player{
-  width:100%;
-  height:100%;
-  border:0;
-  display:block;
+/* Hero layout (your two big cards) */
+.hero-row{
+  margin-top: 18px;
+  display:grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 16px;
+  align-items: stretch;
 }
 
-/* Countdown card (calm, readable) */
-#countdown-card{
-  border-radius: var(--radius);
-  background:
-    linear-gradient(180deg, rgba(15,23,42,.90), rgba(12,20,38,.86));
-}
-#countdown{
-  display:grid !important;
-  grid-template-columns: repeat(4, minmax(110px, 1fr));
-  gap: 10px;
-}
-.timebox{
-  border-radius: 14px;
-  padding: 12px 10px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.035);
-  text-align:center;
-}
-.timebox strong{
-  display:block;
-  font-size: clamp(20px, 2.2vw, 28px);
-  font-weight: 950;
-  letter-spacing: -0.01em;
-}
-.timebox span{
-  display:block;
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--muted2);
-}
+/* Twitch embed card should fill */
+#live .card{ min-height: 360px; display:flex; flex-direction:column; }
+#live .card-body{ flex:1; padding:0; }
+#live .player{ width:100%; height:100%; border:0; display:block; }
 
-/* ===== Sections ===== */
+/* ===== Section headings ===== */
 .section{
   padding: 34px 0;
 }
 .title{
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   font-size: 22px;
-  letter-spacing: -0.01em;
   font-weight: 950;
+  letter-spacing: -0.01em;
 }
 .title::after{
   content:"";
   display:block;
-  width: 54px;
+  width: 42px;
   height: 2px;
   margin-top: 10px;
   border-radius: 2px;
@@ -346,92 +254,97 @@ header{
   opacity:.9;
 }
 
-/* ===== Events grid (professional card grid) ===== */
+/* ===== Event grids ===== */
 .grid{
   display:grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
-
-.event-link{
-  display:block;
-  color:inherit;
-}
+.event-link{ display:block; color:inherit; }
 
 .event{
   position:relative;
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,.10);
-  background: linear-gradient(180deg, rgba(15,23,42,.78), rgba(12,20,38,.72));
+  background: rgba(12,18,34,.76);
   box-shadow: 0 10px 22px rgba(0,0,0,.35);
   padding: 14px 14px 16px;
-  transition: transform .14s ease, border-color .14s ease, background .14s ease;
   overflow:hidden;
+  transition: transform .14s ease, border-color .14s ease, filter .14s ease;
 }
-
 .event:hover{
   transform: translateY(-2px);
   border-color: rgba(255,255,255,.18);
-  background: linear-gradient(180deg, rgba(15,23,42,.86), rgba(12,20,38,.78));
+  filter: brightness(1.03);
 }
 
-.event .tag{
-  position:absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 11px;
-  font-weight: 950;
-  padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.06);
-  color: rgba(234,240,255,.92);
-}
-
-.event h4{
-  margin: 22px 0 6px;
-  font-size: 16px;
-  letter-spacing: -0.01em;
-  font-weight: 950;
-}
-.event .meta{
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-/* background-image events (if you use .with-bg) */
+/* If you use background images on cards */
 .event.with-bg{
   background-image:
-    linear-gradient(180deg, rgba(15,23,42,.78), rgba(12,20,38,.76)),
+    linear-gradient(180deg, rgba(12,18,34,.72), rgba(12,18,34,.86)),
     var(--event-img);
   background-size: cover;
   background-position:center;
   background-repeat:no-repeat;
 }
 
-/* ===== Shots / misc cards ===== */
-.cards{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 14px;
+.event .tag{
+  position:absolute;
+  top:12px;
+  right:12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25);
+  font-size: 11px;
+  font-weight: 950;
+  color: rgba(234,240,255,.92);
 }
-.shot{
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: linear-gradient(180deg, rgba(15,23,42,.78), rgba(12,20,38,.72));
-  overflow:hidden;
-  box-shadow: 0 10px 22px rgba(0,0,0,.30);
-}
-.shot .media{
-  aspect-ratio: 4/3;
-  display:grid;
-  place-items:center;
-  color: var(--muted2);
-  background: rgba(255,255,255,.02);
-}
-.shot .text{ padding: 14px; }
 
+.event h4{
+  margin: 22px 0 6px;
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 10px rgba(0,0,0,.45);
+}
+.event .meta{
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+
+/* ===== About / Contact blocks ===== */
+.form, form{ max-width: 100%; }
+
+/* THIS fixes your white inputs + tiny textarea */
+input[type="text"], input[type="email"], input[type="search"], textarea, select{
+  width: 100%;
+  max-width: 520px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: var(--text);
+  outline: none;
+}
+textarea{
+  min-height: 120px;
+  resize: vertical;
+}
+input::placeholder, textarea::placeholder{
+  color: rgba(234,240,255,.45);
+}
+input:focus, textarea:focus, select:focus{
+  border-color: rgba(58,160,255,.40);
+  box-shadow: var(--ring);
+}
+
+/* align labels nicely if your contact uses plain labels */
+label{ color: var(--muted2); font-size: 12px; font-weight: 800; }
+
+/* ===== Footer ===== */
 footer{
   border-top: 1px solid rgba(255,255,255,.08);
   padding: 18px 0;
@@ -439,11 +352,7 @@ footer{
   font-size: 13px;
 }
 
-/* reveal anim (subtle) */
-.reveal{ opacity:0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
-.reveal.show{ opacity:1; transform:none; }
-
-/* toTop */
+/* ===== Floating buttons (toTop/chat) ===== */
 #toTop{
   position:fixed;
   right: 18px;
@@ -453,7 +362,7 @@ footer{
   height: 52px;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.14);
-  background: rgba(15,23,42,.75);
+  background: rgba(12,18,34,.78);
   box-shadow: 0 10px 22px rgba(0,0,0,.35);
   color: rgba(234,240,255,.90);
   cursor:pointer;
@@ -467,7 +376,7 @@ footer{
 #toTop.show{ opacity:1; pointer-events:auto; }
 #toTop:hover{ transform: translateY(-2px); filter: brightness(1.06); }
 
-/* ===== Chat widget (match new style) ===== */
+/* Keep your chat widget consistent (if present) */
 #tmeChatBtn{
   position:fixed;
   right:18px;
@@ -484,126 +393,16 @@ footer{
   place-items:center;
   box-shadow: 0 10px 22px rgba(0,0,0,.40);
 }
-#tmeChatPanel{
-  position:fixed;
-  right:18px;
-  bottom:148px;
-  z-index:999999;
-  width:min(420px, calc(100vw - 36px));
-  height:min(640px, 85vh);
-  border-radius: 18px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(15,23,42,.94);
-  box-shadow: var(--shadow);
-  overflow:hidden;
-  display:none;
-}
-#tmeChatHeader{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.03);
-}
-#tmeChatClose{
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.04);
-  color: var(--text);
-  border-radius: 12px;
-  padding: 6px 10px;
-  cursor:pointer;
-}
-#tmeChatLog{
-  height: calc(min(640px, 85vh) - 52px - 64px);
-  padding: 12px;
-  overflow:auto;
-  display:flex;
-  flex-direction:column;
-  gap: 10px;
-}
-#tmeChatLog .tmeMsgRow{ display:flex; gap:10px; align-items:flex-end; margin: 6px 0; }
-#tmeChatLog .tmeMsgRow.me{ justify-content:flex-end; }
-#tmeChatLog .tmeMsg{
-  display:inline-block;
-  max-width: 100%;
-  width: fit-content;
-  padding: 10px 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.04);
-  color: var(--text);
-  line-height: 1.25;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-#tmeChatLog .tmeMsg.me{
-  background: linear-gradient(135deg, rgba(58,160,255,.22), rgba(109,251,255,.14));
-  border-color: rgba(255,255,255,.14);
-}
-.tmeMeta{ font-size: 11px; color: var(--muted2); margin-top: 4px; }
-
-#tmeChatInputWrap{
-  height: 64px;
-  padding: 10px;
-  border-top: 1px solid rgba(255,255,255,.08);
-  display:flex;
-  gap: 10px;
-  background: rgba(255,255,255,.02);
-}
-#tmeChatInput{
-  flex:1;
-  border-radius: 14px;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
-  color: var(--text);
-  padding: 10px 12px;
-  outline:none;
-}
-#tmeChatInput:focus{ box-shadow: var(--ring); border-color: rgba(58,160,255,.35); }
-#tmeChatSend{
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color:#051021;
-  font-weight:950;
-  padding: 10px 14px;
-  cursor:pointer;
-}
 
 /* ===== Responsive ===== */
 @media (max-width: 980px){
   .hero-row{ grid-template-columns: 1fr; }
   .grid{ grid-template-columns: 1fr 1fr; }
-  .cards{ grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px){
-  .grid, .cards{ grid-template-columns: 1fr; }
-
-  .nav-toggle{
-    display:block;
-    border:1px solid rgba(255,255,255,.14);
-    background: rgba(255,255,255,.04);
-    color: var(--text);
-    border-radius: 12px;
-    padding: 8px 10px;
-  }
-  .navlinks{
-    display:none;
-    position:absolute;
-    top:58px; left:0; right:0;
-    padding: 12px;
-    background: rgba(7,10,18,.92);
-    border-bottom:1px solid rgba(255,255,255,.08);
-    flex-direction:column;
-    gap:10px;
-  }
-  .navlinks.show{ display:flex; }
-  #countdown{ grid-template-columns: repeat(2, minmax(110px,1fr)); }
+  .grid{ grid-template-columns: 1fr; }
+  input[type="text"], input[type="email"], input[type="search"], textarea, select{ max-width: 100%; }
 }
-
-/* Hide any old stripe overlays if present */
-.tm-stripes{ display:none !important; }
 </style>
 </head>
 
