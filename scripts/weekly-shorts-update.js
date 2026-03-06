@@ -122,85 +122,49 @@ async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
 let cachedLive = { token: null, expAt: 0 };
 
 async function getLiveAccessToken() {
-  const now = Date.now();
-  if (cachedLive.token && now < cachedLive.expAt - 30_000) return cachedLive.token;
+  const refreshToken = process.env.REFRESH_TOKEN;
 
-  if (!UBI_EMAIL || !UBI_PASSWORD) {
-    throw new Error("Missing UBI_EMAIL / UBI_PASSWORD env (Ubisoft login).");
+  if (!refreshToken) {
+    throw new Error("REFRESH_TOKEN environment variable missing");
   }
 
-  // 1) Ubisoft ticket
-  const basic = Buffer.from(`${UBI_EMAIL}:${UBI_PASSWORD}`, "utf8").toString("base64");
-  const ticketRes = await fetchRetry("https://public-ubiservices.ubi.com/v3/profiles/sessions", {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${basic}`,
-      "Ubi-AppId": "86263886-327a-4328-ac69-527f0d20a237",
-      "Content-Type": "application/json",
-      "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
-    },
-    body: "{}",
-  });
-
-  if (!ticketRes.ok) {
-    const body = await ticketRes.text().catch(() => "");
-    throw new Error(`ubisoft ticket failed ${ticketRes.status} ${body || "(no body)"}`);
-  }
-
-  const ticketJson = await ticketRes.json();
-  const ticket = ticketJson?.ticket;
-  if (!ticket) throw new Error("No ticket in Ubisoft response");
-
-  // 2) Nadeo ubiservices token (core)
-  const ubiServicesRes = await fetchRetry(
-    "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices",
+  const res = await fetch(
+    "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh",
     {
       method: "POST",
       headers: {
-        Authorization: `ubi_v1 t=${ticket}`,
         "Content-Type": "application/json",
-        "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
+        Authorization:
+          "Basic " +
+          Buffer.from(
+            `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
+          ).toString("base64"),
       },
-      body: "{}",
+      body: JSON.stringify({
+        refreshToken,
+      }),
     }
   );
 
-  if (!ubiServicesRes.ok) {
-    const body = await ubiServicesRes.text().catch(() => "");
-    throw new Error(`ubiservices token failed ${ubiServicesRes.status} ${body || "(no body)"}`);
+  if (!res.ok) {
+    throw new Error(`refresh token failed ${res.status}`);
   }
 
-  const ubiServicesJson = await ubiServicesRes.json();
-  const lvl1Access = ubiServicesJson?.accessToken || ubiServicesJson?.access_token;
-  if (!lvl1Access) throw new Error("No accessToken from ubiservices");
+  const data = await res.json();
 
-  // 3) Nadeo nadeoservices token for Live Services audience
-  const liveRes = await fetchRetry(
-    "https://prod.trackmania.core.nadeo.online/v2/authentication/token/nadeoservices",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `nadeo_v1 t=${lvl1Access}`,
-        "Content-Type": "application/json",
-        "User-Agent": "trackmaniaevents.com/weekly-shorts (github action)",
-      },
-      body: JSON.stringify({ audience: "NadeoLiveServices" }),
-    }
-  );
+  const accessToken = data.accessToken;
+  const newRefreshToken = data.refreshToken;
 
-  if (!liveRes.ok) {
-    const body = await liveRes.text().catch(() => "");
-    throw new Error(`nadeoservices token failed ${liveRes.status} ${body || "(no body)"}`);
+  // expose new token to GitHub Actions
+  if (process.env.GITHUB_OUTPUT) {
+    const fs = await import("fs");
+    fs.appendFileSync(
+      process.env.GITHUB_OUTPUT,
+      `new_refresh_token=${newRefreshToken}\n`
+    );
   }
 
-  const liveJson = await liveRes.json();
-  const accessToken = liveJson?.accessToken || liveJson?.access_token;
-  const expiresIn = Number(liveJson?.expiresIn || liveJson?.expires_in || 3600);
-
-  if (!accessToken) throw new Error("No NadeoLiveServices accessToken");
-
-  cachedLive = { token: accessToken, expAt: Date.now() + expiresIn * 1000 };
-  return cachedLive.token;
+  return accessToken;
 }
 
 async function jget(url, access) {
