@@ -66,10 +66,33 @@ body::after{
   color:var(--text);
 }
 
-.tag.win{
-  background:linear-gradient(135deg,#ffd86b,#ffb300);
-  color:#1b1200;
-  border:1px solid rgba(255,210,100,.5);
+.tag.win {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 8px;
+  padding: 3px 10px;
+  height: 22px;
+  min-width: 44px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(109, 251, 255, 0.45);
+
+  background:
+    linear-gradient(180deg, rgba(109,251,255,.22), rgba(58,160,255,.14)),
+    rgba(8,18,38,.9);
+
+  color: #dffcff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 10px rgba(109,251,255,.18),
+    0 0 18px rgba(58,160,255,.12);
 }
 
 /* layout */
