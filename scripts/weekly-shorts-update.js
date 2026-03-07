@@ -470,8 +470,6 @@ function cleanMapEntries(mapUid, entriesIn) {
     const ranks = new Set(cleaned.map((e) => Number(e.rank)));
     const has1 = ranks.has(1);
     const has2 = ranks.has(2);
-    // If we don't have rank 1, it's still potentially OK if the first entry has rank 1 after cleaning,
-    // but in practice, missing 1 is a sign the feed is broken.
     trusted = has1 && has2;
   }
 
@@ -480,8 +478,40 @@ function cleanMapEntries(mapUid, entriesIn) {
 
 // ---------- Aggregate ----------
 
-function buildAggregate(allWeekJson) {
+function buildAggregate(allWeekJson, nameCacheObj = {}) {
   const by = new Map();
+
+  function getOrCreate(accountId, fallbackPlayer = null) {
+    if (!accountId) return null;
+
+    let rec = by.get(accountId);
+    if (!rec) {
+      rec = {
+        accountId,
+        player: nameCacheObj[accountId] || fallbackPlayer || accountId,
+        wins: 0,
+        wrs: 0,
+        top5: 0,
+        weeksWon: [],
+        wrWeeks: [],
+        top5Weeks: [],
+        aliases: [],
+      };
+      by.set(accountId, rec);
+    }
+
+    const latestName = nameCacheObj[accountId] || fallbackPlayer || rec.player || accountId;
+
+    if (rec.player && latestName && rec.player !== latestName) {
+      rec.aliases.push(rec.player);
+    }
+    if (fallbackPlayer && fallbackPlayer !== latestName) {
+      rec.aliases.push(fallbackPlayer);
+    }
+
+    rec.player = latestName;
+    return rec;
+  }
 
   for (const w of allWeekJson) {
     const weekNum = Number(w.week);
@@ -489,67 +519,48 @@ function buildAggregate(allWeekJson) {
     const points = Array.isArray(w.entries) ? w.entries : [];
     const winner = points.find((p) => Number(p.rank) === 1);
 
-    if (winner?.player) {
-      const rec =
-        by.get(winner.player) || {
-          player: winner.player,
-          wins: 0,
-          wrs: 0,
-          top5: 0,
-          weeksWon: [],
-          wrWeeks: [],
-          top5Weeks: [],
-        };
-      rec.wins += 1;
-      rec.weeksWon.push(weekNum);
-      by.set(winner.player, rec);
+    if (winner?.accountId) {
+      const rec = getOrCreate(winner.accountId, winner.player);
+      if (rec) {
+        rec.wins += 1;
+        rec.weeksWon.push(weekNum);
+      }
     }
 
     for (const m of w.maps || []) {
       const mapUid = m.mapUid;
       const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
-
-      // Define "WR" as best valid entry after cleaning. If untrusted, do not count.
       const best = entriesClean[0] || null;
 
-      if (trusted && best?.player) {
-        const player = best.player;
-        const rec =
-          by.get(player) || {
-            player,
-            wins: 0,
-            wrs: 0,
-            top5: 0,
-            weeksWon: [],
-            wrWeeks: [],
-            top5Weeks: [],
-          };
-
-        rec.wrs += 1;
-        rec.wrWeeks.push({ week: weekNum, mapUid, timeMs: best.timeMs, rawRank: best.rank });
-        by.set(player, rec);
+      if (trusted && best?.accountId) {
+        const rec = getOrCreate(best.accountId, best.player);
+        if (rec) {
+          rec.wrs += 1;
+          rec.wrWeeks.push({
+            week: weekNum,
+            mapUid,
+            timeMs: best.timeMs,
+            rawRank: best.rawRank ?? best.rank,
+          });
+        }
       }
 
-      // Top5: use top 5 entries *after cleaning*, but only if trusted
       if (trusted) {
         for (let i = 0; i < Math.min(5, entriesClean.length); i++) {
           const e = entriesClean[i];
-          if (!e?.player) continue;
+          if (!e?.accountId) continue;
 
-          const rec =
-            by.get(e.player) || {
-              player: e.player,
-              wins: 0,
-              wrs: 0,
-              top5: 0,
-              weeksWon: [],
-              wrWeeks: [],
-              top5Weeks: [],
-            };
+          const rec = getOrCreate(e.accountId, e.player);
+          if (!rec) continue;
 
           rec.top5 += 1;
-          rec.top5Weeks.push({ week: weekNum, mapUid, rank: i + 1, timeMs: e.timeMs, rawRank: e.rank });
-          by.set(e.player, rec);
+          rec.top5Weeks.push({
+            week: weekNum,
+            mapUid,
+            rank: i + 1,
+            timeMs: e.timeMs,
+            rawRank: e.rawRank ?? e.rank,
+          });
         }
       }
     }
@@ -558,6 +569,9 @@ function buildAggregate(allWeekJson) {
   const players = Array.from(by.values()).map((p) => ({
     ...p,
     weeksWon: Array.from(new Set(p.weeksWon)).sort((a, b) => a - b),
+    aliases: Array.from(new Set((p.aliases || []).filter(Boolean))).sort((a, b) =>
+      a.localeCompare(b)
+    ),
   }));
 
   players.sort(
@@ -604,6 +618,7 @@ function getBaselineWRFromWeekFile(weekJson, mapUid) {
 
   return {
     holder: best.player,
+    holderAccountId: best.accountId || null,
     timeMs: best.timeMs,
   };
 }
@@ -643,28 +658,30 @@ async function main() {
         // Raw entries
         let entries = rows.map((r) => ({
           rank: r.rank,
+          accountId: r.accountId,
           player: nameCacheObj[r.accountId] || r.accountId,
           timeMs: r.timeMs,
         }));
 
         const cleaned = cleanMapEntries(mapUid, entries);
 
-// Re-rank after cleaning so "best valid" becomes rank 1,
-// but preserve original leaderboard rank in rawRank.
-const reRanked = cleaned.entriesClean.map((e, idx) => ({
-  rank: idx + 1,
-  rawRank: e.rank,
-  player: e.player,
-  timeMs: e.timeMs,
-}));
+        // Re-rank after cleaning so "best valid" becomes rank 1,
+        // but preserve original leaderboard rank in rawRank.
+        const reRanked = cleaned.entriesClean.map((e, idx) => ({
+          rank: idx + 1,
+          rawRank: e.rank,
+          accountId: e.accountId || null,
+          player: e.player,
+          timeMs: e.timeMs,
+        }));
 
-maps.push({
-  mapUid,
-  mapName: null,
-  trusted: cleaned.trusted,
-  entries: reRanked,
-  dropped: DEBUG ? cleaned.dropped : undefined,
-});
+        maps.push({
+          mapUid,
+          mapName: null,
+          trusted: cleaned.trusted,
+          entries: reRanked,
+          dropped: DEBUG ? cleaned.dropped : undefined,
+        });
 
         await sleep(SLEEP_MS);
       }
@@ -677,6 +694,7 @@ maps.push({
         const n = Number.isFinite(r.score) ? r.score : 0;
         return {
           rank: r.rank,
+          accountId: r.accountId,
           player,
           score: n,
           points: n,
@@ -727,6 +745,8 @@ maps.push({
             mapUid,
             newHolder: currentHolder,
             oldHolder: baseline.holder,
+            newHolderAccountId: current.accountId || null,
+            oldHolderAccountId: baseline.holderAccountId || null,
             newTimeMs: currentTimeMs,
             oldTimeMs: baseline.timeMs,
             deltaMs: baseline.timeMs - currentTimeMs,
@@ -745,7 +765,7 @@ maps.push({
   }
 
   writeJson(WEEKS_INDEX_PATH, weeksIndex);
-  writeJson(AGG_PATH, buildAggregate(allWeekJson));
+  writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj));
   writeJson(NAME_CACHE_PATH, nameCacheObj);
 
   changelog.generatedAt = isoNow();
