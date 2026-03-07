@@ -26,8 +26,8 @@
   --border:rgba(255,255,255,.07);
   --border-strong:rgba(255,255,255,.12);
 
-  --shadow-sm:0 8px 22px rgba(0,0,0,.22);
-  --shadow-md:0 16px 36px rgba(0,0,0,.28);
+  --shadow-sm:0 8px 22px rgba(0,0,0,.20);
+  --shadow-md:0 16px 36px rgba(0,0,0,.24);
 
   --radius:18px;
   --radius-sm:12px;
@@ -58,13 +58,14 @@ body.bg-track-curves{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
 }
+
 body.bg-track-curves::after{
   content:"";
   position:fixed;
   inset:0;
   pointer-events:none;
   z-index:-1;
-  opacity:.02;
+  opacity:.018;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
   background-size:220px 220px;
 }
@@ -75,7 +76,7 @@ header{
   position:sticky;
   top:0;
   z-index:50;
-  background:rgba(10,16,26,.88);
+  background:rgba(10,16,26,.92);
   backdrop-filter:blur(10px);
 }
 
@@ -84,26 +85,27 @@ header{
   grid-template-columns:auto 1fr auto;
   align-items:center;
   gap:1rem;
-  padding:.9rem 0 .75rem;
+  padding:1rem 0 .7rem;
 }
 
 h1{
   margin:0;
-  font-size:1.9rem;
+  font-size:2rem;
   line-height:1;
   font-weight:950;
-  letter-spacing:-.02em;
-  color:#f6f9ff;
+  letter-spacing:-.03em;
+  color:#f7faff;
 }
 
 .nav-center{
   display:flex;
   justify-content:center;
+  align-items:center;
 }
 
 .navlinks{
   display:flex;
-  gap:1.4rem;
+  gap:1.5rem;
   align-items:center;
 }
 
@@ -111,9 +113,9 @@ h1{
   color:var(--muted);
   white-space:nowrap;
   font-size:.95rem;
-  font-weight:700;
+  font-weight:800;
   letter-spacing:.01em;
-  opacity:.9;
+  opacity:.92;
   transition:color .18s ease, opacity .18s ease;
 }
 
@@ -159,10 +161,10 @@ h1{
   align-items:center;
   justify-content:flex-start;
   gap:.7rem;
-  padding:.1rem 1rem .95rem;
+  padding:.05rem 1rem 1rem;
   color:var(--muted);
-  font-size:.95rem;
-  font-weight:700;
+  font-size:.94rem;
+  font-weight:800;
 }
 
 .select{
@@ -175,11 +177,11 @@ select{
   background:#101a2c;
   border:1px solid var(--border);
   color:var(--text);
-  padding:.55rem .8rem;
+  padding:.58rem .84rem;
   border-radius:10px;
-  font-weight:700;
+  font-weight:800;
   outline:none;
-  min-width:136px;
+  min-width:146px;
 }
 
 select:focus{
@@ -200,7 +202,7 @@ select:focus{
   border:1px solid var(--border);
   background:#121d31;
   color:var(--text);
-  font-weight:800;
+  font-weight:850;
   font-size:.92rem;
   line-height:1;
   transition:transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
@@ -227,9 +229,9 @@ select:focus{
 
 .hero{
   display:grid;
-  grid-template-columns:minmax(300px, 470px) minmax(280px, 1fr);
-  gap:1.1rem;
-  margin:1.1rem 0 1.3rem;
+  grid-template-columns:minmax(320px, 480px) minmax(280px, 1fr);
+  gap:1.15rem;
+  margin:1.15rem 0 1.35rem;
   align-items:stretch;
 }
 
@@ -246,27 +248,28 @@ select:focus{
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  gap:.85rem;
+  gap:.95rem;
   min-width:0;
   border:1px solid var(--border);
   border-radius:var(--radius);
-  background:linear-gradient(180deg, rgba(17,27,44,.98), rgba(12,19,33,.98));
-  padding:1.15rem 1.15rem 1.1rem;
+  background:
+    linear-gradient(180deg, rgba(17,27,44,.98), rgba(12,19,33,.98));
+  padding:1.2rem 1.2rem 1.15rem;
   box-shadow:none;
 }
 
 .hero h2{
   margin:0;
-  font-size:clamp(1.7rem,2.9vw,2.3rem);
-  line-height:1.05;
-  letter-spacing:-.03em;
-  color:#f6f9ff;
+  font-size:clamp(1.7rem,2.9vw,2.35rem);
+  line-height:1.03;
+  letter-spacing:-.035em;
+  color:#f7faff;
 }
 
 .hero-meta{
   display:flex;
   flex-direction:column;
-  gap:.55rem;
+  gap:.62rem;
 }
 
 .hero-row{
@@ -278,14 +281,14 @@ select:focus{
 
 .hero-label{
   color:var(--muted);
-  font-weight:800;
+  font-weight:850;
 }
 
 .actions{
   display:flex;
   flex-wrap:wrap;
   gap:.65rem;
-  margin-top:.2rem;
+  margin-top:.28rem;
 }
 
 /* ---------- GRID ---------- */
@@ -293,7 +296,7 @@ select:focus{
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
-  gap:1.1rem;
+  gap:1.15rem;
   align-items:stretch;
 }
 
@@ -315,7 +318,7 @@ select:focus{
 .card:hover{
   transform:translateY(-4px);
   border-color:var(--border-strong);
-  box-shadow:var(--shadow-md);
+  box-shadow:0 10px 22px rgba(0,0,0,.20);
 }
 
 .thumb{
@@ -331,25 +334,26 @@ select:focus{
 }
 
 .meta{
-  padding:1rem 1rem 1.05rem;
+  padding:1.02rem 1rem 1.05rem;
   display:flex;
   flex-direction:column;
   flex:1;
-  gap:.5rem;
+  gap:.56rem;
   min-width:0;
 }
 
 .date{
-  font-size:.86rem;
+  font-size:.84rem;
   color:var(--muted);
   line-height:1.2;
-  font-weight:700;
+  font-weight:800;
+  letter-spacing:.01em;
 }
 
 .card-title{
   margin:0;
   font-size:1.12rem;
-  line-height:1.22;
+  line-height:1.2;
   font-weight:950;
   letter-spacing:-.02em;
   color:#f5f8ff;
@@ -367,7 +371,7 @@ select:focus{
 
 .byline-label{
   color:var(--soft);
-  font-weight:800;
+  font-weight:850;
 }
 
 .badge{
@@ -379,13 +383,13 @@ select:focus{
   border:1px solid var(--border);
   padding:.28rem .62rem;
   border-radius:999px;
-  font-size:.82rem;
+  font-size:.81rem;
   background:#16233a;
   color:#e2ecff;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-weight:700;
+  font-weight:800;
 }
 
 /* ---------- MEDALS ---------- */
@@ -395,7 +399,7 @@ select:focus{
   flex-wrap:wrap;
   align-items:center;
   gap:.45rem;
-  margin-top:.1rem;
+  margin-top:.06rem;
 }
 
 .medal{
@@ -410,7 +414,7 @@ select:focus{
   font-size:.8rem;
   line-height:1;
   color:#edf3ff;
-  font-weight:700;
+  font-weight:800;
 }
 
 .medal .medal-icon{
@@ -434,7 +438,7 @@ select:focus{
 
 .meta-footer{
   margin-top:auto;
-  padding-top:.35rem;
+  padding-top:.38rem;
   display:flex;
   flex-wrap:wrap;
   gap:.6rem;
@@ -462,7 +466,7 @@ select:focus{
 
 @media (max-width: 640px){
   h1{
-    font-size:1.55rem;
+    font-size:1.58rem;
   }
 
   .nav{
@@ -490,7 +494,7 @@ select:focus{
     backdrop-filter:blur(8px);
     flex-direction:column;
     align-items:flex-start;
-    gap:.8rem;
+    gap:.82rem;
     border-top:1px solid var(--border);
   }
 
