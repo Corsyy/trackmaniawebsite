@@ -1,12 +1,13 @@
-name: Update Data (TOTD + WR Data)
+name: Update TOTD
 
 on:
   workflow_dispatch:
   schedule:
+    # 18:00 UTC = 1:00 PM EST (no DST auto-switch)
     - cron: "0 18 * * *"
 
 concurrency:
-  group: update-data
+  group: update-totd
   cancel-in-progress: true
 
 jobs:
@@ -14,14 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     env:
       PUBLIC_DIR: .
       DEBUG: "0"
-
-      REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
-      CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
-      CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
 
     steps:
       - name: Checkout repository
@@ -34,71 +30,70 @@ jobs:
         with:
           node-version: "20"
 
-      # -------------------------------
-      # TOTD FETCHER
-      # -------------------------------
       - name: Run TOTD fetcher
         run: |
           echo "Running TOTD fetcher..."
+          node -v
           node scripts/totd-fetcher.js
+          echo ""
+          echo "Listing generated files:"
+          ls -R data/totd || true
+          echo ""
+          echo "Root snapshot:"
+          ls -l totd.json || true
 
-      # -------------------------------
-      # REBUILD TOTD MONTHS INDEX
-      # -------------------------------
-      - name: Rebuild TOTD months index
+      # Compute a stable content hash across your generated files
+      - name: Compute new content hash
+        id: newhash
         shell: bash
         run: |
-          node - <<'NODE'
-          const fs = require("fs");
-          const path = require("path");
+          set -euo pipefail
+          # Hash totd.json (if present) + all per-day JSONs in a stable order
+          tmplist=$(mktemp)
+          if [ -f totd.json ]; then
+            echo "totd.json" >> "$tmplist"
+          fi
+          if [ -d data/totd ]; then
+            find data/totd -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+          fi
 
-          const dir = path.join(process.cwd(), "data", "totd");
+          if [ -s "$tmplist" ]; then
+            # sha256 of concatenated per-file sha256s
+            HASH=$(xargs -a "$tmplist" -I{} sha256sum "{}" | sort | sha256sum | cut -d' ' -f1)
+          else
+            HASH="none"
+          fi
 
-          if (!fs.existsSync(dir)) {
-            console.log("No data/totd directory.");
-            process.exit(0);
-          }
+          echo "new=$HASH" >> "$GITHUB_OUTPUT"
 
-          const months = fs.readdirSync(dir)
-            .filter(f => /^\d{4}-\d{2}\.json$/.test(f))
-            .map(f => f.replace(".json",""))
-            .sort()
-            .reverse();
-
-          fs.writeFileSync(
-            path.join(dir,"months.json"),
-            JSON.stringify({ months }, null, 2)
-          );
-
-          console.log("Updated months.json");
-          NODE
-
-      # -------------------------------
-      # BUILD WR STATIC JSON
-      # -------------------------------
-      - name: Build WR static JSON
+      - name: Read previous hash (if any)
+        id: prevhash
+        shell: bash
         run: |
-          echo "Building WR leaderboard + recent WR JSON..."
-          node scripts/build-wr-data.js
+          PREV=$(git show HEAD:.totd.hash 2>/dev/null || true)
+          echo "prev=${PREV:-none}" >> "$GITHUB_OUTPUT"
 
-      # -------------------------------
-      # COMMIT DATA
-      # -------------------------------
-      - name: Commit updates
+      - name: Commit updated TOTD data (only if changed)
+        if: steps.newhash.outputs.new != steps.prevhash.outputs.prev
         run: |
+          echo "${{ steps.newhash.outputs.new }}" > .totd.hash
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
-
-          git add totd.json
-          git add data/totd
-          git add data/recent-wrs
-          git add data/wr-leaderboard
+          # Only stage TOTD-related files + the hash file
+          git add .totd.hash totd.json data/totd/*.json 2>/dev/null || true
 
           if ! git diff --cached --quiet; then
-            git commit -m "data: refresh TOTD + WR JSON [skip ci]"
+            echo "Changes detected — committing updates."
+            git commit -m "data: refresh TOTD [skip ci]"
+            # Rebase-pull to avoid non-fast-forward in busy repos
+            git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
             git push
           else
-            echo "No changes."
+            echo "No staged changes (hash matched)."
           fi
+
+      - name: No changes — skip
+        if: steps.newhash.outputs.new == steps.prevhash.outputs.prev
+        run: echo "No content changes detected; nothing to push."
