@@ -18,10 +18,6 @@ const LIVE_BASE = "https://live-services.trackmania.nadeo.live";
 const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
 const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-// Ubisoft credentials (GitHub Secrets)
-const UBI_EMAIL = String(process.env.UBI_EMAIL || "").trim();
-const UBI_PASSWORD = String(process.env.UBI_PASSWORD || "").trim();
-
 const WS_START_ISO = String(process.env.WS_START_ISO || "2024-01-01T00:00:00Z").trim();
 
 const WS_MAPS_PER_WEEK = Number(process.env.WS_MAPS_PER_WEEK || 5);
@@ -36,13 +32,9 @@ const WR_BUG_OVERRIDES = {
   },
 };
 
-// If true, we will refuse to count WR when the map leaderboard looks broken.
 const STRICT_TRUST_CHECKS = true;
-
-// Heuristic: if rank1 is *absurdly* faster than rank2, treat it as bugged.
-// (Won’t trigger for normal close times like 11480 vs 11869.)
-const BUGGED_RATIO_THRESHOLD = 0.5; // rank1 < rank2 * 0.5
-const BUGGED_ABSOLUTE_FLOOR_MS = 2500; // below this is almost certainly impossible in WS context
+const BUGGED_RATIO_THRESHOLD = 0.5;
+const BUGGED_ABSOLUTE_FLOOR_MS = 2500;
 
 function isoNow() {
   return new Date().toISOString();
@@ -117,7 +109,7 @@ async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
   throw lastErr || new Error(`fetch failed for ${url}`);
 }
 
-// ---------- LIVE SERVICES AUTH (Ubisoft login each run) ----------
+// ---------- LIVE SERVICES AUTH ----------
 
 let cachedLive = { token: null, expAt: 0 };
 
@@ -230,16 +222,16 @@ async function getOAuthToken() {
   return cachedOAuth.token;
 }
 
-async function resolveDisplayNames(nameCacheObj, ids) {
+async function resolveDisplayNames(nameCacheObj, ids, { forceRefresh = false } = {}) {
   const all = Array.from(new Set((ids || []).filter(Boolean)));
-  const need = all.filter((id) => !nameCacheObj[id]);
-  if (!need.length) return nameCacheObj;
+  const targets = forceRefresh ? all : all.filter((id) => !nameCacheObj[id]);
+  if (!targets.length) return nameCacheObj;
 
   const token = await getOAuthToken();
   const CHUNK = 50;
 
-  for (let i = 0; i < need.length; i += CHUNK) {
-    const batch = need.slice(i, i + CHUNK);
+  for (let i = 0; i < targets.length; i += CHUNK) {
+    const batch = targets.slice(i, i + CHUNK);
     const params = new URLSearchParams();
     for (const id of batch) params.append("accountId[]", id);
 
@@ -253,22 +245,70 @@ async function resolveDisplayNames(nameCacheObj, ids) {
       });
 
       if (!r.ok) {
-        for (const id of batch) if (!nameCacheObj[id]) nameCacheObj[id] = id;
+        for (const id of batch) {
+          if (!nameCacheObj[id]) nameCacheObj[id] = id;
+        }
       } else {
         const j = await r.json();
         for (const id of batch) {
           const dn = j?.[id];
-          nameCacheObj[id] = typeof dn === "string" && dn ? dn : id;
+          nameCacheObj[id] = typeof dn === "string" && dn ? dn : (nameCacheObj[id] || id);
         }
       }
     } catch {
-      for (const id of batch) if (!nameCacheObj[id]) nameCacheObj[id] = id;
+      for (const id of batch) {
+        if (!nameCacheObj[id]) nameCacheObj[id] = id;
+      }
     }
 
     await sleep(40);
   }
 
   return nameCacheObj;
+}
+
+function collectAccountIdsFromWeekJson(weekJson) {
+  const ids = [];
+
+  for (const e of weekJson?.entries || []) {
+    if (e?.accountId) ids.push(e.accountId);
+  }
+
+  for (const m of weekJson?.maps || []) {
+    for (const e of m?.entries || []) {
+      if (e?.accountId) ids.push(e.accountId);
+    }
+  }
+
+  return Array.from(new Set(ids));
+}
+
+function applyLatestNamesToWeekJson(weekJson, nameCacheObj) {
+  if (!weekJson || typeof weekJson !== "object") return weekJson;
+
+  if (Array.isArray(weekJson.entries)) {
+    for (const e of weekJson.entries) {
+      if (e?.accountId) e.player = nameCacheObj[e.accountId] || e.player || e.accountId;
+    }
+  }
+
+  if (Array.isArray(weekJson.maps)) {
+    for (const m of weekJson.maps) {
+      if (!Array.isArray(m?.entries)) continue;
+      for (const e of m.entries) {
+        if (e?.accountId) e.player = nameCacheObj[e.accountId] || e.player || e.accountId;
+      }
+      if (Array.isArray(m?.dropped)) {
+        for (const d of m.dropped) {
+          if (d?.entry?.accountId) {
+            d.entry.player = nameCacheObj[d.entry.accountId] || d.entry.player || d.entry.accountId;
+          }
+        }
+      }
+    }
+  }
+
+  return weekJson;
 }
 
 // ---------- Weekly Shorts discovery ----------
@@ -432,7 +472,6 @@ function cleanMapEntries(mapUid, entriesIn) {
 
   const dropped = [];
 
-  // 1) Known overrides
   const ov = WR_BUG_OVERRIDES[mapUid];
   let cleaned = entries.filter((e) => {
     const player = String(e?.player || "");
@@ -448,7 +487,6 @@ function cleanMapEntries(mapUid, entriesIn) {
 
   cleaned.sort((a, b) => Number(a.rank) - Number(b.rank));
 
-  // 2) Heuristic: if the best visible time is absurdly low vs #2, drop it
   const rank1 = cleaned.find((e) => Number(e.rank) === 1) || cleaned[0] || null;
   const rank2 = cleaned.find((e) => Number(e.rank) === 2) || cleaned[1] || null;
 
@@ -464,7 +502,6 @@ function cleanMapEntries(mapUid, entriesIn) {
     cleaned.sort((a, b) => Number(a.rank) - Number(b.rank));
   }
 
-  // 3) Trust check: leaderboard should include ranks 1 and 2 (unless "secret" rows)
   let trusted = true;
   if (STRICT_TRUST_CHECKS) {
     const ranks = new Set(cleaned.map((e) => Number(e.rank)));
@@ -585,7 +622,7 @@ function buildAggregate(allWeekJson, nameCacheObj = {}) {
   return { generatedAt: isoNow(), players };
 }
 
-// ---------- CHANGELOG (post-week WR improvements) ----------
+// ---------- CHANGELOG ----------
 
 function loadChangelog() {
   const existing = readJson(CHANGELOG_PATH, { generatedAt: isoNow(), items: [] });
@@ -595,7 +632,7 @@ function loadChangelog() {
 }
 
 function changelogKey(item) {
-  return `${item.week}|${item.mapUid}|${item.newTimeMs}|${item.newHolder}`;
+  return `${item.week}|${item.mapUid}|${item.newTimeMs}|${item.newHolderAccountId || item.newHolder}`;
 }
 
 function appendChangelogItem(changelog, item) {
@@ -610,7 +647,6 @@ function getBaselineWRFromWeekFile(weekJson, mapUid) {
   const m = (weekJson.maps || []).find((x) => x.mapUid === mapUid);
   if (!m) return null;
 
-  // baseline WR = best valid from snapshot after cleaning (trusted only)
   const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
   if (!trusted) return null;
   const best = entriesClean[0] || null;
@@ -621,6 +657,27 @@ function getBaselineWRFromWeekFile(weekJson, mapUid) {
     holderAccountId: best.accountId || null,
     timeMs: best.timeMs,
   };
+}
+
+function refreshChangelogNames(changelog, nameCacheObj) {
+  if (!Array.isArray(changelog?.items)) return changelog;
+
+  for (const item of changelog.items) {
+    if (item?.newHolderAccountId) {
+      item.newHolder = nameCacheObj[item.newHolderAccountId] || item.newHolder || item.newHolderAccountId;
+    }
+    if (item?.oldHolderAccountId) {
+      item.oldHolder = nameCacheObj[item.oldHolderAccountId] || item.oldHolder || item.oldHolderAccountId;
+    }
+
+    if (item?.newHolder && item?.oldHolder && Number.isFinite(item?.week) && Number.isFinite(item?.mapIndex)) {
+      item.text = `${item.newHolder} has overtaken the world record for the ${item.mapIndex}${ordinalSuffix(
+        item.mapIndex
+      )} map of Week ${item.week}, previously held by ${item.oldHolder}.`;
+    }
+  }
+
+  return changelog;
 }
 
 async function main() {
@@ -643,9 +700,15 @@ async function main() {
 
     let weekJson = null;
 
-    // Freeze ended weeks: if week file already exists and week ended, DO NOT overwrite.
     if (isEnded && fs.existsSync(weekPath)) {
       weekJson = readJson(weekPath, null);
+
+      if (weekJson) {
+        const ids = collectAccountIdsFromWeekJson(weekJson);
+        await resolveDisplayNames(nameCacheObj, ids, { forceRefresh: true });
+        applyLatestNamesToWeekJson(weekJson, nameCacheObj);
+        writeJson(weekPath, weekJson);
+      }
     }
 
     if (!weekJson) {
@@ -653,9 +716,8 @@ async function main() {
 
       for (const mapUid of w.mapUids || []) {
         const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
-        await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId));
+        await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId), { forceRefresh: true });
 
-        // Raw entries
         let entries = rows.map((r) => ({
           rank: r.rank,
           accountId: r.accountId,
@@ -665,8 +727,6 @@ async function main() {
 
         const cleaned = cleanMapEntries(mapUid, entries);
 
-        // Re-rank after cleaning so "best valid" becomes rank 1,
-        // but preserve original leaderboard rank in rawRank.
         const reRanked = cleaned.entriesClean.map((e, idx) => ({
           rank: idx + 1,
           rawRank: e.rank,
@@ -687,7 +747,7 @@ async function main() {
       }
 
       const pointsRows = await fetchWsWeekPointsTop(access, w.leaderboardGroupUid, POINTS_TOP_LENGTH);
-      await resolveDisplayNames(nameCacheObj, pointsRows.map((r) => r.accountId));
+      await resolveDisplayNames(nameCacheObj, pointsRows.map((r) => r.accountId), { forceRefresh: true });
 
       const pointsEntries = pointsRows.map((r) => {
         const player = nameCacheObj[r.accountId] || r.accountId;
@@ -721,7 +781,6 @@ async function main() {
 
     allWeekJson.push(weekJson);
 
-    // --------- Post-week WR changelog (ended weeks only) ----------
     if (isEnded) {
       for (let i = 0; i < (w.mapUids || []).length; i++) {
         const mapUid = w.mapUids[i];
@@ -733,7 +792,12 @@ async function main() {
         const current = await fetchCurrentWR(access, mapUid);
         if (!current) continue;
 
-        await resolveDisplayNames(nameCacheObj, [current.accountId]);
+        await resolveDisplayNames(nameCacheObj, [current.accountId], { forceRefresh: true });
+        if (baseline.holderAccountId) {
+          await resolveDisplayNames(nameCacheObj, [baseline.holderAccountId], { forceRefresh: true });
+          baseline.holder = nameCacheObj[baseline.holderAccountId] || baseline.holder;
+        }
+
         const currentHolder = nameCacheObj[current.accountId] || current.accountId;
         const currentTimeMs = current.timeMs;
 
@@ -763,6 +827,8 @@ async function main() {
       }
     }
   }
+
+  refreshChangelogNames(changelog, nameCacheObj);
 
   writeJson(WEEKS_INDEX_PATH, weeksIndex);
   writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj));
