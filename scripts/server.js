@@ -1022,6 +1022,59 @@ app.get("/api/top-weekly", ensureCacheOnce, async (req, res) => {
   }
 });
 
+app.get("/api/top-monthly", ensureCacheOnce, async (req, res) => {
+  try {
+    debouncedUidRefresh();
+    debouncedQuickRefresh();
+
+    const ym = (req.query.ym || "").toString();
+    if (!ym) {
+      return res.status(400).json({ error: "Missing ym (YYYY-MM)" });
+    }
+
+    const [y, m] = ym.split("-").map(Number);
+    const start = new Date(Date.UTC(y, m - 1, 1)).getTime() / 1000;
+    const end = new Date(Date.UTC(y, m, 1)).getTime() / 1000;
+
+    const safeRows = (wrCache.rows || []).filter(
+      r =>
+        isValidTimeMs(Number(r.timeMs)) &&
+        r.timestamp >= start &&
+        r.timestamp < end
+    );
+
+    const tally = new Map();
+
+    for (const r of safeRows) {
+      if (!r.accountId) continue;
+
+      const rec = tally.get(r.accountId) || {
+        accountId: r.accountId,
+        displayName: r.displayName || r.accountId,
+        wrs: 0,
+        latestTs: 0
+      };
+
+      rec.wrs++;
+      if (r.timestamp > rec.latestTs) rec.latestTs = r.timestamp;
+
+      tally.set(r.accountId, rec);
+    }
+
+    const top = Array.from(tally.values())
+      .sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs)
+      .slice(0, 3);
+
+    res.json({
+      ym,
+      top
+    });
+
+  } catch (e) {
+    res.status(500).json({ error: e.message || String(e) });
+  }
+});
+
 /* ---------------- Control ---------------- */
 
 app.post("/api/rebuild-now", async (req, res) => {
