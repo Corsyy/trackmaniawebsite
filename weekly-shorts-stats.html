@@ -540,7 +540,47 @@ tbody tr:hover{
   }
 }
 
+
 @media (max-width:640px){
+  table.leaderboard-table thead{
+  display:none;
+}
+
+table.leaderboard-table,
+table.leaderboard-table tbody,
+table.leaderboard-table tr,
+table.leaderboard-table td{
+  display:block;
+  width:100%;
+}
+
+table.leaderboard-table tr{
+  background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));
+  padding:.75rem .8rem;
+  margin-bottom:.7rem;
+  border-radius:14px;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px rgba(0,0,0,.22);
+}
+
+table.leaderboard-table td{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:.45rem;
+  font-size:.92rem;
+  padding:.45rem 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+table.leaderboard-table td:last-child{
+  border-bottom:none;
+}
+
+table.leaderboard-table td::before{
+  content:attr(data-label);
+  color:var(--muted);
+  font-weight:800;
+}
   .nav{
     justify-content:center;
   }
