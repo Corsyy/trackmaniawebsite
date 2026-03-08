@@ -101,39 +101,11 @@ header{
 }
 
 .nav{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:1rem;
-  padding:1rem 0 .85rem;
-}
-
-.brand{
   display:flex;
+  justify-content:center;
   align-items:center;
-  gap:.75rem;
-  font-weight:950;
-  letter-spacing:-.02em;
-  color:#f7faff;
-  font-size:1.08rem;
-}
-
-.brand-badge{
-  width:38px;
-  height:38px;
-  border-radius:12px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(180deg,#18263d,#132036);
-  border:1px solid var(--border);
-  box-shadow:none;
-  transition:transform .18s ease, border-color .18s ease, background .18s ease;
-}
-
-.brand:hover .brand-badge{
-  transform:translateY(-1px);
-  border-color:var(--border-strong);
-  background:#1a2944;
+  padding:1rem 0 .85rem;
+  position:relative;
 }
 
 .navlinks{
@@ -176,43 +148,6 @@ header{
   background:linear-gradient(90deg,var(--accent),var(--accent-2));
 }
 
-.cta{
-  display:flex;
-  justify-content:flex-end;
-  gap:.6rem;
-}
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.45rem;
-  min-height:42px;
-  padding:.62rem 1rem;
-  border:1px solid var(--border);
-  border-radius:12px;
-  background:#121d31;
-  color:var(--text);
-  font-weight:850;
-  font-size:.92rem;
-  line-height:1;
-  transition:transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
-  box-shadow:none;
-  cursor:pointer;
-}
-
-.btn:hover{
-  transform:translateY(-1px);
-  border-color:var(--border-strong);
-  background:#16233a;
-  box-shadow:var(--shadow-sm);
-}
-
-.btn:focus{
-  outline:none;
-  box-shadow:var(--ring);
-}
-
 .nav-toggle{
   display:none;
   border:1px solid var(--border);
@@ -222,6 +157,8 @@ header{
   padding:.5rem .7rem;
   cursor:pointer;
   font-weight:800;
+  position:absolute;
+  left:0;
 }
 
 /* ---------- TAGS ---------- */
@@ -242,9 +179,6 @@ header{
 }
 
 .tag.win{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
   margin-right:8px;
   padding:3px 10px;
   height:22px;
@@ -315,28 +249,6 @@ h1{
   text-align:right;
 }
 
-.muted{
-  color:var(--muted);
-}
-
-.mini{
-  font-size:12px;
-}
-
-.help{
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.5;
-}
-
-.label{
-  color:var(--muted);
-  font-size:12px;
-  font-weight:800;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-}
-
 /* ---------- GRID ---------- */
 
 .grid{
@@ -379,76 +291,11 @@ h1{
   background:rgba(255,255,255,.02);
 }
 
-.card-h .t{
-  font-size:13px;
-  letter-spacing:.05em;
-  text-transform:uppercase;
-  font-weight:800;
-  color:#dbe7ff;
-}
-
 .card-b{
   padding:18px;
 }
 
-/* ---------- KPI ---------- */
-
-.kpi-label{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.kpi-main{
-  font-size:22px;
-  font-weight:900;
-  margin-top:4px;
-}
-
-.kpi-sub{
-  margin-top:6px;
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* ---------- CONTROLS ---------- */
-
-.controls{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:flex-end;
-}
-
-input,select,button{
-  background:var(--panel-soft);
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:8px 10px;
-  border-radius:10px;
-  font-size:13px;
-}
-
-input:focus,
-select:focus{
-  outline:none;
-  border-color:var(--accent);
-  box-shadow:var(--ring);
-}
-
-button{
-  cursor:pointer;
-}
-
-button:hover{
-  border-color:var(--border-strong);
-}
-
 /* ---------- TABLES ---------- */
-
-.table-wrap{
-  width:100%;
-}
 
 table{
   width:100%;
@@ -471,58 +318,8 @@ td{
   font-size:14px;
 }
 
-.right{
-  text-align:right;
-}
-
-.player-cell b{
-  font-weight:800;
-}
-
 tbody tr:hover{
   background:rgba(74,163,255,.06);
-}
-
-/* ---------- PAGER ---------- */
-
-.pager{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:12px 16px;
-  border-top:1px solid var(--border);
-}
-
-.spacer{
-  flex:1;
-}
-
-/* ---------- CHANGELOG ---------- */
-
-.logitem{
-  padding:12px 0;
-  border-bottom:1px solid var(--border);
-}
-
-.logitem:last-child{
-  border-bottom:none;
-}
-
-.logwhen{
-  font-size:12px;
-  color:var(--muted);
-}
-
-.logtext{
-  margin-top:4px;
-}
-
-/* ---------- FOOTER ---------- */
-
-.footer{
-  margin-top:22px;
-  font-size:12px;
-  color:var(--muted);
 }
 
 /* ---------- RESPONSIVE ---------- */
@@ -532,15 +329,6 @@ tbody tr:hover{
     flex-direction:column;
   }
 
-  .header-actions{
-    width:100%;
-    align-items:flex-start;
-  }
-
-  .meta{
-    text-align:left;
-  }
-
   .kpis{
     grid-template-columns:1fr;
   }
@@ -548,52 +336,11 @@ tbody tr:hover{
   .row2{
     grid-template-columns:1fr;
   }
-
-  .card-h{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .controls{
-    width:100%;
-    justify-content:flex-start;
-  }
-
-  table,
-  tbody,
-  tr,
-  td{
-    display:block;
-    width:100%;
-  }
-
-  thead{
-    display:none;
-  }
-
-  tr{
-    border:1px solid var(--border);
-    border-radius:14px;
-    margin-bottom:10px;
-    overflow:hidden;
-  }
-
-  td{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    border-bottom:1px solid var(--border);
-  }
-
-  td:last-child{
-    border-bottom:none;
-  }
 }
 
 @media (max-width:640px){
+
   .nav{
-    display:flex;
-    align-items:center;
     justify-content:space-between;
   }
 
@@ -619,10 +366,6 @@ tbody tr:hover{
     display:flex;
   }
 
-  .cta{
-    display:none;
-  }
-
   .wrap{
     padding:20px 14px 70px;
   }
@@ -632,28 +375,19 @@ tbody tr:hover{
 
 <body class="bg-track-curves">
   <header>
-    <div class="container nav">
-      <a class="brand" href="/" aria-label="Trackmania Events Home">
-        <span class="brand-badge" aria-hidden="true">🎮</span>
-        <span>Trackmania Events</span>
-      </a>
+  <div class="container nav nav-no-brand">
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
 
-      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-
-      <nav id="primary-nav" class="navlinks" aria-label="Primary">
-        <a href="/">Home</a>
-        <a href="/kacky">Kacky Finishes</a>
-        <a href="/wrleaderboard">WR Leaderboard</a>
-        <a href="/weekly-shorts-stats" class="active">Weekly Shorts Stats</a>
-        <a href="/totd">Track of the Day</a>
-        <a href="/highlights">Community Highlights</a>
-      </nav>
-
-      <div class="cta">
-        <a class="btn" href="/recent-wrs">Recent WRs</a>
-      </div>
-    </div>
-  </header>
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/kacky">Kacky Finishes</a>
+      <a href="/wrleaderboard">WR Leaderboard</a>
+      <a href="/weekly-shorts-stats" class="active">Weekly Shorts Stats</a>
+      <a href="/totd">Track of the Day</a>
+      <a href="/highlights">Community Highlights</a>
+    </nav>
+  </div>
+</header>
 
   <div class="wrap">
     <div class="header">
