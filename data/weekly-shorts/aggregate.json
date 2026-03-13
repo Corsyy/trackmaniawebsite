@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-13T02:53:11.429Z",
+  "generatedAt": "2026-03-13T04:56:44.738Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -490,7 +490,7 @@
       "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
       "player": "shieldbandit",
       "wins": 6,
-      "wrs": 11,
+      "wrs": 12,
       "top5": 44,
       "weeksWon": [
         6,
@@ -564,6 +564,12 @@
         {
           "week": 65,
           "mapUid": "4oFeh6v1SGvcouvL_noKtSaQwdg",
+          "timeMs": null,
+          "rawRank": 1
+        },
+        {
+          "week": 65,
+          "mapUid": "bwmCSVdgno4UWk2jCvHX3Wxn4Va",
           "timeMs": null,
           "rawRank": 1
         }
@@ -873,9 +879,9 @@
         {
           "week": 65,
           "mapUid": "bwmCSVdgno4UWk2jCvHX3Wxn4Va",
-          "rank": 2,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 1
         }
       ],
       "aliases": []
@@ -9620,46 +9626,6 @@
       "aliases": []
     },
     {
-      "accountId": "5dda004f-add9-43ad-b9cd-7a90101aa8f2",
-      "player": "Ewin.tm",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 3,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 65,
-          "mapUid": "bwmCSVdgno4UWk2jCvHX3Wxn4Va",
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 62,
-          "mapUid": "kwQCg0V78LVpuaUHSj5E57dRny0",
-          "rank": 5,
-          "timeMs": 16424,
-          "rawRank": 5
-        },
-        {
-          "week": 65,
-          "mapUid": "dYUABVgMUp12Luz79rxNmptLqc1",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        },
-        {
-          "week": 65,
-          "mapUid": "bwmCSVdgno4UWk2jCvHX3Wxn4Va",
-          "rank": 1,
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "4b5253cd-2931-4ca5-845a-c81691d5a8c6",
       "player": "Flyer36",
       "wins": 0,
@@ -12732,6 +12698,39 @@
           "rank": 3,
           "timeMs": 18058,
           "rawRank": 3
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "5dda004f-add9-43ad-b9cd-7a90101aa8f2",
+      "player": "Ewin.tm",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 3,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 62,
+          "mapUid": "kwQCg0V78LVpuaUHSj5E57dRny0",
+          "rank": 5,
+          "timeMs": 16424,
+          "rawRank": 5
+        },
+        {
+          "week": 65,
+          "mapUid": "dYUABVgMUp12Luz79rxNmptLqc1",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
+        },
+        {
+          "week": 65,
+          "mapUid": "bwmCSVdgno4UWk2jCvHX3Wxn4Va",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
         }
       ],
       "aliases": []
