@@ -9,6 +9,7 @@ const WEEKS_INDEX_PATH = path.join(BASE_DIR, "weeks.json");
 const AGG_PATH = path.join(BASE_DIR, "aggregate.json");
 const CHANGELOG_PATH = path.join(BASE_DIR, "changelog.json");
 const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
+const WR_STATE_PATH = path.join(BASE_DIR, "wr-state.json");
 
 const DEBUG = String(process.env.DEBUG || "0") === "1";
 const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
@@ -351,7 +352,7 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
         w?.leaderboardGroup?.id ||
         w?.campaignLeaderboardGroupUid ||
         w?.leaderboard?.groupUid ||
-        w?.leaderboard?.group?.uid ||
+        w?.leaderboard?.group?.id ||
         w?.uid ||
         w?.id ||
         w?.campaignUid ||
@@ -631,8 +632,41 @@ function loadChangelog() {
   return existing;
 }
 
+function loadWrState() {
+  const existing = readJson(WR_STATE_PATH, { generatedAt: isoNow(), maps: {} });
+  if (!existing || typeof existing !== "object") return { generatedAt: isoNow(), maps: {} };
+  if (!existing.maps || typeof existing.maps !== "object") existing.maps = {};
+  return existing;
+}
+
+function wrStateKey(week, mapUid) {
+  return `${week}|${mapUid}`;
+}
+
+function getWrStateEntry(wrState, week, mapUid) {
+  return wrState.maps[wrStateKey(week, mapUid)] || null;
+}
+
+function setWrStateEntry(wrState, week, mapUid, entry) {
+  wrState.maps[wrStateKey(week, mapUid)] = {
+    week: Number(week),
+    mapUid,
+    holder: entry.holder || null,
+    holderAccountId: entry.holderAccountId || null,
+    timeMs: entry.timeMs ?? null,
+    updatedAt: isoNow(),
+  };
+}
+
 function changelogKey(item) {
-  return `${item.week}|${item.mapUid}|${item.newTimeMs}|${item.newHolderAccountId || item.newHolder}`;
+  return [
+    item.week,
+    item.mapUid,
+    item.oldHolderAccountId || item.oldHolder || "",
+    item.newHolderAccountId || item.newHolder || "",
+    item.oldTimeMs,
+    item.newTimeMs,
+  ].join("|");
 }
 
 function appendChangelogItem(changelog, item) {
@@ -671,9 +705,9 @@ function refreshChangelogNames(changelog, nameCacheObj) {
     }
 
     if (item?.newHolder && item?.oldHolder && Number.isFinite(item?.week) && Number.isFinite(item?.mapIndex)) {
-      item.text = `${item.newHolder} has overtaken the world record for the ${item.mapIndex}${ordinalSuffix(
+      item.text = `${item.newHolder} has overtaken ${item.oldHolder} for the world record on the ${item.mapIndex}${ordinalSuffix(
         item.mapIndex
-      )} map of Week ${item.week}, previously held by ${item.oldHolder}.`;
+      )} map of Week ${item.week}.`;
     }
   }
 
@@ -689,6 +723,7 @@ async function main() {
 
   const nameCacheObj = readJson(NAME_CACHE_PATH, {});
   const changelog = loadChangelog();
+  const wrState = loadWrState();
   const allWeekJson = [];
 
   const nowMs = Date.now();
@@ -787,40 +822,102 @@ async function main() {
         const mapIndex = i + 1;
 
         const baseline = getBaselineWRFromWeekFile(weekJson, mapUid);
-        if (!baseline || !isValidTimeMs(baseline.timeMs) || !baseline.holder) continue;
+        if (!baseline || !isValidTimeMs(baseline.timeMs) || !baseline.holderAccountId) {
+          await sleep(SLEEP_MS);
+          continue;
+        }
+
+        await resolveDisplayNames(nameCacheObj, [baseline.holderAccountId], { forceRefresh: true });
+        baseline.holder = nameCacheObj[baseline.holderAccountId] || baseline.holder || baseline.holderAccountId;
+
+        let previous = getWrStateEntry(wrState, w.week, mapUid);
+
+        if (!previous) {
+          previous = {
+            holder: baseline.holder,
+            holderAccountId: baseline.holderAccountId,
+            timeMs: baseline.timeMs,
+          };
+
+          setWrStateEntry(wrState, w.week, mapUid, previous);
+        }
 
         const current = await fetchCurrentWR(access, mapUid);
-        if (!current) continue;
+        if (!current?.accountId || !isValidTimeMs(current?.timeMs)) {
+          await sleep(SLEEP_MS);
+          continue;
+        }
 
         await resolveDisplayNames(nameCacheObj, [current.accountId], { forceRefresh: true });
-        if (baseline.holderAccountId) {
-          await resolveDisplayNames(nameCacheObj, [baseline.holderAccountId], { forceRefresh: true });
-          baseline.holder = nameCacheObj[baseline.holderAccountId] || baseline.holder;
-        }
 
         const currentHolder = nameCacheObj[current.accountId] || current.accountId;
         const currentTimeMs = current.timeMs;
 
-        if (isValidTimeMs(currentTimeMs) && currentTimeMs < baseline.timeMs) {
+        const previousHolderId = previous.holderAccountId || null;
+        const previousHolderName =
+          (previousHolderId ? nameCacheObj[previousHolderId] : null) ||
+          previous.holder ||
+          previousHolderId;
+
+        const holderChanged =
+          previousHolderId &&
+          current.accountId &&
+          current.accountId !== previousHolderId;
+
+        const timeImproved =
+          isValidTimeMs(previous.timeMs) &&
+          isValidTimeMs(currentTimeMs) &&
+          currentTimeMs < previous.timeMs;
+
+        if (timeImproved && !holderChanged) {
+          setWrStateEntry(wrState, w.week, mapUid, {
+            holder: currentHolder,
+            holderAccountId: current.accountId,
+            timeMs: currentTimeMs,
+          });
+
+          dlog(
+            "wr state self-improved",
+            `week=${w.week}`,
+            `map=${mapIndex}`,
+            `${currentHolder}: ${previous.timeMs} -> ${currentTimeMs}`
+          );
+
+          await sleep(SLEEP_MS);
+          continue;
+        }
+
+        if (timeImproved && holderChanged) {
           const item = {
             ts: isoNow(),
             week: Number(w.week),
             mapIndex,
             mapUid,
             newHolder: currentHolder,
-            oldHolder: baseline.holder,
+            oldHolder: previousHolderName,
             newHolderAccountId: current.accountId || null,
-            oldHolderAccountId: baseline.holderAccountId || null,
+            oldHolderAccountId: previousHolderId,
             newTimeMs: currentTimeMs,
-            oldTimeMs: baseline.timeMs,
-            deltaMs: baseline.timeMs - currentTimeMs,
-            text: `${currentHolder} has overtaken the world record for the ${mapIndex}${ordinalSuffix(
+            oldTimeMs: previous.timeMs,
+            deltaMs: previous.timeMs - currentTimeMs,
+            text: `${currentHolder} has overtaken ${previousHolderName} for the world record on the ${mapIndex}${ordinalSuffix(
               mapIndex
-            )} map of Week ${w.week}, previously held by ${baseline.holder}.`,
+            )} map of Week ${w.week}.`,
           };
 
           const added = appendChangelogItem(changelog, item);
-          if (added) dlog("changelog +", item.text);
+          if (added) {
+            dlog("changelog +", item.text);
+          }
+
+          setWrStateEntry(wrState, w.week, mapUid, {
+            holder: currentHolder,
+            holderAccountId: current.accountId,
+            timeMs: currentTimeMs,
+          });
+
+          await sleep(SLEEP_MS);
+          continue;
         }
 
         await sleep(SLEEP_MS);
@@ -836,6 +933,9 @@ async function main() {
 
   changelog.generatedAt = isoNow();
   writeJson(CHANGELOG_PATH, changelog);
+
+  wrState.generatedAt = isoNow();
+  writeJson(WR_STATE_PATH, wrState);
 
   console.log("[DONE] Weekly Shorts updated.");
   console.log("Weeks:", allWeekJson.length);
