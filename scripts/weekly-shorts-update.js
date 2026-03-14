@@ -10,6 +10,7 @@ const AGG_PATH = path.join(BASE_DIR, "aggregate.json");
 const CHANGELOG_PATH = path.join(BASE_DIR, "changelog.json");
 const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
 const WR_STATE_PATH = path.join(BASE_DIR, "wr-state.json");
+const POSTWEEK_MAP_STATE_PATH = path.join(BASE_DIR, "postweek-map-state.json");
 
 const DEBUG = String(process.env.DEBUG || "0") === "1";
 const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
@@ -79,7 +80,7 @@ function extractNumber(v) {
     return Number.isFinite(n) ? n : NaN;
   }
   if (v && typeof v === "object") {
-    const keys = ["score", "points", "value", "val", "total", "result"];
+    const keys = ["score", "points", "value", "val", "total", "result", "time", "timeMs", "best", "record"];
     for (const k of keys) {
       if (k in v) {
         const n = extractNumber(v[k]);
@@ -360,14 +361,6 @@ function buildWeeksIndexFromWeeklyShortsFeed(weeksRaw) {
         w?.seasonId ||
         null;
 
-      if (DEBUG && !leaderboardGroupUid) {
-        console.log("[WS] missing leaderboardGroupUid for feed item", {
-          year: w?.year,
-          week: w?.week,
-          keys: Object.keys(w || {}),
-        });
-      }
-
       return {
         year: w?.year ?? null,
         wsWeek: w?.week ?? null,
@@ -422,7 +415,30 @@ async function fetchWsTop(access, mapUid, length = 10) {
       const accountId = x?.accountId ?? x?.account_id ?? x?.playerId ?? null;
       if (!accountId) return null;
 
-      const extracted = extractNumber(x?.score);
+      const candidates = [
+        x?.score,
+        x?.time,
+        x?.timeMs,
+        x?.best,
+        x?.record,
+        x?.value,
+        x?.points,
+        x?.sp,
+        x?.score?.score,
+        x?.score?.time,
+        x?.score?.timeMs,
+        x?.score?.value,
+      ];
+
+      let extracted = NaN;
+      for (const c of candidates) {
+        const n = extractNumber(c);
+        if (Number.isFinite(n)) {
+          extracted = n;
+          break;
+        }
+      }
+
       const timeMs = isValidTimeMs(extracted) ? extracted : null;
 
       if (!Number.isFinite(rank) || rank <= 0) return null;
@@ -452,6 +468,34 @@ async function fetchCurrentWR(access, mapUid, nameCacheObj = {}) {
     accountId: best.accountId,
     timeMs: best.timeMs,
   };
+}
+
+async function fetchCurrentPostweekMapEntries(access, mapUid, nameCacheObj = {}) {
+  const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
+  if (!rows.length) return [];
+
+  await resolveDisplayNames(
+    nameCacheObj,
+    rows.map((r) => r.accountId),
+    { forceRefresh: true }
+  );
+
+  const entries = rows.map((r) => ({
+    rank: r.rank,
+    accountId: r.accountId,
+    player: nameCacheObj[r.accountId] || r.accountId,
+    timeMs: r.timeMs,
+  }));
+
+  const cleaned = cleanMapEntries(mapUid, entries);
+
+  return cleaned.entriesClean.map((e, idx) => ({
+    rank: idx + 1,
+    rawRank: e.rank,
+    accountId: e.accountId || null,
+    player: e.player,
+    timeMs: e.timeMs,
+  }));
 }
 
 async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
@@ -533,7 +577,7 @@ function cleanMapEntries(mapUid, entriesIn) {
 
 // ---------- Aggregate ----------
 
-function buildAggregate(allWeekJson, nameCacheObj = {}) {
+function buildAggregate(allWeekJson, nameCacheObj = {}, postweekMapState = { maps: {} }) {
   const by = new Map();
 
   function getOrCreate(accountId, fallbackPlayer = null) {
@@ -584,10 +628,29 @@ function buildAggregate(allWeekJson, nameCacheObj = {}) {
 
     for (const m of w.maps || []) {
       const mapUid = m.mapUid;
-      const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
-      const best = entriesClean[0] || null;
+      const mapState = getPostweekMapEntry(postweekMapState, weekNum, mapUid);
 
-      if (trusted && best?.accountId) {
+      let sourceEntries = [];
+
+      if (Array.isArray(mapState?.entries) && mapState.entries.length) {
+        sourceEntries = mapState.entries;
+      } else {
+        const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
+        if (!trusted) continue;
+
+        sourceEntries = entriesClean.map((e, idx) => ({
+          rank: idx + 1,
+          rawRank: e.rawRank ?? e.rank,
+          accountId: e.accountId || null,
+          player: e.player,
+          timeMs: e.timeMs,
+        }));
+      }
+
+      if (!sourceEntries.length) continue;
+
+      const best = sourceEntries[0] || null;
+      if (best?.accountId) {
         const rec = getOrCreate(best.accountId, best.player);
         if (rec) {
           rec.wrs += 1;
@@ -600,23 +663,21 @@ function buildAggregate(allWeekJson, nameCacheObj = {}) {
         }
       }
 
-      if (trusted) {
-        for (let i = 0; i < Math.min(5, entriesClean.length); i++) {
-          const e = entriesClean[i];
-          if (!e?.accountId) continue;
+      for (let i = 0; i < Math.min(5, sourceEntries.length); i++) {
+        const e = sourceEntries[i];
+        if (!e?.accountId) continue;
 
-          const rec = getOrCreate(e.accountId, e.player);
-          if (!rec) continue;
+        const rec = getOrCreate(e.accountId, e.player);
+        if (!rec) continue;
 
-          rec.top5 += 1;
-          rec.top5Weeks.push({
-            week: weekNum,
-            mapUid,
-            rank: i + 1,
-            timeMs: e.timeMs,
-            rawRank: e.rawRank ?? e.rank,
-          });
-        }
+        rec.top5 += 1;
+        rec.top5Weeks.push({
+          week: weekNum,
+          mapUid,
+          rank: i + 1,
+          timeMs: e.timeMs,
+          rawRank: e.rawRank ?? e.rank,
+        });
       }
     }
   }
@@ -640,7 +701,7 @@ function buildAggregate(allWeekJson, nameCacheObj = {}) {
   return { generatedAt: isoNow(), players };
 }
 
-// ---------- CHANGELOG ----------
+// ---------- CHANGELOG / STATE ----------
 
 function loadChangelog() {
   const existing = readJson(CHANGELOG_PATH, { generatedAt: isoNow(), items: [] });
@@ -651,6 +712,13 @@ function loadChangelog() {
 
 function loadWrState() {
   const existing = readJson(WR_STATE_PATH, { generatedAt: isoNow(), maps: {} });
+  if (!existing || typeof existing !== "object") return { generatedAt: isoNow(), maps: {} };
+  if (!existing.maps || typeof existing.maps !== "object") existing.maps = {};
+  return existing;
+}
+
+function loadPostweekMapState() {
+  const existing = readJson(POSTWEEK_MAP_STATE_PATH, { generatedAt: isoNow(), maps: {} });
   if (!existing || typeof existing !== "object") return { generatedAt: isoNow(), maps: {} };
   if (!existing.maps || typeof existing.maps !== "object") existing.maps = {};
   return existing;
@@ -672,6 +740,23 @@ function setWrStateEntry(wrState, week, mapUid, entry) {
     holderAccountId: entry.holderAccountId || null,
     timeMs: entry.timeMs ?? null,
     updatedAt: isoNow(),
+  };
+}
+
+function postweekMapKey(week, mapUid) {
+  return `${week}|${mapUid}`;
+}
+
+function getPostweekMapEntry(postweekMapState, week, mapUid) {
+  return postweekMapState.maps[postweekMapKey(week, mapUid)] || null;
+}
+
+function setPostweekMapEntry(postweekMapState, week, mapUid, entry) {
+  postweekMapState.maps[postweekMapKey(week, mapUid)] = {
+    week: Number(week),
+    mapUid,
+    updatedAt: isoNow(),
+    entries: Array.isArray(entry?.entries) ? entry.entries : [],
   };
 }
 
@@ -741,6 +826,7 @@ async function main() {
   const nameCacheObj = readJson(NAME_CACHE_PATH, {});
   const changelog = loadChangelog();
   const wrState = loadWrState();
+  const postweekMapState = loadPostweekMapState();
   const allWeekJson = [];
 
   const nowMs = Date.now();
@@ -837,6 +923,13 @@ async function main() {
       for (let i = 0; i < (w.mapUids || []).length; i++) {
         const mapUid = w.mapUids[i];
         const mapIndex = i + 1;
+
+        const currentPostweekEntries = await fetchCurrentPostweekMapEntries(access, mapUid, nameCacheObj);
+        if (currentPostweekEntries.length) {
+          setPostweekMapEntry(postweekMapState, w.week, mapUid, {
+            entries: currentPostweekEntries,
+          });
+        }
 
         const baseline = getBaselineWRFromWeekFile(weekJson, mapUid);
         if (!baseline || !isValidTimeMs(baseline.timeMs) || !baseline.holderAccountId) {
@@ -945,7 +1038,7 @@ async function main() {
   refreshChangelogNames(changelog, nameCacheObj);
 
   writeJson(WEEKS_INDEX_PATH, weeksIndex);
-  writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj));
+  writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj, postweekMapState));
   writeJson(NAME_CACHE_PATH, nameCacheObj);
 
   changelog.generatedAt = isoNow();
@@ -953,6 +1046,9 @@ async function main() {
 
   wrState.generatedAt = isoNow();
   writeJson(WR_STATE_PATH, wrState);
+
+  postweekMapState.generatedAt = isoNow();
+  writeJson(POSTWEEK_MAP_STATE_PATH, postweekMapState);
 
   console.log("[DONE] Weekly Shorts updated.");
   console.log("Weeks:", allWeekJson.length);
