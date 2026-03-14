@@ -19,10 +19,7 @@ jobs:
       PUBLIC_DIR: .
       DEBUG: "0"
 
-      # Live Services refresh-token auth
       REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
-
-      # Trackmania OAuth (display names)
       CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
 
@@ -67,6 +64,7 @@ jobs:
             data/weekly-shorts/aggregate.json \
             data/weekly-shorts/changelog.json \
             data/weekly-shorts/wr-state.json \
+            data/weekly-shorts/postweek-map-state.json \
             data/weekly-shorts/weeks \
             data/weekly-shorts/name-cache.json
 
