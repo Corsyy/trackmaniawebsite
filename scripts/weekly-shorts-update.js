@@ -432,9 +432,26 @@ async function fetchWsTop(access, mapUid, length = 10) {
     .sort((a, b) => a.rank - b.rank);
 }
 
-async function fetchCurrentWR(access, mapUid) {
-  const rows = await fetchWsTop(access, mapUid, 1);
-  return rows[0] || null;
+async function fetchCurrentWR(access, mapUid, nameCacheObj = {}) {
+  const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
+  if (!rows.length) return null;
+
+  const entries = rows.map((r) => ({
+    rank: r.rank,
+    accountId: r.accountId,
+    player: nameCacheObj[r.accountId] || r.accountId,
+    timeMs: r.timeMs,
+  }));
+
+  const cleaned = cleanMapEntries(mapUid, entries);
+  const best = cleaned.entriesClean[0] || null;
+  if (!best) return null;
+
+  return {
+    rank: best.rawRank ?? best.rank ?? 1,
+    accountId: best.accountId,
+    timeMs: best.timeMs,
+  };
 }
 
 async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
@@ -753,7 +770,7 @@ async function main() {
         const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
         await resolveDisplayNames(nameCacheObj, rows.map((r) => r.accountId), { forceRefresh: true });
 
-        let entries = rows.map((r) => ({
+        const entries = rows.map((r) => ({
           rank: r.rank,
           accountId: r.accountId,
           player: nameCacheObj[r.accountId] || r.accountId,
@@ -842,7 +859,7 @@ async function main() {
           setWrStateEntry(wrState, w.week, mapUid, previous);
         }
 
-        const current = await fetchCurrentWR(access, mapUid);
+        const current = await fetchCurrentWR(access, mapUid, nameCacheObj);
         if (!current?.accountId || !isValidTimeMs(current?.timeMs)) {
           await sleep(SLEEP_MS);
           continue;
@@ -860,8 +877,8 @@ async function main() {
           previousHolderId;
 
         const holderChanged =
-          previousHolderId &&
-          current.accountId &&
+          !!previousHolderId &&
+          !!current.accountId &&
           current.accountId !== previousHolderId;
 
         const timeImproved =
