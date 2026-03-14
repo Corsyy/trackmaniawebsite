@@ -91,6 +91,21 @@ function extractNumber(v) {
   return NaN;
 }
 
+function formatTimeMs(ms) {
+  if (!Number.isFinite(ms)) return "unknown time";
+
+  const totalMs = Math.round(ms);
+  const minutes = Math.floor(totalMs / 60000);
+  const seconds = Math.floor((totalMs % 60000) / 1000);
+  const millis = totalMs % 1000;
+
+  if (minutes > 0) {
+    return `${minutes}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
+  }
+
+  return `${seconds}.${String(millis).padStart(3, "0")}s`;
+}
+
 async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
   let lastErr;
   for (let i = 0; i <= retries; i++) {
@@ -762,6 +777,7 @@ function setPostweekMapEntry(postweekMapState, week, mapUid, entry) {
 
 function changelogKey(item) {
   return [
+    item.type || "overtake",
     item.week,
     item.mapUid,
     item.oldHolderAccountId || item.oldHolder || "",
@@ -800,16 +816,30 @@ function refreshChangelogNames(changelog, nameCacheObj) {
 
   for (const item of changelog.items) {
     if (item?.newHolderAccountId) {
-      item.newHolder = nameCacheObj[item.newHolderAccountId] || item.newHolder || item.newHolderAccountId;
+      item.newHolder =
+        nameCacheObj[item.newHolderAccountId] ||
+        item.newHolder ||
+        item.newHolderAccountId;
     }
     if (item?.oldHolderAccountId) {
-      item.oldHolder = nameCacheObj[item.oldHolderAccountId] || item.oldHolder || item.oldHolderAccountId;
+      item.oldHolder =
+        nameCacheObj[item.oldHolderAccountId] ||
+        item.oldHolder ||
+        item.oldHolderAccountId;
     }
 
-    if (item?.newHolder && item?.oldHolder && Number.isFinite(item?.week) && Number.isFinite(item?.mapIndex)) {
-      item.text = `${item.newHolder} has overtaken ${item.oldHolder} for the world record on the ${item.mapIndex}${ordinalSuffix(
-        item.mapIndex
-      )} map of Week ${item.week}.`;
+    if (Number.isFinite(item?.week) && Number.isFinite(item?.mapIndex)) {
+      if (item.type === "self_improve") {
+        item.text =
+          `${item.newHolder} has improved their world record on the ${item.mapIndex}${ordinalSuffix(
+            item.mapIndex
+          )} map of Week ${item.week} from ${formatTimeMs(item.oldTimeMs)} to ${formatTimeMs(item.newTimeMs)}.`;
+      } else {
+        item.text =
+          `${item.newHolder} has overtaken ${item.oldHolder} for the world record on the ${item.mapIndex}${ordinalSuffix(
+            item.mapIndex
+          )} map of Week ${item.week} with a time of ${formatTimeMs(item.newTimeMs)}.`;
+      }
     }
   }
 
@@ -980,6 +1010,29 @@ async function main() {
           currentTimeMs < previous.timeMs;
 
         if (timeImproved && !holderChanged) {
+          const item = {
+            type: "self_improve",
+            ts: isoNow(),
+            week: Number(w.week),
+            mapIndex,
+            mapUid,
+            newHolder: currentHolder,
+            oldHolder: currentHolder,
+            newHolderAccountId: current.accountId || null,
+            oldHolderAccountId: current.accountId || null,
+            newTimeMs: currentTimeMs,
+            oldTimeMs: previous.timeMs,
+            deltaMs: previous.timeMs - currentTimeMs,
+            text: `${currentHolder} has improved their world record on the ${mapIndex}${ordinalSuffix(
+              mapIndex
+            )} map of Week ${w.week} from ${formatTimeMs(previous.timeMs)} to ${formatTimeMs(currentTimeMs)}.`,
+          };
+
+          const added = appendChangelogItem(changelog, item);
+          if (added) {
+            dlog("changelog +", item.text);
+          }
+
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
@@ -999,6 +1052,7 @@ async function main() {
 
         if (timeImproved && holderChanged) {
           const item = {
+            type: "overtake",
             ts: isoNow(),
             week: Number(w.week),
             mapIndex,
@@ -1012,7 +1066,7 @@ async function main() {
             deltaMs: previous.timeMs - currentTimeMs,
             text: `${currentHolder} has overtaken ${previousHolderName} for the world record on the ${mapIndex}${ordinalSuffix(
               mapIndex
-            )} map of Week ${w.week}.`,
+            )} map of Week ${w.week} with a time of ${formatTimeMs(currentTimeMs)}.`,
           };
 
           const added = appendChangelogItem(changelog, item);
