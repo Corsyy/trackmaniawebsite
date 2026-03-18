@@ -1329,6 +1329,93 @@ footer{
     });
   };
 
+  function getEventSegments(event) {
+    if (Array.isArray(event?.segments) && event.segments.length) {
+      return event.segments
+        .filter((seg) => seg && seg.start_iso && seg.end_iso)
+        .map((seg) => ({
+          ...seg,
+          start: new Date(seg.start_iso),
+          end: new Date(seg.end_iso),
+        }))
+        .sort((a, b) => a.start - b.start);
+    }
+
+    if (event?.start_iso && event?.end_iso) {
+      return [
+        {
+          start_iso: event.start_iso,
+          end_iso: event.end_iso,
+          label: event.label || "",
+          start: new Date(event.start_iso),
+          end: new Date(event.end_iso),
+        },
+      ];
+    }
+
+    return [];
+  }
+
+  function getEventStartIso(event) {
+    const segs = getEventSegments(event);
+    return segs[0]?.start_iso || event?.start_iso || null;
+  }
+
+  function getEventEndIso(event) {
+    const segs = getEventSegments(event);
+    return segs[segs.length - 1]?.end_iso || event?.end_iso || null;
+  }
+
+  function isEventLive(event, now = new Date()) {
+    return getEventSegments(event).some((seg) => now >= seg.start && now <= seg.end);
+  }
+
+  function getNextUpcomingSegment(event, now = new Date()) {
+    return getEventSegments(event).find((seg) => seg.end > now) || null;
+  }
+
+  function getDisplayRange(event, now = new Date()) {
+    const liveSeg = getEventSegments(event).find((seg) => now >= seg.start && now <= seg.end);
+    if (liveSeg) {
+      return {
+        start_iso: liveSeg.start_iso,
+        end_iso: liveSeg.end_iso,
+        label: liveSeg.label || "",
+      };
+    }
+
+    const nextSeg = getNextUpcomingSegment(event, now);
+    if (nextSeg) {
+      return {
+        start_iso: nextSeg.start_iso,
+        end_iso: nextSeg.end_iso,
+        label: nextSeg.label || "",
+      };
+    }
+
+    return {
+      start_iso: getEventStartIso(event),
+      end_iso: getEventEndIso(event),
+      label: "",
+    };
+  }
+
+  function getCalendarRangesForEvent(event, index) {
+    return getEventSegments(event).map((seg) => {
+      const start = new Date(seg.start);
+      const end = new Date(seg.end);
+
+      return {
+        start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
+        end: new Date(end.getFullYear(), end.getMonth(), end.getDate()),
+        index,
+        label: seg.label || "",
+        start_iso: seg.start_iso,
+        end_iso: seg.end_iso,
+      };
+    });
+  }
+
   function setCountdown(dd, hh, mm, ss) {
     if (d) d.textContent = dd;
     if (h) h.textContent = hh;
@@ -1393,11 +1480,18 @@ footer{
         ? e.location || ""
         : e.description || "";
 
+    const range = getDisplayRange(e);
+    const hasSegments = Array.isArray(e.segments) && e.segments.length > 0;
+    const segmentText = hasSegments
+      ? `<div class="meta" style="margin-top:.35rem;color:#9fb2df">${e.segments.length} stages${range.label ? ` • ${range.label}` : ""}</div>`
+      : "";
+
     article.innerHTML = `
       <span class="tag">${tag}</span>
-      <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+      <div class="meta">${fmtDate(range.start_iso)} — ${fmtDate(range.end_iso)}</div>
       <h4>${e.title}</h4>
       <div class="meta">${subline}</div>
+      ${segmentText}
     `;
 
     if (e.image) {
@@ -1426,7 +1520,7 @@ footer{
 
   // ---------- MINI CALENDAR STATE ----------
   let calYear, calMonth;
-  let allEventRanges = []; // [{start: Date, end: Date, index: number}]
+  let allEventRanges = []; // [{start: Date, end: Date, index: number, label?: string}]
   let calendarInitialized = false;
 
   function loadMiniCalendar(dateIso) {
@@ -1487,95 +1581,90 @@ footer{
   }
 
   function attachCalendarTooltips() {
-  const container = document.getElementById("miniCalendar");
-  const grid = document.getElementById("cal-grid");
-  if (!container || !grid) return;
+    const container = document.getElementById("miniCalendar");
+    const grid = document.getElementById("cal-grid");
+    if (!container || !grid) return;
 
-  // Create tooltip ONCE on <body> so it's never clipped by hero mask/overflow
-  let tooltip = document.getElementById("cal-tooltip");
-  if (!tooltip) {
-    tooltip = document.createElement("div");
-    tooltip.id = "cal-tooltip";
-    document.body.appendChild(tooltip);
-  }
+    let tooltip = document.getElementById("cal-tooltip");
+    if (!tooltip) {
+      tooltip = document.createElement("div");
+      tooltip.id = "cal-tooltip";
+      document.body.appendChild(tooltip);
+    }
 
-  // Ensure tooltip styling still applies (your CSS already targets #cal-tooltip)
-  tooltip.style.display = "none";
-
-  function hideTooltip() {
     tooltip.style.display = "none";
-  }
 
-  grid.querySelectorAll("td[data-day]").forEach((td) => {
-    td.addEventListener("mouseenter", () => {
-      const day = parseInt(td.dataset.day, 10);
-      const dayObj = new Date(calYear, calMonth, day);
+    function hideTooltip() {
+      tooltip.style.display = "none";
+    }
 
-      const matches = allEventRanges
-        .filter((o) => dayObj >= o.start && dayObj <= o.end)
-        .map((o) => window.__eventsCache[o.index]);
+    grid.querySelectorAll("td[data-day]").forEach((td) => {
+      td.addEventListener("mouseenter", () => {
+        const day = parseInt(td.dataset.day, 10);
+        const dayObj = new Date(calYear, calMonth, day);
 
-      if (!matches.length) {
-        hideTooltip();
-        return;
-      }
+        const matchingRanges = allEventRanges.filter((o) => dayObj >= o.start && dayObj <= o.end);
 
-      let html = "";
-      matches.forEach((ev, idx) => {
-        if (idx > 0) html += `<div class="cal-popup-spacer"></div>`;
-        html += `
-          <div class="cal-popup-title">${ev.title}</div>
-          <div class="cal-popup-date">
-            ${new Date(ev.start_iso).toLocaleDateString()} –
-            ${new Date(ev.end_iso).toLocaleDateString()}
-          </div>
-          <div class="cal-popup-desc">${ev.location || ""}</div>
-        `;
+        const matches = matchingRanges.map((o) => ({
+          event: window.__eventsCache[o.index],
+          range: o,
+        }));
+
+        if (!matches.length) {
+          hideTooltip();
+          return;
+        }
+
+        let html = "";
+        matches.forEach(({ event: ev, range }, idx) => {
+          if (idx > 0) html += `<div class="cal-popup-spacer"></div>`;
+          html += `
+            <div class="cal-popup-title">${ev.title}</div>
+            <div class="cal-popup-date">
+              ${fmtDate(range?.start_iso || getEventStartIso(ev))} –
+              ${fmtDate(range?.end_iso || getEventEndIso(ev))}
+            </div>
+            <div class="cal-popup-desc">
+              ${range?.label ? `${range.label} • ` : ""}${ev.location || ""}
+            </div>
+          `;
+        });
+
+        tooltip.innerHTML = html;
+        tooltip.style.display = "block";
+        tooltip.style.position = "fixed";
+        tooltip.style.zIndex = "9999";
+        tooltip.style.pointerEvents = "none";
+
+        const tdRect = td.getBoundingClientRect();
+        const popRect = tooltip.getBoundingClientRect();
+
+        let top = tdRect.top - popRect.height - 10;
+        if (top < 10) top = tdRect.bottom + 10;
+
+        let left = tdRect.left + tdRect.width / 2 - popRect.width / 2;
+        const pad = 12;
+
+        if (left < pad) left = pad;
+        if (left + popRect.width > window.innerWidth - pad) {
+          left = window.innerWidth - popRect.width - pad;
+        }
+
+        if (top + popRect.height > window.innerHeight - pad) {
+          top = Math.max(pad, window.innerHeight - popRect.height - pad);
+        }
+
+        tooltip.style.top = `${top}px`;
+        tooltip.style.left = `${left}px`;
+        tooltip.style.transform = "none";
       });
 
-      tooltip.innerHTML = html;
-      tooltip.style.display = "block";
-      tooltip.style.position = "fixed";
-      tooltip.style.zIndex = "9999";
-      tooltip.style.pointerEvents = "none";
-
-      const tdRect = td.getBoundingClientRect();
-
-      // Measure after showing
-      const popRect = tooltip.getBoundingClientRect();
-
-      // Prefer above, otherwise below
-      let top = tdRect.top - popRect.height - 10;
-      if (top < 10) top = tdRect.bottom + 10;
-
-      // Center horizontally on the cell, clamp to viewport
-      let left = tdRect.left + tdRect.width / 2 - popRect.width / 2;
-      const pad = 12;
-
-      if (left < pad) left = pad;
-      if (left + popRect.width > window.innerWidth - pad) {
-        left = window.innerWidth - popRect.width - pad;
-      }
-
-      // Also clamp bottom edge (in case it's near the bottom)
-      if (top + popRect.height > window.innerHeight - pad) {
-        top = Math.max(pad, window.innerHeight - popRect.height - pad);
-      }
-
-      tooltip.style.top = `${top}px`;
-      tooltip.style.left = `${left}px`;
-      tooltip.style.transform = "none";
+      td.addEventListener("mouseleave", hideTooltip);
     });
 
-    td.addEventListener("mouseleave", hideTooltip);
-  });
-
-  container.addEventListener("mouseleave", hideTooltip);
-
-  // Optional: hide on scroll (prevents "floating" tooltip)
-  window.addEventListener("scroll", hideTooltip, { passive: true });
-}
-
+    container.addEventListener("mouseleave", hideTooltip);
+    window.addEventListener("scroll", hideTooltip, { passive: true });
+  }
 
   // ---------- RECURRENCE (WEEKLY) ----------
   // events.json weekly template example:
@@ -1591,98 +1680,113 @@ footer{
   }
 
   function buildIsoWithOffset(y, mo, d, hh, mm, offset) {
-    // YYYY-MM-DDTHH:mm:00-04:00
     return `${y}-${pad2(mo)}-${pad2(d)}T${pad2(hh)}:${pad2(mm)}:00${offset || ""}`;
   }
 
   function expandRecurringEvents(events) {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
-  const out = [];
+    const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+    const out = [];
 
-  for (const e of events) {
-    const rec = e && e.recurrence;
-    const isWeekly =
-      rec &&
-      String(rec.freq || "").toLowerCase() === "weekly" &&
-      Array.isArray(rec.byDay) &&
-      rec.byDay.length;
+    for (const e of events) {
+      const rec = e && e.recurrence;
+      const isWeekly =
+        rec &&
+        String(rec.freq || "").toLowerCase() === "weekly" &&
+        Array.isArray(rec.byDay) &&
+        rec.byDay.length;
 
-    // Non-recurring events pass straight through
-    if (!isWeekly) {
-      out.push(e);
-      continue;
+      if (!isWeekly) {
+        out.push(e);
+        continue;
+      }
+
+      const offset = getOffsetFromIso(e.start_iso || "");
+      const durationMinutes = Number(rec.durationMinutes || 60);
+      const [HH, MM] = String(rec.time || "19:00")
+        .split(":")
+        .map((v) => parseInt(v, 10));
+
+      let found = false;
+
+      for (let i = 0; i < 14 && !found; i++) {
+        const candidate = new Date(today);
+        candidate.setDate(today.getDate() + i);
+
+        const dow = candidate.getDay();
+        const want = rec.byDay.some((code) => dayMap[code] === dow);
+        if (!want) continue;
+
+        const startIso = buildIsoWithOffset(
+          candidate.getFullYear(),
+          candidate.getMonth() + 1,
+          candidate.getDate(),
+          HH,
+          MM,
+          offset
+        );
+
+        const startDt = new Date(startIso);
+        const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
+
+        if (endDt <= now) continue;
+
+        const endIso = buildIsoWithOffset(
+          endDt.getFullYear(),
+          endDt.getMonth() + 1,
+          endDt.getDate(),
+          endDt.getHours(),
+          endDt.getMinutes(),
+          offset
+        );
+
+        out.push({
+          ...e,
+          start_iso: startIso,
+          end_iso: endIso,
+          _generated: true,
+        });
+
+        found = true;
+      }
     }
 
-    // Use start_iso ONLY as a timezone anchor
-    const offset = (String(e.start_iso || "").match(/([+-]\d{2}:\d{2}|Z)$/) || [])[1] || "";
-
-    const durationMinutes = Number(rec.durationMinutes || 60);
-    const [HH, MM] = String(rec.time || "19:00")
-      .split(":")
-      .map((v) => parseInt(v, 10));
-
-    let found = false;
-
-    // Look ahead up to 14 days to find the next occurrence
-    for (let i = 0; i < 14 && !found; i++) {
-      const candidate = new Date(today);
-      candidate.setDate(today.getDate() + i);
-
-      const dow = candidate.getDay();
-      const want = rec.byDay.some((code) => dayMap[code] === dow);
-      if (!want) continue;
-
-      const startIso = `${candidate.getFullYear()}-${String(
-        candidate.getMonth() + 1
-      ).padStart(2, "0")}-${String(candidate.getDate()).padStart(2, "0")}T${String(
-        HH
-      ).padStart(2, "0")}:${String(MM).padStart(2, "0")}:00${offset}`;
-
-      const startDt = new Date(startIso);
-      const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
-
-      // Skip if it already ended
-      if (endDt <= now) continue;
-
-      out.push({
-        ...e,
-        start_iso: startIso,
-        end_iso: endDt.toISOString(),
-        _generated: true,
-      });
-
-      found = true;
-    }
+    return out;
   }
-
-  return out;
-}
 
   // ---------- RENDER EVENTS + HOOK CALENDAR ----------
   function renderFromData(rawEvents) {
-    // Expand weekly templates into dated occurrences
     const events = expandRecurringEvents(Array.isArray(rawEvents) ? rawEvents : []);
 
     window.__eventsCache = events;
-    const now = Date.now();
+    const nowDate = new Date();
 
     const live = events
-      .filter((e) => new Date(e.start_iso) <= now && now <= new Date(e.end_iso))
-      .sort((a, b) => new Date(a.start_iso) - new Date(b.start_iso));
+      .filter((e) => isEventLive(e, nowDate))
+      .sort((a, b) => new Date(getEventStartIso(a)) - new Date(getEventStartIso(b)));
 
     const upcoming = events
-      .filter((e) => new Date(e.start_iso) > now)
-      .sort((a, b) => new Date(a.start_iso) - new Date(b.start_iso));
+      .filter((e) => {
+        if (isEventLive(e, nowDate)) return false;
+        const nextSeg = getNextUpcomingSegment(e, nowDate);
+        return !!nextSeg && nextSeg.start > nowDate;
+      })
+      .sort((a, b) => {
+        const aNext = getNextUpcomingSegment(a, nowDate);
+        const bNext = getNextUpcomingSegment(b, nowDate);
+        return new Date(aNext.start_iso) - new Date(bNext.start_iso);
+      });
 
     const past = events
-      .filter((e) => new Date(e.end_iso) <= now)
-      .sort((a, b) => new Date(b.end_iso) - new Date(a.end_iso))
+      .filter((e) => {
+        const endIso = getEventEndIso(e);
+        return endIso && new Date(endIso) <= nowDate;
+      })
+      .sort((a, b) => new Date(getEventEndIso(b)) - new Date(getEventEndIso(a)))
       .slice(0, 6);
 
-    // Category split
     const normCat = (e) => String(e.category || "main").toLowerCase().trim();
     const isWeekly = (e) => ["weekly", "fun", "casual"].includes(normCat(e));
     const isMain = (e) => !isWeekly(e);
@@ -1690,7 +1794,6 @@ footer{
     const upcomingMain = upcoming.filter(isMain);
     const upcomingWeekly = upcoming.filter(isWeekly);
 
-    // Live section
     const liveSection = document.getElementById("live-events");
     const liveGrid = document.getElementById("live-events-grid");
     if (live.length) {
@@ -1704,7 +1807,6 @@ footer{
       liveSection.style.display = "none";
     }
 
-    // Upcoming grids (Main / Weekly)
     const mainGrid = document.getElementById("main-events-grid");
     const weeklyGrid = document.getElementById("weekly-events-grid");
 
@@ -1732,7 +1834,6 @@ footer{
       }
     }
 
-    // Past section
     let pastWrap = document.getElementById("past-events");
     if (!pastWrap) {
       pastWrap = document.createElement("div");
@@ -1743,14 +1844,18 @@ footer{
       `;
       document.querySelector("#schedule .container").appendChild(pastWrap);
     }
+
     const pastGrid = document.getElementById("past-grid");
     pastGrid.innerHTML = "";
     past.forEach((e) => {
+      const startIso = getEventStartIso(e);
+      const endIso = getEventEndIso(e);
+
       const el = document.createElement("article");
       el.className = "event reveal";
       el.innerHTML = `
         <span class="tag">${e.tag || "Event"}</span>
-        <div class="meta">${fmtDate(e.start_iso)} — ${fmtDate(e.end_iso)}</div>
+        <div class="meta">${fmtDate(startIso)} — ${fmtDate(endIso)}</div>
         <h4>${e.title}</h4>
         <div class="meta">${e.location || ""}</div>
       `;
@@ -1761,18 +1866,8 @@ footer{
       pastGrid.appendChild(el);
     });
 
-    // Build date ranges for calendar
-    allEventRanges = events.map((e, idx) => {
-      const start = new Date(e.start_iso);
-      const end = new Date(e.end_iso);
-      return {
-        start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
-        end: new Date(end.getFullYear(), end.getMonth(), end.getDate()),
-        index: idx,
-      };
-    });
+    allEventRanges = events.flatMap((e, idx) => getCalendarRangesForEvent(e, idx));
 
-    // Hero / countdown content (prefer MAIN event as "Next Event")
     const next = upcomingMain[0] || upcoming[0] || null;
 
     const chip = document.getElementById("hero-chip");
@@ -1782,13 +1877,15 @@ footer{
 
     if (live.length) {
       const cur = live[0];
+      const curRange = getDisplayRange(cur, nowDate);
+
       chip.textContent =
         live.length > 1 ? `🟢 ${live.length} events live — ${cur.title}` : `Live now • ${cur.title}`;
 
       pills.innerHTML = `
         <div class="pill">🟢 Live</div>
         <div class="pill">📍 ${cur.location || "Online"}</div>
-        <div class="pill">🏁 ${cur.description || ""}</div>
+        <div class="pill">🏁 ${curRange.label || cur.description || ""}</div>
       `;
 
       header.textContent = "Live now!";
@@ -1799,14 +1896,16 @@ footer{
         setTwitchChannel(cur.twitch);
       }
     } else if (next) {
+      const nextRange = getDisplayRange(next, nowDate);
+
       chip.textContent = `Next Event • ${next.title}`;
       pills.innerHTML = `
-        <div class="pill">🗓️ ${fmtDate(next.start_iso)}</div>
+        <div class="pill">🗓️ ${fmtDate(nextRange.start_iso)}</div>
         <div class="pill">📍 ${next.location || "Online"}</div>
-        <div class="pill">🏁 ${next.description || ""}</div>
+        <div class="pill">🏁 ${nextRange.label || next.description || ""}</div>
       `;
 
-      startCountdown(next.start_iso, header);
+      startCountdown(nextRange.start_iso, header);
       cdCard?.style.removeProperty("--cd-img");
     } else {
       chip.textContent = "No upcoming event";
@@ -1816,9 +1915,9 @@ footer{
       cdCard?.style.removeProperty("--cd-img");
     }
 
-    // Init calendar once we have events
     if (!calendarInitialized) {
-      const initialMonth = live[0]?.start_iso || next?.start_iso || new Date().toISOString();
+      const initialMonth =
+        getEventStartIso(live[0] || next || {}) || new Date().toISOString();
       loadMiniCalendar(initialMonth);
       calendarInitialized = true;
     } else {
@@ -1837,18 +1936,26 @@ footer{
       el.textContent = "{}";
       return;
     }
+
+    const startIso = getEventStartIso(next);
+    const endIso = getEventEndIso(next);
+
     el.textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Event",
       name: next.title,
-      startDate: next.start_iso,
-      endDate: next.end_iso,
+      startDate: startIso,
+      endDate: endIso,
       eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
       eventStatus: "https://schema.org/EventScheduled",
       location: { "@type": "VirtualLocation", url: "https://trackmaniaevents.com" },
       description: next.description || "",
       image: next.image || undefined,
-      organizer: { "@type": "Organization", name: "Trackmania Events", url: "https://trackmaniaevents.com" },
+      organizer: {
+        "@type": "Organization",
+        name: "Trackmania Events",
+        url: "https://trackmaniaevents.com",
+      },
     });
   }
 
