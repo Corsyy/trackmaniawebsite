@@ -622,35 +622,35 @@ header{
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:1.05rem;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:18px;
+  align-items:stretch;
 }
 
+/* event card */
 .event{
   position:relative;
-  padding:1rem;
-  padding-top:3.25rem;
-  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  min-height:255px; /* adjust if you want taller/shorter cards */
+  height:100%;
   overflow:hidden;
-  background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));
-  border:1px solid var(--border);
-  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
+/* title spacing */
 .event h4{
-  margin:.35rem 0 .28rem;
-  letter-spacing:-.01em;
-  color:#fff;
-  text-shadow:none;
-  font-size:1.08rem;
-  line-height:1.24;
+  margin:10px 0 8px;
+  line-height:1.2;
 }
 
-.event .meta{
-  color:#c8d5ff;
-  font-size:.9rem;
-  text-shadow:none;
-  line-height:1.48;
+/* clamp the description/meta text so it doesn't keep growing */
+.event .meta:last-of-type{
+  display:-webkit-box;
+  -webkit-line-clamp:3;   /* change to 2, 3, or 4 lines */
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  line-clamp:3;
 }
 
 .event .tag{
