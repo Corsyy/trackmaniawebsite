@@ -90,7 +90,6 @@ body.bg-track-curves::after{
 a{color:inherit;text-decoration:none}
 .container{width:min(1220px,92vw);margin:0 auto}
 
-/* keep sections clean */
 section,
 #live-events,
 #schedule,
@@ -109,8 +108,6 @@ section,
 #contact .container{
   background:transparent !important;
 }
-
-/* ---------- HEADER ---------- */
 
 header{
   position:sticky;
@@ -251,8 +248,6 @@ header{
   font-weight:800;
 }
 
-/* ---------- HERO ---------- */
-
 .hero{
   position:relative;
   padding:clamp(2.2rem,5vw,4.2rem) 0 2.8rem;
@@ -330,8 +325,6 @@ header{
   font-weight:750;
 }
 
-/* ---------- PANELS / CARDS ---------- */
-
 .card{
   border:1px solid var(--border);
   background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));
@@ -354,7 +347,6 @@ header{
 
 .card-body{padding:1rem}
 
-/* countdown card */
 #countdown-card{
   position:relative;
   border-radius:20px;
@@ -443,7 +435,6 @@ header{
   margin-top:0;
 }
 
-/* live twitch panel */
 #live .card{
   min-height:var(--heroCardH);
   display:flex;
@@ -470,8 +461,6 @@ header{
   border-radius:0 0 20px 20px;
   overflow:hidden;
 }
-
-/* ---------- CALENDAR ---------- */
 
 #miniCalendar{
   position:relative;
@@ -593,8 +582,6 @@ header{
   box-shadow:none;
 }
 
-/* ---------- SECTIONS ---------- */
-
 .section{padding:3rem 0}
 
 .title{
@@ -618,39 +605,47 @@ header{
   opacity:.8;
 }
 
-/* ---------- EVENT CARDS ---------- */
-
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
   gap:18px;
   align-items:stretch;
+  grid-auto-rows:1fr;
 }
 
-/* event card */
+.event-link{
+  display:block;
+  height:100%;
+  color:inherit;
+  text-decoration:none;
+}
+
 .event{
   position:relative;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  min-height:255px; /* adjust if you want taller/shorter cards */
+  min-height:280px;
   height:100%;
+  padding:16px;
   overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));
 }
 
-/* title spacing */
 .event h4{
   margin:10px 0 8px;
   line-height:1.2;
+  max-width:calc(100% - 88px);
 }
 
-/* clamp the description/meta text so it doesn't keep growing */
-.event .meta:last-of-type{
-  display:-webkit-box;
-  -webkit-line-clamp:3;   /* change to 2, 3, or 4 lines */
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-  line-clamp:3;
+.event .meta{
+  line-height:1.45;
+}
+
+.event > .meta:first-of-type{
+  padding-right:96px;
 }
 
 .event .tag{
@@ -679,29 +674,28 @@ header{
   z-index:1;
 }
 
-.event:hover::before{opacity:1}
-.event>.meta:first-of-type{padding-right:120px}
+.event:hover::before{
+  opacity:1;
+}
 
 .event.with-bg{
   background-image:
-    linear-gradient(180deg,rgba(16,25,42,.82),rgba(11,18,32,.72)),
+    linear-gradient(180deg, rgba(16,25,42,.82), rgba(11,18,32,.72)),
     var(--event-img);
-  background-size:contain,cover;
+  background-size:cover,cover;
   background-position:center,center;
   background-repeat:no-repeat,no-repeat;
-  overflow:hidden;
   background-clip:padding-box,padding-box;
-  min-height:180px;
-  border-radius:18px;
+  min-height:280px;
 }
 
 .event.with-bg:hover{
   background-image:
     linear-gradient(180deg, rgba(16,25,42,.78), rgba(11,18,32,.68)),
     var(--event-img);
-  background-size:contain;
-  background-position:center;
-  background-repeat:no-repeat;
+  background-size:cover,cover;
+  background-position:center,center;
+  background-repeat:no-repeat,no-repeat;
 }
 
 .event.with-bg::after{
@@ -719,10 +713,10 @@ header{
   z-index:2;
 }
 
-.event-link{
-  display:block;
-  color:inherit;
-  text-decoration:none;
+.event-stage{
+  margin-top:auto;
+  padding-top:12px;
+  color:#9fb2df;
 }
 
 .event-link:hover .event,
@@ -739,8 +733,6 @@ header{
 .event-link:focus-visible .event{
   box-shadow:var(--ring), var(--shadow-md);
 }
-
-/* ---------- HIGHLIGHTS ---------- */
 
 .cards{
   display:grid;
@@ -772,14 +764,10 @@ header{
 
 .shot .text{padding:1rem}
 
-/* ---------- ABOUT / CONTACT ---------- */
-
 #about .card,
 #contact .card{
   background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));
 }
-
-/* ---------- FOOTER ---------- */
 
 footer{
   border-top:1px solid var(--border);
@@ -800,8 +788,6 @@ footer{
   opacity:1;
   transform:none;
 }
-
-/* ---------- TO TOP ---------- */
 
 #toTop{
   position:fixed;
@@ -855,8 +841,6 @@ footer{
   letter-spacing:.2px;
 }
 
-/* ---------- FORMS ---------- */
-
 .form .field{display:flex;flex-direction:column;gap:.35rem}
 .form .twocol{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
 
@@ -880,8 +864,6 @@ footer{
 }
 
 .help{font-size:.85rem;color:var(--muted)}
-
-/* ---------- CHAT ---------- */
 
 #tmeChatBtn{
   position:fixed;
@@ -1049,8 +1031,6 @@ footer{
   border-color:rgba(74,163,255,.18) !important;
   background:linear-gradient(135deg, rgba(74,163,255,.14), rgba(109,251,255,.10)) !important;
 }
-
-/* ---------- MOBILE ---------- */
 
 @media (max-width:960px){
   .grid{grid-template-columns:1fr 1fr}
@@ -1460,7 +1440,6 @@ footer{
     });
   }
 
-  // ---------- LINK NORMALIZER ----------
   function normalizeHref(raw) {
     if (!raw) return "";
     const t = String(raw).trim();
@@ -1469,7 +1448,6 @@ footer{
     return `https://${t.replace(/^\/+/, "")}`;
   }
 
-  // ---------- EVENT CARD FACTORY ----------
   function makeEventElement(e, options = {}) {
     const article = document.createElement("article");
     article.className = "event reveal";
@@ -1483,17 +1461,16 @@ footer{
     const range = getDisplayRange(e);
     const hasSegments = Array.isArray(e.segments) && e.segments.length > 0;
     const segmentText = hasSegments
-      ? `<div class="meta" style="margin-top:.35rem;color:#9fb2df">${e.segments.length} stages${range.label ? ` • ${range.label}` : ""}</div>`
-      : "";
+  ? `<div class="meta event-stage">${e.segments.length} stages${range.label ? ` • ${range.label}` : ""}</div>`
+  : "";
 
-    article.innerHTML = `
-      <span class="tag">${tag}</span>
-      <div class="meta">${fmtDate(range.start_iso)} — ${fmtDate(range.end_iso)}</div>
-      <h4>${e.title}</h4>
-      <div class="meta">${subline}</div>
-      ${segmentText}
-    `;
-
+article.innerHTML = `
+  <span class="tag">${tag}</span>
+  <div class="meta">${fmtDate(range.start_iso)} — ${fmtDate(range.end_iso)}</div>
+  <h4>${e.title}</h4>
+  <div class="meta">${subline}</div>
+  ${segmentText}
+`;
     if (e.image) {
       article.classList.add("with-bg");
       article.style.setProperty("--event-img", `url("${e.image}")`);
@@ -1518,9 +1495,8 @@ footer{
     return article;
   }
 
-  // ---------- MINI CALENDAR STATE ----------
   let calYear, calMonth;
-  let allEventRanges = []; // [{start: Date, end: Date, index: number, label?: string}]
+  let allEventRanges = [];
   let calendarInitialized = false;
 
   function loadMiniCalendar(dateIso) {
@@ -1666,9 +1642,6 @@ footer{
     window.addEventListener("scroll", hideTooltip, { passive: true });
   }
 
-  // ---------- RECURRENCE (WEEKLY) ----------
-  // events.json weekly template example:
-  // "recurrence": { "freq":"weekly", "byDay":["TH"], "time":"15:00", "durationMinutes":60, "count":12 }
   function getOffsetFromIso(iso) {
     if (!iso) return "";
     const m = String(iso).match(/([+-]\d{2}:\d{2}|Z)$/);
@@ -1756,7 +1729,6 @@ footer{
     return out;
   }
 
-  // ---------- RENDER EVENTS + HOOK CALENDAR ----------
   function renderFromData(rawEvents) {
     const events = expandRecurringEvents(Array.isArray(rawEvents) ? rawEvents : []);
 
@@ -1929,7 +1901,6 @@ footer{
     attachHoverGlow();
   }
 
-  // ---------- STRUCTURED DATA ----------
   function updateJSONLD(next) {
     const el = document.getElementById("event-jsonld");
     if (!next) {
@@ -1959,7 +1930,7 @@ footer{
     });
   }
 
-  // ---------- LOAD EVENTS.JSON ----------
+
   async function loadEvents() {
     try {
       const res = await fetch("/events.json?cb=" + Date.now());
@@ -1986,9 +1957,7 @@ footer{
     }
   }
 
-  // ---------- TWITCH EMBED ----------
   function setTwitchChannel(ch) {
-    // placeholder if you want dynamic channel switching later
   }
 
   (function () {
@@ -2005,7 +1974,6 @@ footer{
     embed.appendChild(iframe);
   })();
 
-  // ---------- NAV ACTIVE LINK ----------
   (function () {
     const sections = [...document.querySelectorAll("section[id]")];
     const links = [...document.querySelectorAll(".navlinks a")];
@@ -2027,7 +1995,6 @@ footer{
     sections.forEach((s) => io.observe(s));
   })();
 
-  // ---------- SCROLL REVEALS ----------
   function attachReveals() {
     const reveals = document.querySelectorAll(".reveal:not(.show)");
     const io2 = new IntersectionObserver(
@@ -2045,18 +2012,15 @@ footer{
   }
   attachReveals();
 
-  // ---------- BACK TO TOP ----------
   (function () {
     const btn = document.getElementById("toTop");
     addEventListener("scroll", () => btn.classList.toggle("show", scrollY > 600));
     btn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
   })();
 
-  // ---------- KICK IT ALL OFF ----------
   loadEvents();
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  // calendar next/prev buttons
   document.getElementById("cal-prev").onclick = () => {
     if (calYear == null || calMonth == null) return;
     calMonth--;
@@ -2078,7 +2042,7 @@ footer{
   };
 </script>
 <script>
-  // ---------- MOBILE NAV TOGGLE ----------
+
   (function () {
     const btn = document.getElementById("navToggle");
     const nav = document.getElementById("primary-nav");
@@ -2094,25 +2058,20 @@ footer{
       e.stopPropagation();
       setOpen(!nav.classList.contains("show"));
     });
-
-    // Close when clicking a link
     nav.querySelectorAll("a").forEach((a) => {
       a.addEventListener("click", () => setOpen(false));
     });
 
-    // Close when clicking outside
     document.addEventListener("click", (e) => {
       if (nav.classList.contains("show") && !nav.contains(e.target) && e.target !== btn) {
         setOpen(false);
       }
     });
 
-    // Close on Escape
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") setOpen(false);
     });
 
-    // If user rotates / resizes out of mobile, clean state
     window.addEventListener("resize", () => {
       if (window.innerWidth > 640) setOpen(false);
     });
@@ -2171,7 +2130,7 @@ footer{
 
   function addMsg({ text, from }) {
   const cleanText = String(text ?? "").trim();
-  if (!cleanText) return; // ← prevents empty ghost messages
+  if (!cleanText) return; 
 
   const sender = String(from || "ai").toLowerCase();
   const who = (sender === "visitor") ? "me" : "them";
