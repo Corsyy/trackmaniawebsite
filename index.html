@@ -625,8 +625,7 @@ header{
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  min-height:280px;
-  height:100%;
+  height:260px; /* 🔥 THIS is the key */
   padding:16px;
   overflow:hidden;
   border:1px solid var(--border);
@@ -685,8 +684,8 @@ header{
   background-size:cover,cover;
   background-position:center,center;
   background-repeat:no-repeat,no-repeat;
-  background-clip:padding-box,padding-box;
-  min-height:280px;
+  min-height:unset;
+  height:260px; /* same as above */
 }
 
 .event.with-bg:hover{
@@ -1067,7 +1066,12 @@ footer{
   .cta{display:none}
 
   .grid,.cards{grid-template-columns:1fr}
-  .event{padding-top:3.6rem}
+
+  .event{
+    min-height:280px;
+    padding:16px;
+    padding-top:3.2rem;
+  }
 
   #countdown{
     grid-template-columns:repeat(2, minmax(120px, 1fr));
