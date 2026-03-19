@@ -1756,7 +1756,32 @@ footer{
     return out;
   }
 
-  // ---------- RENDER EVENTS + HOOK CALENDAR ----------
+  function normalizeEventCardHeights() {
+  const groups = [
+    document.querySelectorAll("#live-events-grid .event"),
+    document.querySelectorAll("#main-events-grid .event"),
+    document.querySelectorAll("#weekly-events-grid .event"),
+    document.querySelectorAll("#past-grid .event"),
+  ];
+
+  groups.forEach((cards) => {
+    if (!cards || !cards.length) return;
+
+    let maxHeight = 0;
+
+    cards.forEach((card) => {
+      card.style.height = "auto";
+    });
+
+    cards.forEach((card) => {
+      maxHeight = Math.max(maxHeight, card.offsetHeight);
+    });
+
+    cards.forEach((card) => {
+      card.style.height = `${maxHeight}px`;
+    });
+  });
+}
   function renderFromData(rawEvents) {
     const events = expandRecurringEvents(Array.isArray(rawEvents) ? rawEvents : []);
 
@@ -1925,8 +1950,9 @@ footer{
     }
 
     updateJSONLD(live[0] || next || null);
-    attachReveals();
-    attachHoverGlow();
+attachReveals();
+attachHoverGlow();
+normalizeEventCardHeights();
   }
 
   // ---------- STRUCTURED DATA ----------
@@ -2076,6 +2102,9 @@ footer{
     }
     renderCalendar();
   };
+  window.addEventListener("resize", () => {
+  normalizeEventCardHeights();
+});
 </script>
 <script>
   // ---------- MOBILE NAV TOGGLE ----------
