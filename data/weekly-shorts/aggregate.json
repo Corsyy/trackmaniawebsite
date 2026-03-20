@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-20T15:04:34.665Z",
+  "generatedAt": "2026-03-20T16:00:49.552Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -3150,7 +3150,7 @@
       "accountId": "083ff8a9-ff45-4cf9-b7cf-8fc601aa656e",
       "player": "Krazy_dudeCr00k",
       "wins": 1,
-      "wrs": 11,
+      "wrs": 10,
       "top5": 22,
       "weeksWon": [
         61
@@ -3214,12 +3214,6 @@
           "week": 63,
           "mapUid": "9qFYqBrCXezBQ7pSdKe7YpouWZ7",
           "timeMs": 11450,
-          "rawRank": 1
-        },
-        {
-          "week": 66,
-          "mapUid": "iSUmWZQqBrK0EJeyfR1XYs14rP4",
-          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -3374,9 +3368,9 @@
         {
           "week": 66,
           "mapUid": "iSUmWZQqBrK0EJeyfR1XYs14rP4",
-          "rank": 1,
+          "rank": 2,
           "timeMs": null,
-          "rawRank": 1
+          "rawRank": 2
         }
       ],
       "aliases": []
@@ -10453,6 +10447,39 @@
       "aliases": []
     },
     {
+      "accountId": "edf486f4-ae0c-4fe3-b4c3-e9135a3156ab",
+      "player": "Verezz",
+      "wins": 0,
+      "wrs": 1,
+      "top5": 2,
+      "weeksWon": [],
+      "wrWeeks": [
+        {
+          "week": 66,
+          "mapUid": "iSUmWZQqBrK0EJeyfR1XYs14rP4",
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "top5Weeks": [
+        {
+          "week": 47,
+          "mapUid": "oHG1ZICw60YXoXJo0OYPZLV5fM5",
+          "rank": 5,
+          "timeMs": 14790,
+          "rawRank": 5
+        },
+        {
+          "week": 66,
+          "mapUid": "iSUmWZQqBrK0EJeyfR1XYs14rP4",
+          "rank": 1,
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "aliases": []
+    },
+    {
       "accountId": "d9170a6b-6e61-46f5-9cfa-d9a498fa57ba",
       "player": "awi.uwu",
       "wins": 0,
@@ -14448,32 +14475,6 @@
           "rank": 5,
           "timeMs": 18887,
           "rawRank": 5
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "edf486f4-ae0c-4fe3-b4c3-e9135a3156ab",
-      "player": "Verezz",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 2,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 47,
-          "mapUid": "oHG1ZICw60YXoXJo0OYPZLV5fM5",
-          "rank": 5,
-          "timeMs": 14790,
-          "rawRank": 5
-        },
-        {
-          "week": 66,
-          "mapUid": "iSUmWZQqBrK0EJeyfR1XYs14rP4",
-          "rank": 2,
-          "timeMs": null,
-          "rawRank": 2
         }
       ],
       "aliases": []
