@@ -1449,7 +1449,6 @@ footer{
     setInterval(tick, 1000);
   }
 
-  // ---------- HOVER GLOW ON EVENT CARDS ----------
   function attachHoverGlow() {
     document.querySelectorAll(".event").forEach((e) => {
       e.addEventListener("mousemove", (ev) => {
@@ -1460,7 +1459,6 @@ footer{
     });
   }
 
-  // ---------- LINK NORMALIZER ----------
   function normalizeHref(raw) {
     if (!raw) return "";
     const t = String(raw).trim();
@@ -1469,7 +1467,6 @@ footer{
     return `https://${t.replace(/^\/+/, "")}`;
   }
 
-  // ---------- EVENT CARD FACTORY ----------
   function makeEventElement(e, options = {}) {
     const article = document.createElement("article");
     article.className = "event reveal";
@@ -1666,21 +1663,175 @@ footer{
     window.addEventListener("scroll", hideTooltip, { passive: true });
   }
 
-  // ---------- RECURRENCE (WEEKLY) ----------
-  // events.json weekly template example:
-  // "recurrence": { "freq":"weekly", "byDay":["TH"], "time":"15:00", "durationMinutes":60, "count":12 }
-  function getOffsetFromIso(iso) {
-    if (!iso) return "";
-    const m = String(iso).match(/([+-]\d{2}:\d{2}|Z)$/);
-    return m ? m[1] : "";
-  }
+      // ---------- EVENT NORMALIZATION + RECURRENCE ----------
+  // Supports:
+  // - old one-off events using start_iso / end_iso
+  // - new one-off events using:
+  //     "date": "2026-04-10",
+  //     "time": "15:00",
+  //     "end_date": "2026-04-10",     // optional
+  //     "end_time": "17:00",          // optional
+  //     "durationMinutes": 120        // optional if no end_time
+  // - weekly recurring events using recurrence.time in Eastern time
+  //
+  // Everything is anchored to America/New_York, and the correct
+  // -04:00 / -05:00 is generated automatically for the actual date.
+
+  const EVENT_TIME_ZONE = "America/New_York";
 
   function pad2(n) {
     return String(n).padStart(2, "0");
   }
 
-  function buildIsoWithOffset(y, mo, d, hh, mm, offset) {
-    return `${y}-${pad2(mo)}-${pad2(d)}T${pad2(hh)}:${pad2(mm)}:00${offset || ""}`;
+  function getTimeZoneOffsetString(date, timeZone = EVENT_TIME_ZONE) {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      timeZoneName: "longOffset",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(date);
+
+    const tzName = parts.find((p) => p.type === "timeZoneName")?.value || "GMT+00:00";
+    const m = tzName.match(/GMT([+-]\d{1,2})(?::(\d{2}))?/i);
+
+    if (!m) return "Z";
+
+    const signHour = m[1];
+    const mins = m[2] || "00";
+    const sign = signHour.startsWith("-") ? "-" : "+";
+    const absHour = signHour.replace(/[+-]/, "").padStart(2, "0");
+
+    return `${sign}${absHour}:${mins}`;
+  }
+
+  function buildIsoForEasternLocal(y, mo, d, hh, mm, timeZone = EVENT_TIME_ZONE) {
+    const probe = new Date(Date.UTC(y, mo - 1, d, 12, 0, 0));
+    const offset = getTimeZoneOffsetString(probe, timeZone);
+    return `${y}-${pad2(mo)}-${pad2(d)}T${pad2(hh)}:${pad2(mm)}:00${offset}`;
+  }
+
+  function getZonedParts(date, timeZone = EVENT_TIME_ZONE) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(date);
+
+    const out = {};
+    for (const p of parts) {
+      if (p.type !== "literal") out[p.type] = p.value;
+    }
+    return out;
+  }
+
+  function buildEndIsoFromDuration(startIso, durationMinutes, timeZone = EVENT_TIME_ZONE) {
+    const startDt = new Date(startIso);
+    const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
+    const endParts = getZonedParts(endDt, timeZone);
+
+    return buildIsoForEasternLocal(
+      Number(endParts.year),
+      Number(endParts.month),
+      Number(endParts.day),
+      Number(endParts.hour),
+      Number(endParts.minute),
+      timeZone
+    );
+  }
+
+  function normalizeSegment(seg) {
+    if (!seg) return seg;
+
+    if (seg.start_iso && seg.end_iso) return seg;
+
+    const startDate = seg.start_date || seg.date;
+    const startTime = seg.start_time || seg.time;
+    const endDate = seg.end_date || startDate;
+    const endTime = seg.end_time || null;
+    const durationMinutes = Number(seg.durationMinutes || 0);
+
+    if (!startDate || !startTime) return seg;
+
+    const [sy, smo, sd] = String(startDate).split("-").map(Number);
+    const [sh, sm] = String(startTime).split(":").map(Number);
+
+    const start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm);
+
+    let end_iso = "";
+    if (endTime) {
+      const [eh, em] = String(endTime).split(":").map(Number);
+      const [ey, emo, ed] = String(endDate).split("-").map(Number);
+      end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em);
+    } else {
+      end_iso = buildEndIsoFromDuration(start_iso, durationMinutes || 60);
+    }
+
+    return {
+      ...seg,
+      start_iso,
+      end_iso,
+    };
+  }
+
+  function normalizeEvent(e) {
+    if (!e) return e;
+
+    const normalized = { ...e };
+
+    if (Array.isArray(normalized.segments) && normalized.segments.length) {
+      normalized.segments = normalized.segments.map(normalizeSegment);
+
+      if (!normalized.start_iso && normalized.segments[0]?.start_iso) {
+        normalized.start_iso = normalized.segments[0].start_iso;
+      }
+      if (!normalized.end_iso && normalized.segments[normalized.segments.length - 1]?.end_iso) {
+        normalized.end_iso = normalized.segments[normalized.segments.length - 1].end_iso;
+      }
+
+      return normalized;
+    }
+
+    if (normalized.start_iso && normalized.end_iso) {
+      return normalized;
+    }
+
+    const startDate = normalized.start_date || normalized.date;
+    const startTime = normalized.start_time || normalized.time;
+    const endDate = normalized.end_date || startDate;
+    const endTime = normalized.end_time || null;
+    const durationMinutes = Number(normalized.durationMinutes || 0);
+
+    if (!startDate || !startTime) {
+      return normalized;
+    }
+
+    const [sy, smo, sd] = String(startDate).split("-").map(Number);
+    const [sh, sm] = String(startTime).split(":").map(Number);
+
+    normalized.start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm);
+
+    if (endTime) {
+      const [eh, em] = String(endTime).split(":").map(Number);
+      const [ey, emo, ed] = String(endDate).split("-").map(Number);
+      normalized.end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em);
+    } else {
+      normalized.end_iso = buildEndIsoFromDuration(
+        normalized.start_iso,
+        durationMinutes || 60
+      );
+    }
+
+    return normalized;
+  }
+
+  function normalizeEvents(events) {
+    return (Array.isArray(events) ? events : []).map(normalizeEvent);
   }
 
   function expandRecurringEvents(events) {
@@ -1703,15 +1854,14 @@ footer{
         continue;
       }
 
-      const offset = getOffsetFromIso(e.start_iso || "");
-      const durationMinutes = Number(rec.durationMinutes || 60);
-      const [HH, MM] = String(rec.time || "19:00")
+      const durationMinutes = Number(rec.durationMinutes || e.durationMinutes || 60);
+      const [HH, MM] = String(rec.time || e.time || "19:00")
         .split(":")
         .map((v) => parseInt(v, 10));
 
       let found = false;
 
-      for (let i = 0; i < 14 && !found; i++) {
+      for (let i = 0; i < 21 && !found; i++) {
         const candidate = new Date(today);
         candidate.setDate(today.getDate() + i);
 
@@ -1719,27 +1869,86 @@ footer{
         const want = rec.byDay.some((code) => dayMap[code] === dow);
         if (!want) continue;
 
-        const startIso = buildIsoWithOffset(
-          candidate.getFullYear(),
-          candidate.getMonth() + 1,
-          candidate.getDate(),
-          HH,
-          MM,
-          offset
-        );
+        const y = candidate.getFullYear();
+        const mo = candidate.getMonth() + 1;
+        const d = candidate.getDate();
 
+        const startIso = buildIsoForEasternLocal(y, mo, d, HH, MM, EVENT_TIME_ZONE);
+        const endIso = buildEndIsoFromDuration(startIso, durationMinutes, EVENT_TIME_ZONE);
+        const endDt = new Date(endIso);
+
+        if (endDt <= now) continue;
+
+        out.push({
+          ...e,
+          start_iso: startIso,
+          end_iso: endIso,
+          _generated: true,
+        });
+
+        found = true;
+      }
+    }
+
+    return out;
+  }
+  function expandRecurringEvents(events) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+    const out = [];
+
+    for (const e of events) {
+      const rec = e && e.recurrence;
+      const isWeekly =
+        rec &&
+        String(rec.freq || "").toLowerCase() === "weekly" &&
+        Array.isArray(rec.byDay) &&
+        rec.byDay.length;
+
+      if (!isWeekly) {
+        out.push(e);
+        continue;
+      }
+
+      const durationMinutes = Number(rec.durationMinutes || 60);
+      const [HH, MM] = String(rec.time || "19:00")
+        .split(":")
+        .map((v) => parseInt(v, 10));
+
+      let found = false;
+
+      for (let i = 0; i < 21 && !found; i++) {
+        const candidate = new Date(today);
+        candidate.setDate(today.getDate() + i);
+
+        const dow = candidate.getDay();
+        const want = rec.byDay.some((code) => dayMap[code] === dow);
+        if (!want) continue;
+
+        const y = candidate.getFullYear();
+        const mo = candidate.getMonth() + 1;
+        const d = candidate.getDate();
+
+        // Build the occurrence as 15:00 / 17:00 / etc in Eastern time,
+        // with the correct -04:00 or -05:00 for that date.
+        const startIso = buildIsoForEasternLocal(y, mo, d, HH, MM, EVENT_TIME_ZONE);
         const startDt = new Date(startIso);
         const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
 
         if (endDt <= now) continue;
 
-        const endIso = buildIsoWithOffset(
-          endDt.getFullYear(),
-          endDt.getMonth() + 1,
-          endDt.getDate(),
-          endDt.getHours(),
-          endDt.getMinutes(),
-          offset
+        // Rebuild end ISO using Eastern-local wall time too, so long events that cross
+        // midnight still stay correct.
+        const endParts = getZonedParts(endDt, EVENT_TIME_ZONE);
+        const endIso = buildIsoForEasternLocal(
+          Number(endParts.year),
+          Number(endParts.month),
+          Number(endParts.day),
+          Number(endParts.hour),
+          Number(endParts.minute),
+          EVENT_TIME_ZONE
         );
 
         out.push({
@@ -1783,7 +1992,7 @@ footer{
   });
 }
   function renderFromData(rawEvents) {
-    const events = expandRecurringEvents(Array.isArray(rawEvents) ? rawEvents : []);
+    const events = expandRecurringEvents(normalizeEvents(Array.isArray(rawEvents) ? rawEvents : []));
 
     window.__eventsCache = events;
     const nowDate = new Date();
