@@ -1854,7 +1854,7 @@ footer{
     return (Array.isArray(events) ? events : []).map(normalizeEvent);
   }
 
-  function expandRecurringEvents(events) {
+    function expandRecurringEvents(events) {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -1893,15 +1893,21 @@ footer{
         const mo = candidate.getMonth() + 1;
         const d = candidate.getDate();
 
-        const startIso = buildIsoForEasternLocal(y, mo, d, HH, MM, EVENT_TIME_ZONE);
-        const endIso = buildEndIsoFromDuration(startIso, durationMinutes, EVENT_TIME_ZONE);
+        // IMPORTANT:
+        // Build recurring events by sending them through the SAME
+        // normalizeEvent() path as your normal events.
+        const generated = normalizeEvent({
+          ...e,
+          start_date: `${y}-${pad2(mo)}-${pad2(d)}`,
+          start_time: `${pad2(HH)}:${pad2(MM)}`,
+          durationMinutes,
+          recurrence: undefined
+        });
 
-        if (new Date(endIso) <= now) continue;
+        if (!generated?.end_iso || new Date(generated.end_iso) <= now) continue;
 
         out.push({
-          ...e,
-          start_iso: startIso,
-          end_iso: endIso,
+          ...generated,
           _generated: true,
         });
 
