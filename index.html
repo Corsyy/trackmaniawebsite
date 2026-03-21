@@ -1879,11 +1879,10 @@ footer{
       .split(":")
       .map((v) => parseInt(v, 10));
 
-    const totalOccurrences = Number(rec.count || 12);
+    // ONLY create the next upcoming occurrence
+    let created = false;
 
-    let created = 0;
-
-    for (let i = 0; i < 120 && created < totalOccurrences; i++) {
+    for (let i = 0; i < 21 && !created; i++) {
       const candidate = new Date(today);
       candidate.setDate(today.getDate() + i);
 
@@ -1913,7 +1912,7 @@ footer{
         _generated: true
       });
 
-      created++;
+      created = true;
     }
   }
 
