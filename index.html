@@ -1663,7 +1663,7 @@ footer{
     window.addEventListener("scroll", hideTooltip, { passive: true });
   }
 
-  // ---------- EVENT NORMALIZATION + RECURRENCE ----------
+    // ---------- EVENT NORMALIZATION + RECURRENCE ----------
   // Supports:
   // - old one-off events using start_iso / end_iso
   // - new one-off events using:
@@ -1673,9 +1673,6 @@ footer{
   //     "end_time": "17:00",          // optional
   //     "durationMinutes": 120        // optional if no end_time
   // - weekly recurring events using recurrence.time in Eastern time
-  //
-  // Everything is anchored to America/New_York, and the correct
-  // -04:00 / -05:00 is generated automatically for the actual date.
 
   const EVENT_TIME_ZONE = "America/New_York";
 
@@ -1683,32 +1680,56 @@ footer{
     return String(n).padStart(2, "0");
   }
 
-  function getTimeZoneOffsetString(date, timeZone = EVENT_TIME_ZONE) {
-    const parts = new Intl.DateTimeFormat("en-US", {
+  function getOffsetMinutesForZone(date, timeZone = EVENT_TIME_ZONE) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
       timeZone,
-      timeZoneName: "longOffset",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false,
+      second: "2-digit",
+      hourCycle: "h23",
     }).formatToParts(date);
 
-    const tzName = parts.find((p) => p.type === "timeZoneName")?.value || "GMT+00:00";
-    const m = tzName.match(/GMT([+-]\d{1,2})(?::(\d{2}))?/i);
+    const map = {};
+    for (const p of parts) {
+      if (p.type !== "literal") map[p.type] = p.value;
+    }
 
-    if (!m) return "Z";
+    const asUtc = Date.UTC(
+      Number(map.year),
+      Number(map.month) - 1,
+      Number(map.day),
+      Number(map.hour),
+      Number(map.minute),
+      Number(map.second)
+    );
 
-    const signHour = m[1];
-    const mins = m[2] || "00";
-    const sign = signHour.startsWith("-") ? "-" : "+";
-    const absHour = signHour.replace(/[+-]/, "").padStart(2, "0");
+    return Math.round((asUtc - date.getTime()) / 60000);
+  }
 
-    return `${sign}${absHour}:${mins}`;
+  function offsetMinutesToString(offsetMinutes) {
+    const sign = offsetMinutes >= 0 ? "+" : "-";
+    const abs = Math.abs(offsetMinutes);
+    const hh = Math.floor(abs / 60);
+    const mm = abs % 60;
+    return `${sign}${pad2(hh)}:${pad2(mm)}`;
   }
 
   function buildIsoForEasternLocal(y, mo, d, hh, mm, timeZone = EVENT_TIME_ZONE) {
-    const probe = new Date(Date.UTC(y, mo - 1, d, 12, 0, 0));
-    const offset = getTimeZoneOffsetString(probe, timeZone);
-    return `${y}-${pad2(mo)}-${pad2(d)}T${pad2(hh)}:${pad2(mm)}:00${offset}`;
+    let guess = new Date(Date.UTC(y, mo - 1, d, hh, mm, 0));
+
+    for (let i = 0; i < 6; i++) {
+      const offsetMinutes = getOffsetMinutesForZone(guess, timeZone);
+      const targetUtcMs = Date.UTC(y, mo - 1, d, hh, mm, 0) - offsetMinutes * 60000;
+      const next = new Date(targetUtcMs);
+      if (next.getTime() === guess.getTime()) break;
+      guess = next;
+    }
+
+    const finalOffset = getOffsetMinutesForZone(guess, timeZone);
+    return `${y}-${pad2(mo)}-${pad2(d)}T${pad2(hh)}:${pad2(mm)}:00${offsetMinutesToString(finalOffset)}`;
   }
 
   function getZonedParts(date, timeZone = EVENT_TIME_ZONE) {
@@ -1731,8 +1752,7 @@ footer{
   }
 
   function buildEndIsoFromDuration(startIso, durationMinutes, timeZone = EVENT_TIME_ZONE) {
-    const startDt = new Date(startIso);
-    const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
+    const endDt = new Date(new Date(startIso).getTime() + durationMinutes * 60000);
     const endParts = getZonedParts(endDt, timeZone);
 
     return buildIsoForEasternLocal(
@@ -1875,9 +1895,8 @@ footer{
 
         const startIso = buildIsoForEasternLocal(y, mo, d, HH, MM, EVENT_TIME_ZONE);
         const endIso = buildEndIsoFromDuration(startIso, durationMinutes, EVENT_TIME_ZONE);
-        const endDt = new Date(endIso);
 
-        if (endDt <= now) continue;
+        if (new Date(endIso) <= now) continue;
 
         out.push({
           ...e,
