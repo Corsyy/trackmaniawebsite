@@ -1855,68 +1855,69 @@ footer{
   }
 
     function expandRecurringEvents(events) {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
-    const out = [];
+  const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+  const out = [];
 
-    for (const e of events) {
-      const rec = e && e.recurrence;
-      const isWeekly =
-        rec &&
-        String(rec.freq || "").toLowerCase() === "weekly" &&
-        Array.isArray(rec.byDay) &&
-        rec.byDay.length;
+  for (const e of events) {
+    const rec = e && e.recurrence;
+    const isWeekly =
+      rec &&
+      String(rec.freq || "").toLowerCase() === "weekly" &&
+      Array.isArray(rec.byDay) &&
+      rec.byDay.length;
 
-      if (!isWeekly) {
-        out.push(e);
-        continue;
-      }
-
-      const durationMinutes = Number(rec.durationMinutes || e.durationMinutes || 60);
-      const [HH, MM] = String(rec.time || e.time || "19:00")
-        .split(":")
-        .map((v) => parseInt(v, 10));
-
-      let found = false;
-
-      for (let i = 0; i < 21 && !found; i++) {
-        const candidate = new Date(today);
-        candidate.setDate(today.getDate() + i);
-
-        const dow = candidate.getDay();
-        const want = rec.byDay.some((code) => dayMap[code] === dow);
-        if (!want) continue;
-
-        const y = candidate.getFullYear();
-        const mo = candidate.getMonth() + 1;
-        const d = candidate.getDate();
-
-        // IMPORTANT:
-        // Build recurring events by sending them through the SAME
-        // normalizeEvent() path as your normal events.
-        const generated = normalizeEvent({
-          ...e,
-          start_date: `${y}-${pad2(mo)}-${pad2(d)}`,
-          start_time: `${pad2(HH)}:${pad2(MM)}`,
-          durationMinutes,
-          recurrence: undefined
-        });
-
-        if (!generated?.end_iso || new Date(generated.end_iso) <= now) continue;
-
-        out.push({
-          ...generated,
-          _generated: true,
-        });
-
-        found = true;
-      }
+    if (!isWeekly) {
+      out.push(e);
+      continue;
     }
 
-    return out;
+    const durationMinutes = Number(rec.durationMinutes || e.durationMinutes || 60);
+    const [HH, MM] = String(rec.time || e.time || "19:00")
+      .split(":")
+      .map((v) => parseInt(v, 10));
+
+    let found = false;
+
+    for (let i = 0; i < 21 && !found; i++) {
+      const candidate = new Date(today);
+      candidate.setDate(today.getDate() + i);
+
+      const dow = candidate.getDay();
+      const want = rec.byDay.some((code) => dayMap[code] === dow);
+      if (!want) continue;
+
+      const y = candidate.getFullYear();
+      const mo = candidate.getMonth() + 1;
+      const d = candidate.getDate();
+
+      // IMPORTANT:
+      // Generate recurring events through the SAME path as normal events.
+      const generated = normalizeEvent({
+        ...e,
+        start_date: `${y}-${pad2(mo)}-${pad2(d)}`,
+        start_time: `${pad2(HH)}:${pad2(MM)}`,
+        end_date: `${y}-${pad2(mo)}-${pad2(d)}`,
+        end_time: null,
+        durationMinutes,
+        recurrence: undefined
+      });
+
+      if (!generated?.end_iso || new Date(generated.end_iso) <= now) continue;
+
+      out.push({
+        ...generated,
+        _generated: true,
+      });
+
+      found = true;
+    }
   }
+
+  return out;
+}
  
   function normalizeEventCardHeights() {
   const groups = [
