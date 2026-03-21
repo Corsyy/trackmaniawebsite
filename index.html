@@ -1663,7 +1663,7 @@ footer{
     window.addEventListener("scroll", hideTooltip, { passive: true });
   }
 
-      // ---------- EVENT NORMALIZATION + RECURRENCE ----------
+  // ---------- EVENT NORMALIZATION + RECURRENCE ----------
   // Supports:
   // - old one-off events using start_iso / end_iso
   // - new one-off events using:
@@ -1892,79 +1892,7 @@ footer{
 
     return out;
   }
-  function expandRecurringEvents(events) {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
-    const out = [];
-
-    for (const e of events) {
-      const rec = e && e.recurrence;
-      const isWeekly =
-        rec &&
-        String(rec.freq || "").toLowerCase() === "weekly" &&
-        Array.isArray(rec.byDay) &&
-        rec.byDay.length;
-
-      if (!isWeekly) {
-        out.push(e);
-        continue;
-      }
-
-      const durationMinutes = Number(rec.durationMinutes || 60);
-      const [HH, MM] = String(rec.time || "19:00")
-        .split(":")
-        .map((v) => parseInt(v, 10));
-
-      let found = false;
-
-      for (let i = 0; i < 21 && !found; i++) {
-        const candidate = new Date(today);
-        candidate.setDate(today.getDate() + i);
-
-        const dow = candidate.getDay();
-        const want = rec.byDay.some((code) => dayMap[code] === dow);
-        if (!want) continue;
-
-        const y = candidate.getFullYear();
-        const mo = candidate.getMonth() + 1;
-        const d = candidate.getDate();
-
-        // Build the occurrence as 15:00 / 17:00 / etc in Eastern time,
-        // with the correct -04:00 or -05:00 for that date.
-        const startIso = buildIsoForEasternLocal(y, mo, d, HH, MM, EVENT_TIME_ZONE);
-        const startDt = new Date(startIso);
-        const endDt = new Date(startDt.getTime() + durationMinutes * 60000);
-
-        if (endDt <= now) continue;
-
-        // Rebuild end ISO using Eastern-local wall time too, so long events that cross
-        // midnight still stay correct.
-        const endParts = getZonedParts(endDt, EVENT_TIME_ZONE);
-        const endIso = buildIsoForEasternLocal(
-          Number(endParts.year),
-          Number(endParts.month),
-          Number(endParts.day),
-          Number(endParts.hour),
-          Number(endParts.minute),
-          EVENT_TIME_ZONE
-        );
-
-        out.push({
-          ...e,
-          start_iso: startIso,
-          end_iso: endIso,
-          _generated: true,
-        });
-
-        found = true;
-      }
-    }
-
-    return out;
-  }
-
+ 
   function normalizeEventCardHeights() {
   const groups = [
     document.querySelectorAll("#live-events-grid .event"),
