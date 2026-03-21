@@ -2,8 +2,10 @@
   {
     "tag": "Race",
     "title": "Lars Random Map",
-    "start_iso": "2025-10-25T14:00:00-04:00",
-    "end_iso": "2025-10-31T17:59:00-04:00",
+    "start_date": "2025-10-25",
+    "start_time": "14:00",
+    "end_date": "2025-10-31",
+    "end_time": "17:59",
     "category": "main",
     "location": "Online",
     "image": "/img/randommap.png",
@@ -15,8 +17,10 @@
   {
     "tag": "Build",
     "title": "Map together",
-    "start_iso": "2025-10-26T13:00:00-04:00",
-    "end_iso": "2025-10-26T16:00:00-04:00",
+    "start_date": "2025-10-26",
+    "start_time": "13:00",
+    "end_date": "2025-10-26",
+    "end_time": "16:00",
     "category": "weekly",
     "location": "Online",
     "image": "/img/maptogether-card.png",
@@ -25,13 +29,15 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-   {
+  {
     "tag": "Cup",
     "title": "TrackmaniaGames 2026",
-    "start_iso": "2026-01-23T13:00:00-04:00",
-    "end_iso": "2026-02-08T16:00:00-04:00",
+    "start_date": "2026-01-23",
+    "start_time": "13:00",
+    "end_date": "2026-02-08",
+    "end_time": "16:00",
     "category": "main",
-    "discordUrl":"https://discord.gg/tZV3Mu3Thb",
+    "discordUrl": "https://discord.gg/tZV3Mu3Thb",
     "location": "Online",
     "image": "/img/sjdfkjsjl.png",
     "hero_image": "/img/kjsdfkjsdfkj.png",
@@ -42,8 +48,10 @@
   {
     "tag": "Cup",
     "title": "7 Continents Cup",
-    "start_iso": "2025-11-09T12:00:00-04:00",
-    "end_iso": "2025-11-29T16:14:00-04:00",
+    "start_date": "2025-11-09",
+    "start_time": "12:00",
+    "end_date": "2025-11-29",
+    "end_time": "16:14",
     "category": "main",
     "discordUrl": "https://discord.gg/S966UxKbJt",
     "location": "Online",
@@ -56,8 +64,10 @@
   {
     "tag": "Cup",
     "title": "Trackmania World Cup",
-    "start_iso": "2025-11-01T04:30:00-04:00",
-    "end_iso": "2025-11-01T10:00:00-04:00",
+    "start_date": "2025-11-01",
+    "start_time": "04:30",
+    "end_date": "2025-11-01",
+    "end_time": "10:00",
     "category": "main",
     "location": "Online",
     "discordUrl": "",
@@ -70,8 +80,10 @@
   {
     "tag": "Kacky",
     "title": "Kacky Reloaded 6",
-    "start_iso": "2025-11-01T15:00:00-04:00",
-    "end_iso": "2025-11-30T14:00:00-05:00",
+    "start_date": "2025-11-01",
+    "start_time": "15:00",
+    "end_date": "2025-11-30",
+    "end_time": "14:00",
     "category": "main",
     "location": "Online",
     "discordUrl": "https://discord.gg/skgr5FU",
@@ -83,37 +95,11 @@
   },
   {
     "tag": "Cup",
-    "title": "RHQ Bonk Cup",
-    "start_iso": "2025-10-30T15:00:00-04:00",
-    "end_iso": "2025-10-30T16:00:00-04:00",
-    "category": "weekly",
-    "location": "Online",
-    "discordUrl": "https://discord.gg/gNZrbrSPnc",
-    "description": "Weekly Cup",
-    "image": "/img/bonk.png",
-    "hero_image": "/img/bonk-hero.png",
-    "image_fit": "contain",
-    "image_pos": "center"
-  },
-  {
-    "tag": "Cup",
-    "title": "U10S Cup",
-    "start_iso": "2025-10-31T17:00:00-04:00",
-    "end_iso": "2025-10-31T18:00:00-04:00",
-    "category": "weekly",
-    "location": "Online",
-    "discordUrl": "https://discord.gg/etgWCk4SkC",
-    "description": "Weekly Cup",
-    "image": "/img/U10S1v8.png",
-    "hero_image": "/img/U10S1v8-hero.png",
-    "image_fit": "contain",
-    "image_pos": "center"
-  },
-  {
-    "tag": "Cup",
     "title": "E-Coffee X MOLO Cup 2026",
-    "start_iso": "2026-02-07T04:00:00-05:00",
-    "end_iso": "2026-02-07T18:30:00-05:00",
+    "start_date": "2026-02-07",
+    "start_time": "04:00",
+    "end_date": "2026-02-07",
+    "end_time": "18:30",
     "category": "main",
     "location": "LAN",
     "discordUrl": "https://discord.gg/vsRVP2MFHa",
@@ -123,39 +109,45 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-   {
+  {
     "tag": "Cup",
     "title": "BIG Trackmania Cup",
-    "start_iso": "2025-12-20T07:00:00-05:00",
-    "end_iso": "2025-12-21T14:00:00-05:00",
-    "category": "main",
-    "location":"Online",
-    "discordUrl":"discord.gg/J7QnyyutDr",
-    "description": "10,000€ BIG Trackmania Cup",
-    "image": "/img/BIG.jpg",       
-    "hero_image": "/img/BIG-hero.jpg",
-    "image_fit": "contain",
-  "image_pos": "center"  
-  },
-   {
-    "tag": "Campaign",
-    "title": "OCD CAMPAIGN 2",
-    "start_iso": "2025-12-01T00:00:00-05:00",
-    "end_iso": "2026-01-01T00:00:00-05:00",
+    "start_date": "2025-12-20",
+    "start_time": "07:00",
+    "end_date": "2025-12-21",
+    "end_time": "14:00",
     "category": "main",
     "location": "Online",
-    "discordUrl": " https://discord.gg/ocd-tm",
+    "discordUrl": "discord.gg/J7QnyyutDr",
+    "description": "10,000€ BIG Trackmania Cup",
+    "image": "/img/BIG.jpg",
+    "hero_image": "/img/BIG-hero.jpg",
+    "image_fit": "contain",
+    "image_pos": "center"
+  },
+  {
+    "tag": "Campaign",
+    "title": "OCD CAMPAIGN 2",
+    "start_date": "2025-12-01",
+    "start_time": "00:00",
+    "end_date": "2026-01-01",
+    "end_time": "00:00",
+    "category": "main",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/ocd-tm",
     "description": "25 Brand new maps and a $800 prize pool! Join disc to be eligible",
     "image": "/img/ocd_campaign_2.jpg",
     "hero_image": "/img/ocd_campaign_2-hero.jpg",
     "image_fit": "contain",
     "image_pos": "center"
   },
-     {
+  {
     "tag": "Tournament",
     "title": "Beacon World League Season 3",
-    "start_iso": "2026-02-15T09:00:00-05:00",
-    "end_iso": "2026-03-15T14:00:00-05:00",
+    "start_date": "2026-02-15",
+    "start_time": "09:00",
+    "end_date": "2026-03-15",
+    "end_time": "14:00",
     "category": "main",
     "location": "Online",
     "discordUrl": "https://discord.gg/aJBcSYN2dj",
@@ -165,11 +157,13 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-    {
+  {
     "tag": "Cup",
     "title": "Canyon Smurfscup",
-    "start_iso": "2026-02-06T02:00:00-05:00",
-    "end_iso": "2026-02-07T08:00:00-05:00",
+    "start_date": "2026-02-06",
+    "start_time": "02:00",
+    "end_date": "2026-02-07",
+    "end_time": "08:00",
     "category": "main",
     "location": "Online",
     "discordUrl": "https://www.smurfen.nu/canyon",
@@ -179,11 +173,13 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-      {
+  {
     "tag": "Tournament",
     "title": "EGAMES SIIViM TOUR by Nevers – 3rd edition",
-    "start_iso": "2026-01-17T07:00:00-05:00",
-    "end_iso": "2026-01-25T09:00:00-05:00",
+    "start_date": "2026-01-17",
+    "start_time": "07:00",
+    "end_date": "2026-01-25",
+    "end_time": "09:00",
     "category": "main",
     "location": "Online",
     "discordUrl": "https://discord.gg/g8g6GSPQU4",
@@ -193,11 +189,13 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-    {
+  {
     "tag": "Tournament",
     "title": "Frontier Fullspeed",
-    "start_iso": "2026-04-04T14:00:00-04:00",
-    "end_iso": "2026-05-16T05:59:00-04:00",
+    "start_date": "2026-04-04",
+    "start_time": "14:00",
+    "end_date": "2026-05-16",
+    "end_time": "05:59",
     "category": "main",
     "location": "Online",
     "discordUrl": "https://discord.gg/XrPkDykrzV",
@@ -207,11 +205,13 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-   {
+  {
     "tag": "Kacky",
     "title": "Kacky Pre-mixed",
-    "start_iso": "2026-03-21T14:30:00-04:00",
-    "end_iso": "2026-04-05T14:30:00-04:00",
+    "start_date": "2026-03-21",
+    "start_time": "14:30",
+    "end_date": "2026-04-05",
+    "end_time": "14:30",
     "category": "main",
     "location": "Online",
     "discordUrl": "https://discord.com/invite/skgr5FU",
@@ -221,11 +221,13 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-{
+  {
     "tag": "Deep slid",
     "title": "Deep Slid",
-    "start_iso": "2026-03-20T15:00:00-04:00",
-    "end_iso": "2026-04-05T14:30:00-04:00",
+    "start_date": "2026-03-20",
+    "start_time": "15:00",
+    "end_date": "2026-04-05",
+    "end_time": "14:30",
     "category": "main",
     "location": "Online",
     "discordUrl": "https://discord.com/invite/vZcJBcM9Bd",
@@ -235,75 +237,79 @@
     "image_fit": "contain",
     "image_pos": "center"
   },
-{
-  "tag": "Cup",
-  "title": "RHQ Bonk Cup",
-  "category": "weekly",
-  "start_iso": "2025-10-30T15:00:00-04:00",
-  "location": "Online",
-  "discordUrl": "https://discord.gg/gNZrbrSPnc",
-  "description": "Weekly Cup",
-  "image": "/img/bonk.png",
-  "image_fit": "contain",
-  "image_pos": "center",
-
-  "recurrence": {
-    "freq": "weekly",
-    "byDay": ["TH"],
-    "time": "15:00",
-    "durationMinutes": 60,
-    "count": 12
-  }
-},
-{
-  "tag": "Cup",
-  "title": "OverDrive Circuit 2026",
-  "start_iso": "2026-04-02T04:00:00-04:00",
-  "end_iso": "2026-12-08T16:00:00-04:00",
-  "category": "main",
-  "discordUrl": "https://discord.gg/tZV3Mu3Thb",
-  "location": "Online",
-  "image": "/img/OverDrive.png",
-  "hero_image": "/img/OverDrive.png",
-  "description": "💰 15000€ Starting Prizepool🤝 Amazing Duos and teams🏎️  2 semi-closed Divisions🗓️ Multiple Splits (April-May, September-October, December)🏆 One Major Winner",
-  "image_fit": "contain",
-  "image_pos": "center",
-  "segments": [
-    {
-      "start_iso": "2026-04-02T04:00:00-04:00",
-      "end_iso": "2026-05-29T18:00:00-04:00",
-      "label": "Split 1"
-    },
-    {
-      "start_iso": "2026-09-30T13:00:00-04:00",
-      "end_iso": "2026-10-02T23:59:00-04:00",
-      "label": "Split 2"
-    },
-    {
-      "start_iso": "2026-12-06T13:00:00-04:00",
-      "end_iso": "2026-12-08T16:00:00-04:00",
-      "label": "Split 3"
+  {
+    "tag": "Cup",
+    "title": "RHQ Bonk Cup",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/gNZrbrSPnc",
+    "description": "Weekly Cup",
+    "image": "/img/bonk.png",
+    "image_fit": "contain",
+    "image_pos": "center",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["TH"],
+      "time": "15:00",
+      "durationMinutes": 60,
+      "count": 12
     }
-  ]
-},
-     {
-   "tag": "Cup",
-  "title": "U10S Cup",
-  "category": "weekly",
-  "start_iso": "2025-12-12T17:00:00-04:00",
-  "location": "Online",
-  "discordUrl": "https://discord.gg/etgWCk4SkC",
-  "description": "Weekly Cup",
-  "image": "/img/U10SWeekly.jpg",
-  "image_fit": "contain",
-  "image_pos": "center",
-
-  "recurrence": {
-    "freq": "weekly",
-    "byDay": ["FR"],
-    "time": "17:00",
-    "durationMinutes": 60,
-    "count": 12
+  },
+  {
+    "tag": "Cup",
+    "title": "OverDrive Circuit 2026",
+    "start_date": "2026-04-02",
+    "start_time": "04:00",
+    "end_date": "2026-12-08",
+    "end_time": "16:00",
+    "category": "main",
+    "discordUrl": "https://discord.gg/tZV3Mu3Thb",
+    "location": "Online",
+    "image": "/img/OverDrive.png",
+    "hero_image": "/img/OverDrive.png",
+    "description": "💰 15000€ Starting Prizepool🤝 Amazing Duos and teams🏎️  2 semi-closed Divisions🗓️ Multiple Splits (April-May, September-October, December)🏆 One Major Winner",
+    "image_fit": "contain",
+    "image_pos": "center",
+    "segments": [
+      {
+        "start_date": "2026-04-02",
+        "start_time": "04:00",
+        "end_date": "2026-05-29",
+        "end_time": "18:00",
+        "label": "Split 1"
+      },
+      {
+        "start_date": "2026-09-30",
+        "start_time": "13:00",
+        "end_date": "2026-10-02",
+        "end_time": "23:59",
+        "label": "Split 2"
+      },
+      {
+        "start_date": "2026-12-06",
+        "start_time": "13:00",
+        "end_date": "2026-12-08",
+        "end_time": "16:00",
+        "label": "Split 3"
+      }
+    ]
+  },
+  {
+    "tag": "Cup",
+    "title": "U10S Cup",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/etgWCk4SkC",
+    "description": "Weekly Cup",
+    "image": "/img/U10SWeekly.jpg",
+    "image_fit": "contain",
+    "image_pos": "center",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["FR"],
+      "time": "17:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
   }
-}
 ]
