@@ -1879,9 +1879,11 @@ footer{
       .split(":")
       .map((v) => parseInt(v, 10));
 
-    let found = false;
+    const totalOccurrences = Number(rec.count || 12);
 
-    for (let i = 0; i < 21 && !found; i++) {
+    let created = 0;
+
+    for (let i = 0; i < 120 && created < totalOccurrences; i++) {
       const candidate = new Date(today);
       candidate.setDate(today.getDate() + i);
 
@@ -1893,8 +1895,6 @@ footer{
       const mo = candidate.getMonth() + 1;
       const d = candidate.getDate();
 
-      // IMPORTANT:
-      // Generate recurring events through the SAME path as normal events.
       const generated = normalizeEvent({
         ...e,
         start_date: `${y}-${pad2(mo)}-${pad2(d)}`,
@@ -1905,14 +1905,15 @@ footer{
         recurrence: undefined
       });
 
-      if (!generated?.end_iso || new Date(generated.end_iso) <= now) continue;
+      if (!generated?.end_iso) continue;
+      if (new Date(generated.end_iso) <= now) continue;
 
       out.push({
         ...generated,
-        _generated: true,
+        _generated: true
       });
 
-      found = true;
+      created++;
     }
   }
 
