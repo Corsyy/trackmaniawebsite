@@ -15,19 +15,28 @@ const AUTH_SECRET = process.env.AUTH_SECRET || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 
 const SITE_BASE = process.env.SITE_BASE || "https://trackmaniaevents.com";
-const SITEMAP_URL = process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/, "")}/sitemap.xml`;
+const SITEMAP_URL =
+  process.env.SITEMAP_URL || `${SITE_BASE.replace(/\/+$/, "")}/sitemap.xml`;
 const AI_MODEL = process.env.AI_MODEL || "gpt-4.1-mini";
 
-const OPERATOR_NAME = process.env.OPERATOR_NAME || "Trackmania Events Support";
-const OPERATOR_AVATAR_URL = process.env.OPERATOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/, "")}/logo.png`;
-const VISITOR_AVATAR_URL = process.env.VISITOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/, "")}/logo.png`;
+const OPERATOR_NAME =
+  process.env.OPERATOR_NAME || "Trackmania Events Support";
+const OPERATOR_AVATAR_URL =
+  process.env.OPERATOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/, "")}/logo.png`;
+const VISITOR_AVATAR_URL =
+  process.env.VISITOR_AVATAR_URL || `${SITE_BASE.replace(/\/+$/, "")}/logo.png`;
 
 app.disable("x-powered-by");
 app.use(express.json({ limit: "256kb" }));
+
 app.get("/health", (req, res) => {
   res.status(200).send("ok");
 });
-app.use("/admin", express.static(path.join(__dirname, "admin"), { extensions: ["html"] }));
+
+app.use(
+  "/admin",
+  express.static(path.join(__dirname, "admin"), { extensions: ["html"] })
+);
 
 const ALLOWED_ORIGINS = new Set([
   "https://trackmaniaevents.com",
@@ -78,7 +87,10 @@ function safeText(input) {
 }
 
 function safeName(input) {
-  const t = String(input ?? "").trim().replace(/\s+/g, " ").slice(0, 32);
+  const t = String(input ?? "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 32);
   return t || "Visitor";
 }
 
@@ -140,13 +152,18 @@ function getCookie(req, name) {
   const header = req.headers.cookie || "";
   const parts = header.split(";").map((p) => p.trim());
   for (const p of parts) {
-    if (p.startsWith(name + "=")) return decodeURIComponent(p.slice(name.length + 1));
+    if (p.startsWith(name + "=")) {
+      return decodeURIComponent(p.slice(name.length + 1));
+    }
   }
   return null;
 }
 
 function signToken(payload) {
-  const sig = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
+  const sig = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
   return `${payload}.${sig}`;
 }
 
@@ -154,22 +171,39 @@ function verifyToken(token) {
   if (!token) return null;
   const i = token.lastIndexOf(".");
   if (i < 0) return null;
+
   const payload = token.slice(0, i);
   const sig = token.slice(i + 1);
-  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("hex");
+  const expected = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
+
   try {
-    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+      return null;
+    }
   } catch {
     return null;
   }
+
   return payload;
 }
 
 function requireAdmin(req, res, next) {
-  if (!AUTH_SECRET) return res.status(500).json({ ok: false, error: "AUTH_SECRET not configured" });
+  if (!AUTH_SECRET) {
+    return res
+      .status(500)
+      .json({ ok: false, error: "AUTH_SECRET not configured" });
+  }
+
   const token = getCookie(req, ADMIN_COOKIE_NAME);
   const payload = verifyToken(token);
-  if (!payload || !payload.startsWith("v1:")) return res.status(401).json({ ok: false, error: "Unauthorized" });
+
+  if (!payload || !payload.startsWith("v1:")) {
+    return res.status(401).json({ ok: false, error: "Unauthorized" });
+  }
+
   next();
 }
 
@@ -187,7 +221,10 @@ function loadOperatorStatus() {
 
 function saveOperatorStatus(status) {
   try {
-    fs.writeFileSync(OP_STATUS_FILE, JSON.stringify({ status, updatedAt: now() }, null, 2));
+    fs.writeFileSync(
+      OP_STATUS_FILE,
+      JSON.stringify({ status, updatedAt: now() }, null, 2)
+    );
   } catch {}
 }
 
@@ -198,12 +235,16 @@ function agentsAvailable() {
 }
 
 function operatorAutoMessage() {
-  if (operatorStatus === "online") return "Transferring you to an agent right now.";
-  if (operatorStatus === "busy") return "All agents are currently busy. Please enter your email and we’ll follow up as soon as possible.";
+  if (operatorStatus === "online") {
+    return "Transferring you to an agent right now.";
+  }
+  if (operatorStatus === "busy") {
+    return "All agents are currently busy. Please enter your email and we’ll follow up as soon as possible.";
+  }
   return "There are no agents online at the moment. Please enter your email and we’ll follow up as soon as possible.";
 }
 
-const ESCALATE_CONFIDENCE_THRESHOLD = 0.40;
+const ESCALATE_CONFIDENCE_THRESHOLD = 0.4;
 
 function isGreeting(text) {
   const t = String(text || "").toLowerCase().trim();
@@ -216,7 +257,9 @@ function greetingReply() {
 
 function requestsHuman(text) {
   const t = String(text || "").toLowerCase();
-  return /(operator|human|agent|staff|support|admin|moderator|mod|talk to a person|real person)/.test(t);
+  return /(operator|human|agent|staff|support|admin|moderator|mod|talk to a person|real person)/.test(
+    t
+  );
 }
 
 function shouldEscalateHeuristics(text) {
@@ -229,7 +272,13 @@ function buildClarifyingQuestion() {
 }
 
 let kbChunks = [];
-let kbStatus = { lastRefreshAt: 0, pageCount: 0, chunkCount: 0, lastError: "" };
+let kbStatus = {
+  lastRefreshAt: 0,
+  pageCount: 0,
+  chunkCount: 0,
+  lastError: "",
+  isRefreshing: false,
+};
 
 const KB_MAX_PAGES = 200;
 const KB_CHUNK_SIZE = 1000;
@@ -261,11 +310,12 @@ function chunkText(text) {
   }
   return out;
 }
-async function fetchWithTimeout(url, opts = {}, ms = 8000) {
+
+async function fetchWithTimeout(url, opts = {}, ms = 10000) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), ms);
   try {
-    return await fetch(url, { ...opts, signal: ctrl.signal });
+    return await fetch(url, { ...opts, signal: ctrl.signal, redirect: "follow" });
   } catch {
     return null;
   } finally {
@@ -274,7 +324,8 @@ async function fetchWithTimeout(url, opts = {}, ms = 8000) {
 }
 
 async function fetchText(url) {
-  const r = await fetch(url, { redirect: "follow" });
+  const r = await fetchWithTimeout(url, {}, 10000);
+  if (!r) throw new Error(`Fetch timeout or failure for ${url}`);
   if (!r.ok) throw new Error(`Fetch failed ${r.status} for ${url}`);
   return await r.text();
 }
@@ -283,55 +334,88 @@ function parseSitemapLocs(xml) {
   const locs = [];
   const re = /<loc>\s*([^<\s]+)\s*<\/loc>/gi;
   let m;
+
   while ((m = re.exec(String(xml || "")))) {
     try {
       const u = new URL(m[1]);
       const base = new URL(SITE_BASE);
-      if (u.host === base.host) locs.push(u.toString());
+      if (u.host === base.host) {
+        locs.push(u.toString());
+      }
     } catch {}
   }
+
   return [...new Set(locs)];
 }
 
 async function refreshKnowledge() {
+  if (kbStatus.isRefreshing) return;
+
+  kbStatus.isRefreshing = true;
   const started = now();
-  kbStatus.lastError = "";
-  const xml = await fetchText(SITEMAP_URL);
-  const urls = parseSitemapLocs(xml).slice(0, KB_MAX_PAGES);
+  let lastError = "";
 
-  const newChunks = [];
-  let pageCount = 0;
+  try {
+    const xml = await fetchText(SITEMAP_URL);
+    const urls = parseSitemapLocs(xml).slice(0, KB_MAX_PAGES);
 
-  for (const url of urls) {
-    try {
-      const html = await fetchText(url);
-      const title = extractTitle(html);
-      const text = stripHtml(html);
-      if (text.length < 200) continue;
+    const newChunks = [];
+    let pageCount = 0;
 
-      const chunks = chunkText(text);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        newChunks.push({
-          id: crypto.createHash("sha1").update(url + ":" + idx).digest("hex"),
-          url,
-          title,
-          text: chunks[idx],
-        });
+    for (const url of urls) {
+      try {
+        const html = await fetchText(url);
+        const title = extractTitle(html);
+        const text = stripHtml(html);
+
+        if (text.length < 200) continue;
+
+        const chunks = chunkText(text);
+        for (let idx = 0; idx < chunks.length; idx++) {
+          newChunks.push({
+            id: crypto
+              .createHash("sha1")
+              .update(url + ":" + idx)
+              .digest("hex"),
+            url,
+            title,
+            text: chunks[idx],
+          });
+        }
+
+        pageCount++;
+        await sleep(35);
+      } catch (e) {
+        lastError = String(e?.message || e);
+        console.warn("[KB] Failed page:", url, lastError);
       }
-      pageCount++;
-      await sleep(60);
-    } catch (e) {
-      kbStatus.lastError = String(e?.message || e);
     }
-  }
 
-  kbChunks = newChunks;
-  kbStatus = {
-    lastRefreshAt: started,
-    pageCount,
-    chunkCount: kbChunks.length,
-    lastError: kbStatus.lastError || "",
-  };
+    kbChunks = newChunks;
+    kbStatus = {
+      lastRefreshAt: started,
+      pageCount,
+      chunkCount: kbChunks.length,
+      lastError,
+      isRefreshing: false,
+    };
+
+    console.log(
+      `[KB] Refresh complete. pages=${pageCount} chunks=${kbChunks.length}`
+    );
+    if (lastError) {
+      console.warn("[KB] Last page error:", lastError);
+    }
+  } catch (e) {
+    kbStatus = {
+      ...kbStatus,
+      lastRefreshAt: started,
+      lastError: String(e?.message || e),
+      isRefreshing: false,
+    };
+    console.error("[KB] Refresh failed:", e);
+    throw e;
+  }
 }
 
 function tokenize(s) {
@@ -340,23 +424,31 @@ function tokenize(s) {
     .replace(/https?:\/\/\S+/g, " ")
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter((w) => w.length >= 3)
-    .slice(0, 30);
+    .filter((w) => w.length >= 2)
+    .slice(0, 40);
 }
 
 function searchKB(query, k = 6) {
   if (!kbChunks.length) return [];
+
   const q = tokenize(query);
   if (!q.length) return [];
+
   const scores = [];
 
   for (const c of kbChunks) {
     let score = 0;
-    const hay = (c.title + " " + c.text).toLowerCase();
+    const titleHay = String(c.title || "").toLowerCase();
+    const textHay = String(c.text || "").toLowerCase();
+
     for (const w of q) {
-      const n = hay.split(w).length - 1;
-      if (n > 0) score += Math.min(4, n);
+      const titleMatches = titleHay.split(w).length - 1;
+      const textMatches = textHay.split(w).length - 1;
+
+      if (titleMatches > 0) score += Math.min(8, titleMatches * 3);
+      if (textMatches > 0) score += Math.min(5, textMatches);
     }
+
     if (score > 0) scores.push({ c, score });
   }
 
@@ -365,32 +457,79 @@ function searchKB(query, k = 6) {
 }
 
 async function callOpenAI({ question, contextChunks }) {
-  if (!OPENAI_API_KEY) return { reply: buildClarifyingQuestion(), confidence: 0.0, escalate: false };
+  if (!OPENAI_API_KEY) {
+    return {
+      reply:
+        "AI replies are not configured right now. Please set OPENAI_API_KEY on the server.",
+      confidence: 0,
+      escalate: false,
+    };
+  }
 
-  const context = contextChunks
-    .map((c) => `Title: ${c.title}\nURL: ${c.url}\n${c.text}`)
-    .join("\n\n---\n\n");
+  const context =
+    contextChunks && contextChunks.length
+      ? contextChunks
+          .map(
+            (c) =>
+              `Title: ${c.title || "Untitled"}\nURL: ${c.url}\n${c.text}`
+          )
+          .join("\n\n---\n\n")
+      : "No relevant site context was found.";
 
   const payload = {
     model: AI_MODEL,
+    temperature: 0.3,
     messages: [
-      { role: "system", content: "You are the Trackmania Events website assistant. Be concise, accurate, and ask a clarifying question if unsure." },
-      { role: "user", content: `Question: ${question}\n\nContext:\n${context}` },
+      {
+        role: "system",
+        content:
+          "You are the Trackmania Events website assistant. Answer the visitor's question directly and clearly. Use the provided website context when relevant. If the context is missing, still try to answer based on the site's likely purpose. Do not always ask a clarifying question. Only ask one if the user is genuinely ambiguous.",
+      },
+      {
+        role: "user",
+        content: `Visitor question: ${question}\n\nWebsite context:\n${context}`,
+      },
     ],
-    temperature: 0.2,
   };
 
-  const r = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${OPENAI_API_KEY}` },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
-  if (!r.ok) return { reply: buildClarifyingQuestion(), confidence: 0.0, escalate: false };
+    if (!r.ok) {
+      const errText = await r.text().catch(() => "");
+      console.error("[OpenAI] API error:", r.status, errText);
+      return {
+        reply:
+          "I’m having trouble generating a response right now. Please try again in a moment.",
+        confidence: 0,
+        escalate: false,
+      };
+    }
 
-  const data = await r.json().catch(() => null);
-  const reply = data?.choices?.[0]?.message?.content?.trim() || "";
-  return { reply, confidence: 0.7, escalate: false };
+    const data = await r.json().catch(() => null);
+    const reply = data?.choices?.[0]?.message?.content?.trim();
+
+    return {
+      reply: reply || "I’m not sure how to answer that yet.",
+      confidence: 0.9,
+      escalate: false,
+    };
+  } catch (e) {
+    console.error("[OpenAI] Request failed:", e);
+    return {
+      reply:
+        "I’m having trouble generating a response right now. Please try again in a moment.",
+      confidence: 0,
+      escalate: false,
+    };
+  }
 }
 
 const EMAIL_RE = /([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/i;
@@ -431,11 +570,18 @@ app.post("/api/chat/profile", (req, res) => {
   if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
 
   const convo = conversations.get(sid);
-  if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found" });
+  if (!convo) {
+    return res.status(404).json({ ok: false, error: "Conversation not found" });
+  }
 
-  const name = req.body?.visitorName != null ? safeName(req.body.visitorName) : null;
-  const email = req.body?.visitorEmail != null ? safeText(req.body.visitorEmail) : null;
-  const avatarUrl = req.body?.visitorAvatarUrl != null ? safeUrl(req.body.visitorAvatarUrl) : null;
+  const name =
+    req.body?.visitorName != null ? safeName(req.body.visitorName) : null;
+  const email =
+    req.body?.visitorEmail != null ? safeText(req.body.visitorEmail) : null;
+  const avatarUrl =
+    req.body?.visitorAvatarUrl != null
+      ? safeUrl(req.body.visitorAvatarUrl)
+      : null;
 
   if (name) {
     convo.visitorName = name;
@@ -471,9 +617,16 @@ app.get("/api/chat/poll", (req, res) => {
   if (!sid) return res.status(400).json({ ok: false, error: "Missing sid" });
 
   const convo = conversations.get(sid);
-  if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
+  if (!convo) {
+    return res
+      .status(404)
+      .json({ ok: false, error: "Conversation not found", status: "missing" });
+  }
 
-  const msgs = since > 0 ? convo.messages.filter((m) => Number(m.ts || 0) > since) : convo.messages;
+  const msgs =
+    since > 0
+      ? convo.messages.filter((m) => Number(m.ts || 0) > since)
+      : convo.messages;
 
   res.json({
     ok: true,
@@ -496,9 +649,17 @@ app.post("/api/chat/send", (req, res) => {
   if (!text) return res.status(400).json({ ok: false, error: "Missing text" });
 
   const convo = conversations.get(sid);
-  if (!convo) return res.status(404).json({ ok: false, error: "Conversation not found", status: "missing" });
+  if (!convo) {
+    return res
+      .status(404)
+      .json({ ok: false, error: "Conversation not found", status: "missing" });
+  }
 
-  if (convo.status === "closed") return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
+  if (convo.status === "closed") {
+    return res
+      .status(409)
+      .json({ ok: false, error: "Chat is closed", status: "closed" });
+  }
 
   if (convo.needsAdmin && !convo.visitorEmail) {
     const m = text.match(EMAIL_RE);
@@ -532,6 +693,7 @@ app.post("/api/chat/send", (req, res) => {
           convo.needsAdmin = true;
           return;
         }
+
         pushAI(convo, operatorAutoMessage());
         convo.assignedTo = "admin";
         convo.needsAdmin = true;
@@ -545,13 +707,48 @@ app.post("/api/chat/send", (req, res) => {
       }
 
       const hits = searchKB(text, 6);
-      if (!kbChunks.length || hits.length === 0) {
-        pushAI(convo, buildClarifyingQuestion());
+
+      if (!OPENAI_API_KEY) {
+        pushAI(
+          convo,
+          "AI replies are not configured right now. Please set OPENAI_API_KEY on the server."
+        );
         return;
       }
 
-      const result = await callOpenAI({ question: text, contextChunks: hits });
-      const lowConfidence = Boolean(result.escalate) || Number(result.confidence || 0) < ESCALATE_CONFIDENCE_THRESHOLD;
+      if (!kbChunks.length) {
+        const result = await callOpenAI({
+          question: text,
+          contextChunks: [],
+        });
+        pushAI(
+          convo,
+          result.reply || "I’m not ready yet. Please try again in a moment."
+        );
+        return;
+      }
+
+      if (hits.length === 0) {
+        const result = await callOpenAI({
+          question: text,
+          contextChunks: [],
+        });
+        pushAI(
+          convo,
+          result.reply ||
+            "I’m not fully sure from the site content alone. Ask about events, TOTD, Kacky, world records, or the widget."
+        );
+        return;
+      }
+
+      const result = await callOpenAI({
+        question: text,
+        contextChunks: hits,
+      });
+
+      const lowConfidence =
+        Boolean(result.escalate) ||
+        Number(result.confidence || 0) < ESCALATE_CONFIDENCE_THRESHOLD;
 
       if (lowConfidence) {
         pushAI(convo, buildClarifyingQuestion());
@@ -559,15 +756,24 @@ app.post("/api/chat/send", (req, res) => {
       }
 
       pushAI(convo, result.reply || buildClarifyingQuestion());
-    } catch {
-      pushAI(convo, buildClarifyingQuestion());
+    } catch (e) {
+      console.error("[CHAT] send handler failed:", e);
+      pushAI(
+        convo,
+        "I hit an error while answering that. Please try again in a moment."
+      );
     }
   })();
 });
 
 function convoSummary(convo) {
   const last = convo.messages.slice(-1)[0];
-  const previewText = last?.text ? String(last.text).slice(0, 120) : (last?.kind === "ui" ? "[UI]" : "");
+  const previewText = last?.text
+    ? String(last.text).slice(0, 120)
+    : last?.kind === "ui"
+      ? "[UI]"
+      : "";
+
   return {
     sid: convo.sid,
     status: convo.status,
@@ -591,19 +797,29 @@ function getConvoOr404(sid, res) {
 }
 
 app.post("/api/admin/login", (req, res) => {
-  if (!AUTH_SECRET) return res.status(500).json({ ok: false, error: "AUTH_SECRET not configured" });
+  if (!AUTH_SECRET) {
+    return res
+      .status(500)
+      .json({ ok: false, error: "AUTH_SECRET not configured" });
+  }
 
   const password = safeText(req.body?.password);
-  if (!password) return res.status(400).json({ ok: false, error: "Missing password" });
+  if (!password) {
+    return res.status(400).json({ ok: false, error: "Missing password" });
+  }
 
-  if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) return res.status(401).json({ ok: false, error: "Invalid password" });
+  if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ ok: false, error: "Invalid password" });
+  }
 
   const payload = `v1:${now()}:${crypto.randomBytes(8).toString("hex")}`;
   const token = signToken(payload);
 
   res.setHeader(
     "Set-Cookie",
-    `${ADMIN_COOKIE_NAME}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 7}`
+    `${ADMIN_COOKIE_NAME}=${encodeURIComponent(
+      token
+    )}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 7}`
   );
 
   res.json({ ok: true });
@@ -659,7 +875,11 @@ app.post("/api/admin/send", requireAdmin, (req, res) => {
   const convo = getConvoOr404(sid, res);
   if (!convo) return;
 
-  if (convo.status === "closed") return res.status(409).json({ ok: false, error: "Chat is closed", status: "closed" });
+  if (convo.status === "closed") {
+    return res
+      .status(409)
+      .json({ ok: false, error: "Chat is closed", status: "closed" });
+  }
 
   const ts = nextTs(convo);
   pushMsg(convo, { id: newMsgId(), from: "admin", text, ts });
@@ -676,11 +896,23 @@ app.post("/api/admin/close", requireAdmin, (req, res) => {
   const convo = getConvoOr404(sid, res);
   if (!convo) return;
 
-  if (convo.status === "closed") return res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: now() });
+  if (convo.status === "closed") {
+    return res.json({
+      ok: true,
+      sid: convo.sid,
+      status: convo.status,
+      serverTime: now(),
+    });
+  }
 
   const ts = nextTs(convo);
   convo.status = "closed";
-  pushMsg(convo, { id: newMsgId(), from: "system", text: "[Chat ended by admin]", ts });
+  pushMsg(convo, {
+    id: newMsgId(),
+    from: "system",
+    text: "[Chat ended by admin]",
+    ts,
+  });
 
   res.json({ ok: true, sid: convo.sid, status: convo.status, serverTime: ts });
 });
@@ -691,7 +923,9 @@ app.get("/api/admin/operators", requireAdmin, (req, res) => {
 
 app.post("/api/admin/operators", requireAdmin, (req, res) => {
   const status = String(req.body?.status || "").toLowerCase();
-  if (!["online", "busy", "offline"].includes(status)) return res.status(400).json({ ok: false, error: "Invalid status" });
+  if (!["online", "busy", "offline"].includes(status)) {
+    return res.status(400).json({ ok: false, error: "Invalid status" });
+  }
   operatorStatus = status;
   saveOperatorStatus(operatorStatus);
   res.json({ ok: true, operatorStatus });
@@ -718,16 +952,29 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   if (!ADMIN_PASSWORD) console.warn("[WARN] ADMIN_PASSWORD is not set");
   if (!AUTH_SECRET) console.warn("[WARN] AUTH_SECRET is not set");
-  if (!OPENAI_API_KEY) console.warn("[WARN] OPENAI_API_KEY is not set (AI auto-replies will use clarifying questions)");
+  if (!OPENAI_API_KEY) {
+    console.warn(
+      "[WARN] OPENAI_API_KEY is not set (AI replies will not work properly)"
+    );
+  }
+
   console.log(`Chat service listening on port ${PORT}`);
   console.log(`SITEMAP_URL=${SITEMAP_URL}`);
+  console.log(`AI_MODEL=${AI_MODEL}`);
+  console.log(`OPENAI_API_KEY configured: ${OPENAI_API_KEY ? "yes" : "no"}`);
   console.log(`OPERATOR_NAME=${OPERATOR_NAME}`);
   console.log(`OPERATOR_AVATAR_URL=${OPERATOR_AVATAR_URL}`);
   console.log(`operatorStatus=${operatorStatus}`);
 
+  refreshKnowledge().catch((e) => {
+    kbStatus.lastError = String(e?.message || e);
+    console.error("[KB] Initial refresh failed:", e);
+  });
 
+  setInterval(() => {
+    refreshKnowledge().catch((e) => {
+      kbStatus.lastError = String(e?.message || e);
+      console.error("[KB] Scheduled refresh failed:", e);
+    });
+  }, 15 * 60 * 1000);
 });
-/* ---- background KB refresh (non-blocking) ---- */
-setTimeout(() => {
-  refreshKnowledge().catch(() => {});
-}, 60_000);
