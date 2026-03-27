@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-27T22:55:06.489Z",
+  "generatedAt": "2026-03-27T23:49:32.474Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -490,7 +490,7 @@
       "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
       "player": "shieldbandit",
       "wins": 6,
-      "wrs": 13,
+      "wrs": 12,
       "top5": 46,
       "weeksWon": [
         6,
@@ -571,12 +571,6 @@
           "week": 65,
           "mapUid": "bwmCSVdgno4UWk2jCvHX3Wxn4Va",
           "timeMs": 12895,
-          "rawRank": 1
-        },
-        {
-          "week": 67,
-          "mapUid": "Rz01VMkeZQys05peaNKubDzTix8",
-          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -892,9 +886,9 @@
         {
           "week": 67,
           "mapUid": "Rz01VMkeZQys05peaNKubDzTix8",
-          "rank": 1,
+          "rank": 2,
           "timeMs": null,
-          "rawRank": 1
+          "rawRank": 2
         },
         {
           "week": 67,
@@ -3096,9 +3090,9 @@
         {
           "week": 67,
           "mapUid": "8qy9o3fkiBmZrMvUFgw8lacb6X7",
-          "rank": 2,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -8146,6 +8140,59 @@
       "aliases": []
     },
     {
+      "accountId": "3f29b335-e2da-4a9d-ba7f-8c572cdf938e",
+      "player": "GABRY-TM",
+      "wins": 0,
+      "wrs": 2,
+      "top5": 4,
+      "weeksWon": [],
+      "wrWeeks": [
+        {
+          "week": 58,
+          "mapUid": "BH_Rq0bGyvN27ZMdyZDTPKdj64a",
+          "timeMs": 13614,
+          "rawRank": 1
+        },
+        {
+          "week": 67,
+          "mapUid": "Rz01VMkeZQys05peaNKubDzTix8",
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "top5Weeks": [
+        {
+          "week": 56,
+          "mapUid": "1hEwyRUaOqnY0p6FTY77tUbpwJ3",
+          "rank": 5,
+          "timeMs": 15524,
+          "rawRank": 5
+        },
+        {
+          "week": 58,
+          "mapUid": "BH_Rq0bGyvN27ZMdyZDTPKdj64a",
+          "rank": 1,
+          "timeMs": 13614,
+          "rawRank": 1
+        },
+        {
+          "week": 59,
+          "mapUid": "qLC2PgxgFLDI6ltxsYZDWoQ2lT0",
+          "rank": 5,
+          "timeMs": 16854,
+          "rawRank": 5
+        },
+        {
+          "week": 67,
+          "mapUid": "Rz01VMkeZQys05peaNKubDzTix8",
+          "rank": 1,
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "aliases": []
+    },
+    {
       "accountId": "54565860-6f3d-47d3-b84b-e146372b1069",
       "player": "leoleodeodeo",
       "wins": 0,
@@ -9361,53 +9408,6 @@
           "rank": 3,
           "timeMs": 15230,
           "rawRank": 3
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "3f29b335-e2da-4a9d-ba7f-8c572cdf938e",
-      "player": "GABRY-TM",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 4,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 58,
-          "mapUid": "BH_Rq0bGyvN27ZMdyZDTPKdj64a",
-          "timeMs": 13614,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 56,
-          "mapUid": "1hEwyRUaOqnY0p6FTY77tUbpwJ3",
-          "rank": 5,
-          "timeMs": 15524,
-          "rawRank": 5
-        },
-        {
-          "week": 58,
-          "mapUid": "BH_Rq0bGyvN27ZMdyZDTPKdj64a",
-          "rank": 1,
-          "timeMs": 13614,
-          "rawRank": 1
-        },
-        {
-          "week": 59,
-          "mapUid": "qLC2PgxgFLDI6ltxsYZDWoQ2lT0",
-          "rank": 5,
-          "timeMs": 16854,
-          "rawRank": 5
-        },
-        {
-          "week": 67,
-          "mapUid": "Rz01VMkeZQys05peaNKubDzTix8",
-          "rank": 2,
-          "timeMs": null,
-          "rawRank": 2
         }
       ],
       "aliases": []
@@ -15620,9 +15620,9 @@
         {
           "week": 67,
           "mapUid": "8qy9o3fkiBmZrMvUFgw8lacb6X7",
-          "rank": 3,
+          "rank": 2,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 2
         }
       ],
       "aliases": []
