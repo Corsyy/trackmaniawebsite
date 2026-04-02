@@ -222,6 +222,22 @@
     "image_pos": "center"
   },
   {
+    "tag": "Tournament",
+    "title": "Red Bull Faster 2026",
+    "start_date": "2026-05-16",
+    "start_time": "20:00",
+    "end_date": "2026-05-16",
+    "end_time": "23:00",
+    "category": "main",
+    "location": "Amsterdam, Netherlands ",
+    "discordUrl": "",
+    "description": "TBA",
+    "image": "/img/redbull.png",
+    "hero_image": "/img/redbull.png",
+    "image_fit": "contain",
+    "image_pos": "center"
+  },
+  {
     "tag": "Tower map",
     "title": "Deep Slid",
     "start_date": "2026-03-20",
@@ -236,6 +252,78 @@
     "hero_image": "/img/ds.jpg",
     "image_fit": "contain",
     "image_pos": "center"
+  },
+  {
+    "tag": "Cup",
+    "title": "RHQ Bonk Cup",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/gNZrbrSPnc",
+    "description": "Weekly Cup",
+    "image": "/img/bonk.png",
+    "image_fit": "contain",
+    "image_pos": "center",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["TH"],
+      "time": "14:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
+    "title": "Quick Relearn Cup Tuesday",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/S966UxKbJt",
+    "description": "Weekly Cup",
+    "image": "/img/QRC.png",
+    "image_fit": "contain",
+    "image_pos": "center",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["TU"],
+      "time": "22:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
+    "title": "Quick Relearn Cup Monday",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/S966UxKbJt",
+    "description": "Weekly Cup",
+    "image": "/img/bonk.png",
+    "image_fit": "contain",
+    "image_pos": "center",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["MO"],
+      "time": "14:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
+    "title": "RHQ Bonk Cup",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/gNZrbrSPnc",
+    "description": "Weekly Cup",
+    "image": "/img/bonk.png",
+    "image_fit": "contain",
+    "image_pos": "center",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["TH"],
+      "time": "15:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
   },
   {
     "tag": "Cup",
@@ -307,7 +395,7 @@
     "recurrence": {
       "freq": "weekly",
       "byDay": ["FR"],
-      "time": "17:00",
+      "time": "16:00",
       "durationMinutes": 60,
       "count": 12
     }
