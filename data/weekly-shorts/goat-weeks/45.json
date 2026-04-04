@@ -1,0 +1,152 @@
+{
+  "week": 45,
+  "year": 2025,
+  "wsWeek": 45,
+  "weekStart": "2025-10-19T16:00:00.000Z",
+  "endedAt": "2025-10-26T16:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "score": 94589,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "52d76984-7d76-498b-aebb-a6b9c0aa0b6e",
+      "player": "eepyCoco",
+      "score": 47759,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "06f82f24-f945-4fdd-aea2-8fd031616861",
+      "player": "TiToch22",
+      "score": 46949,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "f3cf9fe9-0f07-4d59-a6ac-5f580db25134",
+      "player": "Marc--TM",
+      "score": 44557,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "d9312f62-7d73-46d4-8349-81a283e0022e",
+      "player": "BloodTM-_-",
+      "score": 42370,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "a_ucbV0hiRRCMo6gFy3lwyPUAN4",
+      "accountId": "52d76984-7d76-498b-aebb-a6b9c0aa0b6e",
+      "player": "eepyCoco",
+      "timeMs": null,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "JTwIy71u6dLVLYutHxJHKGaIBT",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 15322,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "j_BXrp8IJ7T10RXzbctVpTKFxwf",
+      "accountId": "d9312f62-7d73-46d4-8349-81a283e0022e",
+      "player": "BloodTM-_-",
+      "timeMs": 9921,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "cuymrIKDDTCxzljc1v5k1qVVA0n",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 17520,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "GI4xJZ6GqtpbhLv4bebDDPlRTu7",
+      "accountId": "06f82f24-f945-4fdd-aea2-8fd031616861",
+      "player": "TiToch22",
+      "timeMs": 13458,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "points": 100,
+      "weekWins": 1,
+      "wrs": 2,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "52d76984-7d76-498b-aebb-a6b9c0aa0b6e",
+      "player": "eepyCoco",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "06f82f24-f945-4fdd-aea2-8fd031616861",
+      "player": "TiToch22",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "d9312f62-7d73-46d4-8349-81a283e0022e",
+      "player": "BloodTM-_-",
+      "points": 29,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    },
+    {
+      "accountId": "f3cf9fe9-0f07-4d59-a6ac-5f580db25134",
+      "player": "Marc--TM",
+      "points": 6,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    }
+  ]
+}

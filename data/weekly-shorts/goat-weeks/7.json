@@ -1,0 +1,152 @@
+{
+  "week": 7,
+  "year": 2025,
+  "wsWeek": 7,
+  "weekStart": "2025-01-26T17:00:00.000Z",
+  "endedAt": "2025-02-02T16:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "score": 63822,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "score": 58373,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "b8df00f6-431c-40f8-96fc-5cd83906c520",
+      "player": "Quibz.RD",
+      "score": 51958,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "4f63f046-06dc-4c49-b4e3-5fb65211d2af",
+      "player": "tree-tm",
+      "score": 51364,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "aa4e40ed-5775-4c4e-b1a2-1e857e4b6d99",
+      "player": "JanVan8ern",
+      "score": 45274,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "mztL5l2wa7JqshOhkY94h2TpSIg",
+      "accountId": "b8df00f6-431c-40f8-96fc-5cd83906c520",
+      "player": "Quibz.RD",
+      "timeMs": 19417,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "6ZYlBN86N698I3syPJmTdN_2kk8",
+      "accountId": "aa4e40ed-5775-4c4e-b1a2-1e857e4b6d99",
+      "player": "JanVan8ern",
+      "timeMs": 17834,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "FspbMuKCvJagsOOl9imeXvk1CD0",
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "timeMs": 15622,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "LLZuXrl3AuALnoRvMEFgvr7UE1f",
+      "accountId": "4f63f046-06dc-4c49-b4e3-5fb65211d2af",
+      "player": "tree-tm",
+      "timeMs": 18179,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "8_zup1DPaX9y1bifmKSmGaeCAO4",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 18212,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "points": 75,
+      "weekWins": 1,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "b8df00f6-431c-40f8-96fc-5cd83906c520",
+      "player": "Quibz.RD",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "4f63f046-06dc-4c49-b4e3-5fb65211d2af",
+      "player": "tree-tm",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "aa4e40ed-5775-4c4e-b1a2-1e857e4b6d99",
+      "player": "JanVan8ern",
+      "points": 29,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}

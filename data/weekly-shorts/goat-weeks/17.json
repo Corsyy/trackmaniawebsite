@@ -1,0 +1,152 @@
+{
+  "week": 17,
+  "year": 2025,
+  "wsWeek": 17,
+  "weekStart": "2025-04-06T16:00:00.000Z",
+  "endedAt": "2025-04-13T15:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "a198e640-779a-47c0-97b5-9d38a351e7fa",
+      "player": "Tekky..",
+      "score": 63303,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "f3cf9fe9-0f07-4d59-a6ac-5f580db25134",
+      "player": "Marc--TM",
+      "score": 44021,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "c0d0d93b-8396-40dd-a928-377c436e8a70",
+      "player": "qpdb...",
+      "score": 43275,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "81909621-cd53-43aa-82bb-238fb9bdeb88",
+      "player": "crypii",
+      "score": 41162,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "f1b773ad-15bf-4a82-8c27-7ae8c01b22b0",
+      "player": "Neko.TMU",
+      "score": 40000,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "mb0uDNRn5LR9GEJwHthdR0rQN41",
+      "accountId": "c0d0d93b-8396-40dd-a928-377c436e8a70",
+      "player": "qpdb...",
+      "timeMs": 14082,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "U42k11jMcksX6VA8pnoJMTZonQi",
+      "accountId": "81909621-cd53-43aa-82bb-238fb9bdeb88",
+      "player": "crypii",
+      "timeMs": 15175,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "rTcZRTdSo1xfRPMjNw8C1ctV7Yk",
+      "accountId": "f3cf9fe9-0f07-4d59-a6ac-5f580db25134",
+      "player": "Marc--TM",
+      "timeMs": 16864,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "N61aZI2RpBNFg5wHlk5nBRiqmc9",
+      "accountId": "f1b773ad-15bf-4a82-8c27-7ae8c01b22b0",
+      "player": "Neko.TMU",
+      "timeMs": 16475,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "Uytv8RGVfXk5RKzAuWKhui493G5",
+      "accountId": "a198e640-779a-47c0-97b5-9d38a351e7fa",
+      "player": "Tekky..",
+      "timeMs": 14293,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "a198e640-779a-47c0-97b5-9d38a351e7fa",
+      "player": "Tekky..",
+      "points": 75,
+      "weekWins": 1,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "f3cf9fe9-0f07-4d59-a6ac-5f580db25134",
+      "player": "Marc--TM",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "c0d0d93b-8396-40dd-a928-377c436e8a70",
+      "player": "qpdb...",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "81909621-cd53-43aa-82bb-238fb9bdeb88",
+      "player": "crypii",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "f1b773ad-15bf-4a82-8c27-7ae8c01b22b0",
+      "player": "Neko.TMU",
+      "points": 29,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}

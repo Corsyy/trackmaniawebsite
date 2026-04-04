@@ -1,0 +1,152 @@
+{
+  "week": 28,
+  "year": 2025,
+  "wsWeek": 28,
+  "weekStart": "2025-06-22T16:00:00.000Z",
+  "endedAt": "2025-06-29T15:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "score": 100000,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "52d76984-7d76-498b-aebb-a6b9c0aa0b6e",
+      "player": "eepyCoco",
+      "score": 66667,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "cd32b288-a361-483a-9c48-68417eb83c74",
+      "player": "Flechetas",
+      "score": 49995,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "66b78c2a-1481-40d7-b8cd-a318dee16c00",
+      "player": "Its_Cam.",
+      "score": 47986,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "715d87d3-9ffe-4fb1-9813-b3c95978b093",
+      "player": "DarrahTM",
+      "score": 45366,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "QWGf5yamr1ZjO0jLUSRXfYA3qeb",
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "timeMs": 13735,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "jxOnDruJ66eE95f1IDtGvUi_B6b",
+      "accountId": "52d76984-7d76-498b-aebb-a6b9c0aa0b6e",
+      "player": "eepyCoco",
+      "timeMs": 17749,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "AKGVeFEXNc52AFp4YQ5mF3z_yF7",
+      "accountId": "66b78c2a-1481-40d7-b8cd-a318dee16c00",
+      "player": "Its_Cam.",
+      "timeMs": 11675,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "ihO8eo4_hsbyoIXM7FjM4xAhuZc",
+      "accountId": "cd32b288-a361-483a-9c48-68417eb83c74",
+      "player": "Flechetas",
+      "timeMs": 15463,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "5Hjld7nqP5i91RyCO8Yn8GUTA2",
+      "accountId": "715d87d3-9ffe-4fb1-9813-b3c95978b093",
+      "player": "DarrahTM",
+      "timeMs": 8941,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "points": 75,
+      "weekWins": 1,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "52d76984-7d76-498b-aebb-a6b9c0aa0b6e",
+      "player": "eepyCoco",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "cd32b288-a361-483a-9c48-68417eb83c74",
+      "player": "Flechetas",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "66b78c2a-1481-40d7-b8cd-a318dee16c00",
+      "player": "Its_Cam.",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "715d87d3-9ffe-4fb1-9813-b3c95978b093",
+      "player": "DarrahTM",
+      "points": 29,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}

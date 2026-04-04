@@ -1,0 +1,152 @@
+{
+  "week": 5,
+  "year": 2025,
+  "wsWeek": 5,
+  "weekStart": "2025-01-12T17:00:00.000Z",
+  "endedAt": "2025-01-19T16:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "score": 128000,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "ae8fd088-4f8b-407a-beb8-be2ce1dc1d8b",
+      "player": "Arturek.tm",
+      "score": 49993,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "score": 46554,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "f8968be2-68e1-45e9-b752-3d3e7941339e",
+      "player": "Blavok",
+      "score": 44963,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "05477e79-25fd-48c2-84c7-e1621aa46517",
+      "player": "GranaDy.",
+      "score": 31223,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "KfceSF5qA9z15MjpGPQjUWaqMP8",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 15508,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "27UoLVaC4HYNe6F1XDvHnqDHk8m",
+      "accountId": "f8968be2-68e1-45e9-b752-3d3e7941339e",
+      "player": "Blavok",
+      "timeMs": 15455,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "nS1vpA5IuBCYbBqmDXKDvpwcpDi",
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "timeMs": 10119,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "_1wwHLTH0FigznOJo7MH09nGqjj",
+      "accountId": "ae8fd088-4f8b-407a-beb8-be2ce1dc1d8b",
+      "player": "Arturek.tm",
+      "timeMs": 13780,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "GL9v94JYqOsOOmfQ6zAw9yF0WA8",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 19532,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "points": 100,
+      "weekWins": 1,
+      "wrs": 2,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "ae8fd088-4f8b-407a-beb8-be2ce1dc1d8b",
+      "player": "Arturek.tm",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "f8968be2-68e1-45e9-b752-3d3e7941339e",
+      "player": "Blavok",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "05477e79-25fd-48c2-84c7-e1621aa46517",
+      "player": "GranaDy.",
+      "points": 4,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "week": 23,
+  "year": 2025,
+  "wsWeek": 23,
+  "weekStart": "2025-05-18T16:00:00.000Z",
+  "endedAt": "2025-05-25T15:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "score": 60032,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "a198e640-779a-47c0-97b5-9d38a351e7fa",
+      "player": "Tekky..",
+      "score": 53868,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "4a983dc3-a938-4564-8a1c-8be20779f069",
+      "player": "Zypher.TM",
+      "score": 50356,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "6593ec2d-c06a-461c-b87f-7427d28a55c8",
+      "player": "zKrustt",
+      "score": 47122,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "81909621-cd53-43aa-82bb-238fb9bdeb88",
+      "player": "crypii",
+      "score": 40583,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "C2h3SSnCWmQOCpyDJcy93oOn0Zc",
+      "accountId": "a198e640-779a-47c0-97b5-9d38a351e7fa",
+      "player": "Tekky..",
+      "timeMs": 13429,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "cBwgkVikezucQmZ2oGcBSJK_Hm7",
+      "accountId": "81909621-cd53-43aa-82bb-238fb9bdeb88",
+      "player": "crypii",
+      "timeMs": 14804,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "2wjrCExq_BbxGwLWEeKzAFLP9Da",
+      "accountId": "6593ec2d-c06a-461c-b87f-7427d28a55c8",
+      "player": "zKrustt",
+      "timeMs": 12290,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "OWMRMDcQyQbHCEx4E6lTkq2FF0j",
+      "accountId": "4a983dc3-a938-4564-8a1c-8be20779f069",
+      "player": "Zypher.TM",
+      "timeMs": 17595,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "LDvjv6rST9weVjtcZiduGIq4Lu6",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 14893,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "points": 75,
+      "weekWins": 1,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "a198e640-779a-47c0-97b5-9d38a351e7fa",
+      "player": "Tekky..",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "4a983dc3-a938-4564-8a1c-8be20779f069",
+      "player": "Zypher.TM",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "6593ec2d-c06a-461c-b87f-7427d28a55c8",
+      "player": "zKrustt",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "81909621-cd53-43aa-82bb-238fb9bdeb88",
+      "player": "crypii",
+      "points": 29,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}

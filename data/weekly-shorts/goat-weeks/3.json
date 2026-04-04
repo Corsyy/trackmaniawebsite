@@ -1,0 +1,152 @@
+{
+  "week": 3,
+  "year": 2025,
+  "wsWeek": 3,
+  "weekStart": "2024-12-29T17:00:00.000Z",
+  "endedAt": "2025-01-05T16:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "b981e0b1-2d6a-4470-9b52-c1f6b0b1d0a6",
+      "player": "L1ngotm",
+      "score": 97133,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "score": 65725,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "score": 44716,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "6a3d3f3a-00f6-4cdc-927e-7218253c1c90",
+      "player": "eltanqueta",
+      "score": 42698,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "a98c34ef-5896-417b-bdfe-35c8ed25c4bc",
+      "player": "YannexTM",
+      "score": 35290,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "tLUGP9B546I44qqu9OLuwXhQjgh",
+      "accountId": "6a3d3f3a-00f6-4cdc-927e-7218253c1c90",
+      "player": "eltanqueta",
+      "timeMs": 22280,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "HdROtck8bdvDZi6UoZUBzrr2X6",
+      "accountId": "b981e0b1-2d6a-4470-9b52-c1f6b0b1d0a6",
+      "player": "L1ngotm",
+      "timeMs": 17089,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "9GqkCj24DnIFbXRtTmdyljyVz4k",
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "timeMs": 18982,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "uOB0G8QuHC9lfNMtHxVFX3zhUi4",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 17610,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "xJFYV85yqxGJCYoHHTuLdDf3zb7",
+      "accountId": "b981e0b1-2d6a-4470-9b52-c1f6b0b1d0a6",
+      "player": "L1ngotm",
+      "timeMs": 20384,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "b981e0b1-2d6a-4470-9b52-c1f6b0b1d0a6",
+      "player": "L1ngotm",
+      "points": 100,
+      "weekWins": 1,
+      "wrs": 2,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "6a3d3f3a-00f6-4cdc-927e-7218253c1c90",
+      "player": "eltanqueta",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "a98c34ef-5896-417b-bdfe-35c8ed25c4bc",
+      "player": "YannexTM",
+      "points": 4,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}

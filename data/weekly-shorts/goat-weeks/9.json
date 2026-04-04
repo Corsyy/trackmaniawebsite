@@ -1,0 +1,152 @@
+{
+  "week": 9,
+  "year": 2025,
+  "wsWeek": 9,
+  "weekStart": "2025-02-09T17:00:00.000Z",
+  "endedAt": "2025-02-16T16:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
+      "player": "shieldbandit",
+      "score": 81244,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "0cf03ab8-4e41-40fd-963e-d206a574762f",
+      "player": "Cinn007",
+      "score": 63522,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "cd32b288-a361-483a-9c48-68417eb83c74",
+      "player": "Flechetas",
+      "score": 40000,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "score": 40000,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "7df4f91e-e3b4-407b-9fe0-ad854ca147b6",
+      "player": "UnprovenRuben",
+      "score": 40000,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "736ORpllr0lFFDoc_L9H5FDxO5f",
+      "accountId": "cd32b288-a361-483a-9c48-68417eb83c74",
+      "player": "Flechetas",
+      "timeMs": 21020,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "JnEvrufuAxb9hkCnhtsxx1rdEof",
+      "accountId": "0cf03ab8-4e41-40fd-963e-d206a574762f",
+      "player": "Cinn007",
+      "timeMs": 20554,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "S2i9AiVTNSmuUwl8hGwA9Hb815",
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "timeMs": 18659,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "lKbfeYq1PytJcokL6JiQr2mPRVg",
+      "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
+      "player": "shieldbandit",
+      "timeMs": 22446,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "XmFLxnHaeZbXijcbIt7qUEIKUz4",
+      "accountId": "7df4f91e-e3b4-407b-9fe0-ad854ca147b6",
+      "player": "UnprovenRuben",
+      "timeMs": 14808,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
+      "player": "shieldbandit",
+      "points": 75,
+      "weekWins": 1,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "0cf03ab8-4e41-40fd-963e-d206a574762f",
+      "player": "Cinn007",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "cd32b288-a361-483a-9c48-68417eb83c74",
+      "player": "Flechetas",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "7df4f91e-e3b4-407b-9fe0-ad854ca147b6",
+      "player": "UnprovenRuben",
+      "points": 29,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}

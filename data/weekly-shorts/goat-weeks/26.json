@@ -1,0 +1,152 @@
+{
+  "week": 26,
+  "year": 2025,
+  "wsWeek": 26,
+  "weekStart": "2025-06-08T16:00:00.000Z",
+  "endedAt": "2025-06-15T15:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "placements": [
+    {
+      "rank": 1,
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "score": 67338,
+      "goatPoints": 50
+    },
+    {
+      "rank": 2,
+      "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
+      "player": "shieldbandit",
+      "score": 57284,
+      "goatPoints": 15
+    },
+    {
+      "rank": 3,
+      "accountId": "98d15e41-dac2-4ef5-8fa9-d4ddf473c4bd",
+      "player": "Nieqtv",
+      "score": 47803,
+      "goatPoints": 10
+    },
+    {
+      "rank": 4,
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "score": 43489,
+      "goatPoints": 6
+    },
+    {
+      "rank": 5,
+      "accountId": "0d5cbd22-6690-41cc-925e-f76d24e9c9fe",
+      "player": "Galeniium",
+      "score": 42145,
+      "goatPoints": 4
+    }
+  ],
+  "mapWrs": [
+    {
+      "mapIndex": 1,
+      "mapUid": "5_6_K2baDS2a_HKjQyzOaVfMxa8",
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "timeMs": 15865,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "Lvpv9G7bypTboIF40tx2Heu2n3h",
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "timeMs": 14144,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "CGDNalKB_zAHEoVTaEmgFeXz76m",
+      "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
+      "player": "shieldbandit",
+      "timeMs": 16115,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "upw3Bhl0kWla7RlBISFa75VLwoc",
+      "accountId": "98d15e41-dac2-4ef5-8fa9-d4ddf473c4bd",
+      "player": "Nieqtv",
+      "timeMs": 15621,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "n508eFc4PH59H6cqLdTJcv8olF6",
+      "accountId": "0d5cbd22-6690-41cc-925e-f76d24e9c9fe",
+      "player": "Galeniium",
+      "timeMs": null,
+      "goatPoints": 25
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
+      "player": "Susuwi",
+      "points": 75,
+      "weekWins": 1,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "98b7dfd7-6706-47f4-9b47-6362e9daf7a2",
+      "player": "shieldbandit",
+      "points": 40,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "98d15e41-dac2-4ef5-8fa9-d4ddf473c4bd",
+      "player": "Nieqtv",
+      "points": 35,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "player": "Korniee",
+      "points": 31,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "0d5cbd22-6690-41cc-925e-f76d24e9c9fe",
+      "player": "Galeniium",
+      "points": 29,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}
