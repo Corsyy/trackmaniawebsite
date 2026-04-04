@@ -1,0 +1,455 @@
+{
+  "week": 22,
+  "year": 2025,
+  "wsWeek": 22,
+  "weekStart": "2025-05-11T16:00:00.000Z",
+  "endedAt": "2025-05-18T15:59:59.999Z",
+  "finalized": true,
+  "pointsSystem": {
+    "weekWin": 50,
+    "wr": 25,
+    "second": 15,
+    "third": 10,
+    "fourth": 6,
+    "fifth": 4
+  },
+  "weekAwards": [
+    {
+      "rank": 1,
+      "accountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "player": "Vermithor._",
+      "score": 95124,
+      "goatPoints": 50
+    }
+  ],
+  "mapPlacements": [
+    {
+      "mapIndex": 1,
+      "mapUid": "7YEp8XvUcrpXrbiAkdLm01cbeUa",
+      "rank": 1,
+      "rawRank": 1,
+      "accountId": "9991d011-b918-49cb-b4e4-5d642575b4d0",
+      "player": "PiasekTM",
+      "timeMs": 16922,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 1,
+      "mapUid": "7YEp8XvUcrpXrbiAkdLm01cbeUa",
+      "rank": 2,
+      "rawRank": 2,
+      "accountId": "c8cb45ed-b2d7-42aa-b37f-3b7ab5204b91",
+      "player": "No1RioluFan",
+      "timeMs": 16932,
+      "goatPoints": 15
+    },
+    {
+      "mapIndex": 1,
+      "mapUid": "7YEp8XvUcrpXrbiAkdLm01cbeUa",
+      "rank": 3,
+      "rawRank": 3,
+      "accountId": "bf96354e-1946-4f27-8c50-516bc5000f20",
+      "player": "piana.",
+      "timeMs": 16934,
+      "goatPoints": 10
+    },
+    {
+      "mapIndex": 1,
+      "mapUid": "7YEp8XvUcrpXrbiAkdLm01cbeUa",
+      "rank": 4,
+      "rawRank": 4,
+      "accountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "player": "Vermithor._",
+      "timeMs": 16942,
+      "goatPoints": 6
+    },
+    {
+      "mapIndex": 1,
+      "mapUid": "7YEp8XvUcrpXrbiAkdLm01cbeUa",
+      "rank": 5,
+      "rawRank": 5,
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "timeMs": 16951,
+      "goatPoints": 4
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "dmafOijyFmAR7qR1Yc4VF9okBri",
+      "rank": 1,
+      "rawRank": 1,
+      "accountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "player": "Vermithor._",
+      "timeMs": 15264,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "dmafOijyFmAR7qR1Yc4VF9okBri",
+      "rank": 2,
+      "rawRank": 2,
+      "accountId": "c0d0d93b-8396-40dd-a928-377c436e8a70",
+      "player": "qpdb...",
+      "timeMs": 15299,
+      "goatPoints": 15
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "dmafOijyFmAR7qR1Yc4VF9okBri",
+      "rank": 3,
+      "rawRank": 3,
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "timeMs": 15304,
+      "goatPoints": 10
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "dmafOijyFmAR7qR1Yc4VF9okBri",
+      "rank": 4,
+      "rawRank": 4,
+      "accountId": "97ace52c-563a-4ac0-894f-5b073d8a5259",
+      "player": "scrolltm",
+      "timeMs": 15334,
+      "goatPoints": 6
+    },
+    {
+      "mapIndex": 2,
+      "mapUid": "dmafOijyFmAR7qR1Yc4VF9okBri",
+      "rank": 5,
+      "rawRank": 5,
+      "accountId": "acb625b9-26c4-4344-a5b0-5bc3ddbc8708",
+      "player": "DubbyTM",
+      "timeMs": 15344,
+      "goatPoints": 4
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "lZMOss2pMSOPHY8rAyRH_KLFE68",
+      "rank": 1,
+      "rawRank": 1,
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "timeMs": 14950,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "lZMOss2pMSOPHY8rAyRH_KLFE68",
+      "rank": 2,
+      "rawRank": 2,
+      "accountId": "c0d0d93b-8396-40dd-a928-377c436e8a70",
+      "player": "qpdb...",
+      "timeMs": 14970,
+      "goatPoints": 15
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "lZMOss2pMSOPHY8rAyRH_KLFE68",
+      "rank": 3,
+      "rawRank": 3,
+      "accountId": "6db1e4ce-dd3e-418f-ae57-5f532410f6dd",
+      "player": "CharleyMcXx",
+      "timeMs": 14974,
+      "goatPoints": 10
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "lZMOss2pMSOPHY8rAyRH_KLFE68",
+      "rank": 4,
+      "rawRank": 4,
+      "accountId": "c8cb45ed-b2d7-42aa-b37f-3b7ab5204b91",
+      "player": "No1RioluFan",
+      "timeMs": 14974,
+      "goatPoints": 6
+    },
+    {
+      "mapIndex": 3,
+      "mapUid": "lZMOss2pMSOPHY8rAyRH_KLFE68",
+      "rank": 5,
+      "rawRank": 5,
+      "accountId": "468e9d22-309b-4077-88f3-ea0a6cd84aa0",
+      "player": "Arctic_XpERt",
+      "timeMs": 14992,
+      "goatPoints": 4
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "ozoudQTvfYtr7bhjMRCdy9Y8BAl",
+      "rank": 1,
+      "rawRank": 1,
+      "accountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "player": "Vermithor._",
+      "timeMs": 15141,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "ozoudQTvfYtr7bhjMRCdy9Y8BAl",
+      "rank": 2,
+      "rawRank": 2,
+      "accountId": "c0d0d93b-8396-40dd-a928-377c436e8a70",
+      "player": "qpdb...",
+      "timeMs": 15161,
+      "goatPoints": 15
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "ozoudQTvfYtr7bhjMRCdy9Y8BAl",
+      "rank": 3,
+      "rawRank": 3,
+      "accountId": "e07e9ea9-daa5-4496-9908-9680e35da02b",
+      "player": "BirdieTM",
+      "timeMs": 15191,
+      "goatPoints": 10
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "ozoudQTvfYtr7bhjMRCdy9Y8BAl",
+      "rank": 4,
+      "rawRank": 4,
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "timeMs": 15208,
+      "goatPoints": 6
+    },
+    {
+      "mapIndex": 4,
+      "mapUid": "ozoudQTvfYtr7bhjMRCdy9Y8BAl",
+      "rank": 5,
+      "rawRank": 5,
+      "accountId": "b131fcf6-d928-4df3-8ba0-3b39d411991c",
+      "player": "Ricso5",
+      "timeMs": 15231,
+      "goatPoints": 4
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "UJ62yyaRvaK6jXm5kJeSG6ljoy9",
+      "rank": 1,
+      "rawRank": 1,
+      "accountId": "f3cf9fe9-0f07-4d59-a6ac-5f580db25134",
+      "player": "Marc--TM",
+      "timeMs": 14643,
+      "goatPoints": 25
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "UJ62yyaRvaK6jXm5kJeSG6ljoy9",
+      "rank": 2,
+      "rawRank": 2,
+      "accountId": "7c9be520-7287-49fd-afd1-6e2421d6a55c",
+      "player": "dongr.",
+      "timeMs": 14696,
+      "goatPoints": 15
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "UJ62yyaRvaK6jXm5kJeSG6ljoy9",
+      "rank": 3,
+      "rawRank": 3,
+      "accountId": "f66462b2-9255-4380-ad63-e1c609695082",
+      "player": "Mikiisfuneral",
+      "timeMs": 14718,
+      "goatPoints": 10
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "UJ62yyaRvaK6jXm5kJeSG6ljoy9",
+      "rank": 4,
+      "rawRank": 4,
+      "accountId": "ff851ec9-372a-40aa-823d-b4e0c0441530",
+      "player": "AzeN__",
+      "timeMs": 14718,
+      "goatPoints": 6
+    },
+    {
+      "mapIndex": 5,
+      "mapUid": "UJ62yyaRvaK6jXm5kJeSG6ljoy9",
+      "rank": 5,
+      "rawRank": 5,
+      "accountId": "c8cb45ed-b2d7-42aa-b37f-3b7ab5204b91",
+      "player": "No1RioluFan",
+      "timeMs": 14724,
+      "goatPoints": 4
+    }
+  ],
+  "playerTotals": [
+    {
+      "accountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "player": "Vermithor._",
+      "points": 106,
+      "weekWins": 1,
+      "wrs": 2,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
+      "player": "Jxliano",
+      "points": 45,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 1,
+      "fifthPlaces": 1
+    },
+    {
+      "accountId": "c0d0d93b-8396-40dd-a928-377c436e8a70",
+      "player": "qpdb...",
+      "points": 45,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 3,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "f3cf9fe9-0f07-4d59-a6ac-5f580db25134",
+      "player": "Marc--TM",
+      "points": 25,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "c8cb45ed-b2d7-42aa-b37f-3b7ab5204b91",
+      "player": "No1RioluFan",
+      "points": 25,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 1
+    },
+    {
+      "accountId": "9991d011-b918-49cb-b4e4-5d642575b4d0",
+      "player": "PiasekTM",
+      "points": 25,
+      "weekWins": 0,
+      "wrs": 1,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "7c9be520-7287-49fd-afd1-6e2421d6a55c",
+      "player": "dongr.",
+      "points": 15,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 1,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "e07e9ea9-daa5-4496-9908-9680e35da02b",
+      "player": "BirdieTM",
+      "points": 10,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "6db1e4ce-dd3e-418f-ae57-5f532410f6dd",
+      "player": "CharleyMcXx",
+      "points": 10,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "f66462b2-9255-4380-ad63-e1c609695082",
+      "player": "Mikiisfuneral",
+      "points": 10,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "bf96354e-1946-4f27-8c50-516bc5000f20",
+      "player": "piana.",
+      "points": 10,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 1,
+      "fourthPlaces": 0,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "ff851ec9-372a-40aa-823d-b4e0c0441530",
+      "player": "AzeN__",
+      "points": 6,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "97ace52c-563a-4ac0-894f-5b073d8a5259",
+      "player": "scrolltm",
+      "points": 6,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 1,
+      "fifthPlaces": 0
+    },
+    {
+      "accountId": "468e9d22-309b-4077-88f3-ea0a6cd84aa0",
+      "player": "Arctic_XpERt",
+      "points": 4,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    },
+    {
+      "accountId": "acb625b9-26c4-4344-a5b0-5bc3ddbc8708",
+      "player": "DubbyTM",
+      "points": 4,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    },
+    {
+      "accountId": "b131fcf6-d928-4df3-8ba0-3b39d411991c",
+      "player": "Ricso5",
+      "points": 4,
+      "weekWins": 0,
+      "wrs": 0,
+      "secondPlaces": 0,
+      "thirdPlaces": 0,
+      "fourthPlaces": 0,
+      "fifthPlaces": 1
+    }
+  ]
+}
