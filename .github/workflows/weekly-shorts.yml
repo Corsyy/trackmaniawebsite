@@ -66,7 +66,10 @@ jobs:
             data/weekly-shorts/wr-state.json \
             data/weekly-shorts/postweek-map-state.json \
             data/weekly-shorts/weeks \
-            data/weekly-shorts/name-cache.json
+            data/weekly-shorts/name-cache.json \
+            data/weekly-shorts/goat-weeks.json \
+            data/weekly-shorts/goat-leaderboard.json \
+            data/weekly-shorts/goat-weeks
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
