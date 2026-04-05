@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Weekly Shorts Stats — Trackmania 2020</title>
-  <meta name="description" content="Trackmania 2020 Weekly Shorts campaign stats: wins, WRs, top 5, per-week leaderboards, and WR improvement changelog." />
+  <meta name="description" content="Trackmania 2020 Weekly Shorts campaign stats: wins, WRs, top 5, per-week leaderboards, champion points, and WR improvement changelog." />
 
 <style>
 :root{
@@ -88,8 +88,6 @@ a{
   width:min(1220px,92vw);
   margin:0 auto;
 }
-
-/* ---------- HEADER / NAV ---------- */
 
 header{
   position:sticky;
@@ -211,8 +209,6 @@ header{
   left:0;
 }
 
-/* ---------- TAGS ---------- */
-
 .tag{
   display:inline-flex;
   align-items:center;
@@ -248,8 +244,6 @@ header{
     0 0 10px rgba(109,251,255,.18),
     0 0 18px rgba(58,160,255,.12);
 }
-
-/* ---------- LAYOUT ---------- */
 
 .wrap{
   max-width:1200px;
@@ -320,6 +314,7 @@ h1{
   letter-spacing:.04em;
   text-transform:uppercase;
 }
+
 .nav-home{
   display:none;
 }
@@ -331,8 +326,6 @@ h1{
 .spacer{
   flex:1;
 }
-
-/* ---------- GRID ---------- */
 
 .grid{
   display:grid;
@@ -346,8 +339,6 @@ h1{
 .row2{
   grid-template-columns:1.4fr .6fr;
 }
-
-/* ---------- CARDS ---------- */
 
 .card{
   border:1px solid var(--border);
@@ -386,8 +377,6 @@ h1{
   padding:18px;
 }
 
-/* ---------- KPI ---------- */
-
 .kpi-label{
   font-size:12px;
   color:var(--muted);
@@ -404,8 +393,6 @@ h1{
   font-size:13px;
   color:var(--muted);
 }
-
-/* ---------- CONTROLS ---------- */
 
 .controls{
   display:flex;
@@ -439,7 +426,127 @@ button:hover{
   border-color:var(--border-strong);
 }
 
-/* ---------- TABLES ---------- */
+.leaderboard-tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.tab-btn{
+  appearance:none;
+  border:1px solid var(--border);
+  background:#121d31;
+  color:var(--muted);
+  padding:.62rem 1rem;
+  border-radius:999px;
+  font-size:.9rem;
+  font-weight:900;
+  letter-spacing:.01em;
+  cursor:pointer;
+  transition:transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+.tab-btn:hover{
+  transform:translateY(-1px);
+  border-color:var(--border-strong);
+  color:var(--text);
+}
+
+.tab-btn.active{
+  color:#eaffff;
+  border-color:rgba(109,251,255,.45);
+  background:
+    linear-gradient(180deg, rgba(109,251,255,.18), rgba(58,160,255,.14)),
+    #12243a;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 0 14px rgba(109,251,255,.12);
+}
+
+.tab-panel[hidden]{
+  display:none !important;
+}
+
+.goat-note{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 14px;
+  align-items:center;
+}
+
+.goat-table th,
+.goat-table td{
+  vertical-align:middle;
+}
+
+.goat-table th:nth-child(4),
+.goat-table td:nth-child(4){
+  width:56px;
+  text-align:center;
+}
+
+.goat-table th.tier-col,
+.goat-table td.tier-col{
+  text-align:center !important;
+  vertical-align:middle;
+  padding-top:8px;
+  padding-bottom:8px;
+}
+
+.tier-badge{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100%;
+  line-height:0;
+}
+
+.tier-badge img{
+  display:block;
+  width:22px;
+  height:22px;
+  object-fit:contain;
+  transform:none;
+}
+
+.tier-badge img[src*="champion"]{
+  animation:championGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes championGlow{
+  0%,100%{
+    filter:
+      drop-shadow(0 0 4px rgba(255,215,90,.14))
+      drop-shadow(0 0 8px rgba(255,215,90,.08));
+  }
+  50%{
+    filter:
+      drop-shadow(0 0 7px rgba(255,215,90,.24))
+      drop-shadow(0 0 14px rgba(255,215,90,.14));
+  }
+}
+
+.tier-badge.tier-unranked{
+  width:auto;
+  height:auto;
+}
+
+.tier-badge-fallback{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:74px;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  color:var(--soft);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
 
 .table-wrap{
   width:100%;
@@ -470,8 +577,6 @@ tbody tr:hover{
   background:rgba(74,163,255,.06);
 }
 
-/* ---------- PAGER ---------- */
-
 .pager{
   display:flex;
   align-items:center;
@@ -479,8 +584,6 @@ tbody tr:hover{
   padding:12px 16px;
   border-top:1px solid var(--border);
 }
-
-/* ---------- CHANGELOG ---------- */
 
 .logitem{
   padding:12px 0;
@@ -500,15 +603,11 @@ tbody tr:hover{
   margin-top:4px;
 }
 
-/* ---------- FOOTER ---------- */
-
 .footer{
   margin-top:22px;
   font-size:12px;
   color:var(--muted);
 }
-
-/* ---------- RESPONSIVE ---------- */
 
 @media (max-width:900px){
   .header{
@@ -543,47 +642,47 @@ tbody tr:hover{
   }
 }
 
-
 @media (max-width:640px){
   table.leaderboard-table thead{
-  display:none;
-}
+    display:none;
+  }
 
-table.leaderboard-table,
-table.leaderboard-table tbody,
-table.leaderboard-table tr,
-table.leaderboard-table td{
-  display:block;
-  width:100%;
-}
+  table.leaderboard-table,
+  table.leaderboard-table tbody,
+  table.leaderboard-table tr,
+  table.leaderboard-table td{
+    display:block;
+    width:100%;
+  }
 
-table.leaderboard-table tr{
-  background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));
-  padding:.75rem .8rem;
-  margin-bottom:.7rem;
-  border-radius:14px;
-  border:1px solid var(--border);
-  box-shadow:0 8px 20px rgba(0,0,0,.22);
-}
+  table.leaderboard-table tr{
+    background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));
+    padding:.75rem .8rem;
+    margin-bottom:.7rem;
+    border-radius:14px;
+    border:1px solid var(--border);
+    box-shadow:0 8px 20px rgba(0,0,0,.22);
+  }
 
-table.leaderboard-table td{
-  display:grid;
-  grid-template-columns:120px 1fr;
-  gap:.45rem;
-  font-size:.92rem;
-  padding:.45rem 0;
-  border-bottom:1px solid rgba(255,255,255,.05);
-}
+  table.leaderboard-table td{
+    display:grid;
+    grid-template-columns:120px 1fr;
+    gap:.45rem;
+    font-size:.92rem;
+    padding:.45rem 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
+  }
 
-table.leaderboard-table td:last-child{
-  border-bottom:none;
-}
+  table.leaderboard-table td:last-child{
+    border-bottom:none;
+  }
 
-table.leaderboard-table td::before{
-  content:attr(data-label);
-  color:var(--muted);
-  font-weight:800;
-}
+  table.leaderboard-table td::before{
+    content:attr(data-label);
+    color:var(--muted);
+    font-weight:800;
+  }
+
   .nav{
     justify-content:center;
   }
@@ -614,6 +713,11 @@ table.leaderboard-table td::before{
     display:none;
   }
 
+  .tier-badge img{
+    width:22px;
+    height:22px;
+  }
+
   .wrap{
     padding:20px 14px 70px;
   }
@@ -623,21 +727,22 @@ table.leaderboard-table td::before{
 
 <body class="bg-track-curves">
   <header>
-  <div class="container nav nav-no-brand">
-    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+    <div class="container nav nav-no-brand">
+      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
 
-    <nav id="primary-nav" class="navlinks" aria-label="Primary">
-  <a href="/">Home</a>
-  <a href="/kacky">Kacky Finishes</a>
-  <a href="/wrleaderboard">WR Leaderboard</a>
-  <a href="/totd">Track of the Day</a>
-  <a href="/highlights">Community Highlights</a>
-</nav>
-    <div class="cta">
- <a href="/" class="btn">Home</a>
- </div>
-  </div>
-</header>
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/kacky">Kacky Finishes</a>
+        <a href="/wrleaderboard">WR Leaderboard</a>
+        <a href="/totd">Track of the Day</a>
+        <a href="/highlights">Community Highlights</a>
+      </nav>
+
+      <div class="cta">
+        <a href="/" class="btn">Home</a>
+      </div>
+    </div>
+  </header>
 
   <div class="wrap">
     <div class="header">
@@ -645,7 +750,7 @@ table.leaderboard-table td::before{
         <h1>Weekly Shorts</h1>
         <p class="subtitle">
           A quick look at who’s been farming <b>wins</b>, <b>world records</b>, and <b>Top 5s</b> across the Weekly Shorts campaign.
-          Use search + sorting to find players, and check the changelog for post-week WR improvements.
+          Use search + sorting to find players, check the changelog for post-week WR improvements, or switch to the <b>GOAT Leaderboard</b> tab for frozen point-based standings.
         </p>
       </div>
 
@@ -700,54 +805,131 @@ table.leaderboard-table td::before{
     <div class="grid row2">
       <div class="card" id="overallCard">
         <div class="card-h">
-          <div class="t">Overall leaderboard</div>
-          <div class="controls">
-            <span class="label">Sort</span>
-            <select id="sortBy" aria-label="Sort leaderboard">
-              <option value="wins">Wins</option>
-              <option value="wrs">WRs</option>
-              <option value="top5">Top 5</option>
-              <option value="name">Name</option>
-            </select>
+          <div class="leaderboard-tabs" role="tablist" aria-label="Leaderboard type">
+            <button id="tabOverall" class="tab-btn active" type="button" role="tab" aria-selected="true">
+              Overall Leaderboard
+            </button>
+            <button id="tabGoat" class="tab-btn" type="button" role="tab" aria-selected="false">
+              GOAT Leaderboard
+            </button>
+          </div>
 
-            <input id="playerSearch" type="text" placeholder="Search player…" aria-label="Search player" />
-            <button id="clearSearch" aria-label="Clear search">Clear</button>
+          <div class="controls">
+            <div id="overallControls" class="controls" style="display:flex;">
+              <span class="label">Sort</span>
+              <select id="sortBy" aria-label="Sort overall leaderboard">
+                <option value="wins">Wins</option>
+                <option value="wrs">WRs</option>
+                <option value="top5">Top 5</option>
+                <option value="name">Name</option>
+              </select>
+
+              <input id="playerSearch" type="text" placeholder="Search player…" aria-label="Search overall player" />
+              <button id="clearSearch" aria-label="Clear overall search">Clear</button>
+            </div>
+
+            <div id="goatControls" class="controls" style="display:none;">
+              <span class="label">Sort</span>
+              <select id="goatSortBy" aria-label="Sort GOAT leaderboard">
+                <option value="points">Points</option>
+                <option value="wins">Wins</option>
+                <option value="wrs">WRs</option>
+                <option value="name">Name</option>
+              </select>
+
+              <input id="goatSearch" type="text" placeholder="Search player…" aria-label="Search GOAT player" />
+              <button id="clearGoatSearch" aria-label="Clear GOAT search">Clear</button>
+            </div>
           </div>
         </div>
 
-        <div class="card-b help" style="padding-top:10px; padding-bottom:10px;">
-          Tip: WRs here are counted per-map. If a bugged leaderboard entry is filtered server-side, the next valid time becomes the WR (and the raw rank is preserved).
+        <div id="overallPanel" class="tab-panel" style="display:block;">
+          <div class="card-b help" style="padding-top:10px; padding-bottom:10px;">
+            Tip: WRs here are counted per-map. If a bugged leaderboard entry is filtered server-side, the next valid time becomes the WR.
+          </div>
+
+          <div class="card-b table-wrap" style="padding:0">
+            <table class="leaderboard-table overall-table">
+              <thead>
+                <tr>
+                  <th style="width:54px">#</th>
+                  <th>Player</th>
+                  <th class="right">Wins</th>
+                  <th class="right">WRs</th>
+                  <th class="right">Top 5</th>
+                  <th class="right">Weeks won</th>
+                </tr>
+              </thead>
+              <tbody id="overallBody"></tbody>
+            </table>
+
+            <div class="pager">
+              <button id="prevPage">← Prev</button>
+              <div class="mini muted" id="pageInfo">Page 1 / 1</div>
+              <button id="nextPage">Next →</button>
+
+              <div class="spacer"></div>
+
+              <span class="mini muted">Per page</span>
+              <select id="pageSize" aria-label="Overall page size">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div class="card-b table-wrap" style="padding:0">
-          <table class="leaderboard-table overall-table">
-            <thead>
-              <tr>
-                <th style="width:54px">#</th>
-                <th>Player</th>
-                <th class="right">Wins</th>
-                <th class="right">WRs</th>
-                <th class="right">Top 5</th>
-                <th class="right">Weeks won</th>
-              </tr>
-            </thead>
-            <tbody id="overallBody"></tbody>
-          </table>
+        <div id="goatPanel" class="tab-panel" style="display:none;">
+          <div class="card-b help goat-note" style="padding-top:10px; padding-bottom:10px;">
+            <span>Points only count from frozen ended-week results.</span>
+            <span>#1 overall = Champion</span>
+            <span>Gold Tier = 750+</span>
+            <span>Silver Tier = 500–749</span>
+            <span>Bronze Tier = 250–499</span>
+            <span>Week win = 50</span>
+            <span>WR = 25</span>
+            <span>2nd = 15</span>
+            <span>3rd = 10</span>
+            <span>4th = 6</span>
+            <span>5th = 4</span>
+          </div>
 
-          <div class="pager">
-            <button id="prevPage">← Prev</button>
-            <div class="mini muted" id="pageInfo">Page 1 / 1</div>
-            <button id="nextPage">Next →</button>
+          <div class="card-b table-wrap" style="padding:0">
+            <table class="leaderboard-table goat-table">
+              <thead>
+                <tr>
+                  <th style="width:54px">#</th>
+                  <th>Player</th>
+                  <th class="right">Points</th>
+                  <th class="tier-col">Tier</th>
+                  <th class="right">Wins</th>
+                  <th class="right">WRs</th>
+                  <th class="right">2nd</th>
+                  <th class="right">3rd</th>
+                  <th class="right">4th</th>
+                  <th class="right">5th</th>
+                </tr>
+              </thead>
+              <tbody id="goatBody"></tbody>
+            </table>
 
-            <div class="spacer"></div>
+            <div class="pager">
+              <button id="prevGoatPage">← Prev</button>
+              <div class="mini muted" id="goatPageInfo">Page 1 / 1</div>
+              <button id="nextGoatPage">Next →</button>
 
-            <span class="mini muted">Per page</span>
-            <select id="pageSize" aria-label="Page size">
-              <option value="25">25</option>
-              <option value="50" selected>50</option>
-              <option value="100">100</option>
-              <option value="200">200</option>
-            </select>
+              <div class="spacer"></div>
+
+              <span class="mini muted">Per page</span>
+              <select id="goatPageSize" aria-label="GOAT leaderboard page size">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -791,16 +973,17 @@ table.leaderboard-table td::before{
 
     <div class="footer">
       <div><b>Data source:</b> all stats are all grabbed from nadeo services</div>
-      <div> If something looks off, or if any stats aren't showing properly contact the website owner.</div>
+      <div>If something looks off, or if any stats aren't showing properly contact the website owner.</div>
     </div>
   </div>
 
   <script>
     const PATHS = {
       weeksIndex: `/data/weekly-shorts/weeks.json`,
-      aggregate:  `/data/weekly-shorts/aggregate.json`,
-      changelog:  `/data/weekly-shorts/changelog.json`,
-      weekFile:   (weekNum) => `/data/weekly-shorts/weeks/${weekNum}.json`,
+      aggregate: `/data/weekly-shorts/aggregate.json`,
+      changelog: `/data/weekly-shorts/changelog.json`,
+      goatAggregate: `/data/weekly-shorts/goat-leaderboard.json`,
+      weekFile: (weekNum) => `/data/weekly-shorts/weeks/${weekNum}.json`,
     };
 
     const $ = (id) => document.getElementById(id);
@@ -824,16 +1007,22 @@ table.leaderboard-table td::before{
       if (!iso) return "—";
       const d = new Date(iso);
       if (isNaN(d.getTime())) return iso;
-      return d.toLocaleString(undefined, { year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+      return d.toLocaleString(undefined, {
+        year:"numeric",
+        month:"short",
+        day:"2-digit",
+        hour:"2-digit",
+        minute:"2-digit"
+      });
     }
 
     async function fetchJson(url){
-  const sep = url.includes("?") ? "&" : "?";
-  const bust = `${url}${sep}v=${Date.now()}`;
-  const r = await fetch(bust, { cache: "no-store" });
-  if (!r.ok) throw new Error(`Failed ${r.status} ${url}`);
-  return r.json();
-}
+      const sep = url.includes("?") ? "&" : "?";
+      const bust = `${url}${sep}v=${Date.now()}`;
+      const r = await fetch(bust, { cache: "no-store" });
+      if (!r.ok) throw new Error(`Failed ${r.status} ${url}`);
+      return r.json();
+    }
 
     function pickLeader(players, key){
       let best = null;
@@ -875,13 +1064,76 @@ table.leaderboard-table td::before{
       return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
     }
 
+    function sortGoatPlayers(players, sortBy){
+      const arr = [...players];
+      const byNumDesc = (k) => (a,b) => (b[k]??0) - (a[k]??0) || (a.player||"").localeCompare(b.player||"");
+
+      if (sortBy === "points") return arr.sort(byNumDesc("goatPoints"));
+      if (sortBy === "wins") return arr.sort(byNumDesc("weekWins"));
+      if (sortBy === "wrs") return arr.sort(byNumDesc("wrs"));
+      if (sortBy === "seconds") return arr.sort(byNumDesc("secondPlaces"));
+      return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
+    }
+
     let overallPage = 1;
+    let goatPage = 1;
+    let activeTab = "overall";
 
     function getOverallList(players, sortBy, searchTerm){
       const term = (searchTerm || "").trim().toLowerCase();
       let list = sortPlayers(players || [], sortBy);
       if (term) list = list.filter(p => (p.player||"").toLowerCase().includes(term));
       return list;
+    }
+
+    function getGoatList(players, sortBy, searchTerm){
+      const term = (searchTerm || "").trim().toLowerCase();
+      let list = sortGoatPlayers(players || [], sortBy);
+      if (term) list = list.filter(p => (p.player||"").toLowerCase().includes(term));
+      return list;
+    }
+
+    const BADGE_ASSETS = {
+      champion: "/img/champion.png",
+      gold: "/img/gold.png",
+      silver: "/img/silver.png",
+      bronze: "/img/bronze.png",
+    };
+
+    function getTierMeta(player, championPoints){
+  const points = Number(player?.goatPoints ?? 0);
+
+  if (points > 0 && points === championPoints) {
+    return { key: "champion", label: "Champion", points };
+  }
+  if (points >= 750) {
+    return { key: "gold", label: "Gold Tier", points };
+  }
+  if (points >= 500) {
+    return { key: "silver", label: "Silver Tier", points };
+  }
+  if (points >= 250) {
+    return { key: "bronze", label: "Bronze Tier", points };
+  }
+  return { key: "unranked", label: "Unranked", points };
+}
+
+    function renderTierBadge(meta){
+      if (!meta || meta.key === "unranked") {
+        return `<span class="tier-badge tier-unranked"><span class="tier-badge-fallback">Unranked</span></span>`;
+      }
+
+      const src = BADGE_ASSETS[meta.key];
+      return `
+        <span class="tier-badge" title="${meta.label}">
+          <img
+            src="${src}"
+            alt="${meta.label}"
+            loading="lazy"
+            onerror="this.closest('.tier-badge').innerHTML='<span class=&quot;tier-badge-fallback&quot;>${meta.label}</span>'"
+          />
+        </span>
+      `;
     }
 
     function renderOverall(players, sortBy, searchTerm){
@@ -910,7 +1162,6 @@ table.leaderboard-table td::before{
       page.forEach((p, i) => {
         const weeksWon = Array.isArray(p.weeksWon) ? p.weeksWon.join(", ") : "—";
         const tr = document.createElement("tr");
-        tr.dataset.player = (p.player||"").toLowerCase();
         tr.innerHTML = `
           <td class="muted rank-cell" data-label="#">${start + i + 1}</td>
           <td class="player-cell" data-label="Player"><b>${p.player || "—"}</b></td>
@@ -922,6 +1173,50 @@ table.leaderboard-table td::before{
         body.appendChild(tr);
       });
     }
+
+    function renderGoat(players, sortBy, searchTerm){
+  const body = $("goatBody");
+  body.innerHTML = "";
+
+  const list = getGoatList(players, sortBy, searchTerm);
+  const championPoints = list.length ? Number(list[0].goatPoints ?? 0) : 0;
+  const pageSize = Math.max(1, Number($("goatPageSize")?.value || 50));
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+
+  if (goatPage > totalPages) goatPage = totalPages;
+  if (goatPage < 1) goatPage = 1;
+
+  $("goatPageInfo").textContent = `Page ${goatPage} / ${totalPages} (${list.length} players)`;
+  $("prevGoatPage").disabled = goatPage <= 1;
+  $("nextGoatPage").disabled = goatPage >= totalPages;
+
+  if (!list.length){
+    body.innerHTML = `<tr><td colspan="10" class="muted">No players match.</td></tr>`;
+    return;
+  }
+
+  const start = (goatPage - 1) * pageSize;
+  const page = list.slice(start, start + pageSize);
+
+  page.forEach((p, i) => {
+    const tierMeta = getTierMeta(p, championPoints);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="muted rank-cell" data-label="#">${start + i + 1}</td>
+      <td class="player-cell" data-label="Player"><b>${p.player || "—"}</b></td>
+      <td class="right" data-label="Points">${fmtScore(p.goatPoints ?? 0)}</td>
+      <td class="tier-col" data-label="Tier">${renderTierBadge(tierMeta)}</td>
+      <td class="right" data-label="Wins">${p.weekWins ?? 0}</td>
+      <td class="right" data-label="WRs">${p.wrs ?? 0}</td>
+      <td class="right" data-label="2nd">${p.secondPlaces ?? 0}</td>
+      <td class="right" data-label="3rd">${p.thirdPlaces ?? 0}</td>
+      <td class="right" data-label="4th">${p.fourthPlaces ?? 0}</td>
+      <td class="right" data-label="5th">${p.fifthPlaces ?? 0}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
 
     function populateWeeksDropdown(weeks){
       const sel = $("weekSelect");
@@ -984,12 +1279,6 @@ table.leaderboard-table td::before{
 
         if (it.text) {
           div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="logtext">${it.text}</div>`;
-        } else if (it.type === "WR_IMPROVED_AFTER_WEEK") {
-          const msg =
-            `<b>${it.playerNew}</b> improved <b>Week ${it.week}</b> WR ` +
-            `(previously held by <b>${it.playerPrev}</b>) — ` +
-            `<b>${fmtTime(it.timeNewMs)}</b> (prev ${fmtTime(it.timePrevMs)})`;
-          div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="logtext">${msg}</div>`;
         } else {
           div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="muted">Unknown changelog item.</div>`;
         }
@@ -998,10 +1287,29 @@ table.leaderboard-table td::before{
       }
     }
 
+    function setActiveTab(tab){
+  activeTab = tab;
+
+  const isOverall = tab === "overall";
+
+  $("tabOverall").classList.toggle("active", isOverall);
+  $("tabGoat").classList.toggle("active", !isOverall);
+
+  $("tabOverall").setAttribute("aria-selected", isOverall ? "true" : "false");
+  $("tabGoat").setAttribute("aria-selected", !isOverall ? "true" : "false");
+
+  $("overallPanel").style.display = isOverall ? "" : "none";
+  $("goatPanel").style.display = isOverall ? "none" : "";
+
+  $("overallControls").style.display = isOverall ? "flex" : "none";
+  $("goatControls").style.display = isOverall ? "none" : "flex";
+}
+
     async function main(){
-      const [weeksIndex, agg, changelog] = await Promise.all([
+      const [weeksIndex, agg, goatAgg, changelog] = await Promise.all([
         fetchJson(PATHS.weeksIndex),
         fetchJson(PATHS.aggregate),
+        fetchJson(PATHS.goatAggregate).catch(() => ({ players: [] })),
         fetchJson(PATHS.changelog).catch(() => ({ items: [] }))
       ]);
 
@@ -1011,21 +1319,60 @@ table.leaderboard-table td::before{
       const sortBy = $("sortBy");
       const search = $("playerSearch");
 
+      const goatSortBy = $("goatSortBy");
+      const goatSearch = $("goatSearch");
+
       function rerenderOverall(resetPage=false){
         if (resetPage) overallPage = 1;
         renderOverall(agg.players || [], sortBy.value, search.value);
       }
 
+      function rerenderGoat(resetPage=false){
+        if (resetPage) goatPage = 1;
+        renderGoat(goatAgg.players || [], goatSortBy.value, goatSearch.value);
+      }
+
       sortBy.addEventListener("change", () => rerenderOverall(true));
       search.addEventListener("input", () => rerenderOverall(true));
-      $("clearSearch").addEventListener("click", () => { search.value = ""; rerenderOverall(true); });
+      $("clearSearch").addEventListener("click", () => {
+        search.value = "";
+        rerenderOverall(true);
+      });
 
-      $("prevPage").addEventListener("click", () => { overallPage--; rerenderOverall(false); });
-      $("nextPage").addEventListener("click", () => { overallPage++; rerenderOverall(false); });
+      $("prevPage").addEventListener("click", () => {
+        overallPage--;
+        rerenderOverall(false);
+      });
+      $("nextPage").addEventListener("click", () => {
+        overallPage++;
+        rerenderOverall(false);
+      });
       $("pageSize").addEventListener("change", () => rerenderOverall(true));
 
+      goatSortBy.addEventListener("change", () => rerenderGoat(true));
+      goatSearch.addEventListener("input", () => rerenderGoat(true));
+      $("clearGoatSearch").addEventListener("click", () => {
+        goatSearch.value = "";
+        rerenderGoat(true);
+      });
+
+      $("prevGoatPage").addEventListener("click", () => {
+        goatPage--;
+        rerenderGoat(false);
+      });
+      $("nextGoatPage").addEventListener("click", () => {
+        goatPage++;
+        rerenderGoat(false);
+      });
+      $("goatPageSize").addEventListener("change", () => rerenderGoat(true));
+
+      $("tabOverall").addEventListener("click", () => setActiveTab("overall"));
+      $("tabGoat").addEventListener("click", () => setActiveTab("goat"));
+
       rerenderOverall(true);
+      rerenderGoat(true);
       renderChangelog(changelog.items || []);
+      setActiveTab("overall");
 
       const defaultWeek = populateWeeksDropdown(weeks);
 
@@ -1049,16 +1396,17 @@ table.leaderboard-table td::before{
         </div>`;
     });
   </script>
-  <script>
-const navToggle = document.getElementById("navToggle");
-const primaryNav = document.getElementById("primary-nav");
 
-if (navToggle && primaryNav) {
-  navToggle.addEventListener("click", () => {
-    const open = primaryNav.classList.toggle("show");
-    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-}
-</script>
+  <script>
+    const navToggle = document.getElementById("navToggle");
+    const primaryNav = document.getElementById("primary-nav");
+
+    if (navToggle && primaryNav) {
+      navToggle.addEventListener("click", () => {
+        const open = primaryNav.classList.toggle("show");
+        navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
+  </script>
 </body>
 </html>
