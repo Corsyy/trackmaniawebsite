@@ -4,7 +4,6 @@ import path from "node:path";
 const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
 const BASE_DIR = path.join(process.cwd(), PUBLIC_DIR, "data", "weekly-shorts");
 const WEEKS_DIR = path.join(BASE_DIR, "weeks");
-const GOAT_WEEKS_DIR = path.join(BASE_DIR, "goat-weeks");
 
 const WEEKS_INDEX_PATH = path.join(BASE_DIR, "weeks.json");
 const AGG_PATH = path.join(BASE_DIR, "aggregate.json");
@@ -12,9 +11,6 @@ const CHANGELOG_PATH = path.join(BASE_DIR, "changelog.json");
 const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
 const WR_STATE_PATH = path.join(BASE_DIR, "wr-state.json");
 const POSTWEEK_MAP_STATE_PATH = path.join(BASE_DIR, "postweek-map-state.json");
-
-const GOAT_WEEKS_INDEX_PATH = path.join(BASE_DIR, "goat-weeks.json");
-const GOAT_AGG_PATH = path.join(BASE_DIR, "goat-leaderboard.json");
 
 const DEBUG = String(process.env.DEBUG || "0") === "1";
 const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
@@ -41,15 +37,6 @@ const WR_BUG_OVERRIDES = {
 const STRICT_TRUST_CHECKS = true;
 const BUGGED_RATIO_THRESHOLD = 0.5;
 const BUGGED_ABSOLUTE_FLOOR_MS = 2500;
-
-const GOAT_POINTS = {
-  weekWin: 50,
-  wr: 25,
-  second: 15,
-  third: 10,
-  fourth: 6,
-  fifth: 4,
-};
 
 function isoNow() {
   return new Date().toISOString();
@@ -729,152 +716,7 @@ function buildAggregate(allWeekJson, nameCacheObj = {}, postweekMapState = { map
   return { generatedAt: isoNow(), players };
 }
 
-// ---------- GOAT ----------
-
-function goatMapPlacementPoints(rank) {
-  switch (Number(rank)) {
-    case 1:
-      return GOAT_POINTS.wr;
-    case 2:
-      return GOAT_POINTS.second;
-    case 3:
-      return GOAT_POINTS.third;
-    case 4:
-      return GOAT_POINTS.fourth;
-    case 5:
-      return GOAT_POINTS.fifth;
-    default:
-      return 0;
-  }
-}
-
-function getGoatTier(points) {
-  if (points >= 750) return { tier: 3, label: "GOAT" };
-  if (points >= 500) return { tier: 2, label: "Tier 2" };
-  if (points >= 250) return { tier: 1, label: "Tier 1" };
-  return { tier: 0, label: "Unranked" };
-}
-
-function buildGoatWeekJson(weekJson, nameCacheObj = {}) {
-  const by = new Map();
-
-  function getOrCreate(accountId, fallbackPlayer = null) {
-    if (!accountId) return null;
-
-    let rec = by.get(accountId);
-    if (!rec) {
-      rec = {
-        accountId,
-        player: nameCacheObj[accountId] || fallbackPlayer || accountId,
-        points: 0,
-        weekWins: 0,
-        wrs: 0,
-        secondPlaces: 0,
-        thirdPlaces: 0,
-        fourthPlaces: 0,
-        fifthPlaces: 0,
-      };
-      by.set(accountId, rec);
-    }
-
-    rec.player = nameCacheObj[accountId] || fallbackPlayer || rec.player || accountId;
-    return rec;
-  }
-
-  const weeklyWinner = (weekJson.entries || []).find((entry) => Number(entry.rank) === 1) || null;
-
-  const weekAwards = [];
-  if (weeklyWinner?.accountId) {
-    const rec = getOrCreate(weeklyWinner.accountId, weeklyWinner.player);
-    if (rec) {
-      rec.points += GOAT_POINTS.weekWin;
-      rec.weekWins += 1;
-
-      weekAwards.push({
-        rank: 1,
-        accountId: weeklyWinner.accountId,
-        player: rec.player,
-        score: weeklyWinner.score ?? weeklyWinner.points ?? null,
-        goatPoints: GOAT_POINTS.weekWin,
-      });
-    }
-  }
-
-  const mapPlacements = [];
-
-  for (let i = 0; i < (weekJson.maps || []).length; i++) {
-    const map = weekJson.maps[i];
-    const top = Array.isArray(map?.entries) ? map.entries.slice(0, 5) : [];
-
-    for (const entry of top) {
-      if (!entry?.accountId) continue;
-
-      const pointsAwarded = goatMapPlacementPoints(entry.rank);
-      if (!pointsAwarded) continue;
-
-      const rec = getOrCreate(entry.accountId, entry.player);
-      if (!rec) continue;
-
-      rec.points += pointsAwarded;
-
-      if (entry.rank === 1) rec.wrs += 1;
-      if (entry.rank === 2) rec.secondPlaces += 1;
-      if (entry.rank === 3) rec.thirdPlaces += 1;
-      if (entry.rank === 4) rec.fourthPlaces += 1;
-      if (entry.rank === 5) rec.fifthPlaces += 1;
-
-      mapPlacements.push({
-        mapIndex: i + 1,
-        mapUid: map.mapUid,
-        rank: entry.rank,
-        rawRank: entry.rawRank ?? entry.rank,
-        accountId: entry.accountId,
-        player: rec.player,
-        timeMs: entry.timeMs ?? null,
-        goatPoints: pointsAwarded,
-      });
-    }
-  }
-
-  const playerTotals = Array.from(by.values()).sort(
-    (a, b) => b.points - a.points || a.player.localeCompare(b.player)
-  );
-
-  return {
-    week: Number(weekJson.week),
-    year: weekJson.year ?? null,
-    wsWeek: weekJson.wsWeek ?? null,
-    weekStart: weekJson.weekStart || null,
-    endedAt: weekJson.endedAt || null,
-    finalized: true,
-    pointsSystem: {
-      weekWin: GOAT_POINTS.weekWin,
-      wr: GOAT_POINTS.wr,
-      second: GOAT_POINTS.second,
-      third: GOAT_POINTS.third,
-      fourth: GOAT_POINTS.fourth,
-      fifth: GOAT_POINTS.fifth,
-    },
-    weekAwards,
-    mapPlacements,
-    playerTotals,
-  };
-}
-
-function buildGoatWeeksIndex(goatWeeks) {
-  return {
-    generatedAt: isoNow(),
-    weeks: goatWeeks
-      .map((w) => ({
-        week: Number(w.week),
-        endedAt: w.endedAt || null,
-        finalized: true,
-      }))
-      .sort((a, b) => a.week - b.week),
-  };
-}
-
-function buildGoatAggregate(goatWeeks, nameCacheObj = {}) {
+function buildGoatAggregate(allWeekJson, nameCacheObj = {}) {
   const by = new Map();
 
   function getOrCreate(accountId, fallbackPlayer = null) {
@@ -892,100 +734,85 @@ function buildGoatAggregate(goatWeeks, nameCacheObj = {}) {
         thirdPlaces: 0,
         fourthPlaces: 0,
         fifthPlaces: 0,
-        weeksWon: [],
-        wrWeeks: [],
-        secondPlaceWeeks: [],
-        thirdPlaceWeeks: [],
-        fourthPlaceWeeks: [],
-        fifthPlaceWeeks: [],
+        aliases: [],
       };
       by.set(accountId, rec);
     }
 
-    rec.player = nameCacheObj[accountId] || fallbackPlayer || rec.player || accountId;
+    const latestName = nameCacheObj[accountId] || fallbackPlayer || rec.player || accountId;
+
+    if (rec.player && latestName && rec.player !== latestName) {
+      rec.aliases.push(rec.player);
+    }
+    if (fallbackPlayer && fallbackPlayer !== latestName) {
+      rec.aliases.push(fallbackPlayer);
+    }
+
+    rec.player = latestName;
     return rec;
   }
 
-  for (const week of goatWeeks) {
-    const weekNum = Number(week.week);
+  for (const w of allWeekJson) {
+    const points = Array.isArray(w.entries) ? w.entries : [];
+    const winner = points.find((p) => Number(p.rank) === 1);
 
-    for (const award of week.weekAwards || []) {
-      const rec = getOrCreate(award.accountId, award.player);
-      if (!rec) continue;
-
-      rec.goatPoints += Number(award.goatPoints || 0);
-      rec.weekWins += 1;
-      rec.weeksWon.push(weekNum);
+    if (winner?.accountId) {
+      const rec = getOrCreate(winner.accountId, winner.player);
+      if (rec) {
+        rec.weekWins += 1;
+        rec.goatPoints += 50;
+      }
     }
 
-    for (const placement of week.mapPlacements || []) {
-      const rec = getOrCreate(placement.accountId, placement.player);
-      if (!rec) continue;
+    for (const m of w.maps || []) {
+      const mapUid = m.mapUid;
 
-      rec.goatPoints += Number(placement.goatPoints || 0);
+      const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
+      if (!trusted) continue;
 
-      if (placement.rank === 1) {
-        rec.wrs += 1;
-        rec.wrWeeks.push({
-          week: weekNum,
-          mapUid: placement.mapUid,
-          mapIndex: placement.mapIndex,
-          timeMs: placement.timeMs ?? null,
-        });
-      }
+      const sourceEntries = entriesClean.map((e, idx) => ({
+        rank: idx + 1,
+        rawRank: e.rawRank ?? e.rank,
+        accountId: e.accountId || null,
+        player: e.player,
+        timeMs: e.timeMs,
+      }));
 
-      if (placement.rank === 2) {
-        rec.secondPlaces += 1;
-        rec.secondPlaceWeeks.push({
-          week: weekNum,
-          mapUid: placement.mapUid,
-          mapIndex: placement.mapIndex,
-          timeMs: placement.timeMs ?? null,
-        });
-      }
+      if (!sourceEntries.length) continue;
 
-      if (placement.rank === 3) {
-        rec.thirdPlaces += 1;
-        rec.thirdPlaceWeeks.push({
-          week: weekNum,
-          mapUid: placement.mapUid,
-          mapIndex: placement.mapIndex,
-          timeMs: placement.timeMs ?? null,
-        });
-      }
+      for (let i = 0; i < Math.min(5, sourceEntries.length); i++) {
+        const e = sourceEntries[i];
+        if (!e?.accountId) continue;
 
-      if (placement.rank === 4) {
-        rec.fourthPlaces += 1;
-        rec.fourthPlaceWeeks.push({
-          week: weekNum,
-          mapUid: placement.mapUid,
-          mapIndex: placement.mapIndex,
-          timeMs: placement.timeMs ?? null,
-        });
-      }
+        const rec = getOrCreate(e.accountId, e.player);
+        if (!rec) continue;
 
-      if (placement.rank === 5) {
-        rec.fifthPlaces += 1;
-        rec.fifthPlaceWeeks.push({
-          week: weekNum,
-          mapUid: placement.mapUid,
-          mapIndex: placement.mapIndex,
-          timeMs: placement.timeMs ?? null,
-        });
+        if (i === 0) {
+          rec.wrs += 1;
+          rec.goatPoints += 25;
+        } else if (i === 1) {
+          rec.secondPlaces += 1;
+          rec.goatPoints += 15;
+        } else if (i === 2) {
+          rec.thirdPlaces += 1;
+          rec.goatPoints += 10;
+        } else if (i === 3) {
+          rec.fourthPlaces += 1;
+          rec.goatPoints += 6;
+        } else if (i === 4) {
+          rec.fifthPlaces += 1;
+          rec.goatPoints += 4;
+        }
       }
     }
   }
 
-  const players = Array.from(by.values()).map((p) => {
-    const tierInfo = getGoatTier(p.goatPoints);
-    return {
-      ...p,
-      tier: tierInfo.tier,
-      tierLabel: tierInfo.label,
-      qualifiedGoat: p.goatPoints >= 750,
-      weeksWon: Array.from(new Set(p.weeksWon)).sort((a, b) => a - b),
-    };
-  });
+  const players = Array.from(by.values()).map((p) => ({
+    ...p,
+    aliases: Array.from(new Set((p.aliases || []).filter(Boolean))).sort((a, b) =>
+      a.localeCompare(b)
+    ),
+  }));
 
   players.sort(
     (a, b) =>
@@ -999,24 +826,7 @@ function buildGoatAggregate(goatWeeks, nameCacheObj = {}) {
       a.player.localeCompare(b.player)
   );
 
-  return {
-    generatedAt: isoNow(),
-    minimumGoatPoints: 750,
-    tiers: {
-      tier1: 250,
-      tier2: 500,
-      goat: 750,
-    },
-    pointsSystem: {
-      weekWin: GOAT_POINTS.weekWin,
-      wr: GOAT_POINTS.wr,
-      second: GOAT_POINTS.second,
-      third: GOAT_POINTS.third,
-      fourth: GOAT_POINTS.fourth,
-      fifth: GOAT_POINTS.fifth,
-    },
-    players,
-  };
+  return { generatedAt: isoNow(), players };
 }
 
 // ---------- CHANGELOG / STATE ----------
@@ -1151,7 +961,6 @@ function refreshChangelogNames(changelog, nameCacheObj) {
 
 async function main() {
   ensureDir(WEEKS_DIR);
-  ensureDir(GOAT_WEEKS_DIR);
 
   const access = await getLiveAccessToken();
   const weeksRaw = await fetchWeeklyShortsCampaignWeeks(access);
@@ -1162,7 +971,6 @@ async function main() {
   const wrState = loadWrState();
   const postweekMapState = loadPostweekMapState();
   const allWeekJson = [];
-  const goatWeeks = [];
 
   const nowMs = Date.now();
 
@@ -1255,10 +1063,6 @@ async function main() {
     allWeekJson.push(weekJson);
 
     if (isEnded) {
-      const goatWeekJson = buildGoatWeekJson(weekJson, nameCacheObj);
-      goatWeeks.push(goatWeekJson);
-      writeJson(path.join(GOAT_WEEKS_DIR, `${w.week}.json`), goatWeekJson);
-
       for (let i = 0; i < (w.mapUids || []).length; i++) {
         const mapUid = w.mapUids[i];
         const mapIndex = i + 1;
@@ -1338,13 +1142,22 @@ async function main() {
           };
 
           const added = appendChangelogItem(changelog, item);
-          if (added) dlog("changelog +", item.text);
+          if (added) {
+            dlog("changelog +", item.text);
+          }
 
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
             timeMs: currentTimeMs,
           });
+
+          dlog(
+            "wr state self-improved",
+            `week=${w.week}`,
+            `map=${mapIndex}`,
+            `${currentHolder}: ${previous.timeMs} -> ${currentTimeMs}`
+          );
 
           await sleep(SLEEP_MS);
           continue;
@@ -1357,12 +1170,12 @@ async function main() {
             week: Number(w.week),
             mapIndex,
             mapUid,
-            oldHolder: previousHolderName,
             newHolder: currentHolder,
-            oldHolderAccountId: previousHolderId,
+            oldHolder: previousHolderName,
             newHolderAccountId: current.accountId || null,
-            oldTimeMs: previous.timeMs,
+            oldHolderAccountId: previousHolderId,
             newTimeMs: currentTimeMs,
+            oldTimeMs: previous.timeMs,
             deltaMs: previous.timeMs - currentTimeMs,
             text: `${currentHolder} has overtaken ${previousHolderName} for the world record on the ${mapIndex}${ordinalSuffix(
               mapIndex
@@ -1370,13 +1183,18 @@ async function main() {
           };
 
           const added = appendChangelogItem(changelog, item);
-          if (added) dlog("changelog +", item.text);
+          if (added) {
+            dlog("changelog +", item.text);
+          }
 
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
             timeMs: currentTimeMs,
           });
+
+          await sleep(SLEEP_MS);
+          continue;
         }
 
         await sleep(SLEEP_MS);
@@ -1386,25 +1204,24 @@ async function main() {
 
   refreshChangelogNames(changelog, nameCacheObj);
 
-  writeJson(WEEKS_INDEX_PATH, weeksIndex);
-  writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj, postweekMapState));
-  writeJson(NAME_CACHE_PATH, nameCacheObj);
+const GOAT_AGG_PATH = path.join(BASE_DIR, "goat-aggregate.json");
 
-  changelog.generatedAt = isoNow();
-  writeJson(CHANGELOG_PATH, changelog);
+writeJson(WEEKS_INDEX_PATH, weeksIndex);
+writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj, postweekMapState));
+writeJson(GOAT_AGG_PATH, buildGoatAggregate(allWeekJson, nameCacheObj));
+writeJson(NAME_CACHE_PATH, nameCacheObj);
 
-  wrState.generatedAt = isoNow();
-  writeJson(WR_STATE_PATH, wrState);
+changelog.generatedAt = isoNow();
+writeJson(CHANGELOG_PATH, changelog);
 
-  postweekMapState.generatedAt = isoNow();
-  writeJson(POSTWEEK_MAP_STATE_PATH, postweekMapState);
+wrState.generatedAt = isoNow();
+writeJson(WR_STATE_PATH, wrState);
 
-  writeJson(GOAT_WEEKS_INDEX_PATH, buildGoatWeeksIndex(goatWeeks));
-  writeJson(GOAT_AGG_PATH, buildGoatAggregate(goatWeeks, nameCacheObj));
+postweekMapState.generatedAt = isoNow();
+writeJson(POSTWEEK_MAP_STATE_PATH, postweekMapState);
 
   console.log("[DONE] Weekly Shorts updated.");
   console.log("Weeks:", allWeekJson.length);
-  console.log("Frozen GOAT weeks:", goatWeeks.length);
   console.log("Changelog items:", (changelog.items || []).length);
 }
 
