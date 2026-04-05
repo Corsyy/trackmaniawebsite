@@ -491,23 +491,44 @@ button:hover{
   align-items:center;
 }
 
+.goat-table th,
+.goat-table td{
+  vertical-align:middle;
+}
+
+.goat-table th:nth-child(4),
+.goat-table td:nth-child(4){
+  width:86px;
+  text-align:center;
+}
+
+.tier-cell{
+  text-align:center !important;
+  vertical-align:middle;
+  padding-top:8px;
+  padding-bottom:8px;
+}
+
 .tier-badge{
   display:inline-flex;
   align-items:center;
-  justify-content:flex-end;
-  min-height:40px;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  line-height:0;
 }
 
 .tier-badge img{
   display:block;
-  width:36px;
-  height:36px;
+  width:32px;
+  height:32px;
   object-fit:contain;
-  filter:drop-shadow(0 4px 10px rgba(0,0,0,.24));
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,.22));
 }
 
 .tier-badge.tier-unranked{
-  justify-content:center;
+  width:auto;
+  height:auto;
 }
 
 .tier-badge-fallback{
@@ -699,6 +720,16 @@ tbody tr:hover{
 
   .cta{
     display:none;
+  }
+
+  .tier-badge{
+    width:28px;
+    height:28px;
+  }
+
+  .tier-badge img{
+    width:28px;
+    height:28px;
   }
 
   .wrap{
@@ -1189,7 +1220,7 @@ tbody tr:hover{
           <td class="muted rank-cell" data-label="#">${start + i + 1}</td>
           <td class="player-cell" data-label="Player"><b>${p.player || "—"}</b></td>
           <td class="right" data-label="Points">${fmtScore(p.goatPoints ?? 0)}</td>
-          <td class="right" data-label="Tier">${renderTierBadge(tierMeta)}</td>
+          <td class="right tier-cell" data-label="Tier">${renderTierBadge(tierMeta)}</td>
           <td class="right" data-label="Wins">${p.weekWins ?? 0}</td>
           <td class="right" data-label="WRs">${p.wrs ?? 0}</td>
           <td class="right" data-label="2nd">${p.secondPlaces ?? 0}</td>
