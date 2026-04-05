@@ -466,6 +466,57 @@ async function fetchWsTop(access, mapUid, length = 10) {
     .sort((a, b) => a.rank - b.rank);
 }
 
+async function fetchWsTopForGroup(access, groupUid, mapUid, length = 10) {
+  if (!groupUid) return [];
+
+  const url =
+    `${LIVE_BASE}/api/token/leaderboard/group/${encodeURIComponent(groupUid)}` +
+    `/map/${encodeURIComponent(mapUid)}/top?onlyWorld=true&length=${length}&offset=0`;
+
+  const j = await jget(url, access);
+  const topArr = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
+
+  return topArr
+    .map((x) => {
+      const rankRaw = x?.position ?? x?.rank ?? x?.place ?? null;
+      const rank = Number(rankRaw);
+
+      const accountId = x?.accountId ?? x?.account_id ?? x?.playerId ?? null;
+      if (!accountId) return null;
+
+      const candidates = [
+        x?.score,
+        x?.time,
+        x?.timeMs,
+        x?.best,
+        x?.record,
+        x?.value,
+        x?.points,
+        x?.sp,
+        x?.score?.score,
+        x?.score?.time,
+        x?.score?.timeMs,
+        x?.score?.value,
+      ];
+
+      let extracted = NaN;
+      for (const c of candidates) {
+        const n = extractNumber(c);
+        if (Number.isFinite(n)) {
+          extracted = n;
+          break;
+        }
+      }
+
+      const timeMs = isValidTimeMs(extracted) ? extracted : null;
+
+      if (!Number.isFinite(rank) || rank <= 0) return null;
+      return { rank, accountId, timeMs };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.rank - b.rank);
+}
+
 async function fetchCurrentWR(access, mapUid, nameCacheObj = {}) {
   const rows = await fetchWsTop(access, mapUid, MAP_TOP_LENGTH);
   if (!rows.length) return null;
@@ -544,6 +595,91 @@ async function fetchWsWeekPointsTop(access, leaderboardGroupUid, length = 10) {
     accountId: r.accountId,
     score: r.score,
   }));
+}
+
+async function buildGoatWeekJson(access, weekMeta, nameCacheObj) {
+  const maps = [];
+
+  for (const mapUid of weekMeta.mapUids || []) {
+    const rows = await fetchWsTopForGroup(
+      access,
+      weekMeta.leaderboardGroupUid,
+      mapUid,
+      MAP_TOP_LENGTH
+    );
+
+    await resolveDisplayNames(
+      nameCacheObj,
+      rows.map((r) => r.accountId),
+      { forceRefresh: true }
+    );
+
+    const entries = rows.map((r) => ({
+      rank: r.rank,
+      accountId: r.accountId,
+      player: nameCacheObj[r.accountId] || r.accountId,
+      timeMs: r.timeMs,
+    }));
+
+    const cleaned = cleanMapEntries(mapUid, entries);
+
+    const reRanked = cleaned.entriesClean.map((e, idx) => ({
+      rank: idx + 1,
+      rawRank: e.rank,
+      accountId: e.accountId || null,
+      player: e.player,
+      timeMs: e.timeMs,
+    }));
+
+    maps.push({
+      mapUid,
+      mapName: null,
+      trusted: cleaned.trusted,
+      entries: reRanked,
+      dropped: DEBUG ? cleaned.dropped : undefined,
+    });
+
+    await sleep(SLEEP_MS);
+  }
+
+  const pointsRows = await fetchWsWeekPointsTop(
+    access,
+    weekMeta.leaderboardGroupUid,
+    POINTS_TOP_LENGTH
+  );
+
+  await resolveDisplayNames(
+    nameCacheObj,
+    pointsRows.map((r) => r.accountId),
+    { forceRefresh: true }
+  );
+
+  const pointsEntries = pointsRows.map((r) => {
+    const player = nameCacheObj[r.accountId] || r.accountId;
+    const n = Number.isFinite(r.score) ? r.score : 0;
+    return {
+      rank: r.rank,
+      accountId: r.accountId,
+      player,
+      score: n,
+      points: n,
+      value: n,
+      total: n,
+      scoreText: String(n),
+    };
+  });
+
+  return {
+    week: weekMeta.week,
+    year: weekMeta.year,
+    wsWeek: weekMeta.wsWeek,
+    weekStart: weekMeta.weekStart,
+    endedAt: weekMeta.endedAt,
+    entries: pointsEntries,
+    maps,
+    mapUids: weekMeta.mapUids || [],
+    leaderboardGroupUid: weekMeta.leaderboardGroupUid || null,
+  };
 }
 
 function cleanMapEntries(mapUid, entriesIn) {
@@ -1066,13 +1202,10 @@ async function main() {
 
     allWeekJson.push(weekJson);
 
-    // Freeze only from a week file that already existed before this run.
-    if (isEnded && hadExistingWeekFile && !fs.existsSync(goatWeekPath)) {
-      const frozenWeek = readJson(weekPath, null);
-      if (frozenWeek) {
-        writeJson(goatWeekPath, JSON.parse(JSON.stringify(frozenWeek)));
-        dlog("goat week frozen", `week=${w.week}`);
-      }
+    if (isEnded && w.leaderboardGroupUid) {
+      const goatWeekJson = await buildGoatWeekJson(access, w, nameCacheObj);
+      writeJson(goatWeekPath, goatWeekJson);
+      dlog("goat week rebuilt from campaign leaderboard", `week=${w.week}`);
     }
 
     if (isEnded) {
@@ -1164,6 +1297,13 @@ async function main() {
             holderAccountId: current.accountId,
             timeMs: currentTimeMs,
           });
+
+          dlog(
+            "wr state self-improved",
+            `week=${w.week}`,
+            `map=${mapIndex}`,
+            `${currentHolder}: ${previous.timeMs} -> ${currentTimeMs}`
+          );
 
           await sleep(SLEEP_MS);
           continue;
