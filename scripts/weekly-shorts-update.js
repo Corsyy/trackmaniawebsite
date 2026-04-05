@@ -719,7 +719,7 @@ function buildAggregate(allWeekJson, nameCacheObj = {}, postweekMapState = { map
   return { generatedAt: isoNow(), players };
 }
 
-function buildGoatAggregate(allWeekJson, nameCacheObj = {}) {
+function buildGoatAggregate(frozenWeekJson, nameCacheObj = {}) {
   const by = new Map();
 
   function getOrCreate(accountId, fallbackPlayer = null) {
@@ -755,7 +755,7 @@ function buildGoatAggregate(allWeekJson, nameCacheObj = {}) {
     return rec;
   }
 
-  for (const w of allWeekJson) {
+  for (const w of frozenWeekJson) {
     const points = Array.isArray(w.entries) ? w.entries : [];
     const winner = points.find((p) => Number(p.rank) === 1);
 
@@ -769,7 +769,6 @@ function buildGoatAggregate(allWeekJson, nameCacheObj = {}) {
 
     for (const m of w.maps || []) {
       const mapUid = m.mapUid;
-
       const { entriesClean, trusted } = cleanMapEntries(mapUid, m.entries || []);
       if (!trusted) continue;
 
@@ -780,8 +779,6 @@ function buildGoatAggregate(allWeekJson, nameCacheObj = {}) {
         player: e.player,
         timeMs: e.timeMs,
       }));
-
-      if (!sourceEntries.length) continue;
 
       for (let i = 0; i < Math.min(5, sourceEntries.length); i++) {
         const e = sourceEntries[i];
@@ -980,6 +977,9 @@ async function main() {
 
   for (const w of weeksIndex.weeks || []) {
     const weekPath = path.join(WEEKS_DIR, `${w.week}.json`);
+    const goatWeekPath = path.join(GOAT_WEEKS_DIR, `${w.week}.json`);
+    const hadExistingWeekFile = fs.existsSync(weekPath);
+
     const endedMs = Date.parse(w.endedAt);
     const isEnded = Number.isFinite(endedMs) && nowMs > endedMs;
 
@@ -1066,9 +1066,13 @@ async function main() {
 
     allWeekJson.push(weekJson);
 
-    const goatWeekPath = path.join(GOAT_WEEKS_DIR, `${w.week}.json`);
-    if (isEnded && !fs.existsSync(goatWeekPath)) {
-      writeJson(goatWeekPath, JSON.parse(JSON.stringify(weekJson)));
+    // Freeze only from a week file that already existed before this run.
+    if (isEnded && hadExistingWeekFile && !fs.existsSync(goatWeekPath)) {
+      const frozenWeek = readJson(weekPath, null);
+      if (frozenWeek) {
+        writeJson(goatWeekPath, JSON.parse(JSON.stringify(frozenWeek)));
+        dlog("goat week frozen", `week=${w.week}`);
+      }
     }
 
     if (isEnded) {
@@ -1150,13 +1154,22 @@ async function main() {
             )} map of Week ${w.week} from ${formatTimeMs(previous.timeMs)} to ${formatTimeMs(currentTimeMs)}.`,
           };
 
-          appendChangelogItem(changelog, item);
+          const added = appendChangelogItem(changelog, item);
+          if (added) {
+            dlog("changelog +", item.text);
+          }
+
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
             timeMs: currentTimeMs,
           });
-        } else if (timeImproved && holderChanged) {
+
+          await sleep(SLEEP_MS);
+          continue;
+        }
+
+        if (timeImproved && holderChanged) {
           const item = {
             type: "overtake",
             ts: isoNow(),
@@ -1166,7 +1179,7 @@ async function main() {
             newHolder: currentHolder,
             oldHolder: previousHolderName,
             newHolderAccountId: current.accountId || null,
-            oldHolderAccountId: previousHolderId || null,
+            oldHolderAccountId: previousHolderId,
             newTimeMs: currentTimeMs,
             oldTimeMs: previous.timeMs,
             deltaMs: previous.timeMs - currentTimeMs,
@@ -1175,12 +1188,19 @@ async function main() {
             )} map of Week ${w.week} with a time of ${formatTimeMs(currentTimeMs)}.`,
           };
 
-          appendChangelogItem(changelog, item);
+          const added = appendChangelogItem(changelog, item);
+          if (added) {
+            dlog("changelog +", item.text);
+          }
+
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
             timeMs: currentTimeMs,
           });
+
+          await sleep(SLEEP_MS);
+          continue;
         }
 
         await sleep(SLEEP_MS);
@@ -1221,6 +1241,7 @@ async function main() {
 
   console.log("[DONE] Weekly Shorts updated.");
   console.log("Weeks:", allWeekJson.length);
+  console.log("GOAT weeks:", goatWeekFiles.length);
   console.log("Changelog items:", (changelog.items || []).length);
 }
 
