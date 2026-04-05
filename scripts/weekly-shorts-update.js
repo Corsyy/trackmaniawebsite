@@ -4,9 +4,12 @@ import path from "node:path";
 const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
 const BASE_DIR = path.join(process.cwd(), PUBLIC_DIR, "data", "weekly-shorts");
 const WEEKS_DIR = path.join(BASE_DIR, "weeks");
+const GOAT_WEEKS_DIR = path.join(BASE_DIR, "goat-weeks");
 
 const WEEKS_INDEX_PATH = path.join(BASE_DIR, "weeks.json");
+const GOAT_WEEKS_INDEX_PATH = path.join(BASE_DIR, "goat-weeks.json");
 const AGG_PATH = path.join(BASE_DIR, "aggregate.json");
+const GOAT_AGG_PATH = path.join(BASE_DIR, "goat-aggregate.json");
 const CHANGELOG_PATH = path.join(BASE_DIR, "changelog.json");
 const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
 const WR_STATE_PATH = path.join(BASE_DIR, "wr-state.json");
@@ -961,6 +964,7 @@ function refreshChangelogNames(changelog, nameCacheObj) {
 
 async function main() {
   ensureDir(WEEKS_DIR);
+  ensureDir(GOAT_WEEKS_DIR);
 
   const access = await getLiveAccessToken();
   const weeksRaw = await fetchWeeklyShortsCampaignWeeks(access);
@@ -1062,6 +1066,11 @@ async function main() {
 
     allWeekJson.push(weekJson);
 
+    const goatWeekPath = path.join(GOAT_WEEKS_DIR, `${w.week}.json`);
+    if (isEnded && !fs.existsSync(goatWeekPath)) {
+      writeJson(goatWeekPath, JSON.parse(JSON.stringify(weekJson)));
+    }
+
     if (isEnded) {
       for (let i = 0; i < (w.mapUids || []).length; i++) {
         const mapUid = w.mapUids[i];
@@ -1141,29 +1150,13 @@ async function main() {
             )} map of Week ${w.week} from ${formatTimeMs(previous.timeMs)} to ${formatTimeMs(currentTimeMs)}.`,
           };
 
-          const added = appendChangelogItem(changelog, item);
-          if (added) {
-            dlog("changelog +", item.text);
-          }
-
+          appendChangelogItem(changelog, item);
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
             timeMs: currentTimeMs,
           });
-
-          dlog(
-            "wr state self-improved",
-            `week=${w.week}`,
-            `map=${mapIndex}`,
-            `${currentHolder}: ${previous.timeMs} -> ${currentTimeMs}`
-          );
-
-          await sleep(SLEEP_MS);
-          continue;
-        }
-
-        if (timeImproved && holderChanged) {
+        } else if (timeImproved && holderChanged) {
           const item = {
             type: "overtake",
             ts: isoNow(),
@@ -1173,7 +1166,7 @@ async function main() {
             newHolder: currentHolder,
             oldHolder: previousHolderName,
             newHolderAccountId: current.accountId || null,
-            oldHolderAccountId: previousHolderId,
+            oldHolderAccountId: previousHolderId || null,
             newTimeMs: currentTimeMs,
             oldTimeMs: previous.timeMs,
             deltaMs: previous.timeMs - currentTimeMs,
@@ -1182,19 +1175,12 @@ async function main() {
             )} map of Week ${w.week} with a time of ${formatTimeMs(currentTimeMs)}.`,
           };
 
-          const added = appendChangelogItem(changelog, item);
-          if (added) {
-            dlog("changelog +", item.text);
-          }
-
+          appendChangelogItem(changelog, item);
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
             timeMs: currentTimeMs,
           });
-
-          await sleep(SLEEP_MS);
-          continue;
         }
 
         await sleep(SLEEP_MS);
@@ -1204,21 +1190,34 @@ async function main() {
 
   refreshChangelogNames(changelog, nameCacheObj);
 
-const GOAT_AGG_PATH = path.join(BASE_DIR, "goat-aggregate.json");
+  const goatWeekFiles = fs.existsSync(GOAT_WEEKS_DIR)
+    ? fs.readdirSync(GOAT_WEEKS_DIR)
+        .filter((f) => f.endsWith(".json"))
+        .map((f) => readJson(path.join(GOAT_WEEKS_DIR, f), null))
+        .filter(Boolean)
+        .sort((a, b) => Number(a?.week || 0) - Number(b?.week || 0))
+    : [];
 
-writeJson(WEEKS_INDEX_PATH, weeksIndex);
-writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj, postweekMapState));
-writeJson(GOAT_AGG_PATH, buildGoatAggregate(allWeekJson, nameCacheObj));
-writeJson(NAME_CACHE_PATH, nameCacheObj);
+  writeJson(WEEKS_INDEX_PATH, weeksIndex);
+  writeJson(GOAT_WEEKS_INDEX_PATH, {
+    generatedAt: isoNow(),
+    weeks: goatWeekFiles.map((w) => ({
+      week: w.week,
+      endedAt: w.endedAt,
+    })),
+  });
+  writeJson(AGG_PATH, buildAggregate(allWeekJson, nameCacheObj, postweekMapState));
+  writeJson(GOAT_AGG_PATH, buildGoatAggregate(goatWeekFiles, nameCacheObj));
+  writeJson(NAME_CACHE_PATH, nameCacheObj);
 
-changelog.generatedAt = isoNow();
-writeJson(CHANGELOG_PATH, changelog);
+  changelog.generatedAt = isoNow();
+  writeJson(CHANGELOG_PATH, changelog);
 
-wrState.generatedAt = isoNow();
-writeJson(WR_STATE_PATH, wrState);
+  wrState.generatedAt = isoNow();
+  writeJson(WR_STATE_PATH, wrState);
 
-postweekMapState.generatedAt = isoNow();
-writeJson(POSTWEEK_MAP_STATE_PATH, postweekMapState);
+  postweekMapState.generatedAt = isoNow();
+  writeJson(POSTWEEK_MAP_STATE_PATH, postweekMapState);
 
   console.log("[DONE] Weekly Shorts updated.");
   console.log("Weeks:", allWeekJson.length);
