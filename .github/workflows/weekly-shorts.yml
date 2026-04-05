@@ -61,14 +61,14 @@ jobs:
 
           git add \
             data/weekly-shorts/weeks.json \
+            data/weekly-shorts/goat-weeks.json \
             data/weekly-shorts/aggregate.json \
+            data/weekly-shorts/goat-aggregate.json \
             data/weekly-shorts/changelog.json \
             data/weekly-shorts/wr-state.json \
             data/weekly-shorts/postweek-map-state.json \
-            data/weekly-shorts/weeks \
             data/weekly-shorts/name-cache.json \
-            data/weekly-shorts/goat-weeks.json \
-            data/weekly-shorts/goat-aggregate.json \
+            data/weekly-shorts/weeks \
             data/weekly-shorts/goat-weeks
 
           if git diff --cached --quiet; then
