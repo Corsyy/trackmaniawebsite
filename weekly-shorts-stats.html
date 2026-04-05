@@ -315,10 +315,6 @@ h1{
   text-transform:uppercase;
 }
 
-.nav-home{
-  display:none;
-}
-
 .right{
   text-align:right;
 }
@@ -464,10 +460,6 @@ button:hover{
     0 0 14px rgba(109,251,255,.12);
 }
 
-.tab-panel[hidden]{
-  display:none !important;
-}
-
 .goat-note{
   display:flex;
   flex-wrap:wrap;
@@ -528,6 +520,7 @@ button:hover{
       drop-shadow(0 0 20px rgba(255,225,120,.28));
   }
 }
+
 .tier-badge.tier-unranked{
   width:auto;
   height:auto;
@@ -981,10 +974,12 @@ tbody tr:hover{
   <script>
     const PATHS = {
       weeksIndex: `/data/weekly-shorts/weeks.json`,
+      goatWeeksIndex: `/data/weekly-shorts/goat-weeks.json`,
       aggregate: `/data/weekly-shorts/aggregate.json`,
       changelog: `/data/weekly-shorts/changelog.json`,
       goatAggregate: `/data/weekly-shorts/goat-aggregate.json`,
       weekFile: (weekNum) => `/data/weekly-shorts/weeks/${weekNum}.json`,
+      goatWeekFile: (weekNum) => `/data/weekly-shorts/goat-weeks/${weekNum}.json`,
     };
 
     const $ = (id) => document.getElementById(id);
@@ -1072,13 +1067,14 @@ tbody tr:hover{
       if (sortBy === "points") return arr.sort(byNumDesc("goatPoints"));
       if (sortBy === "wins") return arr.sort(byNumDesc("weekWins"));
       if (sortBy === "wrs") return arr.sort(byNumDesc("wrs"));
-      if (sortBy === "seconds") return arr.sort(byNumDesc("secondPlaces"));
       return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
     }
 
     let overallPage = 1;
     let goatPage = 1;
     let activeTab = "overall";
+    let liveWeeksIndex = [];
+    let goatWeeksIndex = [];
 
     function getOverallList(players, sortBy, searchTerm){
       const term = (searchTerm || "").trim().toLowerCase();
@@ -1102,22 +1098,22 @@ tbody tr:hover{
     };
 
     function getTierMeta(player, championPoints){
-  const points = Number(player?.goatPoints ?? 0);
+      const points = Number(player?.goatPoints ?? 0);
 
-  if (points > 0 && points === championPoints) {
-    return { key: "champion", label: "Champion", points };
-  }
-  if (points >= 750) {
-    return { key: "gold", label: "Gold Tier", points };
-  }
-  if (points >= 500) {
-    return { key: "silver", label: "Silver Tier", points };
-  }
-  if (points >= 250) {
-    return { key: "bronze", label: "Bronze Tier", points };
-  }
-  return { key: "unranked", label: "Unranked", points };
-}
+      if (points > 0 && points === championPoints) {
+        return { key: "champion", label: "Champion", points };
+      }
+      if (points >= 750) {
+        return { key: "gold", label: "Gold Tier", points };
+      }
+      if (points >= 500) {
+        return { key: "silver", label: "Silver Tier", points };
+      }
+      if (points >= 250) {
+        return { key: "bronze", label: "Bronze Tier", points };
+      }
+      return { key: "unranked", label: "Unranked", points };
+    }
 
     function renderTierBadge(meta){
       if (!meta || meta.key === "unranked") {
@@ -1142,9 +1138,8 @@ tbody tr:hover{
       body.innerHTML = "";
 
       const list = getOverallList(players, sortBy, searchTerm);
-      const pageSize = Math.max(1, Number($("pageSize")?.value || 50));
+      const pageSize = Number($("pageSize").value || 50);
       const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
-
       if (overallPage > totalPages) overallPage = totalPages;
       if (overallPage < 1) overallPage = 1;
 
@@ -1161,7 +1156,7 @@ tbody tr:hover{
       const page = list.slice(start, start + pageSize);
 
       page.forEach((p, i) => {
-        const weeksWon = Array.isArray(p.weeksWon) ? p.weeksWon.join(", ") : "—";
+        const weeksWon = Array.isArray(p.weeksWon) && p.weeksWon.length ? p.weeksWon.join(", ") : "—";
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="muted rank-cell" data-label="#">${start + i + 1}</td>
@@ -1169,58 +1164,62 @@ tbody tr:hover{
           <td class="right" data-label="Wins">${p.wins ?? 0}</td>
           <td class="right" data-label="WRs">${p.wrs ?? 0}</td>
           <td class="right" data-label="Top 5">${p.top5 ?? 0}</td>
-          <td class="right weeks-cell" data-label="Weeks Won"><span>${weeksWon || "—"}</span></td>
+          <td class="right weeks-cell" data-label="Weeks Won"><span>${weeksWon}</span></td>
         `;
         body.appendChild(tr);
       });
     }
 
     function renderGoat(players, sortBy, searchTerm){
-  const body = $("goatBody");
-  body.innerHTML = "";
+      const body = $("goatBody");
+      body.innerHTML = "";
 
-  const list = getGoatList(players, sortBy, searchTerm);
-  const championPoints = list.length ? Number(list[0].goatPoints ?? 0) : 0;
-  const pageSize = Math.max(1, Number($("goatPageSize")?.value || 50));
-  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      const list = getGoatList(players, sortBy, searchTerm);
+      const pageSize = Number($("goatPageSize").value || 50);
+      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      if (goatPage > totalPages) goatPage = totalPages;
+      if (goatPage < 1) goatPage = 1;
 
-  if (goatPage > totalPages) goatPage = totalPages;
-  if (goatPage < 1) goatPage = 1;
+      const championPoints = list.length ? Number(list[0].goatPoints || 0) : 0;
 
-  $("goatPageInfo").textContent = `Page ${goatPage} / ${totalPages} (${list.length} players)`;
-  $("prevGoatPage").disabled = goatPage <= 1;
-  $("nextGoatPage").disabled = goatPage >= totalPages;
+      $("goatPageInfo").textContent = `Page ${goatPage} / ${totalPages} (${list.length} players)`;
+      $("prevGoatPage").disabled = goatPage <= 1;
+      $("nextGoatPage").disabled = goatPage >= totalPages;
 
-  if (!list.length){
-    body.innerHTML = `<tr><td colspan="10" class="muted">No players match.</td></tr>`;
-    return;
-  }
+      if (!list.length){
+        body.innerHTML = `<tr><td colspan="10" class="muted">No players match.</td></tr>`;
+        return;
+      }
 
-  const start = (goatPage - 1) * pageSize;
-  const page = list.slice(start, start + pageSize);
+      const start = (goatPage - 1) * pageSize;
+      const page = list.slice(start, start + pageSize);
 
-  page.forEach((p, i) => {
-    const tierMeta = getTierMeta(p, championPoints);
+      page.forEach((p, i) => {
+        const tierMeta = getTierMeta(p, championPoints);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="muted rank-cell" data-label="#">${start + i + 1}</td>
+          <td class="player-cell" data-label="Player"><b>${p.player || "—"}</b></td>
+          <td class="right" data-label="Points">${fmtScore(p.goatPoints ?? 0)}</td>
+          <td class="tier-col" data-label="Tier">${renderTierBadge(tierMeta)}</td>
+          <td class="right" data-label="Wins">${p.weekWins ?? 0}</td>
+          <td class="right" data-label="WRs">${p.wrs ?? 0}</td>
+          <td class="right" data-label="2nd">${p.secondPlaces ?? 0}</td>
+          <td class="right" data-label="3rd">${p.thirdPlaces ?? 0}</td>
+          <td class="right" data-label="4th">${p.fourthPlaces ?? 0}</td>
+          <td class="right" data-label="5th">${p.fifthPlaces ?? 0}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="muted rank-cell" data-label="#">${start + i + 1}</td>
-      <td class="player-cell" data-label="Player"><b>${p.player || "—"}</b></td>
-      <td class="right" data-label="Points">${fmtScore(p.goatPoints ?? 0)}</td>
-      <td class="tier-col" data-label="Tier">${renderTierBadge(tierMeta)}</td>
-      <td class="right" data-label="Wins">${p.weekWins ?? 0}</td>
-      <td class="right" data-label="WRs">${p.wrs ?? 0}</td>
-      <td class="right" data-label="2nd">${p.secondPlaces ?? 0}</td>
-      <td class="right" data-label="3rd">${p.thirdPlaces ?? 0}</td>
-      <td class="right" data-label="4th">${p.fourthPlaces ?? 0}</td>
-      <td class="right" data-label="5th">${p.fifthPlaces ?? 0}</td>
-    `;
-    body.appendChild(tr);
-  });
-}
+    function getActiveWeeksList(){
+      return activeTab === "goat" ? goatWeeksIndex : liveWeeksIndex;
+    }
 
     function populateWeeksDropdown(weeks){
       const sel = $("weekSelect");
+      const currentValue = sel.value;
       sel.innerHTML = "";
       const sorted = [...(weeks || [])].sort((a,b) => (b.week||0) - (a.week||0));
       for (const w of sorted){
@@ -1229,6 +1228,12 @@ tbody tr:hover{
         opt.textContent = `Week ${w.week}`;
         sel.appendChild(opt);
       }
+
+      if (currentValue && sorted.some(w => String(w.week) === String(currentValue))) {
+        sel.value = String(currentValue);
+        return currentValue;
+      }
+
       return sorted.length ? sorted[0].week : null;
     }
 
@@ -1281,41 +1286,63 @@ tbody tr:hover{
         if (it.text) {
           div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="logtext">${it.text}</div>`;
         } else {
-          div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="muted">Unknown changelog item.</div>`;
+          div.innerHTML = `<div class="logwhen">${fmtIso(when)}</div><div class="logtext">${JSON.stringify(it)}</div>`;
         }
 
         el.appendChild(div);
       }
     }
 
+    async function loadWeek(weekNum){
+      if (!weekNum) return;
+      const url = activeTab === "goat" ? PATHS.goatWeekFile(weekNum) : PATHS.weekFile(weekNum);
+      const w = await fetchJson(url);
+      renderWeekTable(w);
+    }
+
+    async function switchWeekSource(){
+      const defaultWeek = populateWeeksDropdown(getActiveWeeksList());
+      if (defaultWeek != null) {
+        await loadWeek(defaultWeek);
+      } else {
+        $("weekBody").innerHTML = `<tr><td colspan="3" class="muted">No data for this view yet.</td></tr>`;
+        $("weekEnded").textContent = "—";
+      }
+    }
+
     function setActiveTab(tab){
-  activeTab = tab;
+      activeTab = tab;
 
-  const isOverall = tab === "overall";
+      const isOverall = tab === "overall";
 
-  $("tabOverall").classList.toggle("active", isOverall);
-  $("tabGoat").classList.toggle("active", !isOverall);
+      $("tabOverall").classList.toggle("active", isOverall);
+      $("tabGoat").classList.toggle("active", !isOverall);
 
-  $("tabOverall").setAttribute("aria-selected", isOverall ? "true" : "false");
-  $("tabGoat").setAttribute("aria-selected", !isOverall ? "true" : "false");
+      $("tabOverall").setAttribute("aria-selected", isOverall ? "true" : "false");
+      $("tabGoat").setAttribute("aria-selected", !isOverall ? "true" : "false");
 
-  $("overallPanel").style.display = isOverall ? "" : "none";
-  $("goatPanel").style.display = isOverall ? "none" : "";
+      $("overallPanel").style.display = isOverall ? "block" : "none";
+      $("goatPanel").style.display = isOverall ? "none" : "block";
 
-  $("overallControls").style.display = isOverall ? "flex" : "none";
-  $("goatControls").style.display = isOverall ? "none" : "flex";
-}
+      $("overallControls").style.display = isOverall ? "flex" : "none";
+      $("goatControls").style.display = isOverall ? "none" : "flex";
+
+      switchWeekSource().catch(console.error);
+    }
 
     async function main(){
-      const [weeksIndex, agg, goatAgg, changelog] = await Promise.all([
+      const [weeksIndex, goatWeeksIndexData, agg, goatAgg, changelog] = await Promise.all([
         fetchJson(PATHS.weeksIndex),
+        fetchJson(PATHS.goatWeeksIndex).catch(() => ({ weeks: [] })),
         fetchJson(PATHS.aggregate),
         fetchJson(PATHS.goatAggregate).catch(() => ({ players: [] })),
         fetchJson(PATHS.changelog).catch(() => ({ items: [] }))
       ]);
 
-      const weeks = weeksIndex.weeks || [];
-      renderKpis(agg, weeks.length);
+      liveWeeksIndex = weeksIndex.weeks || [];
+      goatWeeksIndex = goatWeeksIndexData.weeks || [];
+
+      renderKpis(agg, liveWeeksIndex.length);
 
       const sortBy = $("sortBy");
       const search = $("playerSearch");
@@ -1370,21 +1397,12 @@ tbody tr:hover{
       $("tabOverall").addEventListener("click", () => setActiveTab("overall"));
       $("tabGoat").addEventListener("click", () => setActiveTab("goat"));
 
+      $("weekSelect").addEventListener("change", (e) => loadWeek(e.target.value));
+
       rerenderOverall(true);
       rerenderGoat(true);
       renderChangelog(changelog.items || []);
       setActiveTab("overall");
-
-      const defaultWeek = populateWeeksDropdown(weeks);
-
-      async function loadWeek(weekNum){
-        if (!weekNum) return;
-        const w = await fetchJson(PATHS.weekFile(weekNum));
-        renderWeekTable(w);
-      }
-
-      $("weekSelect").addEventListener("change", (e) => loadWeek(e.target.value));
-      if (defaultWeek != null) await loadWeek(defaultWeek);
     }
 
     main().catch(err => {
