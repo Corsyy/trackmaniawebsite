@@ -68,7 +68,7 @@ jobs:
             data/weekly-shorts/weeks \
             data/weekly-shorts/name-cache.json \
             data/weekly-shorts/goat-weeks.json \
-            data/weekly-shorts/goat-leaderboard.json \
+            data/weekly-shorts/goat-aggregate.json \
             data/weekly-shorts/goat-weeks
 
           if git diff --cached --quiet; then
