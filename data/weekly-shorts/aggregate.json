@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-06T17:34:44.104Z",
+  "generatedAt": "2026-04-06T18:18:05.594Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -932,7 +932,7 @@
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
       "player": "in-.-",
       "wins": 5,
-      "wrs": 16,
+      "wrs": 17,
       "top5": 30,
       "weeksWon": [
         44,
@@ -1030,6 +1030,12 @@
           "week": 67,
           "mapUid": "x59gPNK7ehYz0qbqry0hTkwWm5l",
           "timeMs": 8194,
+          "rawRank": 1
+        },
+        {
+          "week": 69,
+          "mapUid": "4F_LWXXcYPeCej8IKNpSTecXy35",
+          "timeMs": null,
           "rawRank": 1
         },
         {
@@ -1239,9 +1245,9 @@
         {
           "week": 69,
           "mapUid": "4F_LWXXcYPeCej8IKNpSTecXy35",
-          "rank": 2,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 1
         },
         {
           "week": 69,
@@ -11446,32 +11452,6 @@
       "aliases": []
     },
     {
-      "accountId": "2a13aa7d-992d-4a7c-a3c5-d29b08b7f8cb",
-      "player": "keby..",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 69,
-          "mapUid": "4F_LWXXcYPeCej8IKNpSTecXy35",
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 69,
-          "mapUid": "4F_LWXXcYPeCej8IKNpSTecXy35",
-          "rank": 1,
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "08098526-ed51-4a9c-807b-4026f54e9b3e",
       "player": "Keksik4",
       "wins": 0,
@@ -17854,6 +17834,25 @@
           "rank": 5,
           "timeMs": 10199,
           "rawRank": 5
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "2a13aa7d-992d-4a7c-a3c5-d29b08b7f8cb",
+      "player": "keby..",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 69,
+          "mapUid": "4F_LWXXcYPeCej8IKNpSTecXy35",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
         }
       ],
       "aliases": []
