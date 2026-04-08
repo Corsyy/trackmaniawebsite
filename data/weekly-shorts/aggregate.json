@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-08T20:11:43.163Z",
+  "generatedAt": "2026-04-08T21:06:54.877Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -5422,7 +5422,7 @@
       "accountId": "52d76984-7d76-498b-aebb-a6b9c0aa0b6e",
       "player": "eepyCoco",
       "wins": 0,
-      "wrs": 7,
+      "wrs": 8,
       "top5": 20,
       "weeksWon": [],
       "wrWeeks": [
@@ -5466,6 +5466,12 @@
           "week": 61,
           "mapUid": "r323JynezGZzR_PRcEdXtmrEbA8",
           "timeMs": 15635,
+          "rawRank": 1
+        },
+        {
+          "week": 69,
+          "mapUid": "KG3HmGO7hGZikz6Xdjzle2VzzD5",
+          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -5606,9 +5612,9 @@
         {
           "week": 69,
           "mapUid": "KG3HmGO7hGZikz6Xdjzle2VzzD5",
-          "rank": 2,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 1
         }
       ],
       "aliases": []
@@ -8325,52 +8331,6 @@
       "aliases": []
     },
     {
-      "accountId": "ba7b2419-7b71-47c5-96ba-d5f150f4e836",
-      "player": "EltonBrawl",
-      "wins": 0,
-      "wrs": 2,
-      "top5": 3,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 62,
-          "mapUid": "Fe1i4Yre060KvXcr4eGlXIbrjs3",
-          "timeMs": 17032,
-          "rawRank": 1
-        },
-        {
-          "week": 69,
-          "mapUid": "KG3HmGO7hGZikz6Xdjzle2VzzD5",
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 62,
-          "mapUid": "Fe1i4Yre060KvXcr4eGlXIbrjs3",
-          "rank": 1,
-          "timeMs": 17032,
-          "rawRank": 1
-        },
-        {
-          "week": 63,
-          "mapUid": "3RivwBNCh8wVNyKEPthDRgG8HZ5",
-          "rank": 3,
-          "timeMs": 17493,
-          "rawRank": 3
-        },
-        {
-          "week": 69,
-          "mapUid": "KG3HmGO7hGZikz6Xdjzle2VzzD5",
-          "rank": 1,
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "54565860-6f3d-47d3-b84b-e146372b1069",
       "player": "leoleodeodeo",
       "wins": 0,
@@ -10240,6 +10200,46 @@
           "rank": 5,
           "timeMs": 17744,
           "rawRank": 5
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "ba7b2419-7b71-47c5-96ba-d5f150f4e836",
+      "player": "EltonBrawl",
+      "wins": 0,
+      "wrs": 1,
+      "top5": 3,
+      "weeksWon": [],
+      "wrWeeks": [
+        {
+          "week": 62,
+          "mapUid": "Fe1i4Yre060KvXcr4eGlXIbrjs3",
+          "timeMs": 17032,
+          "rawRank": 1
+        }
+      ],
+      "top5Weeks": [
+        {
+          "week": 62,
+          "mapUid": "Fe1i4Yre060KvXcr4eGlXIbrjs3",
+          "rank": 1,
+          "timeMs": 17032,
+          "rawRank": 1
+        },
+        {
+          "week": 63,
+          "mapUid": "3RivwBNCh8wVNyKEPthDRgG8HZ5",
+          "rank": 3,
+          "timeMs": 17493,
+          "rawRank": 3
+        },
+        {
+          "week": 69,
+          "mapUid": "KG3HmGO7hGZikz6Xdjzle2VzzD5",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
         }
       ],
       "aliases": []
