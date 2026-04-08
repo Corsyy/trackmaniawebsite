@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-08T18:00:45.986Z",
+  "generatedAt": "2026-04-08T20:11:43.163Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -5618,7 +5618,7 @@
       "player": "TurtledTM",
       "wins": 0,
       "wrs": 5,
-      "top5": 29,
+      "top5": 30,
       "weeksWon": [],
       "wrWeeks": [
         {
@@ -5855,6 +5855,13 @@
           "rank": 1,
           "timeMs": null,
           "rawRank": 1
+        },
+        {
+          "week": 69,
+          "mapUid": "KG3HmGO7hGZikz6Xdjzle2VzzD5",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -13746,39 +13753,6 @@
       "aliases": []
     },
     {
-      "accountId": "de8f4871-31b8-4db5-8f3d-add0bf2774e0",
-      "player": "RuyRegaloTM",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 3,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 60,
-          "mapUid": "9t94j3MsiBl0ug5UL9Be46jO2R0",
-          "rank": 3,
-          "timeMs": 11472,
-          "rawRank": 3
-        },
-        {
-          "week": 68,
-          "mapUid": "5xOGV8LrSbWZVVbEY9mi5cgznD1",
-          "rank": 4,
-          "timeMs": 16183,
-          "rawRank": 4
-        },
-        {
-          "week": 69,
-          "mapUid": "KG3HmGO7hGZikz6Xdjzle2VzzD5",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "858b4049-4368-4703-b98d-1f43be016f0c",
       "player": "Snippsku",
       "wins": 0,
@@ -14856,6 +14830,32 @@
           "rank": 3,
           "timeMs": 13889,
           "rawRank": 3
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "de8f4871-31b8-4db5-8f3d-add0bf2774e0",
+      "player": "RuyRegaloTM",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 2,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 60,
+          "mapUid": "9t94j3MsiBl0ug5UL9Be46jO2R0",
+          "rank": 3,
+          "timeMs": 11472,
+          "rawRank": 3
+        },
+        {
+          "week": 68,
+          "mapUid": "5xOGV8LrSbWZVVbEY9mi5cgznD1",
+          "rank": 4,
+          "timeMs": 16183,
+          "rawRank": 4
         }
       ],
       "aliases": []
