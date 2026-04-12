@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-12T22:01:42.192Z",
+  "generatedAt": "2026-04-12T22:37:39.260Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -925,7 +925,7 @@
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
       "player": "in-.-",
       "wins": 5,
-      "wrs": 17,
+      "wrs": 18,
       "top5": 32,
       "weeksWon": [
         44,
@@ -1035,6 +1035,12 @@
           "week": 69,
           "mapUid": "P3uSNZSB4XNxMIVPLqZKochgP0h",
           "timeMs": 10881,
+          "rawRank": 1
+        },
+        {
+          "week": 70,
+          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
+          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -1259,9 +1265,9 @@
         {
           "week": 70,
           "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "rank": 4,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 1
         }
       ],
       "aliases": []
@@ -1784,9 +1790,9 @@
         {
           "week": 70,
           "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "rank": 3,
+          "rank": 4,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 4
         }
       ],
       "aliases": []
@@ -5836,9 +5842,9 @@
         {
           "week": 70,
           "mapUid": "FUHfo3rDPWczCSPUKsTS8OBpJUl",
-          "rank": 3,
+          "rank": 4,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 4
         }
       ],
       "aliases": []
@@ -9519,60 +9525,6 @@
       "aliases": []
     },
     {
-      "accountId": "816608cd-f6e7-4456-8723-39ed87ff7011",
-      "player": "Leek.TM",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 5,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 70,
-          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 21,
-          "mapUid": "0BfIkFWcqPIcAn_qSaMP2dBHYI9",
-          "rank": 4,
-          "timeMs": 18262,
-          "rawRank": 4
-        },
-        {
-          "week": 26,
-          "mapUid": "CGDNalKB_zAHEoVTaEmgFeXz76m",
-          "rank": 5,
-          "timeMs": 16157,
-          "rawRank": 5
-        },
-        {
-          "week": 36,
-          "mapUid": "JltuwdPfl9LkbxhKPcK9iNMjTN1",
-          "rank": 2,
-          "timeMs": 18051,
-          "rawRank": 2
-        },
-        {
-          "week": 55,
-          "mapUid": "skdDQJtTGyIEYk2fuKtuRLOS_ma",
-          "rank": 3,
-          "timeMs": 13548,
-          "rawRank": 3
-        },
-        {
-          "week": 70,
-          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "rank": 1,
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "36460791-6ebe-4aa1-8ba4-8f1eab6acc7a",
       "player": "Maniaaaac_",
       "wins": 0,
@@ -13103,6 +13055,53 @@
       "aliases": []
     },
     {
+      "accountId": "816608cd-f6e7-4456-8723-39ed87ff7011",
+      "player": "Leek.TM",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 5,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 21,
+          "mapUid": "0BfIkFWcqPIcAn_qSaMP2dBHYI9",
+          "rank": 4,
+          "timeMs": 18262,
+          "rawRank": 4
+        },
+        {
+          "week": 26,
+          "mapUid": "CGDNalKB_zAHEoVTaEmgFeXz76m",
+          "rank": 5,
+          "timeMs": 16157,
+          "rawRank": 5
+        },
+        {
+          "week": 36,
+          "mapUid": "JltuwdPfl9LkbxhKPcK9iNMjTN1",
+          "rank": 2,
+          "timeMs": 18051,
+          "rawRank": 2
+        },
+        {
+          "week": 55,
+          "mapUid": "skdDQJtTGyIEYk2fuKtuRLOS_ma",
+          "rank": 3,
+          "timeMs": 13548,
+          "rawRank": 3
+        },
+        {
+          "week": 70,
+          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
+        }
+      ],
+      "aliases": []
+    },
+    {
       "accountId": "365e6d4c-2fc2-4ce0-b86e-8ad144178203",
       "player": "Nelaiy",
       "wins": 0,
@@ -13568,9 +13567,9 @@
         {
           "week": 70,
           "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "rank": 2,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -13997,9 +13996,9 @@
         {
           "week": 70,
           "mapUid": "FUHfo3rDPWczCSPUKsTS8OBpJUl",
-          "rank": 4,
+          "rank": 5,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -15464,9 +15463,9 @@
         {
           "week": 70,
           "mapUid": "FUHfo3rDPWczCSPUKsTS8OBpJUl",
-          "rank": 5,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 5
+          "rawRank": 3
         }
       ],
       "aliases": []
