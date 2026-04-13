@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-13T10:28:26.459Z",
+  "generatedAt": "2026-04-13T11:52:38.954Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -925,7 +925,7 @@
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
       "player": "in-.-",
       "wins": 5,
-      "wrs": 18,
+      "wrs": 17,
       "top5": 32,
       "weeksWon": [
         44,
@@ -1035,12 +1035,6 @@
           "week": 69,
           "mapUid": "P3uSNZSB4XNxMIVPLqZKochgP0h",
           "timeMs": 10881,
-          "rawRank": 1
-        },
-        {
-          "week": 70,
-          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -1265,9 +1259,9 @@
         {
           "week": 70,
           "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "rank": 1,
+          "rank": 2,
           "timeMs": null,
-          "rawRank": 1
+          "rawRank": 2
         }
       ],
       "aliases": []
@@ -10151,6 +10145,46 @@
       "aliases": []
     },
     {
+      "accountId": "eeb31a68-a673-4611-bc78-d1eed66ecddb",
+      "player": "Arrvee",
+      "wins": 0,
+      "wrs": 1,
+      "top5": 3,
+      "weeksWon": [],
+      "wrWeeks": [
+        {
+          "week": 70,
+          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "top5Weeks": [
+        {
+          "week": 40,
+          "mapUid": "kIXqzxSxxWXaOzvzS2ksnb7EZs1",
+          "rank": 5,
+          "timeMs": 15042,
+          "rawRank": 5
+        },
+        {
+          "week": 65,
+          "mapUid": "dE8IbQABh9wj9qh8doPl6lnglq7",
+          "rank": 2,
+          "timeMs": 17274,
+          "rawRank": 2
+        },
+        {
+          "week": 70,
+          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
+          "rank": 1,
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "aliases": []
+    },
+    {
       "accountId": "3c530018-af61-4c4a-81ee-c2f9e1e9f996",
       "player": "Bartje101",
       "wins": 0,
@@ -13034,9 +13068,9 @@
         {
           "week": 70,
           "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "rank": 2,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -13524,39 +13558,6 @@
           "rank": 4,
           "timeMs": 12962,
           "rawRank": 4
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "eeb31a68-a673-4611-bc78-d1eed66ecddb",
-      "player": "Arrvee",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 3,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 40,
-          "mapUid": "kIXqzxSxxWXaOzvzS2ksnb7EZs1",
-          "rank": 5,
-          "timeMs": 15042,
-          "rawRank": 5
-        },
-        {
-          "week": 65,
-          "mapUid": "dE8IbQABh9wj9qh8doPl6lnglq7",
-          "rank": 2,
-          "timeMs": 17274,
-          "rawRank": 2
-        },
-        {
-          "week": 70,
-          "mapUid": "nu6Yf6Mj_bqMLXEdxQTYZ4yDgwl",
-          "rank": 3,
-          "timeMs": null,
-          "rawRank": 3
         }
       ],
       "aliases": []
