@@ -1441,7 +1441,14 @@ footer{
 
   try {
     if (supabaseConfigured) {
-      tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storage: window.localStorage,
+        },
+      });
     } else {
       console.warn("Supabase is not configured yet. Login/register and shoutbox posting are disabled until you add your URL/key.");
     }
@@ -3069,20 +3076,35 @@ normalizeEventCardHeights();
       return;
     }
 
-    const { data, error } = await tmeSupabase
+    shoutboxMessages.innerHTML = '<div class="meta">Loading shoutbox…</div>';
+
+    let { data, error } = await tmeSupabase
       .from("shoutbox_messages")
       .select("id, user_id, username, message, type, created_at")
-      .order("created_at", { ascending: true })
+      .eq("deleted", false)
+      .order("created_at", { ascending: false })
       .limit(50);
+
+    if (error && String(error.message || "").toLowerCase().includes("deleted")) {
+      // Fallback for older tables that do not have the deleted column yet.
+      const retry = await tmeSupabase
+        .from("shoutbox_messages")
+        .select("id, user_id, username, message, type, created_at")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) {
       console.warn("Shoutbox load failed:", error);
       renderShoutMessages([]);
-      setShoutStatus("Could not load shoutbox messages.");
+      setShoutStatus(`Could not load shoutbox messages: ${error.message || "Unknown error"}`);
       return;
     }
 
-    renderShoutMessages(data || []);
+    renderShoutMessages([...(data || [])].reverse());
     setShoutStatus("");
   }
 
@@ -3225,12 +3247,15 @@ normalizeEventCardHeights();
   if (tmeSupabase) {
     tmeSupabase.auth.onAuthStateChange(async () => {
       await updateAuthUI();
+      await loadShoutboxMessages();
     });
   }
 
-  updateAuthUI();
-  loadShoutboxMessages();
-  startShoutboxRealtime();
+  (async () => {
+    await updateAuthUI();
+    await loadShoutboxMessages();
+    startShoutboxRealtime();
+  })();
 
 </script>
 
