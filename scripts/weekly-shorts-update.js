@@ -14,7 +14,45 @@ const CHANGELOG_PATH = path.join(BASE_DIR, "changelog.json");
 const NAME_CACHE_PATH = path.join(BASE_DIR, "name-cache.json");
 const WR_STATE_PATH = path.join(BASE_DIR, "wr-state.json");
 const POSTWEEK_MAP_STATE_PATH = path.join(BASE_DIR, "postweek-map-state.json");
+// ---------- SUPABASE SYSTEM MESSAGES ----------
+const SUPABASE_URL = String(process.env.SUPABASE_URL || "").replace(/\/+$/, "");
+const SUPABASE_SERVICE_ROLE_KEY = String(process.env.SUPABASE_SERVICE_ROLE_KEY || "");
 
+async function postSystemMessage(message, systemKey) {
+  try {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !message || !systemKey) {
+      return false;
+    }
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/shoutbox_messages`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=ignore-duplicates,return=minimal",
+      },
+      body: JSON.stringify({
+        username: "SYSTEM",
+        type: "system",
+        message,
+        system_key: systemKey,
+      }),
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      console.warn("[SYSTEM MESSAGE FAILED]", res.status, txt);
+      return false;
+    }
+
+    console.log("[SYSTEM MESSAGE]", message);
+    return true;
+  } catch (err) {
+    console.warn("[SYSTEM MESSAGE ERROR]", err);
+    return false;
+  }
+}
 const DEBUG = String(process.env.DEBUG || "0") === "1";
 const dlog = (...a) => DEBUG && console.log("[WS]", ...a);
 
@@ -1288,9 +1326,14 @@ async function main() {
           };
 
           const added = appendChangelogItem(changelog, item);
-          if (added) {
-            dlog("changelog +", item.text);
-          }
+if (added) {
+  dlog("changelog +", item.text);
+
+  await postSystemMessage(
+    item.text,
+    `ws-${item.type}-week-${item.week}-map-${item.mapUid}-${item.newHolderAccountId || item.newHolder}-${item.newTimeMs}`
+  );
+}
 
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
@@ -1329,10 +1372,14 @@ async function main() {
           };
 
           const added = appendChangelogItem(changelog, item);
-          if (added) {
-            dlog("changelog +", item.text);
-          }
+if (added) {
+  dlog("changelog +", item.text);
 
+  await postSystemMessage(
+    item.text,
+    `ws-${item.type}-week-${item.week}-map-${item.mapUid}-${item.newHolderAccountId || item.newHolder}-${item.newTimeMs}`
+  );
+}
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
