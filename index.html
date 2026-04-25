@@ -1050,6 +1050,46 @@ footer{
   background:linear-gradient(135deg, rgba(74,163,255,.14), rgba(109,251,255,.10)) !important;
 }
 
+
+
+/* ---------- AUTH + SHOUTBOX ---------- */
+.auth-open{cursor:pointer;font-family:inherit}
+.auth-open.nav-auth-mobile{display:none;width:100%;min-height:40px;margin-top:.25rem}
+.auth-user-pill{display:inline-flex;align-items:center;gap:.4rem;padding:.62rem .9rem;min-height:42px;border-radius:12px;border:1px solid rgba(74,163,255,.16);background:rgba(74,163,255,.08);color:#dff7ff;font-weight:850;font-size:.9rem}
+#authModal{position:fixed;inset:0;z-index:9999999;display:none;align-items:center;justify-content:center;padding:1rem;background:rgba(3,7,14,.74);backdrop-filter:blur(10px)}
+#authModal.show{display:flex}
+.auth-dialog{width:min(430px,94vw);border-radius:22px;border:1px solid var(--border-strong);background:linear-gradient(180deg,rgba(16,25,42,.98),rgba(10,16,29,.98));box-shadow:var(--shadow-lg);overflow:hidden}
+.auth-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;padding:1.05rem 1.1rem .85rem;border-bottom:1px solid var(--border)}
+.auth-head strong{display:block;font-size:1.08rem;font-weight:950;color:#fff}
+.auth-head span{display:block;margin-top:.25rem;color:var(--muted);font-size:.86rem;line-height:1.35}
+.auth-close{width:36px;height:36px;border-radius:11px;border:1px solid var(--border);background:#121d31;color:var(--text);cursor:pointer;font-weight:950}
+.auth-body{padding:1.1rem}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.85rem}
+.auth-tab{border:1px solid var(--border);background:#121d31;color:var(--muted);border-radius:12px;min-height:40px;cursor:pointer;font-weight:900}
+.auth-tab.active{color:#07111d;border-color:rgba(74,163,255,.2);background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.auth-panel{display:none;gap:.7rem;flex-direction:column}
+.auth-panel.active{display:flex}
+.auth-row{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap}
+.auth-message{min-height:20px;font-size:.86rem;color:var(--muted);line-height:1.35}
+.auth-message.error{color:#ff9d9d}
+.auth-message.ok{color:#8fffd0}
+.auth-link-btn{border:0;background:transparent;color:#a9d8ff;padding:0;cursor:pointer;font-weight:850;font-size:.88rem;text-align:left}
+.auth-link-btn:hover{color:#fff}
+#shoutbox-section{padding-top:1.1rem;padding-bottom:2.2rem}
+.shoutbox-card:hover{transform:none}
+.shoutbox-top{display:flex;align-items:center;justify-content:space-between;gap:.85rem;flex-wrap:wrap}
+.shoutbox-sub{color:var(--muted);font-size:.86rem;margin-top:.25rem}
+#shoutboxMessages{height:245px;overflow:auto;display:flex;flex-direction:column;gap:.55rem;padding:.75rem;border-radius:14px;border:1px solid var(--border);background:rgba(8,13,23,.55)}
+.shout-msg{border:1px solid rgba(255,255,255,.06);background:#121d31;border-radius:14px;padding:.65rem .75rem;line-height:1.35;overflow-wrap:anywhere}
+.shout-msg.system{border-color:rgba(255,176,46,.17);background:linear-gradient(135deg,rgba(255,176,46,.10),rgba(74,163,255,.06))}
+.shout-meta{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.25rem;color:var(--muted);font-size:.76rem;font-weight:850}
+.shout-name{color:#eaf4ff;font-weight:950}
+.shout-msg.system .shout-name{color:#ffd18a}
+.shout-text{color:#eef3ff;font-size:.93rem}
+.shout-form{display:grid;grid-template-columns:1fr auto;gap:.65rem;margin-top:.75rem}
+#shoutStatus{margin-top:.55rem;color:var(--muted);font-size:.86rem;min-height:18px}
+@media (max-width:640px){.auth-open.nav-auth-mobile{display:inline-flex}.shout-form{grid-template-columns:1fr}#shoutboxMessages{height:220px}}
+
 /* ---------- MOBILE ---------- */
 
 @media (max-width:960px){
@@ -1123,8 +1163,10 @@ footer{
       <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
       <a href="/totd">Track of the Day</a>
       <a href="/highlights">Community Highlights</a>
+      <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
     </nav>
-    <div class="cta">
+    <div class="cta" id="authArea">
+      <button class="btn auth-open" type="button">Login / Register</button>
       <a class="btn" href="#contact">Contact</a>
     </div>
   </div>
@@ -1180,6 +1222,30 @@ footer{
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<section id="shoutbox-section" class="section" aria-label="Community shoutbox">
+  <div class="container">
+    <div class="card shoutbox-card reveal">
+      <div class="card-header shoutbox-top">
+        <div>
+          <strong>Community Shoutbox</strong>
+          <div class="shoutbox-sub">Chat with signed-in users and see automatic event/system notices.</div>
+        </div>
+        <span class="chip" id="shoutboxAuthState">Guest</span>
+      </div>
+      <div class="card-body">
+        <div id="shoutboxMessages" aria-live="polite">
+          <div class="meta">Loading shoutbox…</div>
+        </div>
+        <div class="shout-form">
+          <input id="shoutInput" class="input" type="text" maxlength="300" placeholder="Login to send a shout…" autocomplete="off" />
+          <button id="sendShout" class="btn primary" type="button">Send</button>
+        </div>
+        <div id="shoutStatus" aria-live="polite"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1287,6 +1353,51 @@ footer{
   </div>
 </footer>
 
+<div id="authModal" role="dialog" aria-modal="true" aria-label="Account login and registration">
+  <div class="auth-dialog">
+    <div class="auth-head">
+      <div>
+        <strong id="authTitle">Account</strong>
+        <span id="authSubtitle">Login or create an account to use the shoutbox.</span>
+      </div>
+      <button class="auth-close" id="authClose" type="button" aria-label="Close account window">×</button>
+    </div>
+
+    <div class="auth-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" type="button" data-auth-tab="login">Login</button>
+        <button class="auth-tab" type="button" data-auth-tab="register">Register</button>
+      </div>
+
+      <div class="auth-panel active" id="authLoginPanel">
+        <input id="authLoginEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
+        <input id="authLoginPassword" class="input" type="password" placeholder="Password" autocomplete="current-password" />
+        <button id="authLoginBtn" class="btn primary" type="button">Login</button>
+        <button id="authForgotBtn" class="auth-link-btn" type="button">Forgot password?</button>
+      </div>
+
+      <div class="auth-panel" id="authRegisterPanel">
+        <input id="authRegisterUsername" class="input" type="text" maxlength="24" placeholder="Username" autocomplete="username" />
+        <input id="authRegisterEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
+        <input id="authRegisterPassword" class="input" type="password" placeholder="Password" autocomplete="new-password" />
+        <button id="authRegisterBtn" class="btn primary" type="button">Create Account</button>
+        <div class="help">You may need to confirm your email before logging in.</div>
+      </div>
+
+      <div class="auth-panel" id="authForgotPanel">
+        <input id="authResetEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
+        <button id="authResetBtn" class="btn primary" type="button">Send Password Reset</button>
+        <button id="authBackLoginBtn" class="auth-link-btn" type="button">Back to login</button>
+      </div>
+
+      <div class="auth-message" id="authMessage" aria-live="polite"></div>
+      <div class="auth-row" style="margin-top:.85rem">
+        <button id="authLogoutBtn" class="btn" type="button" style="display:none">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <button id="tmeChatBtn" aria-label="Open chat">💬</button>
 
 <div id="tmeChatPanel" role="dialog" aria-label="Trackmania Events Chat">
@@ -1310,8 +1421,35 @@ footer{
     <button id="tmeChatSend" type="button">Send</button>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const TTV_CHANNEL = "C0rsy";
+
+  // ---------- SUPABASE CONFIG ----------
+  // Replace these two values with your real Supabase Project URL and anon public key.
+  // Leaving the placeholders in will NOT crash the site; auth/shoutbox will simply stay disabled.
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co/rest/v1/";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+  let tmeSupabase = null;
+  const supabaseConfigured =
+    typeof window.supabase !== "undefined" &&
+    /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) &&
+    SUPABASE_ANON_KEY &&
+    !SUPABASE_ANON_KEY.includes("PASTE_") &&
+    SUPABASE_ANON_KEY.length > 50;
+
+  try {
+    if (supabaseConfigured) {
+      tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+      console.warn("Supabase is not configured yet. Login/register and shoutbox posting are disabled until you add your URL/key.");
+    }
+  } catch (err) {
+    console.warn("Supabase failed to initialize:", err);
+    tmeSupabase = null;
+  }
+
   const d = document.getElementById("d");
   const h = document.getElementById("h");
   const m = document.getElementById("m");
@@ -2753,6 +2891,347 @@ normalizeEventCardHeights();
   sendBtn.addEventListener("click", send);
   input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
 })();
+
+
+  // ---------- AUTH + SHOUTBOX ----------
+  const authModal = document.getElementById("authModal");
+  const authMessage = document.getElementById("authMessage");
+  const authLogoutBtn = document.getElementById("authLogoutBtn");
+  const shoutboxMessages = document.getElementById("shoutboxMessages");
+  const shoutInput = document.getElementById("shoutInput");
+  const shoutStatus = document.getElementById("shoutStatus");
+  const shoutboxAuthState = document.getElementById("shoutboxAuthState");
+  let shoutboxChannel = null;
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function setAuthMessage(text, type = "") {
+    if (!authMessage) return;
+    authMessage.textContent = text || "";
+    authMessage.className = `auth-message ${type}`.trim();
+  }
+
+  function setShoutStatus(text) {
+    if (shoutStatus) shoutStatus.textContent = text || "";
+  }
+
+  function openAuthModal(panel = "login") {
+    if (!authModal) return;
+    authModal.classList.add("show");
+    showAuthPanel(panel);
+    setAuthMessage("");
+  }
+
+  function closeAuthModal() {
+    authModal?.classList.remove("show");
+  }
+
+  function showAuthPanel(panel) {
+    const panels = {
+      login: document.getElementById("authLoginPanel"),
+      register: document.getElementById("authRegisterPanel"),
+      forgot: document.getElementById("authForgotPanel"),
+    };
+
+    Object.values(panels).forEach((el) => el?.classList.remove("active"));
+    panels[panel]?.classList.add("active");
+
+    document.querySelectorAll(".auth-tab").forEach((tab) => {
+      tab.classList.toggle("active", tab.dataset.authTab === panel);
+    });
+
+    const title = document.getElementById("authTitle");
+    const subtitle = document.getElementById("authSubtitle");
+
+    if (panel === "register") {
+      if (title) title.textContent = "Create Account";
+      if (subtitle) subtitle.textContent = "Register with your email, username, and password.";
+    } else if (panel === "forgot") {
+      if (title) title.textContent = "Recover Account";
+      if (subtitle) subtitle.textContent = "Send a password reset link to your email.";
+    } else {
+      if (title) title.textContent = "Login";
+      if (subtitle) subtitle.textContent = "Login to post in the community shoutbox.";
+    }
+  }
+
+  function getUsernameFromUser(user) {
+    return (
+      user?.user_metadata?.username ||
+      user?.user_metadata?.name ||
+      (user?.email ? user.email.split("@")[0] : "User")
+    );
+  }
+
+  async function getCurrentUser() {
+    if (!tmeSupabase) return null;
+    const { data } = await tmeSupabase.auth.getUser();
+    return data?.user || null;
+  }
+
+  async function updateAuthUI() {
+    const user = await getCurrentUser();
+    const username = getUsernameFromUser(user);
+
+    document.querySelectorAll(".auth-open").forEach((btn) => {
+      btn.textContent = user ? username : "Login / Register";
+    });
+
+    if (authLogoutBtn) authLogoutBtn.style.display = user ? "inline-flex" : "none";
+    if (shoutboxAuthState) shoutboxAuthState.textContent = user ? `Signed in • ${username}` : "Guest";
+    if (shoutInput) shoutInput.placeholder = user ? "Type a shout…" : "Login to send a shout…";
+  }
+
+  function localSystemMessages() {
+    const out = [];
+    const now = new Date();
+    const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
+
+    const liveEvent = events.find((e) => isEventLive(e, now));
+    if (liveEvent?.title) {
+      out.push({
+        id: "local-live-" + liveEvent.title,
+        username: "SYSTEM",
+        type: "system",
+        message: `${liveEvent.title} has just started or is live now.`,
+        created_at: new Date().toISOString(),
+        local: true,
+      });
+    }
+
+    const upcoming = events
+      .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
+      .filter((x) => x.seg && x.seg.start > now)
+      .sort((a, b) => a.seg.start - b.seg.start)[0];
+
+    if (upcoming?.event?.title) {
+      const minutes = Math.round((upcoming.seg.start - now) / 60000);
+      if (minutes > 0 && minutes <= 60) {
+        out.push({
+          id: "local-upcoming-" + upcoming.event.title,
+          username: "SYSTEM",
+          type: "system",
+          message: `${upcoming.event.title} is about to begin in ${minutes} minute${minutes === 1 ? "" : "s"}.`,
+          created_at: new Date().toISOString(),
+          local: true,
+        });
+      }
+    }
+
+    return out;
+  }
+
+  function renderShoutMessages(messages) {
+    if (!shoutboxMessages) return;
+
+    const safeMessages = Array.isArray(messages) ? messages : [];
+    const merged = [...localSystemMessages(), ...safeMessages].slice(-60);
+
+    if (!merged.length) {
+      shoutboxMessages.innerHTML = '<div class="meta">No shoutbox messages yet.</div>';
+      return;
+    }
+
+    shoutboxMessages.innerHTML = merged.map((msg) => {
+      const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
+      const date = msg.created_at ? new Date(msg.created_at) : new Date();
+      const time = Number.isNaN(date.getTime())
+        ? ""
+        : date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+      return `
+        <div class="shout-msg ${isSystem ? "system" : "user"}">
+          <div class="shout-meta">
+            <span class="shout-name">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+            <span>${escapeHtml(time)}</span>
+          </div>
+          <div class="shout-text">${escapeHtml(msg.message)}</div>
+        </div>
+      `;
+    }).join("");
+
+    shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+  }
+
+  async function loadShoutboxMessages() {
+    if (!shoutboxMessages) return;
+
+    if (!tmeSupabase) {
+      renderShoutMessages([]);
+      setShoutStatus("You will need to login before you can send a shout in the shoutbox.");
+      return;
+    }
+
+    const { data, error } = await tmeSupabase
+      .from("shoutbox_messages")
+      .select("id, user_id, username, message, type, created_at")
+      .order("created_at", { ascending: true })
+      .limit(50);
+
+    if (error) {
+      console.warn("Shoutbox load failed:", error);
+      renderShoutMessages([]);
+      setShoutStatus("Could not load shoutbox messages.");
+      return;
+    }
+
+    renderShoutMessages(data || []);
+    setShoutStatus("");
+  }
+
+  async function sendShout() {
+    if (!tmeSupabase) {
+      setShoutStatus("Supabase is not configured yet.");
+      return;
+    }
+
+    const message = shoutInput?.value.trim();
+    if (!message) return;
+    if (message.length > 300) {
+      setShoutStatus("Message must be 300 characters or less.");
+      return;
+    }
+
+    const user = await getCurrentUser();
+    if (!user) {
+      openAuthModal("login");
+      setShoutStatus("Login first to send a shout.");
+      return;
+    }
+
+    const username = getUsernameFromUser(user).slice(0, 24);
+    const { error } = await tmeSupabase.from("shoutbox_messages").insert({
+      user_id: user.id,
+      username,
+      message,
+      type: "user",
+    });
+
+    if (error) {
+      console.warn("Shoutbox send failed:", error);
+      setShoutStatus(error.message || "Could not send message.");
+      return;
+    }
+
+    shoutInput.value = "";
+    setShoutStatus("");
+    await loadShoutboxMessages();
+  }
+
+  function startShoutboxRealtime() {
+    if (!tmeSupabase || shoutboxChannel) return;
+
+    shoutboxChannel = tmeSupabase
+      .channel("public:shoutbox_messages")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "shoutbox_messages" },
+        () => loadShoutboxMessages()
+      )
+      .subscribe();
+  }
+
+  document.querySelectorAll(".auth-open").forEach((btn) => {
+    btn.addEventListener("click", () => openAuthModal("login"));
+  });
+
+  document.getElementById("authClose")?.addEventListener("click", closeAuthModal);
+  authModal?.addEventListener("click", (e) => {
+    if (e.target === authModal) closeAuthModal();
+  });
+
+  document.querySelectorAll(".auth-tab").forEach((tab) => {
+    tab.addEventListener("click", () => showAuthPanel(tab.dataset.authTab || "login"));
+  });
+
+  document.getElementById("authForgotBtn")?.addEventListener("click", () => showAuthPanel("forgot"));
+  document.getElementById("authBackLoginBtn")?.addEventListener("click", () => showAuthPanel("login"));
+
+  document.getElementById("authLoginBtn")?.addEventListener("click", async () => {
+    if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+
+    const email = document.getElementById("authLoginEmail")?.value.trim();
+    const password = document.getElementById("authLoginPassword")?.value;
+    if (!email || !password) return setAuthMessage("Enter your email and password.", "error");
+
+    const { error } = await tmeSupabase.auth.signInWithPassword({ email, password });
+    if (error) return setAuthMessage(error.message, "error");
+
+    setAuthMessage("Logged in successfully.", "ok");
+    await updateAuthUI();
+    await loadShoutboxMessages();
+    setTimeout(closeAuthModal, 650);
+  });
+
+  document.getElementById("authRegisterBtn")?.addEventListener("click", async () => {
+    if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+
+    const username = document.getElementById("authRegisterUsername")?.value.trim();
+    const email = document.getElementById("authRegisterEmail")?.value.trim();
+    const password = document.getElementById("authRegisterPassword")?.value;
+
+    if (!username || !email || !password) return setAuthMessage("Fill out username, email, and password.", "error");
+    if (!/^[a-zA-Z0-9_.-]{2,24}$/.test(username)) {
+      return setAuthMessage("Username can use letters, numbers, underscore, dot, or dash. 2–24 chars.", "error");
+    }
+
+    const { error } = await tmeSupabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { username },
+        emailRedirectTo: "https://trackmaniaevents.com/",
+      },
+    });
+
+    if (error) return setAuthMessage(error.message, "error");
+    setAuthMessage("Account created. Check your email to confirm it.", "ok");
+  });
+
+  document.getElementById("authResetBtn")?.addEventListener("click", async () => {
+    if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+
+    const email = document.getElementById("authResetEmail")?.value.trim();
+    if (!email) return setAuthMessage("Enter your email first.", "error");
+
+    const { error } = await tmeSupabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://trackmaniaevents.com/",
+    });
+
+    if (error) return setAuthMessage(error.message, "error");
+    setAuthMessage("Password reset email sent.", "ok");
+  });
+
+  authLogoutBtn?.addEventListener("click", async () => {
+    if (!tmeSupabase) return;
+    await tmeSupabase.auth.signOut();
+    setAuthMessage("Logged out.", "ok");
+    await updateAuthUI();
+    await loadShoutboxMessages();
+  });
+
+  document.getElementById("sendShout")?.addEventListener("click", sendShout);
+  shoutInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendShout();
+  });
+
+  if (tmeSupabase) {
+    tmeSupabase.auth.onAuthStateChange(async () => {
+      await updateAuthUI();
+    });
+  }
+
+  updateAuthUI();
+  loadShoutboxMessages();
+  startShoutboxRealtime();
+
 </script>
 
 </body>
