@@ -1106,6 +1106,26 @@ footer{
 
 #schedule{--section-img:none !important}
 #schedule::before{background:none !important}
+
+/* ---------- AUTH + SHOUTBOX ---------- */
+.auth-state{display:flex;align-items:center;gap:.6rem;justify-content:flex-end}
+.user-pill{display:none;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.56rem .78rem;border-radius:999px;border:1px solid rgba(74,163,255,.16);background:rgba(18,29,49,.82);color:#dce7ff;font-size:.86rem;font-weight:850}
+.shoutbox-section{padding-top:0}.shoutbox-card{overflow:hidden}.shoutbox-head{display:flex;align-items:center;justify-content:space-between;gap:1rem}.shoutbox-status{color:var(--muted);font-size:.82rem;font-weight:800}
+#shoutboxMessages{height:245px;overflow:auto;display:flex;flex-direction:column;gap:.55rem;padding-right:.25rem}
+.shout-message{padding:.62rem .75rem;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:#0f1829;color:var(--text);line-height:1.35;word-break:break-word}
+.shout-message.system{border-color:rgba(255,176,46,.18);background:linear-gradient(135deg, rgba(255,176,46,.10), rgba(74,163,255,.06))}
+.shout-topline{display:flex;align-items:center;gap:.5rem;justify-content:space-between;margin-bottom:.22rem}.shout-name{font-weight:950;color:#f7faff}.shout-time{color:rgba(159,178,223,.82);font-size:.76rem;font-weight:750}.shout-text{color:#dce7ff}
+.shout-actions{display:flex;gap:.65rem;align-items:center;margin-top:.85rem}.shout-actions .input{min-height:42px}.shout-help{margin-top:.55rem;color:var(--muted);font-size:.84rem}
+.auth-modal{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;padding:1rem;background:rgba(2,6,12,.72);backdrop-filter:blur(10px)}.auth-modal.show{display:flex}
+.auth-box{width:min(430px,94vw);border:1px solid var(--border-strong);border-radius:22px;background:linear-gradient(180deg, rgba(16,25,42,.98), rgba(11,18,32,.98));box-shadow:var(--shadow-lg);overflow:hidden}
+.auth-box-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 1rem .85rem;border-bottom:1px solid var(--border)}.auth-box-head strong{font-size:1.08rem;font-weight:950}
+.auth-close{width:36px;height:36px;border-radius:11px;border:1px solid var(--border);background:#121d31;color:var(--text);cursor:pointer;font-weight:900}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;padding:1rem 1rem 0}.auth-tab{border:1px solid var(--border);background:#121d31;color:var(--muted);border-radius:12px;padding:.65rem .85rem;cursor:pointer;font-weight:900}
+.auth-tab.active{color:#07111d;border-color:rgba(74,163,255,.22);background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.auth-form{padding:1rem;display:flex;flex-direction:column;gap:.75rem}.auth-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.auth-link{border:0;background:transparent;color:#b8c9ff;cursor:pointer;font-weight:850;padding:0}.auth-status{min-height:20px;color:var(--muted);font-size:.86rem;line-height:1.35}
+@media (max-width:640px){.user-pill{display:none!important}.shout-actions{flex-direction:column;align-items:stretch}.shout-actions .btn{width:100%}}
+
 </style>
 </head>
 
@@ -1124,8 +1144,10 @@ footer{
       <a href="/totd">Track of the Day</a>
       <a href="/highlights">Community Highlights</a>
     </nav>
-    <div class="cta">
-      <a class="btn" href="#contact">Contact</a>
+    <div class="cta auth-state">
+      <span class="user-pill" id="authUserPill"></span>
+      <button class="btn" id="authOpenBtn" type="button">Login / Register</button>
+      <button class="btn" id="authLogoutBtn" type="button" style="display:none">Logout</button>
     </div>
   </div>
 </header>
@@ -1180,6 +1202,30 @@ footer{
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<section id="shoutbox" class="section shoutbox-section">
+  <div class="container">
+    <div class="card shoutbox-card reveal">
+      <div class="card-header shoutbox-head">
+        <strong>Community Shoutbox</strong>
+        <span class="shoutbox-status" id="shoutboxStatus">Login to chat</span>
+      </div>
+      <div class="card-body">
+        <div id="shoutboxMessages" aria-live="polite">
+          <div class="shout-message system">
+            <div class="shout-topline"><span class="shout-name">SYSTEM</span><span class="shout-time">Loading</span></div>
+            <div class="shout-text">Loading shoutbox…</div>
+          </div>
+        </div>
+        <div class="shout-actions">
+          <input id="shoutInput" class="input" maxlength="300" placeholder="Login to send a message…" autocomplete="off" disabled />
+          <button id="sendShoutBtn" class="btn primary" type="button" disabled>Send</button>
+        </div>
+        <div class="shout-help" id="shoutHelp">SYSTEM posts can show event notices and Weekly Shorts changelog updates.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1287,6 +1333,30 @@ footer{
   </div>
 </footer>
 
+<div id="authModal" class="auth-modal" role="dialog" aria-modal="true" aria-label="Account login and registration">
+  <div class="auth-box">
+    <div class="auth-box-head">
+      <strong id="authTitle">Account</strong>
+      <button class="auth-close" id="authCloseBtn" type="button" aria-label="Close account popup">×</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authLoginTab" type="button">Login</button>
+      <button class="auth-tab" id="authRegisterTab" type="button">Register</button>
+    </div>
+    <div class="auth-form">
+      <input class="input" id="authEmail" type="email" placeholder="Email address" autocomplete="email" />
+      <input class="input" id="authUsername" type="text" placeholder="Username" autocomplete="username" style="display:none" />
+      <input class="input" id="authPassword" type="password" placeholder="Password" autocomplete="current-password" />
+      <button class="btn primary" id="authSubmitBtn" type="button">Login</button>
+      <div class="auth-row">
+        <button class="auth-link" id="authForgotPasswordBtn" type="button">Forgot password?</button>
+        <span class="help">Email confirmation must be completed before login.</span>
+      </div>
+      <div class="auth-status" id="authStatus" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
 <button id="tmeChatBtn" aria-label="Open chat">💬</button>
 
 <div id="tmeChatPanel" role="dialog" aria-label="Trackmania Events Chat">
@@ -1310,8 +1380,15 @@ footer{
     <button id="tmeChatSend" type="button">Send</button>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const TTV_CHANNEL = "C0rsy";
+
+  // ---------- SUPABASE CONFIG ----------
+  // Replace these two values with your Supabase Project URL and anon public key.
+  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+  const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE";
+  const tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const d = document.getElementById("d");
   const h = document.getElementById("h");
   const m = document.getElementById("m");
