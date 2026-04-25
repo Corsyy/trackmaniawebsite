@@ -22,6 +22,8 @@ jobs:
       REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
       CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Checkout
@@ -77,4 +79,5 @@ jobs:
           fi
 
           git commit -m "Update Weekly Shorts data"
-          git push
+          git pull --rebase origin main
+          git push origin main
