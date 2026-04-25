@@ -3070,42 +3070,68 @@ normalizeEventCardHeights();
   async function loadShoutboxMessages() {
     if (!shoutboxMessages) return;
 
-    if (!tmeSupabase) {
-      renderShoutMessages([]);
-      setShoutStatus("You will need to login before you can send a shout in the shoutbox.");
-      return;
+    const timeoutMs = 9000;
+    const timeout = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Shoutbox request timed out. Check Supabase URL/RLS/network.")), timeoutMs);
+    });
+
+    async function loadViaRest(useDeletedFilter = true) {
+      const select = "id,user_id,username,message,type,created_at";
+      const deletedPart = useDeletedFilter ? "&deleted=eq.false" : "";
+      const url = `${SUPABASE_URL}/rest/v1/shoutbox_messages?select=${select}${deletedPart}&order=created_at.desc&limit=50`;
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Accept: "application/json",
+        },
+      });
+
+      const text = await res.text();
+      let json = null;
+      try { json = text ? JSON.parse(text) : null; } catch { json = text; }
+
+      if (!res.ok) {
+        const message = json?.message || json?.hint || text || `HTTP ${res.status}`;
+        const err = new Error(message);
+        err.status = res.status;
+        throw err;
+      }
+
+      return Array.isArray(json) ? json : [];
     }
 
-    shoutboxMessages.innerHTML = '<div class="meta">Loading shoutbox…</div>';
+    try {
+      shoutboxMessages.innerHTML = '<div class="meta">Loading shoutbox…</div>';
 
-    let { data, error } = await tmeSupabase
-      .from("shoutbox_messages")
-      .select("id, user_id, username, message, type, created_at")
-      .eq("deleted", false)
-      .order("created_at", { ascending: false })
-      .limit(50);
+      if (!supabaseConfigured) {
+        renderShoutMessages([]);
+        setShoutStatus("Supabase is not configured yet.");
+        return;
+      }
 
-    if (error && String(error.message || "").toLowerCase().includes("deleted")) {
-      // Fallback for older tables that do not have the deleted column yet.
-      const retry = await tmeSupabase
-        .from("shoutbox_messages")
-        .select("id, user_id, username, message, type, created_at")
-        .order("created_at", { ascending: false })
-        .limit(50);
+      let messages = [];
 
-      data = retry.data;
-      error = retry.error;
-    }
+      try {
+        messages = await Promise.race([loadViaRest(true), timeout]);
+      } catch (firstError) {
+        // Fallback for tables that do not have the deleted column yet.
+        if (String(firstError.message || "").toLowerCase().includes("deleted")) {
+          messages = await Promise.race([loadViaRest(false), timeout]);
+        } else {
+          throw firstError;
+        }
+      }
 
-    if (error) {
+      renderShoutMessages([...messages].reverse());
+      setShoutStatus("");
+    } catch (error) {
       console.warn("Shoutbox load failed:", error);
       renderShoutMessages([]);
       setShoutStatus(`Could not load shoutbox messages: ${error.message || "Unknown error"}`);
-      return;
     }
-
-    renderShoutMessages([...(data || [])].reverse());
-    setShoutStatus("");
   }
 
   async function sendShout() {
@@ -3247,15 +3273,16 @@ normalizeEventCardHeights();
   if (tmeSupabase) {
     tmeSupabase.auth.onAuthStateChange(async () => {
       await updateAuthUI();
-      await loadShoutboxMessages();
     });
   }
 
-  (async () => {
-    await updateAuthUI();
-    await loadShoutboxMessages();
-    startShoutboxRealtime();
-  })();
+  updateAuthUI();
+  loadShoutboxMessages();
+  startShoutboxRealtime();
+
+  window.addEventListener("error", (event) => {
+    console.warn("Page script error:", event.error || event.message);
+  });
 
 </script>
 
