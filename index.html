@@ -1447,67 +1447,64 @@ footer{
           autoRefreshToken: true,
           detectSessionInUrl: true,
           storage: window.localStorage,
+          storageKey: "tme-supabase-auth",
+          flowType: "implicit",
         },
       });
-      // ---------- AUTO LOGOUT TIMER (3 HOURS) ----------
-// ---------- AUTO LOGOUT TIMER (3 HOURS FROM LOGIN) ----------
-const AUTO_LOGOUT_MS = 3 * 60 * 60 * 1000;
-const LOGIN_TIME_KEY = "tme_login_time";
 
-async function startLogoutTimer() {
-  if (!tmeSupabase) return;
+      // ---------- PROFESSIONAL SESSION TIMER ----------
+      // Keeps normal Supabase persistence on refresh, but limits each login to 3 hours.
+      const AUTO_LOGOUT_MS = 3 * 60 * 60 * 1000;
+      const LOGIN_TIME_KEY = "tme_login_started_at";
 
-  const { data } = await tmeSupabase.auth.getSession();
-  const session = data?.session;
+      function clearLogoutTimer() {
+        if (window.__tmeLogoutTimer) {
+          clearTimeout(window.__tmeLogoutTimer);
+          window.__tmeLogoutTimer = null;
+        }
+      }
 
-  clearTimeout(window.__logoutTimer);
+      async function startLogoutTimer() {
+        if (!tmeSupabase) return;
 
-  if (!session) {
-    localStorage.removeItem(LOGIN_TIME_KEY);
-    return;
-  }
+        const { data } = await tmeSupabase.auth.getSession();
+        const session = data?.session || null;
 
-  let loginTime = Number(localStorage.getItem(LOGIN_TIME_KEY) || "0");
+        clearLogoutTimer();
 
-  if (!loginTime) {
-    loginTime = Date.now();
-    localStorage.setItem(LOGIN_TIME_KEY, String(loginTime));
-  }
+        if (!session) {
+          localStorage.removeItem(LOGIN_TIME_KEY);
+          return;
+        }
 
-  const logoutAt = loginTime + AUTO_LOGOUT_MS;
-  const delay = logoutAt - Date.now();
+        let startedAt = Number(localStorage.getItem(LOGIN_TIME_KEY) || "0");
 
-  if (delay <= 0) {
-    localStorage.removeItem(LOGIN_TIME_KEY);
-    await tmeSupabase.auth.signOut();
-    location.reload();
-    return;
-  }
+        if (!startedAt) {
+          startedAt = Date.now();
+          localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
+        }
 
-  window.__logoutTimer = setTimeout(async () => {
-    localStorage.removeItem(LOGIN_TIME_KEY);
-    await tmeSupabase.auth.signOut();
-    alert("Session expired. Logged out.");
-    location.reload();
-  }, delay);
-}
+        const remaining = startedAt + AUTO_LOGOUT_MS - Date.now();
 
-startLogoutTimer();
+        if (remaining <= 0) {
+          localStorage.removeItem(LOGIN_TIME_KEY);
+          await tmeSupabase.auth.signOut();
+          await updateAuthUI?.();
+          await loadShoutboxMessages?.();
+          return;
+        }
 
-tmeSupabase.auth.onAuthStateChange((event) => {
-  if (event === "SIGNED_IN") {
-    if (!localStorage.getItem(LOGIN_TIME_KEY)) {
-      localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
-    }
-  }
+        window.__tmeLogoutTimer = setTimeout(async () => {
+          localStorage.removeItem(LOGIN_TIME_KEY);
+          await tmeSupabase.auth.signOut();
+          await updateAuthUI?.();
+          await loadShoutboxMessages?.();
+          setAuthMessage?.("Your session expired. Please log in again.", "error");
+        }, remaining);
+      }
 
-  if (event === "SIGNED_OUT") {
-    localStorage.removeItem(LOGIN_TIME_KEY);
-  }
-
-  startLogoutTimer();
-});
-
+      window.startLogoutTimer = startLogoutTimer;
+      window.clearLogoutTimer = clearLogoutTimer;
     } else {
       console.warn("Supabase is not configured yet. Login/register and shoutbox posting are disabled until you add your URL/key.");
     }
@@ -3366,15 +3363,30 @@ normalizeEventCardHeights();
 
       const email = document.getElementById("authLoginEmail")?.value.trim();
       const password = document.getElementById("authLoginPassword")?.value;
-      if (!email || !password) return setAuthMessage("Enter your email and password.", "error");
 
-      const { error } = await tmeSupabase.auth.signInWithPassword({ email, password });
+      if (!email || !password) {
+        return setAuthMessage("Enter your email and password.", "error");
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Logging in...";
+      setAuthMessage("");
+
+      const { data, error } = await tmeSupabase.auth.signInWithPassword({ email, password });
+
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login";
+
       if (error) return setAuthMessage(error.message, "error");
+      if (!data?.session) return setAuthMessage("Login failed. Please try again.", "error");
 
-      setAuthMessage("Logged in successfully.", "ok");
+      localStorage.setItem("tme_login_started_at", String(Date.now()));
+
       await updateAuthUI();
       await loadShoutboxMessages();
-      setTimeout(closeAuthModal, 650);
+      await window.startLogoutTimer?.();
+
+      closeAuthModal();
     };
 
     const registerBtn = document.getElementById("authRegisterBtn");
@@ -3390,6 +3402,9 @@ normalizeEventCardHeights();
         return setAuthMessage("Username can use letters, numbers, underscore, dot, or dash. 2–24 chars.", "error");
       }
 
+      registerBtn.disabled = true;
+      registerBtn.textContent = "Creating...";
+
       const { error } = await tmeSupabase.auth.signUp({
         email,
         password,
@@ -3398,6 +3413,9 @@ normalizeEventCardHeights();
           emailRedirectTo: "https://trackmaniaevents.com/",
         },
       });
+
+      registerBtn.disabled = false;
+      registerBtn.textContent = "Create Account";
 
       if (error) return setAuthMessage(error.message, "error");
       setAuthMessage("Account created. Check your email to confirm it.", "ok");
@@ -3410,20 +3428,28 @@ normalizeEventCardHeights();
       const email = document.getElementById("authResetEmail")?.value.trim();
       if (!email) return setAuthMessage("Enter your email first.", "error");
 
+      resetBtn.disabled = true;
+      resetBtn.textContent = "Sending...";
+
       const { error } = await tmeSupabase.auth.resetPasswordForEmail(email, {
         redirectTo: "https://trackmaniaevents.com/",
       });
 
+      resetBtn.disabled = false;
+      resetBtn.textContent = "Send Password Reset";
+
       if (error) return setAuthMessage(error.message, "error");
-      setAuthMessage("Password reset email sent.", "ok");
+      setAuthMessage("Password reset email sent. Check your inbox.", "ok");
     };
 
     if (authLogoutBtn) authLogoutBtn.onclick = async () => {
       if (!tmeSupabase) return;
+      localStorage.removeItem("tme_login_started_at");
       await tmeSupabase.auth.signOut();
-      setAuthMessage("Logged out.", "ok");
       await updateAuthUI();
       await loadShoutboxMessages();
+      await window.clearLogoutTimer?.();
+      setAuthMessage("Logged out.", "ok");
     };
 
     const sendBtn = document.getElementById("sendShout");
@@ -3439,70 +3465,116 @@ normalizeEventCardHeights();
   bindAuthAndShoutbox();
 
   if (tmeSupabase) {
-    tmeSupabase.auth.onAuthStateChange(async () => {
+    tmeSupabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_OUT") {
+        localStorage.removeItem("tme_login_started_at");
+        await window.clearLogoutTimer?.();
+      }
+
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
+        if (!localStorage.getItem("tme_login_started_at")) {
+          localStorage.setItem("tme_login_started_at", String(Date.now()));
+        }
+      }
+
       await updateAuthUI();
       await loadShoutboxMessages();
+      await window.startLogoutTimer?.();
     });
   }
 
-  updateAuthUI();
-  loadShoutboxMessages();
-  startShoutboxRealtime();
-// ---------- PASSWORD RESET HANDLER ----------
-async function handlePasswordRecovery() {
-  if (!tmeSupabase) return;
+  // ---------- PASSWORD RESET HANDLER ----------
+  async function handlePasswordRecovery() {
+    if (!tmeSupabase) return;
 
-  const hash = window.location.hash || "";
-  const params = new URLSearchParams(hash.replace(/^#/, ""));
-  const type = params.get("type");
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+    const searchParams = new URLSearchParams(search.replace(/^\?/, ""));
 
-  if (type !== "recovery") return;
+    const isRecovery =
+      hashParams.get("type") === "recovery" ||
+      searchParams.get("type") === "recovery" ||
+      hash.includes("access_token") ||
+      searchParams.has("code");
 
-  // Open modal
-  document.getElementById("authModal")?.classList.add("show");
+    if (!isRecovery) return;
 
-  document.getElementById("authTitle").textContent = "Reset Password";
-  document.getElementById("authSubtitle").textContent = "Enter your new password.";
-
-  // Switch panel
-  document.querySelectorAll(".auth-panel").forEach(p => p.classList.remove("active"));
-  const panel = document.getElementById("authForgotPanel");
-  panel.classList.add("active");
-
-  // Replace UI
-  panel.innerHTML = `
-    <input id="newPasswordInput" class="input" type="password" placeholder="New password" />
-    <button id="updatePasswordBtn" class="btn primary">Update Password</button>
-  `;
-
-  document.getElementById("updatePasswordBtn").onclick = async () => {
-    const password = document.getElementById("newPasswordInput").value;
-
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters.");
-      return;
+    const code = searchParams.get("code");
+    if (code && typeof tmeSupabase.auth.exchangeCodeForSession === "function") {
+      const { error } = await tmeSupabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        setAuthMessage(error.message, "error");
+      }
     }
 
-    const { error } = await tmeSupabase.auth.updateUser({ password });
+    const modal = document.getElementById("authModal");
+    const title = document.getElementById("authTitle");
+    const subtitle = document.getElementById("authSubtitle");
+    const panel = document.getElementById("authForgotPanel");
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+    modal?.classList.add("show");
+    if (title) title.textContent = "Reset Password";
+    if (subtitle) subtitle.textContent = "Enter your new password.";
 
-    alert("Password updated successfully.");
+    document.querySelector(".auth-tabs")?.setAttribute("style", "display:none");
+    document.querySelectorAll(".auth-panel").forEach((p) => p.classList.remove("active"));
 
-document.getElementById("authModal")?.classList.remove("show");
+    if (!panel) return;
+    panel.classList.add("active");
 
-await tmeSupabase.auth.signOut();
+    panel.innerHTML = `
+      <input id="newPasswordInput" class="input" type="password" placeholder="New password" autocomplete="new-password" />
+      <button id="updatePasswordBtn" class="btn primary" type="button">Update Password</button>
+    `;
 
-window.history.replaceState({}, document.title, "/");
-window.location.href = "/";
-  };
-}
+    const updateBtn = document.getElementById("updatePasswordBtn");
 
-// RUN IT
-handlePasswordRecovery();
+    updateBtn.onclick = async () => {
+      const password = document.getElementById("newPasswordInput")?.value || "";
+
+      if (password.length < 6) {
+        setAuthMessage("Password must be at least 6 characters.", "error");
+        return;
+      }
+
+      updateBtn.disabled = true;
+      updateBtn.textContent = "Updating...";
+      setAuthMessage("");
+
+      const { error } = await tmeSupabase.auth.updateUser({ password });
+
+      updateBtn.disabled = false;
+      updateBtn.textContent = "Update Password";
+
+      if (error) {
+        setAuthMessage(error.message, "error");
+        return;
+      }
+
+      setAuthMessage("Password updated successfully.", "ok");
+
+      setTimeout(async () => {
+        modal?.classList.remove("show");
+        document.querySelector(".auth-tabs")?.removeAttribute("style");
+
+        window.history.replaceState({}, document.title, "/");
+
+        await updateAuthUI();
+        await loadShoutboxMessages();
+        await window.startLogoutTimer?.();
+      }, 650);
+    };
+  }
+
+  (async () => {
+    await handlePasswordRecovery();
+    await updateAuthUI();
+    await loadShoutboxMessages();
+    await window.startLogoutTimer?.();
+    startShoutboxRealtime();
+    setInterval(loadShoutboxMessages, 15000);
+  })();
 
 </script>
 
