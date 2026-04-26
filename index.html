@@ -3038,25 +3038,40 @@ normalizeEventCardHeights();
     );
   }
 
-  async function getCurrentUser() {
-    if (!tmeSupabase) return null;
-    const { data, error } = await tmeSupabase.auth.getUser();
-    if (error) return null;
-    return data?.user || null;
+ async function getCurrentSession() {
+  if (!tmeSupabase) return null;
+
+  try {
+    const { data, error } = await tmeSupabase.auth.getSession();
+    if (error) {
+      console.warn("Supabase getSession failed:", error);
+      return null;
+    }
+
+    return data?.session || null;
+  } catch (error) {
+    console.warn("Supabase getSession crashed:", error);
+    return null;
   }
+}
 
-  async function updateAuthUI() {
-    const user = await getCurrentUser();
-    const username = getUsernameFromUser(user);
+async function getCurrentUser() {
+  const session = await getCurrentSession();
+  return session?.user || null;
+}
 
-    document.querySelectorAll(".auth-open").forEach((btn) => {
-      btn.textContent = user ? username : "Login / Register";
-    });
+async function updateAuthUI() {
+  const user = await getCurrentUser();
+  const username = getUsernameFromUser(user);
 
-    if (authLogoutBtn) authLogoutBtn.style.display = user ? "inline-flex" : "none";
-    if (shoutboxAuthState) shoutboxAuthState.textContent = user ? `Signed in • ${username}` : "Guest";
-    if (shoutInput) shoutInput.placeholder = user ? "Type a shout…" : "Login to send a shout…";
-  }
+  document.querySelectorAll(".auth-open").forEach((btn) => {
+    btn.textContent = user ? username : "Login / Register";
+  });
+
+  if (authLogoutBtn) authLogoutBtn.style.display = user ? "inline-flex" : "none";
+  if (shoutboxAuthState) shoutboxAuthState.textContent = user ? `Signed in • ${username}` : "Guest";
+  if (shoutInput) shoutInput.placeholder = user ? "Type a shout…" : "Login to send a shout…";
+}
 
   function localSystemMessages() {
   const out = [];
@@ -3204,10 +3219,12 @@ normalizeEventCardHeights();
     shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
   }
 
-  async function loadShoutboxMessages() {
-    if (!shoutboxMessages) return;
+ async function loadShoutboxMessages(showLoading = false) {
+  if (!shoutboxMessages) return;
 
+  if (showLoading) {
     shoutboxMessages.innerHTML = '<div class="meta">Loading shoutbox…</div>';
+  }
 
     if (!supabaseConfigured || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
       renderShoutMessages([]);
@@ -3570,10 +3587,10 @@ normalizeEventCardHeights();
   (async () => {
     await handlePasswordRecovery();
     await updateAuthUI();
-    await loadShoutboxMessages();
+    await loadShoutboxMessages(true);
     await window.startLogoutTimer?.();
     startShoutboxRealtime();
-    setInterval(loadShoutboxMessages, 15000);
+    setInterval(() => loadShoutboxMessages(false), 15000);
   })();
 
 </script>
