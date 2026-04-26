@@ -1450,7 +1450,9 @@ footer{
         },
       });
       // ---------- AUTO LOGOUT TIMER (3 HOURS) ----------
+// ---------- AUTO LOGOUT TIMER (3 HOURS FROM LOGIN) ----------
 const AUTO_LOGOUT_MS = 3 * 60 * 60 * 1000;
+const LOGIN_TIME_KEY = "tme_login_time";
 
 async function startLogoutTimer() {
   if (!tmeSupabase) return;
@@ -1458,30 +1460,54 @@ async function startLogoutTimer() {
   const { data } = await tmeSupabase.auth.getSession();
   const session = data?.session;
 
-  if (!session) return;
-
-  const now = Date.now();
-  const expiresAt = session.expires_at ? session.expires_at * 1000 : now + AUTO_LOGOUT_MS;
-
-  const logoutAt = Math.min(expiresAt, now + AUTO_LOGOUT_MS);
-  const delay = Math.max(0, logoutAt - now);
-
   clearTimeout(window.__logoutTimer);
 
+  if (!session) {
+    localStorage.removeItem(LOGIN_TIME_KEY);
+    return;
+  }
+
+  let loginTime = Number(localStorage.getItem(LOGIN_TIME_KEY) || "0");
+
+  if (!loginTime) {
+    loginTime = Date.now();
+    localStorage.setItem(LOGIN_TIME_KEY, String(loginTime));
+  }
+
+  const logoutAt = loginTime + AUTO_LOGOUT_MS;
+  const delay = logoutAt - Date.now();
+
+  if (delay <= 0) {
+    localStorage.removeItem(LOGIN_TIME_KEY);
+    await tmeSupabase.auth.signOut();
+    location.reload();
+    return;
+  }
+
   window.__logoutTimer = setTimeout(async () => {
+    localStorage.removeItem(LOGIN_TIME_KEY);
     await tmeSupabase.auth.signOut();
     alert("Session expired. Logged out.");
     location.reload();
   }, delay);
 }
 
-// start it
 startLogoutTimer();
 
-// restart on auth changes
-tmeSupabase.auth.onAuthStateChange(() => {
+tmeSupabase.auth.onAuthStateChange((event) => {
+  if (event === "SIGNED_IN") {
+    if (!localStorage.getItem(LOGIN_TIME_KEY)) {
+      localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
+    }
+  }
+
+  if (event === "SIGNED_OUT") {
+    localStorage.removeItem(LOGIN_TIME_KEY);
+  }
+
   startLogoutTimer();
 });
+
     } else {
       console.warn("Supabase is not configured yet. Login/register and shoutbox posting are disabled until you add your URL/key.");
     }
@@ -3036,43 +3062,118 @@ normalizeEventCardHeights();
   }
 
   function localSystemMessages() {
-    const out = [];
-    const now = new Date();
-    const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
+  const out = [];
+  const now = new Date();
 
-    const liveEvent = events.find((e) => isEventLive(e, now));
-    if (liveEvent?.title) {
+  function easternParts(date = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      weekday: "short",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).formatToParts(date);
+
+    const map = {};
+    parts.forEach((p) => {
+      if (p.type !== "literal") map[p.type] = p.value;
+    });
+
+    return {
+      weekday: map.weekday,
+      hour: Number(map.hour),
+      minute: Number(map.minute),
+    };
+  }
+
+  const et = easternParts(now);
+  const minutesNow = et.hour * 60 + et.minute;
+
+  // Cup of the Day — every day at 2:00 PM Eastern
+  if (minutesNow >= 13 * 60 + 50 && minutesNow < 14 * 60) {
+    out.push({
+      id: "cotd-10-min",
+      username: "SYSTEM",
+      type: "system",
+      message: "Cup of the Day is starting in 10 minutes.",
+      created_at: new Date().toISOString(),
+      local: true,
+    });
+  }
+
+  if (minutesNow >= 14 * 60 && minutesNow < 14 * 60 + 10) {
+    out.push({
+      id: "cotd-now",
+      username: "SYSTEM",
+      type: "system",
+      message: "Cup of the Day is starting now.",
+      created_at: new Date().toISOString(),
+      local: true,
+    });
+  }
+
+  // Weekly Shorts — Sunday 12:00 PM Eastern
+  if (et.weekday === "Sun" && minutesNow >= 11 * 60 + 50 && minutesNow < 12 * 60) {
+    out.push({
+      id: "weekly-shorts-ending",
+      username: "SYSTEM",
+      type: "system",
+      message: "This Weekly Shorts week is ending in 10 minutes.",
+      created_at: new Date().toISOString(),
+      local: true,
+    });
+  }
+
+  if (et.weekday === "Sun" && minutesNow >= 12 * 60 && minutesNow < 12 * 60 + 10) {
+    out.push({
+      id: "weekly-shorts-started",
+      username: "SYSTEM",
+      type: "system",
+      message: "The previous Weekly Shorts week has ended and the new week has started.",
+      created_at: new Date().toISOString(),
+      local: true,
+    });
+  }
+
+  // Existing normal event notices from your events.json
+  const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
+
+  const liveEvent = events.find((e) => isEventLive(e, now));
+  if (liveEvent?.title) {
+    out.push({
+      id: "local-live-" + liveEvent.title,
+      username: "SYSTEM",
+      type: "system",
+      message: `${liveEvent.title} has just started or is live now.`,
+      created_at: new Date().toISOString(),
+      local: true,
+    });
+  }
+
+  const upcoming = events
+    .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
+    .filter((x) => x.seg && x.seg.start > now)
+    .sort((a, b) => a.seg.start - b.seg.start)[0];
+
+  if (upcoming?.event?.title) {
+    const minutes = Math.round((upcoming.seg.start - now) / 60000);
+    if (minutes > 0 && minutes <= 60) {
       out.push({
-        id: "local-live-" + liveEvent.title,
+        id: "local-upcoming-" + upcoming.event.title,
         username: "SYSTEM",
         type: "system",
-        message: `${liveEvent.title} has just started or is live now.`,
+        message: `${upcoming.event.title} is about to begin in ${minutes} minute${minutes === 1 ? "" : "s"}.`,
         created_at: new Date().toISOString(),
         local: true,
       });
     }
-
-    const upcoming = events
-      .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
-      .filter((x) => x.seg && x.seg.start > now)
-      .sort((a, b) => a.seg.start - b.seg.start)[0];
-
-    if (upcoming?.event?.title) {
-      const minutes = Math.round((upcoming.seg.start - now) / 60000);
-      if (minutes > 0 && minutes <= 60) {
-        out.push({
-          id: "local-upcoming-" + upcoming.event.title,
-          username: "SYSTEM",
-          type: "system",
-          message: `${upcoming.event.title} is about to begin in ${minutes} minute${minutes === 1 ? "" : "s"}.`,
-          created_at: new Date().toISOString(),
-          local: true,
-        });
-      }
-    }
-
-    return out;
   }
+
+  return out;
+}
 
   function renderShoutMessages(messages) {
     if (!shoutboxMessages) return;
@@ -3391,8 +3492,12 @@ async function handlePasswordRecovery() {
 
     alert("Password updated successfully.");
 
-    await tmeSupabase.auth.signOut();
-    window.location.href = "/";
+document.getElementById("authModal")?.classList.remove("show");
+
+await tmeSupabase.auth.signOut();
+
+window.history.replaceState({}, document.title, "/");
+window.location.href = "/";
   };
 }
 
