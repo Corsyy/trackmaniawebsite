@@ -3345,7 +3345,7 @@ async function updateAuthUI() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "shoutbox_messages" },
-        () => loadShoutboxMessages()
+        () => loadShoutboxMessages(false)
       )
       .subscribe();
   }
@@ -3481,7 +3481,7 @@ async function updateAuthUI() {
 
   bindAuthAndShoutbox();
 
-  if (tmeSupabase) {
+if (tmeSupabase) {
   tmeSupabase.auth.onAuthStateChange(async (event, session) => {
 
     if (event === "SIGNED_OUT") {
@@ -3588,18 +3588,24 @@ async function updateAuthUI() {
   await handlePasswordRecovery();
 
   if (tmeSupabase) {
+    // 🔥 Wait for Supabase to restore session properly
     const { data } = await tmeSupabase.auth.getSession();
+    const session = data?.session;
 
-    if (data?.session) {
-      localStorage.setItem(
-        "tme_login_started_at",
-        localStorage.getItem("tme_login_started_at") || String(Date.now())
-      );
+    if (session) {
+      // Ensure logout timer baseline exists
+      if (!localStorage.getItem("tme_login_started_at")) {
+        localStorage.setItem("tme_login_started_at", String(Date.now()));
+      }
     }
   }
 
+  // Now update UI AFTER session is known
   await updateAuthUI();
+
+  // Only show loading once
   await loadShoutboxMessages(true);
+
   await window.startLogoutTimer?.();
 
   startShoutboxRealtime();
