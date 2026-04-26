@@ -3482,23 +3482,23 @@ async function updateAuthUI() {
   bindAuthAndShoutbox();
 
   if (tmeSupabase) {
-    tmeSupabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_OUT") {
-        localStorage.removeItem("tme_login_started_at");
-        await window.clearLogoutTimer?.();
-      }
+  tmeSupabase.auth.onAuthStateChange(async (event, session) => {
 
-      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
-        if (!localStorage.getItem("tme_login_started_at")) {
-          localStorage.setItem("tme_login_started_at", String(Date.now()));
-        }
-      }
+    if (event === "SIGNED_OUT") {
+      localStorage.removeItem("tme_login_started_at");
+    }
 
-      await updateAuthUI();
-      await loadShoutboxMessages();
-      await window.startLogoutTimer?.();
-    });
-  }
+    if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
+      if (!localStorage.getItem("tme_login_started_at")) {
+        localStorage.setItem("tme_login_started_at", String(Date.now()));
+      }
+    }
+
+    await updateAuthUI();
+    await loadShoutboxMessages(false);
+    await window.startLogoutTimer?.();
+  });
+}
 
   // ---------- PASSWORD RESET HANDLER ----------
   async function handlePasswordRecovery() {
@@ -3585,13 +3585,27 @@ async function updateAuthUI() {
   }
 
   (async () => {
-    await handlePasswordRecovery();
-    await updateAuthUI();
-    await loadShoutboxMessages(true);
-    await window.startLogoutTimer?.();
-    startShoutboxRealtime();
-    setInterval(() => loadShoutboxMessages(false), 15000);
-  })();
+  await handlePasswordRecovery();
+
+  if (tmeSupabase) {
+    const { data } = await tmeSupabase.auth.getSession();
+
+    if (data?.session) {
+      localStorage.setItem(
+        "tme_login_started_at",
+        localStorage.getItem("tme_login_started_at") || String(Date.now())
+      );
+    }
+  }
+
+  await updateAuthUI();
+  await loadShoutboxMessages(true);
+  await window.startLogoutTimer?.();
+
+  startShoutboxRealtime();
+
+  setInterval(() => loadShoutboxMessages(false), 15000);
+})();
 
 </script>
 
