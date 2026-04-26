@@ -1449,6 +1449,39 @@ footer{
           storage: window.localStorage,
         },
       });
+      // ---------- AUTO LOGOUT TIMER (3 HOURS) ----------
+const AUTO_LOGOUT_MS = 3 * 60 * 60 * 1000;
+
+async function startLogoutTimer() {
+  if (!tmeSupabase) return;
+
+  const { data } = await tmeSupabase.auth.getSession();
+  const session = data?.session;
+
+  if (!session) return;
+
+  const now = Date.now();
+  const expiresAt = session.expires_at ? session.expires_at * 1000 : now + AUTO_LOGOUT_MS;
+
+  const logoutAt = Math.min(expiresAt, now + AUTO_LOGOUT_MS);
+  const delay = Math.max(0, logoutAt - now);
+
+  clearTimeout(window.__logoutTimer);
+
+  window.__logoutTimer = setTimeout(async () => {
+    await tmeSupabase.auth.signOut();
+    alert("Session expired. Logged out.");
+    location.reload();
+  }, delay);
+}
+
+// start it
+startLogoutTimer();
+
+// restart on auth changes
+tmeSupabase.auth.onAuthStateChange(() => {
+  startLogoutTimer();
+});
     } else {
       console.warn("Supabase is not configured yet. Login/register and shoutbox posting are disabled until you add your URL/key.");
     }
@@ -3314,7 +3347,57 @@ normalizeEventCardHeights();
   updateAuthUI();
   loadShoutboxMessages();
   startShoutboxRealtime();
+// ---------- PASSWORD RESET HANDLER ----------
+async function handlePasswordRecovery() {
+  if (!tmeSupabase) return;
 
+  const hash = window.location.hash || "";
+  const params = new URLSearchParams(hash.replace(/^#/, ""));
+  const type = params.get("type");
+
+  if (type !== "recovery") return;
+
+  // Open modal
+  document.getElementById("authModal")?.classList.add("show");
+
+  document.getElementById("authTitle").textContent = "Reset Password";
+  document.getElementById("authSubtitle").textContent = "Enter your new password.";
+
+  // Switch panel
+  document.querySelectorAll(".auth-panel").forEach(p => p.classList.remove("active"));
+  const panel = document.getElementById("authForgotPanel");
+  panel.classList.add("active");
+
+  // Replace UI
+  panel.innerHTML = `
+    <input id="newPasswordInput" class="input" type="password" placeholder="New password" />
+    <button id="updatePasswordBtn" class="btn primary">Update Password</button>
+  `;
+
+  document.getElementById("updatePasswordBtn").onclick = async () => {
+    const password = document.getElementById("newPasswordInput").value;
+
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters.");
+      return;
+    }
+
+    const { error } = await tmeSupabase.auth.updateUser({ password });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Password updated successfully.");
+
+    await tmeSupabase.auth.signOut();
+    window.location.href = "/";
+  };
+}
+
+// RUN IT
+handlePasswordRecovery();
 
 </script>
 
