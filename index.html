@@ -1465,43 +1465,43 @@ footer{
       }
 
       async function startLogoutTimer() {
-        if (!tmeSupabase) return;
+  if (!tmeSupabase) return;
 
-        const { data } = await tmeSupabase.auth.getSession();
-        const session = data?.session || null;
+  clearLogoutTimer();
 
-        clearLogoutTimer();
+  const { data } = await tmeSupabase.auth.getSession();
+  const session = data?.session || null;
 
-        if (!session) {
-          localStorage.removeItem(LOGIN_TIME_KEY);
-          return;
-        }
+  // IMPORTANT:
+  // Do NOT remove tme_login_started_at here.
+  // On refresh, Supabase can briefly return no session before restoring it.
+  if (!session) return;
 
-        let startedAt = Number(localStorage.getItem(LOGIN_TIME_KEY) || "0");
+  let startedAt = Number(localStorage.getItem(LOGIN_TIME_KEY) || "0");
 
-        if (!startedAt) {
-          startedAt = Date.now();
-          localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
-        }
+  if (!startedAt) {
+    startedAt = Date.now();
+    localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
+  }
 
-        const remaining = startedAt + AUTO_LOGOUT_MS - Date.now();
+  const remaining = startedAt + AUTO_LOGOUT_MS - Date.now();
 
-        if (remaining <= 0) {
-          localStorage.removeItem(LOGIN_TIME_KEY);
-          await tmeSupabase.auth.signOut();
-          await updateAuthUI?.();
-          await loadShoutboxMessages?.();
-          return;
-        }
+  if (remaining <= 0) {
+    localStorage.removeItem(LOGIN_TIME_KEY);
+    await tmeSupabase.auth.signOut();
+    await updateAuthUI?.();
+    await loadShoutboxMessages?.(false);
+    return;
+  }
 
-        window.__tmeLogoutTimer = setTimeout(async () => {
-          localStorage.removeItem(LOGIN_TIME_KEY);
-          await tmeSupabase.auth.signOut();
-          await updateAuthUI?.();
-          await loadShoutboxMessages?.();
-          setAuthMessage?.("Your session expired. Please log in again.", "error");
-        }, remaining);
-      }
+  window.__tmeLogoutTimer = setTimeout(async () => {
+    localStorage.removeItem(LOGIN_TIME_KEY);
+    await tmeSupabase.auth.signOut();
+    await updateAuthUI?.();
+    await loadShoutboxMessages?.(false);
+    setAuthMessage?.("Your session expired. Please log in again.", "error");
+  }, remaining);
+}
 
       window.startLogoutTimer = startLogoutTimer;
       window.clearLogoutTimer = clearLogoutTimer;
@@ -3042,15 +3042,24 @@ normalizeEventCardHeights();
   if (!tmeSupabase) return null;
 
   try {
-    const { data, error } = await tmeSupabase.auth.getSession();
+    let { data, error } = await tmeSupabase.auth.getSession();
+
     if (error) {
-      console.warn("Supabase getSession failed:", error);
+      console.warn("getSession error:", error);
       return null;
     }
 
-    return data?.session || null;
-  } catch (error) {
-    console.warn("Supabase getSession crashed:", error);
+    // 🔥 CRITICAL FIX: wait if session isn't ready yet
+    if (!data?.session) {
+      await new Promise(r => setTimeout(r, 500));
+
+      const retry = await tmeSupabase.auth.getSession();
+      return retry.data?.session || null;
+    }
+
+    return data.session;
+  } catch (err) {
+    console.warn("getSession crash:", err);
     return null;
   }
 }
@@ -3061,7 +3070,9 @@ async function getCurrentUser() {
 }
 
 async function updateAuthUI() {
-  const user = await getCurrentUser();
+  const session = await getCurrentSession();
+  const user = session?.user || null;
+
   const username = getUsernameFromUser(user);
 
   document.querySelectorAll(".auth-open").forEach((btn) => {
@@ -3334,7 +3345,7 @@ async function updateAuthUI() {
 
     shoutInput.value = "";
     setShoutStatus("");
-    await loadShoutboxMessages();
+    await loadShoutboxMessages(false);
   }
 
   function startShoutboxRealtime() {
@@ -3400,7 +3411,7 @@ async function updateAuthUI() {
       localStorage.setItem("tme_login_started_at", String(Date.now()));
 
       await updateAuthUI();
-      await loadShoutboxMessages();
+      await loadShoutboxMessages(false);
       await window.startLogoutTimer?.();
 
       closeAuthModal();
@@ -3464,7 +3475,7 @@ async function updateAuthUI() {
       localStorage.removeItem("tme_login_started_at");
       await tmeSupabase.auth.signOut();
       await updateAuthUI();
-      await loadShoutboxMessages();
+      await loadShoutboxMessages(false);
       await window.clearLogoutTimer?.();
       setAuthMessage("Logged out.", "ok");
     };
@@ -3578,7 +3589,7 @@ if (tmeSupabase) {
         window.history.replaceState({}, document.title, "/");
 
         await updateAuthUI();
-        await loadShoutboxMessages();
+        await loadShoutboxMessages(false);
         await window.startLogoutTimer?.();
       }, 650);
     };
