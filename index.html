@@ -3664,7 +3664,7 @@ if (tmeSupabase) {
     if (tmeSupabase) {
       const { data } = await withTimeout(
         tmeSupabase.auth.getSession(),
-        8000,
+        30000,
         "Session restore"
       );
 
