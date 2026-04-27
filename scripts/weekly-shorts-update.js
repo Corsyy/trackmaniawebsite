@@ -116,12 +116,25 @@ function isValidTimeMs(ms) {
 
 function extractNumber(v) {
   if (typeof v === "number") return v;
+
   if (typeof v === "string") {
     const n = Number(v.replace(/,/g, ""));
     return Number.isFinite(n) ? n : NaN;
   }
+
   if (v && typeof v === "object") {
-    const keys = ["score", "points", "value", "val", "total", "result", "time", "timeMs", "best", "record"];
+    const keys = [
+      "timeMs",
+      "time",
+      "bestTime",
+      "personalBestTime",
+      "recordTime",
+      "score",
+      "value",
+      "best",
+      "record",
+    ];
+
     for (const k of keys) {
       if (k in v) {
         const n = extractNumber(v[k]);
@@ -129,6 +142,7 @@ function extractNumber(v) {
       }
     }
   }
+
   return NaN;
 }
 
@@ -472,19 +486,22 @@ async function fetchWsTop(access, mapUid, length = 10) {
       if (!accountId) return null;
 
       const candidates = [
-        x?.score,
-        x?.time,
-        x?.timeMs,
-        x?.best,
-        x?.record,
-        x?.value,
-        x?.points,
-        x?.sp,
-        x?.score?.score,
-        x?.score?.time,
-        x?.score?.timeMs,
-        x?.score?.value,
-      ];
+  x?.timeMs,
+  x?.time,
+  x?.bestTime,
+  x?.personalBestTime,
+  x?.recordTime,
+  x?.score?.timeMs,
+  x?.score?.time,
+  x?.score?.bestTime,
+  x?.score?.personalBestTime,
+  x?.score?.score,
+  x?.score?.value,
+  x?.score,
+  x?.best,
+  x?.record,
+  x?.value,
+];
 
       let extracted = NaN;
       for (const c of candidates) {
@@ -1252,11 +1269,21 @@ async function main() {
         const mapIndex = i + 1;
 
         const currentPostweekEntries = await fetchCurrentPostweekMapEntries(access, mapUid, nameCacheObj);
-        if (currentPostweekEntries.length) {
-          setPostweekMapEntry(postweekMapState, w.week, mapUid, {
-            entries: currentPostweekEntries,
-          });
-        }
+
+if (currentPostweekEntries.length) {
+  setPostweekMapEntry(postweekMapState, w.week, mapUid, {
+    entries: currentPostweekEntries,
+  });
+
+  
+  const mapObj = (weekJson.maps || []).find((m) => m.mapUid === mapUid);
+  if (mapObj) {
+    mapObj.entries = currentPostweekEntries;
+    mapObj.trusted = true;
+  }
+
+  writeJson(weekPath, weekJson);
+}
 
         const baseline = getBaselineWRFromWeekFile(weekJson, mapUid);
         if (!baseline || !isValidTimeMs(baseline.timeMs) || !baseline.holderAccountId) {
