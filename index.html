@@ -3256,7 +3256,7 @@ async function updateAuthUI() {
       const url = `${SUPABASE_URL}/rest/v1/shoutbox_messages?select=${selected}${deletedPart}&order=created_at.desc&limit=50`;
 
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 9000);
+      const timer = setTimeout(() => controller.abort(), 20000);
 
       try {
         const res = await fetch(url, {
@@ -3418,7 +3418,7 @@ function withTimeout(promise, ms = 12000, label = "Request") {
     try {
       const { data, error } = await withTimeout(
         tmeSupabase.auth.signInWithPassword({ email, password }),
-        12000,
+        30000,
         "Login"
       );
 
@@ -3428,10 +3428,14 @@ function withTimeout(promise, ms = 12000, label = "Request") {
       localStorage.setItem("tme_login_started_at", String(Date.now()));
 
       await updateAuthUI();
-      await loadShoutboxMessages(false);
-      await window.startLogoutTimer?.();
+await window.startLogoutTimer?.();
 
-      closeAuthModal();
+closeAuthModal();
+
+loadShoutboxMessages(false).catch((err) => {
+  console.warn("Shoutbox reload after login failed:", err);
+  setShoutStatus("Logged in, but shoutbox failed to load. Refresh or try again.");
+});
     } catch (err) {
       console.warn("Login failed:", err);
       setAuthMessage(err.message || "Login failed. Please try again.", "error");
