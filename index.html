@@ -2923,22 +2923,29 @@ normalizeEventCardHeights();
   }
 
   function showPanel() {
-    panel.style.display = "block";
-    setInputEnabled(false);
-    addSystemLine("Connecting…");
+  panel.style.display = "block";
+  setInputEnabled(false);
+  addSystemLine("Connecting…");
 
-    (async () => {
-      await refreshStatus();
-      if (!sid) await initChat();
-      else {
-        setInputEnabled(true);
-        await pollOnce();
-        renderNameCapture();
-      }
-      startPolling();
-      input.focus();
-    })();
-  }
+  (async () => {
+    await refreshStatus();
+
+    if (!sid) {
+      await initChat();
+    } else {
+      setInputEnabled(true);
+      await pollOnce();
+      renderNameCapture();
+    }
+
+    startPolling();
+    input.focus();
+  })().catch((err) => {
+    console.warn("Chat open failed:", err);
+    addMsg({ text: "Chat failed to connect. Please refresh and try again.", from: "ai" });
+    setInputEnabled(false);
+  });
+}
 
   function hidePanel() {
     panel.style.display = "none";
@@ -3361,49 +3368,59 @@ async function updateAuthUI() {
       .subscribe();
   }
 
+function withTimeout(promise, ms = 12000, label = "Request") {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out. Please try again.`)), ms)
+    ),
+  ]);
+}
   function bindAuthAndShoutbox() {
-    document.querySelectorAll(".auth-open").forEach((btn) => {
-      btn.onclick = () => openAuthModal("login");
-    });
+  document.querySelectorAll(".auth-open").forEach((btn) => {
+    btn.onclick = () => openAuthModal("login");
+  });
 
-    const closeBtn = document.getElementById("authClose");
-    if (closeBtn) closeBtn.onclick = closeAuthModal;
+  const closeBtn = document.getElementById("authClose");
+  if (closeBtn) closeBtn.onclick = closeAuthModal;
 
-    if (authModal) {
-      authModal.onclick = (e) => {
-        if (e.target === authModal) closeAuthModal();
-      };
+  if (authModal) {
+    authModal.onclick = (e) => {
+      if (e.target === authModal) closeAuthModal();
+    };
+  }
+
+  document.querySelectorAll(".auth-tab").forEach((tab) => {
+    tab.onclick = () => showAuthPanel(tab.dataset.authTab || "login");
+  });
+
+  const forgotBtn = document.getElementById("authForgotBtn");
+  if (forgotBtn) forgotBtn.onclick = () => showAuthPanel("forgot");
+
+  const backBtn = document.getElementById("authBackLoginBtn");
+  if (backBtn) backBtn.onclick = () => showAuthPanel("login");
+
+  const loginBtn = document.getElementById("authLoginBtn");
+  if (loginBtn) loginBtn.onclick = async () => {
+    if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+
+    const email = document.getElementById("authLoginEmail")?.value.trim();
+    const password = document.getElementById("authLoginPassword")?.value;
+
+    if (!email || !password) {
+      return setAuthMessage("Enter your email and password.", "error");
     }
 
-    document.querySelectorAll(".auth-tab").forEach((tab) => {
-      tab.onclick = () => showAuthPanel(tab.dataset.authTab || "login");
-    });
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Logging in...";
+    setAuthMessage("");
 
-    const forgotBtn = document.getElementById("authForgotBtn");
-    if (forgotBtn) forgotBtn.onclick = () => showAuthPanel("forgot");
-
-    const backBtn = document.getElementById("authBackLoginBtn");
-    if (backBtn) backBtn.onclick = () => showAuthPanel("login");
-
-    const loginBtn = document.getElementById("authLoginBtn");
-    if (loginBtn) loginBtn.onclick = async () => {
-      if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
-
-      const email = document.getElementById("authLoginEmail")?.value.trim();
-      const password = document.getElementById("authLoginPassword")?.value;
-
-      if (!email || !password) {
-        return setAuthMessage("Enter your email and password.", "error");
-      }
-
-      loginBtn.disabled = true;
-      loginBtn.textContent = "Logging in...";
-      setAuthMessage("");
-
-      const { data, error } = await tmeSupabase.auth.signInWithPassword({ email, password });
-
-      loginBtn.disabled = false;
-      loginBtn.textContent = "Login";
+    try {
+      const { data, error } = await withTimeout(
+        tmeSupabase.auth.signInWithPassword({ email, password }),
+        12000,
+        "Login"
+      );
 
       if (error) return setAuthMessage(error.message, "error");
       if (!data?.session) return setAuthMessage("Login failed. Please try again.", "error");
@@ -3415,99 +3432,140 @@ async function updateAuthUI() {
       await window.startLogoutTimer?.();
 
       closeAuthModal();
-    };
+    } catch (err) {
+      console.warn("Login failed:", err);
+      setAuthMessage(err.message || "Login failed. Please try again.", "error");
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login";
+    }
+  };
 
-    const registerBtn = document.getElementById("authRegisterBtn");
-    if (registerBtn) registerBtn.onclick = async () => {
-      if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+  const registerBtn = document.getElementById("authRegisterBtn");
+  if (registerBtn) registerBtn.onclick = async () => {
+    if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
 
-      const username = document.getElementById("authRegisterUsername")?.value.trim();
-      const email = document.getElementById("authRegisterEmail")?.value.trim();
-      const password = document.getElementById("authRegisterPassword")?.value;
+    const username = document.getElementById("authRegisterUsername")?.value.trim();
+    const email = document.getElementById("authRegisterEmail")?.value.trim();
+    const password = document.getElementById("authRegisterPassword")?.value;
 
-      if (!username || !email || !password) return setAuthMessage("Fill out username, email, and password.", "error");
-      if (!/^[a-zA-Z0-9_.-]{2,24}$/.test(username)) {
-        return setAuthMessage("Username can use letters, numbers, underscore, dot, or dash. 2–24 chars.", "error");
-      }
+    if (!username || !email || !password) {
+      return setAuthMessage("Fill out username, email, and password.", "error");
+    }
 
-      registerBtn.disabled = true;
-      registerBtn.textContent = "Creating...";
+    if (!/^[a-zA-Z0-9_.-]{2,24}$/.test(username)) {
+      return setAuthMessage("Username can use letters, numbers, underscore, dot, or dash. 2–24 chars.", "error");
+    }
 
-      const { error } = await tmeSupabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { username },
-          emailRedirectTo: "https://trackmaniaevents.com/",
-        },
-      });
+    registerBtn.disabled = true;
+    registerBtn.textContent = "Creating...";
+    setAuthMessage("");
 
-      registerBtn.disabled = false;
-      registerBtn.textContent = "Create Account";
+    try {
+      const { error } = await withTimeout(
+        tmeSupabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { username },
+            emailRedirectTo: "https://trackmaniaevents.com/",
+          },
+        }),
+        12000,
+        "Register"
+      );
 
       if (error) return setAuthMessage(error.message, "error");
       setAuthMessage("Account created. Check your email to confirm it.", "ok");
-    };
+    } catch (err) {
+      console.warn("Register failed:", err);
+      setAuthMessage(err.message || "Register failed. Please try again.", "error");
+    } finally {
+      registerBtn.disabled = false;
+      registerBtn.textContent = "Create Account";
+    }
+  };
 
-    const resetBtn = document.getElementById("authResetBtn");
-    if (resetBtn) resetBtn.onclick = async () => {
-      if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+  const resetBtn = document.getElementById("authResetBtn");
+  if (resetBtn) resetBtn.onclick = async () => {
+    if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
 
-      const email = document.getElementById("authResetEmail")?.value.trim();
-      if (!email) return setAuthMessage("Enter your email first.", "error");
+    const email = document.getElementById("authResetEmail")?.value.trim();
+    if (!email) return setAuthMessage("Enter your email first.", "error");
 
-      resetBtn.disabled = true;
-      resetBtn.textContent = "Sending...";
+    resetBtn.disabled = true;
+    resetBtn.textContent = "Sending...";
+    setAuthMessage("");
 
-      const { error } = await tmeSupabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "https://trackmaniaevents.com/",
-      });
-
-      resetBtn.disabled = false;
-      resetBtn.textContent = "Send Password Reset";
+    try {
+      const { error } = await withTimeout(
+        tmeSupabase.auth.resetPasswordForEmail(email, {
+          redirectTo: "https://trackmaniaevents.com/",
+        }),
+        12000,
+        "Password reset"
+      );
 
       if (error) return setAuthMessage(error.message, "error");
       setAuthMessage("Password reset email sent. Check your inbox.", "ok");
-    };
+    } catch (err) {
+      console.warn("Password reset failed:", err);
+      setAuthMessage(err.message || "Password reset failed. Please try again.", "error");
+    } finally {
+      resetBtn.disabled = false;
+      resetBtn.textContent = "Send Password Reset";
+    }
+  };
 
-    if (authLogoutBtn) authLogoutBtn.onclick = async () => {
-      if (!tmeSupabase) return;
+  if (authLogoutBtn) authLogoutBtn.onclick = async () => {
+    if (!tmeSupabase) return;
+
+    try {
       localStorage.removeItem("tme_login_started_at");
       await tmeSupabase.auth.signOut();
       await updateAuthUI();
       await loadShoutboxMessages(false);
       await window.clearLogoutTimer?.();
       setAuthMessage("Logged out.", "ok");
-    };
-
-    const sendBtn = document.getElementById("sendShout");
-    if (sendBtn) sendBtn.onclick = sendShout;
-
-    if (shoutInput) {
-      shoutInput.onkeydown = (e) => {
-        if (e.key === "Enter") sendShout();
-      };
+    } catch (err) {
+      console.warn("Logout failed:", err);
+      setAuthMessage(err.message || "Logout failed.", "error");
     }
+  };
+
+  const sendBtn = document.getElementById("sendShout");
+  if (sendBtn) sendBtn.onclick = sendShout;
+
+  if (shoutInput) {
+    shoutInput.onkeydown = (e) => {
+      if (e.key === "Enter") sendShout();
+    };
   }
+}
 
   bindAuthAndShoutbox();
 
 if (tmeSupabase) {
   tmeSupabase.auth.onAuthStateChange(async (event, session) => {
-
-    if (event === "SIGNED_OUT") {
-      localStorage.removeItem("tme_login_started_at");
-    }
-
-    if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
-      if (!localStorage.getItem("tme_login_started_at")) {
-        localStorage.setItem("tme_login_started_at", String(Date.now()));
+    try {
+      if (event === "SIGNED_OUT") {
+        localStorage.removeItem("tme_login_started_at");
+        await window.clearLogoutTimer?.();
       }
-    }
 
-    await updateAuthUI();
-    await loadShoutboxMessages(false);
-    await window.startLogoutTimer?.();
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") && session) {
+        if (!localStorage.getItem("tme_login_started_at")) {
+          localStorage.setItem("tme_login_started_at", String(Date.now()));
+        }
+      }
+
+      await updateAuthUI();
+      await loadShoutboxMessages(false);
+      await window.startLogoutTimer?.();
+    } catch (err) {
+      console.warn("Auth state update failed:", err);
+      setShoutStatus(err.message || "Auth update failed.");
+    }
   });
 }
 
@@ -3596,32 +3654,41 @@ if (tmeSupabase) {
   }
 
   (async () => {
-  await handlePasswordRecovery();
+  try {
+    await handlePasswordRecovery();
 
-  if (tmeSupabase) {
-    // 🔥 Wait for Supabase to restore session properly
-    const { data } = await tmeSupabase.auth.getSession();
-    const session = data?.session;
+    if (tmeSupabase) {
+      const { data } = await withTimeout(
+        tmeSupabase.auth.getSession(),
+        8000,
+        "Session restore"
+      );
 
-    if (session) {
-      // Ensure logout timer baseline exists
-      if (!localStorage.getItem("tme_login_started_at")) {
+      const session = data?.session || null;
+
+      if (session && !localStorage.getItem("tme_login_started_at")) {
         localStorage.setItem("tme_login_started_at", String(Date.now()));
       }
     }
+
+    await updateAuthUI();
+    await loadShoutboxMessages(true);
+    await window.startLogoutTimer?.();
+
+    startShoutboxRealtime();
+
+    setInterval(() => {
+      loadShoutboxMessages(false).catch(console.warn);
+    }, 15000);
+  } catch (err) {
+    console.warn("Page auth/shoutbox init failed:", err);
+
+    if (shoutboxMessages) {
+      shoutboxMessages.innerHTML = `<div class="meta">Could not load shoutbox. Refresh or try again.</div>`;
+    }
+
+    setShoutStatus(err.message || "Could not load shoutbox.");
   }
-
-  // Now update UI AFTER session is known
-  await updateAuthUI();
-
-  // Only show loading once
-  await loadShoutboxMessages(true);
-
-  await window.startLogoutTimer?.();
-
-  startShoutboxRealtime();
-
-  setInterval(() => loadShoutboxMessages(false), 15000);
 })();
 
 </script>
