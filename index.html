@@ -3024,28 +3024,24 @@ normalizeEventCardHeights();
     );
   }
 
- async function getCurrentSession() {
+async function getCurrentSession() {
   if (!tmeSupabase) return null;
 
   try {
-    let { data, error } = await tmeSupabase.auth.getSession();
+    const { data, error } = await withTimeout(
+      tmeSupabase.auth.getSession(),
+      5000,
+      "Session check"
+    );
 
     if (error) {
       console.warn("getSession error:", error);
       return null;
     }
 
-    // 🔥 CRITICAL FIX: wait if session isn't ready yet
-    if (!data?.session) {
-      await new Promise(r => setTimeout(r, 500));
-
-      const retry = await tmeSupabase.auth.getSession();
-      return retry.data?.session || null;
-    }
-
-    return data.session;
+    return data?.session || null;
   } catch (err) {
-    console.warn("getSession crash:", err);
+    console.warn("getSession timed out/failed:", err);
     return null;
   }
 }
@@ -3554,6 +3550,7 @@ if (tmeSupabase) {
     console.warn("Auth state update failed:", err);
   }
 });
+}
 
   // ---------- PASSWORD RESET HANDLER ----------
   async function handlePasswordRecovery() {
@@ -3661,9 +3658,8 @@ if (tmeSupabase) {
         localStorage.removeItem("tme_login_started_at");
       }
     }
-
-    await updateAuthUI();
     await loadShoutboxMessages(true);
+    await updateAuthUI();
     await window.startLogoutTimer?.();
 
     startShoutboxRealtime();
