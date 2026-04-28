@@ -2961,41 +2961,38 @@ normalizeEventCardHeights();
   "spick",
   "coon",
   "beaner",
-  "retard",
-  "black boy",
-  "testword",
+  "retard"
 ];
 
 function normalizeModerationText(text) {
   return String(text || "")
     .toLowerCase()
+    // leetspeak fixes
     .replace(/[0@]/g, "o")
     .replace(/[1!|]/g, "i")
     .replace(/3/g, "e")
     .replace(/4/g, "a")
     .replace(/[5$]/g, "s")
     .replace(/7/g, "t")
+    // remove symbols but KEEP spaces
     .replace(/[^a-z\s]/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-function escapeRegExp(text) {
-  return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function messageHasBlockedWords(message) {
   const clean = normalizeModerationText(message);
-  const compact = clean.replace(/\s+/g, "");
+  const compact = clean.replace(/\s+/g, ""); // removes spaces for spaced attacks
 
   for (const word of BLOCKED_WORDS) {
     const term = normalizeModerationText(word);
     if (!term || term.length < 3) continue;
 
-    const exact = new RegExp(`\\b${escapeRegExp(term)}\\b`, "i");
+    const compactTerm = term.replace(/\s+/g, "");
 
-    if (exact.test(clean)) return true;
-    if (compact.includes(term.replace(/\s+/g, ""))) return true;
+    // match normal OR spaced OR compact
+    if (clean.includes(term)) return true;
+    if (compact.includes(compactTerm)) return true;
   }
 
   return false;
