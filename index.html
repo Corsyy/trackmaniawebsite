@@ -1479,20 +1479,18 @@ footer{
 
   let startedAt = Number(localStorage.getItem(LOGIN_TIME_KEY) || "0");
 
-  if (!startedAt) {
-    startedAt = Date.now();
-    localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
-  }
+if (!Number.isFinite(startedAt) || startedAt <= 0 || startedAt > Date.now()) {
+  startedAt = Date.now();
+  localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
+}
 
-  const remaining = startedAt + AUTO_LOGOUT_MS - Date.now();
+const remaining = startedAt + AUTO_LOGOUT_MS - Date.now();
 
-  if (remaining <= 0) {
-    localStorage.removeItem(LOGIN_TIME_KEY);
-    await tmeSupabase.auth.signOut();
-    await updateAuthUI?.();
-    await loadShoutboxMessages?.(false);
-    return;
-  }
+if (remaining <= 0) {
+  startedAt = Date.now();
+  localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
+  return startLogoutTimer();
+}
 
   window.__tmeLogoutTimer = setTimeout(async () => {
     localStorage.removeItem(LOGIN_TIME_KEY);
