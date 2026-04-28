@@ -3400,14 +3400,18 @@ if (loginBtn) loginBtn.onclick = async () => {
     );
 
     if (error) {
-      setAuthMessage(error.message, "error");
-      return;
-    }
+  loginBtn.disabled = false;
+  loginBtn.textContent = "Login";
+  setAuthMessage(error.message, "error");
+  return;
+}
 
-    if (!data?.session) {
-      setAuthMessage("Login failed. Please try again.", "error");
-      return;
-    }
+if (!data?.session) {
+  loginBtn.disabled = false;
+  loginBtn.textContent = "Login";
+  setAuthMessage("Login failed. Please try again.", "error");
+  return;
+}
 
     localStorage.setItem("tme_login_started_at", String(Date.now()));
 
