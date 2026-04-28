@@ -3030,7 +3030,7 @@ async function getCurrentSession() {
   try {
     const { data, error } = await withTimeout(
       tmeSupabase.auth.getSession(),
-      5000,
+      30000,
       "Session check"
     );
 
@@ -3395,7 +3395,7 @@ if (loginBtn) loginBtn.onclick = async () => {
   try {
     const { data, error } = await withTimeout(
       tmeSupabase.auth.signInWithPassword({ email, password }),
-      30000,
+      60000,
       "Login"
     );
 
