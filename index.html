@@ -1469,10 +1469,13 @@ footer{
 
   clearLogoutTimer();
 
-  const { data } = await tmeSupabase.auth.getSession();
-  const session = data?.session || null;
+  // ❌ REMOVE getSession dependency completely
+  // We trust Supabase persistence instead
 
-  if (!session) return;
+  const hasSession =
+    localStorage.getItem("tme-supabase-auth") !== null;
+
+  if (!hasSession) return;
 
   localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
 
@@ -3028,11 +3031,7 @@ async function getCurrentSession() {
   if (!tmeSupabase) return null;
 
   try {
-    const { data, error } = await withTimeout(
-      tmeSupabase.auth.getSession(),
-      30000,
-      "Session check"
-    );
+    const { data, error } = await tmeSupabase.auth.getSession();
 
     if (error) {
       console.warn("getSession error:", error);
@@ -3041,7 +3040,7 @@ async function getCurrentSession() {
 
     return data?.session || null;
   } catch (err) {
-    console.warn("getSession timed out/failed:", err);
+    console.warn("getSession failed:", err);
     return null;
   }
 }
@@ -3543,31 +3542,26 @@ if (!data?.session) {
   bindAuthAndShoutbox();
 
 if (tmeSupabase) {
-  tmeSupabase.auth.onAuthStateChange(async (event, session) => {
-  try {
+  tmeSupabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT") {
+      localStorage.removeItem("tme_login_started_at");
+      window.clearLogoutTimer?.();
+
+      updateAuthUI().catch(console.warn);
+      loadShoutboxMessages(false).catch(console.warn);
+      return;
+    }
+
     if (session) {
       if (!localStorage.getItem("tme_login_started_at")) {
         localStorage.setItem("tme_login_started_at", String(Date.now()));
       }
 
-      await updateAuthUI();
-      await loadShoutboxMessages(false);
-      await window.startLogoutTimer?.();
-      return;
+      updateAuthUI().catch(console.warn);
+      loadShoutboxMessages(false).catch(console.warn);
+      window.startLogoutTimer?.().catch(console.warn);
     }
-
-    if (event === "SIGNED_OUT") {
-      localStorage.removeItem("tme_login_started_at");
-      await window.clearLogoutTimer?.();
-
-      await updateAuthUI();
-      await loadShoutboxMessages(false);
-    }
-
-  } catch (err) {
-    console.warn("Auth state update failed:", err);
-  }
-});
+  });
 }
 
   // ---------- PASSWORD RESET HANDLER ----------
