@@ -2956,9 +2956,50 @@ normalizeEventCardHeights();
   let shoutboxChannel = null;
 
   const BLOCKED_WORDS = [
-    // Add exact words/phrases here. Keep them lowercase.
-    // Example: "badword"
-  ];
+  "nigger",
+  "faggot",
+  "spick",
+  "coon",
+  "beaner",
+  "retard",
+  "black boy",
+  "testword",
+];
+
+function normalizeModerationText(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[0@]/g, "o")
+    .replace(/[1!|]/g, "i")
+    .replace(/3/g, "e")
+    .replace(/4/g, "a")
+    .replace(/[5$]/g, "s")
+    .replace(/7/g, "t")
+    .replace(/[^a-z\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function escapeRegExp(text) {
+  return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function messageHasBlockedWords(message) {
+  const clean = normalizeModerationText(message);
+  const compact = clean.replace(/\s+/g, "");
+
+  for (const word of BLOCKED_WORDS) {
+    const term = normalizeModerationText(word);
+    if (!term || term.length < 3) continue;
+
+    const exact = new RegExp(`\\b${escapeRegExp(term)}\\b`, "i");
+
+    if (exact.test(clean)) return true;
+    if (compact.includes(term.replace(/\s+/g, ""))) return true;
+  }
+
+  return false;
+}
 
   function escapeHtml(value) {
     return String(value ?? "")
