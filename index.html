@@ -2999,13 +2999,10 @@ function messageHasBlockedWords(message) {
 }
 
   function escapeHtml(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
+  const div = document.createElement("div");
+  div.textContent = String(value ?? "");
+  return div.innerHTML;
+}
 
   function setAuthMessage(text, type = "") {
     if (!authMessage) return;
@@ -3316,23 +3313,6 @@ async function updateAuthUI() {
       setShoutStatus(`Could not load shoutbox messages: ${error.message || "Unknown error"}`);
     }
   }
-
-  function messageHasBlockedWords(message) {
-  if (!Array.isArray(BLOCKED_WORDS) || BLOCKED_WORDS.length === 0) {
-    return false;
-  }
-
-  const clean = String(message || "").toLowerCase();
-
-  return BLOCKED_WORDS.some((word) => {
-    const w = String(word || "").trim().toLowerCase();
-
-    // ignore empty / invalid entries
-    if (!w || w.length < 3) return false;
-
-    return clean.includes(w);
-  });
-}
 
   async function sendShout() {
     if (!tmeSupabase) {
