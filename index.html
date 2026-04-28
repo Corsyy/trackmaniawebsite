@@ -3280,9 +3280,21 @@ async function updateAuthUI() {
   }
 
   function messageHasBlockedWords(message) {
-    const clean = String(message || "").toLowerCase();
-    return BLOCKED_WORDS.some((word) => word && clean.includes(word));
+  if (!Array.isArray(BLOCKED_WORDS) || BLOCKED_WORDS.length === 0) {
+    return false;
   }
+
+  const clean = String(message || "").toLowerCase();
+
+  return BLOCKED_WORDS.some((word) => {
+    const w = String(word || "").trim().toLowerCase();
+
+    // ignore empty / invalid entries
+    if (!w || w.length < 3) return false;
+
+    return clean.includes(w);
+  });
+}
 
   async function sendShout() {
     if (!tmeSupabase) {
