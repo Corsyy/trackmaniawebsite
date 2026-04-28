@@ -3662,16 +3662,21 @@ if (tmeSupabase) {
     await handlePasswordRecovery();
 
     if (tmeSupabase) {
-      const { data } = await withTimeout(
-        tmeSupabase.auth.getSession(),
-        30000,
-        "Session restore"
-      );
+      try {
+        const { data } = await withTimeout(
+          tmeSupabase.auth.getSession(),
+          30000,
+          "Session restore"
+        );
 
-      const session = data?.session || null;
+        const session = data?.session || null;
 
-      if (session && !localStorage.getItem("tme_login_started_at")) {
-        localStorage.setItem("tme_login_started_at", String(Date.now()));
+        if (session && !localStorage.getItem("tme_login_started_at")) {
+          localStorage.setItem("tme_login_started_at", String(Date.now()));
+        }
+      } catch (err) {
+        console.warn("Session restore failed, continuing as guest:", err);
+        localStorage.removeItem("tme_login_started_at");
       }
     }
 
