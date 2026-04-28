@@ -3402,10 +3402,10 @@ function withTimeout(promise, ms = 12000, label = "Request") {
 
       localStorage.setItem("tme_login_started_at", String(Date.now()));
 
-      await updateAuthUI();
-await window.startLogoutTimer?.();
-
 closeAuthModal();
+
+updateAuthUI().catch(console.warn);
+window.startLogoutTimer?.().catch(console.warn);
 
 loadShoutboxMessages(false).catch((err) => {
   console.warn("Shoutbox reload after login failed:", err);
