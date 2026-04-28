@@ -3376,49 +3376,63 @@ function withTimeout(promise, ms = 12000, label = "Request") {
   if (backBtn) backBtn.onclick = () => showAuthPanel("login");
 
   const loginBtn = document.getElementById("authLoginBtn");
-  if (loginBtn) loginBtn.onclick = async () => {
-    if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+if (loginBtn) loginBtn.onclick = async () => {
+  if (!tmeSupabase) {
+    return setAuthMessage("Supabase is not configured yet.", "error");
+  }
 
-    const email = document.getElementById("authLoginEmail")?.value.trim();
-    const password = document.getElementById("authLoginPassword")?.value;
+  const email = document.getElementById("authLoginEmail")?.value.trim();
+  const password = document.getElementById("authLoginPassword")?.value;
 
-    if (!email || !password) {
-      return setAuthMessage("Enter your email and password.", "error");
+  if (!email || !password) {
+    return setAuthMessage("Enter your email and password.", "error");
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Logging in...";
+  setAuthMessage("");
+
+  try {
+    const { data, error } = await withTimeout(
+      tmeSupabase.auth.signInWithPassword({ email, password }),
+      30000,
+      "Login"
+    );
+
+    if (error) {
+      setAuthMessage(error.message, "error");
+      return;
     }
 
-    loginBtn.disabled = true;
-    loginBtn.textContent = "Logging in...";
-    setAuthMessage("");
-
-    try {
-      const { data, error } = await withTimeout(
-        tmeSupabase.auth.signInWithPassword({ email, password }),
-        30000,
-        "Login"
-      );
-
-      if (error) return setAuthMessage(error.message, "error");
-      if (!data?.session) return setAuthMessage("Login failed. Please try again.", "error");
-
-      localStorage.setItem("tme_login_started_at", String(Date.now()));
-
-closeAuthModal();
-
-updateAuthUI().catch(console.warn);
-window.startLogoutTimer?.().catch(console.warn);
-
-loadShoutboxMessages(false).catch((err) => {
-  console.warn("Shoutbox reload after login failed:", err);
-  setShoutStatus("Logged in, but shoutbox failed to load. Refresh or try again.");
-});
-    } catch (err) {
-      console.warn("Login failed:", err);
-      setAuthMessage(err.message || "Login failed. Please try again.", "error");
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.textContent = "Login";
+    if (!data?.session) {
+      setAuthMessage("Login failed. Please try again.", "error");
+      return;
     }
-  };
+
+    localStorage.setItem("tme_login_started_at", String(Date.now()));
+
+    // Reset button + close modal immediately after Supabase login succeeds.
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
+    closeAuthModal();
+
+    // Do slower UI/session/shoutbox work in the background.
+    setTimeout(() => {
+      updateAuthUI().catch(console.warn);
+      window.startLogoutTimer?.().catch(console.warn);
+
+      loadShoutboxMessages(false).catch((err) => {
+        console.warn("Shoutbox reload after login failed:", err);
+        setShoutStatus("Logged in, but shoutbox failed to load. Refresh or try again.");
+      });
+    }, 0);
+  } catch (err) {
+    console.warn("Login failed:", err);
+    setAuthMessage(err.message || "Login failed. Please try again.", "error");
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
+  }
+};
 
   const registerBtn = document.getElementById("authRegisterBtn");
   if (registerBtn) registerBtn.onclick = async () => {
