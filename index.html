@@ -1472,33 +1472,14 @@ footer{
   const { data } = await tmeSupabase.auth.getSession();
   const session = data?.session || null;
 
-  // IMPORTANT:
-  // Do NOT remove tme_login_started_at here.
-  // On refresh, Supabase can briefly return no session before restoring it.
   if (!session) return;
 
-  let startedAt = Number(localStorage.getItem(LOGIN_TIME_KEY) || "0");
-
-if (!Number.isFinite(startedAt) || startedAt <= 0 || startedAt > Date.now()) {
-  startedAt = Date.now();
-  localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
-}
-
-const remaining = startedAt + AUTO_LOGOUT_MS - Date.now();
-
-if (remaining <= 0) {
-  startedAt = Date.now();
-  localStorage.setItem(LOGIN_TIME_KEY, String(startedAt));
-  return startLogoutTimer();
-}
+  localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
 
   window.__tmeLogoutTimer = setTimeout(async () => {
-    localStorage.removeItem(LOGIN_TIME_KEY);
-    await tmeSupabase.auth.signOut();
-    await updateAuthUI?.();
-    await loadShoutboxMessages?.(false);
-    setAuthMessage?.("Your session expired. Please log in again.", "error");
-  }, remaining);
+    localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
+    await startLogoutTimer();
+  }, AUTO_LOGOUT_MS);
 }
 
       window.startLogoutTimer = startLogoutTimer;
@@ -3549,27 +3530,30 @@ loadShoutboxMessages(false).catch((err) => {
 
 if (tmeSupabase) {
   tmeSupabase.auth.onAuthStateChange(async (event, session) => {
-    try {
-      if (event === "SIGNED_OUT") {
-        localStorage.removeItem("tme_login_started_at");
-        await window.clearLogoutTimer?.();
-      }
-
-      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") && session) {
-        if (!localStorage.getItem("tme_login_started_at")) {
-          localStorage.setItem("tme_login_started_at", String(Date.now()));
-        }
+  try {
+    if (session) {
+      if (!localStorage.getItem("tme_login_started_at")) {
+        localStorage.setItem("tme_login_started_at", String(Date.now()));
       }
 
       await updateAuthUI();
       await loadShoutboxMessages(false);
       await window.startLogoutTimer?.();
-    } catch (err) {
-      console.warn("Auth state update failed:", err);
-      setShoutStatus(err.message || "Auth update failed.");
+      return;
     }
-  });
-}
+
+    if (event === "SIGNED_OUT") {
+      localStorage.removeItem("tme_login_started_at");
+      await window.clearLogoutTimer?.();
+
+      await updateAuthUI();
+      await loadShoutboxMessages(false);
+    }
+
+  } catch (err) {
+    console.warn("Auth state update failed:", err);
+  }
+});
 
   // ---------- PASSWORD RESET HANDLER ----------
   async function handlePasswordRecovery() {
