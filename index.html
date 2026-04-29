@@ -1115,7 +1115,10 @@
     .send-btn:active {
       transform: translateY(0);
     }
-
+    .shout-name.admin {
+  color: #4aa3ff;
+  text-shadow: 0 0 14px rgba(74, 163, 255, .18);
+}
     .shout-input-row {
       display: flex;
       gap: 0.5rem;
@@ -3109,80 +3112,93 @@
       return out;
     }
 
+    function formatShoutTimeAgo(value) {
+      const date = value ? new Date(value) : new Date();
+      const diff = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
 
+      if (Number.isNaN(diff)) return "";
+      if (diff < 10) return "just now";
+      if (diff < 60) return `${diff}s ago`;
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return `${Math.floor(diff / 86400)}d ago`;
+    }
     function renderShoutMessages(messages) {
-  if (!shoutboxMessages) return;
+      if (!shoutboxMessages) return;
 
-  const safeMessages = Array.isArray(messages) ? messages : [];
-  const merged = [...localSystemMessages(), ...safeMessages].slice(-60);
+      const safeMessages = Array.isArray(messages) ? messages : [];
+      const merged = [...localSystemMessages(), ...safeMessages].slice(-60);
 
-  if (!merged.length) {
-    shoutboxMessages.innerHTML = '<div class="meta">No shoutbox messages yet.</div>';
-    return;
-  }
+      if (!merged.length) {
+        shoutboxMessages.innerHTML = '<div class="meta">No shoutbox messages yet.</div>';
+        return;
+      }
 
-  shoutboxMessages.innerHTML = merged.map((msg) => {
-    const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
-    const isLocal = !!msg.local;
-    const date = msg.created_at ? new Date(msg.created_at) : new Date();
-    const time = Number.isNaN(date.getTime())
-      ? ""
-      : date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      shoutboxMessages.innerHTML = merged.map((msg) => {
+        const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
+        const isLocal = !!msg.local;
+        const time = formatShoutTimeAgo(msg.created_at);
 
-    const deleteButton = !isLocal && !isSystem && msg.id
-      ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
-      : "";
+        const nameKey = String(msg.username || "").toLowerCase();
+        const roleClass =
+          nameKey === "ryvennox" || nameKey === "corsy"
+            ? "admin"
+            : "";
 
-    return `
+        const deleteButton = !isLocal && !isSystem && msg.id
+          ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
+          : "";
+
+        return `
       <div class="shout-msg ${isSystem ? "system" : "user"}">
         ${deleteButton}
         <div class="shout-meta">
-          <span class="shout-name">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+          <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
           <span>${escapeHtml(time)}</span>
         </div>
         <div class="shout-text">${escapeHtml(msg.message)}</div>
       </div>
     `;
-  }).join("");
+      }).join("");
 
-  shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
-}
-async function deleteShoutMessage(messageId) {
-  if (!tmeSupabase || !messageId) return;
+      shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+    }
+    async function deleteShoutMessage(messageId) {
+      if (!tmeSupabase || !messageId) return;
 
-  const ok = confirm("Delete this shoutbox message?");
-  if (!ok) return;
+      const ok = confirm("Delete this shoutbox message?");
+      if (!ok) return;
 
-  setShoutStatus("Deleting message...");
+      setShoutStatus("Deleting message...");
 
-  const { data, error } = await tmeSupabase
-    .from("shoutbox_messages")
-    .delete()
-    .eq("id", messageId)
-    .select("id");
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_messages")
+        .delete()
+        .eq("id", messageId)
+        .select("id");
 
-  if (error) {
-    console.error("Delete shout failed:", error);
-    setShoutStatus(error.message || "Could not delete message.");
-    return;
-  }
+      if (error) {
+        console.error("Delete shout failed:", error);
+        setShoutStatus(error.message || "Could not delete message.");
+        return;
+      }
 
-  if (!data || data.length === 0) {
-    setShoutStatus("Delete did not remove anything. Check your Supabase delete policy.");
-    return;
-  }
+      if (!data || data.length === 0) {
+        setShoutStatus("Delete did not remove anything. Check your Supabase delete policy.");
+        return;
+      }
 
-  setShoutStatus("Message deleted.");
-  await loadShoutboxMessages(false);
-}
-if (shoutboxMessages) {
-  shoutboxMessages.onclick = async (event) => {
-    const btn = event.target.closest("[data-delete-shout]");
-    if (!btn) return;
+      setShoutStatus("Message deleted.");
+      await loadShoutboxMessages(false);
+    }
+    if (shoutboxMessages) {
+      shoutboxMessages.onclick = async (event) => {
+        const btn = event.target.closest("[data-delete-shout]");
+        if (!btn) return;
 
-    await deleteShoutMessage(btn.dataset.deleteShout);
-  };
-}
+        await deleteShoutMessage(btn.dataset.deleteShout);
+      };
+    }
     function updateShoutboxEventTicker() {
       const ticker = document.getElementById("shoutboxEventTicker");
       if (!ticker) return;
@@ -3350,7 +3366,8 @@ if (shoutboxMessages) {
         setShoutStatus(`Could not load shoutbox messages: ${error.message || "Unknown error"}`);
       }
     }
-
+    let lastShoutSendAt = 0;
+    let lastShoutMessage = "";
     async function sendShout() {
       if (!tmeSupabase) {
         setShoutStatus("Supabase is not configured yet.");
@@ -3365,7 +3382,17 @@ if (shoutboxMessages) {
         setShoutStatus("Message must be 300 characters or less.");
         return;
       }
+      const nowSend = Date.now();
 
+      if (nowSend - lastShoutSendAt < 2500) {
+        setShoutStatus("Slow down a bit before sending another shout.");
+        return;
+      }
+
+      if (message.toLowerCase() === lastShoutMessage.toLowerCase()) {
+        setShoutStatus("Please do not send the same message twice.");
+        return;
+      }
       if (messageHasBlockedWords(message)) {
         setShoutStatus("That message is not allowed.");
         return;
@@ -3392,6 +3419,9 @@ if (shoutboxMessages) {
         return;
       }
 
+      lastShoutSendAt = Date.now();
+      lastShoutMessage = message;
+
       shoutInput.value = "";
       setShoutStatus("");
       await loadShoutboxMessages(false);
@@ -3404,7 +3434,7 @@ if (shoutboxMessages) {
         .channel("public:shoutbox_messages")
         .on(
           "postgres_changes",
-          { event: "INSERT", schema: "public", table: "shoutbox_messages" },
+          { event: "*", schema: "public", table: "shoutbox_messages" },
           () => loadShoutboxMessages(false)
         )
         .subscribe();
