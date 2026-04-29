@@ -3423,7 +3423,13 @@
         '$1<span class="shout-mention">$2</span>'
       );
     }
+function messageMentionsCurrentUser(message) {
+  const username = String(window.__currentShoutUsername || "").toLowerCase();
+  if (!username) return false;
 
+  const text = String(message || "").toLowerCase();
+  return text.includes(`@${username}`);
+}
     function renderShoutMessages(messages) {
       if (!shoutboxMessages) return;
 
@@ -3454,7 +3460,8 @@
           : "";
 
         return `
-   <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
+  <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
+    <div class="shout-meta">
       <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
 
       <div class="shout-meta-right">
