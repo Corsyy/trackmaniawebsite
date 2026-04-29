@@ -1112,6 +1112,14 @@
       transform: translateY(-1px);
     }
 
+    .shout-typing {
+      min-height: 18px;
+      margin-top: .45rem;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 750;
+    }
+
     .shout-msg.mentioned-me {
       border-color: rgba(109, 251, 255, .28);
       background: linear-gradient(135deg, rgba(109, 251, 255, .08), rgba(18, 29, 49, .95));
@@ -1574,6 +1582,7 @@
           <div id="shoutboxMessages" aria-live="polite">
             <div class="meta">Loading shoutbox…</div>
           </div>
+          <div id="shoutTyping" class="shout-typing"></div>
           <div class="shout-form">
             <div class="shout-input-row">
               <input id="shoutInput" class="input" type="text" maxlength="300" placeholder="Type a shout..."
@@ -2850,9 +2859,14 @@
     const authLogoutBtn = document.getElementById("authLogoutBtn");
     const shoutboxMessages = document.getElementById("shoutboxMessages");
     const shoutInput = document.getElementById("shoutInput");
+    const shoutTyping = document.getElementById("shoutTyping");
     const shoutStatus = document.getElementById("shoutStatus");
     const shoutboxAuthState = document.getElementById("shoutboxAuthState");
     let shoutboxChannel = null;
+    let typingChannel = null;
+    let typingTimeout = null;
+    let lastTypingSentAt = 0;
+    const typingUsers = new Map();
 
     const BLOCKED_WORDS = [
       "nigger",
@@ -2951,6 +2965,79 @@
 
     function setShoutStatus(text) {
       if (shoutStatus) shoutStatus.textContent = text || "";
+    }
+    function renderTypingUsers() {
+      if (!shoutTyping) return;
+
+      const now = Date.now();
+
+      for (const [key, value] of typingUsers.entries()) {
+        if (now - value.at > 3500) {
+          typingUsers.delete(key);
+        }
+      }
+
+      const names = [...typingUsers.values()]
+        .map((x) => x.username)
+        .filter(Boolean);
+
+      if (!names.length) {
+        shoutTyping.textContent = "";
+      } else if (names.length === 1) {
+        shoutTyping.textContent = `${names[0]} is typing...`;
+      } else if (names.length === 2) {
+        shoutTyping.textContent = `${names[0]} and ${names[1]} are typing...`;
+      } else {
+        shoutTyping.textContent = `${names[0]}, ${names[1]}, and ${names.length - 2} others are typing...`;
+      }
+    }
+
+    async function sendTypingSignal() {
+      if (!tmeSupabase || !typingChannel) return;
+
+      const now = Date.now();
+      if (now - lastTypingSentAt < 1200) return;
+      lastTypingSentAt = now;
+
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      const username =
+        user.user_metadata?.username ||
+        user.email?.split("@")[0] ||
+        "Someone";
+
+      typingChannel.send({
+        type: "broadcast",
+        event: "typing",
+        payload: {
+          user_id: user.id,
+          username,
+          at: Date.now(),
+        },
+      });
+    }
+
+    function startTypingIndicator() {
+      if (!tmeSupabase || typingChannel) return;
+
+      typingChannel = tmeSupabase.channel("shoutbox-typing");
+
+      typingChannel
+        .on("broadcast", { event: "typing" }, ({ payload }) => {
+          if (!payload?.user_id) return;
+          if (payload.user_id === window.__currentShoutUserId) return;
+
+          typingUsers.set(payload.user_id, {
+            username: payload.username || "Someone",
+            at: payload.at || Date.now(),
+          });
+
+          renderTypingUsers();
+        })
+        .subscribe();
+
+      setInterval(renderTypingUsers, 1000);
     }
 
     function openAuthModal(panel = "login") {
@@ -3934,6 +4021,15 @@
         shoutInput.onkeydown = (e) => {
           if (e.key === "Enter") sendShout();
         };
+
+        shoutInput.oninput = () => {
+          if (!shoutInput.value.trim()) return;
+
+          sendTypingSignal();
+
+          clearTimeout(typingTimeout);
+          typingTimeout = setTimeout(renderTypingUsers, 1200);
+        };
       }
     }
 
@@ -4074,6 +4170,7 @@
         await window.startLogoutTimer?.();
 
         startShoutboxRealtime();
+        startTypingIndicator();
 
         setInterval(() => {
           loadShoutboxMessages(false).catch(console.warn);
