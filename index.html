@@ -1112,6 +1112,29 @@
       transform: translateY(-1px);
     }
 
+    .shout-edit {
+      position: absolute;
+      top: 8px;
+      right: 38px;
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(18, 29, 49, .9);
+      color: #cfdcff;
+      cursor: pointer;
+      font-weight: 950;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .shout-edit:hover {
+      background: #1a2944;
+      color: #fff;
+      border-color: var(--border-strong);
+    }
+
     .shout-reactions {
       display: flex;
       gap: .35rem;
@@ -3267,7 +3290,15 @@
 
       await loadShoutboxMessages(false);
     }
-
+    function canEditShout(msg) {
+      return (
+        msg?.id &&
+        !msg.local &&
+        msg.type !== "system" &&
+        window.__currentShoutUserId &&
+        msg.user_id === window.__currentShoutUserId
+      );
+    }
     function renderShoutMessages(messages) {
       if (!shoutboxMessages) return;
 
@@ -3289,13 +3320,15 @@
           nameKey === "ryvennox" || nameKey === "corsy"
             ? "admin"
             : "";
-
         const deleteButton = !isLocal && !isSystem && msg.id
           ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
           : "";
+          const editButton = canEditShout(msg)
+          ? `<button class="shout-edit" type="button" data-edit-shout="${escapeHtml(msg.id)}" title="Edit message">✎</button>`
+          : "";
 
         return `
-      <div class="shout-msg ${isSystem ? "system" : "user"}">
+      <div class="shout-msg ${isSystem ? "system" : "user"}" data-message-id="${escapeHtml(msg.id || "")}">
         ${deleteButton}
         <div class="shout-meta">
           <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
@@ -3309,6 +3342,49 @@ ${renderReactionButtons(msg)}
 
       shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
     }
+    async function editShoutMessage(messageId) {
+      if (!tmeSupabase || !messageId) return;
+
+      const card = shoutboxMessages?.querySelector(`[data-message-id="${CSS.escape(messageId)}"]`);
+      const textEl = card?.querySelector(".shout-text");
+      const oldText = textEl?.textContent || "";
+
+      const nextText = prompt("Edit your message:", oldText)?.trim();
+      if (!nextText || nextText === oldText) return;
+
+      if (nextText.length > 300) {
+        setShoutStatus("Message must be 300 characters or less.");
+        return;
+      }
+
+      if (isBlockedShout(nextText)) {
+        setShoutStatus("That message contains blocked language.");
+        return;
+      }
+
+      setShoutStatus("Saving edit...");
+
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_messages")
+        .update({ message: nextText })
+        .eq("id", messageId)
+        .select("id");
+
+      if (error) {
+        console.error("Edit shout failed:", error);
+        setShoutStatus(error.message || "Could not edit message.");
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        setShoutStatus("Edit did not save. Check your Supabase update policy.");
+        return;
+      }
+
+      setShoutStatus("Message edited.");
+      await loadShoutboxMessages(false);
+    }
+
     async function deleteShoutMessage(messageId) {
       if (!tmeSupabase || !messageId) return;
 
