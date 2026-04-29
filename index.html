@@ -1075,6 +1075,25 @@ footer{
 .auth-message.ok{color:#8fffd0}
 .auth-link-btn{border:0;background:transparent;color:#a9d8ff;padding:0;cursor:pointer;font-weight:850;font-size:.88rem;text-align:left}
 .auth-link-btn:hover{color:#fff}
+.shout-event-ticker {
+  display: none;
+  margin-bottom: .65rem;
+  padding: .65rem .75rem;
+  border-radius: 14px;
+  border: 1px solid rgba(74,163,255,.18);
+  background: linear-gradient(135deg, rgba(74,163,255,.12), rgba(109,251,255,.07));
+  color: #eaf4ff;
+  font-size: .86rem;
+  line-height: 1.4;
+}
+
+.shout-event-ticker.show {
+  display: block;
+}
+
+.shout-event-line {
+  margin: .18rem 0;
+}
 #shoutbox-section{padding-top:1.1rem;padding-bottom:2.2rem}
 .shoutbox-card:hover{transform:none}
 .shoutbox-top{display:flex;align-items:center;justify-content:space-between;gap:.85rem;flex-wrap:wrap}
@@ -1237,6 +1256,7 @@ footer{
         <span class="chip" id="shoutboxAuthState">Guest</span>
       </div>
       <div class="card-body">
+        <div id="shoutboxEventTicker" class="shout-event-ticker"></div>
         <div id="shoutboxMessages" aria-live="polite">
           <div class="meta">Loading shoutbox…</div>
         </div>
@@ -3107,9 +3127,6 @@ async function updateAuthUI() {
   function easternParts(date = new Date()) {
     const parts = new Intl.DateTimeFormat("en-US", {
       timeZone: "America/New_York",
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
       weekday: "short",
       hour: "numeric",
       minute: "numeric",
@@ -3128,17 +3145,21 @@ async function updateAuthUI() {
     };
   }
 
+  function minutesUntil(date) {
+    return Math.round((date - now) / 60000);
+  }
+
   const et = easternParts(now);
   const minutesNow = et.hour * 60 + et.minute;
 
-  // Cup of the Day — every day at 2:00 PM Eastern
+  // 🏆 Cup of the Day
   if (minutesNow >= 13 * 60 + 50 && minutesNow < 14 * 60) {
     out.push({
       id: "cotd-10-min",
       username: "SYSTEM",
       type: "system",
-      message: "Cup of the Day is starting in 10 minutes.",
-      created_at: new Date().toISOString(),
+      message: "🏆 Cup of the Day starts in 10 minutes.",
+      created_at: now.toISOString(),
       local: true,
     });
   }
@@ -3148,20 +3169,20 @@ async function updateAuthUI() {
       id: "cotd-now",
       username: "SYSTEM",
       type: "system",
-      message: "Cup of the Day is starting now.",
-      created_at: new Date().toISOString(),
+      message: "🚦 Cup of the Day is starting now.",
+      created_at: now.toISOString(),
       local: true,
     });
   }
 
-  // Weekly Shorts — Sunday 12:00 PM Eastern
+  // 🩳 Weekly Shorts
   if (et.weekday === "Sun" && minutesNow >= 11 * 60 + 50 && minutesNow < 12 * 60) {
     out.push({
       id: "weekly-shorts-ending",
       username: "SYSTEM",
       type: "system",
-      message: "This Weekly Shorts week is ending in 10 minutes.",
-      created_at: new Date().toISOString(),
+      message: "⏳ Weekly Shorts ends in 10 minutes.",
+      created_at: now.toISOString(),
       local: true,
     });
   }
@@ -3171,48 +3192,87 @@ async function updateAuthUI() {
       id: "weekly-shorts-started",
       username: "SYSTEM",
       type: "system",
-      message: "The previous Weekly Shorts week has ended and the new week has started.",
-      created_at: new Date().toISOString(),
+      message: "🆕 Weekly Shorts has rolled over — a new week is live.",
+      created_at: now.toISOString(),
       local: true,
     });
   }
 
-  // Existing normal event notices from your events.json
   const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
 
-  const liveEvent = events.find((e) => isEventLive(e, now));
-  if (liveEvent?.title) {
+  // 🔴 Show ALL live events, not just one
+  const liveEvents = events
+    .filter((e) => isEventLive(e, now))
+    .sort((a, b) => new Date(getEventStartIso(a)) - new Date(getEventStartIso(b)));
+
+  liveEvents.forEach((event) => {
+    const range = getDisplayRange(event, now);
+    const end = range?.end_iso ? new Date(range.end_iso) : null;
+    const minsLeft = end && end > now ? minutesUntil(end) : null;
+
     out.push({
-      id: "local-live-" + liveEvent.title,
+      id: "local-live-" + event.title,
       username: "SYSTEM",
       type: "system",
-      message: `${liveEvent.title} has just started or is live now.`,
-      created_at: new Date().toISOString(),
+      message:
+        minsLeft && minsLeft <= 120
+          ? `🔴 ${event.title} is live now — ends in ${minsLeft} minute${minsLeft === 1 ? "" : "s"}.`
+          : `🔴 ${event.title} is live now.`,
+      created_at: now.toISOString(),
       local: true,
     });
-  }
+  });
 
-  const upcoming = events
+  // 🟡 Show upcoming events within 2 hours
+  const upcomingEvents = events
     .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
     .filter((x) => x.seg && x.seg.start > now)
-    .sort((a, b) => a.seg.start - b.seg.start)[0];
+    .sort((a, b) => a.seg.start - b.seg.start)
+    .slice(0, 3);
 
-  if (upcoming?.event?.title) {
-    const minutes = Math.round((upcoming.seg.start - now) / 60000);
-    if (minutes > 0 && minutes <= 60) {
+  upcomingEvents.forEach(({ event, seg }) => {
+    const mins = minutesUntil(seg.start);
+
+    if (mins > 0 && mins <= 120) {
       out.push({
-        id: "local-upcoming-" + upcoming.event.title,
+        id: "local-upcoming-" + event.title,
         username: "SYSTEM",
         type: "system",
-        message: `${upcoming.event.title} is about to begin in ${minutes} minute${minutes === 1 ? "" : "s"}.`,
-        created_at: new Date().toISOString(),
+        message: `🟡 ${event.title} begins in ${mins} minute${mins === 1 ? "" : "s"}.`,
+        created_at: now.toISOString(),
         local: true,
       });
     }
-  }
+  });
+
+  // ✅ Recently ended events within 30 minutes
+  const recentlyEnded = events
+    .map((e) => ({
+      event: e,
+      endIso: getEventEndIso(e),
+    }))
+    .filter((x) => {
+      if (!x.endIso) return false;
+      const end = new Date(x.endIso);
+      const minsAgo = Math.round((now - end) / 60000);
+      return minsAgo >= 0 && minsAgo <= 30;
+    })
+    .slice(0, 3);
+
+  recentlyEnded.forEach(({ event }) => {
+    out.push({
+      id: "local-ended-" + event.title,
+      username: "SYSTEM",
+      type: "system",
+      message: `✅ ${event.title} has ended.`,
+      created_at: now.toISOString(),
+      local: true,
+    });
+  });
 
   return out;
 }
+
 
   function renderShoutMessages(messages) {
     if (!shoutboxMessages) return;
@@ -3245,6 +3305,48 @@ async function updateAuthUI() {
 
     shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
   }
+  function updateShoutboxEventTicker() {
+  const ticker = document.getElementById("shoutboxEventTicker");
+  if (!ticker) return;
+
+  const now = new Date();
+  const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
+
+  const liveEvents = events
+    .filter((e) => isEventLive(e, now))
+    .sort((a, b) => new Date(getEventStartIso(a)) - new Date(getEventStartIso(b)));
+
+  const upcomingEvents = events
+    .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
+    .filter((x) => x.seg && x.seg.start > now)
+    .map((x) => ({
+      ...x,
+      mins: Math.round((x.seg.start - now) / 60000),
+    }))
+    .filter((x) => x.mins > 0 && x.mins <= 120)
+    .sort((a, b) => a.mins - b.mins);
+
+  const lines = [];
+
+  liveEvents.forEach((event) => {
+    lines.push(`🔴 <strong>${escapeHtml(event.title)}</strong> is live now`);
+  });
+
+  upcomingEvents.forEach(({ event, mins }) => {
+    lines.push(`🟡 <strong>${escapeHtml(event.title)}</strong> starts in ${mins} minute${mins === 1 ? "" : "s"}`);
+  });
+
+  if (!lines.length) {
+    ticker.classList.remove("show");
+    ticker.innerHTML = "";
+    return;
+  }
+
+  ticker.classList.add("show");
+  ticker.innerHTML = lines
+    .map((line) => `<div class="shout-event-line">${line}</div>`)
+    .join("");
+}
 
  async function loadShoutboxMessages(showLoading = false) {
   if (!shoutboxMessages) return;
@@ -3307,6 +3409,7 @@ async function updateAuthUI() {
 
       renderShoutMessages(rows.reverse());
       setShoutStatus("");
+      updateShoutboxEventTicker();
     } catch (error) {
       console.warn("Shoutbox load failed:", error);
       renderShoutMessages([]);
@@ -3707,8 +3810,8 @@ if (tmeSupabase) {
     startShoutboxRealtime();
 
     setInterval(() => {
-      loadShoutboxMessages(false).catch(console.warn);
-    }, 15000);
+  loadShoutboxMessages(false).catch(console.warn);
+}, 60000);
   } catch (err) {
     console.warn("Page auth/shoutbox init failed:", err);
 
