@@ -1112,13 +1112,43 @@
       transform: translateY(-1px);
     }
 
+    .shout-reactions {
+      display: flex;
+      gap: .35rem;
+      flex-wrap: wrap;
+      margin-top: .55rem;
+    }
+
+    .shout-reaction {
+      border: 1px solid var(--border);
+      background: rgba(18, 29, 49, .85);
+      color: #dff7ff;
+      border-radius: 999px;
+      padding: .22rem .5rem;
+      cursor: pointer;
+      font-size: .8rem;
+      font-weight: 850;
+    }
+
+    .shout-reaction:hover {
+      background: #1a2944;
+      border-color: var(--border-strong);
+    }
+
+    .shout-reaction.active {
+      border-color: rgba(74, 163, 255, .35);
+      background: rgba(74, 163, 255, .16);
+    }
+
     .send-btn:active {
       transform: translateY(0);
     }
+
     .shout-name.admin {
-  color: #4aa3ff;
-  text-shadow: 0 0 14px rgba(74, 163, 255, .18);
-}
+      color: #4aa3ff;
+      text-shadow: 0 0 14px rgba(74, 163, 255, .18);
+    }
+
     .shout-input-row {
       display: flex;
       gap: 0.5rem;
@@ -3123,6 +3153,121 @@
       if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
       return `${Math.floor(diff / 86400)}d ago`;
     }
+    const SHOUT_REACTION_EMOJIS = ["👍", "😂", "🔥", "🏁", "💀"];
+
+    async function loadShoutReactions(messageIds) {
+      if (!tmeSupabase || !Array.isArray(messageIds) || !messageIds.length) {
+        return {};
+      }
+
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_reactions")
+        .select("message_id,user_id,emoji")
+        .in("message_id", messageIds);
+
+      if (error) {
+        console.warn("Could not load reactions:", error);
+        return {};
+      }
+
+      const grouped = {};
+
+      for (const row of data || []) {
+        if (!grouped[row.message_id]) grouped[row.message_id] = {};
+        if (!grouped[row.message_id][row.emoji]) {
+          grouped[row.message_id][row.emoji] = {
+            count: 0,
+            users: [],
+          };
+        }
+
+        grouped[row.message_id][row.emoji].count += 1;
+        grouped[row.message_id][row.emoji].users.push(row.user_id);
+      }
+
+      return grouped;
+    }
+
+    function renderReactionButtons(msg) {
+      if (!msg.id || msg.local || msg.type === "system") return "";
+
+      const reactions = msg.reactions || {};
+      const currentUserId = window.__currentShoutUserId || "";
+
+      return `
+    <div class="shout-reactions">
+      ${SHOUT_REACTION_EMOJIS.map((emoji) => {
+        const item = reactions[emoji] || { count: 0, users: [] };
+        const active = item.users.includes(currentUserId);
+
+        return `
+          <button
+            class="shout-reaction ${active ? "active" : ""}"
+            type="button"
+            data-react-shout="${escapeHtml(msg.id)}"
+            data-emoji="${escapeHtml(emoji)}"
+            title="React ${escapeHtml(emoji)}"
+          >${escapeHtml(emoji)} ${item.count || 0}</button>
+        `;
+      }).join("")}
+    </div>
+  `;
+    }
+
+    async function toggleShoutReaction(messageId, emoji) {
+      if (!tmeSupabase || !messageId || !emoji) return;
+
+      const user = await getCurrentUser();
+      if (!user) {
+        openAuthModal("login");
+        setShoutStatus("Login first to react.");
+        return;
+      }
+
+      const { data: existing, error: checkError } = await tmeSupabase
+        .from("shoutbox_reactions")
+        .select("id")
+        .eq("message_id", messageId)
+        .eq("user_id", user.id)
+        .eq("emoji", emoji)
+        .maybeSingle();
+
+      if (checkError) {
+        console.warn("Reaction check failed:", checkError);
+        setShoutStatus(checkError.message || "Could not react.");
+        return;
+      }
+
+      if (existing?.id) {
+        const { error } = await tmeSupabase
+          .from("shoutbox_reactions")
+          .delete()
+          .eq("id", existing.id);
+
+        if (error) {
+          console.warn("Reaction remove failed:", error);
+          setShoutStatus(error.message || "Could not remove reaction.");
+          return;
+        }
+      } else {
+        const { error } = await tmeSupabase
+          .from("shoutbox_reactions")
+          .insert({
+            message_id: messageId,
+            user_id: user.id,
+            emoji,
+          });
+
+        if (error) {
+          console.warn("Reaction add failed:", error);
+          setShoutStatus(error.message || "Could not add reaction.");
+          return;
+        }
+      }
+
+      await loadShoutboxMessages(false);
+    }
+
     function renderShoutMessages(messages) {
       if (!shoutboxMessages) return;
 
@@ -3157,6 +3302,7 @@
           <span>${escapeHtml(time)}</span>
         </div>
         <div class="shout-text">${escapeHtml(msg.message)}</div>
+${renderReactionButtons(msg)}
       </div>
     `;
       }).join("");
@@ -3193,10 +3339,19 @@
     }
     if (shoutboxMessages) {
       shoutboxMessages.onclick = async (event) => {
-        const btn = event.target.closest("[data-delete-shout]");
-        if (!btn) return;
+        const deleteBtn = event.target.closest("[data-delete-shout]");
+        if (deleteBtn) {
+          await deleteShoutMessage(deleteBtn.dataset.deleteShout);
+          return;
+        }
 
-        await deleteShoutMessage(btn.dataset.deleteShout);
+        const reactBtn = event.target.closest("[data-react-shout]");
+        if (reactBtn) {
+          await toggleShoutReaction(
+            reactBtn.dataset.reactShout,
+            reactBtn.dataset.emoji
+          );
+        }
       };
     }
     function updateShoutboxEventTicker() {
@@ -3357,7 +3512,20 @@
           }
         }
 
-        renderShoutMessages(rows.reverse());
+        rows = rows.reverse();
+
+        const messageIds = rows.map((row) => row.id).filter(Boolean);
+        const reactionsByMessage = await loadShoutReactions(messageIds);
+        const user = await getCurrentUser();
+
+        window.__currentShoutUserId = user?.id || "";
+
+        rows = rows.map((row) => ({
+          ...row,
+          reactions: reactionsByMessage[row.id] || {},
+        }));
+
+        renderShoutMessages(rows);
         setShoutStatus("");
         updateShoutboxEventTicker();
       } catch (error) {
@@ -3435,6 +3603,11 @@
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "shoutbox_messages" },
+          () => loadShoutboxMessages(false)
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "shoutbox_reactions" },
           () => loadShoutboxMessages(false)
         )
         .subscribe();
