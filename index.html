@@ -1112,23 +1112,47 @@
       transform: translateY(-1px);
     }
 
+    .shout-actions {
+      display: flex;
+      gap: .35rem;
+      justify-content: flex-end;
+      margin-top: .4rem;
+    }
+
+    .shout-meta {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .shout-meta-right {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .shout-actions-inline {
+      display: flex;
+      gap: .3rem;
+    }
+
+    .shout-delete,
     .shout-edit {
-      position: absolute;
-      top: 8px;
-      right: 38px;
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       background: rgba(18, 29, 49, .9);
       color: #cfdcff;
       cursor: pointer;
       font-weight: 950;
-      line-height: 1;
       display: grid;
       place-items: center;
+      font-size: 12px;
     }
 
+    .shout-delete:hover,
     .shout-edit:hover {
       background: #1a2944;
       color: #fff;
@@ -1289,28 +1313,7 @@
       overflow-wrap: anywhere
     }
 
-    .shout-delete {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 24px;
-      height: 24px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: rgba(18, 29, 49, .9);
-      color: #cfdcff;
-      cursor: pointer;
-      font-weight: 950;
-      line-height: 1;
-      display: grid;
-      place-items: center;
-    }
 
-    .shout-delete:hover {
-      background: #1a2944;
-      color: #fff;
-      border-color: var(--border-strong);
-    }
 
     .shout-msg.system {
       border-color: rgba(255, 176, 46, .17);
@@ -3329,12 +3332,23 @@
 
         return `
       <div class="shout-msg ${isSystem ? "system" : "user"}" data-message-id="${escapeHtml(msg.id || "")}">
-        ${editButton}
-        ${deleteButton}
+        <div class="shout-actions">
+  ${editButton}
+  ${deleteButton}
+</div>
         <div class="shout-meta">
-          <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
-          <span>${escapeHtml(time)}</span>
-        </div>
+  <span class="shout-name ${roleClass}">
+    ${escapeHtml(isSystem ? "SYSTEM" : msg.username)}
+  </span>
+
+  <div class="shout-meta-right">
+    <div class="shout-actions-inline">
+      ${editButton}
+      ${deleteButton}
+    </div>
+    <span>${escapeHtml(time)}</span>
+  </div>
+</div>
         <div class="shout-text">${escapeHtml(msg.message)}</div>
 ${renderReactionButtons(msg)}
       </div>
