@@ -1099,6 +1099,23 @@
       color: #fff
     }
 
+    .send-btn {
+      border: 1px solid var(--border);
+      background: #16233a;
+      color: #dff7ff;
+      font-weight: 850;
+    }
+
+    .send-btn:hover {
+      background: #1a2944;
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .send-btn:active {
+      transform: translateY(0);
+    }
+
     .shout-input-row {
       display: flex;
       gap: 0.5rem;
@@ -1456,7 +1473,7 @@
                 autocomplete="off" />
 
               <button id="emojiBtn" class="btn" type="button">😊</button>
-              <button id="sendShout" class="btn primary" type="button">Send</button>
+              <button id="sendShout" class="btn send-btn" type="button">Send</button>
             </div>
           </div>
 
