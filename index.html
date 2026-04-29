@@ -1112,14 +1112,19 @@
       transform: translateY(-1px);
     }
 
+    .shout-msg.mentioned-me {
+      border-color: rgba(109, 251, 255, .28);
+      background: linear-gradient(135deg, rgba(109, 251, 255, .08), rgba(18, 29, 49, .95));
+    }
+
     .shout-mention {
-  color: #6dfbff;
-  font-weight: 950;
-  background: rgba(109, 251, 255, .08);
-  border: 1px solid rgba(109, 251, 255, .14);
-  border-radius: 7px;
-  padding: 0 .25rem;
-}
+      color: #6dfbff;
+      font-weight: 950;
+      background: rgba(109, 251, 255, .08);
+      border: 1px solid rgba(109, 251, 255, .14);
+      border-radius: 7px;
+      padding: 0 .25rem;
+    }
 
     .shout-meta-right {
       display: flex;
@@ -3324,13 +3329,13 @@
     }
 
     function renderShoutText(text) {
-  const safe = escapeHtml(text || "");
+      const safe = escapeHtml(text || "");
 
-  return safe.replace(
-    /(^|\s)(@[a-zA-Z0-9_]{2,24})/g,
-    '$1<span class="shout-mention">$2</span>'
-  );
-}
+      return safe.replace(
+        /(^|\s)(@[a-zA-Z0-9_]{2,24})/g,
+        '$1<span class="shout-mention">$2</span>'
+      );
+    }
 
     function renderShoutMessages(messages) {
       if (!shoutboxMessages) return;
@@ -3346,6 +3351,7 @@
       shoutboxMessages.innerHTML = merged.map((msg) => {
         const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
         const isLocal = !!msg.local;
+        const mentionedMe = messageMentionsCurrentUser(msg.message);
         const time = formatShoutTimeAgo(msg.created_at);
 
         const nameKey = String(msg.username || "").toLowerCase();
@@ -3361,8 +3367,7 @@
           : "";
 
         return `
-  <div class="shout-msg ${isSystem ? "system" : "user"}" data-message-id="${escapeHtml(msg.id || "")}">
-    <div class="shout-meta">
+   <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
       <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
 
       <div class="shout-meta-right">
@@ -3398,9 +3403,9 @@
       }
 
       if (messageHasBlockedWords(nextText)) {
-  setShoutStatus("That message contains blocked language.");
-  return;
-}
+        setShoutStatus("That message contains blocked language.");
+        return;
+      }
       setShoutStatus("Saving edit...");
 
       const { data, error } = await tmeSupabase
@@ -3640,6 +3645,7 @@
         const user = await getCurrentUser();
 
         window.__currentShoutUserId = user?.id || "";
+        window.__currentShoutUsername = user?.user_metadata?.username || user?.email?.split("@")[0] || "";
 
         rows = rows.map((row) => ({
           ...row,
