@@ -1303,6 +1303,25 @@
       color: #fff
     }
 
+    .shout-input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .shout-input-row .input {
+      flex: 1;
+      height: 42px;
+      font-size: 0.9rem;
+      padding: 0 12px;
+    }
+
+    .shout-input-row .btn {
+      height: 42px;
+      padding: 0 14px;
+      white-space: nowrap;
+    }
+
     .shout-event-ticker {
       display: none;
       margin-bottom: .65rem;
@@ -1636,10 +1655,13 @@
             <div class="meta">Loading shoutbox…</div>
           </div>
           <div class="shout-form">
-            <input id="shoutInput" class="input" type="text" maxlength="300" placeholder="Login to send a shout…"
-              autocomplete="off" />
-            <button id="emojiBtn" class="btn" type="button">😊</button>
-            <button id="sendShout" class="btn primary" type="button">Send</button>
+            <div class="shout-input-row">
+              <input id="shoutInput" class="input" type="text" maxlength="300" placeholder="Type a shout..."
+                autocomplete="off" />
+
+              <button id="emojiBtn" class="btn" type="button">😊</button>
+              <button id="sendShout" class="btn primary" type="button">Send</button>
+            </div>
           </div>
 
           <div id="emojiPanel" class="emoji-panel">
