@@ -3312,28 +3312,85 @@ async function updateAuthUI() {
   const now = new Date();
   const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
 
-  const liveEvents = events
-    .filter((e) => isEventLive(e, now))
-    .sort((a, b) => new Date(getEventStartIso(a)) - new Date(getEventStartIso(b)));
+  function minsUntil(date) {
+    return Math.round((date - now) / 60000);
+  }
 
-  const upcomingEvents = events
-    .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
-    .filter((x) => x.seg && x.seg.start > now)
-    .map((x) => ({
-      ...x,
-      mins: Math.round((x.seg.start - now) / 60000),
-    }))
-    .filter((x) => x.mins > 0 && x.mins <= 120)
-    .sort((a, b) => a.mins - b.mins);
+  function easternParts(date = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      weekday: "short",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    }).formatToParts(date);
+
+    const map = {};
+    parts.forEach((p) => {
+      if (p.type !== "literal") map[p.type] = p.value;
+    });
+
+    return {
+      weekday: map.weekday,
+      hour: Number(map.hour),
+      minute: Number(map.minute),
+    };
+  }
+
+  function segmentName(event, seg, index) {
+    return seg?.label || seg?.name || seg?.title || `Stage ${index + 1}`;
+  }
 
   const lines = [];
 
-  liveEvents.forEach((event) => {
-    lines.push(`🔴 <strong>${escapeHtml(event.title)}</strong> is live now`);
-  });
+  // Weekly Shorts — Sunday 12:00 PM Eastern
+  const et = easternParts(now);
+  const minutesNow = et.hour * 60 + et.minute;
 
-  upcomingEvents.forEach(({ event, mins }) => {
-    lines.push(`🟡 <strong>${escapeHtml(event.title)}</strong> starts in ${mins} minute${mins === 1 ? "" : "s"}`);
+  if (et.weekday === "Sun" && minutesNow >= 11 * 60 + 45 && minutesNow < 12 * 60) {
+    const mins = 12 * 60 - minutesNow;
+    lines.push(`⏳ <strong>Weekly Shorts</strong> week is ending in ${mins} minute${mins === 1 ? "" : "s"}.`);
+  }
+
+  if (et.weekday === "Sun" && minutesNow >= 12 * 60 && minutesNow < 12 * 60 + 15) {
+    lines.push(`🆕 <strong>Weekly Shorts</strong> new week has started.`);
+  }
+
+  // All event stages / splits
+  events.forEach((event) => {
+    const segs = getEventSegments(event);
+
+    segs.forEach((seg, index) => {
+      const title = escapeHtml(event.title || "Event");
+      const label = escapeHtml(segmentName(event, seg, index));
+      const start = seg.start;
+      const end = seg.end;
+
+      const startsIn = minsUntil(start);
+      const endsIn = minsUntil(end);
+      const endedAgo = Math.round((now - end) / 60000);
+
+      const hasMultipleStages = segs.length > 1;
+      const stageText = hasMultipleStages ? ` — ${label}` : "";
+
+      if (now >= start && now <= end) {
+        if (endsIn > 0 && endsIn <= 15) {
+          lines.push(`⏳ <strong>${title}</strong>${stageText} ends in ${endsIn} minute${endsIn === 1 ? "" : "s"}.`);
+        } else {
+          lines.push(`🔴 <strong>${title}</strong>${stageText} is live now.`);
+        }
+      } else if (startsIn > 0 && startsIn <= 120) {
+        if (startsIn <= 10) {
+          lines.push(`🚨 <strong>${title}</strong>${stageText} starts in ${startsIn} minute${startsIn === 1 ? "" : "s"}!`);
+        } else if (startsIn <= 30) {
+          lines.push(`🟡 <strong>${title}</strong>${stageText} starts in ${startsIn} minute${startsIn === 1 ? "" : "s"}.`);
+        } else {
+          lines.push(`🗓️ <strong>${title}</strong>${stageText} starts in ${startsIn} minute${startsIn === 1 ? "" : "s"}.`);
+        }
+      } else if (endedAgo >= 0 && endedAgo <= 15) {
+        lines.push(`✅ <strong>${title}</strong>${stageText} has ended.`);
+      }
+    });
   });
 
   if (!lines.length) {
@@ -3347,7 +3404,6 @@ async function updateAuthUI() {
     .map((line) => `<div class="shout-event-line">${line}</div>`)
     .join("");
 }
-
  async function loadShoutboxMessages(showLoading = false) {
   if (!shoutboxMessages) return;
 
