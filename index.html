@@ -248,9 +248,17 @@
     }
 
     .btn.primary {
-      border-color: rgba(74, 163, 255, .20);
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #07111d;
+      border: 1px solid var(--border);
+      background: #16233a;
+      /* darker, matches your panels */
+      color: #eaf4ff;
+    }
+
+    .btn.primary:hover {
+      background: #1a2944;
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
     }
 
     .btn:focus {
