@@ -3323,12 +3323,13 @@
         const deleteButton = !isLocal && !isSystem && msg.id
           ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
           : "";
-          const editButton = canEditShout(msg)
+        const editButton = canEditShout(msg)
           ? `<button class="shout-edit" type="button" data-edit-shout="${escapeHtml(msg.id)}" title="Edit message">✎</button>`
           : "";
 
         return `
       <div class="shout-msg ${isSystem ? "system" : "user"}" data-message-id="${escapeHtml(msg.id || "")}">
+        ${editButton}
         ${deleteButton}
         <div class="shout-meta">
           <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
@@ -3420,7 +3421,11 @@ ${renderReactionButtons(msg)}
           await deleteShoutMessage(deleteBtn.dataset.deleteShout);
           return;
         }
-
+        const editBtn = event.target.closest("[data-edit-shout]");
+        if (editBtn) {
+          await editShoutMessage(editBtn.dataset.editShout);
+          return;
+        }
         const reactBtn = event.target.closest("[data-react-shout]");
         if (reactBtn) {
           await toggleShoutReaction(
