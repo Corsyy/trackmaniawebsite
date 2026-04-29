@@ -1224,12 +1224,36 @@
     }
 
     .shout-msg {
+      position: relative;
       border: 1px solid rgba(255, 255, 255, .06);
       background: #121d31;
       border-radius: 14px;
       padding: .65rem .75rem;
       line-height: 1.35;
       overflow-wrap: anywhere
+    }
+
+    .shout-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(18, 29, 49, .9);
+      color: #cfdcff;
+      cursor: pointer;
+      font-weight: 950;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .shout-delete:hover {
+      background: #1a2944;
+      color: #fff;
+      border-color: var(--border-strong);
     }
 
     .shout-msg.system {
@@ -3087,36 +3111,73 @@
 
 
     function renderShoutMessages(messages) {
-      if (!shoutboxMessages) return;
+  if (!shoutboxMessages) return;
 
-      const safeMessages = Array.isArray(messages) ? messages : [];
-      const merged = [...localSystemMessages(), ...safeMessages].slice(-60);
+  const safeMessages = Array.isArray(messages) ? messages : [];
+  const merged = [...localSystemMessages(), ...safeMessages].slice(-60);
 
-      if (!merged.length) {
-        shoutboxMessages.innerHTML = '<div class="meta">No shoutbox messages yet.</div>';
-        return;
-      }
+  if (!merged.length) {
+    shoutboxMessages.innerHTML = '<div class="meta">No shoutbox messages yet.</div>';
+    return;
+  }
 
-      shoutboxMessages.innerHTML = merged.map((msg) => {
-        const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
-        const date = msg.created_at ? new Date(msg.created_at) : new Date();
-        const time = Number.isNaN(date.getTime())
-          ? ""
-          : date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  shoutboxMessages.innerHTML = merged.map((msg) => {
+    const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
+    const isLocal = !!msg.local;
+    const date = msg.created_at ? new Date(msg.created_at) : new Date();
+    const time = Number.isNaN(date.getTime())
+      ? ""
+      : date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
-        return `
-        <div class="shout-msg ${isSystem ? "system" : "user"}">
-          <div class="shout-meta">
-            <span class="shout-name">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
-            <span>${escapeHtml(time)}</span>
-          </div>
-          <div class="shout-text">${escapeHtml(msg.message)}</div>
+    const deleteButton = !isLocal && !isSystem && msg.id
+      ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
+      : "";
+
+    return `
+      <div class="shout-msg ${isSystem ? "system" : "user"}">
+        ${deleteButton}
+        <div class="shout-meta">
+          <span class="shout-name">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+          <span>${escapeHtml(time)}</span>
         </div>
-      `;
-      }).join("");
+        <div class="shout-text">${escapeHtml(msg.message)}</div>
+      </div>
+    `;
+  }).join("");
 
-      shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
-    }
+  shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+}
+async function deleteShoutMessage(messageId) {
+  if (!tmeSupabase || !messageId) return;
+
+  const ok = confirm("Delete this shoutbox message?");
+  if (!ok) return;
+
+  setShoutStatus("Deleting message...");
+
+  const { error } = await tmeSupabase
+  .from("shoutbox_messages")
+  .delete()
+  .eq("id", messageId);
+
+  if (error) {
+    console.error("Delete shout failed:", error);
+    setShoutStatus(error.message || "Could not delete message.");
+    return;
+  }
+
+  setShoutStatus("Message deleted.");
+  await loadShoutboxMessages(false);
+}
+
+if (shoutboxMessages) {
+  shoutboxMessages.onclick = async (event) => {
+    const btn = event.target.closest("[data-delete-shout]");
+    if (!btn) return;
+
+    await deleteShoutMessage(btn.dataset.deleteShout);
+  };
+}
     function updateShoutboxEventTicker() {
       const ticker = document.getElementById("shoutboxEventTicker");
       if (!ticker) return;
