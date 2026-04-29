@@ -1112,6 +1112,15 @@
       transform: translateY(-1px);
     }
 
+    .shout-mention {
+  color: #6dfbff;
+  font-weight: 950;
+  background: rgba(109, 251, 255, .08);
+  border: 1px solid rgba(109, 251, 255, .14);
+  border-radius: 7px;
+  padding: 0 .25rem;
+}
+
     .shout-meta-right {
       display: flex;
       align-items: center;
@@ -3303,6 +3312,7 @@
 
       await loadShoutboxMessages(false);
     }
+
     function canEditShout(msg) {
       return (
         msg?.id &&
@@ -3312,6 +3322,16 @@
         msg.user_id === window.__currentShoutUserId
       );
     }
+
+    function renderShoutText(text) {
+  const safe = escapeHtml(text || "");
+
+  return safe.replace(
+    /(^|\s)(@[a-zA-Z0-9_]{2,24})/g,
+    '$1<span class="shout-mention">$2</span>'
+  );
+}
+
     function renderShoutMessages(messages) {
       if (!shoutboxMessages) return;
 
@@ -3354,7 +3374,7 @@
       </div>
     </div>
 
-    <div class="shout-text">${escapeHtml(msg.message)}</div>
+    <div class="shout-text">${renderShoutText(msg.message)}</div>
     ${renderReactionButtons(msg)}
   </div>
 `;
