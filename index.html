@@ -3377,11 +3377,10 @@
         return;
       }
 
-      if (isBlockedShout(nextText)) {
-        setShoutStatus("That message contains blocked language.");
-        return;
-      }
-
+      if (messageHasBlockedWords(nextText)) {
+  setShoutStatus("That message contains blocked language.");
+  return;
+}
       setShoutStatus("Saving edit...");
 
       const { data, error } = await tmeSupabase
