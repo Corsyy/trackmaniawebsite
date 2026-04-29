@@ -3155,10 +3155,11 @@ async function deleteShoutMessage(messageId) {
 
   setShoutStatus("Deleting message...");
 
-  const { error } = await tmeSupabase
-  .from("shoutbox_messages")
-  .delete()
-  .eq("id", messageId);
+  const { data, error } = await tmeSupabase
+    .from("shoutbox_messages")
+    .delete()
+    .eq("id", messageId)
+    .select("id");
 
   if (error) {
     console.error("Delete shout failed:", error);
@@ -3166,10 +3167,14 @@ async function deleteShoutMessage(messageId) {
     return;
   }
 
+  if (!data || data.length === 0) {
+    setShoutStatus("Delete did not remove anything. Check your Supabase delete policy.");
+    return;
+  }
+
   setShoutStatus("Message deleted.");
   await loadShoutboxMessages(false);
 }
-
 if (shoutboxMessages) {
   shoutboxMessages.onclick = async (event) => {
     const btn = event.target.closest("[data-delete-shout]");
