@@ -1112,6 +1112,23 @@
       transform: translateY(-1px);
     }
 
+    .shout-meta-right {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+    }
+
+    .shout-actions-inline {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+
+    .shout-actions-inline .shout-edit,
+    .shout-actions-inline .shout-delete {
+      position: static;
+    }
+
     .shout-actions {
       display: flex;
       gap: .35rem;
@@ -3331,28 +3348,23 @@
           : "";
 
         return `
-      <div class="shout-msg ${isSystem ? "system" : "user"}" data-message-id="${escapeHtml(msg.id || "")}">
-        <div class="shout-actions">
-  ${editButton}
-  ${deleteButton}
-</div>
-        <div class="shout-meta">
-  <span class="shout-name ${roleClass}">
-    ${escapeHtml(isSystem ? "SYSTEM" : msg.username)}
-  </span>
+  <div class="shout-msg ${isSystem ? "system" : "user"}" data-message-id="${escapeHtml(msg.id || "")}">
+    <div class="shout-meta">
+      <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
 
-  <div class="shout-meta-right">
-    <div class="shout-actions-inline">
-      ${editButton}
-      ${deleteButton}
-    </div>
-    <span>${escapeHtml(time)}</span>
-  </div>
-</div>
-        <div class="shout-text">${escapeHtml(msg.message)}</div>
-${renderReactionButtons(msg)}
+      <div class="shout-meta-right">
+        <div class="shout-actions-inline">
+          ${editButton}
+          ${deleteButton}
+        </div>
+        <span>${escapeHtml(time)}</span>
       </div>
-    `;
+    </div>
+
+    <div class="shout-text">${escapeHtml(msg.message)}</div>
+    ${renderReactionButtons(msg)}
+  </div>
+`;
       }).join("");
 
       shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
@@ -3435,11 +3447,13 @@ ${renderReactionButtons(msg)}
           await deleteShoutMessage(deleteBtn.dataset.deleteShout);
           return;
         }
+
         const editBtn = event.target.closest("[data-edit-shout]");
         if (editBtn) {
           await editShoutMessage(editBtn.dataset.editShout);
           return;
         }
+
         const reactBtn = event.target.closest("[data-react-shout]");
         if (reactBtn) {
           await toggleShoutReaction(
