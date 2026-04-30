@@ -3489,7 +3489,16 @@ function messageMentionsCurrentUser(message) {
 `;
       }).join("");
 
-      shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+      const latestMention = shoutboxMessages.querySelector(".shout-msg.mentioned-me:last-of-type");
+
+if (latestMention) {
+  latestMention.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+} else {
+  shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+}
     }
     async function editShoutMessage(messageId) {
       if (!tmeSupabase || !messageId) return;
