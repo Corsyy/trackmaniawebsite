@@ -1112,6 +1112,65 @@
       transform: translateY(-1px);
     }
 
+    .shoutbox-header-actions {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .online-users-wrap {
+      position: relative;
+    }
+
+    .online-users-btn {
+      cursor: pointer;
+    }
+
+    .online-users-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 220px;
+      padding: .65rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #10192a;
+      box-shadow: var(--shadow-md);
+      z-index: 9999;
+    }
+
+    .online-users-menu.show {
+      display: block;
+    }
+
+    .online-users-title {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 900;
+      margin-bottom: .5rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .online-user-item {
+      padding: .45rem .5rem;
+      border-radius: 10px;
+      color: #eaf4ff;
+      font-size: .88rem;
+      font-weight: 850;
+    }
+
+    .online-user-item:hover {
+      background: rgba(255, 255, 255, .05);
+    }
+
+    .online-user-empty {
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
     .shout-msg.grouped {
       margin-top: -6px;
       padding-top: .35rem;
@@ -1589,8 +1648,20 @@
             <strong>Community Shoutbox</strong>
             <div class="shoutbox-sub">Chat with signed-in users and see automatic event/system notices.</div>
           </div>
-          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
-            <span class="chip" id="onlineUsersChip">0 online</span>
+          <div class="shoutbox-header-actions">
+            <div class="online-users-wrap">
+              <button id="onlineUsersBtn" class="chip online-users-btn" type="button">
+                👥 <span id="onlineUsersChip">0 online</span>
+              </button>
+
+              <div id="onlineUsersMenu" class="online-users-menu">
+                <div class="online-users-title">Online Users</div>
+                <div id="onlineUsersList" class="online-users-list">
+                  <div class="online-user-empty">No users online</div>
+                </div>
+              </div>
+            </div>
+
             <span class="chip" id="shoutboxAuthState">Guest</span>
           </div>
         </div>
@@ -1810,6 +1881,9 @@
     let tmeSupabase = null;
     let currentShoutRole = "user";
     let onlineUsersChannel = null;
+    const onlineUsersBtn = document.getElementById("onlineUsersBtn");
+    const onlineUsersMenu = document.getElementById("onlineUsersMenu");
+    const onlineUsersList = document.getElementById("onlineUsersList");
     const onlineUsersChip = document.getElementById("onlineUsersChip");
     const shoutRolesByUserId = {};
     const supabaseConfigured =
@@ -3467,10 +3541,25 @@
       onlineUsersChannel
         .on("presence", { event: "sync" }, () => {
           const state = onlineUsersChannel.presenceState();
-          const count = Object.keys(state).length;
+
+          const users = Object.values(state)
+            .flat()
+            .map((entry) => entry.username)
+            .filter(Boolean);
+
+          const uniqueUsers = [...new Set(users)].sort((a, b) => a.localeCompare(b));
+          const count = uniqueUsers.length;
 
           if (onlineUsersChip) {
             onlineUsersChip.textContent = `${count} online`;
+          }
+
+          if (onlineUsersList) {
+            onlineUsersList.innerHTML = uniqueUsers.length
+              ? uniqueUsers
+                .map((name) => `<div class="online-user-item">${escapeHtml(name)}</div>`)
+                .join("")
+              : `<div class="online-user-empty">No users online</div>`;
           }
         })
         .subscribe(async (status) => {
@@ -4182,7 +4271,24 @@
         shoutInput.onkeydown = (e) => {
           if (e.key === "Enter") sendShout();
         };
+        sendShout?.addEventListener("click", sendShoutMessage);
 
+        shoutInput?.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") sendShoutMessage();
+        });
+
+        // 👇 ADD THIS HERE
+        onlineUsersBtn?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          onlineUsersMenu?.classList.toggle("show");
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!onlineUsersMenu?.classList.contains("show")) return;
+          if (e.target.closest(".online-users-wrap")) return;
+
+          onlineUsersMenu.classList.remove("show");
+        });
         shoutInput.oninput = () => {
           if (!shoutInput.value.trim()) return;
 
