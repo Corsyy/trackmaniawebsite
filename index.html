@@ -4413,63 +4413,53 @@
         }
       };
 
-      const sendBtn = document.getElementById("sendShout");
-      if (sendBtn) sendBtn.onclick = sendShout;
+      const sendShoutBtn = document.getElementById("sendShout");
 
-      if (shoutInput) {
-        shoutInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") sendShout();
-        });
+      sendShoutBtn?.addEventListener("click", sendShout);
 
-        const sendShoutBtn = document.getElementById("sendShout");
-        sendShoutBtn?.addEventListener("click", sendShout);
+      shoutInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendShout();
+      });
 
-        // 👇 ADD THIS HERE
-        onlineUsersBtn?.addEventListener("click", (e) => {
-          e.stopPropagation();
-          onlineUsersMenu?.classList.toggle("show");
-        });
-        sendShoutBtn?.addEventListener("click", sendShout);
+      // online users (this is fine)
+      onlineUsersBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onlineUsersMenu?.classList.toggle("show");
+      });
 
-        shoutInput?.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") sendShout();
-        });
+      // 👇 ADD THIS BLOCK HERE
+      reactionPickerMenu?.addEventListener("click", async (event) => {
+        const btn = event.target.closest("[data-picker-emoji]");
+        if (!btn || !activeReactionMessageId) return;
 
-        // 👇 ADD THIS BLOCK HERE
-        reactionPickerMenu?.addEventListener("click", async (event) => {
-          const btn = event.target.closest("[data-picker-emoji]");
-          if (!btn || !activeReactionMessageId) return;
+        await toggleShoutReaction(activeReactionMessageId, btn.dataset.pickerEmoji);
+        closeReactionPicker();
+      });
 
-          await toggleShoutReaction(activeReactionMessageId, btn.dataset.pickerEmoji);
-          closeReactionPicker();
-        });
+      document.addEventListener("click", (event) => {
+        if (!reactionPickerMenu?.classList.contains("show")) return;
+        if (event.target.closest(".reaction-picker-menu")) return;
+        if (event.target.closest("[data-open-reaction-picker]")) return;
 
-        document.addEventListener("click", (event) => {
-          if (!reactionPickerMenu?.classList.contains("show")) return;
-          if (event.target.closest(".reaction-picker-menu")) return;
-          if (event.target.closest("[data-open-reaction-picker]")) return;
+        closeReactionPicker();
+      });
 
-          closeReactionPicker();
-        });
+      document.addEventListener("click", (e) => {
+        if (!onlineUsersMenu) return;
+        if (!onlineUsersMenu.classList.contains("show")) return;
+        if (e.target.closest(".online-users-wrap")) return;
 
-        document.addEventListener("click", (e) => {
-          if (!onlineUsersMenu) return;
-          if (!onlineUsersMenu.classList.contains("show")) return;
-          if (e.target.closest(".online-users-wrap")) return;
+        onlineUsersMenu.classList.remove("show");
+      });
+      shoutInput.oninput = () => {
+        if (!shoutInput.value.trim()) return;
 
-          onlineUsersMenu.classList.remove("show");
-        });
-        shoutInput.oninput = () => {
-          if (!shoutInput.value.trim()) return;
+        sendTypingSignal();
 
-          sendTypingSignal();
-
-          clearTimeout(typingTimeout);
-          typingTimeout = setTimeout(renderTypingUsers, 1200);
-        };
-      }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(renderTypingUsers, 1200);
+      };
     }
-
     bindAuthAndShoutbox();
     bindEmojiPicker();
 
