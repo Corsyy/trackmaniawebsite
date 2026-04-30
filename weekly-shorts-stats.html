@@ -195,6 +195,36 @@ header{
   transform:none;
   box-shadow:none;
 }
+.mention-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 280px;
+  padding: .7rem .9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(109,251,255,.18);
+  background: rgba(16,25,42,.96);
+  color: #dff7ff;
+  font-size: .9rem;
+  font-weight: 850;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: all .2s ease;
+  z-index: 99999;
+  cursor: pointer;
+}
+
+.mention-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mention-toast:hover {
+  background: #16233a;
+}
 
 .nav-toggle{
   display:none;
@@ -967,7 +997,27 @@ tbody tr:hover{
       <div>If something looks off, or if any stats aren't showing properly contact the website owner.</div>
     </div>
   </div>
+<div id="globalMentionToast" class="mention-toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+  window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage,
+      storageKey: "tme-supabase-auth",
+      flowType: "implicit",
+    },
+  });
+</script>
+
+<script src="/js/global-mentions.js"></script>
   <script>
     const PATHS = {
       weeksIndex: `/data/weekly-shorts/weeks.json`,
