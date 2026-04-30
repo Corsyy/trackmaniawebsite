@@ -397,8 +397,9 @@
           localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
 
           window.__tmeLogoutTimer = setTimeout(async () => {
-            localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
-            await startLogoutTimer();
+            await tmeSupabase.auth.signOut();
+            localStorage.removeItem(LOGIN_TIME_KEY);
+            location.reload();
           }, AUTO_LOGOUT_MS);
         }
 
@@ -1605,7 +1606,9 @@
           console.log("Typing channel status:", status);
         });
 
-      setInterval(renderTypingUsers, 1000);
+      if (!window.__typingInterval) {
+        window.__typingInterval = setInterval(renderTypingUsers, 1000);
+      }
     }
 
     function openAuthModal(panel = "login") {
@@ -2158,7 +2161,8 @@
       }
 
       let lastUserId = null;
-
+      const shouldScroll =
+        shoutboxMessages.scrollHeight - shoutboxMessages.scrollTop - shoutboxMessages.clientHeight < 120;
       shoutboxMessages.innerHTML = merged.map((msg) => {
         const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
         const isLocal = !!msg.local;
@@ -2210,13 +2214,11 @@
     `;
       }).join("");
 
-      const latestMention = shoutboxMessages.querySelector(".shout-msg.mentioned-me:last-of-type");
-
-      if (latestMention) {
-        latestMention.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+      if (shouldScroll) {
+  shoutboxMessages.scrollTo({
+    top: shoutboxMessages.scrollHeight,
+    behavior: "smooth"
+  });
       } else {
         const isNearBottom =
           shoutboxMessages.scrollHeight -
@@ -2836,7 +2838,10 @@
       };
     }
     bindAuthAndShoutbox();
-    bindEmojiPicker();
+    if (!window.__emojiBound) {
+      window.__emojiBound = true;
+      bindEmojiPicker();
+    }
 
     if (tmeSupabase) {
       tmeSupabase.auth.onAuthStateChange((event, session) => {
