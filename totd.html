@@ -549,7 +549,23 @@ select:focus{
     </div>
   </div>
 </header>
+<script>
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
+  window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage,
+      storageKey: "tme-supabase-auth",
+      flowType: "implicit",
+    },
+  });
+</script>
+
+<script src="/js/global-mentions.js"></script>
 <script>
 (function(){
   const btn = document.getElementById('navToggle');
@@ -761,5 +777,6 @@ select:focus{
   });
 })();
 </script>
+<div id="globalMentionToast" class="mention-toast"></div>
 </body>
 </html>
