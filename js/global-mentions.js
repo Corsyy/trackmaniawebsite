@@ -6,9 +6,12 @@
 
   style.textContent = `
     .mention-toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
+      position: fixed !important;
+      bottom: 24px !important;
+      right: 24px !important;
+      left: auto !important;
+      top: auto !important;
+
       max-width: 280px;
       padding: .7rem .9rem;
       border-radius: 14px;
@@ -18,11 +21,13 @@
       font-size: .9rem;
       font-weight: 850;
       box-shadow: 0 16px 36px rgba(0,0,0,.24);
+
       opacity: 0;
       transform: translateY(10px);
       pointer-events: none;
       transition: all .2s ease;
-      z-index: 99999;
+
+      z-index: 999999;
       cursor: pointer;
     }
 
