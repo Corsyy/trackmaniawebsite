@@ -1796,6 +1796,8 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
     let tmeSupabase = null;
+    let currentShoutRole = "user";
+    const shoutRolesByUserId = {};
     const supabaseConfigured =
       typeof window.supabase !== "undefined" &&
       /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) &&
