@@ -4284,7 +4284,8 @@
         });
 
         document.addEventListener("click", (e) => {
-          if (!onlineUsersMenu?.classList.contains("show")) return;
+          if (!onlineUsersMenu) return;
+          if (!onlineUsersMenu.classList.contains("show")) return;
           if (e.target.closest(".online-users-wrap")) return;
 
           onlineUsersMenu.classList.remove("show");
