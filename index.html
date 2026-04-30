@@ -1112,6 +1112,15 @@
       transform: translateY(-1px);
     }
 
+    .shout-msg.grouped {
+      margin-top: -6px;
+      padding-top: .35rem;
+    }
+
+    .shout-msg.grouped .shout-text {
+      margin-top: 0;
+    }
+
     .shout-typing {
       min-height: 18px;
       margin-top: .45rem;
@@ -3505,39 +3514,57 @@
         return;
       }
 
+      let lastUserId = null;
+
       shoutboxMessages.innerHTML = merged.map((msg) => {
         const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
         const isLocal = !!msg.local;
         const mentionedMe = messageMentionsCurrentUser(msg.message);
         const time = formatShoutTimeAgo(msg.created_at);
 
+        const shouldGroup =
+          !isSystem &&
+          !isLocal &&
+          msg.user_id &&
+          msg.user_id === lastUserId;
+
+        if (!isSystem && !isLocal && msg.user_id) {
+          lastUserId = msg.user_id;
+        } else {
+          lastUserId = null;
+        }
+
         const role = getShoutRole(msg);
         const roleClass = role === "admin" || role === "mod" ? role : "";
+
         const deleteButton = canDeleteShout(msg)
           ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
           : "";
+
         const editButton = canEditShout(msg)
           ? `<button class="shout-edit" type="button" data-edit-shout="${escapeHtml(msg.id)}" title="Edit message">✎</button>`
           : "";
 
         return `
-  <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
-    <div class="shout-meta">
-      <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+      <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""} ${shouldGroup ? "grouped" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
+        ${!shouldGroup ? `
+          <div class="shout-meta">
+            <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
 
-      <div class="shout-meta-right">
-        <div class="shout-actions-inline">
-          ${editButton}
-          ${deleteButton}
-        </div>
-        <span>${escapeHtml(time)}</span>
+            <div class="shout-meta-right">
+              <div class="shout-actions-inline">
+                ${editButton}
+                ${deleteButton}
+              </div>
+              <span>${escapeHtml(time)}</span>
+            </div>
+          </div>
+        ` : ""}
+
+        <div class="shout-text">${renderShoutText(msg.message)}</div>
+        ${renderReactionButtons(msg)}
       </div>
-    </div>
-
-    <div class="shout-text">${renderShoutText(msg.message)}</div>
-    ${renderReactionButtons(msg)}
-  </div>
-`;
+    `;
       }).join("");
 
       const latestMention = shoutboxMessages.querySelector(".shout-msg.mentioned-me:last-of-type");
