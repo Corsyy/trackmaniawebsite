@@ -1112,6 +1112,88 @@
       transform: translateY(-1px);
     }
 
+    .shout-reaction-row {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      flex-wrap: wrap;
+      margin-top: .55rem;
+    }
+
+    .shout-reaction-pill,
+    .shout-reaction-picker-btn {
+      border: 1px solid var(--border);
+      background: rgba(18, 29, 49, .85);
+      color: #dff7ff;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 850;
+      transition: .15s ease;
+    }
+
+    .shout-reaction-pill {
+      padding: .22rem .5rem;
+      font-size: .8rem;
+    }
+
+    .shout-reaction-picker-btn {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      font-size: .92rem;
+      opacity: .72;
+    }
+
+    .shout-msg:hover .shout-reaction-picker-btn {
+      opacity: 1;
+    }
+
+    .shout-reaction-pill:hover,
+    .shout-reaction-picker-btn:hover {
+      background: #1a2944;
+      border-color: var(--border-strong);
+    }
+
+    .shout-reaction-pill.active {
+      border-color: rgba(74, 163, 255, .35);
+      background: rgba(74, 163, 255, .16);
+    }
+
+    .reaction-picker-menu {
+      display: none;
+      position: fixed;
+      z-index: 999999;
+      width: max-content;
+      max-width: 230px;
+      padding: .45rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #10192a;
+      box-shadow: var(--shadow-md);
+      gap: .35rem;
+    }
+
+    .reaction-picker-menu.show {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .reaction-picker-emoji {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .reaction-picker-emoji:hover {
+      background: #16233a;
+      border-color: var(--border);
+    }
+
     .shoutbox-header-actions {
       display: flex;
       gap: .5rem;
@@ -1867,7 +1949,7 @@
       </div>
     </div>
   </div>
-
+  <div id="reactionPickerMenu" class="reaction-picker-menu"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const TTV_CHANNEL = "Ryvennox";
@@ -1889,6 +1971,8 @@
     const onlineUsersMenu = document.getElementById("onlineUsersMenu");
     const onlineUsersList = document.getElementById("onlineUsersList");
     const onlineUsersChip = document.getElementById("onlineUsersChip");
+    const reactionPickerMenu = document.getElementById("reactionPickerMenu");
+    let activeReactionMessageId = "";
     const shoutRolesByUserId = {};
     const supabaseConfigured =
       typeof window.supabase !== "undefined" &&
@@ -3440,26 +3524,62 @@
       const reactions = msg.reactions || {};
       const currentUserId = window.__currentShoutUserId || "";
 
-      return `
-    <div class="shout-reactions">
-      ${SHOUT_REACTION_EMOJIS.map((emoji) => {
-        const item = reactions[emoji] || { count: 0, users: [] };
-        const active = item.users.includes(currentUserId);
+      const existingReactionPills = Object.entries(reactions)
+        .filter(([, item]) => item?.count > 0)
+        .map(([emoji, item]) => {
+          const active = item.users.includes(currentUserId);
 
-        return `
-          <button
-            class="shout-reaction ${active ? "active" : ""}"
-            type="button"
-            data-react-shout="${escapeHtml(msg.id)}"
-            data-emoji="${escapeHtml(emoji)}"
-            title="React ${escapeHtml(emoji)}"
-          >${escapeHtml(emoji)} ${item.count || 0}</button>
-        `;
-      }).join("")}
+          return `
+        <button
+          class="shout-reaction-pill ${active ? "active" : ""}"
+          type="button"
+          data-react-shout="${escapeHtml(msg.id)}"
+          data-emoji="${escapeHtml(emoji)}"
+          title="React ${escapeHtml(emoji)}"
+        >${escapeHtml(emoji)} ${item.count}</button>
+      `;
+        })
+        .join("");
+
+      return `
+    <div class="shout-reaction-row">
+      ${existingReactionPills}
+
+      <button
+        class="shout-reaction-picker-btn"
+        type="button"
+        data-open-reaction-picker="${escapeHtml(msg.id)}"
+        title="Add reaction"
+      >😊</button>
     </div>
   `;
     }
+    function closeReactionPicker() {
+      if (!reactionPickerMenu) return;
+      reactionPickerMenu.classList.remove("show");
+      reactionPickerMenu.innerHTML = "";
+      activeReactionMessageId = "";
+    }
 
+    function openReactionPicker(messageId, anchorEl) {
+      if (!reactionPickerMenu || !messageId || !anchorEl) return;
+
+      activeReactionMessageId = messageId;
+
+      reactionPickerMenu.innerHTML = SHOUT_REACTION_EMOJIS.map((emoji) => `
+    <button
+      type="button"
+      class="reaction-picker-emoji"
+      data-picker-emoji="${escapeHtml(emoji)}"
+    >${escapeHtml(emoji)}</button>
+  `).join("");
+
+      const rect = anchorEl.getBoundingClientRect();
+
+      reactionPickerMenu.style.left = `${Math.min(rect.left, window.innerWidth - 240)}px`;
+      reactionPickerMenu.style.top = `${rect.bottom + 8}px`;
+      reactionPickerMenu.classList.add("show");
+    }
     async function toggleShoutReaction(messageId, emoji) {
       if (!tmeSupabase || !messageId || !emoji) return;
 
@@ -3814,6 +3934,11 @@
         const editBtn = event.target.closest("[data-edit-shout]");
         if (editBtn) {
           await editShoutMessage(editBtn.dataset.editShout);
+          return;
+        }
+        const pickerBtn = event.target.closest("[data-open-reaction-picker]");
+        if (pickerBtn) {
+          openReactionPicker(pickerBtn.dataset.openReactionPicker, pickerBtn);
           return;
         }
 
@@ -4303,6 +4428,28 @@
         onlineUsersBtn?.addEventListener("click", (e) => {
           e.stopPropagation();
           onlineUsersMenu?.classList.toggle("show");
+        });
+        sendShoutBtn?.addEventListener("click", sendShout);
+
+        shoutInput?.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") sendShout();
+        });
+
+        // 👇 ADD THIS BLOCK HERE
+        reactionPickerMenu?.addEventListener("click", async (event) => {
+          const btn = event.target.closest("[data-picker-emoji]");
+          if (!btn || !activeReactionMessageId) return;
+
+          await toggleShoutReaction(activeReactionMessageId, btn.dataset.pickerEmoji);
+          closeReactionPicker();
+        });
+
+        document.addEventListener("click", (event) => {
+          if (!reactionPickerMenu?.classList.contains("show")) return;
+          if (event.target.closest(".reaction-picker-menu")) return;
+          if (event.target.closest("[data-open-reaction-picker]")) return;
+
+          closeReactionPicker();
         });
 
         document.addEventListener("click", (e) => {
