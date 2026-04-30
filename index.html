@@ -4268,37 +4268,34 @@
       if (sendBtn) sendBtn.onclick = sendShout;
 
       if (shoutInput) {
-        shoutInput.onkeydown = (e) => {
+        shoutInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter") sendShout();
-        };
-        sendShout?.addEventListener("click", sendShoutMessage);
-
-        shoutInput?.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") sendShoutMessage();
         });
+        
+      sendShout?.addEventListener("click", sendShout);
 
-        // 👇 ADD THIS HERE
-        onlineUsersBtn?.addEventListener("click", (e) => {
-          e.stopPropagation();
-          onlineUsersMenu?.classList.toggle("show");
-        });
+      // 👇 ADD THIS HERE
+      onlineUsersBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onlineUsersMenu?.classList.toggle("show");
+      });
 
-        document.addEventListener("click", (e) => {
-          if (!onlineUsersMenu) return;
-          if (!onlineUsersMenu.classList.contains("show")) return;
-          if (e.target.closest(".online-users-wrap")) return;
+      document.addEventListener("click", (e) => {
+        if (!onlineUsersMenu) return;
+        if (!onlineUsersMenu.classList.contains("show")) return;
+        if (e.target.closest(".online-users-wrap")) return;
 
-          onlineUsersMenu.classList.remove("show");
-        });
-        shoutInput.oninput = () => {
-          if (!shoutInput.value.trim()) return;
+        onlineUsersMenu.classList.remove("show");
+      });
+      shoutInput.oninput = () => {
+        if (!shoutInput.value.trim()) return;
 
-          sendTypingSignal();
+        sendTypingSignal();
 
-          clearTimeout(typingTimeout);
-          typingTimeout = setTimeout(renderTypingUsers, 1200);
-        };
-      }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(renderTypingUsers, 1200);
+      };
+    }
     }
 
     bindAuthAndShoutbox();
