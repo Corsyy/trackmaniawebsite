@@ -4271,8 +4271,9 @@
         shoutInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter") sendShout();
         });
-        
-      sendShout?.addEventListener("click", sendShout);
+
+      const sendShoutBtn = document.getElementById("sendShout");
+sendShoutBtn?.addEventListener("click", sendShout);
 
       // 👇 ADD THIS HERE
       onlineUsersBtn?.addEventListener("click", (e) => {
