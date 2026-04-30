@@ -1224,8 +1224,13 @@
     }
 
     .shout-name.admin {
-      color: #4aa3ff;
+      color: #2090fa;
       text-shadow: 0 0 14px rgba(74, 163, 255, .18);
+    }
+
+    .shout-name.mod {
+      color: #c084fc;
+      text-shadow: 0 0 14px rgba(192, 132, 252, .16);
     }
 
     .shout-input-row {
@@ -2993,62 +2998,62 @@
     }
 
     async function sendTypingSignal() {
-  if (!tmeSupabase || !typingChannel) return;
+      if (!tmeSupabase || !typingChannel) return;
 
-  const now = Date.now();
-  if (now - lastTypingSentAt < 1200) return;
-  lastTypingSentAt = now;
+      const now = Date.now();
+      if (now - lastTypingSentAt < 1200) return;
+      lastTypingSentAt = now;
 
-  const user = await getCurrentUser();
-  if (!user) return;
+      const user = await getCurrentUser();
+      if (!user) return;
 
-  const username =
-    user.user_metadata?.username ||
-    user.email?.split("@")[0] ||
-    "Someone";
+      const username =
+        user.user_metadata?.username ||
+        user.email?.split("@")[0] ||
+        "Someone";
 
-  const result = await typingChannel.send({
-    type: "broadcast",
-    event: "typing",
-    payload: {
-      user_id: user.id,
-      username,
-      at: Date.now(),
-    },
-  });
-
-  console.log("Typing sent:", result);
-}
-
-    function startTypingIndicator() {
-  if (!tmeSupabase || typingChannel) return;
-
-  typingChannel = tmeSupabase.channel("shoutbox-typing", {
-    config: {
-      broadcast: {
-        self: false
-      }
-    }
-  });
-
-  typingChannel
-    .on("broadcast", { event: "typing" }, ({ payload }) => {
-      if (!payload?.user_id) return;
-      if (payload.user_id === window.__currentShoutUserId) return;
-
-      typingUsers.set(payload.user_id, {
-        username: payload.username || "Someone",
-        at: payload.at || Date.now(),
+      const result = await typingChannel.send({
+        type: "broadcast",
+        event: "typing",
+        payload: {
+          user_id: user.id,
+          username,
+          at: Date.now(),
+        },
       });
 
-      renderTypingUsers();
-    })
-    .subscribe((status) => {
-      console.log("Typing channel status:", status);
-    });
+      console.log("Typing sent:", result);
+    }
 
-  setInterval(renderTypingUsers, 1000);
-}
+    function startTypingIndicator() {
+      if (!tmeSupabase || typingChannel) return;
+
+      typingChannel = tmeSupabase.channel("shoutbox-typing", {
+        config: {
+          broadcast: {
+            self: false
+          }
+        }
+      });
+
+      typingChannel
+        .on("broadcast", { event: "typing" }, ({ payload }) => {
+          if (!payload?.user_id) return;
+          if (payload.user_id === window.__currentShoutUserId) return;
+
+          typingUsers.set(payload.user_id, {
+            username: payload.username || "Someone",
+            at: payload.at || Date.now(),
+          });
+
+          renderTypingUsers();
+        })
+        .subscribe((status) => {
+          console.log("Typing channel status:", status);
+        });
+
+      setInterval(renderTypingUsers, 1000);
+    }
 
     function openAuthModal(panel = "login") {
       if (!authModal) return;
@@ -3433,13 +3438,60 @@
         '$1<span class="shout-mention">$2</span>'
       );
     }
-function messageMentionsCurrentUser(message) {
-  const username = String(window.__currentShoutUsername || "").toLowerCase();
-  if (!username) return false;
+    function messageMentionsCurrentUser(message) {
+      const username = String(window.__currentShoutUsername || "").toLowerCase();
+      if (!username) return false;
 
-  const text = String(message || "").toLowerCase();
-  return text.includes(`@${username}`);
-}
+      const text = String(message || "").toLowerCase();
+      return text.includes(`@${username}`);
+    }
+    async function loadShoutboxRoles(userIds) {
+      if (!tmeSupabase || !Array.isArray(userIds) || !userIds.length) return {};
+
+      const uniqueIds = [...new Set(userIds.filter(Boolean))];
+
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_roles")
+        .select("user_id, role")
+        .in("user_id", uniqueIds);
+
+      if (error) {
+        console.warn("Could not load shoutbox roles:", error);
+        return {};
+      }
+
+      const roles = {};
+      for (const row of data || []) {
+        roles[row.user_id] = row.role || "user";
+      }
+
+      return roles;
+    }
+
+    function getShoutRole(msg) {
+      return shoutRolesByUserId[msg?.user_id] || "user";
+    }
+
+    function canDeleteShout(msg) {
+      if (!msg?.id || msg.local || msg.type === "system") return false;
+
+      const isOwnMessage = msg.user_id === window.__currentShoutUserId;
+
+      return (
+        currentShoutRole === "admin" ||
+        currentShoutRole === "mod" ||
+        isOwnMessage
+      );
+    }
+
+    function canDeleteShout(msg) {
+      if (!msg?.id || msg.local || msg.type === "system") return false;
+
+      const isOwnMessage = msg.user_id === window.__currentShoutUserId;
+      const isStaff = currentShoutRole === "admin" || currentShoutRole === "mod";
+
+      return isStaff || isOwnMessage;
+    }
     function renderShoutMessages(messages) {
       if (!shoutboxMessages) return;
 
@@ -3457,12 +3509,9 @@ function messageMentionsCurrentUser(message) {
         const mentionedMe = messageMentionsCurrentUser(msg.message);
         const time = formatShoutTimeAgo(msg.created_at);
 
-        const nameKey = String(msg.username || "").toLowerCase();
-        const roleClass =
-          nameKey === "ryvennox" || nameKey === "corsy"
-            ? "admin"
-            : "";
-        const deleteButton = !isLocal && !isSystem && msg.id
+        const role = getShoutRole(msg);
+        const roleClass = role === "admin" || role === "mod" ? role : "";
+        const deleteButton = canDeleteShout(msg)
           ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
           : "";
         const editButton = canEditShout(msg)
@@ -3491,14 +3540,14 @@ function messageMentionsCurrentUser(message) {
 
       const latestMention = shoutboxMessages.querySelector(".shout-msg.mentioned-me:last-of-type");
 
-if (latestMention) {
-  latestMention.scrollIntoView({
-    behavior: "smooth",
-    block: "center",
-  });
-} else {
-  shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
-}
+      if (latestMention) {
+        latestMention.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      } else {
+        shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+      }
     }
     async function editShoutMessage(messageId) {
       if (!tmeSupabase || !messageId) return;
@@ -3754,11 +3803,26 @@ if (latestMention) {
         rows = rows.reverse();
 
         const messageIds = rows.map((row) => row.id).filter(Boolean);
+        const userIds = rows.map((row) => row.user_id).filter(Boolean);
+
         const reactionsByMessage = await loadShoutReactions(messageIds);
+
         const user = await getCurrentUser();
 
         window.__currentShoutUserId = user?.id || "";
-        window.__currentShoutUsername = user?.user_metadata?.username || user?.email?.split("@")[0] || "";
+        window.__currentShoutUsername =
+          user?.user_metadata?.username ||
+          user?.email?.split("@")[0] ||
+          "";
+
+        const rolesByUser = await loadShoutboxRoles([
+          ...userIds,
+          window.__currentShoutUserId,
+        ]);
+
+        Object.assign(shoutRolesByUserId, rolesByUser);
+
+        currentShoutRole = shoutRolesByUserId[user?.id] || "user";
 
         rows = rows.map((row) => ({
           ...row,
