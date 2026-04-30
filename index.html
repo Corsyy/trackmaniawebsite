@@ -1881,6 +1881,10 @@
     let tmeSupabase = null;
     let currentShoutRole = "user";
     let onlineUsersChannel = null;
+    let lastMessageCount = 0;
+
+    const mentionSound = new Audio("/sounds/ping.mp3");
+    mentionSound.volume = 0.35;
     const onlineUsersBtn = document.getElementById("onlineUsersBtn");
     const onlineUsersMenu = document.getElementById("onlineUsersMenu");
     const onlineUsersList = document.getElementById("onlineUsersList");
@@ -4004,10 +4008,6 @@
 
         currentShoutRole = shoutRolesByUserId[user?.id] || "user";
 
-        const mentionSound = new Audio("/sounds/ping.mp3");
-        mentionSound.volume = 0.35;
-
-        let lastMessageCount = 0;
         rows = rows.map((row) => ({
           ...row,
           reactions: reactionsByMessage[row.id] || {},
