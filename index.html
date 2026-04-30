@@ -1589,7 +1589,10 @@
             <strong>Community Shoutbox</strong>
             <div class="shoutbox-sub">Chat with signed-in users and see automatic event/system notices.</div>
           </div>
-          <span class="chip" id="shoutboxAuthState">Guest</span>
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+            <span class="chip" id="onlineUsersChip">0 online</span>
+            <span class="chip" id="shoutboxAuthState">Guest</span>
+          </div>
         </div>
         <div class="card-body">
           <div id="shoutboxEventTicker" class="shout-event-ticker"></div>
@@ -1806,6 +1809,8 @@
 
     let tmeSupabase = null;
     let currentShoutRole = "user";
+    let onlineUsersChannel = null;
+    const onlineUsersChip = document.getElementById("onlineUsersChip");
     const shoutRolesByUserId = {};
     const supabaseConfigured =
       typeof window.supabase !== "undefined" &&
@@ -3440,7 +3445,44 @@
         msg.user_id === window.__currentShoutUserId
       );
     }
+    async function startOnlineUsersPresence() {
+      if (!tmeSupabase || onlineUsersChannel) return;
 
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      const username =
+        user.user_metadata?.username ||
+        user.email?.split("@")[0] ||
+        "Someone";
+
+      onlineUsersChannel = tmeSupabase.channel("shoutbox-online-users", {
+        config: {
+          presence: {
+            key: user.id,
+          },
+        },
+      });
+
+      onlineUsersChannel
+        .on("presence", { event: "sync" }, () => {
+          const state = onlineUsersChannel.presenceState();
+          const count = Object.keys(state).length;
+
+          if (onlineUsersChip) {
+            onlineUsersChip.textContent = `${count} online`;
+          }
+        })
+        .subscribe(async (status) => {
+          if (status !== "SUBSCRIBED") return;
+
+          await onlineUsersChannel.track({
+            user_id: user.id,
+            username,
+            online_at: new Date().toISOString(),
+          });
+        });
+    }
     function renderShoutText(text) {
       const safe = escapeHtml(text || "");
 
@@ -4290,6 +4332,7 @@
 
         startShoutboxRealtime();
         startTypingIndicator();
+        startOnlineUsersPresence();
 
         setInterval(() => {
           loadShoutboxMessages(false).catch(console.warn);
