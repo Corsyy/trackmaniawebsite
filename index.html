@@ -2993,52 +2993,62 @@
     }
 
     async function sendTypingSignal() {
-      if (!tmeSupabase || !typingChannel) return;
+  if (!tmeSupabase || !typingChannel) return;
 
-      const now = Date.now();
-      if (now - lastTypingSentAt < 1200) return;
-      lastTypingSentAt = now;
+  const now = Date.now();
+  if (now - lastTypingSentAt < 1200) return;
+  lastTypingSentAt = now;
 
-      const user = await getCurrentUser();
-      if (!user) return;
+  const user = await getCurrentUser();
+  if (!user) return;
 
-      const username =
-        user.user_metadata?.username ||
-        user.email?.split("@")[0] ||
-        "Someone";
+  const username =
+    user.user_metadata?.username ||
+    user.email?.split("@")[0] ||
+    "Someone";
 
-      typingChannel.send({
-        type: "broadcast",
-        event: "typing",
-        payload: {
-          user_id: user.id,
-          username,
-          at: Date.now(),
-        },
-      });
-    }
+  const result = await typingChannel.send({
+    type: "broadcast",
+    event: "typing",
+    payload: {
+      user_id: user.id,
+      username,
+      at: Date.now(),
+    },
+  });
+
+  console.log("Typing sent:", result);
+}
 
     function startTypingIndicator() {
-      if (!tmeSupabase || typingChannel) return;
+  if (!tmeSupabase || typingChannel) return;
 
-      typingChannel = tmeSupabase.channel("shoutbox-typing");
-
-      typingChannel
-        .on("broadcast", { event: "typing" }, ({ payload }) => {
-          if (!payload?.user_id) return;
-          if (payload.user_id === window.__currentShoutUserId) return;
-
-          typingUsers.set(payload.user_id, {
-            username: payload.username || "Someone",
-            at: payload.at || Date.now(),
-          });
-
-          renderTypingUsers();
-        })
-        .subscribe();
-
-      setInterval(renderTypingUsers, 1000);
+  typingChannel = tmeSupabase.channel("shoutbox-typing", {
+    config: {
+      broadcast: {
+        self: false
+      }
     }
+  });
+
+  typingChannel
+    .on("broadcast", { event: "typing" }, ({ payload }) => {
+      if (!payload?.user_id) return;
+      if (payload.user_id === window.__currentShoutUserId) return;
+
+      typingUsers.set(payload.user_id, {
+        username: payload.username || "Someone",
+        at: payload.at || Date.now(),
+      });
+
+      renderTypingUsers();
+    })
+    .subscribe((status) => {
+      console.log("Typing channel status:", status);
+    });
+
+  setInterval(renderTypingUsers, 1000);
+}
 
     function openAuthModal(panel = "login") {
       if (!authModal) return;
