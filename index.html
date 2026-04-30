@@ -3635,6 +3635,8 @@
       return isStaff || isOwnMessage;
     }
     function renderShoutMessages(messages) {
+      const previousCount = lastMessageCount;
+      const newCount = messages.length;
       if (!shoutboxMessages) return;
 
       const safeMessages = Array.isArray(messages) ? messages : [];
@@ -3643,6 +3645,17 @@
       if (!merged.length) {
         shoutboxMessages.innerHTML = '<div class="meta">No shoutbox messages yet.</div>';
         return;
+        const newMessages = messages.slice(previousCount);
+
+        for (const msg of newMessages) {
+          if (messageMentionsCurrentUser(msg.message)) {
+            mentionSound.currentTime = 0;
+            mentionSound.play().catch(() => { });
+            break;
+          }
+        }
+
+        lastMessageCount = newCount;
       }
 
       let lastUserId = null;
@@ -3706,7 +3719,14 @@
           block: "center",
         });
       } else {
-        shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+        const isNearBottom =
+          shoutboxMessages.scrollHeight -
+          shoutboxMessages.scrollTop -
+          shoutboxMessages.clientHeight < 60;
+
+        if (isNearBottom) {
+          shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+        }
       }
     }
     async function editShoutMessage(messageId) {
@@ -3984,6 +4004,10 @@
 
         currentShoutRole = shoutRolesByUserId[user?.id] || "user";
 
+        const mentionSound = new Audio("/sounds/ping.mp3");
+        mentionSound.volume = 0.35;
+
+        let lastMessageCount = 0;
         rows = rows.map((row) => ({
           ...row,
           reactions: reactionsByMessage[row.id] || {},
@@ -4272,31 +4296,31 @@
           if (e.key === "Enter") sendShout();
         });
 
-      const sendShoutBtn = document.getElementById("sendShout");
-sendShoutBtn?.addEventListener("click", sendShout);
+        const sendShoutBtn = document.getElementById("sendShout");
+        sendShoutBtn?.addEventListener("click", sendShout);
 
-      // 👇 ADD THIS HERE
-      onlineUsersBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        onlineUsersMenu?.classList.toggle("show");
-      });
+        // 👇 ADD THIS HERE
+        onlineUsersBtn?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          onlineUsersMenu?.classList.toggle("show");
+        });
 
-      document.addEventListener("click", (e) => {
-        if (!onlineUsersMenu) return;
-        if (!onlineUsersMenu.classList.contains("show")) return;
-        if (e.target.closest(".online-users-wrap")) return;
+        document.addEventListener("click", (e) => {
+          if (!onlineUsersMenu) return;
+          if (!onlineUsersMenu.classList.contains("show")) return;
+          if (e.target.closest(".online-users-wrap")) return;
 
-        onlineUsersMenu.classList.remove("show");
-      });
-      shoutInput.oninput = () => {
-        if (!shoutInput.value.trim()) return;
+          onlineUsersMenu.classList.remove("show");
+        });
+        shoutInput.oninput = () => {
+          if (!shoutInput.value.trim()) return;
 
-        sendTypingSignal();
+          sendTypingSignal();
 
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(renderTypingUsers, 1200);
-      };
-    }
+          clearTimeout(typingTimeout);
+          typingTimeout = setTimeout(renderTypingUsers, 1200);
+        };
+      }
     }
 
     bindAuthAndShoutbox();
