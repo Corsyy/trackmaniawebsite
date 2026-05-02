@@ -342,6 +342,9 @@
 
     const mentionSound = new Audio("/sounds/ping.mp3");
     mentionSound.volume = 0.35;
+    document.addEventListener("click", () => {
+      mentionSound.play().catch(() => { });
+    }, { once: true });
     const onlineUsersBtn = document.getElementById("onlineUsersBtn");
     const onlineUsersMenu = document.getElementById("onlineUsersMenu");
     const onlineUsersList = document.getElementById("onlineUsersList");
@@ -2610,20 +2613,26 @@
       if (!tmeSupabase || shoutboxChannel) return;
 
       shoutboxChannel = tmeSupabase
-        .channel("public:shoutbox_messages")
+        .channel("shoutbox-live") // ✅ clean name
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "shoutbox_messages" },
-          () => loadShoutboxMessages(false)
+          (payload) => {
+            console.log("Realtime message:", payload);
+            loadShoutboxMessages(false);
+          }
         )
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "shoutbox_reactions" },
-          () => loadShoutboxMessages(false)
+          () => {
+            loadShoutboxMessages(false);
+          }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log("Realtime status:", status);
+        });
     }
-
     function withTimeout(promise, ms = 12000, label = "Request") {
       return Promise.race([
         promise,
@@ -3003,12 +3012,6 @@
         }
         startTypingIndicator();
         startOnlineUsersPresence();
-
-        if (!window.__shoutboxInterval) {
-          window.__shoutboxInterval = setInterval(() => {
-            loadShoutboxMessages(false);
-          }, 5000); // faster updates (5s)
-        }
       } catch (err) {
         console.warn("Page auth/shoutbox init failed:", err);
 
