@@ -3,7 +3,6 @@ name: Update TOTD
 on:
   workflow_dispatch:
   schedule:
-    # 18:00 UTC = 1:00 PM EST (no DST auto-switch)
     - cron: "0 18 * * *"
 
 concurrency:
@@ -17,7 +16,8 @@ jobs:
       contents: write
     env:
       PUBLIC_DIR: .
-      DEBUG: "0"
+      DEBUG: "1"
+      REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -35,33 +35,40 @@ jobs:
           echo "Running TOTD fetcher..."
           node -v
           node scripts/totd-fetcher.js
+
           echo ""
-          echo "Listing generated files:"
+          echo "Listing generated TOTD files:"
           ls -R data/totd || true
+
+          echo ""
+          echo "Listing generated TOTD leaderboard files:"
           ls -R data/totd-leaderboards || true
+
           echo ""
           echo "Root snapshot:"
           ls -l totd.json || true
 
-      # Compute a stable content hash across your generated files
       - name: Compute new content hash
         id: newhash
         shell: bash
         run: |
           set -euo pipefail
-          # Hash totd.json (if present) + all per-day JSONs in a stable order
+
           tmplist=$(mktemp)
+
           if [ -f totd.json ]; then
             echo "totd.json" >> "$tmplist"
           fi
+
           if [ -d data/totd ]; then
             find data/totd -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
           fi
+
           if [ -d data/totd-leaderboards ]; then
-          find data/totd-leaderboards -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+            find data/totd-leaderboards -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
           fi
+
           if [ -s "$tmplist" ]; then
-            # sha256 of concatenated per-file sha256s
             HASH=$(xargs -a "$tmplist" -I{} sha256sum "{}" | sort | sha256sum | cut -d' ' -f1)
           else
             HASH="none"
@@ -69,14 +76,14 @@ jobs:
 
           echo "new=$HASH" >> "$GITHUB_OUTPUT"
 
-      - name: Read previous hash (if any)
+      - name: Read previous hash
         id: prevhash
         shell: bash
         run: |
           PREV=$(git show HEAD:.totd.hash 2>/dev/null || true)
           echo "prev=${PREV:-none}" >> "$GITHUB_OUTPUT"
 
-      - name: Commit updated TOTD data (only if changed)
+      - name: Commit updated TOTD data
         if: steps.newhash.outputs.new != steps.prevhash.outputs.prev
         run: |
           echo "${{ steps.newhash.outputs.new }}" > .totd.hash
@@ -84,19 +91,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Only stage TOTD-related files + the hash file
           git add .totd.hash totd.json data/totd/*.json data/totd-leaderboards/*.json 2>/dev/null || true
 
           if ! git diff --cached --quiet; then
             echo "Changes detected — committing updates."
             git commit -m "data: refresh TOTD [skip ci]"
-            # Rebase-pull to avoid non-fast-forward in busy repos
             git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
             git push
           else
-            echo "No staged changes (hash matched)."
+            echo "No staged changes."
           fi
 
-      - name: No changes — skip
+      - name: No changes
         if: steps.newhash.outputs.new == steps.prevhash.outputs.prev
         run: echo "No content changes detected; nothing to push."
