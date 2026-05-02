@@ -6,10 +6,10 @@ import { constants as FS } from "node:fs";
 import path from "node:path";
 
 /* ----------------------------- config/constants ---------------------------- */
-const TOTD_LEADERBOARD_DIR = `${PUBLIC_DIR.replace(/\/+$/, "")}/data/totd-leaderboards`;
 const PUBLIC_DIR = process.env.PUBLIC_DIR || ".";
 const TOTD_DIR = `${PUBLIC_DIR.replace(/\/+$/, "")}/data/totd`;
 const TOTD_LATEST = `${PUBLIC_DIR.replace(/\/+$/, "")}/totd.json`;
+const TOTD_LEADERBOARD_DIR = `${PUBLIC_DIR.replace(/\/+$/, "")}/data/totd-leaderboards`;
 const TMIO = "https://trackmania.io";
 const TMX_API = "https://trackmania.exchange/api"; // base for TMX API
 const TMX_DL_BASE = "https://trackmania.exchange/maps/download";
