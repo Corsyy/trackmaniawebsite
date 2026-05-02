@@ -552,6 +552,32 @@ async function writeTotdMonth(index = 0) {
 }
 
 /* ----------------------------------- main ---------------------------------- */
+async function writeLeaderboardsForExistingTotdFiles(access) {
+  if (!access) return;
+
+  const files = await readdir(TOTD_DIR);
+
+  const monthFiles = files.filter((file) =>
+    file.endsWith(".json") &&
+    file !== "months.json" &&
+    !file.startsWith("_")
+  );
+
+  for (const file of monthFiles) {
+    const fullPath = path.join(TOTD_DIR, file);
+    const monthJson = await loadJson(fullPath, null);
+    const days = monthJson?.days || {};
+
+    for (const rec of Object.values(days)) {
+      const uid = rec?.map?.uid;
+      if (!uid) continue;
+
+      console.log("[TOTD LEADERBOARD BACKFILL]", file, uid);
+      await writeTotdLeaderboard(uid, access);
+      await sleep(120);
+    }
+  }
+}
 async function main() {
   await ensureDir(TOTD_DIR);
 
