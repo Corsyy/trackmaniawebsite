@@ -860,10 +860,24 @@
       }
 
       async function loadMonth(ym) {
-        const month = await jget(`data/totd/${ym}.json`);
-        const latest = month.days[Object.keys(month.days).sort().pop()];
+        const month = await jget(`/data/totd/${ym}.json`);
+
+        console.log("[TOTD month loaded]", ym, month);
+        console.log("[TOTD days count]", Object.keys(month.days || {}).length);
+
+        const days = month.days || {};
+        const keys = Object.keys(days).sort();
+
+        if (!keys.length) {
+          renderHero(null);
+          renderGrid({});
+          return;
+        }
+
+        const latest = days[keys[keys.length - 1]];
+
         renderHero(latest);
-        renderGrid(month.days);
+        renderGrid(days);
       }
 
       async function init() {
