@@ -382,9 +382,15 @@ async function writeTotdMonth(index = 0) {
 }
 
 /* ----------------------------------- main ---------------------------------- */
-async function main() {
+async function main(){
   await ensureDir(TOTD_DIR);
-  await writeTotdMonth(0);
-  console.log("[DONE] TOTD updated with TMX + Nadeo medal fallback.");
+
+  for (let i = 0; i < 6; i++) {
+    console.log(`[TOTD] Updating month index ${i}...`);
+    await writeTotdMonth(i);
+    await sleep(500);
+  }
+
+  console.log("[DONE] TOTD backfilled with TMX + Nadeo medals.");
 }
 main().catch(err => { console.error(err); process.exit(1); });
