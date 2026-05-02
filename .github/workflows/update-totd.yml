@@ -38,6 +38,7 @@ jobs:
           echo ""
           echo "Listing generated files:"
           ls -R data/totd || true
+          ls -R data/totd-leaderboards || true
           echo ""
           echo "Root snapshot:"
           ls -l totd.json || true
@@ -56,7 +57,9 @@ jobs:
           if [ -d data/totd ]; then
             find data/totd -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
           fi
-
+          if [ -d data/totd-leaderboards ]; then
+          find data/totd-leaderboards -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+          fi
           if [ -s "$tmplist" ]; then
             # sha256 of concatenated per-file sha256s
             HASH=$(xargs -a "$tmplist" -I{} sha256sum "{}" | sort | sha256sum | cut -d' ' -f1)
@@ -82,7 +85,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # Only stage TOTD-related files + the hash file
-          git add .totd.hash totd.json data/totd/*.json 2>/dev/null || true
+          git add .totd.hash totd.json data/totd/*.json data/totd-leaderboards/*.json 2>/dev/null || true
 
           if ! git diff --cached --quiet; then
             echo "Changes detected — committing updates."
