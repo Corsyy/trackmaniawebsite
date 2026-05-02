@@ -1,6 +1,6 @@
 // scripts/totd-fetcher.js — TOTD + TMX medal times & difficulty (keeps manual downloadUrl)
 // Node 18+ (global fetch).
-
+import fs from "node:fs";
 import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import { constants as FS } from "node:fs";
 import path from "node:path";
