@@ -107,6 +107,24 @@ async function liveGet(url, access) {
   if (!r.ok) throw new Error(`${url} -> ${r.status}`);
   return r.json();
 }
+async function fetchNadeoMapInfo(mapUid, access) {
+  if (!mapUid || !access) return null;
+
+  try {
+    const url = `https://live-services.trackmania.nadeo.live/api/token/map/${encodeURIComponent(mapUid)}`;
+    const j = await liveGet(url, access);
+
+    return {
+      authorTime: Number.isFinite(Number(j?.authorTime)) ? Number(j.authorTime) : null,
+      goldTime: Number.isFinite(Number(j?.goldTime)) ? Number(j.goldTime) : null,
+      silverTime: Number.isFinite(Number(j?.silverTime)) ? Number(j.silverTime) : null,
+      bronzeTime: Number.isFinite(Number(j?.bronzeTime)) ? Number(j.bronzeTime) : null,
+    };
+  } catch (err) {
+    dlog("Nadeo map info failed", mapUid, err?.message || err);
+    return null;
+  }
+}
 async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 500) {
   let lastErr;
@@ -327,10 +345,10 @@ async function writeTotdMonth(index = 0) {
         const nadeo = await fetchNadeoMapInfo(rec.map.uid, liveAccess);
 
         if (nadeo) {
-          rec.map.authorTime = rec.map.authorTime ?? nadeo.authorTime;
-          rec.map.goldTime = rec.map.goldTime ?? nadeo.goldTime;
-          rec.map.silverTime = rec.map.silverTime ?? nadeo.silverTime;
-          rec.map.bronzeTime = rec.map.bronzeTime ?? nadeo.bronzeTime;
+          if (nadeo.authorTime) rec.map.authorTime = nadeo.authorTime;
+          if (nadeo.goldTime) rec.map.goldTime = nadeo.goldTime;
+          if (nadeo.silverTime) rec.map.silverTime = nadeo.silverTime;
+          if (nadeo.bronzeTime) rec.map.bronzeTime = nadeo.bronzeTime;
         }
       }
       await sleep(120); // be nice to public APIs
@@ -364,7 +382,7 @@ async function writeTotdMonth(index = 0) {
 }
 
 /* ----------------------------------- main ---------------------------------- */
-async function main(){
+async function main() {
   await ensureDir(TOTD_DIR);
   await writeTotdMonth(0);
   console.log("[DONE] TOTD updated with TMX + Nadeo medal fallback.");
