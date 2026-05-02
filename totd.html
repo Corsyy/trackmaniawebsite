@@ -1,783 +1,923 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/png" href="/logo.png">
-<link rel="apple-touch-icon" href="/logo.png">
-<link rel="shortcut icon" href="/logo.png">
-<title>Track of the Day</title>
-
-<style>
-:root{
-  --bg:#0a101a;
-  --bg-2:#0d1422;
-  --panel:#10192a;
-  --panel-2:#0d1524;
-  --panel-3:#0b1220;
-
-  --text:#eef3ff;
-  --muted:#9fb2df;
-  --soft:#cfdcff;
-
-  --accent:#4aa3ff;
-  --accent-2:#6dfbff;
-
-  --border:rgba(255,255,255,.07);
-  --border-strong:rgba(255,255,255,.12);
-
-  --shadow-sm:0 8px 22px rgba(0,0,0,.20);
-  --shadow-md:0 16px 36px rgba(0,0,0,.24);
-
-  --radius:18px;
-  --radius-sm:12px;
-
-  --ring:0 0 0 3px rgba(74,163,255,.18);
-}
-
-*{box-sizing:border-box}
-html,body{height:100%}
-
-body{
-  margin:0;
-  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
-  color:var(--text);
-  background:#0a101a;
-}
-
-a{color:inherit;text-decoration:none}
-
-.container{
-  width:min(1200px,92vw);
-  margin:auto;
-  padding:1rem;
-}
-
-body.bg-track-curves{
-  background:#0a101a;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
-
-body.bg-track-curves::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:-1;
-  opacity:.018;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
-  background-size:220px 220px;
-}
-
-/* ---------- HEADER ---------- */
-
-header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  background:rgba(10,16,26,.92);
-  backdrop-filter:blur(10px);
-}
-
-.nav{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:1rem;
-  padding:1rem 0 .7rem;
-}
-
-h1{
-  margin:0;
-  font-size:2rem;
-  line-height:1;
-  font-weight:950;
-  letter-spacing:-.03em;
-  color:#f7faff;
-}
-
-.nav-center{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-.navlinks{
-  display:flex;
-  gap:1.5rem;
-  align-items:center;
-}
-
-.navlinks a{
-  color:var(--muted);
-  white-space:nowrap;
-  font-size:.95rem;
-  font-weight:800;
-  letter-spacing:.01em;
-  opacity:.92;
-  transition:color .18s ease, opacity .18s ease;
-}
-
-.navlinks a:hover{
-  color:#ffffff;
-  opacity:1;
-}
-
-.navlinks a.active{
-  color:#ffffff;
-  position:relative;
-}
-
-.navlinks a.active::after{
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:-8px;
-  height:2px;
-  border-radius:2px;
-  background:linear-gradient(90deg,var(--accent),var(--accent-2));
-}
-
-.cta{
-  display:flex;
-  justify-content:flex-end;
-}
-
-.nav-toggle{
-  display:none;
-  border:1px solid var(--border);
-  background:#131e31;
-  color:var(--text);
-  border-radius:10px;
-  padding:.5rem .7rem;
-  cursor:pointer;
-  font-weight:800;
-}
-
-.month-row{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  gap:.7rem;
-  padding:.05rem 1rem 1rem;
-  color:var(--muted);
-  font-size:.94rem;
-  font-weight:800;
-}
-
-.select{
-  display:flex;
-  align-items:center;
-  gap:.6rem;
-}
-
-select{
-  background:#101a2c;
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:.58rem .84rem;
-  border-radius:10px;
-  font-weight:800;
-  outline:none;
-  min-width:146px;
-}
-
-select:focus{
-  box-shadow:var(--ring);
-  border-color:var(--border-strong);
-}
-
-/* ---------- BUTTONS ---------- */
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.45rem;
-  min-height:40px;
-  padding:.58rem .95rem;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:#121d31;
-  color:var(--text);
-  font-weight:850;
-  font-size:.92rem;
-  line-height:1;
-  transition:transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
-  box-shadow:none;
-}
-
-.btn:hover{
-  transform:translateY(-1px);
-  border-color:var(--border-strong);
-  background:#16233a;
-  box-shadow:var(--shadow-sm);
-}
-
-.btn.ghost{
-  background:transparent;
-}
-
-.btn:focus-visible{
-  outline:none;
-  box-shadow:var(--ring);
-}
-
-/* ---------- HERO ---------- */
-
-.hero{
-  display:grid;
-  grid-template-columns:minmax(320px, 480px) minmax(280px, 1fr);
-  gap:1.15rem;
-  margin:1.15rem 0 1.35rem;
-  align-items:stretch;
-}
-
-.hero .thumb{
-  width:100%;
-  border-radius:var(--radius);
-  overflow:hidden;
-  border:1px solid var(--border);
-  background:#09111d;
-  box-shadow:none;
-}
-
-.hero-panel{
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  gap:.95rem;
-  min-width:0;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  background:
-    linear-gradient(180deg, rgba(17,27,44,.98), rgba(12,19,33,.98));
-  padding:1.2rem 1.2rem 1.15rem;
-  box-shadow:none;
-}
-
-.hero h2{
-  margin:0;
-  font-size:clamp(1.7rem,2.9vw,2.35rem);
-  line-height:1.03;
-  letter-spacing:-.035em;
-  color:#f7faff;
-}
-
-.hero-meta{
-  display:flex;
-  flex-direction:column;
-  gap:.62rem;
-}
-
-.hero-row{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:.55rem;
-}
-
-.hero-label{
-  color:var(--muted);
-  font-weight:850;
-}
-
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:.65rem;
-  margin-top:.28rem;
-}
-
-/* ---------- GRID ---------- */
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
-  gap:1.15rem;
-  align-items:stretch;
-}
-
-/* ---------- CARDS ---------- */
-
-.card{
-  display:flex;
-  flex-direction:column;
-  min-height:100%;
-  overflow:hidden;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  background:
-    linear-gradient(180deg, rgba(13,21,36,.98), rgba(9,15,27,.98));
-  box-shadow:none;
-  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-}
-
-.card:hover{
-  transform:translateY(-4px);
-  border-color:var(--border-strong);
-  box-shadow:0 10px 22px rgba(0,0,0,.20);
-}
-
-.thumb{
-  aspect-ratio:16/9;
-  background:#09111d;
-}
-
-.thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-
-.meta{
-  padding:1.02rem 1rem 1.05rem;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-  gap:.56rem;
-  min-width:0;
-}
-
-.date{
-  font-size:.84rem;
-  color:var(--muted);
-  line-height:1.2;
-  font-weight:800;
-  letter-spacing:.01em;
-}
-
-.card-title{
-  margin:0;
-  font-size:1.12rem;
-  line-height:1.2;
-  font-weight:950;
-  letter-spacing:-.02em;
-  color:#f5f8ff;
-  word-break:break-word;
-}
-
-.byline{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:.45rem;
-  color:#dce7ff;
-  line-height:1.35;
-}
-
-.byline-label{
-  color:var(--soft);
-  font-weight:850;
-}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:.35rem;
-  max-width:100%;
-  min-height:30px;
-  border:1px solid var(--border);
-  padding:.28rem .62rem;
-  border-radius:999px;
-  font-size:.81rem;
-  background:#16233a;
-  color:#e2ecff;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-weight:800;
-}
-
-/* ---------- MEDALS ---------- */
-
-.medals{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:.45rem;
-  margin-top:.06rem;
-}
-
-.medal{
-  display:inline-flex;
-  align-items:center;
-  gap:.38rem;
-  min-height:28px;
-  padding:.24rem .5rem;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#101a2b;
-  font-size:.8rem;
-  line-height:1;
-  color:#edf3ff;
-  font-weight:800;
-}
-
-.medal .medal-icon{
-  width:15px;
-  height:15px;
-  object-fit:contain;
-  flex:0 0 auto;
-}
-
-.medal.author{
-  border-color:rgba(255,179,82,.26);
-  background:rgba(255,190,90,.08);
-}
-
-.mono{
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-  letter-spacing:.01em;
-}
-
-/* ---------- CARD FOOTER ---------- */
-
-.meta-footer{
-  margin-top:auto;
-  padding-top:.38rem;
-  display:flex;
-  flex-wrap:wrap;
-  gap:.6rem;
-}
-
-.meta-footer .btn{
-  flex:0 0 auto;
-}
-
-/* ---------- MOBILE ---------- */
-
-@media (max-width: 920px){
-  .nav{
-    grid-template-columns:auto auto 1fr auto;
-  }
-
-  .nav-center{
-    justify-content:flex-start;
-  }
-
-  .hero{
-    grid-template-columns:1fr;
-  }
-}
-
-@media (max-width: 640px){
-  h1{
-    font-size:1.58rem;
-  }
-
-  .nav{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-
-  .nav-center{
-    display:contents;
-  }
-
-  .nav-toggle{
-    display:block;
-  }
-
-  .navlinks{
-    display:none;
-    position:absolute;
-    top:64px;
-    left:0;
-    right:0;
-    padding:.9rem 1rem 1rem;
-    background:rgba(10,16,26,.97);
-    backdrop-filter:blur(8px);
-    flex-direction:column;
-    align-items:flex-start;
-    gap:.82rem;
-    border-top:1px solid var(--border);
-  }
-
-  .navlinks.show{
-    display:flex;
-  }
-
-  .cta{
-    display:none;
-  }
-
-  .container{
-    width:min(100%,94vw);
-  }
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .meta-footer .btn,
-  .actions .btn{
-    width:100%;
-  }
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="shortcut icon" href="/logo.png">
+  <title>Track of the Day</title>
+
+  <style>
+    :root {
+      --bg: #0a101a;
+      --bg-2: #0d1422;
+      --panel: #10192a;
+      --panel-2: #0d1524;
+      --panel-3: #0b1220;
+
+      --text: #eef3ff;
+      --muted: #9fb2df;
+      --soft: #cfdcff;
+
+      --accent: #4aa3ff;
+      --accent-2: #6dfbff;
+
+      --border: rgba(255, 255, 255, .07);
+      --border-strong: rgba(255, 255, 255, .12);
+
+      --shadow-sm: 0 8px 22px rgba(0, 0, 0, .20);
+      --shadow-md: 0 16px 36px rgba(0, 0, 0, .24);
+
+      --radius: 18px;
+      --radius-sm: 12px;
+
+      --ring: 0 0 0 3px rgba(74, 163, 255, .18);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
+      color: var(--text);
+      background: #0a101a;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    .container {
+      width: min(1200px, 92vw);
+      margin: auto;
+      padding: 1rem;
+    }
+
+    body.bg-track-curves {
+      background: #0a101a;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body.bg-track-curves::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      opacity: .018;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
+      background-size: 220px 220px;
+    }
+
+    /* ---------- HEADER ---------- */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(10, 16, 26, .92);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0 .7rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -.03em;
+      color: #f7faff;
+    }
+
+    .nav-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .navlinks {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .navlinks a {
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: .01em;
+      opacity: .92;
+      transition: color .18s ease, opacity .18s ease;
+    }
+
+    .navlinks a:hover {
+      color: #ffffff;
+      opacity: 1;
+    }
+
+    .navlinks a.active {
+      color: #ffffff;
+      position: relative;
+    }
+
+    .navlinks a.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .cta {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .nav-toggle {
+      display: none;
+      border: 1px solid var(--border);
+      background: #131e31;
+      color: var(--text);
+      border-radius: 10px;
+      padding: .5rem .7rem;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .month-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: .7rem;
+      padding: .05rem 1rem 1rem;
+      color: var(--muted);
+      font-size: .94rem;
+      font-weight: 800;
+    }
+
+    .select {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    select {
+      background: #101a2c;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .58rem .84rem;
+      border-radius: 10px;
+      font-weight: 800;
+      outline: none;
+      min-width: 146px;
+    }
+
+    select:focus {
+      box-shadow: var(--ring);
+      border-color: var(--border-strong);
+    }
+
+    /* ---------- BUTTONS ---------- */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      min-height: 40px;
+      padding: .58rem .95rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #121d31;
+      color: var(--text);
+      font-weight: 850;
+      font-size: .92rem;
+      line-height: 1;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+      box-shadow: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+      background: #16233a;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: var(--ring);
+    }
+
+    /* ---------- HERO ---------- */
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(320px, 480px) minmax(280px, 1fr);
+      gap: 1.15rem;
+      margin: 1.15rem 0 1.35rem;
+      align-items: stretch;
+    }
+
+    .hero .thumb {
+      width: 100%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #09111d;
+      box-shadow: none;
+    }
+
+    .hero-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: .95rem;
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(17, 27, 44, .98), rgba(12, 19, 33, .98));
+      padding: 1.2rem 1.2rem 1.15rem;
+      box-shadow: none;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 2.9vw, 2.35rem);
+      line-height: 1.03;
+      letter-spacing: -.035em;
+      color: #f7faff;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+      gap: .62rem;
+    }
+
+    .hero-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .55rem;
+    }
+
+    .hero-label {
+      color: var(--muted);
+      font-weight: 850;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      margin-top: .28rem;
+    }
+
+    /* ---------- GRID ---------- */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.15rem;
+      align-items: stretch;
+    }
+
+    /* ---------- CARDS ---------- */
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(13, 21, 36, .98), rgba(9, 15, 27, .98));
+      box-shadow: none;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-strong);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, .20);
+    }
+
+    .thumb {
+      aspect-ratio: 16/9;
+      background: #09111d;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .meta {
+      padding: 1.02rem 1rem 1.05rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: .56rem;
+      min-width: 0;
+    }
+
+    .date {
+      font-size: .84rem;
+      color: var(--muted);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 1.12rem;
+      line-height: 1.2;
+      font-weight: 950;
+      letter-spacing: -.02em;
+      color: #f5f8ff;
+      word-break: break-word;
+    }
+
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .45rem;
+      color: #dce7ff;
+      line-height: 1.35;
+    }
+
+    .byline-label {
+      color: var(--soft);
+      font-weight: 850;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      max-width: 100%;
+      min-height: 30px;
+      border: 1px solid var(--border);
+      padding: .28rem .62rem;
+      border-radius: 999px;
+      font-size: .81rem;
+      background: #16233a;
+      color: #e2ecff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 800;
+    }
+
+    /* ---------- MEDALS ---------- */
+
+    .medals {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .45rem;
+      margin-top: .06rem;
+    }
+
+    .medal {
+      display: inline-flex;
+      align-items: center;
+      gap: .38rem;
+      min-height: 28px;
+      padding: .24rem .5rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #101a2b;
+      font-size: .8rem;
+      line-height: 1;
+      color: #edf3ff;
+      font-weight: 800;
+    }
+
+    .medal .medal-icon {
+      width: 15px;
+      height: 15px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .medal.author {
+      border-color: rgba(255, 179, 82, .26);
+      background: rgba(255, 190, 90, .08);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      letter-spacing: .01em;
+    }
+
+    /* ---------- CARD FOOTER ---------- */
+
+    .meta-footer {
+      margin-top: auto;
+      padding-top: .38rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+    }
+
+    .meta-footer .btn {
+      flex: 0 0 auto;
+    }
+
+    /* ---------- MOBILE ---------- */
+
+    @media (max-width: 920px) {
+      .nav {
+        grid-template-columns: auto auto 1fr auto;
+      }
+
+      .nav-center {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.58rem;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .nav-center {
+        display: contents;
+      }
+
+      .nav-toggle {
+        display: block;
+      }
+
+      .navlinks {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        padding: .9rem 1rem 1rem;
+        background: rgba(10, 16, 26, .97);
+        backdrop-filter: blur(8px);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .82rem;
+        border-top: 1px solid var(--border);
+      }
+
+      .navlinks.show {
+        display: flex;
+      }
+
+      .cta {
+        display: none;
+      }
+
+      .container {
+        width: min(100%, 94vw);
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .meta-footer .btn,
+      .actions .btn {
+        width: 100%;
+      }
+    }
+
+    .today-extra {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .75rem;
+      margin-top: .2rem;
+    }
+
+    .stat-box {
+      border: 1px solid var(--border);
+      background: #0d1728;
+      border-radius: 14px;
+      padding: .75rem;
+    }
+
+    .stat-box span {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 850;
+      margin-bottom: .25rem;
+    }
+
+    .stat-box strong {
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .archive-tools {
+      display: flex;
+      gap: .7rem;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1rem 0 1.1rem;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      flex: 1;
+      min-width: 240px;
+      background: #101a2c;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .72rem .9rem;
+      border-radius: 12px;
+      font-weight: 750;
+      outline: none;
+    }
+
+    .search:focus {
+      box-shadow: var(--ring);
+      border-color: var(--border-strong);
+    }
+
+    .section-title {
+      margin: 1.1rem 0 .75rem;
+      font-size: 1.25rem;
+      font-weight: 950;
+      letter-spacing: -.02em;
+    }
+
+    .empty-state {
+      grid-column: 1/-1;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      background: #0d1524;
+    }
+
+    @media(max-width:640px) {
+      .today-extra {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body class="bg-track-curves">
-<header>
-  <div class="container nav">
-    <h1>Track of the Day</h1>
+  <header>
+    <div class="container nav">
+      <h1>Track of the Day</h1>
 
-    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
 
-    <div class="nav-center">
-      <nav id="primary-nav" class="navlinks" aria-label="Primary">
-        <a href="/kacky">Kacky Finishes</a>
-        <a href="/recentwrs">Recent WRs</a>
-        <a href="/highlights">Community Highlights</a>
-      </nav>
-    </div>
+      <div class="nav-center">
+        <nav id="primary-nav" class="navlinks" aria-label="Primary">
+          <a href="/kacky">Kacky Finishes</a>
+          <a href="/recentwrs">Recent WRs</a>
+          <a href="/highlights">Community Highlights</a>
+        </nav>
+      </div>
 
-    <div class="cta">
-      <a href="/" class="btn">Home</a>
-    </div>
-  </div>
-
-  <div class="container month-row">
-    <div class="select">
-      <span>Month:</span>
-      <select id="month"></select>
-    </div>
-  </div>
-</header>
-<div id="globalMentionToast" class="mention-toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
-
-  window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: window.localStorage,
-      storageKey: "tme-supabase-auth",
-      flowType: "implicit",
-    },
-  });
-</script>
-
-<script src="/js/global-mentions.js"></script>
-<script>
-(function(){
-  const btn = document.getElementById('navToggle');
-  const nav = document.getElementById('primary-nav');
-  if (!btn || !nav) return;
-
-  function syncDesktop() {
-    if (window.innerWidth > 640) {
-      nav.classList.remove('show');
-      btn.setAttribute('aria-expanded', 'false');
-    }
-  }
-
-  btn.addEventListener('click', () => {
-    const open = nav.classList.toggle('show');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-
-  window.addEventListener('resize', syncDesktop);
-  syncDesktop();
-})();
-</script>
-
-<main class="container">
-  <section id="today" class="hero">
-    <div class="thumb" id="t-thumb"></div>
-
-    <div class="hero-panel">
-      <h2 id="t-name">(loading…)</h2>
-
-      <div class="hero-meta">
-        <div class="hero-row">
-          <span class="hero-label">Author:</span>
-          <span class="badge" id="t-author">—</span>
-        </div>
-
-        <p id="t-date" class="date"></p>
-
-        <div id="t-medals"></div>
-
-        <div class="actions" id="t-actions"></div>
+      <div class="cta">
+        <a href="/" class="btn">Home</a>
       </div>
     </div>
-  </section>
 
-  <section class="grid" id="grid"></section>
-</main>
+    <div class="container month-row">
+      <div class="select">
+        <span>Month:</span>
+        <select id="month"></select>
+      </div>
+    </div>
+  </header>
+  <div id="globalMentionToast" class="mention-toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
-<script>
-(function(){
-  const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const bust=()=>`?t=${Date.now()}`;
+    window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+  </script>
 
-  const jget = async (url)=>{
-    const r = await fetch(url+bust(), { cache:"no-store" });
-    if(!r.ok) throw new Error(`${url} -> ${r.status}`);
-    return r.json();
-  };
+  <script src="/js/global-mentions.js"></script>
+  <script>
+    (function () {
+      const btn = document.getElementById('navToggle');
+      const nav = document.getElementById('primary-nav');
+      if (!btn || !nav) return;
 
-  const set=(id,html)=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML=html;
-  };
+      function syncDesktop() {
+        if (window.innerWidth > 640) {
+          nav.classList.remove('show');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      }
 
-  const setText=(id,txt)=>{
-    const el=document.getElementById(id);
-    if(el) el.textContent=txt ?? "";
-  };
+      btn.addEventListener('click', () => {
+        const open = nav.classList.toggle('show');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
 
-  function fmtMs(ms){
-    if(ms==null) return null;
-    const t=Math.max(0,Number(ms)|0);
-    const m=Math.floor(t/60000);
-    const s=Math.floor((t%60000)/1000);
-    const ms3=(t%1000).toString().padStart(3,"0");
-    return `${m}:${s.toString().padStart(2,"0")}.${ms3}`;
-  }
+      window.addEventListener('resize', syncDesktop);
+      syncDesktop();
+    })();
+  </script>
 
-  function authorMedal(msVal){
-    if (msVal == null || Number(msVal) <= 0) return "";
-    return `
+  <main class="container">
+    <section id="today" class="hero">
+      <div class="thumb" id="t-thumb"></div>
+
+      <div class="hero-panel">
+        <div class="hero-row">
+          <span class="badge">🏁 Today’s TOTD</span>
+        </div>
+
+        <h2 id="t-name">(loading…)</h2>
+
+        <div class="hero-meta">
+          <div class="hero-row">
+            <span class="hero-label">Author:</span>
+            <span class="badge" id="t-author">—</span>
+          </div>
+
+          <p id="t-date" class="date"></p>
+
+          <div id="t-medals"></div>
+
+          <div class="today-extra">
+            <div class="stat-box">
+              <span>Map UID</span>
+              <strong id="t-uid">—</strong>
+            </div>
+            <div class="stat-box">
+              <span>Author Time</span>
+              <strong id="t-at">—</strong>
+            </div>
+            <div class="stat-box">
+              <span>Status</span>
+              <strong>Daily Track</strong>
+            </div>
+          </div>
+
+          <div class="actions" id="t-actions"></div>
+        </div>
+    </section>
+
+    <div class="archive-tools">
+      <h2 class="section-title">TOTD Archive</h2>
+      <input id="mapSearch" class="search" type="search" placeholder="Search maps or authors...">
+    </div>
+
+    <section class="grid" id="grid"></section>
+  </main>
+
+  <script>
+    (function () {
+      const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const bust = () => `?t=${Date.now()}`;
+
+      const jget = async (url) => {
+        const r = await fetch(url + bust(), { cache: "no-store" });
+        if (!r.ok) throw new Error(`${url} -> ${r.status}`);
+        return r.json();
+      };
+
+      const set = (id, html) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+      };
+
+      const setText = (id, txt) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = txt ?? "";
+      };
+
+      function fmtMs(ms) {
+        if (ms == null) return null;
+        const t = Math.max(0, Number(ms) | 0);
+        const m = Math.floor(t / 60000);
+        const s = Math.floor((t % 60000) / 1000);
+        const ms3 = (t % 1000).toString().padStart(3, "0");
+        return `${m}:${s.toString().padStart(2, "0")}.${ms3}`;
+      }
+
+      function authorMedal(msVal) {
+        if (msVal == null || Number(msVal) <= 0) return "";
+        return `
       <span class="medal author">
         <img class="medal-icon" src="/img/author.png" alt="Author Medal" loading="lazy">
         <b>AT</b>
         <span class="mono">${fmtMs(msVal)}</span>
       </span>
     `;
-  }
-
-  function buildMedals(map){
-    if(!map) return "";
-    const at = authorMedal(map.authorTime);
-    return at ? `<div class="medals">${at}</div>` : "";
-  }
-
-  const button = (label, href, extra='') =>
-    `<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
-
-  function actionsFromMap(map){
-    const acts=[];
-    if(map?.downloadUrl) acts.push(button("⬇️ Download", map.downloadUrl));
-    if(map?.uid) acts.push(`<button class="btn ghost" data-copy-uid="${map.uid}">Copy UID</button>`);
-    return acts.join("");
-  }
-
-  function renderHero(rec){
-    if(!rec) return;
-    const m = rec.map || {};
-
-    set("t-thumb",
-      m.thumbnailUrl
-        ? `<img src="${m.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">`
-        : `<div class="thumb" style="display:grid;place-items:center;color:var(--muted)">No image</div>`
-    );
-
-    setText("t-name", m.name || "(unknown map)");
-    setText("t-author", m.authorDisplayName || "—");
-    setText("t-date", rec.date || "");
-    set("t-medals", buildMedals(m));
-    set("t-actions", actionsFromMap(m));
-  }
-
-  function renderGrid(days){
-    const grid=document.getElementById("grid");
-    if(!grid) return;
-    grid.innerHTML="";
-
-    const keys=Object.keys(days).sort();
-    for(const k of keys){
-      const d=days[k];
-      const m=d.map || {};
-
-      const card=document.createElement("article");
-      card.className="card";
-      card.innerHTML=`
-        <div class="thumb">
-          ${m.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${m.thumbnailUrl}" alt="">` : ""}
-        </div>
-        <div class="meta">
-          <div class="date">${d.date}</div>
-          <h3 class="card-title">${m.name || "(unknown map)"}</h3>
-
-          <div class="byline">
-            <span class="byline-label">Author:</span>
-            <span class="badge">${m.authorDisplayName || "—"}</span>
-          </div>
-
-          ${buildMedals(m)}
-
-          <div class="meta-footer">
-            ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank" rel="noopener">⬇️ Download</a>` : ""}
-            ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
-          </div>
-        </div>`;
-      grid.appendChild(card);
-    }
-  }
-
-  async function loadMonth(ym){
-    const month = await jget(`data/totd/${ym}.json`);
-    const latest = month.days[Object.keys(month.days).sort().pop()];
-    renderHero(latest);
-    renderGrid(month.days);
-  }
-
-  async function init(){
-    const sel=document.getElementById("month");
-    const monthsJ=await jget("/data/totd/months.json");
-    const months=(monthsJ?.months||[]).slice().sort().reverse();
-
-    if(!months.length){
-      if(sel) sel.innerHTML=`<option>(no data yet)</option>`;
-      return;
-    }
-
-    if(sel){
-      sel.innerHTML=months.map(k=>{
-        const [y,mm]=k.split("-");
-        return `<option value="${k}">${MONTHS[+mm-1]} ${y}</option>`;
-      }).join("");
-
-      sel.value=months[0];
-      sel.onchange=()=>loadMonth(sel.value);
-    }
-
-    await loadMonth(months[0]);
-  }
-
-  document.addEventListener("click",(e)=>{
-    const t=e.target;
-    if(t && t.matches("[data-copy-uid]")){
-      const uid=t.getAttribute("data-copy-uid");
-      if(uid){
-        navigator.clipboard?.writeText(uid).then(()=>{
-          t.textContent="Copied!";
-          setTimeout(()=>t.textContent="Copy UID",1200);
-        }).catch(()=>{
-          t.textContent="Copy failed";
-          setTimeout(()=>t.textContent="Copy UID",1200);
-        });
       }
-    }
-  });
 
-  init().catch(err=>{
-    console.error("[TOTD] init failed:",err);
-    const n=document.getElementById("t-name");
-    if(n) n.textContent="(failed to load)";
-  });
-})();
-</script>
+      function buildMedals(map) {
+        if (!map) return "";
+        const at = authorMedal(map.authorTime);
+        return at ? `<div class="medals">${at}</div>` : "";
+      }
+
+      const button = (label, href, extra = '') =>
+        `<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
+
+      function actionsFromMap(map) {
+        const acts = [];
+        if (map?.downloadUrl) acts.push(button("⬇️ Download", map.downloadUrl));
+        if (map?.uid) acts.push(`<button class="btn ghost" data-copy-uid="${map.uid}">Copy UID</button>`);
+        return acts.join("");
+      }
+
+      function renderHero(rec) {
+        if (!rec) return;
+        const m = rec.map || {};
+
+        set("t-thumb",
+          m.thumbnailUrl
+            ? `<img src="${m.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">`
+            : `<div class="thumb" style="display:grid;place-items:center;color:var(--muted)">No image</div>`
+        );
+
+        setText("t-name", m.name || "(unknown map)");
+        setText("t-author", m.authorDisplayName || "—");
+        setText("t-date", rec.date ? `Released ${rec.date}` : "");
+        set("t-medals", buildMedals(m));
+        set("t-actions", actionsFromMap(m));
+
+        setText("t-uid", m.uid ? `${m.uid.slice(0, 8)}…` : "—");
+        setText("t-at", m.authorTime ? fmtMs(m.authorTime) : "—");
+      }
+
+      function renderGrid(days) {
+        let currentDays = {};
+
+        function renderGrid(days) {
+          currentDays = days || {};
+          const grid = document.getElementById("grid");
+          if (!grid) return;
+
+          const search = document.getElementById("mapSearch");
+          const q = String(search?.value || "").toLowerCase().trim();
+
+          grid.innerHTML = "";
+
+          const keys = Object.keys(currentDays).sort().reverse();
+
+          const filtered = keys.filter((k) => {
+            const d = currentDays[k];
+            const m = d.map || {};
+            const haystack = `${m.name || ""} ${m.authorDisplayName || ""} ${d.date || ""}`.toLowerCase();
+            return !q || haystack.includes(q);
+          });
+
+          if (!filtered.length) {
+            grid.innerHTML = `<div class="empty-state">No maps found for that search.</div>`;
+            return;
+          }
+
+          for (const k of filtered) {
+            const d = currentDays[k];
+            const m = d.map || {};
+
+            const card = document.createElement("article");
+            card.className = "card";
+            card.innerHTML = `
+      <div class="thumb">
+        ${m.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${m.thumbnailUrl}" alt="">` : ""}
+      </div>
+      <div class="meta">
+        <div class="date">${d.date}</div>
+        <h3 class="card-title">${m.name || "(unknown map)"}</h3>
+
+        <div class="byline">
+          <span class="byline-label">Author:</span>
+          <span class="badge">${m.authorDisplayName || "—"}</span>
+        </div>
+
+        ${buildMedals(m)}
+
+        <div class="meta-footer">
+          ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank" rel="noopener">⬇️ Download</a>` : ""}
+          ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
+        </div>
+      </div>`;
+            grid.appendChild(card);
+          }
+        }
+      }
+
+      async function loadMonth(ym) {
+        const month = await jget(`data/totd/${ym}.json`);
+        const latest = month.days[Object.keys(month.days).sort().pop()];
+        renderHero(latest);
+        renderGrid(month.days);
+      }
+
+      async function init() {
+        const sel = document.getElementById("month");
+        const monthsJ = await jget("/data/totd/months.json");
+        const months = (monthsJ?.months || []).slice().sort().reverse();
+
+        if (!months.length) {
+          if (sel) sel.innerHTML = `<option>(no data yet)</option>`;
+          return;
+        }
+
+        if (sel) {
+          sel.innerHTML = months.map(k => {
+            const [y, mm] = k.split("-");
+            return `<option value="${k}">${MONTHS[+mm - 1]} ${y}</option>`;
+          }).join("");
+
+          sel.value = months[0];
+          sel.onchange = () => loadMonth(sel.value);
+        }
+
+        await loadMonth(months[0]);
+        const search = document.getElementById("mapSearch");
+        if (search) {
+          search.addEventListener("input", () => {
+            renderGrid(currentDays);
+          });
+        }
+      }
+
+      document.addEventListener("click", (e) => {
+        const t = e.target;
+        if (t && t.matches("[data-copy-uid]")) {
+          const uid = t.getAttribute("data-copy-uid");
+          if (uid) {
+            navigator.clipboard?.writeText(uid).then(() => {
+              t.textContent = "Copied!";
+              setTimeout(() => t.textContent = "Copy UID", 1200);
+            }).catch(() => {
+              t.textContent = "Copy failed";
+              setTimeout(() => t.textContent = "Copy UID", 1200);
+            });
+          }
+        }
+      });
+
+      init().catch(err => {
+        console.error("[TOTD] init failed:", err);
+        const n = document.getElementById("t-name");
+        if (n) n.textContent = "(failed to load)";
+      });
+    })();
+  </script>
 </body>
+
 </html>
