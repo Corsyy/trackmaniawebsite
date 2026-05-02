@@ -1049,12 +1049,21 @@
     async function sendSystemMessage(text) {
   if (!tmeSupabase) return;
 
-  await tmeSupabase.from("shoutbox_messages").insert({
-    user_id: null,
+  const { data } = await tmeSupabase.auth.getUser();
+  const user = data?.user;
+  if (!user) return;
+
+  const { error } = await tmeSupabase.from("shoutbox_messages").insert({
+    user_id: user.id,          // ✅ must be your user id
     username: "SYSTEM",
     message: text,
     type: "system",
   });
+
+  if (error) {
+    console.warn("System message blocked:", error.message);
+    return;
+  }
 
   await loadShoutboxMessages();
 }
