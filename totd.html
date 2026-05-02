@@ -235,6 +235,23 @@
       box-shadow: var(--ring);
     }
 
+    .leaderboard-panel {
+      margin: 1rem 0 1.5rem;
+    }
+
+    .leaderboard-row {
+      display: flex;
+      justify-content: space-between;
+      padding: .55rem .75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .leaderboard-rank {
+      width: 24px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+
     /* ---------- HERO ---------- */
 
     .hero {
@@ -717,9 +734,11 @@
     </section>
 
     <section class="leaderboard-panel">
-  <h2 class="section-title">🏆 Today’s Leaderboard</h2>
-  <div id="totdLeaderboard" class="empty-state">Coming soon — leaderboard hookup next.</div>
-</section>
+      <h2 class="section-title">🏆 Today's Top 10</h2>
+      <div id="totdLeaderboard" class="empty-state">
+        Loading leaderboard...
+      </div>
+    </section>
 
     <div class="archive-tools">
       <h2 class="section-title">TOTD Archive</h2>
@@ -770,11 +789,11 @@
     `;
       }
 
-      function buildMedals(map){
-  if(!map) return "";
+      function buildMedals(map) {
+        if (!map) return "";
 
-  if (map.authorTime == null || Number(map.authorTime) <= 0) {
-    return `
+        if (map.authorTime == null || Number(map.authorTime) <= 0) {
+          return `
       <div class="medals">
         <span class="medal">
           <b>AT</b>
@@ -782,14 +801,14 @@
         </span>
       </div>
     `;
-  }
+        }
 
-  return `
+        return `
     <div class="medals">
       ${authorMedal(map.authorTime)}
     </div>
   `;
-}
+      }
 
       const button = (label, href, extra = '') =>
         `<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
@@ -821,33 +840,33 @@
         setText("t-at", m.authorTime ? fmtMs(m.authorTime) : "—");
       }
 
-      function renderGrid(days){
-  const grid = document.getElementById("grid");
-  if(!grid) return;
+      function renderGrid(days) {
+        const grid = document.getElementById("grid");
+        if (!grid) return;
 
-  currentDays = days || {};
+        currentDays = days || {};
 
-  const search = document.getElementById("mapSearch");
-  const q = (search?.value || "").toLowerCase();
+        const search = document.getElementById("mapSearch");
+        const q = (search?.value || "").toLowerCase();
 
-  grid.innerHTML = "";
+        grid.innerHTML = "";
 
-  const keys = Object.keys(currentDays).sort().reverse();
+        const keys = Object.keys(currentDays).sort().reverse();
 
-  let count = 0;
+        let count = 0;
 
-  for(const k of keys){
-    const d = currentDays[k];
-    const m = d.map || {};
+        for (const k of keys) {
+          const d = currentDays[k];
+          const m = d.map || {};
 
-    const hay = `${m.name || ""} ${m.authorDisplayName || ""}`.toLowerCase();
-    if(q && !hay.includes(q)) continue;
+          const hay = `${m.name || ""} ${m.authorDisplayName || ""}`.toLowerCase();
+          if (q && !hay.includes(q)) continue;
 
-    count++;
+          count++;
 
-    const card = document.createElement("article");
-    card.className = "card";
-    card.innerHTML = `
+          const card = document.createElement("article");
+          card.className = "card";
+          card.innerHTML = `
       <div class="thumb">
         ${m.thumbnailUrl ? `<img src="${m.thumbnailUrl}" loading="lazy">` : ""}
       </div>
@@ -868,13 +887,13 @@
         </div>
       </div>
     `;
-    grid.appendChild(card);
-  }
+          grid.appendChild(card);
+        }
 
-  if(count === 0){
-    grid.innerHTML = `<div class="empty-state">No maps found.</div>`;
-  }
-}
+        if (count === 0) {
+          grid.innerHTML = `<div class="empty-state">No maps found.</div>`;
+        }
+      }
 
       async function loadMonth(ym) {
         const month = await jget(`/data/totd/${ym}.json`);
