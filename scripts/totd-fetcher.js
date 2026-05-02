@@ -290,44 +290,74 @@ function baseDayRecord(y, m1, entry, idx) {
         }
     };
 }
-async function fetchTotdLeaderboard(mapUid, access) {
-    if (!mapUid || !access) return [];
+function extractNumber(v) {
+  if (typeof v === "number") return v;
 
-    try {
-        const url =
-            `https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
-            `/top?onlyWorld=true&length=10&offset=0`;
+  if (typeof v === "string") {
+    const n = Number(v.replace(/,/g, ""));
+    return Number.isFinite(n) ? n : NaN;
+  }
 
-        const j = await liveGet(url, access);
-        const rows = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
+  if (v && typeof v === "object") {
+    const keys = [
+      "timeMs",
+      "time",
+      "bestTime",
+      "personalBestTime",
+      "recordTime",
+      "score",
+      "value",
+      "best",
+      "record",
+    ];
 
-        return rows
-            .map((r, i) => ({
-                rank: Number(r.position ?? r.rank ?? i + 1),
-                accountId: r.accountId ?? null,
-                player: r.displayName || r.name || r.accountId || "Unknown",
-                timeMs: Number(
-                    r.timeMs ??
-                    r.time ??
-                    r.score?.timeMs ??
-                    r.score?.time ??
-                    r.score?.score ??
-                    r.score ??
-                    0
-                ),
-            }))
-            .filter((r) => r.accountId && Number.isFinite(r.timeMs) && r.timeMs > 0)
-            .sort((a, b) => a.rank - b.rank);
-    } catch (err) {
-        dlog("TOTD leaderboard failed", mapUid, err?.message || err);
-        return [];
+    for (const k of keys) {
+      if (k in v) {
+        const n = extractNumber(v[k]);
+        if (Number.isFinite(n)) return n;
+      }
     }
+  }
+
+  return NaN;
+}
+
+async function fetchTotdLeaderboard(mapUid, access) {
+  if (!mapUid || !access) return [];
+
+  try {
+    const url =
+      `https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(mapUid)}` +
+      `/top?onlyWorld=true&length=10&offset=0`;
+
+    const j = await liveGet(url, access);
+    const rows = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
+
+    console.log("[TOTD RAW LEADERBOARD]", mapUid, JSON.stringify(rows[0] || null));
+
+    return rows
+      .map((r, i) => {
+        const timeMs = extractNumber(r?.score ?? r?.timeMs ?? r?.time ?? r?.bestTime ?? r?.recordTime);
+
+        return {
+          rank: Number(r.position ?? r.rank ?? i + 1),
+          accountId: r.accountId ?? null,
+          player: r.displayName || r.name || r.accountId || "Unknown",
+          timeMs,
+        };
+      })
+      .filter((r) => r.accountId && Number.isFinite(r.timeMs) && r.timeMs > 0)
+      .sort((a, b) => a.rank - b.rank);
+  } catch (err) {
+    console.warn("[TOTD LEADERBOARD FAILED]", mapUid, err?.message || err);
+    return [];
+  }
 }
 async function writeTotdLeaderboard(mapUid, access) {
     if (!mapUid || !access) return;
 
     const rows = await fetchTotdLeaderboard(mapUid, access);
-
+console.log("[TOTD LEADERBOARD WRITTEN]", mapUid, rows.length);
     await ensureDir(TOTD_LEADERBOARD_DIR);
 
     await writeJson(
