@@ -1047,26 +1047,26 @@
       });
     }
     async function sendSystemMessage(text) {
-  if (!tmeSupabase) return;
+      if (!tmeSupabase) return;
 
-  const { data } = await tmeSupabase.auth.getUser();
-  const user = data?.user;
-  if (!user) return;
+      const { data } = await tmeSupabase.auth.getUser();
+      const user = data?.user;
+      if (!user) return;
 
-  const { error } = await tmeSupabase.from("shoutbox_messages").insert({
-    user_id: user.id,          // ✅ must be your user id
-    username: "SYSTEM",
-    message: text,
-    type: "system",
-  });
+      const { error } = await tmeSupabase.from("shoutbox_messages").insert({
+        user_id: user.id,          // ✅ must be your user id
+        username: "SYSTEM",
+        message: text,
+        type: "system",
+      });
 
-  if (error) {
-    console.warn("System message blocked:", error.message);
-    return;
-  }
+      if (error) {
+        console.warn("System message blocked:", error.message);
+        return;
+      }
 
-  await loadShoutboxMessages();
-}
+      await loadShoutboxMessages();
+    }
     function renderFromData(rawEvents) {
       const events = expandRecurringEvents(normalizeEvents(Array.isArray(rawEvents) ? rawEvents : []));
 
@@ -2236,10 +2236,10 @@
       }).join("");
 
       if (shouldScroll) {
-  shoutboxMessages.scrollTo({
-    top: shoutboxMessages.scrollHeight,
-    behavior: "smooth"
-  });
+        shoutboxMessages.scrollTo({
+          top: shoutboxMessages.scrollHeight,
+          behavior: "smooth"
+        });
       } else {
         const isNearBottom =
           shoutboxMessages.scrollHeight -
@@ -2997,13 +2997,18 @@
         await updateAuthUI();
         await window.startLogoutTimer?.();
 
-        startShoutboxRealtime();
+        if (!window.__realtimeStarted) {
+          window.__realtimeStarted = true;
+          startShoutboxRealtime();
+        }
         startTypingIndicator();
         startOnlineUsersPresence();
 
-        setInterval(() => {
-          loadShoutboxMessages(false).catch(console.warn);
-        }, 60000);
+        if (!window.__shoutboxInterval) {
+          window.__shoutboxInterval = setInterval(() => {
+            loadShoutboxMessages(false);
+          }, 5000); // faster updates (5s)
+        }
       } catch (err) {
         console.warn("Page auth/shoutbox init failed:", err);
 
