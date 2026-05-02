@@ -17,7 +17,7 @@ jobs:
     env:
       PUBLIC_DIR: .
       DEBUG: "1"
-      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
