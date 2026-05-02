@@ -716,6 +716,11 @@
         </div>
     </section>
 
+    <section class="leaderboard-panel">
+  <h2 class="section-title">🏆 Today’s Leaderboard</h2>
+  <div id="totdLeaderboard" class="empty-state">Coming soon — leaderboard hookup next.</div>
+</section>
+
     <div class="archive-tools">
       <h2 class="section-title">TOTD Archive</h2>
       <input id="mapSearch" class="search" type="search" placeholder="Search maps or authors...">
@@ -765,11 +770,26 @@
     `;
       }
 
-      function buildMedals(map) {
-        if (!map) return "";
-        const at = authorMedal(map.authorTime);
-        return at ? `<div class="medals">${at}</div>` : "";
-      }
+      function buildMedals(map){
+  if(!map) return "";
+
+  if (map.authorTime == null || Number(map.authorTime) <= 0) {
+    return `
+      <div class="medals">
+        <span class="medal">
+          <b>AT</b>
+          <span class="mono">Unavailable</span>
+        </span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="medals">
+      ${authorMedal(map.authorTime)}
+    </div>
+  `;
+}
 
       const button = (label, href, extra = '') =>
         `<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
