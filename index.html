@@ -2610,35 +2610,44 @@
     }
 
     function startShoutboxRealtime() {
-  if (!tmeSupabase) return;
+      if (!tmeSupabase) return;
 
-  if (shoutboxChannel) {
-    tmeSupabase.removeChannel(shoutboxChannel);
-    shoutboxChannel = null;
-  }
+      // 🔥 ALWAYS reset (this is the fix)
+      if (shoutboxChannel) {
+        tmeSupabase.removeChannel(shoutboxChannel);
+        shoutboxChannel = null;
+      }
 
-  shoutboxChannel = tmeSupabase
-    .channel("shoutbox-live-v2")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "shoutbox_messages" },
-      (payload) => {
-        console.log("Shoutbox realtime:", payload);
-        loadShoutboxMessages(false).catch(console.warn);
-      }
-    )
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "shoutbox_reactions" },
-      (payload) => {
-        console.log("Reaction realtime:", payload);
-        loadShoutboxMessages(false).catch(console.warn);
-      }
-    )
-    .subscribe((status) => {
-      console.log("Shoutbox realtime status:", status);
-    });
-}
+      shoutboxChannel = tmeSupabase
+        .channel("shoutbox-live-final")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "shoutbox_messages" },
+          (payload) => {
+            console.log("NEW MESSAGE:", payload);
+
+            // ⚡ instant update without full reload
+            loadShoutboxMessages(false);
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "DELETE", schema: "public", table: "shoutbox_messages" },
+          () => {
+            loadShoutboxMessages(false);
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "shoutbox_messages" },
+          () => {
+            loadShoutboxMessages(false);
+          }
+        )
+        .subscribe((status) => {
+          console.log("REALTIME STATUS:", status);
+        });
+    }
     function withTimeout(promise, ms = 12000, label = "Request") {
       return Promise.race([
         promise,
@@ -3014,7 +3023,9 @@
 
         if (!window.__realtimeStarted) {
           window.__realtimeStarted = true;
-          startShoutboxRealtime();
+          setTimeout(() => {
+            startShoutboxRealtime();
+          }, 500);
         }
         startTypingIndicator();
         startOnlineUsersPresence();
