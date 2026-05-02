@@ -553,8 +553,13 @@ async function writeTotdMonth(index = 0) {
 
 /* ----------------------------------- main ---------------------------------- */
 async function main() {
-    await ensureDir(TOTD_DIR);
-    await writeTotdMonth(0);
-    console.log("[DONE] TOTD updated with TMX + Nadeo medal fallback.");
+  await ensureDir(TOTD_DIR);
+
+  await writeTotdMonth(0);
+
+  const access = await getLiveAccessToken();
+  await writeLeaderboardsForExistingTotdFiles(access);
+
+  console.log("[DONE] TOTD + all existing leaderboards updated.");
 }
 main().catch(err => { console.error(err); process.exit(1); });
