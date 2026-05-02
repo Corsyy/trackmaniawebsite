@@ -226,7 +226,7 @@ async function writeTotdMonth(index=0){
       rec.map.downloadUrl = prevRec.downloadUrl;
     }
     // only fetch if we have a UID and no preserved link/medals yet
-    if (rec.map.uid && (!rec.map.downloadUrl || prevRec.authorTime==null)){
+    if (rec.map.uid){
       const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
       if (!rec.map.downloadUrl) rec.map.downloadUrl = downloadUrl || null;
       if (medals){
