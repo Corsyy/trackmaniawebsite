@@ -273,6 +273,13 @@ function baseDayRecord(y, m1, entry, idx) {
 }
 
 async function writeTotdMonth(index = 0) {
+  let liveAccess = null;
+
+  try {
+    liveAccess = await getLiveAccessToken();
+  } catch (err) {
+    dlog("Nadeo token unavailable:", err?.message || err);
+  }
   // 0) load remote list
   const j = await fetchTmioMonth(index);
   const { y, m1 } = tmioMonthYear(j);
