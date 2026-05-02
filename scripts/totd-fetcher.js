@@ -381,17 +381,41 @@ async function writeTotdMonth(index = 0) {
     dlog("no days found for", mKey);
   }
 }
+async function writeLeaderboardsForExistingTotdFiles(access) {
+  if (!access) return;
 
+  const files = await readdir(TOTD_DIR);
+
+  const monthFiles = files.filter((file) =>
+    file.endsWith(".json") &&
+    file !== "months.json" &&
+    !file.startsWith("_")
+  );
+
+  for (const file of monthFiles) {
+    const fullPath = path.join(TOTD_DIR, file);
+    const monthJson = await loadJson(fullPath, null);
+    const days = monthJson?.days || {};
+
+    for (const rec of Object.values(days)) {
+      const uid = rec?.map?.uid;
+      if (!uid) continue;
+
+      console.log("[TOTD LEADERBOARD BACKFILL]", file, uid);
+      await writeTotdLeaderboard(uid, access);
+      await sleep(120);
+    }
+  }
+}
 /* ----------------------------------- main ---------------------------------- */
 async function main() {
   await ensureDir(TOTD_DIR);
 
-  for (let i = 0; i < 6; i++) {
-    console.log(`[TOTD] Updating month index ${i}...`);
-    await writeTotdMonth(i);
-    await sleep(500);
-  }
+  await writeTotdMonth(0);
 
-  console.log("[DONE] TOTD + leaderboards updated.");
+  const access = await getLiveAccessToken();
+  await writeLeaderboardsForExistingTotdFiles(access);
+
+  console.log("[DONE] TOTD + all existing leaderboards updated.");
 }
 main().catch(err => { console.error(err); process.exit(1); });
