@@ -621,6 +621,23 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* View leaderboard button */
+.btn.ghost[data-load-board] {
+  border-color: rgba(74, 163, 255, 0.25);
+}
+
+.btn.ghost[data-load-board]:hover {
+  background: rgba(74, 163, 255, 0.08);
+  border-color: rgba(74, 163, 255, 0.5);
+}
+
+/* Optional: highlight active leaderboard */
+.leaderboard-panel.active {
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius);
+}
   </style>
 </head>
 
@@ -737,6 +754,13 @@
       <h2 class="section-title">🏆 Today's Top 10</h2>
       <div id="totdLeaderboard" class="empty-state">
         Loading leaderboard...
+      </div>
+    </section>
+
+    <section class="leaderboard-panel">
+      <h2 class="section-title">👑 COTD Winner</h2>
+      <div id="cotdWinnerBox" class="empty-state">
+        COTD results coming soon.
       </div>
     </section>
 
@@ -884,6 +908,7 @@
 
         <div class="meta-footer">
           ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank">⬇️ Download</a>` : ""}
+          ${m.uid ? `<button class="btn ghost" data-load-board="${m.uid}" data-map-name="${(m.name || "Map").replace(/"/g, "&quot;")}">View Top 10</button>` : ""}
           ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
         </div>
       </div>
@@ -976,6 +1001,22 @@
 
       document.addEventListener("click", (e) => {
         const t = e.target;
+        if (t && t.matches("[data-load-board]")) {
+          const uid = t.getAttribute("data-load-board");
+          const name = t.getAttribute("data-map-name") || "Selected map";
+
+          const title = document.querySelector(".leaderboard-panel .section-title");
+          if (title) title.textContent = `🏆 Top 10 — ${name}`;
+
+          loadTotdLeaderboard(uid);
+
+          document.querySelector(".leaderboard-panel")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+
+          return;
+        }
         if (t && t.matches("[data-copy-uid]")) {
           const uid = t.getAttribute("data-copy-uid");
           if (uid) {
