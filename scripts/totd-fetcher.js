@@ -364,9 +364,16 @@ async function writeTotdMonth(index = 0) {
 }
 
 /* ----------------------------------- main ---------------------------------- */
-async function main() {
+async function main(){
   await ensureDir(TOTD_DIR);
-  await writeTotdMonth(0); // current month (index 0)
-  console.log("[DONE] TOTD updated with TMX medal times + difficulty.");
+
+  // Rebuild current month + previous 12 months
+  for (let i = 0; i < 12; i++) {
+    console.log(`[TOTD] Updating month index ${i}...`);
+    await writeTotdMonth(i);
+    await sleep(500);
+  }
+
+  console.log("[DONE] TOTD updated with TMX + Nadeo medal fallback.");
 }
 main().catch(err => { console.error(err); process.exit(1); });
