@@ -15,11 +15,11 @@ jobs:
     permissions:
       contents: write
     env:
-  PUBLIC_DIR: .
-  DEBUG: "1"
-  REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-  CLIENT_ID: ${{ secrets.CLIENT_ID }}
-  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      PUBLIC_DIR: .
+      DEBUG: "1"
+      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
     steps:
       - name: Checkout repository
