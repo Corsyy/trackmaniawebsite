@@ -1,12 +1,12 @@
-name: Update Weekly Shorts (static JSON)
+name: Update TOTD
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "0 18 * * *"
 
 concurrency:
-  group: weekly-shorts
+  group: update-totd
   cancel-in-progress: true
 
 jobs:
@@ -14,70 +14,96 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     env:
       PUBLIC_DIR: .
-      DEBUG: "0"
-
+      DEBUG: "1"
       REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
-      CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
-      CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install deps (if package-lock exists)
+      - name: Run TOTD fetcher
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
+          echo "Running TOTD fetcher..."
+          node -v
+          node scripts/totd-fetcher.js
+
+          echo ""
+          echo "Listing generated TOTD files:"
+          ls -R data/totd || true
+
+          echo ""
+          echo "Listing generated TOTD leaderboard files:"
+          ls -R data/totd-leaderboards || true
+
+          echo ""
+          echo "Root snapshot:"
+          ls -l totd.json || true
+
+      - name: Compute new content hash
+        id: newhash
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tmplist=$(mktemp)
+
+          if [ -f totd.json ]; then
+            echo "totd.json" >> "$tmplist"
+          fi
+
+          if [ -d data/totd ]; then
+            find data/totd -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+          fi
+
+          if [ -d data/totd-leaderboards ]; then
+            find data/totd-leaderboards -type f -name '*.json' -print0 | sort -z | xargs -0 -I{} echo "{}" >> "$tmplist"
+          fi
+
+          if [ -s "$tmplist" ]; then
+            HASH=$(xargs -a "$tmplist" -I{} sha256sum "{}" | sort | sha256sum | cut -d' ' -f1)
           else
-            echo "No package-lock.json, skipping npm ci"
+            HASH="none"
           fi
 
-      - name: Run Weekly Shorts updater
-        id: update
-        run: node scripts/weekly-shorts-update.js
+          echo "new=$HASH" >> "$GITHUB_OUTPUT"
 
-      - name: Rotate NADEO refresh token
-        if: success() && steps.update.outputs.new_refresh_token != ''
-        env:
-          GH_TOKEN: ${{ secrets.GH_SECRET_ROTATION_PAT }}
-          NEW_REFRESH_TOKEN: ${{ steps.update.outputs.new_refresh_token }}
+      - name: Read previous hash
+        id: prevhash
+        shell: bash
         run: |
-          gh secret set NADEO_REFRESH_TOKEN --body "$NEW_REFRESH_TOKEN"
+          PREV=$(git show HEAD:.totd.hash 2>/dev/null || true)
+          echo "prev=${PREV:-none}" >> "$GITHUB_OUTPUT"
 
-      - name: Commit & push if changed
+      - name: Commit updated TOTD data
+        if: steps.newhash.outputs.new != steps.prevhash.outputs.prev
         run: |
+          echo "${{ steps.newhash.outputs.new }}" > .totd.hash
+
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add \
-            data/weekly-shorts/weeks.json \
-            data/weekly-shorts/aggregate.json \
-            data/weekly-shorts/changelog.json \
-            data/weekly-shorts/wr-state.json \
-            data/weekly-shorts/postweek-map-state.json \
-            data/weekly-shorts/weeks \
-            data/weekly-shorts/name-cache.json \
-            data/weekly-shorts/goat-weeks.json \
-            data/weekly-shorts/goat-aggregate.json \
-            data/weekly-shorts/goat-weeks
+          git add .totd.hash totd.json data/totd/*.json data/totd-leaderboards/*.json 2>/dev/null || true
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
+          if ! git diff --cached --quiet; then
+            echo "Changes detected — committing updates."
+            git commit -m "data: refresh TOTD [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD)}" || true
+            git push
+          else
+            echo "No staged changes."
           fi
 
-          git commit -m "Update Weekly Shorts data"
-          git pull --rebase origin main
-          git push origin main
+      - name: No changes
+        if: steps.newhash.outputs.new == steps.prevhash.outputs.prev
+        run: echo "No content changes detected; nothing to push."
