@@ -1046,6 +1046,18 @@
         });
       });
     }
+    async function sendSystemMessage(text) {
+  if (!tmeSupabase) return;
+
+  await tmeSupabase.from("shoutbox_messages").insert({
+    user_id: null,
+    username: "SYSTEM",
+    message: text,
+    type: "system",
+  });
+
+  await loadShoutboxMessages();
+}
     function renderFromData(rawEvents) {
       const events = expandRecurringEvents(normalizeEvents(Array.isArray(rawEvents) ? rawEvents : []));
 
