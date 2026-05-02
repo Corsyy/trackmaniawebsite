@@ -838,6 +838,7 @@
 
         setText("t-uid", m.uid ? `${m.uid.slice(0, 8)}…` : "—");
         setText("t-at", m.authorTime ? fmtMs(m.authorTime) : "—");
+        loadTotdLeaderboard(m.uid);
       }
 
       function renderGrid(days) {
@@ -915,7 +916,35 @@
         renderHero(latest);
         renderGrid(days);
       }
+      async function loadTotdLeaderboard(mapUid) {
+        const el = document.getElementById("totdLeaderboard");
+        if (!el || !mapUid) return;
 
+        el.innerHTML = "Loading leaderboard...";
+
+        try {
+          const res = await fetch(`/data/totd-leaderboards/${mapUid}.json?t=${Date.now()}`);
+          if (!res.ok) throw new Error("Missing leaderboard JSON");
+
+          const data = await res.json();
+          const rows = data.rows || [];
+
+          if (!rows.length) {
+            el.innerHTML = "No leaderboard data yet.";
+            return;
+          }
+
+          el.innerHTML = rows.slice(0, 10).map((r, i) => `
+      <div class="leaderboard-row">
+        <span class="leaderboard-rank">#${i + 1}</span>
+        <span>${r.player || "Unknown"}</span>
+        <strong class="mono">${fmtMs(r.timeMs)}</strong>
+      </div>
+    `).join("");
+        } catch (err) {
+          el.innerHTML = "Leaderboard coming soon.";
+        }
+      }
       async function init() {
         const sel = document.getElementById("month");
         const monthsJ = await jget("/data/totd/months.json");
