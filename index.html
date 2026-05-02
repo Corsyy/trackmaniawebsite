@@ -2624,10 +2624,8 @@
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "shoutbox_messages" },
           (payload) => {
-            console.log("NEW MESSAGE:", payload);
-
-            // ⚡ instant update without full reload
-            loadShoutboxMessages(false);
+            console.log("SHOUTBOX MESSAGE REALTIME:", payload);
+            loadShoutboxMessages(false).catch(console.warn);
           }
         )
         .on(
