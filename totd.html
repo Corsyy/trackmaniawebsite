@@ -801,46 +801,39 @@
         setText("t-at", m.authorTime ? fmtMs(m.authorTime) : "—");
       }
 
-      function renderGrid(days) {
-        let currentDays = {};
+      function renderGrid(days){
+  const grid = document.getElementById("grid");
+  if(!grid) return;
 
-        function renderGrid(days) {
-          currentDays = days || {};
-          const grid = document.getElementById("grid");
-          if (!grid) return;
+  currentDays = days || {};
 
-          const search = document.getElementById("mapSearch");
-          const q = String(search?.value || "").toLowerCase().trim();
+  const search = document.getElementById("mapSearch");
+  const q = (search?.value || "").toLowerCase();
 
-          grid.innerHTML = "";
+  grid.innerHTML = "";
 
-          const keys = Object.keys(currentDays).sort().reverse();
+  const keys = Object.keys(currentDays).sort().reverse();
 
-          const filtered = keys.filter((k) => {
-            const d = currentDays[k];
-            const m = d.map || {};
-            const haystack = `${m.name || ""} ${m.authorDisplayName || ""} ${d.date || ""}`.toLowerCase();
-            return !q || haystack.includes(q);
-          });
+  let count = 0;
 
-          if (!filtered.length) {
-            grid.innerHTML = `<div class="empty-state">No maps found for that search.</div>`;
-            return;
-          }
+  for(const k of keys){
+    const d = currentDays[k];
+    const m = d.map || {};
 
-          for (const k of filtered) {
-            const d = currentDays[k];
-            const m = d.map || {};
+    const hay = `${m.name || ""} ${m.authorDisplayName || ""}`.toLowerCase();
+    if(q && !hay.includes(q)) continue;
 
-            const card = document.createElement("article");
-            card.className = "card";
-            card.innerHTML = `
+    count++;
+
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `
       <div class="thumb">
-        ${m.thumbnailUrl ? `<img loading="lazy" referrerpolicy="no-referrer" src="${m.thumbnailUrl}" alt="">` : ""}
+        ${m.thumbnailUrl ? `<img src="${m.thumbnailUrl}" loading="lazy">` : ""}
       </div>
       <div class="meta">
         <div class="date">${d.date}</div>
-        <h3 class="card-title">${m.name || "(unknown map)"}</h3>
+        <h3 class="card-title">${m.name || "(unknown)"}</h3>
 
         <div class="byline">
           <span class="byline-label">Author:</span>
@@ -850,14 +843,18 @@
         ${buildMedals(m)}
 
         <div class="meta-footer">
-          ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank" rel="noopener">⬇️ Download</a>` : ""}
+          ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank">⬇️ Download</a>` : ""}
           ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
         </div>
-      </div>`;
-            grid.appendChild(card);
-          }
-        }
-      }
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+
+  if(count === 0){
+    grid.innerHTML = `<div class="empty-state">No maps found.</div>`;
+  }
+}
 
       async function loadMonth(ym) {
         const month = await jget(`/data/totd/${ym}.json`);
