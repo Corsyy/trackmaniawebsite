@@ -25,6 +25,10 @@ const loadJson = async (p, f) => (await exists(p)) ? JSON.parse(await readFile(p
 const writeJson = (p, obj) => writeFile(p, JSON.stringify(obj, null, 2), "utf8");
 
 /* --------------------------------- utils ----------------------------------- */
+const OAUTH_CLIENT_ID = process.env.CLIENT_ID;
+const OAUTH_CLIENT_SECRET = process.env.CLIENT_SECRET;
+
+let cachedOAuth = { token: null, expAt: 0 };
 const pad2 = (n) => String(n).padStart(2, "0");
 const monthKey = (y, m1) => `${y}-${pad2(m1)}`;
 const dateKey = (y, m1, d) => `${y}-${pad2(m1)}-${pad2(d)}`;
@@ -321,7 +325,79 @@ function extractNumber(v) {
 
   return NaN;
 }
+async function getOAuthToken() {
+  const now = Date.now();
+  if (cachedOAuth.token && now < cachedOAuth.expAt - 30_000) return cachedOAuth.token;
 
+  if (!OAUTH_CLIENT_ID || !OAUTH_CLIENT_SECRET) {
+    throw new Error("Missing CLIENT_ID / CLIENT_SECRET env.");
+  }
+
+  const r = await fetchRetry("https://api.trackmania.com/api/access_token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "trackmaniaevents.com/totd",
+    },
+    body: new URLSearchParams({
+      grant_type: "client_credentials",
+      client_id: OAUTH_CLIENT_ID,
+      client_secret: OAUTH_CLIENT_SECRET,
+    }).toString(),
+  });
+
+  if (!r.ok) throw new Error(`oauth token failed ${r.status}`);
+
+  const j = await r.json();
+  const token = j.access_token || j.accessToken;
+  const expiresIn = j.expires_in || 3600;
+
+  if (!token) throw new Error("OAuth response missing access token");
+
+  cachedOAuth = {
+    token,
+    expAt: Date.now() + expiresIn * 1000,
+  };
+
+  return token;
+}
+
+async function resolveDisplayNames(accountIds) {
+  const ids = Array.from(new Set((accountIds || []).filter(Boolean)));
+  if (!ids.length) return {};
+
+  try {
+    const token = await getOAuthToken();
+    const out = {};
+
+    for (let i = 0; i < ids.length; i += 50) {
+      const batch = ids.slice(i, i + 50);
+      const params = new URLSearchParams();
+
+      for (const id of batch) {
+        params.append("accountId[]", id);
+      }
+
+      const r = await fetchRetry(`https://api.trackmania.com/api/display-names?${params.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "User-Agent": "trackmaniaevents.com/totd",
+        },
+      });
+
+      if (r.ok) {
+        const j = await r.json();
+        Object.assign(out, j);
+      }
+    }
+
+    return out;
+  } catch (err) {
+    console.warn("[TOTD NAME RESOLVE FAILED]", err?.message || err);
+    return {};
+  }
+}
 async function fetchTotdLeaderboard(mapUid, access) {
   if (!mapUid || !access) return [];
 
@@ -335,19 +411,31 @@ async function fetchTotdLeaderboard(mapUid, access) {
 
     console.log("[TOTD RAW LEADERBOARD]", mapUid, JSON.stringify(rows[0] || null));
 
-    return rows
-      .map((r, i) => {
-        const timeMs = extractNumber(r?.score ?? r?.timeMs ?? r?.time ?? r?.bestTime ?? r?.recordTime);
+    const parsed = rows
+  .map((r, i) => ({
+    rank: Number(r.position ?? r.rank ?? i + 1),
+    accountId: r.accountId ?? null,
+    player: r.displayName || r.name || r.accountId || "Unknown",
+    timeMs: Number(
+      r.timeMs ??
+      r.time ??
+      r.score?.timeMs ??
+      r.score?.time ??
+      r.score?.score ??
+      r.score ??
+      0
+    ),
+  }))
+  .filter((r) => r.accountId && Number.isFinite(r.timeMs) && r.timeMs > 0)
+  .sort((a, b) => a.rank - b.rank);
 
-        return {
-          rank: Number(r.position ?? r.rank ?? i + 1),
-          accountId: r.accountId ?? null,
-          player: r.displayName || r.name || r.accountId || "Unknown",
-          timeMs,
-        };
-      })
-      .filter((r) => r.accountId && Number.isFinite(r.timeMs) && r.timeMs > 0)
-      .sort((a, b) => a.rank - b.rank);
+// 🔥 THIS IS THE NEW PART
+const names = await resolveDisplayNames(parsed.map(r => r.accountId));
+
+return parsed.map(r => ({
+  ...r,
+  player: names[r.accountId] || r.player || r.accountId
+}));
   } catch (err) {
     console.warn("[TOTD LEADERBOARD FAILED]", mapUid, err?.message || err);
     return [];
