@@ -429,13 +429,7 @@ async function fetchTotdLeaderboard(mapUid, access) {
   .filter((r) => r.accountId && Number.isFinite(r.timeMs) && r.timeMs > 0)
   .sort((a, b) => a.rank - b.rank);
 
-// 🔥 THIS IS THE NEW PART
-const names = await resolveDisplayNames(parsed.map(r => r.accountId));
-
-return parsed.map(r => ({
-  ...r,
-  player: names[r.accountId] || r.player || r.accountId
-}));
+return parsed;
   } catch (err) {
     console.warn("[TOTD LEADERBOARD FAILED]", mapUid, err?.message || err);
     return [];
