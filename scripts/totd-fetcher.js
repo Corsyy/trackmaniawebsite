@@ -630,12 +630,10 @@ async function main() {
   await ensureDir(TOTD_DIR);
 
   await writeTotdMonth(0);
-  await writeCotdResultsPlaceholder();
-  await debugCotdMatches(access, 42741)
-  const access = await getLiveAccessToken();
-  await writeLeaderboardsForExistingTotdFiles(access);
 
-  await debugCotdCompetitions(); // 👈 ADD THIS
+  const access = await getLiveAccessToken();
+
+  await debugCotdMatches(access, 42741);
 
   console.log("[DONE]");
 }
