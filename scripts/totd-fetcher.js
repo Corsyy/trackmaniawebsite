@@ -409,27 +409,41 @@ async function fetchTotdLeaderboard(mapUid, access) {
     const j = await liveGet(url, access);
     const rows = Array.isArray(j?.tops?.[0]?.top) ? j.tops[0].top : [];
 
-    console.log("[TOTD RAW LEADERBOARD]", mapUid, JSON.stringify(rows[0] || null));
+    const accountIds = rows
+      .map((r) => r.accountId)
+      .filter(Boolean);
+
+    const namesById = await resolveDisplayNames(accountIds);
 
     const parsed = rows
-  .map((r, i) => ({
-    rank: Number(r.position ?? r.rank ?? i + 1),
-    accountId: r.accountId ?? null,
-    player: r.displayName || r.name || r.accountId || "Unknown",
-    timeMs: Number(
-      r.timeMs ??
-      r.time ??
-      r.score?.timeMs ??
-      r.score?.time ??
-      r.score?.score ??
-      r.score ??
-      0
-    ),
-  }))
-  .filter((r) => r.accountId && Number.isFinite(r.timeMs) && r.timeMs > 0)
-  .sort((a, b) => a.rank - b.rank);
+      .map((r, i) => {
+        const accountId = r.accountId ?? null;
 
-return parsed;
+        return {
+          rank: Number(r.position ?? r.rank ?? i + 1),
+          accountId,
+          player: stripTmFormatting(
+            namesById[accountId] ||
+            r.displayName ||
+            r.name ||
+            accountId ||
+            "Unknown"
+          ),
+          timeMs: Number(
+            r.timeMs ??
+            r.time ??
+            r.score?.timeMs ??
+            r.score?.time ??
+            r.score?.score ??
+            r.score ??
+            0
+          ),
+        };
+      })
+      .filter((r) => r.accountId && Number.isFinite(r.timeMs) && r.timeMs > 0)
+      .sort((a, b) => a.rank - b.rank);
+
+    return parsed;
   } catch (err) {
     console.warn("[TOTD LEADERBOARD FAILED]", mapUid, err?.message || err);
     return [];
@@ -572,152 +586,12 @@ async function writeLeaderboardsForExistingTotdFiles(access) {
     }
   }
 }
-async function debugCotdCompetitions() {
-  try {
-    const r = await fetchRetry(
-      "https://meet.trackmania.nadeo.club/api/competitions?length=10&offset=0",
-      {
-        headers: {
-          Accept: "application/json",
-          "User-Agent": USER_AGENT,
-        },
-      }
-    );
-
-    if (!r.ok) {
-      console.warn("[COTD DEBUG FAILED]", r.status);
-      return;
-    }
-
-    const j = await r.json();
-
-    console.log("[COTD DEBUG RESPONSE]", JSON.stringify(j).slice(0, 2000));
-  } catch (err) {
-    console.warn("[COTD DEBUG ERROR]", err?.message || err);
-  }
-}
-async function writeCotdResultsPlaceholder() {
-  await writeJson(`${TOTD_DIR}/cotd-results.json`, {
-    generatedAt: new Date().toISOString(),
-    mainWinner: null,
-    status: "debug only - winner parser not added yet"
-  });
-}
-async function liveMeetGet(url, access) {
-  const r = await fetchRetry(url, {
-    headers: {
-      Authorization: `nadeo_v1 t=${access}`,
-      Accept: "application/json",
-      "User-Agent": USER_AGENT,
-    },
-  });
-
-  if (!r.ok) {
-    const txt = await r.text().catch(() => "");
-    throw new Error(`${url} -> ${r.status} ${txt}`);
-  }
-
-  return r.json();
-}
-async function writeCotdMatch1Result(access, competitionId) {
-  const url = `https://meet.trackmania.nadeo.club/api/competitions/${competitionId}/rounds/1/matches?length=5&offset=0`;
-
-  const j = await liveMeetGet(url, access);
-  const result = extractMatch1Winner(j);
-
-  await ensureDir(TOTD_DIR);
-
-  await writeJson(path.join(TOTD_DIR, "cotd-results.json"), {
-    generatedAt: new Date().toISOString(),
-    ...result,
-  });
-
-  console.log("[COTD RESULT WRITTEN]", result);
-}
-async function debugCotdMatches(access, competitionId) {
-  try {
-    const url = `https://meet.trackmania.nadeo.club/api/competitions/${competitionId}/rounds/1/matches?length=5&offset=0`;
-
-    const r = await fetchRetry(url, {
-      headers: {
-        Authorization: `nadeo_v1 t=${access}`,
-        Accept: "application/json",
-        "User-Agent": USER_AGENT,
-      },
-    });
-
-    if (!r.ok) {
-      console.warn("[COTD MATCHES DEBUG FAILED]", r.status, await r.text().catch(() => ""));
-      return;
-    }
-
-    const j = await r.json();
-    console.log("[COTD MATCHES DEBUG]", JSON.stringify(j, null, 2).slice(0, 6000));
-  } catch (err) {
-    console.warn("[COTD MATCHES DEBUG ERROR]", err?.message || err);
-  }
-}
-function normalizeArrayPayload(j) {
-  if (Array.isArray(j)) return j;
-  if (Array.isArray(j?.items)) return j.items;
-  if (Array.isArray(j?.matches)) return j.matches;
-  if (Array.isArray(j?.rounds)) return j.rounds;
-  return [];
-}
-
-function extractMatch1Winner(matchesJson) {
-  const matches = normalizeArrayPayload(matchesJson);
-
-  const match1 =
-    matches.find((m) => Number(m.position ?? m.rank ?? m.matchNumber ?? m.id) === 1) ||
-    matches.find((m) => String(m.name || m.label || "").toLowerCase().includes("match 1")) ||
-    matches[0];
-
-  if (!match1) return null;
-
-  const players =
-    match1.players ||
-    match1.participants ||
-    match1.results ||
-    match1.ranking ||
-    match1.teams ||
-    [];
-
-  const winnerRow = players.find((p) =>
-    Number(p.rank ?? p.position ?? p.placement ?? p.result?.rank ?? p.result?.position) === 1
-  );
-
-  if (!winnerRow) return null;
-
-  const player = winnerRow.player || winnerRow.account || winnerRow.user || winnerRow;
-
-  return {
-    winner:
-      stripTmFormatting(
-        player.displayName ||
-        player.name ||
-        winnerRow.displayName ||
-        winnerRow.name ||
-        "Unknown"
-      ),
-    accountId:
-      player.accountId ||
-      player.id ||
-      winnerRow.accountId ||
-      winnerRow.playerId ||
-      null,
-    match: 1,
-  };
-}
 async function main() {
   await ensureDir(TOTD_DIR);
 
   await writeTotdMonth(0);
 
-  const access = await getLiveAccessToken();
-
-  await writeCotdMatch1Result(access, 42741);
-
   console.log("[DONE]");
 }
+main().catch(err => { console.error(err); process.exit(1); });
 main().catch(err => { console.error(err); process.exit(1); });
