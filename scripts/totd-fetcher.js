@@ -603,11 +603,35 @@ async function writeCotdResultsPlaceholder() {
     status: "debug only - winner parser not added yet"
   });
 }
+async function debugCotdMatches(access, competitionId) {
+  try {
+    const url = `https://meet.trackmania.nadeo.club/api/competitions/${competitionId}/rounds/1/matches?length=5&offset=0`;
+
+    const r = await fetchRetry(url, {
+      headers: {
+        Authorization: `nadeo_v1 t=${access}`,
+        Accept: "application/json",
+        "User-Agent": USER_AGENT,
+      },
+    });
+
+    if (!r.ok) {
+      console.warn("[COTD MATCHES DEBUG FAILED]", r.status, await r.text().catch(() => ""));
+      return;
+    }
+
+    const j = await r.json();
+    console.log("[COTD MATCHES DEBUG]", JSON.stringify(j, null, 2).slice(0, 6000));
+  } catch (err) {
+    console.warn("[COTD MATCHES DEBUG ERROR]", err?.message || err);
+  }
+}
 async function main() {
   await ensureDir(TOTD_DIR);
 
   await writeTotdMonth(0);
   await writeCotdResultsPlaceholder();
+  await debugCotdMatches(access, 42741)
   const access = await getLiveAccessToken();
   await writeLeaderboardsForExistingTotdFiles(access);
 
