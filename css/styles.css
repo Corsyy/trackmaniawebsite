@@ -1622,4 +1622,787 @@
     #schedule::before {
       background: none !important
     }
-  
+
+    #shoutboxMessages {
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    #shoutboxMessages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #shoutboxMessages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .auth-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auth-panel .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.auth-panel label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.auth-panel .input {
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+}
+
+.auth-panel .btn.primary {
+  margin-top: 0.5rem;
+}
+
+.auth-link-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.auth-link-btn:hover {
+  color: #fff;
+}
+
+
+/* ========================================================================== */
+/* TRACKMANIA EVENTS — HOME PAGE REDESIGN OVERRIDES                           */
+/* Paste-safe: this keeps your existing HTML/JS, but changes the visual feel.  */
+/* ========================================================================== */
+
+:root {
+  --bg: #080d14;
+  --bg-2: #0b111b;
+  --bg-3: #101826;
+
+  --panel: #111a27;
+  --panel-2: #0d1521;
+  --panel-3: #0a1019;
+
+  --text: #f4f7fb;
+  --muted: #93a4ba;
+  --soft: #dce7f7;
+
+  --accent: #4f8cff;
+  --accent-2: #33d69f;
+  --accent-3: #f5b84b;
+  --danger: #ff6b7a;
+
+  --ok: #33d69f;
+  --warn: #f5b84b;
+
+  --border: rgba(255, 255, 255, .085);
+  --border-strong: rgba(255, 255, 255, .16);
+
+  --shadow-sm: 0 8px 22px rgba(0, 0, 0, .26);
+  --shadow-md: 0 18px 42px rgba(0, 0, 0, .34);
+  --shadow-lg: 0 30px 70px rgba(0, 0, 0, .42);
+
+  --radius: 18px;
+  --radius-sm: 11px;
+
+  --ring: 0 0 0 3px rgba(79, 140, 255, .20);
+  --heroCardH: 430px;
+}
+
+::selection {
+  background: rgba(79, 140, 255, .36);
+  color: #fff;
+}
+
+body,
+body.bg-track-curves {
+  background:
+    radial-gradient(900px 520px at 12% -12%, rgba(79, 140, 255, .13), transparent 62%),
+    radial-gradient(780px 420px at 90% 8%, rgba(51, 214, 159, .085), transparent 58%),
+    linear-gradient(180deg, #080d14 0%, #0b111b 48%, #080d14 100%);
+  color: var(--text);
+}
+
+body.bg-track-curves::before {
+  opacity: .026;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
+  background-size: 72px 72px, 72px 72px, 220px 220px;
+}
+
+body.bg-track-curves::after {
+  background:
+    linear-gradient(115deg, rgba(79,140,255,.055), transparent 35%),
+    radial-gradient(900px 420px at 48% -220px, rgba(79, 140, 255, .10), transparent 62%);
+}
+
+/* ---------- Header: more app/platform, less landing template ---------- */
+
+header {
+  background: rgba(8, 13, 20, .82);
+  backdrop-filter: blur(16px) saturate(135%);
+  border-bottom: 1px solid rgba(255,255,255,.065);
+}
+
+.nav {
+  padding: .82rem 0;
+}
+
+.brand {
+  font-size: 1.02rem;
+  letter-spacing: -.015em;
+}
+
+.brand-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02)),
+    linear-gradient(135deg, rgba(79,140,255,.22), rgba(51,214,159,.12));
+  border-color: rgba(255,255,255,.11);
+}
+
+.navlinks {
+  gap: 1.05rem;
+}
+
+.nav a {
+  font-size: .88rem;
+  font-weight: 760;
+  color: #aebbd0;
+}
+
+.nav a:hover,
+.nav a:focus {
+  color: #f5f9ff;
+}
+
+.nav a.active::after {
+  bottom: -8px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  min-height: 40px;
+  padding: .58rem .92rem;
+  border-radius: 11px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)),
+    #101826;
+  border-color: rgba(255,255,255,.09);
+  color: #f1f6ff;
+  font-weight: 780;
+  font-size: .88rem;
+  letter-spacing: .005em;
+  box-shadow: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+    #142033;
+  border-color: rgba(255,255,255,.16);
+  box-shadow: 0 10px 26px rgba(0,0,0,.28);
+}
+
+.btn.primary {
+  color: #061018;
+  border-color: rgba(79,140,255,.35);
+  background:
+    linear-gradient(135deg, #7fb0ff 0%, #4f8cff 48%, #33d69f 120%);
+  box-shadow: 0 12px 28px rgba(79,140,255,.18);
+}
+
+.btn.primary:hover {
+  filter: none;
+  box-shadow: 0 16px 34px rgba(79,140,255,.24);
+}
+
+/* ---------- New homepage hero feel using existing HTML ---------- */
+
+.hero {
+  position: relative;
+  padding: clamp(2.6rem, 5.5vw, 5.2rem) 0 2.6rem;
+  overflow: hidden;
+  background: transparent;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(760px 390px at 18% 16%, rgba(79,140,255,.12), transparent 62%),
+    radial-gradient(560px 320px at 82% 22%, rgba(51,214,159,.09), transparent 64%);
+  z-index: -1;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 1.2rem;
+  width: min(1180px, 92vw);
+  height: calc(100% - 2.4rem);
+  transform: translateX(-50%);
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,.045);
+  border-radius: 30px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.035), transparent 30%),
+    linear-gradient(180deg, rgba(17,26,39,.34), rgba(8,13,20,.08));
+  z-index: -1;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .94fr) minmax(420px, 1.06fr);
+  gap: 1.8rem;
+  align-items: stretch;
+}
+
+.hero-top {
+  justify-content: center;
+  min-height: 460px;
+  padding: clamp(1rem, 2vw, 1.6rem) 0;
+}
+
+.hero-row {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.chip,
+#hero-chip,
+#live-chip {
+  padding: .43rem .72rem;
+  border-radius: 999px;
+  color: #dbeafe;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    rgba(79,140,255,.10);
+  border: 1px solid rgba(125, 170, 255, .18);
+  box-shadow: none;
+  font-size: .77rem;
+  font-weight: 820;
+}
+
+#hero-chip::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--ok);
+  box-shadow: 0 0 0 4px rgba(51,214,159,.12);
+}
+
+.h1 {
+  max-width: 720px;
+  font-size: clamp(2.75rem, 5.6vw, 5.7rem);
+  line-height: .94;
+  margin: .55rem 0 0;
+  font-weight: 920;
+  letter-spacing: -.06em;
+  color: #f8fbff;
+}
+
+.h1::after {
+  content: "";
+  display: block;
+  width: 78px;
+  height: 3px;
+  margin-top: 1.05rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.lead {
+  color: #a8b6ca;
+  max-width: 58ch;
+  margin-top: .35rem;
+  font-size: clamp(1rem, 1.2vw, 1.12rem);
+  line-height: 1.65;
+}
+
+.keyfacts {
+  margin-top: 1rem;
+  gap: .55rem;
+}
+
+.pill {
+  padding: .5rem .75rem;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)),
+    rgba(17, 26, 39, .78);
+  border: 1px solid rgba(255,255,255,.09);
+  color: #dce7f8;
+  font-size: .86rem;
+  font-weight: 760;
+  backdrop-filter: blur(8px);
+}
+
+/* ---------- Panels / cards ---------- */
+
+.card,
+.event,
+.shot,
+.auth-dialog {
+  border-color: rgba(255,255,255,.085);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)),
+    radial-gradient(420px at 14% 0%, rgba(79,140,255,.055), transparent 58%),
+    linear-gradient(180deg, rgba(17,26,39,.96), rgba(9,15,24,.96));
+  border-radius: 18px;
+  box-shadow: 0 18px 42px rgba(0,0,0,.34);
+}
+
+.card:hover,
+.shot:hover {
+  transform: translateY(-2px) scale(1.002);
+  border-color: rgba(255,255,255,.15);
+  box-shadow: 0 24px 54px rgba(0,0,0,.40);
+}
+
+.card-header {
+  padding: .9rem 1rem .72rem;
+  border-bottom: 1px solid rgba(255,255,255,.075);
+  color: #f8fbff;
+  letter-spacing: -.01em;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+/* ---------- Countdown dashboard card ---------- */
+
+#countdown-card {
+  min-height: 235px;
+  border-radius: 22px;
+  overflow: hidden;
+  background-image:
+    linear-gradient(135deg, rgba(17,26,39,.97), rgba(9,15,24,.94)),
+    radial-gradient(520px at 0% 0%, rgba(79,140,255,.14), transparent 58%),
+    var(--cd-img, none);
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
+}
+
+#countdown-card::after {
+  background:
+    linear-gradient(180deg, rgba(8,13,20,.08), rgba(8,13,20,.34)),
+    linear-gradient(90deg, rgba(79,140,255,.08), transparent 46%);
+}
+
+#countdown-card .card-header {
+  background: rgba(255,255,255,.018);
+}
+
+#countdown-card .card-body {
+  gap: .9rem;
+}
+
+#countdown {
+  grid-template-columns: repeat(4, minmax(84px, 1fr));
+  gap: .65rem;
+}
+
+.timebox {
+  min-height: 76px;
+  padding: .88rem .55rem;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    rgba(8, 13, 20, .58);
+  border-color: rgba(255,255,255,.08);
+  backdrop-filter: blur(8px);
+}
+
+.timebox:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,.16);
+}
+
+.timebox strong {
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  color: #ffffff;
+}
+
+.timebox span {
+  color: #9fb0c6;
+}
+
+/* ---------- Twitch card becomes media module ---------- */
+
+#live .card {
+  min-height: var(--heroCardH);
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+#live .card:hover {
+  transform: translateY(-2px) scale(1.002);
+}
+
+#live .player {
+  border-radius: 0 0 22px 22px;
+}
+
+/* ---------- Calendar ---------- */
+
+.calendar-container {
+  margin-top: .85rem;
+  border-radius: 15px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)),
+    rgba(8,13,20,.50);
+  border-color: rgba(255,255,255,.075);
+  backdrop-filter: blur(8px);
+}
+
+.cal-header button {
+  background: rgba(17,26,39,.85);
+  border-color: rgba(255,255,255,.09);
+}
+
+.cal-header button:hover {
+  background: rgba(22,34,53,.95);
+}
+
+.cal-event-day div:first-child {
+  border-color: rgba(79,140,255,.30);
+  background: rgba(79,140,255,.12);
+}
+
+#cal-grid td.today {
+  background: rgba(51,214,159,.14);
+  color: #d9fff0;
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding: clamp(2.5rem, 5vw, 4.2rem) 0;
+}
+
+.title {
+  font-size: clamp(1.55rem, 2.5vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -.035em;
+  color: #f8fbff;
+}
+
+.title::after {
+  width: 64px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+/* ---------- Event cards ---------- */
+
+.grid {
+  gap: 1rem;
+}
+
+.event {
+  border-radius: 18px;
+  padding: 1rem;
+  padding-top: 3.15rem;
+}
+
+.event:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.15);
+  box-shadow: 0 22px 48px rgba(0,0,0,.38);
+}
+
+.event h4 {
+  font-size: 1.06rem;
+  font-weight: 850;
+  letter-spacing: -.02em;
+}
+
+.event .meta {
+  color: #b7c4d7;
+}
+
+.event .tag {
+  top: 11px;
+  right: 11px;
+  background: rgba(79,140,255,.12);
+  color: #dbeafe;
+  border-color: rgba(79,140,255,.18);
+}
+
+.event::before {
+  background: radial-gradient(340px circle at var(--x, -100px) var(--y, -100px), rgba(79, 140, 255, .10), transparent 44%);
+}
+
+.event.with-bg {
+  border-radius: 18px;
+  min-height: 190px;
+}
+
+/* ---------- Shoutbox ---------- */
+
+.shoutbox-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.014)),
+    radial-gradient(560px at 10% 0%, rgba(51,214,159,.045), transparent 60%),
+    rgba(10,16,25,.92);
+}
+
+#shoutboxMessages {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.018), rgba(255,255,255,.006)),
+    rgba(5, 9, 15, .62);
+  border-color: rgba(255,255,255,.075);
+}
+
+.shout-msg {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)),
+    rgba(17,26,39,.92);
+  border-color: rgba(255,255,255,.07);
+}
+
+.shout-msg.system {
+  border-color: rgba(245,184,75,.20);
+  background: linear-gradient(135deg, rgba(245,184,75,.11), rgba(79,140,255,.05));
+}
+
+.shout-input-row .input {
+  background: rgba(8,13,20,.74);
+}
+
+.send-btn {
+  background: rgba(79,140,255,.12);
+  border-color: rgba(79,140,255,.20);
+}
+
+/* ---------- Forms ---------- */
+
+.input,
+.textarea {
+  border-radius: 11px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.008)),
+    rgba(8,13,20,.72);
+  border-color: rgba(255,255,255,.085);
+  color: #f3f7ff;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: rgba(79,140,255,.38);
+  box-shadow: var(--ring);
+}
+
+/* ---------- Auth modal: cleaner, more professional ---------- */
+
+#authModal {
+  background: rgba(3, 7, 13, .76);
+  backdrop-filter: blur(14px) saturate(125%);
+}
+
+.auth-dialog {
+  width: min(420px, 94vw);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.auth-head {
+  padding: 1.05rem 1.1rem .9rem;
+  background: rgba(255,255,255,.015);
+}
+
+.auth-head strong {
+  font-size: 1.03rem;
+  font-weight: 900;
+}
+
+.auth-head span {
+  color: #9fb0c6;
+}
+
+.auth-close {
+  background: rgba(8,13,20,.62);
+  border-color: rgba(255,255,255,.09);
+}
+
+.auth-body {
+  padding: 1.05rem;
+}
+
+.auth-tabs {
+  padding: .22rem;
+  gap: .22rem;
+  border: 1px solid rgba(255,255,255,.075);
+  background: rgba(8,13,20,.46);
+  border-radius: 13px;
+}
+
+.auth-tab {
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  min-height: 36px;
+  color: #94a3b8;
+  font-weight: 820;
+}
+
+.auth-tab.active {
+  color: #061018;
+  background: linear-gradient(135deg, #7fb0ff 0%, #4f8cff 62%, #33d69f 145%);
+}
+
+.auth-panel {
+  display: none;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.auth-panel.active {
+  display: flex;
+}
+
+.auth-panel .field {
+  display: flex;
+  flex-direction: column;
+  gap: .28rem;
+}
+
+.auth-panel label {
+  color: #aebbd0;
+  font-size: .79rem;
+  font-weight: 760;
+}
+
+.auth-panel .input {
+  padding: .72rem .85rem;
+  border-radius: 10px;
+}
+
+.auth-panel .btn.primary {
+  margin-top: .25rem;
+}
+
+.auth-link-btn {
+  width: fit-content;
+  border: 0;
+  background: transparent;
+  color: #9fb0c6;
+  padding: .05rem 0;
+  cursor: pointer;
+  font-weight: 760;
+  font-size: .86rem;
+  text-align: left;
+}
+
+.auth-link-btn:hover {
+  color: #ffffff;
+}
+
+/* ---------- To top ---------- */
+
+#toTop {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    rgba(17,26,39,.92);
+  border-color: rgba(255,255,255,.10);
+}
+
+/* ---------- Mobile polish ---------- */
+
+@media (max-width: 960px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-top {
+    min-height: auto;
+    padding-top: 1rem;
+  }
+
+  .hero-row {
+    grid-template-columns: 1fr;
+  }
+
+  #live .card {
+    min-height: 390px;
+  }
+}
+
+@media (max-width: 640px) {
+  header {
+    background: rgba(8,13,20,.94);
+  }
+
+  .navlinks {
+    top: 60px;
+    background: rgba(8,13,20,.98);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+
+  .hero {
+    padding: 2rem 0 1.6rem;
+  }
+
+  .hero::after {
+    display: none;
+  }
+
+  .h1 {
+    font-size: clamp(2.35rem, 13vw, 3.45rem);
+    letter-spacing: -.055em;
+  }
+
+  .lead {
+    font-size: .98rem;
+  }
+
+  #countdown {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .timebox {
+    min-height: 72px;
+  }
+
+  .event {
+    padding-top: 3.45rem;
+  }
+
+  .shout-input-row {
+    gap: .42rem;
+  }
+
+  .shout-input-row .btn {
+    padding: 0 11px;
+  }
+
+  #live .card {
+    min-height: 330px;
+  }
+}
+
