@@ -302,7 +302,7 @@
     }
 
     .h1 {
-      font-size: clamp(2.45rem, 4vw, 4.15rem);
+      font-size: clamp(2.3rem, 4.2vw, 4.2rem);
       line-height: 1.02;
       margin: .85rem 0 0;
       font-weight: 950;
@@ -1846,7 +1846,7 @@ header {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, .9fr) minmax(420px, 1.1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 2rem;
   align-items: center;
 }
