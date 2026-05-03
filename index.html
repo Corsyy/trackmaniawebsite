@@ -3037,7 +3037,19 @@
         setShoutStatus(err.message || "Could not load shoutbox.");
       }
     })();
+    const loginEmail = document.getElementById("authLoginEmail");
+    const loginPassword = document.getElementById("authLoginPassword");
+    const loginBtn = document.getElementById("authLoginBtn");
 
+    function handleLoginEnter(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        loginBtn?.click();
+      }
+    }
+
+    loginEmail?.addEventListener("keydown", handleLoginEnter);
+    loginPassword?.addEventListener("keydown", handleLoginEnter);
   </script>
 
 </body>
