@@ -2,938 +2,3044 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="icon" type="image/png" href="/logo.png">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trackmania Events — Official Site</title>
+  <meta name="description"
+    content="Live Trackmania events, schedule, and stream hub. Watch live on Twitch, see upcoming events, and get in touch." />
+  <meta name="theme-color" content="#0a0f1a" />
+  <meta property="og:title" content="Trackmania Events — Official Site" />
+  <meta property="og:description" content="Live Trackmania events, schedule, and stream hub." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://trackmaniaevents.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script id="event-jsonld" type="application/ld+json">{}</script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="shortcut icon" href="/logo.png">
-  <title>Track of the Day</title>
-
-  <style>
-    :root {
-      --bg: #0a101a;
-      --bg-2: #0d1422;
-      --panel: #10192a;
-      --panel-2: #0d1524;
-      --panel-3: #0b1220;
-
-      --text: #eef3ff;
-      --muted: #9fb2df;
-      --soft: #cfdcff;
-
-      --accent: #4aa3ff;
-      --accent-2: #6dfbff;
-
-      --border: rgba(255, 255, 255, .07);
-      --border-strong: rgba(255, 255, 255, .12);
-
-      --shadow-sm: 0 8px 22px rgba(0, 0, 0, .20);
-      --shadow-md: 0 16px 36px rgba(0, 0, 0, .24);
-
-      --radius: 18px;
-      --radius-sm: 12px;
-
-      --ring: 0 0 0 3px rgba(74, 163, 255, .18);
-    }
-
-    * {
-      box-sizing: border-box
-    }
-
-    html,
-    body {
-      height: 100%
-    }
-
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
-      color: var(--text);
-      background: #0a101a;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none
-    }
-
-    .container {
-      width: min(1200px, 92vw);
-      margin: auto;
-      padding: 1rem;
-    }
-
-    body.bg-track-curves {
-      background: #0a101a;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    body.bg-track-curves::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-      opacity: .018;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
-      background-size: 220px 220px;
-    }
-
-    /* ---------- HEADER ---------- */
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(10, 16, 26, .92);
-      backdrop-filter: blur(10px);
-    }
-
-    .nav {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 0 .7rem;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 2rem;
-      line-height: 1;
-      font-weight: 950;
-      letter-spacing: -.03em;
-      color: #f7faff;
-    }
-
-    .nav-center {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .navlinks {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-    }
-
-    .navlinks a {
-      color: var(--muted);
-      white-space: nowrap;
-      font-size: .95rem;
-      font-weight: 800;
-      letter-spacing: .01em;
-      opacity: .92;
-      transition: color .18s ease, opacity .18s ease;
-    }
-
-    .navlinks a:hover {
-      color: #ffffff;
-      opacity: 1;
-    }
-
-    .navlinks a.active {
-      color: #ffffff;
-      position: relative;
-    }
-
-    .navlinks a.active::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -8px;
-      height: 2px;
-      border-radius: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    }
-
-    .cta {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .nav-toggle {
-      display: none;
-      border: 1px solid var(--border);
-      background: #131e31;
-      color: var(--text);
-      border-radius: 10px;
-      padding: .5rem .7rem;
-      cursor: pointer;
-      font-weight: 800;
-    }
-
-    .month-row {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: .7rem;
-      padding: .05rem 1rem 1rem;
-      color: var(--muted);
-      font-size: .94rem;
-      font-weight: 800;
-    }
-
-    .select {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-
-    select {
-      background: #101a2c;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: .58rem .84rem;
-      border-radius: 10px;
-      font-weight: 800;
-      outline: none;
-      min-width: 146px;
-    }
-
-    select:focus {
-      box-shadow: var(--ring);
-      border-color: var(--border-strong);
-    }
-
-    /* ---------- BUTTONS ---------- */
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: .45rem;
-      min-height: 40px;
-      padding: .58rem .95rem;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #121d31;
-      color: var(--text);
-      font-weight: 850;
-      font-size: .92rem;
-      line-height: 1;
-      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
-      box-shadow: none;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--border-strong);
-      background: #16233a;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn.ghost {
-      background: transparent;
-    }
-
-    .btn:focus-visible {
-      outline: none;
-      box-shadow: var(--ring);
-    }
-
-    /* ---------- HERO ---------- */
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(320px, 480px) minmax(280px, 1fr);
-      gap: 1.15rem;
-      margin: 1.15rem 0 1.35rem;
-      align-items: stretch;
-    }
-
-    .hero .thumb {
-      width: 100%;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: #09111d;
-      box-shadow: none;
-    }
-
-    .hero-panel {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: .95rem;
-      min-width: 0;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(180deg, rgba(17, 27, 44, .98), rgba(12, 19, 33, .98));
-      padding: 1.2rem 1.2rem 1.15rem;
-      box-shadow: none;
-    }
-
-    .hero h2 {
-      margin: 0;
-      font-size: clamp(1.7rem, 2.9vw, 2.35rem);
-      line-height: 1.03;
-      letter-spacing: -.035em;
-      color: #f7faff;
-    }
-
-    .hero-meta {
-      display: flex;
-      flex-direction: column;
-      gap: .62rem;
-    }
-
-    .hero-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: .55rem;
-    }
-
-    .hero-label {
-      color: var(--muted);
-      font-weight: 850;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .65rem;
-      margin-top: .28rem;
-    }
-
-    /* ---------- GRID ---------- */
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 1.15rem;
-      align-items: stretch;
-    }
-
-    /* ---------- CARDS ---------- */
-
-    .card {
-      display: flex;
-      flex-direction: column;
-      min-height: 100%;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(180deg, rgba(13, 21, 36, .98), rgba(9, 15, 27, .98));
-      box-shadow: none;
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: var(--border-strong);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, .20);
-    }
-
-    .thumb {
-      aspect-ratio: 16/9;
-      background: #09111d;
-    }
-
-    .thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .meta {
-      padding: 1.02rem 1rem 1.05rem;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      gap: .56rem;
-      min-width: 0;
-    }
-
-    .date {
-      font-size: .84rem;
-      color: var(--muted);
-      line-height: 1.2;
-      font-weight: 800;
-      letter-spacing: .01em;
-    }
-
-    .card-title {
-      margin: 0;
-      font-size: 1.12rem;
-      line-height: 1.2;
-      font-weight: 950;
-      letter-spacing: -.02em;
-      color: #f5f8ff;
-      word-break: break-word;
-    }
-
-    .byline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: .45rem;
-      color: #dce7ff;
-      line-height: 1.35;
-    }
-
-    .byline-label {
-      color: var(--soft);
-      font-weight: 850;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .35rem;
-      max-width: 100%;
-      min-height: 30px;
-      border: 1px solid var(--border);
-      padding: .28rem .62rem;
-      border-radius: 999px;
-      font-size: .81rem;
-      background: #16233a;
-      color: #e2ecff;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 800;
-    }
-
-    /* ---------- MEDALS ---------- */
-
-    .medals {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: .45rem;
-      margin-top: .06rem;
-    }
-
-    .medal {
-      display: inline-flex;
-      align-items: center;
-      gap: .38rem;
-      min-height: 28px;
-      padding: .24rem .5rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #101a2b;
-      font-size: .8rem;
-      line-height: 1;
-      color: #edf3ff;
-      font-weight: 800;
-    }
-
-    .medal .medal-icon {
-      width: 15px;
-      height: 15px;
-      object-fit: contain;
-      flex: 0 0 auto;
-    }
-
-    .medal.author {
-      border-color: rgba(255, 179, 82, .26);
-      background: rgba(255, 190, 90, .08);
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      letter-spacing: .01em;
-    }
-
-    /* ---------- CARD FOOTER ---------- */
-
-    .meta-footer {
-      margin-top: auto;
-      padding-top: .38rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .6rem;
-    }
-
-    .meta-footer .btn {
-      flex: 0 0 auto;
-    }
-
-    /* ---------- MOBILE ---------- */
-
-    @media (max-width: 920px) {
-      .nav {
-        grid-template-columns: auto auto 1fr auto;
-      }
-
-      .nav-center {
-        justify-content: flex-start;
-      }
-
-      .hero {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 640px) {
-      h1 {
-        font-size: 1.58rem;
-      }
-
-      .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .nav-center {
-        display: contents;
-      }
-
-      .nav-toggle {
-        display: block;
-      }
-
-      .navlinks {
-        display: none;
-        position: absolute;
-        top: 64px;
-        left: 0;
-        right: 0;
-        padding: .9rem 1rem 1rem;
-        background: rgba(10, 16, 26, .97);
-        backdrop-filter: blur(8px);
-        flex-direction: column;
-        align-items: flex-start;
-        gap: .82rem;
-        border-top: 1px solid var(--border);
-      }
-
-      .navlinks.show {
-        display: flex;
-      }
-
-      .cta {
-        display: none;
-      }
-
-      .container {
-        width: min(100%, 94vw);
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .meta-footer .btn,
-      .actions .btn {
-        width: 100%;
-      }
-    }
-
-    .today-extra {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: .75rem;
-      margin-top: .2rem;
-    }
-
-    .stat-box {
-      border: 1px solid var(--border);
-      background: #0d1728;
-      border-radius: 14px;
-      padding: .75rem;
-    }
-
-    .stat-box span {
-      display: block;
-      color: var(--muted);
-      font-size: .78rem;
-      font-weight: 850;
-      margin-bottom: .25rem;
-    }
-
-    .stat-box strong {
-      font-size: 1rem;
-      color: #fff;
-    }
-
-    .archive-tools {
-      display: flex;
-      gap: .7rem;
-      align-items: center;
-      justify-content: space-between;
-      margin: 1rem 0 1.1rem;
-      flex-wrap: wrap;
-    }
-
-    .search {
-      flex: 1;
-      min-width: 240px;
-      background: #101a2c;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: .72rem .9rem;
-      border-radius: 12px;
-      font-weight: 750;
-      outline: none;
-    }
-
-    .search:focus {
-      box-shadow: var(--ring);
-      border-color: var(--border-strong);
-    }
-
-    .section-title {
-      margin: 1.1rem 0 .75rem;
-      font-size: 1.25rem;
-      font-weight: 950;
-      letter-spacing: -.02em;
-    }
-
-    .empty-state {
-      grid-column: 1/-1;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem;
-      background: #0d1524;
-    }
-
-    @media(max-width:640px) {
-      .today-extra {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 <body class="bg-track-curves">
   <header>
     <div class="container nav">
-      <h1>Track of the Day</h1>
-
+      <a class="brand" href="/" aria-label="Trackmania Events Home">
+        <span class="brand-badge" aria-hidden="true">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
       <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-
-      <div class="nav-center">
-        <nav id="primary-nav" class="navlinks" aria-label="Primary">
-          <a href="/kacky">Kacky Finishes</a>
-          <a href="/recentwrs">Recent WRs</a>
-          <a href="/highlights">Community Highlights</a>
-        </nav>
-      </div>
-
-      <div class="cta">
-        <a href="/" class="btn">Home</a>
-      </div>
-    </div>
-
-    <div class="container month-row">
-      <div class="select">
-        <span>Month:</span>
-        <select id="month"></select>
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
+        <a href="/kacky">Kacky Finishes</a>
+        <a href="/wrleaderboard">WR Leaderboard</a>
+        <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+        <a href="/totd">Track of the Day</a>
+        <a href="/highlights">Community Highlights</a>
+        <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
+      </nav>
+      <div class="cta" id="authArea">
+        <button class="btn auth-open" type="button">Login / Register</button>
+        <a class="btn" href="#contact">Contact</a>
       </div>
     </div>
   </header>
-  <div id="globalMentionToast" class="mention-toast"></div>
+
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div class="hero-top">
+        <span class="chip" id="hero-chip">Next Event</span>
+        <h1 class="h1">Live Trackmania events and community races</h1>
+        <p class="lead">Your central hub for upcoming events, live streams, and highlights.</p>
+
+        <div class="keyfacts" id="hero-pills">
+          <div class="pill">🗓️ TBA</div>
+          <div class="pill">📍 Online</div>
+          <div class="pill">🏁 Community races</div>
+        </div>
+      </div>
+
+      <div class="hero-row">
+        <div>
+          <div class="card" id="countdown-card" aria-live="polite">
+            <div class="card-header">
+              <strong id="countdown-title">Countdown to green light</strong>
+            </div>
+            <div class="card-body">
+              <div class="countdown" id="countdown">
+                <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+                <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+                <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+                <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+              </div>
+
+              <div id="miniCalendar" class="calendar-container">
+                <div class="cal-header">
+                  <button id="cal-prev" type="button">←</button>
+                  <div id="cal-title"></div>
+                  <button id="cal-next" type="button">→</button>
+                </div>
+                <table id="cal-grid"></table>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div id="live" class="live">
+          <div class="card reveal">
+            <div class="card-header"><strong>Live on Twitch</strong></div>
+            <div class="card-body">
+              <div id="twitch-embed"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="shoutbox-section" class="section" aria-label="Community shoutbox">
+    <div class="container">
+      <div class="card shoutbox-card reveal">
+        <div class="card-header shoutbox-top">
+          <div>
+            <strong>Community Shoutbox</strong>
+            <div class="shoutbox-sub">Chat with signed-in users and see automatic event/system notices.</div>
+          </div>
+          <div class="shoutbox-header-actions">
+            <div class="online-users-wrap">
+              <button id="onlineUsersBtn" class="chip online-users-btn" type="button">
+                👥 <span id="onlineUsersChip">0 online</span>
+              </button>
+
+              <div id="onlineUsersMenu" class="online-users-menu">
+                <div class="online-users-title">Online Users</div>
+                <div id="onlineUsersList" class="online-users-list">
+                  <div class="online-user-empty">No users online</div>
+                </div>
+              </div>
+            </div>
+
+            <span class="chip" id="shoutboxAuthState">Guest</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="shoutboxEventTicker" class="shout-event-ticker"></div>
+          <div id="shoutboxMessages" aria-live="polite">
+            <div class="meta">Loading shoutbox…</div>
+          </div>
+          <div id="shoutTyping" class="shout-typing"></div>
+          <div class="shout-form">
+            <div class="shout-input-row">
+              <input id="shoutInput" class="input" type="text" maxlength="300" placeholder="Type a shout..."
+                autocomplete="off" />
+
+              <button id="emojiBtn" class="btn" type="button">😊</button>
+              <button id="sendShout" class="btn send-btn" type="button">Send</button>
+            </div>
+          </div>
+
+          <div id="emojiPanel" class="emoji-panel">
+            <button type="button" data-emoji="🔥">🔥</button>
+            <button type="button" data-emoji="😂">😂</button>
+            <button type="button" data-emoji="💀">💀</button>
+            <button type="button" data-emoji="🏁">🏁</button>
+            <button type="button" data-emoji="🏆">🏆</button>
+            <button type="button" data-emoji="🚨">🚨</button>
+            <button type="button" data-emoji="👀">👀</button>
+            <button type="button" data-emoji="✅">✅</button>
+            <button type="button" data-emoji="❌">❌</button>
+            <button type="button" data-emoji="❤️">❤️</button>
+          </div>
+          <div id="shoutStatus" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="live-events" class="section">
+    <div class="container">
+      <h2 class="title">Live Now</h2>
+      <div class="grid" id="live-events-grid"></div>
+    </div>
+  </section>
+
+  <section id="schedule" class="section">
+    <div class="container">
+      <h2 class="title">Main Events (click cards for discord invites for event info)</h2>
+      <div class="grid" id="main-events-grid">
+        <article class="event">
+          <div class="meta">Loading schedule…</div>
+        </article>
+      </div>
+
+      <h3 class="title" style="margin-top:2rem;font-size:1.8rem">Fun / Weekly Events (click cards for discord invites
+        for event info)</h3>
+      <div class="grid" id="weekly-events-grid">
+        <article class="event">
+          <div class="meta">Loading schedule…</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section id="showcase" class="section">
+    <div class="container">
+      <h2 class="title">Highlights</h2>
+      <div class="cards">
+        <article class="shot reveal">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong></strong>
+            <div class="meta">N/A</div>
+          </div>
+        </article>
+        <article class="shot reveal">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong></strong>
+            <div class="meta">N/A</div>
+          </div>
+        </article>
+        <article class="shot reveal">
+          <div class="media">Clip / Screenshot</div>
+          <div class="text"><strong></strong>
+            <div class="meta">N/A</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="title">About</h2>
+      <div class="card reveal">
+        <div class="card-body">
+          <p>Trackmania Events is a central hub for everything happening in the Trackmania community — bringing together
+            live leaderboards, campaign world-records, Track of the Day archives, and player statistics in one clean
+            interface. The goal is to give fans, players, and creators a single place to explore records, follow
+            seasonal updates, and connect with ongoing competitive and creative events across Trackmania.</p>
+          <div class="keyfacts" style="margin-top:1rem">
+            <a class="btn" href="https://twitch.tv/Ryvennox" target="_blank" rel="noreferrer">Follow on Twitch</a>
+            <a class="btn" href="#contact">Business / Collabs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <div class="container">
+      <h2 class="title">Contact</h2>
+      <div class="grid" style="grid-template-columns:2fr 1fr">
+        <form action="https://formspree.io/f/xjkazybj" method="POST" class="card form reveal" id="contact-form">
+          <div class="card-body">
+            <div class="twocol">
+              <div class="field">
+                <label for="name">Name</label>
+                <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
+              </div>
+            </div>
+            <div class="field" style="margin-top:.8rem">
+              <label for="message">Message</label>
+              <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?"
+                required></textarea>
+            </div>
+            <div style="margin-top:1rem;display:flex;gap:.6rem;align-items:center">
+              <button class="btn primary" type="submit">Send</button>
+              <span id="formStatus" style="font-size:0.9rem;" aria-live="polite"></span>
+            </div>
+          </div>
+        </form>
+        <aside class="card reveal">
+          <div class="card-body">
+            <strong>Discord</strong>
+            <div class="meta"><a href="https://discord.gg/9bDcTTbTGJ" target="_blank" rel="noreferrer">You can join the
+                discord server or fill out the contact form if you have any questions related to adding your events to
+                the website!</a></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <button id="toTop" aria-label="Back to top"><span>Top</span></button>
+
+  <footer>
+    <div class="container"
+      style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a> • <a href="#contact">Contact</a></div>
+    </div>
+  </footer>
+
+  <div id="authModal" role="dialog" aria-modal="true" aria-label="Account login and registration">
+    <div class="auth-dialog">
+      <div class="auth-head">
+        <div>
+          <strong id="authTitle">Account</strong>
+          <span id="authSubtitle">Login or create an account to use the shoutbox.</span>
+        </div>
+        <button class="auth-close" id="authClose" type="button" aria-label="Close account window">×</button>
+      </div>
+
+      <div class="auth-body">
+        <div class="auth-tabs">
+          <button class="auth-tab active" type="button" data-auth-tab="login">Login</button>
+          <button class="auth-tab" type="button" data-auth-tab="register">Register</button>
+        </div>
+
+        <div class="auth-panel active" id="authLoginPanel">
+          <input id="authLoginEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
+          <input id="authLoginPassword" class="input" type="password" placeholder="Password"
+            autocomplete="current-password" />
+          <button id="authLoginBtn" class="btn primary" type="button">Login</button>
+          <button id="authForgotBtn" class="auth-link-btn" type="button">Forgot password?</button>
+        </div>
+
+        <div class="auth-panel" id="authRegisterPanel">
+          <input id="authRegisterUsername" class="input" type="text" maxlength="24" placeholder="Username"
+            autocomplete="username" />
+          <input id="authRegisterEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
+          <input id="authRegisterPassword" class="input" type="password" placeholder="Password"
+            autocomplete="new-password" />
+          <button id="authRegisterBtn" class="btn primary" type="button">Create Account</button>
+          <div class="help">You may need to confirm your email before logging in.</div>
+        </div>
+
+        <div class="auth-panel" id="authForgotPanel">
+          <input id="authResetEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
+          <button id="authResetBtn" class="btn primary" type="button">Send Password Reset</button>
+          <button id="authBackLoginBtn" class="auth-link-btn" type="button">Back to login</button>
+        </div>
+
+        <div class="auth-message" id="authMessage" aria-live="polite"></div>
+        <div class="auth-row" style="margin-top:.85rem">
+          <button id="authLogoutBtn" class="btn" type="button" style="display:none">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="reactionPickerMenu" class="reaction-picker-menu"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const TTV_CHANNEL = "Ryvennox";
+
+    // ---------- SUPABASE CONFIG ----------
+    // Replace these two values with your real Supabase Project URL and anon public key.
+    // Leaving the placeholders in will NOT crash the site; auth/shoutbox will simply stay disabled.
     const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
-    window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: window.localStorage,
-        storageKey: "tme-supabase-auth",
-        flowType: "implicit",
-      },
-    });
-  </script>
+    let tmeSupabase = null;
+    let currentShoutRole = "user";
+    let onlineUsersChannel = null;
+    let lastMessageCount = 0;
 
-  <script src="/js/global-mentions.js"></script>
-  <script>
-    (function () {
-      const btn = document.getElementById('navToggle');
-      const nav = document.getElementById('primary-nav');
-      if (!btn || !nav) return;
+    const mentionSound = new Audio("/sounds/ping.mp3");
+    mentionSound.volume = 0.35;
+    document.addEventListener("click", () => {
+      mentionSound.play().catch(() => { });
+    }, { once: true });
+    const onlineUsersBtn = document.getElementById("onlineUsersBtn");
+    const onlineUsersMenu = document.getElementById("onlineUsersMenu");
+    const onlineUsersList = document.getElementById("onlineUsersList");
+    const onlineUsersChip = document.getElementById("onlineUsersChip");
+    const reactionPickerMenu = document.getElementById("reactionPickerMenu");
+    let activeReactionMessageId = "";
+    const shoutRolesByUserId = {};
+    const supabaseConfigured =
+      typeof window.supabase !== "undefined" &&
+      /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) &&
+      SUPABASE_ANON_KEY &&
+      !SUPABASE_ANON_KEY.includes("PASTE_") &&
+      SUPABASE_ANON_KEY.length > 50;
 
-      function syncDesktop() {
-        if (window.innerWidth > 640) {
-          nav.classList.remove('show');
-          btn.setAttribute('aria-expanded', 'false');
+    try {
+      if (supabaseConfigured) {
+        tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storage: window.localStorage,
+            storageKey: "tme-supabase-auth",
+            flowType: "implicit",
+          },
+        });
+
+        // ---------- PROFESSIONAL SESSION TIMER ----------
+        // Keeps normal Supabase persistence on refresh, but limits each login to 3 hours.
+        const AUTO_LOGOUT_MS = 3 * 60 * 60 * 1000;
+        const LOGIN_TIME_KEY = "tme_login_started_at";
+
+        function clearLogoutTimer() {
+          if (window.__tmeLogoutTimer) {
+            clearTimeout(window.__tmeLogoutTimer);
+            window.__tmeLogoutTimer = null;
+          }
         }
+
+        async function startLogoutTimer() {
+          if (!tmeSupabase) return;
+
+          clearLogoutTimer();
+
+          // ❌ REMOVE getSession dependency completely
+          // We trust Supabase persistence instead
+
+          const hasSession =
+            localStorage.getItem("tme-supabase-auth") !== null;
+
+          if (!hasSession) return;
+
+          localStorage.setItem(LOGIN_TIME_KEY, String(Date.now()));
+
+          window.__tmeLogoutTimer = setTimeout(async () => {
+            await tmeSupabase.auth.signOut();
+            localStorage.removeItem(LOGIN_TIME_KEY);
+            location.reload();
+          }, AUTO_LOGOUT_MS);
+        }
+
+        window.startLogoutTimer = startLogoutTimer;
+        window.clearLogoutTimer = clearLogoutTimer;
+      } else {
+        console.warn("Supabase is not configured yet. Login/register and shoutbox posting are disabled until you add your URL/key.");
+      }
+    } catch (err) {
+      console.warn("Supabase failed to initialize:", err);
+      tmeSupabase = null;
+    }
+
+    const d = document.getElementById("d");
+    const h = document.getElementById("h");
+    const m = document.getElementById("m");
+    const s = document.getElementById("s");
+
+    // ---------- COUNTDOWN HELPERS ----------
+    const fmtDate = (iso) => {
+      const dt = new Date(iso);
+      return dt.toLocaleString(undefined, {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+    };
+
+    function getEventSegments(event) {
+      if (Array.isArray(event?.segments) && event.segments.length) {
+        return event.segments
+          .filter((seg) => seg && seg.start_iso && seg.end_iso)
+          .map((seg) => ({
+            ...seg,
+            start: new Date(seg.start_iso),
+            end: new Date(seg.end_iso),
+          }))
+          .sort((a, b) => a.start - b.start);
       }
 
-      btn.addEventListener('click', () => {
-        const open = nav.classList.toggle('show');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (event?.start_iso && event?.end_iso) {
+        return [
+          {
+            start_iso: event.start_iso,
+            end_iso: event.end_iso,
+            label: event.label || "",
+            start: new Date(event.start_iso),
+            end: new Date(event.end_iso),
+          },
+        ];
+      }
+
+      return [];
+    }
+
+    function getEventStartIso(event) {
+      const segs = getEventSegments(event);
+      return segs[0]?.start_iso || event?.start_iso || null;
+    }
+
+    function getEventEndIso(event) {
+      const segs = getEventSegments(event);
+      return segs[segs.length - 1]?.end_iso || event?.end_iso || null;
+    }
+
+    function isEventLive(event, now = new Date()) {
+      return getEventSegments(event).some((seg) => now >= seg.start && now <= seg.end);
+    }
+
+    function getNextUpcomingSegment(event, now = new Date()) {
+      return getEventSegments(event).find((seg) => seg.end > now) || null;
+    }
+
+    function getDisplayRange(event, now = new Date()) {
+      const liveSeg = getEventSegments(event).find((seg) => now >= seg.start && now <= seg.end);
+      if (liveSeg) {
+        return {
+          start_iso: liveSeg.start_iso,
+          end_iso: liveSeg.end_iso,
+          label: liveSeg.label || "",
+        };
+      }
+
+      const nextSeg = getNextUpcomingSegment(event, now);
+      if (nextSeg) {
+        return {
+          start_iso: nextSeg.start_iso,
+          end_iso: nextSeg.end_iso,
+          label: nextSeg.label || "",
+        };
+      }
+
+      return {
+        start_iso: getEventStartIso(event),
+        end_iso: getEventEndIso(event),
+        label: "",
+      };
+    }
+
+    function getCalendarRangesForEvent(event, index) {
+      return getEventSegments(event).map((seg) => {
+        const start = new Date(seg.start);
+        const end = new Date(seg.end);
+
+        return {
+          start: new Date(start.getFullYear(), start.getMonth(), start.getDate()),
+          end: new Date(end.getFullYear(), end.getMonth(), end.getDate()),
+          index,
+          label: seg.label || "",
+          start_iso: seg.start_iso,
+          end_iso: seg.end_iso,
+        };
+      });
+    }
+
+    function setCountdown(dd, hh, mm, ss) {
+      if (d) d.textContent = dd;
+      if (h) h.textContent = hh;
+      if (m) m.textContent = mm;
+      if (s) s.textContent = ss;
+    }
+
+    function startCountdown(iso, titleEl) {
+      function tick() {
+        const now = new Date();
+        const then = new Date(iso);
+        let diff = then - now;
+
+        if (diff <= 0) {
+          setCountdown(0, 0, 0, 0);
+          if (titleEl) titleEl.textContent = "Live now!";
+          return;
+        }
+
+        const days = Math.floor(diff / 86400000);
+        diff %= 86400000;
+        const hrs = Math.floor(diff / 3600000);
+        diff %= 3600000;
+        const mins = Math.floor(diff / 60000);
+        diff %= 60000;
+        const secs = Math.floor(diff / 1000);
+        setCountdown(days, hrs, mins, secs);
+      }
+
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    function attachHoverGlow() {
+      document.querySelectorAll(".event").forEach((e) => {
+        e.addEventListener("mousemove", (ev) => {
+          const r = e.getBoundingClientRect();
+          e.style.setProperty("--x", `${ev.clientX - r.left}px`);
+          e.style.setProperty("--y", `${ev.clientY - r.top}px`);
+        });
+      });
+    }
+
+    function normalizeHref(raw) {
+      if (!raw) return "";
+      const t = String(raw).trim();
+      if (!t) return "";
+      if (/^https?:\/\//i.test(t)) return t;
+      return `https://${t.replace(/^\/+/, "")}`;
+    }
+
+    function makeEventElement(e, options = {}) {
+      const article = document.createElement("article");
+      article.className = "event reveal";
+
+      const tag = options.tagText || e.tag || "Event";
+      const subline =
+        options.subline === "location"
+          ? e.location || ""
+          : e.description || "";
+
+      const range = getDisplayRange(e);
+      const hasSegments = Array.isArray(e.segments) && e.segments.length > 0;
+      const segmentText = hasSegments
+        ? `<div class="meta" style="margin-top:.35rem;color:#9fb2df">${e.segments.length} stages${range.label ? ` • ${range.label}` : ""}</div>`
+        : "";
+
+      article.innerHTML = `
+      <span class="tag">${tag}</span>
+      <div class="meta">${fmtDate(range.start_iso)} — ${fmtDate(range.end_iso)}</div>
+      <h4>${e.title}</h4>
+      <div class="meta">${subline}</div>
+      ${segmentText}
+    `;
+
+      if (e.image) {
+        article.classList.add("with-bg");
+        article.style.setProperty("--event-img", `url("${e.image}")`);
+      }
+
+      const href =
+        normalizeHref(e.discordUrl) ||
+        normalizeHref(e.url) ||
+        "";
+
+      if (href) {
+        const a = document.createElement("a");
+        a.className = "event-link";
+        a.href = href;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.setAttribute("aria-label", `${e.title} — more info on Discord`);
+        a.appendChild(article);
+        return a;
+      }
+
+      return article;
+    }
+
+    // ---------- MINI CALENDAR STATE ----------
+    let calYear, calMonth;
+    let allEventRanges = []; // [{start: Date, end: Date, index: number, label?: string}]
+    let calendarInitialized = false;
+
+    function loadMiniCalendar(dateIso) {
+      const dd = new Date(dateIso);
+      calYear = dd.getFullYear();
+      calMonth = dd.getMonth();
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const title = document.getElementById("cal-title");
+      const grid = document.getElementById("cal-grid");
+      if (!title || !grid || calYear == null || calMonth == null) return;
+
+      const firstDay = new Date(calYear, calMonth, 1).getDay();
+      const lastDate = new Date(calYear, calMonth + 1, 0).getDate();
+
+      title.textContent = new Date(calYear, calMonth, 1).toLocaleString("default", {
+        month: "long",
+        year: "numeric",
       });
 
-      window.addEventListener('resize', syncDesktop);
-      syncDesktop();
+      let html = `
+      <tr>
+        <th>Sun</th><th>Mon</th><th>Tue</th>
+        <th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+      </tr><tr>
+    `;
+
+      for (let i = 0; i < firstDay; i++) html += "<td></td>";
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      for (let day = 1; day <= lastDate; day++) {
+        const dayObj = new Date(calYear, calMonth, day);
+        const isToday = dayObj.getTime() === today.getTime();
+
+        const matches = allEventRanges
+          .filter((o) => dayObj >= o.start && dayObj <= o.end)
+          .map((o) => window.__eventsCache[o.index]);
+
+        const isEventDay = matches.length > 0;
+
+        html += `
+        <td data-day="${day}" class="${isToday ? "today" : ""} ${isEventDay ? "cal-event-day" : ""}">
+          <div>${day}</div>
+        </td>
+      `;
+
+        if ((firstDay + day) % 7 === 0) html += "</tr><tr>";
+      }
+
+      html += "</tr>";
+      grid.innerHTML = html;
+
+      attachCalendarTooltips();
+    }
+
+    function attachCalendarTooltips() {
+      const container = document.getElementById("miniCalendar");
+      const grid = document.getElementById("cal-grid");
+      if (!container || !grid) return;
+
+      let tooltip = document.getElementById("cal-tooltip");
+      if (!tooltip) {
+        tooltip = document.createElement("div");
+        tooltip.id = "cal-tooltip";
+        document.body.appendChild(tooltip);
+      }
+
+      tooltip.style.display = "none";
+
+      function hideTooltip() {
+        tooltip.style.display = "none";
+      }
+
+      grid.querySelectorAll("td[data-day]").forEach((td) => {
+        td.addEventListener("mouseenter", () => {
+          const day = parseInt(td.dataset.day, 10);
+          const dayObj = new Date(calYear, calMonth, day);
+
+          const matchingRanges = allEventRanges.filter((o) => dayObj >= o.start && dayObj <= o.end);
+
+          const matches = matchingRanges.map((o) => ({
+            event: window.__eventsCache[o.index],
+            range: o,
+          }));
+
+          if (!matches.length) {
+            hideTooltip();
+            return;
+          }
+
+          let html = "";
+          matches.forEach(({ event: ev, range }, idx) => {
+            if (idx > 0) html += `<div class="cal-popup-spacer"></div>`;
+            html += `
+            <div class="cal-popup-title">${ev.title}</div>
+            <div class="cal-popup-date">
+              ${fmtDate(range?.start_iso || getEventStartIso(ev))} –
+              ${fmtDate(range?.end_iso || getEventEndIso(ev))}
+            </div>
+            <div class="cal-popup-desc">
+              ${range?.label ? `${range.label} • ` : ""}${ev.location || ""}
+            </div>
+          `;
+          });
+
+          tooltip.innerHTML = html;
+          tooltip.style.display = "block";
+          tooltip.style.position = "fixed";
+          tooltip.style.zIndex = "9999";
+          tooltip.style.pointerEvents = "none";
+
+          const tdRect = td.getBoundingClientRect();
+          const popRect = tooltip.getBoundingClientRect();
+
+          let top = tdRect.top - popRect.height - 10;
+          if (top < 10) top = tdRect.bottom + 10;
+
+          let left = tdRect.left + tdRect.width / 2 - popRect.width / 2;
+          const pad = 12;
+
+          if (left < pad) left = pad;
+          if (left + popRect.width > window.innerWidth - pad) {
+            left = window.innerWidth - popRect.width - pad;
+          }
+
+          if (top + popRect.height > window.innerHeight - pad) {
+            top = Math.max(pad, window.innerHeight - popRect.height - pad);
+          }
+
+          tooltip.style.top = `${top}px`;
+          tooltip.style.left = `${left}px`;
+          tooltip.style.transform = "none";
+        });
+
+        td.addEventListener("mouseleave", hideTooltip);
+      });
+
+      container.addEventListener("mouseleave", hideTooltip);
+      window.addEventListener("scroll", hideTooltip, { passive: true });
+    }
+
+    // ---------- EVENT NORMALIZATION + RECURRENCE ----------
+    // Supports:
+    // - old one-off events using start_iso / end_iso
+    // - new one-off events using:
+    //     "date": "2026-04-10",
+    //     "time": "15:00",
+    //     "end_date": "2026-04-10",     // optional
+    //     "end_time": "17:00",          // optional
+    //     "durationMinutes": 120        // optional if no end_time
+    // - weekly recurring events using recurrence.time in Eastern time
+
+    const EVENT_TIME_ZONE = "America/New_York";
+
+    function pad2(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function getOffsetMinutesForZone(date, timeZone = EVENT_TIME_ZONE) {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23",
+      }).formatToParts(date);
+
+      const map = {};
+      for (const p of parts) {
+        if (p.type !== "literal") map[p.type] = p.value;
+      }
+
+      const asUtc = Date.UTC(
+        Number(map.year),
+        Number(map.month) - 1,
+        Number(map.day),
+        Number(map.hour),
+        Number(map.minute),
+        Number(map.second)
+      );
+
+      return Math.round((asUtc - date.getTime()) / 60000);
+    }
+
+    function offsetMinutesToString(offsetMinutes) {
+      const sign = offsetMinutes >= 0 ? "+" : "-";
+      const abs = Math.abs(offsetMinutes);
+      const hh = Math.floor(abs / 60);
+      const mm = abs % 60;
+      return `${sign}${pad2(hh)}:${pad2(mm)}`;
+    }
+
+    function buildIsoForEasternLocal(y, mo, d, hh, mm, timeZone = EVENT_TIME_ZONE) {
+      let guess = new Date(Date.UTC(y, mo - 1, d, hh, mm, 0));
+
+      for (let i = 0; i < 6; i++) {
+        const offsetMinutes = getOffsetMinutesForZone(guess, timeZone);
+        const targetUtcMs = Date.UTC(y, mo - 1, d, hh, mm, 0) - offsetMinutes * 60000;
+        const next = new Date(targetUtcMs);
+        if (next.getTime() === guess.getTime()) break;
+        guess = next;
+      }
+
+      const finalOffset = getOffsetMinutesForZone(guess, timeZone);
+      return `${y}-${pad2(mo)}-${pad2(d)}T${pad2(hh)}:${pad2(mm)}:00${offsetMinutesToString(finalOffset)}`;
+    }
+
+    function getZonedParts(date, timeZone = EVENT_TIME_ZONE) {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23",
+      }).formatToParts(date);
+
+      const out = {};
+      for (const p of parts) {
+        if (p.type !== "literal") out[p.type] = p.value;
+      }
+      return out;
+    }
+
+    function buildEndIsoFromDuration(startIso, durationMinutes, timeZone = EVENT_TIME_ZONE) {
+      const endDt = new Date(new Date(startIso).getTime() + durationMinutes * 60000);
+      const endParts = getZonedParts(endDt, timeZone);
+
+      return buildIsoForEasternLocal(
+        Number(endParts.year),
+        Number(endParts.month),
+        Number(endParts.day),
+        Number(endParts.hour),
+        Number(endParts.minute),
+        timeZone
+      );
+    }
+
+    function normalizeSegment(seg) {
+      if (!seg) return seg;
+
+      if (seg.start_iso && seg.end_iso) return seg;
+
+      const startDate = seg.start_date || seg.date;
+      const startTime = seg.start_time || seg.time;
+      const endDate = seg.end_date || startDate;
+      const endTime = seg.end_time || null;
+      const durationMinutes = Number(seg.durationMinutes || 0);
+
+      if (!startDate || !startTime) return seg;
+
+      const [sy, smo, sd] = String(startDate).split("-").map(Number);
+      const [sh, sm] = String(startTime).split(":").map(Number);
+
+      const start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm);
+
+      let end_iso = "";
+      if (endTime) {
+        const [eh, em] = String(endTime).split(":").map(Number);
+        const [ey, emo, ed] = String(endDate).split("-").map(Number);
+        end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em);
+      } else {
+        end_iso = buildEndIsoFromDuration(start_iso, durationMinutes || 60);
+      }
+
+      return {
+        ...seg,
+        start_iso,
+        end_iso,
+      };
+    }
+
+    function normalizeEvent(e) {
+      if (!e) return e;
+
+      const normalized = { ...e };
+
+      if (Array.isArray(normalized.segments) && normalized.segments.length) {
+        normalized.segments = normalized.segments.map(normalizeSegment);
+
+        if (!normalized.start_iso && normalized.segments[0]?.start_iso) {
+          normalized.start_iso = normalized.segments[0].start_iso;
+        }
+        if (!normalized.end_iso && normalized.segments[normalized.segments.length - 1]?.end_iso) {
+          normalized.end_iso = normalized.segments[normalized.segments.length - 1].end_iso;
+        }
+
+        return normalized;
+      }
+
+      if (normalized.start_iso && normalized.end_iso) {
+        return normalized;
+      }
+
+      const startDate = normalized.start_date || normalized.date;
+      const startTime = normalized.start_time || normalized.time;
+      const endDate = normalized.end_date || startDate;
+      const endTime = normalized.end_time || null;
+      const durationMinutes = Number(normalized.durationMinutes || 0);
+
+      if (!startDate || !startTime) {
+        return normalized;
+      }
+
+      const [sy, smo, sd] = String(startDate).split("-").map(Number);
+      const [sh, sm] = String(startTime).split(":").map(Number);
+
+      normalized.start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm);
+
+      if (endTime) {
+        const [eh, em] = String(endTime).split(":").map(Number);
+        const [ey, emo, ed] = String(endDate).split("-").map(Number);
+        normalized.end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em);
+      } else {
+        normalized.end_iso = buildEndIsoFromDuration(
+          normalized.start_iso,
+          durationMinutes || 60
+        );
+      }
+
+      return normalized;
+    }
+
+    function normalizeEvents(events) {
+      return (Array.isArray(events) ? events : []).map(normalizeEvent);
+    }
+
+    function expandRecurringEvents(events) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const dayMap = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+      const out = [];
+
+      for (const e of events) {
+        const rec = e && e.recurrence;
+        const isWeekly =
+          rec &&
+          String(rec.freq || "").toLowerCase() === "weekly" &&
+          Array.isArray(rec.byDay) &&
+          rec.byDay.length;
+
+        if (!isWeekly) {
+          out.push(e);
+          continue;
+        }
+
+        const durationMinutes = Number(rec.durationMinutes || e.durationMinutes || 60);
+        const [HH, MM] = String(rec.time || e.time || "19:00")
+          .split(":")
+          .map((v) => parseInt(v, 10));
+
+        // ONLY create the next upcoming occurrence
+        let created = false;
+
+        for (let i = 0; i < 21 && !created; i++) {
+          const candidate = new Date(today);
+          candidate.setDate(today.getDate() + i);
+
+          const dow = candidate.getDay();
+          const want = rec.byDay.some((code) => dayMap[code] === dow);
+          if (!want) continue;
+
+          const y = candidate.getFullYear();
+          const mo = candidate.getMonth() + 1;
+          const d = candidate.getDate();
+
+          const generated = normalizeEvent({
+            ...e,
+            start_date: `${y}-${pad2(mo)}-${pad2(d)}`,
+            start_time: `${pad2(HH)}:${pad2(MM)}`,
+            end_date: `${y}-${pad2(mo)}-${pad2(d)}`,
+            end_time: null,
+            durationMinutes,
+            recurrence: undefined
+          });
+
+          if (!generated?.end_iso) continue;
+          if (new Date(generated.end_iso) <= now) continue;
+
+          out.push({
+            ...generated,
+            _generated: true
+          });
+
+          created = true;
+        }
+      }
+
+      return out;
+    }
+
+    function normalizeEventCardHeights() {
+      const groups = [
+        document.querySelectorAll("#live-events-grid .event"),
+        document.querySelectorAll("#main-events-grid .event"),
+        document.querySelectorAll("#weekly-events-grid .event"),
+        document.querySelectorAll("#past-grid .event"),
+      ];
+
+      groups.forEach((cards) => {
+        if (!cards || !cards.length) return;
+
+        let maxHeight = 0;
+
+        cards.forEach((card) => {
+          card.style.height = "auto";
+        });
+
+        cards.forEach((card) => {
+          maxHeight = Math.max(maxHeight, card.offsetHeight);
+        });
+
+        cards.forEach((card) => {
+          card.style.height = `${maxHeight}px`;
+        });
+      });
+    }
+    async function sendSystemMessage(text) {
+      if (!tmeSupabase) return;
+
+      const { data } = await tmeSupabase.auth.getUser();
+      const user = data?.user;
+      if (!user) return;
+
+      const { error } = await tmeSupabase.from("shoutbox_messages").insert({
+        user_id: user.id,          // ✅ must be your user id
+        username: "SYSTEM",
+        message: text,
+        type: "system",
+      });
+
+      if (error) {
+        console.warn("System message blocked:", error.message);
+        return;
+      }
+
+      await loadShoutboxMessages();
+    }
+    function renderFromData(rawEvents) {
+      const events = expandRecurringEvents(normalizeEvents(Array.isArray(rawEvents) ? rawEvents : []));
+
+      window.__eventsCache = events;
+      const nowDate = new Date();
+
+      const live = events
+        .filter((e) => isEventLive(e, nowDate))
+        .sort((a, b) => new Date(getEventStartIso(a)) - new Date(getEventStartIso(b)));
+
+      const upcoming = events
+        .filter((e) => {
+          if (isEventLive(e, nowDate)) return false;
+          const nextSeg = getNextUpcomingSegment(e, nowDate);
+          return !!nextSeg && nextSeg.start > nowDate;
+        })
+        .sort((a, b) => {
+          const aNext = getNextUpcomingSegment(a, nowDate);
+          const bNext = getNextUpcomingSegment(b, nowDate);
+          return new Date(aNext.start_iso) - new Date(bNext.start_iso);
+        });
+
+      const past = events
+        .filter((e) => {
+          const endIso = getEventEndIso(e);
+          return endIso && new Date(endIso) <= nowDate;
+        })
+        .sort((a, b) => new Date(getEventEndIso(b)) - new Date(getEventEndIso(a)))
+        .slice(0, 6);
+
+      const normCat = (e) => String(e.category || "main").toLowerCase().trim();
+      const isWeekly = (e) => ["weekly", "fun", "casual"].includes(normCat(e));
+      const isMain = (e) => !isWeekly(e);
+
+      const upcomingMain = upcoming.filter(isMain);
+      const upcomingWeekly = upcoming.filter(isWeekly);
+
+      const liveSection = document.getElementById("live-events");
+      const liveGrid = document.getElementById("live-events-grid");
+      if (live.length) {
+        liveSection.style.display = "";
+        liveGrid.innerHTML = "";
+        live.forEach((e) => {
+          const el = makeEventElement(e, { tagText: "LIVE NOW", subline: "description" });
+          liveGrid.appendChild(el);
+        });
+      } else {
+        liveSection.style.display = "none";
+      }
+
+      const mainGrid = document.getElementById("main-events-grid");
+      const weeklyGrid = document.getElementById("weekly-events-grid");
+
+      if (mainGrid) {
+        mainGrid.innerHTML = "";
+        if (upcomingMain.length) {
+          upcomingMain.forEach((e) => {
+            mainGrid.appendChild(makeEventElement(e, { subline: "description" }));
+          });
+        } else {
+          mainGrid.innerHTML =
+            '<article class="event"><div class="meta">No main events scheduled.</div></article>';
+        }
+      }
+
+      if (weeklyGrid) {
+        weeklyGrid.innerHTML = "";
+        if (upcomingWeekly.length) {
+          upcomingWeekly.forEach((e) => {
+            weeklyGrid.appendChild(makeEventElement(e, { subline: "description" }));
+          });
+        } else {
+          weeklyGrid.innerHTML =
+            '<article class="event"><div class="meta">No fun/weekly events scheduled.</div></article>';
+        }
+      }
+
+      let pastWrap = document.getElementById("past-events");
+      if (!pastWrap) {
+        pastWrap = document.createElement("div");
+        pastWrap.id = "past-events";
+        pastWrap.innerHTML = `
+        <h3 class="title" style="margin-top:2rem">Past Events</h3>
+        <div class="grid" id="past-grid"></div>
+      `;
+        document.querySelector("#schedule .container").appendChild(pastWrap);
+      }
+
+      const pastGrid = document.getElementById("past-grid");
+      pastGrid.innerHTML = "";
+      past.forEach((e) => {
+        const startIso = getEventStartIso(e);
+        const endIso = getEventEndIso(e);
+
+        const el = document.createElement("article");
+        el.className = "event reveal";
+        el.innerHTML = `
+        <span class="tag">${e.tag || "Event"}</span>
+        <div class="meta">${fmtDate(startIso)} — ${fmtDate(endIso)}</div>
+        <h4>${e.title}</h4>
+        <div class="meta">${e.location || ""}</div>
+      `;
+        if (e.image) {
+          el.classList.add("with-bg");
+          el.style.setProperty("--event-img", `url("${e.image}")`);
+        }
+        pastGrid.appendChild(el);
+      });
+
+      allEventRanges = events.flatMap((e, idx) => getCalendarRangesForEvent(e, idx));
+
+      const next = upcomingMain[0] || upcoming[0] || null;
+
+      const chip = document.getElementById("hero-chip");
+      const pills = document.getElementById("hero-pills");
+      const header = document.getElementById("countdown-title");
+      const cdCard = document.getElementById("countdown-card");
+
+      if (live.length) {
+        const cur = live[0];
+        const curRange = getDisplayRange(cur, nowDate);
+
+        chip.textContent =
+          live.length > 1 ? `🟢 ${live.length} events live — ${cur.title}` : `Live now • ${cur.title}`;
+
+        pills.innerHTML = `
+        <div class="pill">🟢 Live</div>
+        <div class="pill">📍 ${cur.location || "Online"}</div>
+        <div class="pill">🏁 ${curRange.label || cur.description || ""}</div>
+      `;
+
+        header.textContent = "Live now!";
+        setCountdown(0, 0, 0, 0);
+        cdCard?.style.removeProperty("--cd-img");
+
+        if (cur.twitch && typeof setTwitchChannel === "function") {
+          setTwitchChannel(cur.twitch);
+        }
+      } else if (next) {
+        const nextRange = getDisplayRange(next, nowDate);
+
+        chip.textContent = `Next Event • ${next.title}`;
+        pills.innerHTML = `
+        <div class="pill">🗓️ ${fmtDate(nextRange.start_iso)}</div>
+        <div class="pill">📍 ${next.location || "Online"}</div>
+        <div class="pill">🏁 ${nextRange.label || next.description || ""}</div>
+      `;
+
+        startCountdown(nextRange.start_iso, header);
+        cdCard?.style.removeProperty("--cd-img");
+      } else {
+        chip.textContent = "No upcoming event";
+        pills.innerHTML = '<div class="pill">Check back soon</div>';
+        header.textContent = "Countdown";
+        setCountdown(0, 0, 0, 0);
+        cdCard?.style.removeProperty("--cd-img");
+      }
+
+      if (!calendarInitialized) {
+        const initialMonth =
+          getEventStartIso(live[0] || next || {}) || new Date().toISOString();
+        loadMiniCalendar(initialMonth);
+        calendarInitialized = true;
+      } else {
+        renderCalendar();
+      }
+
+      updateJSONLD(live[0] || next || null);
+      attachReveals();
+      attachHoverGlow();
+      normalizeEventCardHeights();
+    }
+
+    // ---------- STRUCTURED DATA ----------
+    function updateJSONLD(next) {
+      const el = document.getElementById("event-jsonld");
+      if (!next) {
+        el.textContent = "{}";
+        return;
+      }
+
+      const startIso = getEventStartIso(next);
+      const endIso = getEventEndIso(next);
+
+      el.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Event",
+        name: next.title,
+        startDate: startIso,
+        endDate: endIso,
+        eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+        eventStatus: "https://schema.org/EventScheduled",
+        location: { "@type": "VirtualLocation", url: "https://trackmaniaevents.com" },
+        description: next.description || "",
+        image: next.image || undefined,
+        organizer: {
+          "@type": "Organization",
+          name: "Trackmania Events",
+          url: "https://trackmaniaevents.com",
+        },
+      });
+    }
+
+    // ---------- LOAD EVENTS.JSON ----------
+    async function loadEvents() {
+      try {
+        const res = await fetch("/events.json?cb=" + Date.now());
+        if (!res.ok) throw new Error("Failed to fetch events.json");
+        const data = await res.json();
+        renderFromData(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+
+        const mainGrid = document.getElementById("main-events-grid");
+        const weeklyGrid = document.getElementById("weekly-events-grid");
+
+        if (mainGrid) {
+          mainGrid.innerHTML =
+            '<article class="event"><div class="meta">Could not load events.</div></article>';
+        }
+        if (weeklyGrid) {
+          weeklyGrid.innerHTML = "";
+        }
+
+        const t = document.getElementById("countdown-title");
+        if (t) t.textContent = "Countdown";
+        setCountdown(0, 0, 0, 0);
+      }
+    }
+
+    // ---------- TWITCH EMBED ----------
+    function setTwitchChannel(ch) {
+      // placeholder if you want dynamic channel switching later
+    }
+
+    (function () {
+      const parents = ["trackmaniaevents.com", "www.trackmaniaevents.com"];
+      const embed = document.getElementById("twitch-embed");
+      const iframe = document.createElement("iframe");
+      iframe.className = "player";
+      iframe.allowFullscreen = true;
+      iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+      iframe.src =
+        `https://player.twitch.tv/?channel=${encodeURIComponent(TTV_CHANNEL)}&autoplay=false` +
+        parents.map((p) => `&parent=${encodeURIComponent(p)}`).join("") +
+        `&muted=true`;
+      embed.appendChild(iframe);
+    })();
+
+    // ---------- NAV ACTIVE LINK ----------
+    (function () {
+      const sections = [...document.querySelectorAll("section[id]")];
+      const links = [...document.querySelectorAll(".navlinks a")];
+      const byId = (id) => links.find((a) => a.getAttribute("href") === `#${id}`);
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              links.forEach((a) => a.classList.remove("active"));
+              const a = byId(e.target.id);
+              if (a) a.classList.add("active");
+            }
+          });
+        },
+        { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+      );
+
+      sections.forEach((s) => io.observe(s));
+    })();
+
+    // ---------- SCROLL REVEALS ----------
+    function attachReveals() {
+      const reveals = document.querySelectorAll(".reveal:not(.show)");
+      const io2 = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("show");
+              obs.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+      reveals.forEach((el) => io2.observe(el));
+    }
+    attachReveals();
+
+    // ---------- BACK TO TOP ----------
+    (function () {
+      const btn = document.getElementById("toTop");
+      addEventListener("scroll", () => btn.classList.toggle("show", scrollY > 600));
+      btn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+    })();
+
+    // ---------- KICK IT ALL OFF ----------
+    loadEvents();
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // calendar next/prev buttons
+    document.getElementById("cal-prev").onclick = () => {
+      if (calYear == null || calMonth == null) return;
+      calMonth--;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear--;
+      }
+      renderCalendar();
+    };
+
+    document.getElementById("cal-next").onclick = () => {
+      if (calYear == null || calMonth == null) return;
+      calMonth++;
+      if (calMonth > 11) {
+        calMonth = 0;
+        calYear++;
+      }
+      renderCalendar();
+    };
+    window.addEventListener("resize", () => {
+      normalizeEventCardHeights();
+    });
+  </script>
+  <script>
+    // ---------- MOBILE NAV TOGGLE ----------
+    (function () {
+      const btn = document.getElementById("navToggle");
+      const nav = document.getElementById("primary-nav");
+      if (!btn || !nav) return;
+
+      function setOpen(open) {
+        nav.classList.toggle("show", open);
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+      }
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(!nav.classList.contains("show"));
+      });
+
+      // Close when clicking a link
+      nav.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", () => setOpen(false));
+      });
+
+      // Close when clicking outside
+      document.addEventListener("click", (e) => {
+        if (nav.classList.contains("show") && !nav.contains(e.target) && e.target !== btn) {
+          setOpen(false);
+        }
+      });
+
+      // Close on Escape
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") setOpen(false);
+      });
+
+      // If user rotates / resizes out of mobile, clean state
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 640) setOpen(false);
+      });
     })();
   </script>
-
-  <main class="container">
-    <section id="today" class="hero">
-      <div class="thumb" id="t-thumb"></div>
-
-      <div class="hero-panel">
-        <div class="hero-row">
-          <span class="badge">🏁 Today’s TOTD</span>
-        </div>
-
-        <h2 id="t-name">(loading…)</h2>
-
-        <div class="hero-meta">
-          <div class="hero-row">
-            <span class="hero-label">Author:</span>
-            <span class="badge" id="t-author">—</span>
-          </div>
-
-          <p id="t-date" class="date"></p>
-
-          <div id="t-medals"></div>
-
-          <div class="today-extra">
-            <div class="stat-box">
-              <span>Map UID</span>
-              <strong id="t-uid">—</strong>
-            </div>
-            <div class="stat-box">
-              <span>Author Time</span>
-              <strong id="t-at">—</strong>
-            </div>
-            <div class="stat-box">
-              <span>Status</span>
-              <strong>Daily Track</strong>
-            </div>
-          </div>
-
-          <div class="actions" id="t-actions"></div>
-        </div>
-    </section>
-    
-    <section class="leaderboard-panel">
-  <h2 class="section-title">🏆 Today’s Leaderboard</h2>
-  <div id="totdLeaderboard" class="empty-state">Coming soon — leaderboard hookup next.</div>
-</section>
-
-    <div class="archive-tools">
-      <h2 class="section-title">TOTD Archive</h2>
-      <input id="mapSearch" class="search" type="search" placeholder="Search maps or authors...">
-    </div>
-
-    <section class="grid" id="grid"></section>
-  </main>
-
   <script>
-    (function () {
-      const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      const bust = () => `?t=${Date.now()}`;
+    // ---------- AUTH + SHOUTBOX ----------
+    const authModal = document.getElementById("authModal");
+    const authMessage = document.getElementById("authMessage");
+    const authLogoutBtn = document.getElementById("authLogoutBtn");
+    const shoutboxMessages = document.getElementById("shoutboxMessages");
+    const shoutInput = document.getElementById("shoutInput");
+    const shoutTyping = document.getElementById("shoutTyping");
+    const shoutStatus = document.getElementById("shoutStatus");
+    const shoutboxAuthState = document.getElementById("shoutboxAuthState");
+    let shoutboxChannel = null;
+    let typingChannel = null;
+    let typingTimeout = null;
+    let lastTypingSentAt = 0;
+    const typingUsers = new Map();
 
-      const jget = async (url) => {
-        const r = await fetch(url + bust(), { cache: "no-store" });
-        if (!r.ok) throw new Error(`${url} -> ${r.status}`);
-        return r.json();
+    const BLOCKED_WORDS = [
+      "nigger",
+      "faggot",
+      "spick",
+      "coon",
+      "beaner",
+      "retard"
+    ];
+
+    function normalizeModerationText(text) {
+      return String(text || "")
+        .toLowerCase()
+        // leetspeak fixes
+        .replace(/[0@]/g, "o")
+        .replace(/[1!|]/g, "i")
+        .replace(/3/g, "e")
+        .replace(/@/g, "a")
+        .replace(/4/g, "a")
+        .replace(/[5$]/g, "s")
+        .replace(/7/g, "t")
+        .replace(/[^a-z\s]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+    function replaceEmojiShortcuts(text) {
+      const emojiMap = {
+        ":fire:": "🔥",
+        ":joy:": "😂",
+        ":skull:": "💀",
+        ":tm:": "🏁",
+        ":trophy:": "🏆",
+        ":alert:": "🚨",
+        ":eyes:": "👀",
+        ":check:": "✅",
+        ":x:": "❌",
+        ":heart:": "❤️"
       };
 
-      const set = (id, html) => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = html;
+      let out = String(text || "");
+
+      Object.entries(emojiMap).forEach(([code, emoji]) => {
+        out = out.split(code).join(emoji);
+      });
+
+      return out;
+    }
+
+    function bindEmojiPicker() {
+      const emojiBtn = document.getElementById("emojiBtn");
+      const emojiPanel = document.getElementById("emojiPanel");
+      const input = document.getElementById("shoutInput");
+
+      if (!emojiBtn || !emojiPanel || !input) return;
+
+      emojiBtn.onclick = () => {
+        emojiPanel.classList.toggle("show");
       };
 
-      const setText = (id, txt) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = txt ?? "";
-      };
+      emojiPanel.querySelectorAll("[data-emoji]").forEach((btn) => {
+        btn.onclick = () => {
+          input.value += btn.dataset.emoji;
+          input.focus();
+        };
+      });
+    }
+    function messageHasBlockedWords(message) {
+      const clean = normalizeModerationText(message);
+      const compact = clean.replace(/\s+/g, ""); // removes spaces for spaced attacks
 
-      function fmtMs(ms) {
-        if (ms == null) return null;
-        const t = Math.max(0, Number(ms) | 0);
-        const m = Math.floor(t / 60000);
-        const s = Math.floor((t % 60000) / 1000);
-        const ms3 = (t % 1000).toString().padStart(3, "0");
-        return `${m}:${s.toString().padStart(2, "0")}.${ms3}`;
+      for (const word of BLOCKED_WORDS) {
+        const term = normalizeModerationText(word);
+        if (!term || term.length < 3) continue;
+
+        const compactTerm = term.replace(/\s+/g, "");
+
+        // match normal OR spaced OR compact
+        if (clean.includes(term)) return true;
+        if (compact.includes(compactTerm)) return true;
       }
 
-      function authorMedal(msVal) {
-        if (msVal == null || Number(msVal) <= 0) return "";
-        return `
-      <span class="medal author">
-        <img class="medal-icon" src="/img/author.png" alt="Author Medal" loading="lazy">
-        <b>AT</b>
-        <span class="mono">${fmtMs(msVal)}</span>
-      </span>
-    `;
-      }
+      return false;
+    }
 
-      function buildMedals(map) {
-        if (!map) return "";
-        const at = authorMedal(map.authorTime);
-        return at ? `<div class="medals">${at}</div>` : "";
-      }
+    function escapeHtml(value) {
+      const div = document.createElement("div");
+      div.textContent = String(value ?? "");
+      return div.innerHTML;
+    }
 
-      const button = (label, href, extra = '') =>
-        `<a class="btn" href="${href}" target="_blank" rel="noopener" ${extra}>${label}</a>`;
+    function setAuthMessage(text, type = "") {
+      if (!authMessage) return;
+      authMessage.textContent = text || "";
+      authMessage.className = `auth-message ${type}`.trim();
+    }
 
-      function actionsFromMap(map) {
-        const acts = [];
-        if (map?.downloadUrl) acts.push(button("⬇️ Download", map.downloadUrl));
-        if (map?.uid) acts.push(`<button class="btn ghost" data-copy-uid="${map.uid}">Copy UID</button>`);
-        return acts.join("");
-      }
+    function setShoutStatus(text) {
+      if (shoutStatus) shoutStatus.textContent = text || "";
+    }
+    function renderTypingUsers() {
+      if (!shoutTyping) return;
 
-      function renderHero(rec) {
-        if (!rec) return;
-        const m = rec.map || {};
+      const now = Date.now();
 
-        set("t-thumb",
-          m.thumbnailUrl
-            ? `<img src="${m.thumbnailUrl}" referrerpolicy="no-referrer" alt="Map thumbnail">`
-            : `<div class="thumb" style="display:grid;place-items:center;color:var(--muted)">No image</div>`
-        );
-
-        setText("t-name", m.name || "(unknown map)");
-        setText("t-author", m.authorDisplayName || "—");
-        setText("t-date", rec.date ? `Released ${rec.date}` : "");
-        set("t-medals", buildMedals(m));
-        set("t-actions", actionsFromMap(m));
-
-        setText("t-uid", m.uid ? `${m.uid.slice(0, 8)}…` : "—");
-        setText("t-at", m.authorTime ? fmtMs(m.authorTime) : "—");
-      }
-
-      function renderGrid(days){
-  const grid = document.getElementById("grid");
-  if(!grid) return;
-
-  currentDays = days || {};
-
-  const search = document.getElementById("mapSearch");
-  const q = (search?.value || "").toLowerCase();
-
-  grid.innerHTML = "";
-
-  const keys = Object.keys(currentDays).sort().reverse();
-
-  let count = 0;
-
-  for(const k of keys){
-    const d = currentDays[k];
-    const m = d.map || {};
-
-    const hay = `${m.name || ""} ${m.authorDisplayName || ""}`.toLowerCase();
-    if(q && !hay.includes(q)) continue;
-
-    count++;
-
-    const card = document.createElement("article");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="thumb">
-        ${m.thumbnailUrl ? `<img src="${m.thumbnailUrl}" loading="lazy">` : ""}
-      </div>
-      <div class="meta">
-        <div class="date">${d.date}</div>
-        <h3 class="card-title">${m.name || "(unknown)"}</h3>
-
-        <div class="byline">
-          <span class="byline-label">Author:</span>
-          <span class="badge">${m.authorDisplayName || "—"}</span>
-        </div>
-
-        ${buildMedals(m)}
-
-        <div class="meta-footer">
-          ${m.downloadUrl ? `<a class="btn" href="${m.downloadUrl}" target="_blank">⬇️ Download</a>` : ""}
-          ${m.uid ? `<button class="btn ghost" data-copy-uid="${m.uid}">Copy UID</button>` : ""}
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
-  }
-
-  if(count === 0){
-    grid.innerHTML = `<div class="empty-state">No maps found.</div>`;
-  }
-}
-
-      async function loadMonth(ym) {
-        const month = await jget(`/data/totd/${ym}.json`);
-
-        console.log("[TOTD month loaded]", ym, month);
-        console.log("[TOTD days count]", Object.keys(month.days || {}).length);
-
-        const days = month.days || {};
-        const keys = Object.keys(days).sort();
-
-        if (!keys.length) {
-          renderHero(null);
-          renderGrid({});
-          return;
-        }
-
-        const latest = days[keys[keys.length - 1]];
-
-        renderHero(latest);
-        renderGrid(days);
-      }
-
-      async function init() {
-        const sel = document.getElementById("month");
-        const monthsJ = await jget("/data/totd/months.json");
-        const months = (monthsJ?.months || []).slice().sort().reverse();
-
-        if (!months.length) {
-          if (sel) sel.innerHTML = `<option>(no data yet)</option>`;
-          return;
-        }
-
-        if (sel) {
-          sel.innerHTML = months.map(k => {
-            const [y, mm] = k.split("-");
-            return `<option value="${k}">${MONTHS[+mm - 1]} ${y}</option>`;
-          }).join("");
-
-          sel.value = months[0];
-          sel.onchange = () => loadMonth(sel.value);
-        }
-
-        await loadMonth(months[0]);
-        const search = document.getElementById("mapSearch");
-        if (search) {
-          search.addEventListener("input", () => {
-            renderGrid(currentDays);
-          });
+      for (const [key, value] of typingUsers.entries()) {
+        if (now - value.at > 3500) {
+          typingUsers.delete(key);
         }
       }
 
-      document.addEventListener("click", (e) => {
-        const t = e.target;
-        if (t && t.matches("[data-copy-uid]")) {
-          const uid = t.getAttribute("data-copy-uid");
-          if (uid) {
-            navigator.clipboard?.writeText(uid).then(() => {
-              t.textContent = "Copied!";
-              setTimeout(() => t.textContent = "Copy UID", 1200);
-            }).catch(() => {
-              t.textContent = "Copy failed";
-              setTimeout(() => t.textContent = "Copy UID", 1200);
-            });
+      const names = [...typingUsers.values()]
+        .map((x) => x.username)
+        .filter(Boolean);
+
+      if (!names.length) {
+        shoutTyping.textContent = "";
+      } else if (names.length === 1) {
+        shoutTyping.textContent = `${names[0]} is typing...`;
+      } else if (names.length === 2) {
+        shoutTyping.textContent = `${names[0]} and ${names[1]} are typing...`;
+      } else {
+        shoutTyping.textContent = `${names[0]}, ${names[1]}, and ${names.length - 2} others are typing...`;
+      }
+    }
+
+    async function sendTypingSignal() {
+      if (!tmeSupabase || !typingChannel) return;
+
+      const now = Date.now();
+      if (now - lastTypingSentAt < 1200) return;
+      lastTypingSentAt = now;
+
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      const username =
+        user.user_metadata?.username ||
+        user.email?.split("@")[0] ||
+        "Someone";
+
+      const result = await typingChannel.send({
+        type: "broadcast",
+        event: "typing",
+        payload: {
+          user_id: user.id,
+          username,
+          at: Date.now(),
+        },
+      });
+
+      console.log("Typing sent:", result);
+    }
+
+    function startTypingIndicator() {
+      if (!tmeSupabase || typingChannel) return;
+
+      typingChannel = tmeSupabase.channel("shoutbox-typing", {
+        config: {
+          broadcast: {
+            self: false
           }
         }
       });
 
-      init().catch(err => {
-        console.error("[TOTD] init failed:", err);
-        const n = document.getElementById("t-name");
-        if (n) n.textContent = "(failed to load)";
+      typingChannel
+        .on("broadcast", { event: "typing" }, ({ payload }) => {
+          if (!payload?.user_id) return;
+          if (payload.user_id === window.__currentShoutUserId) return;
+
+          typingUsers.set(payload.user_id, {
+            username: payload.username || "Someone",
+            at: payload.at || Date.now(),
+          });
+
+          renderTypingUsers();
+        })
+        .subscribe((status) => {
+          console.log("Typing channel status:", status);
+        });
+
+      if (!window.__typingInterval) {
+        window.__typingInterval = setInterval(renderTypingUsers, 1000);
+      }
+    }
+
+    function openAuthModal(panel = "login") {
+      if (!authModal) return;
+      authModal.classList.add("show");
+      showAuthPanel(panel);
+      setAuthMessage("");
+    }
+
+    function closeAuthModal() {
+      authModal?.classList.remove("show");
+    }
+
+    function showAuthPanel(panel) {
+      const panels = {
+        login: document.getElementById("authLoginPanel"),
+        register: document.getElementById("authRegisterPanel"),
+        forgot: document.getElementById("authForgotPanel"),
+      };
+
+      Object.values(panels).forEach((el) => el?.classList.remove("active"));
+      panels[panel]?.classList.add("active");
+
+      document.querySelectorAll(".auth-tab").forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.authTab === panel);
       });
+
+      const title = document.getElementById("authTitle");
+      const subtitle = document.getElementById("authSubtitle");
+
+      if (panel === "register") {
+        if (title) title.textContent = "Create Account";
+        if (subtitle) subtitle.textContent = "Register with your email, username, and password.";
+      } else if (panel === "forgot") {
+        if (title) title.textContent = "Recover Account";
+        if (subtitle) subtitle.textContent = "Send a password reset link to your email.";
+      } else {
+        if (title) title.textContent = "Login";
+        if (subtitle) subtitle.textContent = "Login to post in the community shoutbox.";
+      }
+    }
+
+    function getUsernameFromUser(user) {
+      return (
+        user?.user_metadata?.username ||
+        user?.user_metadata?.name ||
+        (user?.email ? user.email.split("@")[0] : "User")
+      );
+    }
+
+    async function getCurrentSession() {
+      if (!tmeSupabase) return null;
+
+      try {
+        const { data, error } = await tmeSupabase.auth.getSession();
+
+        if (error) {
+          console.warn("getSession error:", error);
+          return null;
+        }
+
+        return data?.session || null;
+      } catch (err) {
+        console.warn("getSession failed:", err);
+        return null;
+      }
+    }
+
+    async function getCurrentUser() {
+      const session = await getCurrentSession();
+      return session?.user || null;
+    }
+
+    async function updateAuthUI() {
+      const session = await getCurrentSession();
+      const user = session?.user || null;
+
+      const username = getUsernameFromUser(user);
+
+      document.querySelectorAll(".auth-open").forEach((btn) => {
+        btn.textContent = user ? username : "Login / Register";
+      });
+
+      if (authLogoutBtn) authLogoutBtn.style.display = user ? "inline-flex" : "none";
+      if (shoutboxAuthState) shoutboxAuthState.textContent = user ? `Signed in • ${username}` : "Guest";
+      if (shoutInput) shoutInput.placeholder = user ? "Type a shout…" : "Login to send a shout…";
+    }
+
+    function localSystemMessages() {
+      const out = [];
+      const now = new Date();
+
+      function easternParts(date = new Date()) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: "America/New_York",
+          weekday: "short",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: false,
+        }).formatToParts(date);
+
+        const map = {};
+        parts.forEach((p) => {
+          if (p.type !== "literal") map[p.type] = p.value;
+        });
+
+        return {
+          weekday: map.weekday,
+          hour: Number(map.hour),
+          minute: Number(map.minute),
+        };
+      }
+
+      function minutesUntil(date) {
+        return Math.round((date - now) / 60000);
+      }
+
+      const et = easternParts(now);
+      const minutesNow = et.hour * 60 + et.minute;
+
+      // 🏆 Cup of the Day
+      if (minutesNow >= 13 * 60 + 50 && minutesNow < 14 * 60) {
+        out.push({
+          id: "cotd-10-min",
+          username: "SYSTEM",
+          type: "system",
+          message: "🏆 Cup of the Day starts in 10 minutes.",
+          created_at: now.toISOString(),
+          local: true,
+        });
+      }
+
+      if (minutesNow >= 14 * 60 && minutesNow < 14 * 60 + 10) {
+        out.push({
+          id: "cotd-now",
+          username: "SYSTEM",
+          type: "system",
+          message: "🚦 Cup of the Day is starting now.",
+          created_at: now.toISOString(),
+          local: true,
+        });
+      }
+
+      // 🩳 Weekly Shorts
+      if (et.weekday === "Sun" && minutesNow >= 11 * 60 + 50 && minutesNow < 12 * 60) {
+        out.push({
+          id: "weekly-shorts-ending",
+          username: "SYSTEM",
+          type: "system",
+          message: "⏳ Weekly Shorts ends in 10 minutes.",
+          created_at: now.toISOString(),
+          local: true,
+        });
+      }
+
+      if (et.weekday === "Sun" && minutesNow >= 12 * 60 && minutesNow < 12 * 60 + 10) {
+        out.push({
+          id: "weekly-shorts-started",
+          username: "SYSTEM",
+          type: "system",
+          message: "🆕 Weekly Shorts has rolled over — a new week is live.",
+          created_at: now.toISOString(),
+          local: true,
+        });
+      }
+
+      const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
+
+      // 🔴 Show ALL live events, not just one
+      const liveEvents = events
+        .filter((e) => isEventLive(e, now))
+        .sort((a, b) => new Date(getEventStartIso(a)) - new Date(getEventStartIso(b)));
+
+      liveEvents.forEach((event) => {
+        const range = getDisplayRange(event, now);
+        const end = range?.end_iso ? new Date(range.end_iso) : null;
+        const minsLeft = end && end > now ? minutesUntil(end) : null;
+
+        out.push({
+          id: "local-live-" + event.title,
+          username: "SYSTEM",
+          type: "system",
+          message:
+            minsLeft && minsLeft <= 120
+              ? `🔴 ${event.title} is live now — ends in ${minsLeft} minute${minsLeft === 1 ? "" : "s"}.`
+              : `🔴 ${event.title} is live now.`,
+          created_at: now.toISOString(),
+          local: true,
+        });
+      });
+
+      // 🟡 Show upcoming events within 2 hours
+      const upcomingEvents = events
+        .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
+        .filter((x) => x.seg && x.seg.start > now)
+        .sort((a, b) => a.seg.start - b.seg.start)
+        .slice(0, 3);
+
+      upcomingEvents.forEach(({ event, seg }) => {
+        const mins = minutesUntil(seg.start);
+
+        if (mins > 0 && mins <= 120) {
+          out.push({
+            id: "local-upcoming-" + event.title,
+            username: "SYSTEM",
+            type: "system",
+            message: `🟡 ${event.title} begins in ${mins} minute${mins === 1 ? "" : "s"}.`,
+            created_at: now.toISOString(),
+            local: true,
+          });
+        }
+      });
+
+      // ✅ Recently ended events within 30 minutes
+      const recentlyEnded = events
+        .map((e) => ({
+          event: e,
+          endIso: getEventEndIso(e),
+        }))
+        .filter((x) => {
+          if (!x.endIso) return false;
+          const end = new Date(x.endIso);
+          const minsAgo = Math.round((now - end) / 60000);
+          return minsAgo >= 0 && minsAgo <= 30;
+        })
+        .slice(0, 3);
+
+      recentlyEnded.forEach(({ event }) => {
+        out.push({
+          id: "local-ended-" + event.title,
+          username: "SYSTEM",
+          type: "system",
+          message: `✅ ${event.title} has ended.`,
+          created_at: now.toISOString(),
+          local: true,
+        });
+      });
+
+      return out;
+    }
+
+    function formatShoutTimeAgo(value) {
+      const date = value ? new Date(value) : new Date();
+      const diff = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+
+      if (Number.isNaN(diff)) return "";
+      if (diff < 10) return "just now";
+      if (diff < 60) return `${diff}s ago`;
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return `${Math.floor(diff / 86400)}d ago`;
+    }
+    const SHOUT_REACTION_EMOJIS = ["👍", "😂", "🔥", "🏁", "💀"];
+
+    async function loadShoutReactions(messageIds) {
+      if (!tmeSupabase || !Array.isArray(messageIds) || !messageIds.length) {
+        return {};
+      }
+
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_reactions")
+        .select("message_id,user_id,emoji")
+        .in("message_id", messageIds);
+
+      if (error) {
+        console.warn("Could not load reactions:", error);
+        return {};
+      }
+
+      const grouped = {};
+
+      for (const row of data || []) {
+        if (!grouped[row.message_id]) grouped[row.message_id] = {};
+        if (!grouped[row.message_id][row.emoji]) {
+          grouped[row.message_id][row.emoji] = {
+            count: 0,
+            users: [],
+          };
+        }
+
+        grouped[row.message_id][row.emoji].count += 1;
+        grouped[row.message_id][row.emoji].users.push(row.user_id);
+      }
+
+      return grouped;
+    }
+
+    function renderReactionButtons(msg) {
+      if (!msg.id || msg.local || msg.type === "system") return "";
+
+      const reactions = msg.reactions || {};
+      const currentUserId = window.__currentShoutUserId || "";
+
+      const existingReactionPills = Object.entries(reactions)
+        .filter(([, item]) => item?.count > 0)
+        .map(([emoji, item]) => {
+          const active = item.users.includes(currentUserId);
+
+          return `
+        <button
+          class="shout-reaction-pill ${active ? "active" : ""}"
+          type="button"
+          data-react-shout="${escapeHtml(msg.id)}"
+          data-emoji="${escapeHtml(emoji)}"
+          title="React ${escapeHtml(emoji)}"
+        >${escapeHtml(emoji)} ${item.count}</button>
+      `;
+        })
+        .join("");
+
+      return `
+    <div class="shout-reaction-row">
+      ${existingReactionPills}
+
+      <button
+        class="shout-reaction-picker-btn"
+        type="button"
+        data-open-reaction-picker="${escapeHtml(msg.id)}"
+        title="Add reaction"
+      >😊</button>
+    </div>
+  `;
+    }
+    function closeReactionPicker() {
+      if (!reactionPickerMenu) return;
+      reactionPickerMenu.classList.remove("show");
+      reactionPickerMenu.innerHTML = "";
+      activeReactionMessageId = "";
+    }
+
+    function openReactionPicker(messageId, anchorEl) {
+      if (!reactionPickerMenu || !messageId || !anchorEl) return;
+
+      activeReactionMessageId = messageId;
+
+      reactionPickerMenu.innerHTML = SHOUT_REACTION_EMOJIS.map((emoji) => `
+    <button
+      type="button"
+      class="reaction-picker-emoji"
+      data-picker-emoji="${escapeHtml(emoji)}"
+    >${escapeHtml(emoji)}</button>
+  `).join("");
+
+      const rect = anchorEl.getBoundingClientRect();
+
+      reactionPickerMenu.style.left = `${Math.min(rect.left, window.innerWidth - 240)}px`;
+      reactionPickerMenu.style.top = `${rect.bottom + 8}px`;
+      reactionPickerMenu.classList.add("show");
+    }
+    async function toggleShoutReaction(messageId, emoji) {
+      if (!tmeSupabase || !messageId || !emoji) return;
+
+      const user = await getCurrentUser();
+      if (!user) {
+        openAuthModal("login");
+        setShoutStatus("Login first to react.");
+        return;
+      }
+
+      const { data: existing, error: checkError } = await tmeSupabase
+        .from("shoutbox_reactions")
+        .select("id")
+        .eq("message_id", messageId)
+        .eq("user_id", user.id)
+        .eq("emoji", emoji)
+        .maybeSingle();
+
+      if (checkError) {
+        console.warn("Reaction check failed:", checkError);
+        setShoutStatus(checkError.message || "Could not react.");
+        return;
+      }
+
+      if (existing?.id) {
+        const { error } = await tmeSupabase
+          .from("shoutbox_reactions")
+          .delete()
+          .eq("id", existing.id);
+
+        if (error) {
+          console.warn("Reaction remove failed:", error);
+          setShoutStatus(error.message || "Could not remove reaction.");
+          return;
+        }
+      } else {
+        const { error } = await tmeSupabase
+          .from("shoutbox_reactions")
+          .insert({
+            message_id: messageId,
+            user_id: user.id,
+            emoji,
+          });
+
+        if (error) {
+          console.warn("Reaction add failed:", error);
+          setShoutStatus(error.message || "Could not add reaction.");
+          return;
+        }
+      }
+
+      await loadShoutboxMessages(false);
+    }
+
+    function canEditShout(msg) {
+      return (
+        msg?.id &&
+        !msg.local &&
+        msg.type !== "system" &&
+        window.__currentShoutUserId &&
+        msg.user_id === window.__currentShoutUserId
+      );
+    }
+    async function startOnlineUsersPresence() {
+      if (!tmeSupabase || onlineUsersChannel) return;
+
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      const username =
+        user.user_metadata?.username ||
+        user.email?.split("@")[0] ||
+        "Someone";
+
+      onlineUsersChannel = tmeSupabase.channel("shoutbox-online-users", {
+        config: {
+          presence: {
+            key: user.id,
+          },
+        },
+      });
+
+      onlineUsersChannel
+        .on("presence", { event: "sync" }, () => {
+          const state = onlineUsersChannel.presenceState();
+
+          const users = Object.values(state)
+            .flat()
+            .map((entry) => entry.username)
+            .filter(Boolean);
+
+          const uniqueUsers = [...new Set(users)].sort((a, b) => a.localeCompare(b));
+          const count = uniqueUsers.length;
+
+          if (onlineUsersChip) {
+            onlineUsersChip.textContent = `${count} online`;
+          }
+
+          if (onlineUsersList) {
+            onlineUsersList.innerHTML = uniqueUsers.length
+              ? uniqueUsers
+                .map((name) => `<div class="online-user-item">${escapeHtml(name)}</div>`)
+                .join("")
+              : `<div class="online-user-empty">No users online</div>`;
+          }
+        })
+        .subscribe(async (status) => {
+          if (status !== "SUBSCRIBED") return;
+
+          await onlineUsersChannel.track({
+            user_id: user.id,
+            username,
+            online_at: new Date().toISOString(),
+          });
+        });
+    }
+    function renderShoutText(text) {
+      const safe = escapeHtml(text || "");
+
+      return safe.replace(
+        /(^|\s)(@[a-zA-Z0-9_]{2,24})/g,
+        '$1<span class="shout-mention">$2</span>'
+      );
+    }
+    function messageMentionsCurrentUser(message) {
+      const username = String(window.__currentShoutUsername || "").toLowerCase();
+      if (!username) return false;
+
+      const text = String(message || "").toLowerCase();
+      return text.includes(`@${username}`);
+    }
+    async function loadShoutboxRoles(userIds) {
+      if (!tmeSupabase || !Array.isArray(userIds) || !userIds.length) return {};
+
+      const uniqueIds = [...new Set(userIds.filter(Boolean))];
+
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_roles")
+        .select("user_id, role")
+        .in("user_id", uniqueIds);
+
+      if (error) {
+        console.warn("Could not load shoutbox roles:", error);
+        return {};
+      }
+
+      const roles = {};
+      for (const row of data || []) {
+        roles[row.user_id] = row.role || "user";
+      }
+
+      return roles;
+    }
+
+    function getShoutRole(msg) {
+      return shoutRolesByUserId[msg?.user_id] || "user";
+    }
+
+    function canDeleteShout(msg) {
+      if (!msg?.id || msg.local || msg.type === "system") return false;
+
+      const isOwnMessage = msg.user_id === window.__currentShoutUserId;
+
+      return (
+        currentShoutRole === "admin" ||
+        currentShoutRole === "mod" ||
+        isOwnMessage
+      );
+    }
+
+    function canDeleteShout(msg) {
+      if (!msg?.id || msg.local || msg.type === "system") return false;
+
+      const isOwnMessage = msg.user_id === window.__currentShoutUserId;
+      const isStaff = currentShoutRole === "admin" || currentShoutRole === "mod";
+
+      return isStaff || isOwnMessage;
+    }
+    function renderShoutMessages(messages) {
+      const previousCount = lastMessageCount;
+      const newCount = messages.length;
+      if (!shoutboxMessages) return;
+
+      const safeMessages = Array.isArray(messages) ? messages : [];
+      const merged = [...localSystemMessages(), ...safeMessages].slice(-60);
+
+      if (!merged.length) {
+        shoutboxMessages.innerHTML = '<div class="meta">No shoutbox messages yet.</div>';
+        return;
+        const newMessages = messages.slice(previousCount);
+
+        for (const msg of newMessages) {
+          if (messageMentionsCurrentUser(msg.message)) {
+            mentionSound.currentTime = 0;
+            mentionSound.play().catch(() => { });
+            break;
+          }
+        }
+
+        lastMessageCount = newCount;
+      }
+
+      let lastUserId = null;
+      const shouldScroll =
+        shoutboxMessages.scrollHeight - shoutboxMessages.scrollTop - shoutboxMessages.clientHeight < 120;
+      shoutboxMessages.innerHTML = merged.map((msg) => {
+        const isSystem = msg.type === "system" || String(msg.username).toUpperCase() === "SYSTEM";
+        const isLocal = !!msg.local;
+        const mentionedMe = messageMentionsCurrentUser(msg.message);
+        const time = formatShoutTimeAgo(msg.created_at);
+
+        const shouldGroup =
+          !isSystem &&
+          !isLocal &&
+          msg.user_id &&
+          msg.user_id === lastUserId;
+
+        if (!isSystem && !isLocal && msg.user_id) {
+          lastUserId = msg.user_id;
+        } else {
+          lastUserId = null;
+        }
+
+        const role = getShoutRole(msg);
+        const roleClass = role === "admin" || role === "mod" ? role : "";
+
+        const deleteButton = canDeleteShout(msg)
+          ? `<button class="shout-delete" type="button" data-delete-shout="${escapeHtml(msg.id)}" title="Delete message">×</button>`
+          : "";
+
+        const editButton = canEditShout(msg)
+          ? `<button class="shout-edit" type="button" data-edit-shout="${escapeHtml(msg.id)}" title="Edit message">✎</button>`
+          : "";
+
+        return `
+      <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""} ${shouldGroup ? "grouped" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
+        ${!shouldGroup ? `
+          <div class="shout-meta">
+            <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+
+            <div class="shout-meta-right">
+              <div class="shout-actions-inline">
+                ${editButton}
+                ${deleteButton}
+              </div>
+              <span>${escapeHtml(time)}</span>
+            </div>
+          </div>
+        ` : ""}
+
+        <div class="shout-text">${renderShoutText(msg.message)}</div>
+        ${renderReactionButtons(msg)}
+      </div>
+    `;
+      }).join("");
+
+      if (shouldScroll) {
+        shoutboxMessages.scrollTo({
+          top: shoutboxMessages.scrollHeight,
+          behavior: "smooth"
+        });
+      } else {
+        const isNearBottom =
+          shoutboxMessages.scrollHeight -
+          shoutboxMessages.scrollTop -
+          shoutboxMessages.clientHeight < 60;
+
+        if (isNearBottom) {
+          shoutboxMessages.scrollTop = shoutboxMessages.scrollHeight;
+        }
+      }
+    }
+    async function editShoutMessage(messageId) {
+      if (!tmeSupabase || !messageId) return;
+
+      const card = shoutboxMessages?.querySelector(`[data-message-id="${CSS.escape(messageId)}"]`);
+      const textEl = card?.querySelector(".shout-text");
+      const oldText = textEl?.textContent || "";
+
+      const nextText = prompt("Edit your message:", oldText)?.trim();
+      if (!nextText || nextText === oldText) return;
+
+      if (nextText.length > 300) {
+        setShoutStatus("Message must be 300 characters or less.");
+        return;
+      }
+
+      if (messageHasBlockedWords(nextText)) {
+        setShoutStatus("That message contains blocked language.");
+        return;
+      }
+      setShoutStatus("Saving edit...");
+
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_messages")
+        .update({ message: nextText })
+        .eq("id", messageId)
+        .select("id");
+
+      if (error) {
+        console.error("Edit shout failed:", error);
+        setShoutStatus(error.message || "Could not edit message.");
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        setShoutStatus("Edit did not save. Check your Supabase update policy.");
+        return;
+      }
+
+      setShoutStatus("Message edited.");
+      await loadShoutboxMessages(false);
+    }
+
+    async function deleteShoutMessage(messageId) {
+      if (!tmeSupabase || !messageId) return;
+
+      const ok = confirm("Delete this shoutbox message?");
+      if (!ok) return;
+
+      setShoutStatus("Deleting message...");
+
+      const { data, error } = await tmeSupabase
+        .from("shoutbox_messages")
+        .delete()
+        .eq("id", messageId)
+        .select("id");
+
+      if (error) {
+        console.error("Delete shout failed:", error);
+        setShoutStatus(error.message || "Could not delete message.");
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        setShoutStatus("Delete did not remove anything. Check your Supabase delete policy.");
+        return;
+      }
+
+      setShoutStatus("Message deleted.");
+      await loadShoutboxMessages(false);
+    }
+    if (shoutboxMessages) {
+      shoutboxMessages.onclick = async (event) => {
+        const deleteBtn = event.target.closest("[data-delete-shout]");
+        if (deleteBtn) {
+          await deleteShoutMessage(deleteBtn.dataset.deleteShout);
+          return;
+        }
+
+        const editBtn = event.target.closest("[data-edit-shout]");
+        if (editBtn) {
+          await editShoutMessage(editBtn.dataset.editShout);
+          return;
+        }
+        const pickerBtn = event.target.closest("[data-open-reaction-picker]");
+        if (pickerBtn) {
+          openReactionPicker(pickerBtn.dataset.openReactionPicker, pickerBtn);
+          return;
+        }
+
+        const reactBtn = event.target.closest("[data-react-shout]");
+        if (reactBtn) {
+          await toggleShoutReaction(
+            reactBtn.dataset.reactShout,
+            reactBtn.dataset.emoji
+          );
+        }
+      };
+    }
+    function updateShoutboxEventTicker() {
+      const ticker = document.getElementById("shoutboxEventTicker");
+      if (!ticker) return;
+
+      const now = new Date();
+      const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
+
+      function minsUntil(date) {
+        return Math.round((date - now) / 60000);
+      }
+
+      function easternParts(date = new Date()) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: "America/New_York",
+          weekday: "short",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: false,
+        }).formatToParts(date);
+
+        const map = {};
+        parts.forEach((p) => {
+          if (p.type !== "literal") map[p.type] = p.value;
+        });
+
+        return {
+          weekday: map.weekday,
+          hour: Number(map.hour),
+          minute: Number(map.minute),
+        };
+      }
+
+      function segmentName(event, seg, index) {
+        return seg?.label || seg?.name || seg?.title || `Stage ${index + 1}`;
+      }
+
+      const lines = [];
+
+      // Weekly Shorts — Sunday 12:00 PM Eastern
+      const et = easternParts(now);
+      const minutesNow = et.hour * 60 + et.minute;
+
+      if (et.weekday === "Sun" && minutesNow >= 11 * 60 + 45 && minutesNow < 12 * 60) {
+        const mins = 12 * 60 - minutesNow;
+        lines.push(`⏳ <strong>Weekly Shorts</strong> week is ending in ${mins} minute${mins === 1 ? "" : "s"}.`);
+      }
+
+      if (et.weekday === "Sun" && minutesNow >= 12 * 60 && minutesNow < 12 * 60 + 15) {
+        lines.push(`🆕 <strong>Weekly Shorts</strong> new week has started.`);
+      }
+
+      // All event stages / splits
+      events.forEach((event) => {
+        const segs = getEventSegments(event);
+
+        segs.forEach((seg, index) => {
+          const title = escapeHtml(event.title || "Event");
+          const label = escapeHtml(segmentName(event, seg, index));
+          const start = seg.start;
+          const end = seg.end;
+
+          const startsIn = minsUntil(start);
+          const endsIn = minsUntil(end);
+          const endedAgo = Math.round((now - end) / 60000);
+
+          const hasMultipleStages = segs.length > 1;
+          const stageText = hasMultipleStages ? ` — ${label}` : "";
+
+          if (now >= start && now <= end) {
+            if (endsIn > 0 && endsIn <= 15) {
+              lines.push(`⏳ <strong>${title}</strong>${stageText} ends in ${endsIn} minute${endsIn === 1 ? "" : "s"}.`);
+            } else {
+              lines.push(`🔴 <strong>${title}</strong>${stageText} is live now.`);
+            }
+          } else if (startsIn > 0 && startsIn <= 120) {
+            if (startsIn <= 10) {
+              lines.push(`🚨 <strong>${title}</strong>${stageText} starts in ${startsIn} minute${startsIn === 1 ? "" : "s"}!`);
+            } else if (startsIn <= 30) {
+              lines.push(`🟡 <strong>${title}</strong>${stageText} starts in ${startsIn} minute${startsIn === 1 ? "" : "s"}.`);
+            } else {
+              lines.push(`🗓️ <strong>${title}</strong>${stageText} starts in ${startsIn} minute${startsIn === 1 ? "" : "s"}.`);
+            }
+          } else if (endedAgo >= 0 && endedAgo <= 15) {
+            lines.push(`✅ <strong>${title}</strong>${stageText} has ended.`);
+          }
+        });
+      });
+
+      if (!lines.length) {
+        ticker.classList.remove("show");
+        ticker.innerHTML = "";
+        return;
+      }
+
+      ticker.classList.add("show");
+      ticker.innerHTML = lines
+        .map((line) => `<div class="shout-event-line">${line}</div>`)
+        .join("");
+    }
+    async function loadShoutboxMessages(showLoading = false) {
+      if (!shoutboxMessages) return;
+
+      if (showLoading) {
+        shoutboxMessages.innerHTML = '<div class="meta">Loading shoutbox…</div>';
+      }
+
+      if (!supabaseConfigured || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        renderShoutMessages([]);
+        setShoutStatus("Supabase is not configured yet.");
+        return;
+      }
+
+      async function loadViaRest(useDeletedFilter = true) {
+        const selected = encodeURIComponent("id,user_id,username,message,type,created_at");
+        const deletedPart = useDeletedFilter ? "&deleted=eq.false" : "";
+        const url = `${SUPABASE_URL}/rest/v1/shoutbox_messages?select=${selected}${deletedPart}&order=created_at.desc&limit=50`;
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 20000);
+
+        try {
+          const res = await fetch(url, {
+            method: "GET",
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              Accept: "application/json",
+            },
+            signal: controller.signal,
+          });
+
+          const text = await res.text();
+          let json = null;
+          try { json = text ? JSON.parse(text) : null; } catch { json = text; }
+
+          if (!res.ok) {
+            const message = json?.message || json?.hint || text || `HTTP ${res.status}`;
+            throw new Error(message);
+          }
+
+          return Array.isArray(json) ? json : [];
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
+      try {
+        let rows = [];
+        try {
+          rows = await loadViaRest(true);
+        } catch (firstError) {
+          if (String(firstError.message || "").toLowerCase().includes("deleted")) {
+            rows = await loadViaRest(false);
+          } else {
+            throw firstError;
+          }
+        }
+
+        rows = rows.reverse();
+
+        const messageIds = rows.map((row) => row.id).filter(Boolean);
+        const userIds = rows.map((row) => row.user_id).filter(Boolean);
+
+        const reactionsByMessage = await loadShoutReactions(messageIds);
+
+        const user = await getCurrentUser();
+
+        window.__currentShoutUserId = user?.id || "";
+        window.__currentShoutUsername =
+          user?.user_metadata?.username ||
+          user?.email?.split("@")[0] ||
+          "";
+
+        const rolesByUser = await loadShoutboxRoles([
+          ...userIds,
+          window.__currentShoutUserId,
+        ]);
+
+        Object.assign(shoutRolesByUserId, rolesByUser);
+
+        currentShoutRole = shoutRolesByUserId[user?.id] || "user";
+
+        rows = rows.map((row) => ({
+          ...row,
+          reactions: reactionsByMessage[row.id] || {},
+        }));
+
+        renderShoutMessages(rows);
+        setShoutStatus("");
+        updateShoutboxEventTicker();
+      } catch (error) {
+        console.warn("Shoutbox load failed:", error);
+        renderShoutMessages([]);
+        setShoutStatus(`Could not load shoutbox messages: ${error.message || "Unknown error"}`);
+      }
+    }
+    let lastShoutSendAt = 0;
+    let lastShoutMessage = "";
+    async function sendShout() {
+      if (!tmeSupabase) {
+        setShoutStatus("Supabase is not configured yet.");
+        return;
+      }
+
+      let message = shoutInput?.value.trim();
+      message = replaceEmojiShortcuts(message);
+      if (!message) return;
+
+      if (message.length > 300) {
+        setShoutStatus("Message must be 300 characters or less.");
+        return;
+      }
+      const nowSend = Date.now();
+
+      if (nowSend - lastShoutSendAt < 2500) {
+        setShoutStatus("Slow down a bit before sending another shout.");
+        return;
+      }
+
+      if (message.toLowerCase() === lastShoutMessage.toLowerCase()) {
+        setShoutStatus("Please do not send the same message twice.");
+        return;
+      }
+      if (messageHasBlockedWords(message)) {
+        setShoutStatus("That message is not allowed.");
+        return;
+      }
+
+      const user = await getCurrentUser();
+      if (!user) {
+        openAuthModal("login");
+        setShoutStatus("Login first to send a shout.");
+        return;
+      }
+
+      const username = getUsernameFromUser(user).slice(0, 24);
+      const { error } = await tmeSupabase.from("shoutbox_messages").insert({
+        user_id: user.id,
+        username,
+        message,
+        type: "user",
+      });
+
+      if (error) {
+        console.warn("Shoutbox send failed:", error);
+        setShoutStatus(error.message || "Could not send message.");
+        return;
+      }
+
+      lastShoutSendAt = Date.now();
+      lastShoutMessage = message;
+
+      shoutInput.value = "";
+      setShoutStatus("");
+      await loadShoutboxMessages(false);
+    }
+
+    function startShoutboxRealtime() {
+      if (!tmeSupabase) return;
+
+      // 🔥 ALWAYS reset (this is the fix)
+      if (shoutboxChannel) {
+        tmeSupabase.removeChannel(shoutboxChannel);
+        shoutboxChannel = null;
+      }
+
+      shoutboxChannel = tmeSupabase
+        .channel("shoutbox-live-final")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "shoutbox_messages" },
+          (payload) => {
+            console.log("SHOUTBOX MESSAGE REALTIME:", payload);
+            loadShoutboxMessages(false).catch(console.warn);
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "DELETE", schema: "public", table: "shoutbox_messages" },
+          () => {
+            loadShoutboxMessages(false);
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "shoutbox_messages" },
+          () => {
+            loadShoutboxMessages(false);
+          }
+        )
+        .subscribe((status) => {
+          console.log("REALTIME STATUS:", status);
+        });
+    }
+    function withTimeout(promise, ms = 12000, label = "Request") {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error(`${label} timed out. Please try again.`)), ms)
+        ),
+      ]);
+    }
+    function bindAuthAndShoutbox() {
+      document.querySelectorAll(".auth-open").forEach((btn) => {
+        btn.onclick = () => openAuthModal("login");
+      });
+
+      const closeBtn = document.getElementById("authClose");
+      if (closeBtn) closeBtn.onclick = closeAuthModal;
+
+      if (authModal) {
+        authModal.onclick = (e) => {
+          if (e.target === authModal) closeAuthModal();
+        };
+      }
+
+      document.querySelectorAll(".auth-tab").forEach((tab) => {
+        tab.onclick = () => showAuthPanel(tab.dataset.authTab || "login");
+      });
+
+      const forgotBtn = document.getElementById("authForgotBtn");
+      if (forgotBtn) forgotBtn.onclick = () => showAuthPanel("forgot");
+
+      const backBtn = document.getElementById("authBackLoginBtn");
+      if (backBtn) backBtn.onclick = () => showAuthPanel("login");
+
+      const loginBtn = document.getElementById("authLoginBtn");
+      if (loginBtn) loginBtn.onclick = async () => {
+        if (!tmeSupabase) {
+          return setAuthMessage("Supabase is not configured yet.", "error");
+        }
+
+        const email = document.getElementById("authLoginEmail")?.value.trim();
+        const password = document.getElementById("authLoginPassword")?.value;
+
+        if (!email || !password) {
+          return setAuthMessage("Enter your email and password.", "error");
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Logging in...";
+        setAuthMessage("");
+
+        try {
+          const { data, error } = await withTimeout(
+            tmeSupabase.auth.signInWithPassword({ email, password }),
+            60000,
+            "Login"
+          );
+
+          if (error) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = "Login";
+            setAuthMessage(error.message, "error");
+            return;
+          }
+
+          if (!data?.session) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = "Login";
+            setAuthMessage("Login failed. Please try again.", "error");
+            return;
+          }
+
+          localStorage.setItem("tme_login_started_at", String(Date.now()));
+
+          // Reset button + close modal immediately after Supabase login succeeds.
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Login";
+          closeAuthModal();
+
+          // Do slower UI/session/shoutbox work in the background.
+          setTimeout(() => {
+            updateAuthUI().catch(console.warn);
+            window.startLogoutTimer?.().catch(console.warn);
+
+            loadShoutboxMessages(false).catch((err) => {
+              console.warn("Shoutbox reload after login failed:", err);
+              setShoutStatus("Logged in, but shoutbox failed to load. Refresh or try again.");
+            });
+          }, 0);
+        } catch (err) {
+          console.warn("Login failed:", err);
+          setAuthMessage(err.message || "Login failed. Please try again.", "error");
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Login";
+        }
+      };
+
+      const registerBtn = document.getElementById("authRegisterBtn");
+      if (registerBtn) registerBtn.onclick = async () => {
+        if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+
+        const username = document.getElementById("authRegisterUsername")?.value.trim();
+        const email = document.getElementById("authRegisterEmail")?.value.trim();
+        const password = document.getElementById("authRegisterPassword")?.value;
+
+        if (!username || !email || !password) {
+          return setAuthMessage("Fill out username, email, and password.", "error");
+        }
+
+        if (!/^[a-zA-Z0-9_.-]{2,24}$/.test(username)) {
+          return setAuthMessage("Username can use letters, numbers, underscore, dot, or dash. 2–24 chars.", "error");
+        }
+
+        registerBtn.disabled = true;
+        registerBtn.textContent = "Creating...";
+        setAuthMessage("");
+
+        try {
+          const { error } = await withTimeout(
+            tmeSupabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: { username },
+                emailRedirectTo: "https://trackmaniaevents.com/",
+              },
+            }),
+            12000,
+            "Register"
+          );
+
+          if (error) return setAuthMessage(error.message, "error");
+          setAuthMessage("Account created. Check your email to confirm it.", "ok");
+        } catch (err) {
+          console.warn("Register failed:", err);
+          setAuthMessage(err.message || "Register failed. Please try again.", "error");
+        } finally {
+          registerBtn.disabled = false;
+          registerBtn.textContent = "Create Account";
+        }
+      };
+
+      const resetBtn = document.getElementById("authResetBtn");
+      if (resetBtn) resetBtn.onclick = async () => {
+        if (!tmeSupabase) return setAuthMessage("Supabase is not configured yet.", "error");
+
+        const email = document.getElementById("authResetEmail")?.value.trim();
+        if (!email) return setAuthMessage("Enter your email first.", "error");
+
+        resetBtn.disabled = true;
+        resetBtn.textContent = "Sending...";
+        setAuthMessage("");
+
+        try {
+          const { error } = await withTimeout(
+            tmeSupabase.auth.resetPasswordForEmail(email, {
+              redirectTo: "https://trackmaniaevents.com/",
+            }),
+            12000,
+            "Password reset"
+          );
+
+          if (error) return setAuthMessage(error.message, "error");
+          setAuthMessage("Password reset email sent. Check your inbox.", "ok");
+        } catch (err) {
+          console.warn("Password reset failed:", err);
+          setAuthMessage(err.message || "Password reset failed. Please try again.", "error");
+        } finally {
+          resetBtn.disabled = false;
+          resetBtn.textContent = "Send Password Reset";
+        }
+      };
+
+      if (authLogoutBtn) authLogoutBtn.onclick = async () => {
+        if (!tmeSupabase) return;
+
+        try {
+          localStorage.removeItem("tme_login_started_at");
+          await tmeSupabase.auth.signOut();
+          await updateAuthUI();
+          await loadShoutboxMessages(false);
+          await window.clearLogoutTimer?.();
+          setAuthMessage("Logged out.", "ok");
+        } catch (err) {
+          console.warn("Logout failed:", err);
+          setAuthMessage(err.message || "Logout failed.", "error");
+        }
+      };
+
+      const sendShoutBtn = document.getElementById("sendShout");
+
+      sendShoutBtn?.addEventListener("click", sendShout);
+
+      shoutInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendShout();
+      });
+
+      // online users (this is fine)
+      onlineUsersBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onlineUsersMenu?.classList.toggle("show");
+      });
+
+      // 👇 ADD THIS BLOCK HERE
+      reactionPickerMenu?.addEventListener("click", async (event) => {
+        const btn = event.target.closest("[data-picker-emoji]");
+        if (!btn || !activeReactionMessageId) return;
+
+        await toggleShoutReaction(activeReactionMessageId, btn.dataset.pickerEmoji);
+        closeReactionPicker();
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!reactionPickerMenu?.classList.contains("show")) return;
+        if (event.target.closest(".reaction-picker-menu")) return;
+        if (event.target.closest("[data-open-reaction-picker]")) return;
+
+        closeReactionPicker();
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!onlineUsersMenu) return;
+        if (!onlineUsersMenu.classList.contains("show")) return;
+        if (e.target.closest(".online-users-wrap")) return;
+
+        onlineUsersMenu.classList.remove("show");
+      });
+      shoutInput.oninput = () => {
+        if (!shoutInput.value.trim()) return;
+
+        sendTypingSignal();
+
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(renderTypingUsers, 1200);
+      };
+    }
+    bindAuthAndShoutbox();
+    if (!window.__emojiBound) {
+      window.__emojiBound = true;
+      bindEmojiPicker();
+    }
+
+    if (tmeSupabase) {
+      tmeSupabase.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_OUT") {
+          localStorage.removeItem("tme_login_started_at");
+          window.clearLogoutTimer?.();
+
+          updateAuthUI().catch(console.warn);
+          loadShoutboxMessages(false).catch(console.warn);
+          return;
+        }
+
+        if (session) {
+          if (!localStorage.getItem("tme_login_started_at")) {
+            localStorage.setItem("tme_login_started_at", String(Date.now()));
+          }
+
+          updateAuthUI().catch(console.warn);
+          loadShoutboxMessages(false).catch(console.warn);
+          window.startLogoutTimer?.().catch(console.warn);
+        }
+      });
+    }
+
+    // ---------- PASSWORD RESET HANDLER ----------
+    async function handlePasswordRecovery() {
+      if (!tmeSupabase) return;
+
+      const hash = window.location.hash || "";
+      const search = window.location.search || "";
+      const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+      const searchParams = new URLSearchParams(search.replace(/^\?/, ""));
+
+      const isRecovery =
+        hashParams.get("type") === "recovery" ||
+        searchParams.get("type") === "recovery" ||
+        hash.includes("access_token") ||
+        searchParams.has("code");
+
+      if (!isRecovery) return;
+
+      const code = searchParams.get("code");
+      if (code && typeof tmeSupabase.auth.exchangeCodeForSession === "function") {
+        const { error } = await tmeSupabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          setAuthMessage(error.message, "error");
+        }
+      }
+
+      const modal = document.getElementById("authModal");
+      const title = document.getElementById("authTitle");
+      const subtitle = document.getElementById("authSubtitle");
+      const panel = document.getElementById("authForgotPanel");
+
+      modal?.classList.add("show");
+      if (title) title.textContent = "Reset Password";
+      if (subtitle) subtitle.textContent = "Enter your new password.";
+
+      document.querySelector(".auth-tabs")?.setAttribute("style", "display:none");
+      document.querySelectorAll(".auth-panel").forEach((p) => p.classList.remove("active"));
+
+      if (!panel) return;
+      panel.classList.add("active");
+
+      panel.innerHTML = `
+      <input id="newPasswordInput" class="input" type="password" placeholder="New password" autocomplete="new-password" />
+      <button id="updatePasswordBtn" class="btn primary" type="button">Update Password</button>
+    `;
+
+      const updateBtn = document.getElementById("updatePasswordBtn");
+
+      updateBtn.onclick = async () => {
+        const password = document.getElementById("newPasswordInput")?.value || "";
+
+        if (password.length < 6) {
+          setAuthMessage("Password must be at least 6 characters.", "error");
+          return;
+        }
+
+        updateBtn.disabled = true;
+        updateBtn.textContent = "Updating...";
+        setAuthMessage("");
+
+        const { error } = await tmeSupabase.auth.updateUser({ password });
+
+        updateBtn.disabled = false;
+        updateBtn.textContent = "Update Password";
+
+        if (error) {
+          setAuthMessage(error.message, "error");
+          return;
+        }
+
+        setAuthMessage("Password updated successfully.", "ok");
+
+        setTimeout(async () => {
+          modal?.classList.remove("show");
+          document.querySelector(".auth-tabs")?.removeAttribute("style");
+
+          window.history.replaceState({}, document.title, "/");
+
+          await updateAuthUI();
+          await loadShoutboxMessages(false);
+          await window.startLogoutTimer?.();
+        }, 650);
+      };
+    }
+
+    (async () => {
+      try {
+        await handlePasswordRecovery();
+
+        if (tmeSupabase) {
+          try {
+            const { data } = await withTimeout(
+              tmeSupabase.auth.getSession(),
+              30000,
+              "Session restore"
+            );
+
+            const session = data?.session || null;
+
+            if (session && !localStorage.getItem("tme_login_started_at")) {
+              localStorage.setItem("tme_login_started_at", String(Date.now()));
+            }
+          } catch (err) {
+            console.warn("Session restore failed, continuing as guest:", err);
+            localStorage.removeItem("tme_login_started_at");
+          }
+        }
+        await loadShoutboxMessages(true);
+        await updateAuthUI();
+        await window.startLogoutTimer?.();
+
+        if (!window.__realtimeStarted) {
+          window.__realtimeStarted = true;
+          setTimeout(() => {
+            startShoutboxRealtime();
+          }, 500);
+        }
+        startTypingIndicator();
+        startOnlineUsersPresence();
+      } catch (err) {
+        console.warn("Page auth/shoutbox init failed:", err);
+
+        if (shoutboxMessages) {
+          shoutboxMessages.innerHTML = `<div class="meta">Could not load shoutbox. Refresh or try again.</div>`;
+        }
+
+        setShoutStatus(err.message || "Could not load shoutbox.");
+      }
     })();
+
   </script>
+
 </body>
 
 </html>
