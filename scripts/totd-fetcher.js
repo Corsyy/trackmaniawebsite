@@ -578,6 +578,30 @@ async function writeLeaderboardsForExistingTotdFiles(access) {
     }
   }
 }
+async function debugCotdCompetitions() {
+  try {
+    const r = await fetchRetry(
+      "https://meet.trackmania.nadeo.club/api/competitions?length=10&offset=0",
+      {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": USER_AGENT,
+        },
+      }
+    );
+
+    if (!r.ok) {
+      console.warn("[COTD DEBUG FAILED]", r.status);
+      return;
+    }
+
+    const j = await r.json();
+
+    console.log("[COTD DEBUG RESPONSE]", JSON.stringify(j).slice(0, 2000));
+  } catch (err) {
+    console.warn("[COTD DEBUG ERROR]", err?.message || err);
+  }
+}
 async function main() {
   await ensureDir(TOTD_DIR);
 
@@ -586,6 +610,8 @@ async function main() {
   const access = await getLiveAccessToken();
   await writeLeaderboardsForExistingTotdFiles(access);
 
-  console.log("[DONE] TOTD + all existing leaderboards updated.");
+  await debugCotdCompetitions(); // 👈 ADD THIS
+
+  console.log("[DONE]");
 }
 main().catch(err => { console.error(err); process.exit(1); });
