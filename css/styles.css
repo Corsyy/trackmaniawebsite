@@ -1823,6 +1823,7 @@
     .hero {
       position: relative;
       padding: clamp(2.5rem, 5vw, 4.4rem) 0 2.8rem;
+      padding-top: 0 !important;
       overflow: visible;
       isolation: isolate;
       background: transparent !important;
@@ -1846,21 +1847,25 @@
     .hero-grid {
       display: grid;
       grid-template-columns: minmax(0, .95fr) minmax(420px, 1.05fr);
+      align-items: start !important;
       gap: 2rem;
       align-items: center;
     }
 
     .hero-top {
       min-height: 440px;
-      justify-content: center;
       padding: .5rem 0;
+      min-height: auto !important;
+      justify-content: flex-start !important;
+      padding-top: 0 !important;
+      margin-top: 0 !important;
     }
 
     .hero-row {
       display: grid;
       grid-template-columns: 1fr;
       gap: 1rem;
-      margin-top: 0;
+      margin-top: 0 !important;
     }
 
     .hero-kicker {
