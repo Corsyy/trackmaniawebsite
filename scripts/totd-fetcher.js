@@ -589,9 +589,17 @@ async function writeLeaderboardsForExistingTotdFiles(access) {
 async function main() {
   await ensureDir(TOTD_DIR);
 
-  await writeTotdMonth(0);
+  // 0 = current month, 1 = previous month, 2 = two months ago, etc.
+  const MONTHS_TO_FETCH = Number(process.env.TOTD_MONTHS_TO_FETCH || 12);
+
+  for (let i = 0; i < MONTHS_TO_FETCH; i++) {
+    console.log("[TOTD MONTH FETCH]", i);
+    await writeTotdMonth(i);
+    await sleep(500);
+  }
 
   console.log("[DONE]");
 }
+main().catch(err => { console.error(err); process.exit(1); });
 main().catch(err => { console.error(err); process.exit(1); });
 main().catch(err => { console.error(err); process.exit(1); });
