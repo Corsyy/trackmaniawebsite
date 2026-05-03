@@ -17,6 +17,8 @@ jobs:
     env:
       PUBLIC_DIR: .
       DEBUG: "1"
+      TOTD_MONTHS_TO_FETCH: "36"
+      FORCE_TOTD_REBUILD: "0"
       REFRESH_TOKEN: ${{ secrets.NADEO_REFRESH_TOKEN }}
       CLIENT_ID: ${{ secrets.TM_CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.TM_CLIENT_SECRET }}
