@@ -603,6 +603,37 @@ async function writeCotdResultsPlaceholder() {
     status: "debug only - winner parser not added yet"
   });
 }
+async function liveMeetGet(url, access) {
+  const r = await fetchRetry(url, {
+    headers: {
+      Authorization: `nadeo_v1 t=${access}`,
+      Accept: "application/json",
+      "User-Agent": USER_AGENT,
+    },
+  });
+
+  if (!r.ok) {
+    const txt = await r.text().catch(() => "");
+    throw new Error(`${url} -> ${r.status} ${txt}`);
+  }
+
+  return r.json();
+}
+async function writeCotdMatch1Result(access, competitionId) {
+  const url = `https://meet.trackmania.nadeo.club/api/competitions/${competitionId}/rounds/1/matches?length=5&offset=0`;
+
+  const j = await liveMeetGet(url, access);
+  const result = extractMatch1Winner(j);
+
+  await ensureDir(TOTD_DIR);
+
+  await writeJson(path.join(TOTD_DIR, "cotd-results.json"), {
+    generatedAt: new Date().toISOString(),
+    ...result,
+  });
+
+  console.log("[COTD RESULT WRITTEN]", result);
+}
 async function debugCotdMatches(access, competitionId) {
   try {
     const url = `https://meet.trackmania.nadeo.club/api/competitions/${competitionId}/rounds/1/matches?length=5&offset=0`;
@@ -626,6 +657,58 @@ async function debugCotdMatches(access, competitionId) {
     console.warn("[COTD MATCHES DEBUG ERROR]", err?.message || err);
   }
 }
+function normalizeArrayPayload(j) {
+  if (Array.isArray(j)) return j;
+  if (Array.isArray(j?.items)) return j.items;
+  if (Array.isArray(j?.matches)) return j.matches;
+  if (Array.isArray(j?.rounds)) return j.rounds;
+  return [];
+}
+
+function extractMatch1Winner(matchesJson) {
+  const matches = normalizeArrayPayload(matchesJson);
+
+  const match1 =
+    matches.find((m) => Number(m.position ?? m.rank ?? m.matchNumber ?? m.id) === 1) ||
+    matches.find((m) => String(m.name || m.label || "").toLowerCase().includes("match 1")) ||
+    matches[0];
+
+  if (!match1) return null;
+
+  const players =
+    match1.players ||
+    match1.participants ||
+    match1.results ||
+    match1.ranking ||
+    match1.teams ||
+    [];
+
+  const winnerRow = players.find((p) =>
+    Number(p.rank ?? p.position ?? p.placement ?? p.result?.rank ?? p.result?.position) === 1
+  );
+
+  if (!winnerRow) return null;
+
+  const player = winnerRow.player || winnerRow.account || winnerRow.user || winnerRow;
+
+  return {
+    winner:
+      stripTmFormatting(
+        player.displayName ||
+        player.name ||
+        winnerRow.displayName ||
+        winnerRow.name ||
+        "Unknown"
+      ),
+    accountId:
+      player.accountId ||
+      player.id ||
+      winnerRow.accountId ||
+      winnerRow.playerId ||
+      null,
+    match: 1,
+  };
+}
 async function main() {
   await ensureDir(TOTD_DIR);
 
@@ -633,7 +716,7 @@ async function main() {
 
   const access = await getLiveAccessToken();
 
-  await debugCotdMatches(access, 42741);
+  await writeCotdMatch1Result(access, 42741);
 
   console.log("[DONE]");
 }
