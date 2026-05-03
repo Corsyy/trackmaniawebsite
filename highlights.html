@@ -56,16 +56,17 @@
   });
 </script>
   <main>
-    <div class="container page">
+  <div class="container highlights-layout">
+
+    <!-- LEFT: FEED -->
+    <div class="highlights-feed">
       <header class="page-header">
         <h1>Community Highlights</h1>
-        <p class="meta">
-          Share your best WR attempts, saves, fails, and stylish lines.
-        </p>
+        <p>Share your best WRs, fails, saves, and clean lines.</p>
       </header>
 
-      <section class="controls">
-        <div id="chips" class="chips" style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <div class="controls">
+        <div id="chips" class="chips">
           <span class="chip active" data-tag="All">All</span>
           <span class="chip" data-tag="WR">WR</span>
           <span class="chip" data-tag="WR Attempt">WR Attempt</span>
@@ -77,21 +78,82 @@
         </div>
 
         <div class="toolbar-row">
-          <div class="search">
-            <input id="q" type="search" placeholder="Search player, map, tag…">
-          </div>
-          <button id="refresh" class="btn ghost">Refresh</button>
+          <input id="q" type="search" placeholder="Search player, map, tag…">
+          <button id="refresh" class="btn">Refresh</button>
         </div>
-      </section>
+      </div>
 
-      <section aria-live="polite">
-        <div id="grid" class="grid"></div>
-        <div id="empty" class="empty" style="display:none">
-          No highlights yet. Be the first to submit!
-        </div>
-      </section>
+      <div id="grid" class="highlights-grid"></div>
+
+      <div id="empty" class="empty">
+        No highlights yet. Be the first.
+      </div>
     </div>
-  </main>
+
+    <!-- RIGHT: SUBMIT -->
+    <div class="submit-card">
+      <h2>Submit Highlight</h2>
+
+      <form id="form" class="form">
+
+        <div class="field">
+          <label>Username</label>
+          <input id="playerName" required placeholder="Corsy">
+        </div>
+
+        <div class="field">
+          <label>Map Name</label>
+          <input id="mapName" required placeholder="Realm CE">
+        </div>
+
+        <div class="field">
+          <label>Map UID</label>
+          <input id="mapUid">
+        </div>
+
+        <div class="field">
+          <label>Account ID</label>
+          <input id="accountId">
+        </div>
+
+        <div class="field">
+          <label>Tags</label>
+          <div class="tags">
+            <label><input type="checkbox" value="WR"> WR</label>
+            <label><input type="checkbox" value="Save"> Save</label>
+            <label><input type="checkbox" value="Fail"> Fail</label>
+            <label><input type="checkbox" value="Style"> Style</label>
+            <label><input type="checkbox" value="Kacky"> Kacky</label>
+            <label><input type="checkbox" value="TOTD"> TOTD</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <textarea id="description" maxlength="300"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Video URL</label>
+          <input id="videoUrl" placeholder="YouTube or Twitch">
+        </div>
+
+        <div class="field">
+          <label class="checkbox">
+            <input type="checkbox" required>
+            I own this content
+          </label>
+        </div>
+
+        <button type="submit" class="btn primary full">
+          Submit
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</main>
 
   <!-- Modal: Submit -->
   <div id="modal" class="modal" aria-hidden="true">
