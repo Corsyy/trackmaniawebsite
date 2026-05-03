@@ -154,12 +154,139 @@ async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 500) {
 }
 
 /* ------------------------------ tm.io helpers ------------------------------ */
-async function fetchTmioMonth(index = 0) {
-    const r = await fetchRetry(`${TMIO}/api/totd/${index}`);
-    if (!r.ok) throw new Error(`tm.io totd[${index}] failed: ${r.status}`);
-    return r.json();
-}
+async function fetchNadeoTotdMonths(access, length = 36, offset = 0) {
+  const url =
+    `https://live-services.trackmania.nadeo.live/api/token/campaign/month` +
+    `?length=${encodeURIComponent(length)}` +
+    `&offset=${encodeURIComponent(offset)}`;
 
+  const j = await liveGet(url, access);
+
+  return Array.isArray(j?.monthList) ? j.monthList : [];
+}
+function baseNadeoDayRecord(monthObj, entry, idx) {
+  const y = Number(monthObj.year);
+  const m1 = Number(monthObj.month);
+  const d = Number(entry.day ?? entry.monthDay ?? entry.position ?? idx + 1);
+
+  const uid = entry.mapUid ?? entry.map?.mapUid ?? entry.uid ?? null;
+
+  let name =
+    entry.name ??
+    entry.mapName ??
+    entry.map?.name ??
+    "(unknown map)";
+
+  let authorDisplayName =
+    entry.author ??
+    entry.authorName ??
+    entry.authorDisplayName ??
+    entry.map?.author ??
+    entry.map?.authorName ??
+    "(unknown)";
+
+  name = stripTmFormatting(name);
+  authorDisplayName = stripTmFormatting(authorDisplayName);
+
+  return {
+    date: dateKey(y, m1, d),
+    map: {
+      uid,
+      name,
+      authorAccountId:
+        entry.authorAccountId ??
+        entry.map?.authorAccountId ??
+        null,
+      authorDisplayName,
+      thumbnailUrl:
+        entry.thumbnailUrl ??
+        entry.thumbnail ??
+        entry.map?.thumbnailUrl ??
+        entry.map?.thumbnail ??
+        "",
+      downloadUrl: null,
+      authorTime: null,
+      goldTime: null,
+      silverTime: null,
+      bronzeTime: null,
+      difficulty: null,
+    },
+  };
+}
+async function writeNadeoTotdMonth(monthObj, liveAccess) {
+  const y = Number(monthObj.year);
+  const m1 = Number(monthObj.month);
+  const mKey = monthKey(y, m1);
+
+  const monthPath = path.join(TOTD_DIR, `${mKey}.json`);
+  const prev = await loadJson(monthPath, { month: mKey, days: {} });
+  const prevDays = prev?.days || {};
+
+  const daysRaw =
+    monthObj.days ||
+    monthObj.mapList ||
+    monthObj.maps ||
+    [];
+
+  const daysArr = daysRaw.map((entry, i) =>
+    baseNadeoDayRecord(monthObj, entry, i)
+  );
+
+  for (const rec of daysArr) {
+    const prevRec = prevDays[rec.date]?.map || {};
+
+    if (prevRec.downloadUrl) {
+      rec.map.downloadUrl = prevRec.downloadUrl;
+    }
+
+    if (rec.map.uid) {
+      const { downloadUrl, medals } = await fetchMapDetails(rec.map.uid);
+
+      if (!rec.map.downloadUrl) rec.map.downloadUrl = downloadUrl || null;
+
+      if (medals) {
+        rec.map.authorTime = medals.authorTime;
+        rec.map.goldTime = medals.goldTime;
+        rec.map.silverTime = medals.silverTime;
+        rec.map.bronzeTime = medals.bronzeTime;
+        rec.map.difficulty = medals.difficulty;
+      }
+
+      if (
+        liveAccess &&
+        (
+          rec.map.authorTime == null ||
+          rec.map.goldTime == null ||
+          rec.map.silverTime == null ||
+          rec.map.bronzeTime == null
+        )
+      ) {
+        const nadeo = await fetchNadeoMapInfo(rec.map.uid, liveAccess);
+
+        if (nadeo) {
+          if (nadeo.authorTime) rec.map.authorTime = nadeo.authorTime;
+          if (nadeo.goldTime) rec.map.goldTime = nadeo.goldTime;
+          if (nadeo.silverTime) rec.map.silverTime = nadeo.silverTime;
+          if (nadeo.bronzeTime) rec.map.bronzeTime = nadeo.bronzeTime;
+        }
+      }
+
+      await writeTotdLeaderboard(rec.map.uid, liveAccess);
+      await sleep(120);
+    }
+  }
+
+  const daysOut = {};
+  for (const rec of daysArr) {
+    daysOut[rec.date] = rec;
+  }
+
+  await ensureDir(TOTD_DIR);
+  await writeJson(monthPath, { month: mKey, days: daysOut });
+  await rebuildMonthIndex(TOTD_DIR);
+
+  return mKey;
+}
 /**
  * FIXED:
  * tm.io may return month as 1–12 (human) OR 0–11 (JS-style).
@@ -586,16 +713,28 @@ async function writeLeaderboardsForExistingTotdFiles(access) {
     }
   }
 }
+async function getLatestMonthKey() {
+  const files = await readdir(TOTD_DIR);
+  const months = files
+    .filter(f => f.endsWith(".json") && f !== "months.json")
+    .map(f => f.replace(".json", ""))
+    .sort();
+
+  return months[months.length - 1] || null;
+}
 async function main() {
   await ensureDir(TOTD_DIR);
 
-  const MONTHS_TO_FETCH = Number(process.env.TOTD_MONTHS_TO_FETCH || 12);
+  const access = await getLiveAccessToken();
+
+  const MONTHS_TO_FETCH = Number(process.env.TOTD_MONTHS_TO_FETCH || 36);
   const FORCE_REBUILD = process.env.FORCE_TOTD_REBUILD === "1";
 
-  for (let i = 0; i < MONTHS_TO_FETCH; i++) {
-    const j = await fetchTmioMonth(i);
-    const { y, m1 } = tmioMonthYear(j);
-    const mKey = monthKey(y, m1);
+  const months = await fetchNadeoTotdMonths(access, MONTHS_TO_FETCH, 0);
+
+  for (let i = 0; i < months.length; i++) {
+    const monthObj = months[i];
+    const mKey = monthKey(Number(monthObj.year), Number(monthObj.month));
     const monthPath = path.join(TOTD_DIR, `${mKey}.json`);
 
     const isCurrentMonth = i === 0;
@@ -607,7 +746,7 @@ async function main() {
     }
 
     console.log("[TOTD MONTH FETCH]", i, mKey);
-    await writeTotdMonth(i);
+    await writeNadeoTotdMonth(monthObj, access);
     await sleep(500);
   }
 
