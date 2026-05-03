@@ -44,58 +44,76 @@
   </header>
 
   <section class="hero" id="home">
-    <div class="container hero-grid">
-      <div class="hero-top">
-        <span class="chip" id="hero-chip">Next Event</span>
-        <h1 class="h1">Live Trackmania events and community races</h1>
-        <p class="lead">Your central hub for upcoming events, live streams, and highlights.</p>
+  <div class="container hero-grid">
+    <div class="hero-top">
+      <span class="hero-kicker" id="hero-chip">Next Event</span>
 
-        <div class="keyfacts" id="hero-pills">
-          <div class="pill">🗓️ TBA</div>
-          <div class="pill">📍 Online</div>
-          <div class="pill">🏁 Community races</div>
-        </div>
+      <h1 class="h1">Trackmania events, live races, and records.</h1>
+
+      <p class="lead">
+        Schedules, streams, world records, Track of the Day data, and community updates in one place.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn primary" href="#schedule">Browse Events</a>
+        <a class="btn" href="/wrleaderboard">View WR Leaderboard</a>
+        <a class="btn" href="/totd">Track of the Day</a>
       </div>
 
-      <div class="hero-row">
-        <div>
-          <div class="card" id="countdown-card" aria-live="polite">
-            <div class="card-header">
-              <strong id="countdown-title">Countdown to green light</strong>
-            </div>
-            <div class="card-body">
-              <div class="countdown" id="countdown">
-                <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
-                <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
-                <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
-                <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
-              </div>
-
-              <div id="miniCalendar" class="calendar-container">
-                <div class="cal-header">
-                  <button id="cal-prev" type="button">←</button>
-                  <div id="cal-title"></div>
-                  <button id="cal-next" type="button">→</button>
-                </div>
-                <table id="cal-grid"></table>
-              </div>
-
-            </div>
-          </div>
+      <div class="hero-stats" id="hero-pills">
+        <div class="hero-stat">
+          <span>Status</span>
+          <strong>Loading</strong>
         </div>
-
-        <div id="live" class="live">
-          <div class="card reveal">
-            <div class="card-header"><strong>Live on Twitch</strong></div>
-            <div class="card-body">
-              <div id="twitch-embed"></div>
-            </div>
-          </div>
+        <div class="hero-stat">
+          <span>Location</span>
+          <strong>Online</strong>
         </div>
-
+        <div class="hero-stat">
+          <span>Format</span>
+          <strong>Community</strong>
+        </div>
       </div>
     </div>
-  </section>
+
+    <div class="hero-row">
+      <div>
+        <div class="card" id="countdown-card" aria-live="polite">
+          <div class="card-header">
+            <strong id="countdown-title">Countdown to green light</strong>
+          </div>
+
+          <div class="card-body">
+            <div class="countdown" id="countdown">
+              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+            </div>
+
+            <div id="miniCalendar" class="calendar-container">
+              <div class="cal-header">
+                <button id="cal-prev" type="button">←</button>
+                <div id="cal-title"></div>
+                <button id="cal-next" type="button">→</button>
+              </div>
+              <table id="cal-grid"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="live" class="live">
+        <div class="card reveal">
+          <div class="card-header"><strong>Live on Twitch</strong></div>
+          <div class="card-body">
+            <div id="twitch-embed"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
   <section id="shoutbox-section" class="section" aria-label="Community shoutbox">
     <div class="container">
