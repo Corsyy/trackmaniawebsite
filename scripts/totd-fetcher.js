@@ -602,11 +602,18 @@ async function debugCotdCompetitions() {
     console.warn("[COTD DEBUG ERROR]", err?.message || err);
   }
 }
+async function writeCotdResultsPlaceholder() {
+  await writeJson(`${TOTD_DIR}/cotd-results.json`, {
+    generatedAt: new Date().toISOString(),
+    mainWinner: null,
+    status: "debug only - winner parser not added yet"
+  });
+}
 async function main() {
   await ensureDir(TOTD_DIR);
 
   await writeTotdMonth(0);
-
+  await writeCotdResultsPlaceholder();
   const access = await getLiveAccessToken();
   await writeLeaderboardsForExistingTotdFiles(access);
 
