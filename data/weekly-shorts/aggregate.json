@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-07T16:43:45.546Z",
+  "generatedAt": "2026-05-07T18:24:30.820Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -925,7 +925,7 @@
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
       "player": "in-.-",
       "wins": 5,
-      "wrs": 18,
+      "wrs": 19,
       "top5": 36,
       "weeksWon": [
         44,
@@ -1041,6 +1041,12 @@
           "week": 71,
           "mapUid": "zGIKPs4ktC8frhQf5dQijdI_8Z8",
           "timeMs": 14647,
+          "rawRank": 1
+        },
+        {
+          "week": 73,
+          "mapUid": "ZJQl5Hm3wjju5FqtcxCAotruZs",
+          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -1293,9 +1299,9 @@
         {
           "week": 73,
           "mapUid": "ZJQl5Hm3wjju5FqtcxCAotruZs",
-          "rank": 2,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 1
         }
       ],
       "aliases": []
@@ -3501,7 +3507,7 @@
       "accountId": "083ff8a9-ff45-4cf9-b7cf-8fc601aa656e",
       "player": "Krazy_dudeCr00k",
       "wins": 1,
-      "wrs": 12,
+      "wrs": 11,
       "top5": 29,
       "weeksWon": [
         61
@@ -3571,12 +3577,6 @@
           "week": 67,
           "mapUid": "HyQk2OVFE_UELBjjQ8X1PnytA13",
           "timeMs": 13980,
-          "rawRank": 1
-        },
-        {
-          "week": 73,
-          "mapUid": "ZJQl5Hm3wjju5FqtcxCAotruZs",
-          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -3773,9 +3773,9 @@
         {
           "week": 73,
           "mapUid": "ZJQl5Hm3wjju5FqtcxCAotruZs",
-          "rank": 1,
+          "rank": 2,
           "timeMs": null,
-          "rawRank": 1
+          "rawRank": 2
         },
         {
           "week": 73,
@@ -3792,7 +3792,7 @@
       "player": "TurtledTM",
       "wins": 1,
       "wrs": 7,
-      "top5": 37,
+      "top5": 36,
       "weeksWon": [
         71
       ],
@@ -4091,13 +4091,6 @@
           "mapUid": "RILBuEdvtthywscho3UwhoKPxnh",
           "rank": 5,
           "timeMs": 15853,
-          "rawRank": 5
-        },
-        {
-          "week": 73,
-          "mapUid": "_J3WRA9jY27plaXYdotQmhfUNkd",
-          "rank": 5,
-          "timeMs": null,
           "rawRank": 5
         }
       ],
@@ -18328,6 +18321,25 @@
           "mapUid": "v97FfwztlgncAiVxDSyOI8FMmCh",
           "rank": 5,
           "timeMs": 17505,
+          "rawRank": 5
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "f35c6f70-8777-45de-a79e-9860c6d0933b",
+      "player": "ImGrefitea",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 73,
+          "mapUid": "_J3WRA9jY27plaXYdotQmhfUNkd",
+          "rank": 5,
+          "timeMs": null,
           "rawRank": 5
         }
       ],
