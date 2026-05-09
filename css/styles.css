@@ -3743,3 +3743,64 @@ select {
     opacity: .08 !important;
   }
 }
+/* HARD LOW-GLOW OVERRIDE */
+body,
+body.bg-track-curves {
+  background: #050910 !important;
+}
+
+body.bg-track-curves::before {
+  opacity: .006 !important;
+}
+
+body.bg-track-curves::after {
+  opacity: .04 !important;
+  background: none !important;
+}
+
+.hero::before,
+.hero::after {
+  opacity: .08 !important;
+  background: none !important;
+}
+
+.card,
+.event,
+.shot,
+.auth-dialog,
+#countdown-card,
+.calendar-container,
+.timebox,
+#shoutboxMessages,
+.shout-msg {
+  box-shadow: 0 10px 26px rgba(0,0,0,.26) !important;
+}
+
+.card:hover,
+.event:hover,
+.shot:hover,
+.event-link:hover .event,
+.event-link:focus-visible .event {
+  box-shadow: 0 14px 34px rgba(0,0,0,.32) !important;
+}
+
+.nav a.active::after,
+.brand-badge,
+.btn,
+.pill,
+.chip,
+#hero-chip,
+#live-chip,
+.timebox,
+.cal-event-day div:first-child {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.event::before {
+  display: none !important;
+}
+
+.h1 {
+  text-shadow: none !important;
+}
