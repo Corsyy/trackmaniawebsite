@@ -4634,3 +4634,26 @@ select:focus{
   object-fit:cover !important;
   opacity:.25 !important;
 }
+.nav-brand,
+.brand,
+.logo-wrap{
+  overflow: visible !important;
+  min-width: max-content !important;
+}
+
+.nav-brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:.8rem !important;
+}
+
+.nav-brand img,
+.logo,
+.brand-icon{
+  flex-shrink:0 !important;
+}
+
+.brand-name,
+.nav-brand span{
+  white-space:nowrap !important;
+}
