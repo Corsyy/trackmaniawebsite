@@ -1,8 +1,3 @@
-/* ==========================================================================
-   TRACKMANIA EVENTS — PREMIUM GRAPHITE / CYAN CSS
-   Full file generated from your current CSS with a cleaner premium color pass.
-   ========================================================================== */
-
     :root {
       --bg: #0a101a;
       --bg-2: #0d1422;
@@ -3237,5 +3232,348 @@ header {
   #countdown-card,
   #live .card {
     border-radius: 17px !important;
+  }
+}
+
+/* ========================================================================== */
+/* FINAL PLATFORM POLISH — tighter spacing, stronger cards, premium depth      */
+/* Paste-safe overrides. Keep this at the bottom of the CSS file.              */
+/* ========================================================================== */
+
+:root {
+  --radius-xs: 12px;
+  --radius-sm: 14px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --panel: #111c2b;
+  --panel-2: #132033;
+  --panel-3: #07111d;
+  --border: rgba(122, 198, 255, .105);
+  --border-strong: rgba(122, 198, 255, .185);
+  --shadow-sm: 0 10px 28px rgba(0, 0, 0, .30);
+  --shadow-md: 0 26px 62px rgba(0, 0, 0, .43);
+  --shadow-lg: 0 38px 92px rgba(0, 0, 0, .55);
+}
+
+body,
+body.bg-track-curves {
+  background: #040910 !important;
+}
+
+body.bg-track-curves::before {
+  opacity: .026 !important;
+  mix-blend-mode: soft-light;
+}
+
+body.bg-track-curves::after {
+  opacity: 1 !important;
+  background:
+    radial-gradient(720px 430px at 20% 18%, rgba(61, 231, 255, .078), transparent 62%),
+    radial-gradient(620px 380px at 82% 10%, rgba(126, 87, 255, .046), transparent 64%),
+    radial-gradient(780px 520px at 54% 88%, rgba(40, 145, 255, .040), transparent 72%),
+    linear-gradient(180deg, #040910 0%, #07101b 44%, #040910 100%) !important;
+}
+
+header {
+  background: rgba(4, 9, 16, .86) !important;
+  border-bottom-color: rgba(122, 198, 255, .09) !important;
+  box-shadow: 0 12px 42px rgba(0, 0, 0, .24) !important;
+}
+
+.container {
+  width: min(1210px, 91vw) !important;
+}
+
+.hero {
+  padding-bottom: 2.15rem !important;
+}
+
+.hero::before {
+  background:
+    radial-gradient(680px 390px at 25% 10%, rgba(61, 231, 255, .095), transparent 66%),
+    radial-gradient(520px 320px at 78% 14%, rgba(126, 87, 255, .045), transparent 64%) !important;
+}
+
+.h1 {
+  text-shadow:
+    0 0 34px rgba(61, 231, 255, .065),
+    0 16px 44px rgba(0, 0, 0, .30) !important;
+}
+
+.lead {
+  color: #b4c2d4 !important;
+}
+
+.section {
+  padding: 3.25rem 0 !important;
+}
+
+#shoutbox-section {
+  padding-top: 1.45rem !important;
+  padding-bottom: 2.55rem !important;
+}
+
+.card,
+.event,
+.shot,
+.auth-dialog,
+.calendar-container,
+#countdown-card,
+#live .card,
+#shoutboxMessages,
+.shout-msg,
+.input,
+.textarea,
+.btn,
+.pill,
+.chip,
+#hero-chip,
+#live-chip,
+.auth-tab,
+.nav-toggle {
+  border-color: var(--border) !important;
+}
+
+.card,
+.event,
+.shot,
+.auth-dialog,
+#countdown-card,
+#live .card,
+.shoutbox-card {
+  border-radius: var(--radius-lg) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .014)),
+    radial-gradient(520px circle at 14% 0%, rgba(61, 231, 255, .070), transparent 60%),
+    linear-gradient(180deg, rgba(17, 28, 43, .965), rgba(5, 11, 20, .975)) !important;
+  box-shadow:
+    0 24px 62px rgba(0, 0, 0, .40),
+    inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+}
+
+.card:hover,
+.event:hover,
+.shot:hover,
+.event-link:hover .event,
+.event-link:focus-visible .event {
+  transform: translateY(-6px) !important;
+  border-color: var(--border-strong) !important;
+  box-shadow:
+    0 32px 76px rgba(0, 0, 0, .48),
+    0 0 0 1px rgba(122, 198, 255, .10),
+    inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+}
+
+.card-header,
+.auth-head,
+.shoutbox-top {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .010)),
+    rgba(18, 32, 50, .72) !important;
+  border-bottom-color: rgba(122, 198, 255, .10) !important;
+}
+
+.title {
+  margin-bottom: 1.15rem !important;
+  text-shadow: 0 12px 34px rgba(0, 0, 0, .30) !important;
+}
+
+.event {
+  min-height: 240px !important;
+  padding: 1.3rem !important;
+  padding-top: 3.25rem !important;
+}
+
+.event h4 {
+  font-size: 1.2rem !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.025em !important;
+}
+
+.event .meta {
+  color: #bdcadc !important;
+  font-size: .94rem !important;
+  line-height: 1.55 !important;
+}
+
+.event .tag {
+  top: 12px !important;
+  right: 12px !important;
+  border-radius: 999px !important;
+  box-shadow: 0 10px 24px rgba(61, 231, 255, .08) !important;
+}
+
+.event::before {
+  background: radial-gradient(380px circle at var(--x, -100px) var(--y, -100px), rgba(61, 231, 255, .105), transparent 46%) !important;
+}
+
+.event.with-bg {
+  background-image:
+    linear-gradient(180deg, rgba(7, 15, 25, .76), rgba(3, 8, 15, .72)),
+    var(--event-img) !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+}
+
+.event.with-bg::after {
+  background:
+    linear-gradient(180deg, rgba(2, 6, 12, .10) 0%, rgba(2, 6, 12, .34) 62%, rgba(2, 6, 12, .55) 100%),
+    radial-gradient(360px circle at 18% 20%, rgba(61, 231, 255, .11), transparent 64%) !important;
+}
+
+#live .player,
+#live iframe {
+  filter: saturate(.90) brightness(.92) contrast(1.02) !important;
+}
+
+#countdown-card,
+#live .card {
+  overflow: hidden !important;
+}
+
+.timebox {
+  border-radius: var(--radius-md) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .050), rgba(255, 255, 255, .012)),
+    rgba(5, 12, 22, .72) !important;
+}
+
+.calendar-container,
+#shoutboxMessages {
+  border-radius: var(--radius-md) !important;
+}
+
+#cal-grid td.today,
+.cal-event-day div:first-child {
+  border-color: rgba(61, 231, 255, .30) !important;
+  background: rgba(61, 231, 255, .115) !important;
+  color: #e8fbff !important;
+}
+
+.shout-msg {
+  border-radius: var(--radius-sm) !important;
+}
+
+.shout-text,
+.shout-msg {
+  color: #edf6ff !important;
+}
+
+.shout-meta,
+.help,
+.shoutbox-sub {
+  color: #a9b9cc !important;
+}
+
+.input,
+.textarea {
+  background: rgba(5, 12, 22, .78) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: rgba(61, 231, 255, .32) !important;
+  box-shadow: 0 0 0 3px rgba(61, 231, 255, .14) !important;
+}
+
+.btn,
+.nav-toggle,
+.auth-close,
+.cal-header button,
+.shout-delete,
+.shout-edit {
+  border-radius: var(--radius-sm) !important;
+}
+
+.btn.primary,
+.auth-tab.active {
+  background: linear-gradient(135deg, #d7fbff 0%, #60eaff 35%, #2fb7ff 72%, #7e57ff 130%) !important;
+  color: #03101b !important;
+  box-shadow:
+    0 15px 34px rgba(61, 231, 255, .19),
+    inset 0 1px 0 rgba(255, 255, 255, .45) !important;
+}
+
+.pill,
+.chip,
+#hero-chip,
+#live-chip,
+.auth-user-pill,
+.online-users-menu,
+.reaction-picker-menu,
+.emoji-panel {
+  border-radius: var(--radius-sm) !important;
+}
+
+.hero-stat {
+  border-color: rgba(122, 198, 255, .105) !important;
+  border-radius: var(--radius-md) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .050), rgba(255, 255, 255, .012)),
+    rgba(13, 24, 38, .72) !important;
+}
+
+#toTop {
+  border-radius: var(--radius-sm) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .014)),
+    rgba(14, 26, 41, .88) !important;
+  border-color: rgba(122, 198, 255, .13) !important;
+}
+
+@media (max-width: 960px) {
+  .section {
+    padding: 2.7rem 0 !important;
+  }
+
+  .event {
+    min-height: 220px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: min(100% - 28px, 1210px) !important;
+  }
+
+  .hero {
+    padding-bottom: 1.55rem !important;
+  }
+
+  .section {
+    padding: 2.25rem 0 !important;
+  }
+
+  #shoutbox-section {
+    padding-bottom: 2.2rem !important;
+  }
+
+  .card,
+  .event,
+  .shot,
+  .auth-dialog,
+  #countdown-card,
+  #live .card,
+  .shoutbox-card {
+    border-radius: var(--radius-md) !important;
+  }
+
+  .event {
+    min-height: 210px !important;
+    padding: 1.05rem !important;
+    padding-top: 3.25rem !important;
+  }
+
+  .event h4 {
+    font-size: 1.1rem !important;
+  }
+
+  .card:hover,
+  .event:hover,
+  .shot:hover,
+  .event-link:hover .event,
+  .event-link:focus-visible .event {
+    transform: translateY(-3px) !important;
   }
 }
