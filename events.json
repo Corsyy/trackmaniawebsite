@@ -311,6 +311,21 @@
   },
   {
     "tag": "Cup",
+    "title": "Mini RPG of the week",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/Gvxet7xm3n",
+    "description": "Weekly Cup",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["WE"],
+      "time": "14:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
     "title": "Dirt Weeks 26'",
     "category": "weekly",
     "location": "Online",
