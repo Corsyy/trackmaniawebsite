@@ -4196,3 +4196,369 @@ h3,
     height: 220px;
   }
 }
+
+/* ========================================================================== */
+/* FINAL CLEAN GLASS POLISH — CENTERING, NEUTRAL CHAT, EVENTS, SCROLLBARS      */
+/* ========================================================================== */
+
+/* Neutral accent system: no cyan gamer glow */
+:root{
+  --accent:#f4f7fb;
+  --accent-2:#cfd6e0;
+  --accent-3:#ffffff;
+  --accent-soft:rgba(255,255,255,.075);
+  --ok:#dce3ec;
+  --border:rgba(255,255,255,.075);
+  --border-strong:rgba(255,255,255,.145);
+  --ring:0 0 0 3px rgba(255,255,255,.105);
+}
+
+/* Truly flat premium background */
+html,
+body,
+body.bg-track-curves{
+  background:#05070c !important;
+  background-image:none !important;
+}
+
+body.bg-track-curves::before,
+body.bg-track-curves::after,
+body::before,
+body::after,
+.hero::before,
+.hero::after{
+  background:none !important;
+  opacity:0 !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+
+/* Keep the page visually centered and reduce the weird left-heavy feel */
+.container,
+.hero > .container,
+#live-events .container,
+#schedule .container,
+#showcase .container,
+#about .container,
+#contact .container{
+  width:min(1220px,92vw) !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+.hero-grid{
+  width:100% !important;
+  max-width:1220px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* Reduce the dead empty space between the hero and the lower sections */
+.hero{
+  padding-bottom:1.55rem !important;
+  margin-bottom:0 !important;
+}
+
+.hero-top{
+  min-height:auto !important;
+}
+
+#shoutbox-section{
+  padding-top:.65rem !important;
+  margin-top:0 !important;
+}
+
+.section{
+  padding-top:2.55rem !important;
+  padding-bottom:2.75rem !important;
+}
+
+/* Neutral glass cards. No blue/cyan tint. */
+.card,
+.event,
+.shot,
+.auth-dialog,
+.timebox,
+.calendar-container,
+#countdown-card,
+.contact-card,
+.panel{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025)),
+    rgba(255,255,255,.025) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:0 14px 34px rgba(0,0,0,.28) !important;
+  backdrop-filter:blur(18px) saturate(105%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(105%) !important;
+}
+
+.card:hover,
+.event:hover,
+.shot:hover,
+.event-link:hover .event,
+.event-link:focus-visible .event{
+  border-color:rgba(255,255,255,.14) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.34) !important;
+  transform:translateY(-2px);
+}
+
+/* Header/logo/buttons: neutral, no cyan glow */
+header,
+.brand-badge,
+.btn,
+.nav-toggle,
+.auth-close,
+.cal-header button,
+.send-btn,
+.pill,
+.chip,
+#hero-chip,
+#live-chip,
+.auth-user-pill,
+.online-users-menu,
+.reaction-picker-menu{
+  box-shadow:none !important;
+  text-shadow:none !important;
+}
+
+.brand-badge,
+.btn,
+.nav-toggle,
+.auth-close,
+.cal-header button,
+.send-btn,
+.pill,
+.chip,
+#hero-chip,
+#live-chip,
+.auth-user-pill{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.022)),
+    rgba(255,255,255,.028) !important;
+  border-color:rgba(255,255,255,.09) !important;
+  color:#eef1f7 !important;
+}
+
+.btn.primary,
+.auth-tab.active,
+.auth-panel .btn.primary{
+  background:#f4f7fb !important;
+  color:#070a10 !important;
+  border-color:rgba(255,255,255,.55) !important;
+  box-shadow:none !important;
+}
+
+.nav a.active::after{
+  background:#f4f7fb !important;
+  box-shadow:none !important;
+}
+
+/* Calendar/countdown: remove cyan-looking day pills */
+.cal-event-day div:first-child,
+#cal-grid td.today,
+.timebox{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.022)),
+    rgba(255,255,255,.025) !important;
+  border-color:rgba(255,255,255,.10) !important;
+  color:#eef1f7 !important;
+  box-shadow:none !important;
+}
+
+/* Shoutbox: neutral glass, clean corners, no blue panel */
+.shoutbox-card{
+  border-radius:22px !important;
+  overflow:hidden !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.020)),
+    rgba(255,255,255,.025) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:0 16px 38px rgba(0,0,0,.30) !important;
+  backdrop-filter:blur(18px) saturate(105%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(105%) !important;
+}
+
+.shoutbox-top{
+  padding:1rem 1.1rem .9rem !important;
+  border-bottom:1px solid rgba(255,255,255,.07) !important;
+  background:rgba(255,255,255,.012) !important;
+}
+
+#shoutboxMessages{
+  height:245px;
+  max-height:420px;
+  overflow-y:auto;
+  margin:0 !important;
+  padding:.9rem !important;
+  border:none !important;
+  border-radius:0 !important;
+  background:rgba(0,0,0,.10) !important;
+  box-shadow:none !important;
+  scrollbar-color:rgba(255,255,255,.20) transparent !important;
+}
+
+.shout-msg,
+.shout-msg.system,
+.shout-msg.mentioned-me{
+  border-radius:16px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.052), rgba(255,255,255,.018)),
+    rgba(255,255,255,.024) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:none !important;
+}
+
+.shout-msg.system .shout-name,
+.shout-name,
+.shout-name.admin,
+.shout-name.mod,
+.shout-mention{
+  color:#f6f7fa !important;
+  text-shadow:none !important;
+}
+
+.shout-form{
+  padding:1rem !important;
+  border-top:1px solid rgba(255,255,255,.07) !important;
+  background:rgba(0,0,0,.075) !important;
+}
+
+.shout-event-ticker{
+  border-color:rgba(255,255,255,.09) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    rgba(255,255,255,.024) !important;
+  color:#eef1f7 !important;
+  box-shadow:none !important;
+}
+
+/* Inputs/forms: neutral instead of blue */
+.input,
+.textarea,
+.shout-input-row .input,
+input,
+textarea,
+select{
+  background:rgba(0,0,0,.22) !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  color:#f4f7fb !important;
+  box-shadow:none !important;
+}
+
+.input:focus,
+.textarea:focus,
+.shout-input-row .input:focus,
+input:focus,
+textarea:focus,
+select:focus{
+  outline:none !important;
+  border-color:rgba(255,255,255,.18) !important;
+  box-shadow:none !important;
+}
+
+/* Scrollbars: neutral gray everywhere */
+*{
+  scrollbar-color:rgba(255,255,255,.22) transparent !important;
+}
+
+::-webkit-scrollbar{
+  width:8px;
+  height:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:transparent !important;
+}
+
+::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.18) !important;
+  border-radius:999px !important;
+  border:2px solid transparent;
+  background-clip:padding-box !important;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:rgba(255,255,255,.28) !important;
+  background-clip:padding-box !important;
+}
+
+#shoutboxMessages::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.20) !important;
+  border-radius:999px !important;
+}
+
+/* Event cards: stop background images from bleeding through too hard */
+.event,
+.event-link{
+  overflow:hidden !important;
+  position:relative !important;
+  isolation:isolate !important;
+}
+
+.event.with-bg{
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.76), rgba(5,7,12,.86)),
+    var(--event-img) !important;
+  background-size:cover, cover !important;
+  background-position:center, center !important;
+  background-repeat:no-repeat, no-repeat !important;
+}
+
+.event.with-bg:hover{
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.70), rgba(5,7,12,.82)),
+    var(--event-img) !important;
+}
+
+.event.with-bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:rgba(0,0,0,.18) !important;
+  z-index:0;
+  pointer-events:none;
+}
+
+.event.with-bg > :not(.tag),
+.event.with-bg .tag{
+  position:relative;
+  z-index:2;
+}
+
+.event::before{
+  display:none !important;
+}
+
+/* If the page uses actual img tags inside event cards */
+.event img,
+.event-card img,
+.shot img{
+  opacity:.32 !important;
+  filter:saturate(.78) brightness(.78) !important;
+}
+
+/* Clean tag badges without cyan */
+.event .tag{
+  background:rgba(255,255,255,.075) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  color:#eef1f7 !important;
+  box-shadow:none !important;
+}
+
+/* Twitch embed: reduce visual dominance slightly */
+#live .player{
+  filter:saturate(.86) brightness(.90) !important;
+}
+
+/* Fix mobile menu color too */
+@media (max-width:640px){
+  .navlinks{
+    background:rgba(5,7,12,.96) !important;
+    border-top:1px solid rgba(255,255,255,.08) !important;
+  }
+
+  #shoutboxMessages{
+    height:220px;
+  }
+}
