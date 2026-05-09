@@ -88,7 +88,7 @@
       margin: 0 auto
     }
 
-    /* keep sections clean */
+    
     section,
     #live-events,
     #schedule,
@@ -108,7 +108,7 @@
       background: transparent !important;
     }
 
-    /* ---------- HEADER ---------- */
+    
 
     header {
       position: sticky;
@@ -249,7 +249,7 @@
       font-weight: 800;
     }
 
-    /* ---------- HERO ---------- */
+    
 
     .hero {
       position: relative;
@@ -341,7 +341,7 @@
       font-weight: 750;
     }
 
-    /* ---------- PANELS / CARDS ---------- */
+    
 
     .card {
       border: 1px solid var(--border);
@@ -367,7 +367,7 @@
       padding: 1rem
     }
 
-    /* countdown card */
+    
     #countdown-card {
       position: relative;
       border-radius: 20px;
@@ -456,7 +456,7 @@
       margin-top: 0;
     }
 
-    /* live twitch panel */
+    
     #live .card {
       min-height: var(--heroCardH);
       display: flex;
@@ -484,7 +484,7 @@
       overflow: hidden;
     }
 
-    /* ---------- CALENDAR ---------- */
+    
 
     #miniCalendar {
       position: relative;
@@ -608,7 +608,7 @@
       box-shadow: none;
     }
 
-    /* ---------- SECTIONS ---------- */
+    
 
     .section {
       padding: 3rem 0
@@ -628,7 +628,7 @@
       display: none
     }
 
-    /* ---------- EVENT CARDS ---------- */
+    
 
     .grid {
       display: grid;
@@ -755,7 +755,7 @@
       box-shadow: var(--ring), var(--shadow-md);
     }
 
-    /* ---------- HIGHLIGHTS ---------- */
+    
 
     .cards {
       display: grid;
@@ -789,14 +789,14 @@
       padding: 1rem
     }
 
-    /* ---------- ABOUT / CONTACT ---------- */
+    
 
     #about .card,
     #contact .card {
       background: linear-gradient(180deg, rgba(16, 25, 42, .98), rgba(11, 18, 32, .98));
     }
 
-    /* ---------- FOOTER ---------- */
+    
 
     footer {
       border-top: 1px solid var(--border);
@@ -820,7 +820,7 @@
       transform: none;
     }
 
-    /* ---------- TO TOP ---------- */
+    
 
     #toTop {
       position: fixed;
@@ -874,7 +874,7 @@
       letter-spacing: .2px;
     }
 
-    /* ---------- FORMS ---------- */
+    
 
     .form .field {
       display: flex;
@@ -915,7 +915,7 @@
       color: var(--muted)
     }
 
-    /* ---------- AUTH + SHOUTBOX ---------- */
+    
     .auth-open {
       cursor: pointer;
       font-family: inherit
@@ -1537,7 +1537,7 @@
       }
     }
 
-    /* ---------- MOBILE ---------- */
+    
 
     @media (max-width:960px) {
       .grid {
@@ -1676,11 +1676,11 @@
     }
 
 
-    /* ========================================================================== */
-    /* HOME PAGE CLEAN PRO REDESIGN — SAFE OVERRIDES                              */
-    /* Removes the weird background seam/lines and gives the home page a cleaner   */
-    /* custom platform feel without breaking your existing JS.                     */
-    /* ========================================================================== */
+    
+    
+    
+    
+    
 
     :root {
       --bg: #090f18;
@@ -1715,7 +1715,7 @@
       color: #fff;
     }
 
-    /* Clean background: no grid, no seam, no weird horizontal color break */
+    
     body,
     body.bg-track-curves {
       background: #090f18 !important;
@@ -1745,7 +1745,7 @@
       opacity: 1;
     }
 
-    /* Header */
+    
     header {
       padding: .5rem 0;
       background: rgba(9, 15, 24, .88);
@@ -1788,7 +1788,7 @@
       color: #fff;
     }
 
-    /* Buttons */
+    
     .btn {
       min-height: 40px;
       padding: .58rem .92rem;
@@ -1819,7 +1819,7 @@
       box-shadow: 0 14px 30px rgba(79, 140, 255, .18);
     }
 
-    /* Hero layout using the new index.html block */
+    
     .hero {
       position: relative;
       padding: clamp(2.5rem, 5vw, 4.4rem) 0 2.8rem;
@@ -1960,7 +1960,7 @@
       font-weight: 900;
     }
 
-    /* Cards */
+    
     .card,
     .event,
     .shot,
@@ -1987,7 +1987,7 @@
       color: #f8fbff;
     }
 
-    /* Countdown + calendar */
+    
     #countdown-card {
       min-height: 235px;
       border-radius: 20px;
@@ -2039,7 +2039,7 @@
       border-radius: 0 0 20px 20px;
     }
 
-    /* Pills / chips */
+    
     .chip,
     #hero-chip,
     #live-chip,
@@ -2058,7 +2058,7 @@
       backdrop-filter: blur(8px);
     }
 
-    /* Sections */
+    
     .section {
       padding: clamp(2.5rem, 5vw, 4rem) 0;
     }
@@ -2075,7 +2075,7 @@
       border-radius: 999px;
     }
 
-    /* Event cards */
+    
     .event {
       border-radius: 18px;
       padding-top: 3.15rem;
@@ -2102,7 +2102,7 @@
       color: #dbeafe;
     }
 
-    /* Auth modal cleanup */
+    
     #authModal {
       background: rgba(3, 7, 13, .76);
       backdrop-filter: blur(14px) saturate(125%);
@@ -2176,7 +2176,7 @@
       color: #ffffff;
     }
 
-    /* Shoutbox */
+    
     .shoutbox-card:hover {
       transform: none;
     }
@@ -2195,7 +2195,7 @@
       border-color: rgba(255, 255, 255, .07);
     }
 
-    /* Mobile */
+    
     @media (max-width: 960px) {
       .hero-grid {
         grid-template-columns: 1fr;
@@ -2240,10 +2240,10 @@
       margin-top: 0 !important;
       padding-top: 0 !important;
     }
-/* ========================================================================== */
-/* TRACKMANIA EVENTS — PREMIUM GRAPHITE / CYAN FINAL PASS                     */
-/* Put at the END of your CSS, or use this complete file as-is.               */
-/* ========================================================================== */
+
+
+
+
 
 :root {
   --bg: #050910;
@@ -2780,11 +2780,11 @@ footer {
   #live .card { min-height: 330px !important; }
 }
 
-/* ========================================================================== */
-/* FINAL PREMIUM POLISH — TRACKMANIA EVENTS                                   */
-/* Clean graphite base, icy cyan accents, better contrast, better depth.       */
-/* Paste-safe overrides: keep this at the very bottom if copying manually.     */
-/* ========================================================================== */
+
+
+
+
+
 
 :root {
   --bg: #050a11;
@@ -2860,7 +2860,7 @@ body.bg-track-curves::after {
   opacity: 1 !important;
 }
 
-/* Header: clearer premium glass bar */
+
 header {
   background: rgba(4, 9, 16, .84) !important;
   border-bottom: 1px solid rgba(150, 205, 255, .075) !important;
@@ -2896,7 +2896,7 @@ header {
   box-shadow: 0 0 18px rgba(61,231,255,.30) !important;
 }
 
-/* Buttons: less flat, more polished */
+
 .btn,
 .nav-toggle,
 .auth-close,
@@ -2932,7 +2932,7 @@ header {
   box-shadow: 0 16px 35px rgba(61, 231, 255, .18), inset 0 1px 0 rgba(255,255,255,.34) !important;
 }
 
-/* Hero: stronger focal point without looking neon */
+
 .hero {
   background: transparent !important;
 }
@@ -2984,7 +2984,7 @@ header {
   box-shadow: 0 0 0 4px rgba(97, 242, 180, .13), 0 0 20px rgba(97,242,180,.22) !important;
 }
 
-/* Cards: brighter edges, deeper interiors */
+
 .card,
 .event,
 .shot,
@@ -3024,7 +3024,7 @@ header {
   background: linear-gradient(180deg, rgba(255,255,255,.030), rgba(255,255,255,.006)) !important;
 }
 
-/* Countdown and calendar: more readable, less harsh */
+
 .timebox,
 #cal-grid td.today,
 .cal-event-day div:first-child {
@@ -3043,13 +3043,13 @@ header {
   color: #aebcd0 !important;
 }
 
-/* Twitch embed: keep it from overpowering the design */
+
 #live .player,
 #live iframe {
   filter: saturate(.90) brightness(.92) contrast(1.02) !important;
 }
 
-/* Shoutbox: clearer hierarchy */
+
 #shoutboxMessages {
   background:
     linear-gradient(180deg, rgba(255,255,255,.018), rgba(255,255,255,.004)),
@@ -3107,7 +3107,7 @@ header {
   text-shadow: 0 0 16px rgba(124,92,255,.25) !important;
 }
 
-/* Forms and small menus */
+
 .input,
 .textarea,
 .auth-tab,
@@ -3149,7 +3149,7 @@ header {
   border-color: rgba(61, 231, 255, .22) !important;
 }
 
-/* Event/background image cards */
+
 .event.with-bg {
   background-image:
     linear-gradient(180deg, rgba(6, 14, 24, .82), rgba(3, 8, 15, .78)),
@@ -3168,7 +3168,7 @@ header {
   color: #e5fbff !important;
 }
 
-/* Scrollbar polish */
+
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(61,231,255,.30) transparent;
@@ -3192,7 +3192,7 @@ header {
   background: rgba(61,231,255,.38);
 }
 
-/* Mobile: keep premium look without cramped spacing */
+
 @media (max-width: 960px) {
   .hero-grid {
     gap: 1.4rem !important;
@@ -3235,10 +3235,10 @@ header {
   }
 }
 
-/* ========================================================================== */
-/* FINAL PLATFORM POLISH — tighter spacing, stronger cards, premium depth      */
-/* Paste-safe overrides. Keep this at the bottom of the CSS file.              */
-/* ========================================================================== */
+
+
+
+
 
 :root {
   --radius-xs: 12px;
@@ -3578,12 +3578,12 @@ header {
   }
 }
 
-/* ========================================================================== */
-/* FINAL CLEANUP — FLAT BACKGROUND + SHOUTBOX RADIUS FIX                     */
-/* Added to the bottom so it wins over earlier premium/glow override blocks.  */
-/* ========================================================================== */
 
-/* ---- Remove AI-ish ambient glow / bloom ---- */
+
+
+
+
+
 html,
 body,
 body.bg-track-curves{
@@ -3677,7 +3677,7 @@ body.bg-track-curves::after{
   display:none !important;
 }
 
-/* ---- Shoutbox: fix square/clipped top corners + flatter style ---- */
+
 .shoutbox-card,
 #shoutbox-section .card,
 .card.shoutbox-card{
@@ -3781,10 +3781,10 @@ body.bg-track-curves::after{
     height:220px !important;
   }
 }
-/* ========================================================================== */
-/* TRACKMANIA EVENTS — CLEAR GLASS / NO-CYAN FINAL OVERRIDE                   */
-/* Paste-safe final layer. Keeps layout, removes gamer glow/cyan atmosphere.   */
-/* ========================================================================== */
+
+
+
+
 
 :root {
   --bg: #05070c;
@@ -4070,7 +4070,7 @@ h3,
   filter: saturate(.92) brightness(.88) contrast(.98) !important;
 }
 
-/* Shoutbox: clear glass, no clipped/square top corners */
+
 .shoutbox-card {
   border-radius: 22px !important;
   overflow: hidden !important;
@@ -4197,11 +4197,11 @@ h3,
   }
 }
 
-/* ========================================================================== */
-/* FINAL CLEAN GLASS POLISH — CENTERING, NEUTRAL CHAT, EVENTS, SCROLLBARS      */
-/* ========================================================================== */
 
-/* Neutral accent system: no cyan gamer glow */
+
+
+
+
 :root{
   --accent:#f4f7fb;
   --accent-2:#cfd6e0;
@@ -4213,7 +4213,7 @@ h3,
   --ring:0 0 0 3px rgba(255,255,255,.105);
 }
 
-/* Truly flat premium background */
+
 html,
 body,
 body.bg-track-curves{
@@ -4233,7 +4233,7 @@ body::after,
   filter:none !important;
 }
 
-/* Keep the page visually centered and reduce the weird left-heavy feel */
+
 .container,
 .hero > .container,
 #live-events .container,
@@ -4253,7 +4253,7 @@ body::after,
   margin-right:auto !important;
 }
 
-/* Reduce the dead empty space between the hero and the lower sections */
+
 .hero{
   padding-bottom:1.55rem !important;
   margin-bottom:0 !important;
@@ -4273,7 +4273,7 @@ body::after,
   padding-bottom:2.75rem !important;
 }
 
-/* Neutral glass cards. No blue/cyan tint. */
+
 .card,
 .event,
 .shot,
@@ -4302,7 +4302,7 @@ body::after,
   transform:translateY(-2px);
 }
 
-/* Header/logo/buttons: neutral, no cyan glow */
+
 header,
 .brand-badge,
 .btn,
@@ -4353,7 +4353,7 @@ header,
   box-shadow:none !important;
 }
 
-/* Calendar/countdown: remove cyan-looking day pills */
+
 .cal-event-day div:first-child,
 #cal-grid td.today,
 .timebox{
@@ -4365,7 +4365,7 @@ header,
   box-shadow:none !important;
 }
 
-/* Shoutbox: neutral glass, clean corners, no blue panel */
+
 .shoutbox-card{
   border-radius:22px !important;
   overflow:hidden !important;
@@ -4432,7 +4432,7 @@ header,
   box-shadow:none !important;
 }
 
-/* Inputs/forms: neutral instead of blue */
+
 .input,
 .textarea,
 .shout-input-row .input,
@@ -4456,7 +4456,7 @@ select:focus{
   box-shadow:none !important;
 }
 
-/* Scrollbars: neutral gray everywhere */
+
 *{
   scrollbar-color:rgba(255,255,255,.22) transparent !important;
 }
@@ -4487,7 +4487,7 @@ select:focus{
   border-radius:999px !important;
 }
 
-/* Event cards: stop background images from bleeding through too hard */
+
 .event,
 .event-link{
   overflow:hidden !important;
@@ -4530,7 +4530,7 @@ select:focus{
   display:none !important;
 }
 
-/* If the page uses actual img tags inside event cards */
+
 .event img,
 .event-card img,
 .shot img{
@@ -4538,7 +4538,7 @@ select:focus{
   filter:saturate(.78) brightness(.78) !important;
 }
 
-/* Clean tag badges without cyan */
+
 .event .tag{
   background:rgba(255,255,255,.075) !important;
   border-color:rgba(255,255,255,.12) !important;
@@ -4546,12 +4546,12 @@ select:focus{
   box-shadow:none !important;
 }
 
-/* Twitch embed: reduce visual dominance slightly */
+
 #live .player{
   filter:saturate(.86) brightness(.90) !important;
 }
 
-/* Fix mobile menu color too */
+
 @media (max-width:640px){
   .navlinks{
     background:rgba(5,7,12,.96) !important;
@@ -4563,120 +4563,74 @@ select:focus{
   }
 }
 
-/* ========================================================================== */
-/* TARGETED HOME EVENT CARD PATCH — BADGES LEFT + CLEAN IMAGE OVERLAY         */
-/* Keeps the current look. Only fixes event card badge position and image bleed. */
-/* ========================================================================== */
-
-/* Keep event cards clipped cleanly so background art never leaks outside radius */
-.event,
-.event-link,
-.event.with-bg,
-.event-card,
-.event-card.with-bg{
-  position:relative !important;
-  overflow:hidden !important;
-  isolation:isolate !important;
-  background-clip:padding-box !important;
-  border-radius:18px !important;
-}
-
-/* Put card badges back in the TOP LEFT corner */
 .event .tag,
-.event-card .tag{
+.event.with-bg .tag,
+.event-card .tag,
+.event-link .event .tag{
   position:absolute !important;
   top:12px !important;
   left:12px !important;
   right:auto !important;
-  z-index:6 !important;
-
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:.28rem .6rem !important;
-  border-radius:999px !important;
-
-  background:rgba(255,255,255,.075) !important;
-  border:1px solid rgba(255,255,255,.13) !important;
-  color:#eef1f7 !important;
-  box-shadow:none !important;
-  text-shadow:none !important;
+  z-index:8 !important;
 }
 
-/* Keep the first line/text clear of the top-left badge */
 .event,
-.event-card{
-  padding-top:3.45rem !important;
-}
-
-/* Background-image event cards: make image present but not bleeding through text */
 .event.with-bg,
-.event-card.with-bg,
-.event[style*="--event-img"],
-.event-card[style*="--event-img"]{
-  background-image:
-    linear-gradient(180deg, rgba(5,7,12,.86), rgba(5,7,12,.92)),
-    var(--event-img) !important;
-  background-size:cover, cover !important;
-  background-position:center, center !important;
-  background-repeat:no-repeat, no-repeat !important;
+.event-card,
+.event-link .event{
+  overflow:hidden !important;
+  position:relative !important;
+  isolation:isolate !important;
 }
 
-.event.with-bg:hover,
-.event-card.with-bg:hover,
-.event[style*="--event-img"]:hover,
-.event-card[style*="--event-img"]:hover{
-  background-image:
-    linear-gradient(180deg, rgba(5,7,12,.82), rgba(5,7,12,.90)),
-    var(--event-img) !important;
-  background-size:cover, cover !important;
-  background-position:center, center !important;
-  background-repeat:no-repeat, no-repeat !important;
+.event.with-bg{
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:flex-start !important;
+  align-items:flex-start !important;
+  padding:3.15rem 1rem 1rem !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-clip:padding-box !important;
 }
 
-/* Extra overlay on image cards only; content stays above it */
-.event.with-bg::after,
-.event-card.with-bg::after,
-.event[style*="--event-img"]::after,
-.event-card[style*="--event-img"]::after{
+.event.with-bg:hover{
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+
+.event.with-bg::after{
   content:"" !important;
   position:absolute !important;
   inset:0 !important;
   border-radius:inherit !important;
+  background:linear-gradient(180deg,rgba(0,0,0,.50),rgba(0,0,0,.70)) !important;
+  z-index:0 !important;
   pointer-events:none !important;
-  z-index:1 !important;
-  background:
-    linear-gradient(90deg, rgba(5,7,12,.18), rgba(5,7,12,.42)),
-    linear-gradient(180deg, rgba(5,7,12,.06), rgba(5,7,12,.38)) !important;
 }
 
-.event.with-bg > *,
-.event-card.with-bg > *,
-.event[style*="--event-img"] > *,
-.event-card[style*="--event-img"] > *{
+.event.with-bg > :not(.tag){
   position:relative !important;
   z-index:2 !important;
+  text-align:left !important;
+  transform:none !important;
 }
 
-.event.with-bg .tag,
-.event-card.with-bg .tag,
-.event[style*="--event-img"] .tag,
-.event-card[style*="--event-img"] .tag{
-  z-index:6 !important;
+.event.with-bg h4,
+.event.with-bg .meta{
+  text-align:left !important;
+  transform:none !important;
 }
 
-/* If any card uses an actual image element, keep it clipped and subtle */
+.event.with-bg > .meta:first-of-type{
+  padding-right:0 !important;
+}
+
 .event img,
 .event-card img{
-  opacity:.18 !important;
-  filter:saturate(.65) brightness(.62) contrast(.96) !important;
+  max-width:100% !important;
   object-fit:cover !important;
+  opacity:.25 !important;
 }
-
-/* Remove the old cursor-follow glow on event cards so it does not fight the image overlay */
-.event::before,
-.event-card::before{
-  display:none !important;
-}
-
