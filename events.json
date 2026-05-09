@@ -296,24 +296,6 @@
   },
   {
     "tag": "Cup",
-    "title": "Quick Relearn Cup Tuesday",
-    "category": "weekly",
-    "location": "Online",
-    "discordUrl": "https://discord.gg/S966UxKbJt",
-    "description": "Weekly Cup",
-    "image": "/img/QRC.png",
-    "image_fit": "contain",
-    "image_pos": "center",
-    "recurrence": {
-      "freq": "weekly",
-      "byDay": ["TU"],
-      "time": "22:00",
-      "durationMinutes": 60,
-      "count": 12
-    }
-  },
-  {
-    "tag": "Cup",
     "title": "Ultimate Learning Cup",
     "category": "weekly",
     "location": "Online",
@@ -383,24 +365,6 @@
       "freq": "weekly",
       "byDay": ["SA"],
       "time": "22:00",
-      "durationMinutes": 60,
-      "count": 12
-    }
-  },
-  {
-    "tag": "Cup",
-    "title": "Quick Relearn Cup Monday",
-    "category": "weekly",
-    "location": "Online",
-    "discordUrl": "https://discord.gg/S966UxKbJt",
-    "description": "Weekly Cup",
-    "image": "/img/QRC.png",
-    "image_fit": "contain",
-    "image_pos": "center",
-    "recurrence": {
-      "freq": "weekly",
-      "byDay": ["MO"],
-      "time": "14:00",
       "durationMinutes": 60,
       "count": 12
     }
