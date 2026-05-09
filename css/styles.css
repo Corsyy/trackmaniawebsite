@@ -4562,3 +4562,420 @@ select:focus{
     height:220px;
   }
 }
+
+/* ========================================================================== */
+/* HOME FINAL FIX — NEUTRAL GLASS, NO BLUE CHAT, RESTORED EVENT CARDS          */
+/* Put last. This intentionally overrides earlier experimental glass rules.    */
+/* ========================================================================== */
+
+:root{
+  --bg:#05070c;
+  --bg-2:#080a10;
+  --bg-3:#0b0d13;
+
+  --panel:rgba(255,255,255,.035);
+  --panel-2:rgba(255,255,255,.025);
+  --panel-3:rgba(0,0,0,.18);
+
+  --text:#f5f6f8;
+  --muted:#aeb4bf;
+  --soft:#d8dce4;
+
+  --accent:#f0f2f5;
+  --accent-2:#cfd3da;
+  --accent-3:#ffffff;
+
+  --border:rgba(255,255,255,.08);
+  --border-strong:rgba(255,255,255,.15);
+
+  --shadow-sm:0 10px 24px rgba(0,0,0,.22);
+  --shadow-md:0 16px 38px rgba(0,0,0,.30);
+  --shadow-lg:0 24px 60px rgba(0,0,0,.42);
+
+  --ring:0 0 0 3px rgba(255,255,255,.10);
+}
+
+html,
+body,
+body.bg-track-curves{
+  background:#05070c !important;
+  background-image:none !important;
+  color:var(--text) !important;
+}
+
+body.bg-track-curves::before,
+body.bg-track-curves::after,
+body::before,
+body::after,
+.hero::before,
+.hero::after{
+  display:none !important;
+  content:none !important;
+  background:none !important;
+  opacity:0 !important;
+  filter:none !important;
+  box-shadow:none !important;
+}
+
+/* Keep the page centered without forcing weird card widths */
+.container,
+.hero > .container,
+#live-events .container,
+#schedule .container,
+#showcase .container,
+#about .container,
+#contact .container{
+  width:min(1220px,92vw) !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+.hero-grid{
+  max-width:1220px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* Neutral glass cards — no cyan/blue tint */
+.card,
+.shot,
+.auth-dialog,
+.timebox,
+.calendar-container,
+#countdown-card,
+.contact-card,
+.panel{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.020)),
+    rgba(11,12,16,.72) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:0 14px 34px rgba(0,0,0,.26) !important;
+  backdrop-filter:blur(18px) saturate(100%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(100%) !important;
+}
+
+.card:hover,
+.shot:hover{
+  transform:translateY(-2px) !important;
+  border-color:rgba(255,255,255,.14) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.32) !important;
+}
+
+/* Buttons / pills — neutral instead of cyan */
+.btn,
+.nav-toggle,
+.auth-close,
+.cal-header button,
+.send-btn,
+.pill,
+.chip,
+#hero-chip,
+#live-chip,
+.auth-user-pill,
+.online-users-btn,
+.shout-reaction,
+.shout-reaction-pill,
+.shout-reaction-picker-btn{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    rgba(18,19,24,.72) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  color:#eef0f4 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+}
+
+.btn:hover,
+.nav-toggle:hover,
+.auth-close:hover,
+.cal-header button:hover,
+.send-btn:hover,
+.pill:hover,
+.chip:hover,
+.shout-reaction:hover,
+.shout-reaction-pill:hover,
+.shout-reaction-picker-btn:hover{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.024)),
+    rgba(24,25,31,.80) !important;
+  border-color:rgba(255,255,255,.15) !important;
+  box-shadow:none !important;
+}
+
+.btn.primary,
+.auth-tab.active,
+.auth-panel .btn.primary{
+  background:#f1f3f6 !important;
+  color:#07090d !important;
+  border-color:rgba(255,255,255,.45) !important;
+  box-shadow:none !important;
+}
+
+.nav a.active::after{
+  background:#f1f3f6 !important;
+  box-shadow:none !important;
+}
+
+/* Calendar/countdown cleanup */
+.cal-event-day div:first-child,
+#cal-grid td.today,
+.timebox{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.020)),
+    rgba(14,15,19,.72) !important;
+  border-color:rgba(255,255,255,.10) !important;
+  color:#eef0f4 !important;
+  box-shadow:none !important;
+}
+
+/* ========================================================================== */
+/* SHOUTBOX — remove the blue panel and fix corner/radius behavior             */
+/* ========================================================================== */
+
+.shoutbox-card,
+.card.shoutbox-card{
+  border-radius:22px !important;
+  overflow:hidden !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.050), rgba(255,255,255,.018)),
+    rgba(11,12,16,.78) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:0 16px 38px rgba(0,0,0,.30) !important;
+  backdrop-filter:blur(18px) saturate(100%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(100%) !important;
+}
+
+.shoutbox-card:hover,
+.card.shoutbox-card:hover{
+  transform:none !important;
+  border-color:rgba(255,255,255,.10) !important;
+}
+
+.shoutbox-top,
+.shoutbox-card .card-header{
+  padding:1rem 1.1rem .9rem !important;
+  border-bottom:1px solid rgba(255,255,255,.065) !important;
+  background:rgba(255,255,255,.012) !important;
+}
+
+#shoutboxMessages{
+  height:245px !important;
+  max-height:420px !important;
+  overflow-y:auto !important;
+  margin:0 !important;
+  padding:.9rem !important;
+  border:none !important;
+  border-radius:0 !important;
+  background:rgba(0,0,0,.18) !important;
+  box-shadow:none !important;
+  scrollbar-color:rgba(255,255,255,.24) transparent !important;
+}
+
+.shout-msg,
+.shout-msg.system,
+.shout-msg.mentioned-me{
+  border-radius:16px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.050), rgba(255,255,255,.016)),
+    rgba(19,20,25,.76) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:none !important;
+}
+
+.shout-msg.system{
+  border-color:rgba(255,255,255,.10) !important;
+}
+
+.shout-msg.system .shout-name,
+.shout-name,
+.shout-name.admin,
+.shout-name.mod,
+.shout-mention{
+  color:#f4f5f7 !important;
+  text-shadow:none !important;
+  background:transparent !important;
+  border-color:rgba(255,255,255,.10) !important;
+}
+
+.shout-form{
+  padding:1rem !important;
+  border-top:1px solid rgba(255,255,255,.065) !important;
+  background:rgba(0,0,0,.12) !important;
+}
+
+.shout-input-row .input,
+.input,
+.textarea,
+input,
+textarea,
+select{
+  background:rgba(0,0,0,.30) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  color:#f4f5f7 !important;
+  box-shadow:none !important;
+}
+
+.shout-input-row .input:focus,
+.input:focus,
+.textarea:focus,
+input:focus,
+textarea:focus,
+select:focus{
+  outline:none !important;
+  border-color:rgba(255,255,255,.18) !important;
+  box-shadow:none !important;
+}
+
+.shout-event-ticker{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.016)),
+    rgba(17,18,23,.72) !important;
+  border-color:rgba(255,255,255,.085) !important;
+  color:#eef0f4 !important;
+}
+
+/* Gray scrollbar everywhere, especially shoutbox */
+*{
+  scrollbar-color:rgba(255,255,255,.24) transparent !important;
+}
+
+::-webkit-scrollbar{
+  width:8px;
+  height:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:transparent !important;
+}
+
+::-webkit-scrollbar-thumb,
+#shoutboxMessages::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.22) !important;
+  border-radius:999px !important;
+  border:2px solid transparent !important;
+  background-clip:padding-box !important;
+}
+
+::-webkit-scrollbar-thumb:hover,
+#shoutboxMessages::-webkit-scrollbar-thumb:hover{
+  background:rgba(255,255,255,.32) !important;
+  background-clip:padding-box !important;
+}
+
+/* ========================================================================== */
+/* EVENT CARDS — restore layout, stop image bleed, keep cards readable         */
+/* ========================================================================== */
+
+.grid{
+  width:100% !important;
+}
+
+.event,
+.event-link .event{
+  min-height:180px !important;
+  border-radius:20px !important;
+  overflow:hidden !important;
+  position:relative !important;
+  isolation:isolate !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.016)),
+    rgba(14,15,19,.74) !important;
+  border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:0 14px 34px rgba(0,0,0,.26) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.event:hover,
+.event-link:hover .event,
+.event-link:focus-visible .event{
+  transform:translateY(-2px) !important;
+  border-color:rgba(255,255,255,.14) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.32) !important;
+}
+
+.event.with-bg{
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.54), rgba(5,7,12,.72)),
+    var(--event-img) !important;
+  background-size:cover, cover !important;
+  background-position:center, center !important;
+  background-repeat:no-repeat, no-repeat !important;
+}
+
+.event.with-bg:hover{
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.46), rgba(5,7,12,.66)),
+    var(--event-img) !important;
+}
+
+.event.with-bg::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  border-radius:inherit !important;
+  background:rgba(0,0,0,.20) !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+}
+
+.event.with-bg > :not(.tag),
+.event.with-bg .tag{
+  position:relative !important;
+  z-index:2 !important;
+}
+
+.event::before{
+  display:none !important;
+}
+
+/* Do NOT globally dim every image. That was making the event cards look broken. */
+.event img,
+.event-card img,
+.shot img{
+  opacity:1 !important;
+  filter:none !important;
+}
+
+.event .tag{
+  background:rgba(255,255,255,.075) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  color:#eef0f4 !important;
+  box-shadow:none !important;
+}
+
+/* If a section has only 1 or 2 event cards, center them instead of leaving them awkwardly left-heavy. */
+.grid:has(.event-link:nth-child(1):last-child),
+.grid:has(.event:nth-child(1):last-child){
+  justify-content:center !important;
+  grid-template-columns:minmax(300px, 430px) !important;
+}
+
+.grid:has(.event-link:nth-child(2):last-child),
+.grid:has(.event:nth-child(2):last-child){
+  justify-content:center !important;
+  grid-template-columns:repeat(2, minmax(300px, 430px)) !important;
+}
+
+/* Twitch embed should not overpower the page */
+#live .player{
+  filter:saturate(.90) brightness(.92) !important;
+}
+
+@media (max-width:960px){
+  .grid:has(.event-link:nth-child(2):last-child),
+  .grid:has(.event:nth-child(2):last-child){
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:640px){
+  .navlinks{
+    background:rgba(5,7,12,.96) !important;
+    border-top:1px solid rgba(255,255,255,.08) !important;
+  }
+
+  #shoutboxMessages{
+    height:220px !important;
+  }
+}
