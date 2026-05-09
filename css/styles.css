@@ -3781,3 +3781,418 @@ body.bg-track-curves::after{
     height:220px !important;
   }
 }
+/* ========================================================================== */
+/* TRACKMANIA EVENTS — CLEAR GLASS / NO-CYAN FINAL OVERRIDE                   */
+/* Paste-safe final layer. Keeps layout, removes gamer glow/cyan atmosphere.   */
+/* ========================================================================== */
+
+:root {
+  --bg: #05070c;
+  --bg-2: #080b12;
+  --bg-3: #0b1018;
+
+  --panel: rgba(255, 255, 255, .045);
+  --panel-2: rgba(255, 255, 255, .032);
+  --panel-3: rgba(255, 255, 255, .022);
+
+  --text: #f6f7fb;
+  --muted: #a2a9b6;
+  --soft: #d9dde7;
+
+  --accent: #f4f7ff;
+  --accent-2: #b8c0ce;
+  --accent-3: #ffffff;
+  --accent-soft: rgba(255, 255, 255, .075);
+
+  --ok: #b8f3d1;
+  --warn: #f6d79a;
+  --danger: #ff9aa8;
+
+  --border: rgba(255, 255, 255, .095);
+  --border-strong: rgba(255, 255, 255, .17);
+
+  --shadow-sm: 0 10px 26px rgba(0, 0, 0, .24);
+  --shadow-md: 0 16px 40px rgba(0, 0, 0, .30);
+  --shadow-lg: 0 26px 70px rgba(0, 0, 0, .42);
+
+  --radius: 22px;
+  --radius-md: 22px;
+  --radius-sm: 14px;
+  --ring: 0 0 0 3px rgba(255, 255, 255, .16);
+}
+
+::selection {
+  background: rgba(255, 255, 255, .22) !important;
+  color: #ffffff !important;
+}
+
+html,
+body,
+body.bg-track-curves {
+  background: #05070c !important;
+  color: var(--text) !important;
+}
+
+body.bg-track-curves::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: .012 !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>") !important;
+  background-size: 260px 260px !important;
+}
+
+body.bg-track-curves::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.018) 0%, transparent 260px),
+    linear-gradient(180deg, #05070c 0%, #070a10 46%, #05070c 100%) !important;
+  opacity: 1 !important;
+  mask-image: none !important;
+}
+
+.hero,
+.hero::before,
+.hero::after {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.hero::before,
+.hero::after,
+.event::before {
+  display: none !important;
+}
+
+header {
+  background: rgba(7, 9, 14, .72) !important;
+  backdrop-filter: blur(18px) saturate(115%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(115%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .08) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .22) !important;
+}
+
+.brand-badge {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035)),
+    rgba(255,255,255,.045) !important;
+  border-color: rgba(255,255,255,.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+.brand:hover .brand-badge {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.045)),
+    rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.20) !important;
+}
+
+.nav a {
+  color: #a7adba !important;
+}
+
+.nav a:hover,
+.nav a:focus,
+.nav a.active {
+  color: #ffffff !important;
+}
+
+.nav a.active::after {
+  background: rgba(255,255,255,.72) !important;
+  box-shadow: none !important;
+}
+
+.btn,
+.nav-toggle,
+.auth-close,
+.cal-header button,
+.send-btn,
+.emoji-panel button,
+.shout-delete,
+.shout-edit,
+.shout-reaction,
+.shout-reaction-pill,
+.shout-reaction-picker-btn {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.026)),
+    rgba(255,255,255,.035) !important;
+  border-color: rgba(255,255,255,.105) !important;
+  color: #eef1f7 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+  text-shadow: none !important;
+}
+
+.btn:hover,
+.nav-toggle:hover,
+.auth-close:hover,
+.cal-header button:hover,
+.send-btn:hover,
+.emoji-panel button:hover,
+.shout-delete:hover,
+.shout-edit:hover,
+.shout-reaction:hover,
+.shout-reaction-pill:hover,
+.shout-reaction-picker-btn:hover {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.105), rgba(255,255,255,.036)),
+    rgba(255,255,255,.052) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  transform: translateY(-1px);
+}
+
+.btn.primary,
+.auth-tab.active,
+.auth-panel .btn.primary {
+  color: #080a0f !important;
+  border-color: rgba(255,255,255,.42) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(215,221,232,.92)) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.65) !important;
+}
+
+.card,
+.event,
+.shot,
+.auth-dialog,
+#countdown-card,
+#live .card,
+.calendar-container,
+.timebox,
+.pill,
+.chip,
+#hero-chip,
+#live-chip,
+.online-users-menu,
+.reaction-picker-menu,
+.emoji-panel {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.070), rgba(255,255,255,.026)),
+    rgba(255,255,255,.032) !important;
+  border: 1px solid rgba(255,255,255,.105) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.055) !important;
+  backdrop-filter: blur(16px) saturate(112%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(112%) !important;
+}
+
+.card:hover,
+.event:hover,
+.shot:hover,
+.event-link:hover .event,
+.event-link:focus-visible .event {
+  transform: translateY(-2px) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  box-shadow: 0 18px 42px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+
+.card-header,
+#countdown-card .card-header,
+.auth-head {
+  background: rgba(255,255,255,.018) !important;
+  border-bottom: 1px solid rgba(255,255,255,.075) !important;
+}
+
+.h1,
+.title,
+h1,
+h2,
+h3,
+.event h4,
+.shout-name {
+  color: #f8f9fc !important;
+  text-shadow: none !important;
+}
+
+.lead,
+.meta,
+.help,
+.shoutbox-sub,
+.timebox span,
+.footer,
+.auth-head span,
+.auth-panel label {
+  color: #a2a9b6 !important;
+}
+
+.hero-kicker,
+.auth-user-pill,
+.event .tag,
+.shout-event-ticker,
+.cal-event-day div:first-child,
+#cal-grid td.today {
+  color: #f2f4f8 !important;
+  background: rgba(255,255,255,.060) !important;
+  border-color: rgba(255,255,255,.13) !important;
+  box-shadow: none !important;
+}
+
+.hero-kicker::before {
+  background: rgba(255,255,255,.82) !important;
+  box-shadow: none !important;
+}
+
+.event.with-bg {
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.76), rgba(5,7,12,.62)),
+    var(--event-img) !important;
+  background-size: contain, cover !important;
+  background-position: center, center !important;
+  background-repeat: no-repeat, no-repeat !important;
+}
+
+.event.with-bg:hover {
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.70), rgba(5,7,12,.56)),
+    var(--event-img) !important;
+}
+
+.event.with-bg::after,
+#countdown-card::after {
+  background: linear-gradient(180deg, rgba(5,7,12,.05), rgba(5,7,12,.22)) !important;
+}
+
+#countdown-card {
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.018)),
+    var(--cd-img, none) !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+#live .player {
+  filter: saturate(.92) brightness(.88) contrast(.98) !important;
+}
+
+/* Shoutbox: clear glass, no clipped/square top corners */
+.shoutbox-card {
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,.105) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.070), rgba(255,255,255,.024)),
+    rgba(255,255,255,.030) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.055) !important;
+  backdrop-filter: blur(16px) saturate(112%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(112%) !important;
+}
+
+.shoutbox-card:hover {
+  transform: none !important;
+}
+
+.shoutbox-top {
+  padding: 1rem 1.1rem .9rem !important;
+  border-bottom: 1px solid rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.014) !important;
+}
+
+#shoutboxMessages {
+  height: 245px;
+  max-height: 420px;
+  overflow-y: auto;
+  margin: 0 !important;
+  padding: .9rem !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: rgba(0,0,0,.12) !important;
+  box-shadow: none !important;
+  scrollbar-width: thin;
+}
+
+#shoutboxMessages::-webkit-scrollbar {
+  width: 6px;
+}
+
+#shoutboxMessages::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.14) !important;
+  border-radius: 999px;
+}
+
+.shout-msg {
+  border-radius: 16px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.020)),
+    rgba(255,255,255,.030) !important;
+  border: 1px solid rgba(255,255,255,.085) !important;
+  box-shadow: none !important;
+}
+
+.shout-msg.system {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.022)),
+    rgba(255,255,255,.035) !important;
+  border-color: rgba(255,255,255,.12) !important;
+}
+
+.shout-form {
+  padding: 1rem !important;
+  border-top: 1px solid rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.014) !important;
+}
+
+.shout-input-row .input,
+.input,
+.textarea {
+  border-radius: 14px !important;
+  background: rgba(0,0,0,.18) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+
+.input:focus,
+.textarea:focus,
+.shout-input-row .input:focus {
+  border-color: rgba(255,255,255,.20) !important;
+  box-shadow: var(--ring) !important;
+}
+
+.shout-input-row .btn {
+  border-radius: 14px !important;
+}
+
+.shout-mention,
+.shout-msg.mentioned-me {
+  color: #ffffff !important;
+  background: rgba(255,255,255,.075) !important;
+  border-color: rgba(255,255,255,.14) !important;
+}
+
+.shout-name.admin,
+.shout-name.mod {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+#toTop {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.026)),
+    rgba(255,255,255,.035) !important;
+  border-color: rgba(255,255,255,.105) !important;
+  color: #eef1f7 !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.26) !important;
+}
+
+#toTop::before {
+  color: #eef1f7 !important;
+}
+
+@media (max-width: 640px) {
+  .navlinks {
+    background: rgba(7, 9, 14, .94) !important;
+    backdrop-filter: blur(18px) saturate(115%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(115%) !important;
+    border-top: 1px solid rgba(255,255,255,.08) !important;
+  }
+
+  #shoutboxMessages {
+    height: 220px;
+  }
+}
