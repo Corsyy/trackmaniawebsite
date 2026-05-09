@@ -314,6 +314,81 @@
   },
   {
     "tag": "Cup",
+    "title": "Ultimate Learning Cup",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/8cwhv3NmAK",
+    "description": "Weekly Cup",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["TU"],
+      "time": "14:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
+    "title": "Dirt Weeks 26'",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/efJVM54eku",
+    "description": "Weekly Cup",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["MO"],
+      "time": "14:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
+    "title": "FullSpeed of the week",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/ugcqumM5AB",
+    "description": "Weekly Cup",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["MO"],
+      "time": "20:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
+    "title": "Slip Cup",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/cXzuDqey3n",
+    "description": "Weekly Cup",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["FR"],
+      "time": "14:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
+    "title": "Slip Cup after dark",
+    "category": "weekly",
+    "location": "Online",
+    "discordUrl": "https://discord.gg/cXzuDqey3n",
+    "description": "Weekly Cup",
+    "recurrence": {
+      "freq": "weekly",
+      "byDay": ["SA"],
+      "time": "22:00",
+      "durationMinutes": 60,
+      "count": 12
+    }
+  },
+  {
+    "tag": "Cup",
     "title": "Quick Relearn Cup Monday",
     "category": "weekly",
     "location": "Online",
