@@ -4562,3 +4562,121 @@ select:focus{
     height:220px;
   }
 }
+
+/* ========================================================================== */
+/* TARGETED HOME EVENT CARD PATCH — BADGES LEFT + CLEAN IMAGE OVERLAY         */
+/* Keeps the current look. Only fixes event card badge position and image bleed. */
+/* ========================================================================== */
+
+/* Keep event cards clipped cleanly so background art never leaks outside radius */
+.event,
+.event-link,
+.event.with-bg,
+.event-card,
+.event-card.with-bg{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  background-clip:padding-box !important;
+  border-radius:18px !important;
+}
+
+/* Put card badges back in the TOP LEFT corner */
+.event .tag,
+.event-card .tag{
+  position:absolute !important;
+  top:12px !important;
+  left:12px !important;
+  right:auto !important;
+  z-index:6 !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:.28rem .6rem !important;
+  border-radius:999px !important;
+
+  background:rgba(255,255,255,.075) !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+  color:#eef1f7 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+}
+
+/* Keep the first line/text clear of the top-left badge */
+.event,
+.event-card{
+  padding-top:3.45rem !important;
+}
+
+/* Background-image event cards: make image present but not bleeding through text */
+.event.with-bg,
+.event-card.with-bg,
+.event[style*="--event-img"],
+.event-card[style*="--event-img"]{
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.86), rgba(5,7,12,.92)),
+    var(--event-img) !important;
+  background-size:cover, cover !important;
+  background-position:center, center !important;
+  background-repeat:no-repeat, no-repeat !important;
+}
+
+.event.with-bg:hover,
+.event-card.with-bg:hover,
+.event[style*="--event-img"]:hover,
+.event-card[style*="--event-img"]:hover{
+  background-image:
+    linear-gradient(180deg, rgba(5,7,12,.82), rgba(5,7,12,.90)),
+    var(--event-img) !important;
+  background-size:cover, cover !important;
+  background-position:center, center !important;
+  background-repeat:no-repeat, no-repeat !important;
+}
+
+/* Extra overlay on image cards only; content stays above it */
+.event.with-bg::after,
+.event-card.with-bg::after,
+.event[style*="--event-img"]::after,
+.event-card[style*="--event-img"]::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  border-radius:inherit !important;
+  pointer-events:none !important;
+  z-index:1 !important;
+  background:
+    linear-gradient(90deg, rgba(5,7,12,.18), rgba(5,7,12,.42)),
+    linear-gradient(180deg, rgba(5,7,12,.06), rgba(5,7,12,.38)) !important;
+}
+
+.event.with-bg > *,
+.event-card.with-bg > *,
+.event[style*="--event-img"] > *,
+.event-card[style*="--event-img"] > *{
+  position:relative !important;
+  z-index:2 !important;
+}
+
+.event.with-bg .tag,
+.event-card.with-bg .tag,
+.event[style*="--event-img"] .tag,
+.event-card[style*="--event-img"] .tag{
+  z-index:6 !important;
+}
+
+/* If any card uses an actual image element, keep it clipped and subtle */
+.event img,
+.event-card img{
+  opacity:.18 !important;
+  filter:saturate(.65) brightness(.62) contrast(.96) !important;
+  object-fit:cover !important;
+}
+
+/* Remove the old cursor-follow glow on event cards so it does not fight the image overlay */
+.event::before,
+.event-card::before{
+  display:none !important;
+}
+
