@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-11T00:15:10.486Z",
+  "generatedAt": "2026-05-11T04:31:44.356Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -925,7 +925,7 @@
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
       "player": "in-.-",
       "wins": 5,
-      "wrs": 19,
+      "wrs": 20,
       "top5": 37,
       "weeksWon": [
         44,
@@ -935,6 +935,12 @@
         69
       ],
       "wrWeeks": [
+        {
+          "week": 9,
+          "mapUid": "XmFLxnHaeZbXijcbIt7qUEIKUz4",
+          "timeMs": 8284,
+          "rawRank": 1
+        },
         {
           "week": 18,
           "mapUid": "T5L5IsRPM8XQGAr3eI1kYg0VHz8",
@@ -1054,9 +1060,9 @@
         {
           "week": 9,
           "mapUid": "XmFLxnHaeZbXijcbIt7qUEIKUz4",
-          "rank": 2,
-          "timeMs": 8573,
-          "rawRank": 2
+          "rank": 1,
+          "timeMs": 8284,
+          "rawRank": 1
         },
         {
           "week": 11,
@@ -3721,7 +3727,7 @@
       "player": "TurtledTM",
       "wins": 1,
       "wrs": 7,
-      "top5": 37,
+      "top5": 38,
       "weeksWon": [
         71
       ],
@@ -4021,6 +4027,13 @@
           "rank": 5,
           "timeMs": 15853,
           "rawRank": 5
+        },
+        {
+          "week": 74,
+          "mapUid": "HKEWXsard4DKi8u9YXJjiV35Jne",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
         },
         {
           "week": 74,
@@ -4922,9 +4935,9 @@
         {
           "week": 74,
           "mapUid": "HRome2eEOYbdxi4Midplh_SunSj",
-          "rank": 4,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -11508,9 +11521,9 @@
         {
           "week": 74,
           "mapUid": "HKEWXsard4DKi8u9YXJjiV35Jne",
-          "rank": 3,
+          "rank": 4,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 4
         }
       ],
       "aliases": []
@@ -12228,32 +12241,6 @@
           "mapUid": "gQ6A0AHG2bnBSWgobGTefolM5Gi",
           "rank": 1,
           "timeMs": 11449,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "fc54a67c-7bd3-4b33-aa7d-a77f13a7b621",
-      "player": "mtat_tm",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 9,
-          "mapUid": "XmFLxnHaeZbXijcbIt7qUEIKUz4",
-          "timeMs": 8530,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 9,
-          "mapUid": "XmFLxnHaeZbXijcbIt7qUEIKUz4",
-          "rank": 1,
-          "timeMs": 8530,
           "rawRank": 1
         }
       ],
@@ -13426,6 +13413,67 @@
       "aliases": []
     },
     {
+      "accountId": "549e4ccf-45bd-4e0f-898b-185d0ee5d878",
+      "player": "simsun9",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 7,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 38,
+          "mapUid": "wZNvuba_4dDgBkUKkpwUlCu6FPi",
+          "rank": 5,
+          "timeMs": 16951,
+          "rawRank": 5
+        },
+        {
+          "week": 40,
+          "mapUid": "kIXqzxSxxWXaOzvzS2ksnb7EZs1",
+          "rank": 4,
+          "timeMs": 15033,
+          "rawRank": 4
+        },
+        {
+          "week": 42,
+          "mapUid": "Rf2WjC8X_ImBnNRhRHejlFn_ryk",
+          "rank": 5,
+          "timeMs": 16935,
+          "rawRank": 5
+        },
+        {
+          "week": 51,
+          "mapUid": "sYOgjSUO8TbWi3CPM99rGbs8qx6",
+          "rank": 4,
+          "timeMs": 16138,
+          "rawRank": 4
+        },
+        {
+          "week": 52,
+          "mapUid": "i_HYcVjsje6dpTHFzAQTKB8xSOg",
+          "rank": 3,
+          "timeMs": 16152,
+          "rawRank": 3
+        },
+        {
+          "week": 64,
+          "mapUid": "PfKdQepZvYjcz9klFBhMOg8xMI9",
+          "rank": 5,
+          "timeMs": 16858,
+          "rawRank": 5
+        },
+        {
+          "week": 74,
+          "mapUid": "hA100WremIa_RDtw8HVnQSnab4l",
+          "rank": 4,
+          "timeMs": null,
+          "rawRank": 4
+        }
+      ],
+      "aliases": []
+    },
+    {
       "accountId": "c6eff1c6-8bd7-42f7-9610-3eb6701f5b61",
       "player": "Bernkastel_.",
       "wins": 0,
@@ -13475,60 +13523,6 @@
           "rank": 4,
           "timeMs": 8629,
           "rawRank": 4
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "549e4ccf-45bd-4e0f-898b-185d0ee5d878",
-      "player": "simsun9",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 6,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 38,
-          "mapUid": "wZNvuba_4dDgBkUKkpwUlCu6FPi",
-          "rank": 5,
-          "timeMs": 16951,
-          "rawRank": 5
-        },
-        {
-          "week": 40,
-          "mapUid": "kIXqzxSxxWXaOzvzS2ksnb7EZs1",
-          "rank": 4,
-          "timeMs": 15033,
-          "rawRank": 4
-        },
-        {
-          "week": 42,
-          "mapUid": "Rf2WjC8X_ImBnNRhRHejlFn_ryk",
-          "rank": 5,
-          "timeMs": 16935,
-          "rawRank": 5
-        },
-        {
-          "week": 51,
-          "mapUid": "sYOgjSUO8TbWi3CPM99rGbs8qx6",
-          "rank": 4,
-          "timeMs": 16138,
-          "rawRank": 4
-        },
-        {
-          "week": 52,
-          "mapUid": "i_HYcVjsje6dpTHFzAQTKB8xSOg",
-          "rank": 3,
-          "timeMs": 16152,
-          "rawRank": 3
-        },
-        {
-          "week": 64,
-          "mapUid": "PfKdQepZvYjcz9klFBhMOg8xMI9",
-          "rank": 5,
-          "timeMs": 16858,
-          "rawRank": 5
         }
       ],
       "aliases": []
@@ -13775,9 +13769,9 @@
         {
           "week": 74,
           "mapUid": "hA100WremIa_RDtw8HVnQSnab4l",
-          "rank": 4,
+          "rank": 5,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -14422,9 +14416,9 @@
         {
           "week": 74,
           "mapUid": "HRome2eEOYbdxi4Midplh_SunSj",
-          "rank": 3,
+          "rank": 4,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 4
         }
       ],
       "aliases": []
@@ -15137,6 +15131,32 @@
           "rank": 4,
           "timeMs": 13185,
           "rawRank": 4
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "c7de98e6-4c6e-4072-a7de-87500e973495",
+      "player": "Axtro..",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 2,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 73,
+          "mapUid": "_J3WRA9jY27plaXYdotQmhfUNkd",
+          "rank": 3,
+          "timeMs": 16367,
+          "rawRank": 3
+        },
+        {
+          "week": 74,
+          "mapUid": "bK9joOIfErd2lYu2ISmlmauIZb5",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -16729,25 +16749,6 @@
       "aliases": []
     },
     {
-      "accountId": "c7de98e6-4c6e-4072-a7de-87500e973495",
-      "player": "Axtro..",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 73,
-          "mapUid": "_J3WRA9jY27plaXYdotQmhfUNkd",
-          "rank": 3,
-          "timeMs": 16367,
-          "rawRank": 3
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "0691c70d-c69d-46a9-a209-6600d708b4bd",
       "player": "AYNYXAMER_74",
       "wins": 0,
@@ -17196,9 +17197,9 @@
         {
           "week": 74,
           "mapUid": "HKEWXsard4DKi8u9YXJjiV35Jne",
-          "rank": 4,
+          "rank": 5,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -17256,25 +17257,6 @@
           "rank": 3,
           "timeMs": 7668,
           "rawRank": 3
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "e2f6241c-9c7b-4a3e-a1cc-43259876f82e",
-      "player": "ChappaTM",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 74,
-          "mapUid": "bK9joOIfErd2lYu2ISmlmauIZb5",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
         }
       ],
       "aliases": []
@@ -18154,25 +18136,6 @@
       "aliases": []
     },
     {
-      "accountId": "cb7bb189-b312-45d7-a17f-b186b3e8189f",
-      "player": "Gabinou.",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 74,
-          "mapUid": "hA100WremIa_RDtw8HVnQSnab4l",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "aaae15d8-c6c5-4002-9042-ff47f0209a05",
       "player": "gamegod1979",
       "wins": 0,
@@ -18640,9 +18603,9 @@
         {
           "week": 74,
           "mapUid": "HKEWXsard4DKi8u9YXJjiV35Jne",
-          "rank": 2,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -19503,25 +19466,6 @@
       "aliases": []
     },
     {
-      "accountId": "de590c4e-f98c-4783-afa8-a01efb069ceb",
-      "player": "linkTM_",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 74,
-          "mapUid": "HKEWXsard4DKi8u9YXJjiV35Jne",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "4620fd46-c0be-48ad-8e70-f2491093c148",
       "player": "louster_9",
       "wins": 0,
@@ -19897,6 +19841,25 @@
           "rank": 3,
           "timeMs": 17025,
           "rawRank": 3
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "fc54a67c-7bd3-4b33-aa7d-a77f13a7b621",
+      "player": "mtat_tm",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 9,
+          "mapUid": "XmFLxnHaeZbXijcbIt7qUEIKUz4",
+          "rank": 2,
+          "timeMs": 8530,
+          "rawRank": 2
         }
       ],
       "aliases": []
