@@ -4657,3 +4657,364 @@ select:focus{
 .nav-brand span{
   white-space:nowrap !important;
 }
+
+:root {
+  --page-max: 1200px;
+  --heroCardH: 360px;
+  --panel-clean: rgba(13, 21, 33, .82);
+  --panel-clean-2: rgba(8, 13, 22, .72);
+  --border-clean: rgba(225, 238, 255, .075);
+}
+
+.container {
+  width: min(var(--page-max), 90vw) !important;
+}
+
+header {
+  background: rgba(5, 9, 16, .78) !important;
+  border-bottom-color: rgba(225, 238, 255, .055) !important;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .18) !important;
+}
+
+.nav {
+  padding: .68rem 0 !important;
+}
+
+.navlinks {
+  gap: .92rem !important;
+}
+
+.nav a {
+  font-size: .84rem !important;
+  font-weight: 760 !important;
+  color: rgba(222, 232, 246, .72) !important;
+}
+
+.nav a:hover,
+.nav a:focus,
+.nav a.active {
+  color: #ffffff !important;
+}
+
+.cta .btn {
+  min-height: 36px !important;
+  padding: .52rem .82rem !important;
+  border-radius: 12px !important;
+  font-size: .84rem !important;
+}
+
+.hero {
+  padding: .4rem 0 2.35rem !important;
+  min-height: auto !important;
+}
+
+.hero::before {
+  opacity: .68 !important;
+}
+
+.hero-grid {
+  grid-template-columns: minmax(0, .98fr) minmax(410px, .92fr) !important;
+  gap: 2.35rem !important;
+  align-items: start !important;
+}
+
+.hero-top {
+  padding-top: .2rem !important;
+  margin-top: 0 !important;
+  min-height: auto !important;
+  gap: .82rem !important;
+}
+
+.hero-row {
+  gap: .82rem !important;
+}
+
+.h1 {
+  max-width: 620px !important;
+  margin-top: .55rem !important;
+  font-size: clamp(3.15rem, 5vw, 5.65rem) !important;
+  line-height: .965 !important;
+  letter-spacing: -.066em !important;
+}
+
+.lead {
+  max-width: 49ch !important;
+  margin-top: .95rem !important;
+  color: rgba(220, 232, 246, .70) !important;
+  font-size: 1.02rem !important;
+  line-height: 1.58 !important;
+}
+
+.keyfacts,
+.hero-stats {
+  max-width: 520px !important;
+  margin-top: 2.1rem !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: .62rem !important;
+}
+
+.pill,
+.hero-stat {
+  min-height: 38px !important;
+  padding: .48rem .68rem !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .012)), rgba(11, 18, 30, .62) !important;
+  border-color: rgba(225, 238, 255, .075) !important;
+  color: rgba(238, 246, 255, .88) !important;
+  font-size: .82rem !important;
+  font-weight: 820 !important;
+  box-shadow: none !important;
+}
+
+.pill::before {
+  filter: saturate(.9) !important;
+}
+
+.card,
+.event,
+.shot,
+.auth-dialog {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .033), rgba(255, 255, 255, .010)), linear-gradient(180deg, rgba(13, 21, 33, .92), rgba(7, 12, 21, .92)) !important;
+  border-color: var(--border-clean) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .30) !important;
+}
+
+.card:hover,
+.event:hover,
+.shot:hover,
+.event-link:hover .event,
+.event-link:focus-visible .event {
+  transform: translateY(-2px) !important;
+  border-color: rgba(225, 238, 255, .13) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, .36) !important;
+}
+
+.card-header {
+  padding: .82rem 1rem .66rem !important;
+  border-bottom-color: rgba(225, 238, 255, .06) !important;
+  font-size: .92rem !important;
+  font-weight: 900 !important;
+}
+
+#countdown-card {
+  min-height: auto !important;
+  background-image: linear-gradient(180deg, rgba(12, 18, 29, .86), rgba(8, 13, 22, .88)), var(--cd-img, none) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+#countdown-card .card-body {
+  padding: .82rem 1rem 1rem !important;
+  gap: .82rem !important;
+}
+
+#countdown {
+  grid-template-columns: repeat(4, minmax(74px, 1fr)) !important;
+  gap: .52rem !important;
+}
+
+.timebox {
+  min-height: 60px !important;
+  padding: .58rem .42rem !important;
+  border-radius: 13px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .042), rgba(255, 255, 255, .012)), rgba(7, 12, 21, .54) !important;
+  border-color: rgba(225, 238, 255, .07) !important;
+  box-shadow: none !important;
+}
+
+.timebox:hover {
+  transform: none !important;
+  border-color: rgba(225, 238, 255, .12) !important;
+}
+
+.timebox strong {
+  font-size: clamp(1.3rem, 1.75vw, 1.72rem) !important;
+  line-height: 1 !important;
+}
+
+.timebox span {
+  margin-top: .18rem !important;
+  display: block !important;
+  color: rgba(220, 232, 246, .62) !important;
+  font-size: .74rem !important;
+}
+
+.calendar-container {
+  margin-top: .78rem !important;
+  padding: .95rem 1.05rem !important;
+  border-radius: 17px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .026), rgba(255, 255, 255, .008)), rgba(6, 11, 19, .46) !important;
+  border-color: rgba(225, 238, 255, .065) !important;
+  box-shadow: none !important;
+}
+
+.cal-header {
+  margin-bottom: .58rem !important;
+  font-size: .93rem !important;
+}
+
+.cal-header button {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  color: rgba(238, 246, 255, .82) !important;
+}
+
+#cal-grid th {
+  padding-bottom: .38rem !important;
+  color: rgba(220, 232, 246, .58) !important;
+  font-size: .7rem !important;
+}
+
+#cal-grid td {
+  padding: .26rem 0 !important;
+  font-size: .82rem !important;
+}
+
+.cal-event-day div:first-child,
+#cal-grid td > div,
+#cal-grid td.today {
+  min-width: 26px !important;
+  height: 26px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, .055) !important;
+  border: 1px solid rgba(225, 238, 255, .075) !important;
+  box-shadow: none !important;
+}
+
+.cal-event-day div:first-child {
+  background: rgba(51, 214, 255, .105) !important;
+  border-color: rgba(51, 214, 255, .18) !important;
+}
+
+#miniCalendar {
+  margin-bottom: .95rem !important;
+}
+
+#live .card {
+  min-height: 345px !important;
+  border-radius: 20px !important;
+}
+
+#live .card-body {
+  min-height: 300px !important;
+}
+
+#live .player {
+  min-height: 300px !important;
+  background-color: #050910 !important;
+}
+
+#live .card-header {
+  background: rgba(255, 255, 255, .018) !important;
+}
+
+.section {
+  padding: 2.6rem 0 !important;
+}
+
+#shoutbox-section {
+  padding-top: 1.6rem !important;
+}
+
+#shoutboxMessages::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: rgba(225, 238, 255, .16) !important;
+  border-radius: 999px !important;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(5, 9, 16, .38) !important;
+}
+
+@media (max-width: 1120px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .h1 {
+    max-width: 760px !important;
+  }
+
+  .lead {
+    max-width: 64ch !important;
+  }
+
+  .keyfacts,
+  .hero-stats {
+    max-width: 620px !important;
+    margin-top: 1.35rem !important;
+  }
+
+  #live .card {
+    min-height: 390px !important;
+  }
+
+  #live .card-body,
+  #live .player {
+    min-height: 340px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .container {
+    width: min(94vw, var(--page-max)) !important;
+  }
+
+  .hero {
+    padding: 1.25rem 0 1.8rem !important;
+  }
+
+  .h1 {
+    font-size: clamp(2.55rem, 13.2vw, 4.1rem) !important;
+    max-width: 100% !important;
+  }
+
+  .lead {
+    font-size: .98rem !important;
+  }
+
+  .keyfacts,
+  .hero-stats {
+    grid-template-columns: 1fr !important;
+    gap: .5rem !important;
+    margin-top: 1.1rem !important;
+  }
+
+  #countdown {
+    grid-template-columns: repeat(2, minmax(118px, 1fr)) !important;
+  }
+
+  .calendar-container {
+    padding: .82rem !important;
+  }
+
+  #live .card {
+    min-height: 330px !important;
+  }
+
+  #live .card-body,
+  #live .player {
+    min-height: 285px !important;
+  }
+}
+
+@media (min-width: 1121px) {
+  .hero-grid > div:first-child {
+    position: sticky;
+    top: 92px;
+    align-self: start;
+  }
+
+  .hero-grid > div:last-child {
+    max-width: 520px;
+    justify-self: end;
+  }
+}
