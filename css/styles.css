@@ -1495,3 +1495,55 @@ footer {
     bottom: 16px;
   }
 }
+.shoutbox-top {
+  align-items: flex-start !important;
+  gap: 1.1rem !important;
+  padding-bottom: .9rem !important;
+}
+
+.shoutbox-header-actions {
+  gap: .7rem !important;
+}
+
+.online-users-btn,
+.auth-user-pill {
+  min-height: 38px !important;
+  padding: .45rem .8rem !important;
+  border-radius: 999px !important;
+  font-size: .82rem !important;
+}
+
+.shoutbox-sub {
+  margin-top: .35rem !important;
+  font-size: .84rem !important;
+  opacity: .82 !important;
+}
+
+.shout-event-ticker {
+  margin-top: .2rem !important;
+  margin-bottom: 1rem !important;
+  padding: .7rem .9rem !important;
+  border-radius: 14px !important;
+}
+
+#shoutboxMessages {
+  margin-top: .2rem !important;
+  padding: .9rem !important;
+}
+
+.shout-msg {
+  border-radius: 16px !important;
+  padding: .8rem .9rem !important;
+}
+
+@media (max-width: 640px) {
+  .shoutbox-top {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .shoutbox-header-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+}
