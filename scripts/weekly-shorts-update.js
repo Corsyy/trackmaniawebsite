@@ -161,6 +161,12 @@ function formatTimeMs(ms) {
   return `${seconds}.${String(millis).padStart(3, "0")}s`;
 }
 
+function formatDeltaMs(ms) {
+  if (!Number.isFinite(ms)) return "0.000s";
+
+  return `${(ms / 1000).toFixed(3)}s`;
+}
+
 async function fetchRetry(url, opts = {}, retries = 5, baseDelay = 400) {
   let lastErr;
   for (let i = 0; i <= retries; i++) {
@@ -486,22 +492,22 @@ async function fetchWsTop(access, mapUid, length = 10) {
       if (!accountId) return null;
 
       const candidates = [
-  x?.timeMs,
-  x?.time,
-  x?.bestTime,
-  x?.personalBestTime,
-  x?.recordTime,
-  x?.score?.timeMs,
-  x?.score?.time,
-  x?.score?.bestTime,
-  x?.score?.personalBestTime,
-  x?.score?.score,
-  x?.score?.value,
-  x?.score,
-  x?.best,
-  x?.record,
-  x?.value,
-];
+        x?.timeMs,
+        x?.time,
+        x?.bestTime,
+        x?.personalBestTime,
+        x?.recordTime,
+        x?.score?.timeMs,
+        x?.score?.time,
+        x?.score?.bestTime,
+        x?.score?.personalBestTime,
+        x?.score?.score,
+        x?.score?.value,
+        x?.score,
+        x?.best,
+        x?.record,
+        x?.value,
+      ];
 
       let extracted = NaN;
       for (const c of candidates) {
@@ -1125,6 +1131,7 @@ function refreshChangelogNames(changelog, nameCacheObj) {
         item.newHolder ||
         item.newHolderAccountId;
     }
+
     if (item?.oldHolderAccountId) {
       item.oldHolder =
         nameCacheObj[item.oldHolderAccountId] ||
@@ -1137,12 +1144,18 @@ function refreshChangelogNames(changelog, nameCacheObj) {
         item.text =
           `${item.newHolder} has improved their world record on the ${item.mapIndex}${ordinalSuffix(
             item.mapIndex
-          )} map of Week ${item.week} from ${formatTimeMs(item.oldTimeMs)} to ${formatTimeMs(item.newTimeMs)}.`;
+          )} map of Week ${item.week} by ${formatDeltaMs(
+            item.oldTimeMs - item.newTimeMs
+          )} from ${formatTimeMs(item.oldTimeMs)} to ${formatTimeMs(
+            item.newTimeMs
+          )}.`;
       } else {
         item.text =
           `${item.newHolder} has overtaken ${item.oldHolder} for the world record on the ${item.mapIndex}${ordinalSuffix(
             item.mapIndex
-          )} map of Week ${item.week} with a time of ${formatTimeMs(item.newTimeMs)}.`;
+          )} map of Week ${item.week} by ${formatDeltaMs(
+            item.oldTimeMs - item.newTimeMs
+          )} with a time of ${formatTimeMs(item.newTimeMs)}.`;
       }
     }
   }
@@ -1270,20 +1283,20 @@ async function main() {
 
         const currentPostweekEntries = await fetchCurrentPostweekMapEntries(access, mapUid, nameCacheObj);
 
-if (currentPostweekEntries.length) {
-  setPostweekMapEntry(postweekMapState, w.week, mapUid, {
-    entries: currentPostweekEntries,
-  });
+        if (currentPostweekEntries.length) {
+          setPostweekMapEntry(postweekMapState, w.week, mapUid, {
+            entries: currentPostweekEntries,
+          });
 
-  
-  const mapObj = (weekJson.maps || []).find((m) => m.mapUid === mapUid);
-  if (mapObj) {
-    mapObj.entries = currentPostweekEntries;
-    mapObj.trusted = true;
-  }
 
-  writeJson(weekPath, weekJson);
-}
+          const mapObj = (weekJson.maps || []).find((m) => m.mapUid === mapUid);
+          if (mapObj) {
+            mapObj.entries = currentPostweekEntries;
+            mapObj.trusted = true;
+          }
+
+          writeJson(weekPath, weekJson);
+        }
 
         const baseline = getBaselineWRFromWeekFile(weekJson, mapUid);
         if (!baseline || !isValidTimeMs(baseline.timeMs) || !baseline.holderAccountId) {
@@ -1349,18 +1362,20 @@ if (currentPostweekEntries.length) {
             deltaMs: previous.timeMs - currentTimeMs,
             text: `${currentHolder} has improved their world record on the ${mapIndex}${ordinalSuffix(
               mapIndex
-            )} map of Week ${w.week} from ${formatTimeMs(previous.timeMs)} to ${formatTimeMs(currentTimeMs)}.`,
+            )} map of Week ${w.week} by ${formatDeltaMs(
+              previous.timeMs - currentTimeMs
+            )} from ${formatTimeMs(previous.timeMs)} to ${formatTimeMs(currentTimeMs)}.`,
           };
 
           const added = appendChangelogItem(changelog, item);
-if (added) {
-  dlog("changelog +", item.text);
+          if (added) {
+            dlog("changelog +", item.text);
 
-  await postSystemMessage(
-    item.text,
-    `ws-${item.type}-week-${item.week}-map-${item.mapUid}-${item.newHolderAccountId || item.newHolder}-${item.newTimeMs}`
-  );
-}
+            await postSystemMessage(
+              item.text,
+              `ws-${item.type}-week-${item.week}-map-${item.mapUid}-${item.newHolderAccountId || item.newHolder}-${item.newTimeMs}`
+            );
+          }
 
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
@@ -1395,18 +1410,20 @@ if (added) {
             deltaMs: previous.timeMs - currentTimeMs,
             text: `${currentHolder} has overtaken ${previousHolderName} for the world record on the ${mapIndex}${ordinalSuffix(
               mapIndex
-            )} map of Week ${w.week} with a time of ${formatTimeMs(currentTimeMs)}.`,
+            )} map of Week ${w.week} by ${formatDeltaMs(
+              previous.timeMs - currentTimeMs
+            )} with a time of ${formatTimeMs(currentTimeMs)}.`,
           };
 
           const added = appendChangelogItem(changelog, item);
-if (added) {
-  dlog("changelog +", item.text);
+          if (added) {
+            dlog("changelog +", item.text);
 
-  await postSystemMessage(
-    item.text,
-    `ws-${item.type}-week-${item.week}-map-${item.mapUid}-${item.newHolderAccountId || item.newHolder}-${item.newTimeMs}`
-  );
-}
+            await postSystemMessage(
+              item.text,
+              `ws-${item.type}-week-${item.week}-map-${item.mapUid}-${item.newHolderAccountId || item.newHolder}-${item.newTimeMs}`
+            );
+          }
           setWrStateEntry(wrState, w.week, mapUid, {
             holder: currentHolder,
             holderAccountId: current.accountId,
@@ -1426,10 +1443,10 @@ if (added) {
 
   const goatWeekFiles = fs.existsSync(GOAT_WEEKS_DIR)
     ? fs.readdirSync(GOAT_WEEKS_DIR)
-        .filter((f) => f.endsWith(".json"))
-        .map((f) => readJson(path.join(GOAT_WEEKS_DIR, f), null))
-        .filter(Boolean)
-        .sort((a, b) => Number(a?.week || 0) - Number(b?.week || 0))
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => readJson(path.join(GOAT_WEEKS_DIR, f), null))
+      .filter(Boolean)
+      .sort((a, b) => Number(a?.week || 0) - Number(b?.week || 0))
     : [];
 
   writeJson(WEEKS_INDEX_PATH, weeksIndex);
