@@ -1444,13 +1444,33 @@ app.get("/api/ready", async (req, res) => {
         });
     }
 });
-warmStart();
-warmBuildInBackground();
+(async () => {
+    try {
+        building = true;
 
-setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
-setInterval(() => getLiveAccessToken().catch(() => {}), 6 * 60 * 60 * 1000);
-setInterval(() => debouncedQuickRefresh(), 60 * 1000);
-setInterval(() => debouncedUidRefresh(), 10 * 60 * 1000);
+        const accessToken = await getLiveAccessToken();
+
+        await computeUniversalMapIndex(accessToken);
+
+        wrCache = {
+            ts: Date.now(),
+            rows: [],
+        };
+
+        building = false;
+
+        console.log(
+            `Loaded ${metaCache.mapMeta.size} maps`
+        );
+    } catch (e) {
+        building = false;
+
+        console.error(
+            "Startup build failed:",
+            e?.message || e
+        );
+    }
+})();
 app.listen(
     process.env.PORT || 3000,
     () => {
