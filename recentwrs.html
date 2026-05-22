@@ -535,7 +535,7 @@ font-weight:800;
     });
   })();
 </script>
- 
+
 <main>
   <h1>Most Recent World Records on TOTD, official campaign and official club campaigns</h1>
   <div id="meta" class="meta">Loading…</div>
@@ -585,7 +585,6 @@ function fmtTs(ts){
   return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
 }
 
-/* ========== NEW: helpers to safely render clickable player links ========== */
 function escapeHTML(s=''){
   return s.replace(/[&<>"']/g, m => (
     {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
@@ -594,7 +593,6 @@ function escapeHTML(s=''){
 function playerLinkHTML({ id, name }) {
   return escapeHTML(name || id || '—');
 }
-/* ======================================================================== */
 
 async function resolveNames(ids = []) {
   if (!ids.length) return {};
@@ -637,7 +635,6 @@ function renderPage(p = 1) {
     $rows.appendChild(tr);
   });
 
-  // pager controls
   document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
   const prev = document.getElementById("prevBtn");
   const next = document.getElementById("nextBtn");
@@ -646,7 +643,6 @@ function renderPage(p = 1) {
   prev.onclick = () => goTo(page - 1);
   next.onclick = () => goTo(page + 1);
 
-  // keep ?page in URL
   const params = new URLSearchParams(location.search);
   params.set('page', page);
   history.replaceState({}, '', `${location.pathname}?${params}`);
@@ -662,14 +658,12 @@ async function load(){
     const j = await res.json();
     const rows = Array.isArray(j.rows) ? j.rows : [];
 
-    // collect ids lacking proper names
     const needIds = [...new Set(rows
       .filter(r => r.accountId && (!r.displayName || r.displayName === r.accountId))
       .map(r => r.accountId))];
 
     const names = await resolveNames(needIds);
 
-    // attach prettyName once
     allRows = rows.map(r => ({ ...r, prettyName: names[r.accountId] || r.displayName || r.accountId }));
 
     const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
@@ -684,18 +678,17 @@ async function load(){
   }
 }
 
-// initial
 load();
-// optional light auto-refresh
+
 setInterval(() => load(), 60 * 60 * 1000); // once every hour
 </script>
 
 <script>
-  // keep server warm
+
   setInterval(() => {
     fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
   }, 5 * 60 * 1000);
-  // prefetches
+
   const prefetch = (url) => {
     const link = document.createElement('link');
     link.rel = 'prefetch';
