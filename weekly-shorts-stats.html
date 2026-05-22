@@ -296,6 +296,29 @@ input:focus,select:focus{outline:none;border-color:var(--border-strong);box-shad
   cursor:pointer;
   transition:transform .16s ease,border-color .16s ease,background .16s ease,color .16s ease,box-shadow .16s ease;
 }
+#changelog{
+  max-height:700px;
+  overflow-y:auto;
+  padding-right:4px;
+}
+.changelog-scroll{
+  max-height:700px;
+  overflow-y:auto;
+  padding-right:4px;
+}
+
+#changelog::-webkit-scrollbar{
+  width:8px;
+}
+
+#changelog::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.16);
+  border-radius:999px;
+}
+
+#changelog::-webkit-scrollbar-thumb:hover{
+  background:rgba(255,255,255,.24);
+}
 .tab-btn:hover{transform:translateY(-1px);border-color:var(--border-strong);color:var(--text)}
 .tab-btn.active{color:#fff;border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.09);box-shadow:none}
 
@@ -591,7 +614,7 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
         <div class="t">Changelog</div>
         <div class="help">post-week WR improvements</div>
       </div>
-      <div class="card-b" id="changelog">
+      <div class="card-b changelog-scroll" id="changelog">
         <div class="muted">Loading…</div>
       </div>
     </div>
