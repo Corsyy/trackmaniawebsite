@@ -1419,7 +1419,31 @@ function inferSourceType(
 
     return "discovered";
 }
+app.get("/api/ready", async (req, res) => {
+    try {
+        const counts = {};
 
+        for (const meta of metaCache.mapMeta.values()) {
+            for (const source of meta.sources || []) {
+                counts[source] = (counts[source] || 0) + 1;
+            }
+        }
+
+        res.json({
+            ok: !building,
+            building,
+            rows: wrCache.rows.length,
+            mapUniverse: metaCache.mapMeta.size,
+            fetchedAt: wrCache.ts || null,
+            counts,
+        });
+    } catch (e) {
+        res.status(500).json({
+            ok: false,
+            error: e?.message || String(e),
+        });
+    }
+});
 app.listen(
     process.env.PORT || 3000,
     () => {
