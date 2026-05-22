@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T18:27:33.274Z",
+  "generatedAt": "2026-05-22T20:25:31.568Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -4542,7 +4542,7 @@
       "player": "GABRY-TM",
       "wins": 1,
       "wrs": 4,
-      "top5": 6,
+      "top5": 7,
       "weeksWon": [
         75
       ],
@@ -4607,6 +4607,13 @@
           "rank": 1,
           "timeMs": null,
           "rawRank": 1
+        },
+        {
+          "week": 75,
+          "mapUid": "qw39VdLaSY9jCqZyOFokytrjXsb",
+          "rank": 4,
+          "timeMs": null,
+          "rawRank": 4
         },
         {
           "week": 75,
@@ -10275,9 +10282,9 @@
         {
           "week": 75,
           "mapUid": "qw39VdLaSY9jCqZyOFokytrjXsb",
-          "rank": 4,
+          "rank": 5,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -16296,32 +16303,6 @@
       "aliases": []
     },
     {
-      "accountId": "04da993f-f4db-410e-92d8-669e7f3ba544",
-      "player": "Section--",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 2,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 73,
-          "mapUid": "8Im7uKHBYyK_gDBpDAdbrYGLfch",
-          "rank": 2,
-          "timeMs": 16688,
-          "rawRank": 2
-        },
-        {
-          "week": 75,
-          "mapUid": "qw39VdLaSY9jCqZyOFokytrjXsb",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "b70e6c3f-f311-47c7-af0b-aeca691ed216",
       "player": "Sheinex",
       "wins": 0,
@@ -21036,6 +21017,25 @@
           "rank": 3,
           "timeMs": 16038,
           "rawRank": 3
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "04da993f-f4db-410e-92d8-669e7f3ba544",
+      "player": "Section--",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 73,
+          "mapUid": "8Im7uKHBYyK_gDBpDAdbrYGLfch",
+          "rank": 2,
+          "timeMs": 16688,
+          "rawRank": 2
         }
       ],
       "aliases": []
