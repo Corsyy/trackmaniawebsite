@@ -193,8 +193,6 @@
     </div>
   </section>
 
-
-
   <section id="showcase" class="section">
     <div class="container">
       <h2 class="title">Highlights</h2>
@@ -340,9 +338,6 @@
   <script>
     const TTV_CHANNEL = "Ryvennox";
 
-    // ---------- SUPABASE CONFIG ----------
-    // Replace these two values with your real Supabase Project URL and anon public key.
-    // Leaving the placeholders in will NOT crash the site; auth/shoutbox will simply stay disabled.
     const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
@@ -383,8 +378,6 @@
           },
         });
 
-        // ---------- PROFESSIONAL SESSION TIMER ----------
-        // Keeps normal Supabase persistence on refresh, but limits each login to 3 hours.
         const AUTO_LOGOUT_MS = 3 * 60 * 60 * 1000;
         const LOGIN_TIME_KEY = "tme_login_started_at";
 
@@ -399,9 +392,6 @@
           if (!tmeSupabase) return;
 
           clearLogoutTimer();
-
-          // ❌ REMOVE getSession dependency completely
-          // We trust Supabase persistence instead
 
           const hasSession =
             localStorage.getItem("tme-supabase-auth") !== null;
@@ -432,7 +422,6 @@
     const m = document.getElementById("m");
     const s = document.getElementById("s");
 
-    // ---------- COUNTDOWN HELPERS ----------
     const fmtDate = (iso) => {
       const dt = new Date(iso);
       return dt.toLocaleString(undefined, {
@@ -630,7 +619,6 @@
       return article;
     }
 
-    // ---------- MINI CALENDAR STATE ----------
     let calYear, calMonth;
     let allEventRanges = []; // [{start: Date, end: Date, index: number, label?: string}]
     let calendarInitialized = false;
@@ -777,17 +765,6 @@
       container.addEventListener("mouseleave", hideTooltip);
       window.addEventListener("scroll", hideTooltip, { passive: true });
     }
-
-    // ---------- EVENT NORMALIZATION + RECURRENCE ----------
-    // Supports:
-    // - old one-off events using start_iso / end_iso
-    // - new one-off events using:
-    //     "date": "2026-04-10",
-    //     "time": "15:00",
-    //     "end_date": "2026-04-10",     // optional
-    //     "end_time": "17:00",          // optional
-    //     "durationMinutes": 120        // optional if no end_time
-    // - weekly recurring events using recurrence.time in Eastern time
 
     const EVENT_TIME_ZONE = "America/New_York";
 
@@ -994,7 +971,6 @@
           .split(":")
           .map((v) => parseInt(v, 10));
 
-        // ONLY create the next upcoming occurrence
         let created = false;
 
         for (let i = 0; i < 21 && !created; i++) {
@@ -1254,7 +1230,6 @@
       normalizeEventCardHeights();
     }
 
-    // ---------- STRUCTURED DATA ----------
     function updateJSONLD(next) {
       const el = document.getElementById("event-jsonld");
       if (!next) {
@@ -1284,7 +1259,6 @@
       });
     }
 
-    // ---------- LOAD EVENTS.JSON ----------
     async function loadEvents() {
       try {
         const res = await fetch("/events.json?cb=" + Date.now());
@@ -1311,9 +1285,8 @@
       }
     }
 
-    // ---------- TWITCH EMBED ----------
     function setTwitchChannel(ch) {
-      // placeholder if you want dynamic channel switching later
+
     }
 
     (function () {
@@ -1330,7 +1303,6 @@
       embed.appendChild(iframe);
     })();
 
-    // ---------- NAV ACTIVE LINK ----------
     (function () {
       const sections = [...document.querySelectorAll("section[id]")];
       const links = [...document.querySelectorAll(".navlinks a")];
@@ -1352,7 +1324,6 @@
       sections.forEach((s) => io.observe(s));
     })();
 
-    // ---------- SCROLL REVEALS ----------
     function attachReveals() {
       const reveals = document.querySelectorAll(".reveal:not(.show)");
       const io2 = new IntersectionObserver(
@@ -1370,18 +1341,15 @@
     }
     attachReveals();
 
-    // ---------- BACK TO TOP ----------
     (function () {
       const btn = document.getElementById("toTop");
       addEventListener("scroll", () => btn.classList.toggle("show", scrollY > 600));
       btn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
     })();
 
-    // ---------- KICK IT ALL OFF ----------
     loadEvents();
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // calendar next/prev buttons
     document.getElementById("cal-prev").onclick = () => {
       if (calYear == null || calMonth == null) return;
       calMonth--;
@@ -1406,7 +1374,7 @@
     });
   </script>
   <script>
-    // ---------- MOBILE NAV TOGGLE ----------
+
     (function () {
       const btn = document.getElementById("navToggle");
       const nav = document.getElementById("primary-nav");
@@ -1423,31 +1391,27 @@
         setOpen(!nav.classList.contains("show"));
       });
 
-      // Close when clicking a link
       nav.querySelectorAll("a").forEach((a) => {
         a.addEventListener("click", () => setOpen(false));
       });
 
-      // Close when clicking outside
       document.addEventListener("click", (e) => {
         if (nav.classList.contains("show") && !nav.contains(e.target) && e.target !== btn) {
           setOpen(false);
         }
       });
 
-      // Close on Escape
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") setOpen(false);
       });
 
-      // If user rotates / resizes out of mobile, clean state
       window.addEventListener("resize", () => {
         if (window.innerWidth > 640) setOpen(false);
       });
     })();
   </script>
   <script>
-    // ---------- AUTH + SHOUTBOX ----------
+
     const authModal = document.getElementById("authModal");
     const authMessage = document.getElementById("authMessage");
     const authLogoutBtn = document.getElementById("authLogoutBtn");
@@ -1474,7 +1438,7 @@
     function normalizeModerationText(text) {
       return String(text || "")
         .toLowerCase()
-        // leetspeak fixes
+
         .replace(/[0@]/g, "o")
         .replace(/[1!|]/g, "i")
         .replace(/3/g, "e")
@@ -1537,7 +1501,6 @@
 
         const compactTerm = term.replace(/\s+/g, "");
 
-        // match normal OR spaced OR compact
         if (clean.includes(term)) return true;
         if (compact.includes(compactTerm)) return true;
       }
@@ -1764,7 +1727,6 @@
       const et = easternParts(now);
       const minutesNow = et.hour * 60 + et.minute;
 
-      // 🏆 Cup of the Day
       if (minutesNow >= 13 * 60 + 50 && minutesNow < 14 * 60) {
         out.push({
           id: "cotd-10-min",
@@ -1787,7 +1749,6 @@
         });
       }
 
-      // 🩳 Weekly Shorts
       if (et.weekday === "Sun" && minutesNow >= 11 * 60 + 50 && minutesNow < 12 * 60) {
         out.push({
           id: "weekly-shorts-ending",
@@ -1812,7 +1773,6 @@
 
       const events = Array.isArray(window.__eventsCache) ? window.__eventsCache : [];
 
-      // 🔴 Show ALL live events, not just one
       const liveEvents = events
         .filter((e) => isEventLive(e, now))
         .sort((a, b) => new Date(getEventStartIso(a)) - new Date(getEventStartIso(b)));
@@ -1835,7 +1795,6 @@
         });
       });
 
-      // 🟡 Show upcoming events within 2 hours
       const upcomingEvents = events
         .map((e) => ({ event: e, seg: getNextUpcomingSegment(e, now) }))
         .filter((x) => x.seg && x.seg.start > now)
@@ -1857,7 +1816,6 @@
         }
       });
 
-      // ✅ Recently ended events within 30 minutes
       const recentlyEnded = events
         .map((e) => ({
           event: e,
@@ -2401,7 +2359,6 @@
 
       const lines = [];
 
-      // Weekly Shorts — Sunday 12:00 PM Eastern
       const et = easternParts(now);
       const minutesNow = et.hour * 60 + et.minute;
 
@@ -2414,7 +2371,6 @@
         lines.push(`🆕 <strong>Weekly Shorts</strong> new week has started.`);
       }
 
-      // All event stages / splits
       events.forEach((event) => {
         const segs = getEventSegments(event);
 
@@ -2623,7 +2579,6 @@
     function startShoutboxRealtime() {
       if (!tmeSupabase) return;
 
-      // 🔥 ALWAYS reset (this is the fix)
       if (shoutboxChannel) {
         tmeSupabase.removeChannel(shoutboxChannel);
         shoutboxChannel = null;
@@ -2729,12 +2684,10 @@
 
           localStorage.setItem("tme_login_started_at", String(Date.now()));
 
-          // Reset button + close modal immediately after Supabase login succeeds.
           loginBtn.disabled = false;
           loginBtn.textContent = "Login";
           closeAuthModal();
 
-          // Do slower UI/session/shoutbox work in the background.
           setTimeout(() => {
             updateAuthUI().catch(console.warn);
             window.startLogoutTimer?.().catch(console.warn);
@@ -2852,13 +2805,11 @@
         if (e.key === "Enter") sendShout();
       });
 
-      // online users (this is fine)
       onlineUsersBtn?.addEventListener("click", (e) => {
         e.stopPropagation();
         onlineUsersMenu?.classList.toggle("show");
       });
 
-      // 👇 ADD THIS BLOCK HERE
       reactionPickerMenu?.addEventListener("click", async (event) => {
         const btn = event.target.closest("[data-picker-emoji]");
         if (!btn || !activeReactionMessageId) return;
@@ -2920,7 +2871,6 @@
       });
     }
 
-    // ---------- PASSWORD RESET HANDLER ----------
     async function handlePasswordRecovery() {
       if (!tmeSupabase) return;
 
