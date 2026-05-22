@@ -296,6 +296,28 @@ input:focus,select:focus{outline:none;border-color:var(--border-strong);box-shad
   cursor:pointer;
   transition:transform .16s ease,border-color .16s ease,background .16s ease,color .16s ease,box-shadow .16s ease;
 }
+select{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  color:var(--text);
+
+  padding:8px 36px 8px 10px;
+  border-radius:12px;
+  font-size:13px;
+
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5 8 12l6.5-6.5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:12px;
+}
+select option{
+  background:#0b0f17;
+  color:#f4f6fb;
+}
 #changelog{
   max-height:700px;
   overflow-y:auto;
