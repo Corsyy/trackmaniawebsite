@@ -547,11 +547,11 @@ align-items:stretch;
       <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
       <nav id="primary-nav" class="navlinks" aria-label="Primary">
 
-  <!-- Mobile-only extra links -->
+
   <a href="/" class="mobile-only">Home</a>
   <a href="https://kacky.gg/leaderboard" class="mobile-only" target="_blank" rel="noopener">Kacky Leaderboard</a>
 
-  <!-- Normal site pages -->
+
   <a href="/wrleaderboard">WR Leaderboard</a>
   <a href="/totd">Track of the Day</a>
   <a href="/highlights">Community Highlights</a>
@@ -608,12 +608,11 @@ align-items:stretch;
 })();
 </script>
 
-
   <div class="container">
     <h1 class="title-line">Kacky Finishes</h1>
     <p class="hint">Upload your kacky finishes, try to keep them in order when you are submitting finishes. If they are not in order it will be denied and you will have to reupload it once again.</p>
 
-    <!-- Live search toolbar -->
+
     <div class="toolbar" style="display:flex;gap:.5rem;align-items:center;margin:.6rem 0 1rem">
       <input id="search" class="input" type="search" placeholder="Search slot # or title…" autocomplete="off" style="max-width:360px">
       <button id="searchClear" class="btn" type="button" aria-label="Clear">Clear</button>
@@ -622,7 +621,7 @@ align-items:stretch;
     <div id="clipsGrid" class="grid"></div>
   </div>
 
-  <!-- Submit modal -->
+
   <div class="modal" id="submit-modal" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-head">
@@ -635,7 +634,7 @@ align-items:stretch;
             <input class="input" name="title" placeholder="Title" required />
           </div>
 
-          <!-- Either paste a URL OR choose an .mp4 file -->
+
           <input class="input" name="url" id="urlField" placeholder="Twitch clip / YouTube / Streamable URL (or leave blank if you upload .mp4)" />
           <div class="row">
             <input class="input" type="file" id="fileField" accept="video/mp4" />
@@ -656,7 +655,7 @@ align-items:stretch;
     </div>
   </div>
 
-  <!-- Player modal -->
+
   <div class="modal" id="player-modal" aria-hidden="true">
     <div class="modal-card" style="width:min(1280px,96vw)">
       <div class="modal-head">
@@ -677,7 +676,6 @@ align-items:stretch;
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlcnR6c29icGhvcGtveWF4cndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjU4MzksImV4cCI6MjA3NjQwMTgzOX0.Vgpdlh8MHG21QIQW10iL1pztUYRPxJXTHMwg0gTPlWI";
   const H = { headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` } };
 
-  // ---- tiny helper
   function normalizeUrl(raw){
     if (!raw) return raw;
     const has = /^[a-z]+:\/\//i.test(raw);
@@ -775,7 +773,7 @@ align-items:stretch;
             <div class="thumb-center"></div>
           </button>
         `;
-        // data for live filtering
+
         card.dataset.slot  = String(i);
         card.dataset.title = (clip.title || '').toLowerCase();
         card.dataset.map   = (clip.map   || '').toLowerCase();
@@ -816,11 +814,9 @@ align-items:stretch;
   try {
     let u = decodeURIComponent(url);
 
-    // If it's a direct MP4 (Supabase or anywhere)
     if (u.endsWith(".mp4") || u.includes(".mp4?")) {
       playerFrame.style.display = "none";
 
-      // Create a video element if not exists
       let v = document.getElementById("playerVideo");
       if (!v) {
         v = document.createElement("video");
@@ -842,7 +838,6 @@ align-items:stretch;
       return;
     }
 
-    // Otherwise fallback to iframe embeds (YT/Twitch/etc)
     const parsed = new URL(normalizeUrl(u));
 
     if (parsed.host.includes("youtube.com")) {
@@ -873,15 +868,13 @@ align-items:stretch;
   if (v) {
     v.pause();
     v.currentTime = 0;
-    v.src = '';       
+    v.src = '';
     v.style.display = "none";
   }
 
-  // Close modal visually
-  playerModal.classList.remove('open'); 
-  playerModal.setAttribute('aria-hidden','true'); 
+  playerModal.classList.remove('open');
+  playerModal.setAttribute('aria-hidden','true');
 }
-
 
   document.addEventListener('click', (e)=>{
     const t = e.target;
@@ -896,9 +889,8 @@ align-items:stretch;
     }
   });
 
-  // ---------- Upload + submit ----------
   async function uploadMp4(file, slot){
-    // You must have a public storage bucket named "kacky-uploads"
+
     const path = `slot-${slot}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g,'_')}`;
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/kacky-uploads/${encodeURIComponent(path)}`, {
       method: 'POST',
@@ -909,7 +901,7 @@ align-items:stretch;
       const txt = await res.text().catch(()=>res.statusText);
       throw new Error(`Upload failed (${res.status}) ${txt}`);
     }
-    // If the bucket is public, the public URL is:
+
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/kacky-uploads/${path}`;
     return publicUrl;
   }
@@ -946,14 +938,12 @@ align-items:stretch;
       const thumb   = (fd.get('thumb')||'').toString().trim() || null;
       const title   = (fd.get('title')||'').toString().trim();
 
-      // Check slot availability
       try{
         const existsRes = await fetch(`${SUPABASE_URL}/rest/v1/kacky_clips?slot=eq.${encodeURIComponent(slotNum)}&select=slot`, H);
         const exists = await existsRes.json();
         if(Array.isArray(exists) && exists.length){ status.textContent='❌ This slot already has a submission.'; return; }
       }catch{}
 
-      // If a file is picked, upload it and use its public URL.
       const file = fileEl?.files?.[0] || null;
       if (file){
         if(file.type !== 'video/mp4'){ status.textContent='❌ Only .mp4 files are allowed.'; return; }
@@ -966,14 +956,13 @@ align-items:stretch;
           return;
         }
       } else {
-        // No file, must have a valid external clip URL
+
         if(!isValidClipUrl(url)){
           status.textContent='Please upload an .mp4 or enter a YouTube, Streamable, or Twitch *clip* URL.';
           return;
         }
       }
 
-      // Submit DB row
       status.textContent='Sending…';
       const payload = {
         title,
@@ -1009,7 +998,6 @@ align-items:stretch;
     });
   })();
 
-  // ---------- Live search (auto) ----------
   const searchInput  = document.getElementById('search');
   const searchClear  = document.getElementById('searchClear');
   const debounce = (fn, ms = 200) => { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; };
@@ -1045,7 +1033,6 @@ align-items:stretch;
   searchInput?.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ searchInput.value = ''; applyFilter(''); } });
   searchClear?.addEventListener('click', () => { searchInput.value = ''; applyFilter(''); searchInput.focus(); });
 
-  // initial
   loadClips();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
