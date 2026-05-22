@@ -1444,6 +1444,13 @@ app.get("/api/ready", async (req, res) => {
         });
     }
 });
+warmStart();
+warmBuildInBackground();
+
+setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
+setInterval(() => getLiveAccessToken().catch(() => {}), 6 * 60 * 60 * 1000);
+setInterval(() => debouncedQuickRefresh(), 60 * 1000);
+setInterval(() => debouncedUidRefresh(), 10 * 60 * 1000);
 app.listen(
     process.env.PORT || 3000,
     () => {
