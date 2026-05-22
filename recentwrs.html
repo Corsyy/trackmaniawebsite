@@ -1,707 +1,707 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Recent World Records — Trackmania Events</title>
-  <meta name="description" content="Most recent Trackmania world records across all official campaigns, TOTD, and club campaigns."/>
-  <meta name="theme-color" content="#0a0f1a"/>
+  <meta name="description"
+    content="Most recent Trackmania world records across all official campaigns, TOTD, and club campaigns." />
+  <meta name="theme-color" content="#0a0f1a" />
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="shortcut icon" href="/logo.png">
   <style>
-:root{
---bg:#05070c;
---bg-2:#080b11;
---bg-3:#0b0f16;
-
---panel:rgba(255,255,255,.035);
---panel-2:rgba(255,255,255,.028);
---panel-3:rgba(255,255,255,.02);
-
---text:#f3f5f7;
---muted:#a7adb8;
---soft:#d7dbe2;
-
---border:rgba(255,255,255,.07);
---border-strong:rgba(255,255,255,.12);
-
---shadow-sm:0 10px 26px rgba(0,0,0,.22);
---shadow-md:0 18px 42px rgba(0,0,0,.30);
---shadow-lg:0 26px 56px rgba(0,0,0,.34);
-
---radius:20px;
---radius-sm:12px;
-}
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-html,body{
-height:100%;
-}
-
-html{
-scroll-behavior:smooth;
-}
-
-body{
-margin:0;
-color:var(--text);
-font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
-background:#05070c;
--webkit-font-smoothing:antialiased;
-overflow-x:hidden;
-}
-
-body.bg-track-curves{
-background:#05070c;
-}
-
-body.bg-track-curves::before{
-content:"";
-position:fixed;
-inset:0;
-pointer-events:none;
-z-index:-1;
-opacity:.014;
-background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
-background-size:220px 220px;
-}
-
-a{
-color:inherit;
-text-decoration:none;
-}
-
-header{
-position:sticky;
-top:0;
-z-index:50;
-
-background:rgba(5,7,12,.82);
-
-backdrop-filter:blur(18px);
--webkit-backdrop-filter:blur(18px);
-
-border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.container{
-width:min(1220px,92vw);
-margin:0 auto;
-}
-
-.nav{
-display:grid;
-grid-template-columns:auto 1fr auto;
-align-items:center;
-gap:1rem;
-padding:1rem 0 .9rem;
-}
-
-.brand{
-display:flex;
-align-items:center;
-gap:.75rem;
-font-weight:950;
-letter-spacing:-.02em;
-color:#f7faff;
-font-size:1.05rem;
-}
-
-.brand-badge{
-width:38px;
-height:38px;
-border-radius:12px;
-display:grid;
-place-items:center;
-
-background:rgba(255,255,255,.045);
+    :root {
+      --bg: #05070c;
+      --bg-2: #080b11;
+      --bg-3: #0b0f16;
+
+      --panel: rgba(255, 255, 255, .035);
+      --panel-2: rgba(255, 255, 255, .028);
+      --panel-3: rgba(255, 255, 255, .02);
+
+      --text: #f3f5f7;
+      --muted: #a7adb8;
+      --soft: #d7dbe2;
+
+      --border: rgba(255, 255, 255, .07);
+      --border-strong: rgba(255, 255, 255, .12);
+
+      --shadow-sm: 0 10px 26px rgba(0, 0, 0, .22);
+      --shadow-md: 0 18px 42px rgba(0, 0, 0, .30);
+      --shadow-lg: 0 26px 56px rgba(0, 0, 0, .34);
+
+      --radius: 20px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
+      background: #05070c;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body.bg-track-curves {
+      background: #05070c;
+    }
+
+    body.bg-track-curves::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      opacity: .014;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
+      background-size: 220px 220px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+
+      background: rgba(5, 7, 12, .82);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    .container {
+      width: min(1220px, 92vw);
+      margin: 0 auto;
+    }
+
+    .nav {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0 .9rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-weight: 950;
+      letter-spacing: -.02em;
+      color: #f7faff;
+      font-size: 1.05rem;
+    }
+
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+
+      background: rgba(255, 255, 255, .045);
 
-backdrop-filter:blur(18px);
--webkit-backdrop-filter:blur(18px);
-
-border:1px solid var(--border);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      border: 1px solid var(--border);
+
+      transition: .18s ease;
+    }
+
+    .brand:hover .brand-badge {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+    }
+
+    .navlinks {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.45rem;
+    }
 
-transition:.18s ease;
-}
-
-.brand:hover .brand-badge{
-transform:translateY(-1px);
-border-color:var(--border-strong);
-}
-
-.navlinks{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:1.45rem;
-}
+    .nav a {
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: .94rem;
+      font-weight: 800;
+      letter-spacing: .01em;
+      opacity: .92;
+      transition: .18s ease;
+    }
 
-.nav a{
-color:var(--muted);
-white-space:nowrap;
-font-size:.94rem;
-font-weight:800;
-letter-spacing:.01em;
-opacity:.92;
-transition:.18s ease;
-}
+    .nav a:hover,
+    .nav a:focus {
+      opacity: 1;
+      color: #ffffff;
+    }
 
-.nav a:hover,
-.nav a:focus{
-opacity:1;
-color:#ffffff;
-}
+    .nav a.active {
+      opacity: 1;
+      color: #ffffff;
+      position: relative;
+    }
 
-.nav a.active{
-opacity:1;
-color:#ffffff;
-position:relative;
-}
+    .nav a.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -9px;
+      height: 2px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .24);
+    }
+
+    .cta {
+      display: flex;
+      justify-content: flex-end;
+      gap: .6rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+
+      min-height: 42px;
+
+      padding: .62rem 1rem;
+
+      border: 1px solid var(--border);
+
+      border-radius: 14px;
+
+      background: rgba(255, 255, 255, .045);
 
-.nav a.active::after{
-content:"";
-position:absolute;
-left:0;
-right:0;
-bottom:-9px;
-height:2px;
-border-radius:999px;
-background:rgba(255,255,255,.24);
-}
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
 
-.cta{
-display:flex;
-justify-content:flex-end;
-gap:.6rem;
-}
-
-.btn{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-gap:.45rem;
-
-min-height:42px;
-
-padding:.62rem 1rem;
+      color: var(--text);
 
-border:1px solid var(--border);
-
-border-radius:14px;
+      font-weight: 850;
+      font-size: .92rem;
+      line-height: 1;
 
-background:rgba(255,255,255,.045);
+      transition: .18s ease;
 
-backdrop-filter:blur(16px);
--webkit-backdrop-filter:blur(16px);
+      cursor: pointer;
+    }
 
-color:var(--text);
+    .btn:hover {
+      transform: translateY(-2px);
 
-font-weight:850;
-font-size:.92rem;
-line-height:1;
+      border-color: var(--border-strong);
 
-transition:.18s ease;
+      background: rgba(255, 255, 255, .065);
 
-cursor:pointer;
-}
+      box-shadow: var(--shadow-sm);
+    }
 
-.btn:hover{
-transform:translateY(-2px);
+    .btn:focus {
+      outline: none;
+    }
 
-border-color:var(--border-strong);
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
-background:rgba(255,255,255,.065);
+    .nav-toggle {
+      display: none;
+
+      border: 1px solid var(--border);
 
-box-shadow:var(--shadow-sm);
-}
+      background: rgba(255, 255, 255, .045);
+
+      color: var(--text);
 
-.btn:focus{
-outline:none;
-}
+      border-radius: 12px;
+
+      padding: .5rem .7rem;
 
-.btn:disabled{
-opacity:.5;
-cursor:not-allowed;
-transform:none;
-box-shadow:none;
-}
+      cursor: pointer;
+
+      font-weight: 800;
+    }
 
-.nav-toggle{
-display:none;
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem 1.2rem 2.6rem;
+    }
 
-border:1px solid var(--border);
+    h1 {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 950;
+      letter-spacing: -.03em;
+      line-height: 1.08;
+      margin-bottom: .45rem;
+      color: #f7faff;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-bottom: 1rem;
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .8rem;
+      margin: .95rem 0 1rem;
+    }
+
+    #pageInfo {
+      color: var(--muted);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+
+      background: rgba(255, 255, 255, .035);
+
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
+      border-radius: 20px;
+
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+
+      transition: .18s ease;
+
+      padding: 1rem;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+
+      border-color: var(--border-strong);
+
+      box-shadow: var(--shadow-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: .85rem .75rem;
+      text-align: left;
+    }
 
-background:rgba(255,255,255,.045);
+    th {
+      font-size: .82rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      font-weight: 850;
+    }
 
-color:var(--text);
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr {
+      transition: background .16s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, .02);
+    }
+
+    .time {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ts {
+      opacity: .74;
+    }
 
-border-radius:12px;
+    .truncate {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-padding:.5rem .7rem;
+    .skeleton {
+      color: var(--muted);
+    }
 
-cursor:pointer;
+    * {
+      scrollbar-color:
+        rgba(255, 255, 255, .16) transparent;
+    }
 
-font-weight:800;
-}
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
 
-main{
-max-width:1100px;
-margin:auto;
-padding:2rem 1.2rem 2.6rem;
-}
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-h1{
-font-size:clamp(1.8rem,3vw,2.4rem);
-font-weight:950;
-letter-spacing:-.03em;
-line-height:1.08;
-margin-bottom:.45rem;
-color:#f7faff;
-}
-
-.meta{
-color:var(--muted);
-font-size:.95rem;
-margin-bottom:1rem;
-}
-
-.pager{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:.8rem;
-margin:.95rem 0 1rem;
-}
-
-#pageInfo{
-color:var(--muted);
-font-weight:700;
-margin:0;
-}
-
-.card{
-border:1px solid var(--border);
-
-background:rgba(255,255,255,.035);
-
-backdrop-filter:blur(20px);
--webkit-backdrop-filter:blur(20px);
-
-border-radius:20px;
-
-box-shadow:0 12px 30px rgba(0,0,0,.28);
-
-transition:.18s ease;
-
-padding:1rem;
-}
-
-.card:hover{
-transform:translateY(-2px);
-
-border-color:var(--border-strong);
-
-box-shadow:var(--shadow-md);
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-}
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, .16);
+      border-radius: 999px;
+    }
 
-th,td{
-padding:.85rem .75rem;
-text-align:left;
-}
-
-th{
-font-size:.82rem;
-letter-spacing:.05em;
-text-transform:uppercase;
-color:var(--muted);
-border-bottom:1px solid var(--border);
-font-weight:850;
-}
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, .24);
+    }
 
-td{
-border-bottom:1px solid rgba(255,255,255,.05);
-color:var(--text);
-}
+    @media (max-width:640px) {
 
-tr:last-child td{
-border-bottom:none;
-}
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-tbody tr{
-transition:background .16s ease;
-}
-
-tbody tr:hover{
-background:rgba(255,255,255,.02);
-}
-
-.time{
-font-variant-numeric:tabular-nums;
-}
+      .nav-toggle {
+        display: block;
+      }
 
-.ts{
-opacity:.74;
-}
+      .navlinks {
+        display: none;
 
-.truncate{
-display:inline-block;
-max-width:100%;
-overflow:hidden;
-text-overflow:ellipsis;
-white-space:nowrap;
-}
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
 
-.skeleton{
-color:var(--muted);
-}
+        padding: .9rem 1rem 1rem;
 
-*{
-scrollbar-color:
-rgba(255,255,255,.16)
-transparent;
-}
+        background: rgba(5, 7, 12, .96);
 
-::-webkit-scrollbar{
-width:8px;
-height:8px;
-}
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
 
-::-webkit-scrollbar-track{
-background:transparent;
-}
+        flex-direction: column;
+        gap: .7rem;
 
-::-webkit-scrollbar-thumb{
-background:rgba(255,255,255,.16);
-border-radius:999px;
-}
+        border-top: 1px solid var(--border);
+      }
 
-::-webkit-scrollbar-thumb:hover{
-background:rgba(255,255,255,.24);
-}
+      .navlinks.show {
+        display: flex;
+      }
 
-@media (max-width:640px){
+      .cta {
+        display: none;
+      }
 
-.nav{
-display:flex;
-align-items:center;
-justify-content:space-between;
-}
+      table.mobile-stack thead {
+        display: none;
+      }
 
-.nav-toggle{
-display:block;
-}
+      table.mobile-stack,
+      table.mobile-stack tbody,
+      table.mobile-stack tr,
+      table.mobile-stack td {
+        display: block;
+        width: 100%;
+      }
 
-.navlinks{
-display:none;
+      table.mobile-stack tr {
+        background: rgba(255, 255, 255, .03);
 
-position:absolute;
-top:64px;
-left:0;
-right:0;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
 
-padding:.9rem 1rem 1rem;
+        padding: .8rem .85rem;
 
-background:rgba(5,7,12,.96);
+        margin-bottom: .7rem;
 
-backdrop-filter:blur(18px);
--webkit-backdrop-filter:blur(18px);
+        border-radius: 16px;
 
-flex-direction:column;
-gap:.7rem;
+        border: 1px solid var(--border);
 
-border-top:1px solid var(--border);
-}
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .24);
+      }
 
-.navlinks.show{
-display:flex;
-}
+      table.mobile-stack td {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: .45rem;
 
-.cta{
-display:none;
-}
+        font-size: .92rem;
 
-table.mobile-stack thead{
-display:none;
-}
+        padding: .45rem 0;
 
-table.mobile-stack,
-table.mobile-stack tbody,
-table.mobile-stack tr,
-table.mobile-stack td{
-display:block;
-width:100%;
-}
+        border-bottom: 1px solid rgba(255, 255, 255, .05);
+      }
 
-table.mobile-stack tr{
-background:rgba(255,255,255,.03);
+      table.mobile-stack td:last-child {
+        border-bottom: none;
+      }
 
-backdrop-filter:blur(18px);
--webkit-backdrop-filter:blur(18px);
+      table.mobile-stack td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-weight: 800;
+      }
 
-padding:.8rem .85rem;
-
-margin-bottom:.7rem;
-
-border-radius:16px;
-
-border:1px solid var(--border);
-
-box-shadow:0 10px 24px rgba(0,0,0,.24);
-}
-
-table.mobile-stack td{
-display:grid;
-grid-template-columns:100px 1fr;
-gap:.45rem;
-
-font-size:.92rem;
-
-padding:.45rem 0;
-
-border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-table.mobile-stack td:last-child{
-border-bottom:none;
-}
-
-table.mobile-stack td::before{
-content:attr(data-label);
-color:var(--muted);
-font-weight:800;
-}
-
-}
-</style>
+    }
+  </style>
   <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
   <link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
   <link rel="prefetch" href="/recentwrs" as="document">
 </head>
+
 <body class="bg-track-curves">
-<header>
-  <div class="container nav">
-    <a class="brand" href="/"><span class="brand-badge">🏁</span><span>Recent WRs</span></a>
-    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/"><span class="brand-badge">🏁</span><span>Recent WRs</span></a>
+      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
 
-      <a href="/kacky">Kacky Finishes</a>
-      <a href="/totd">Track of the Day</a>
-      <a href="/highlights">Community Highlights</a>
-      <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
-    </nav>
-    <div class="cta">
- <a href="/" class="btn">Home</a>
-       <a href="/wrleaderboard" class="btn">WR Leaderboard</a>
+        <a href="/kacky">Kacky Finishes</a>
+        <a href="/totd">Track of the Day</a>
+        <a href="/highlights">Community Highlights</a>
+        <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+      </nav>
+      <div class="cta">
+        <a href="/" class="btn">Home</a>
+        <a href="/wrleaderboard" class="btn">WR Leaderboard</a>
+      </div>
     </div>
-  </div>
-</header>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+  </header>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
-  window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: window.localStorage,
-      storageKey: "tme-supabase-auth",
-      flowType: "implicit",
-    },
-  });
-</script>
-
-<script src="/js/global-mentions.js"></script>
-<script>
-  (function(){
-    const btn = document.getElementById('navToggle');
-    const nav = document.getElementById('primary-nav');
-    if (!btn || !nav) return;
-    btn.addEventListener('click', () => {
-      const open = nav.classList.toggle('show');
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
     });
-  })();
-</script>
+  </script>
 
-<main>
-  <h1>Most Recent World Records on TOTD, official campaign and official club campaigns</h1>
-  <div id="meta" class="meta">Loading…</div>
+  <script src="/js/global-mentions.js"></script>
+  <script>
+    (function () {
+      const btn = document.getElementById('navToggle');
+      const nav = document.getElementById('primary-nav');
+      if (!btn || !nav) return;
+      btn.addEventListener('click', () => {
+        const open = nav.classList.toggle('show');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    })();
+  </script>
 
-  <div class="pager">
-    <button id="prevBtn" class="btn">Prev</button>
-    <span id="pageInfo" class="meta"></span>
-    <button id="nextBtn" class="btn">Next</button>
-  </div>
+  <main>
+    <h1>Most Recent World Records on TOTD, official campaign and official club campaigns</h1>
+    <div id="meta" class="meta">Loading…</div>
 
-  <div class="card">
-    <table class="mobile-stack">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Map UID</th>
-          <th>Holder</th>
-          <th class="time">WR Time</th>
-          <th class="ts">Set</th>
-        </tr>
-      </thead>
-      <tbody id="rows">
-        <tr><td colspan="5" class="skeleton">Loading…</td></tr>
-      </tbody>
-    </table>
-  </div>
-</main>
+    <div class="pager">
+      <button id="prevBtn" class="btn">Prev</button>
+      <span id="pageInfo" class="meta"></span>
+      <button id="nextBtn" class="btn">Next</button>
+    </div>
 
-<script>
-const API_BASE = "https://trackmaniawebsite.onrender.com";
-const PAGE_SIZE = 25;    // rows per page
-const FETCH_LIMIT = 100; // how many records to fetch once
+    <div class="card">
+      <table class="mobile-stack">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Map UID</th>
+            <th>Holder</th>
+            <th class="time">WR Time</th>
+            <th class="ts">Set</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr>
+            <td colspan="5" class="skeleton">Loading…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
 
-let allRows = [];
-let page = Number(new URLSearchParams(location.search).get('page')) || 1;
+  <script>
+    const STATIC_BASE = "/data";
+    const API_BASE = "https://trackmaniawebsite.onrender.com";
+    const PAGE_SIZE = 25;    // rows per page
+    const FETCH_LIMIT = 100; // how many records to fetch once
 
-function fmt(ms){
-  if(!Number.isFinite(ms)) return "—";
-  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000), x=ms%1000;
-  const pad=(n,w=2)=>String(n).padStart(w,"0");
-  return `${pad(m)}:${pad(s)}:${String(x).padStart(3,"0")}`;
-}
-function fmtTs(ts){
-  if (ts === null || ts === undefined) return "—";
-  const n = Number(ts);
-  const ms = Number.isFinite(n) ? (n > 1e12 ? n : n*1000) : Date.parse(ts);
-  return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
-}
+    let allRows = [];
+    let page = Number(new URLSearchParams(location.search).get('page')) || 1;
 
-function escapeHTML(s=''){
-  return s.replace(/[&<>"']/g, m => (
-    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
-  ));
-}
-function playerLinkHTML({ id, name }) {
-  return escapeHTML(name || id || '—');
-}
-
-async function resolveNames(ids = []) {
-  if (!ids.length) return {};
-  try {
-    const url = `${API_BASE}/api/debug-names?ids=${encodeURIComponent(ids.join(","))}`;
-    const r = await fetch(url);
-    if (!r.ok) return {};
-    const data = await r.json();
-    const arr = Array.isArray(data?.data) ? data.data : [];
-    const map = {};
-    for (const row of arr) {
-      if (row && row.id) map[row.id] = row.name || row.id;
+    function fmt(ms) {
+      if (!Number.isFinite(ms)) return "—";
+      const m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000), x = ms % 1000;
+      const pad = (n, w = 2) => String(n).padStart(w, "0");
+      return `${pad(m)}:${pad(s)}:${String(x).padStart(3, "0")}`;
     }
-    return map;
-  } catch {
-    return {};
-  }
-}
+    function fmtTs(ts) {
+      if (ts === null || ts === undefined) return "—";
+      const n = Number(ts);
+      const ms = Number.isFinite(n) ? (n > 1e12 ? n : n * 1000) : Date.parse(ts);
+      return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
+    }
 
-function renderPage(p = 1) {
-  const total = allRows.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  page = Math.min(Math.max(1, p), totalPages);
+    function escapeHTML(s = '') {
+      return s.replace(/[&<>"']/g, m => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+      ));
+    }
+    function playerLinkHTML({ id, name }) {
+      return escapeHTML(name || id || '—');
+    }
 
-  const start = (page - 1) * PAGE_SIZE;
-  const slice = allRows.slice(start, start + PAGE_SIZE);
+    function renderPage(p = 1) {
+      const total = allRows.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      page = Math.min(Math.max(1, p), totalPages);
 
-  const $rows = document.getElementById("rows");
-  $rows.innerHTML = "";
+      const start = (page - 1) * PAGE_SIZE;
+      const slice = allRows.slice(start, start + PAGE_SIZE);
 
-  slice.forEach((row, i) => {
-    const pretty = row.prettyName || row.displayName || row.accountId || "—";
-    const tr = document.createElement("tr");
-    tr.innerHTML =
-      `<td data-label="#">${start + i + 1}</td>` +
-      `<td data-label="Map UID"><span class="truncate">${escapeHTML(row.mapUid || '')}</span></td>` +
-      `<td data-label="Holder"><span class="truncate">${playerLinkHTML({ id: row.accountId, name: pretty })}</span></td>` +
-      `<td data-label="WR Time" class="time">${row.timeMs != null ? fmt(row.timeMs) : "—"}</td>` +
-      `<td data-label="Set" class="ts">${fmtTs(row.timestamp)}</td>`;
-    $rows.appendChild(tr);
-  });
+      const $rows = document.getElementById("rows");
+      $rows.innerHTML = "";
 
-  document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
-  const prev = document.getElementById("prevBtn");
-  const next = document.getElementById("nextBtn");
-  prev.disabled = page <= 1;
-  next.disabled = page >= totalPages;
-  prev.onclick = () => goTo(page - 1);
-  next.onclick = () => goTo(page + 1);
+      slice.forEach((row, i) => {
+        const pretty = row.prettyName || row.displayName || row.accountId || "—";
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          `<td data-label="#">${start + i + 1}</td>` +
+          `<td data-label="Map UID"><span class="truncate">${escapeHTML(row.mapUid || '')}</span></td>` +
+          `<td data-label="Holder"><span class="truncate">${playerLinkHTML({ id: row.accountId, name: pretty })}</span></td>` +
+          `<td data-label="WR Time" class="time">${row.timeMs != null ? fmt(row.timeMs) : "—"}</td>` +
+          `<td data-label="Set" class="ts">${fmtTs(row.timestamp)}</td>`;
+        $rows.appendChild(tr);
+      });
 
-  const params = new URLSearchParams(location.search);
-  params.set('page', page);
-  history.replaceState({}, '', `${location.pathname}?${params}`);
-}
+      document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
+      const prev = document.getElementById("prevBtn");
+      const next = document.getElementById("nextBtn");
+      prev.disabled = page <= 1;
+      next.disabled = page >= totalPages;
+      prev.onclick = () => goTo(page - 1);
+      next.onclick = () => goTo(page + 1);
 
-function goTo(p){ if (p >= 1) renderPage(p); }
+      const params = new URLSearchParams(location.search);
+      params.set('page', page);
+      history.replaceState({}, '', `${location.pathname}?${params}`);
+    }
 
-async function load(){
-  try {
-    document.getElementById("rows").innerHTML = `<tr><td colspan="5" class="skeleton">Loading…</td></tr>`;
-    const res = await fetch(`${API_BASE}/api/wr-latest?limit=${FETCH_LIMIT}`, { cache: "no-store" });
-    if (!res.ok) throw new Error(await res.text());
-    const j = await res.json();
-    const rows = Array.isArray(j.rows) ? j.rows : [];
+    function goTo(p) { if (p >= 1) renderPage(p); }
 
-    const needIds = [...new Set(rows
-      .filter(r => r.accountId && (!r.displayName || r.displayName === r.accountId))
-      .map(r => r.accountId))];
+    async function load() {
+      try {
+        document.getElementById("rows").innerHTML = `<tr><td colspan="5" class="skeleton">Loading…</td></tr>`;
+        const res = await fetch(`${STATIC_BASE}/recent-wrs/latest.json`);
+        if (!res.ok) throw new Error(await res.text());
 
-    const names = await resolveNames(needIds);
+        const j = await res.json();
 
-    allRows = rows.map(r => ({ ...r, prettyName: names[r.accountId] || r.displayName || r.accountId }));
+        const rows = Array.isArray(j.rows)
+          ? j.rows
+          : Array.isArray(j.records)
+            ? j.records
+            : [];
 
-    const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
-    document.getElementById("meta").textContent =
-      `Fetched ${Math.round(ago/1000)}s ago — ${new Date(j.fetchedAt || Date.now()).toLocaleTimeString()}`;
+        allRows = rows.map(r => ({
+          ...r,
+          prettyName:
+            r.displayName ||
+            r.prettyName ||
+            r.name ||
+            r.accountId
+        }));
 
-    renderPage(page);
-  } catch (e) {
-    console.error(e);
-    document.getElementById("meta").textContent = "Failed to load recent WRs.";
-    document.getElementById("rows").innerHTML = `<tr><td colspan="5">Error loading data.</td></tr>`;
-  }
-}
+        const builtAt = j.builtAt || j.fetchedAt || Date.now();
 
-load();
+        const ago = Math.max(0, Date.now() - new Date(builtAt).getTime());
 
-setInterval(() => load(), 60 * 60 * 1000); // once every hour
-</script>
+        document.getElementById("meta").textContent =
+          `Updated ${Math.round(ago / 1000)}s ago — ${new Date(builtAt).toLocaleTimeString()}`;
 
-<script>
+        renderPage(page);
+      } catch (e) {
+        console.error(e);
+        document.getElementById("meta").textContent = "Failed to load recent WRs.";
+        document.getElementById("rows").innerHTML = `<tr><td colspan="5">Error loading data.</td></tr>`;
+      }
+    }
 
-  setInterval(() => {
-    fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
-  }, 5 * 60 * 1000);
+    load();
 
-  const prefetch = (url) => {
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = url;
-    link.as = 'fetch';
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
-  };
-  const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
-  const tblBtn = document.querySelector('a[href="/recentwrs"]');
-  if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once:true });
-  if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once:true });
-</script>
+    setInterval(() => load(), 5 * 60 * 1000);
+  </script>
+
+  <script>
+
+    setInterval(() => {
+      fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(() => { });
+    }, 5 * 60 * 1000);
+
+    const prefetch = (url) => {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      link.as = 'fetch';
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    };
+    const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
+    const tblBtn = document.querySelector('a[href="/recentwrs"]');
+    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once: true });
+    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once: true });
+  </script>
 
 </body>
+
 </html>
