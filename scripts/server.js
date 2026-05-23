@@ -956,11 +956,14 @@ async function loadTMXUniverse() {
     ...(cached?.maps || [])
 ];
 
-    for (
-        let page = 1;
-        page <= TMX_PAGE_LIMIT;
-        page++
-    ) {
+    const randomStart =
+    Math.floor(Math.random() * 5000);
+
+for (
+    let page = randomStart;
+    page < randomStart + 3;
+    page++
+) {
         const result =
             await fetchTMXPage(page);
 
