@@ -1840,6 +1840,20 @@ async function refreshWRCache(
                             clean.accountId;
                     }
 
+                    const existingIndex =
+                        rows.findIndex(
+                            (r) =>
+                                r.mapUid ===
+                                clean.mapUid
+                        );
+
+                    if (existingIndex >= 0) {
+                        rows.splice(
+                            existingIndex,
+                            1
+                        );
+                    }
+
                     rows.push(clean);
                 }
             } catch { }
@@ -1936,6 +1950,7 @@ async function harvestAllWRs(
     );
 
     let index = 0;
+    let lastLoggedCount = 0;
 
     async function worker() {
         while (
@@ -2044,6 +2059,11 @@ async function harvestAllWRs(
         )
     );
 
+    writeJson(
+        HARVEST_STATE_FILE,
+        harvestState
+    );
+
     wrCache = {
         ts: Date.now(),
         rows,
@@ -2059,10 +2079,6 @@ async function harvestAllWRs(
     );
 }
 
-writeJson(
-    HARVEST_STATE_FILE,
-    harvestState
-);
 function inferSourceType(
     uid
 ) {
