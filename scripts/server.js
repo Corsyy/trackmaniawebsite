@@ -162,10 +162,11 @@ const WEEKLY_GRANDS_DIR =
 const TMX_CACHE_FILE =
     path.join(METADATA_DIR, "tmx-maps.json");
 
-const TMX_PAGE_LIMIT = Math.max(
-    1,
-    Number(process.env.TMX_PAGE_LIMIT || 25)
-);
+const TMX_STATE_FILE =
+    path.join(
+        METADATA_DIR,
+        "tmx-state.json"
+    );
 
 const TMX_ENABLE =
     (process.env.TMX_ENABLE ?? "true").toLowerCase() ===
@@ -865,147 +866,6 @@ function loadWeeklyEventMaps(dir, sourceType) {
     return out;
 }
 
-async function fetchTMXPage(page = 1) {
-    try {
-        const url =
-            `https://trackmania.exchange/mapsearch2/search?api=on&page=${page}`;
-
-        const response =
-            await fetchWithTimeout(
-                url,
-                {
-                    headers: {
-                        "User-Agent":
-                            "trackmaniaevents.com",
-                        Accept: "application/json",
-                    },
-                },
-                20000
-            );
-
-        if (!response.ok) {
-            console.warn(
-                `[TMX] Failed page ${page}`
-            );
-
-            return [];
-        }
-
-        const json =
-            await response.json();
-
-        const results =
-            Array.isArray(json)
-                ? json
-                : json?.results || [];
-
-        return results.map((m) => ({
-            mapUid:
-                m.TrackUID,
-            tmxId:
-                m.TrackID,
-            name:
-                m.Name || null,
-            author:
-                m.Username || null,
-            authorTime:
-                m.AuthorTime || null,
-            uploadedAt:
-                m.UploadedAt || null,
-            thumbnailUrl:
-                m.ThumbnailURL ||
-                m.ThumbnailUrl ||
-                null,
-            tags:
-                Array.isArray(m.Tags)
-                    ? m.Tags
-                    : [],
-        }));
-    } catch (e) {
-        console.error(
-            "TMX page fetch failed:",
-            e?.message || e
-        );
-
-        return [];
-    }
-}
-
-async function loadTMXUniverse() {
-    if (!TMX_ENABLE) {
-        return [];
-    }
-
-    let cached =
-        readJson(
-            TMX_CACHE_FILE,
-            {
-                maps: []
-            }
-        );
-
-    if (
-        cached &&
-        Array.isArray(cached.maps)
-    ) {
-        console.log(
-            `[TMX] Loaded cached maps (${cached.maps.length})`
-        );
-    }
-
-    const maps = [
-        ...(cached?.maps || [])
-    ];
-
-    const randomStart = 1;
-
-    for (
-        let page = randomStart;
-        page <= 3;
-        page++
-    ) {
-        const result =
-            await fetchTMXPage(page);
-
-        if (!result.length) {
-            console.log(
-                `[TMX] Empty page ${page}`
-            );
-
-            continue;
-        }
-        const existing = new Set(
-            maps.map((m) => m.mapUid)
-        );
-
-        for (const map of result) {
-            if (!existing.has(map.mapUid)) {
-                maps.push(map);
-                existing.add(map.mapUid);
-            }
-        }
-
-        console.log(
-            `[TMX] Loaded page ${page} (${maps.length} maps)`
-        );
-
-        await new Promise(
-            (resolve) =>
-                setTimeout(resolve, 120)
-        );
-    }
-
-    writeJson(
-        TMX_CACHE_FILE,
-        {
-            builtAt: Date.now(),
-            maps,
-        }
-    );
-
-    return maps;
-}
-
 function countMonthsFrom2020July() {
     const start = new Date(
         Date.UTC(2020, 6, 1)
@@ -1389,7 +1249,145 @@ async function resolveDisplayNames(
         return {};
     }
 }
+async function fetchTMXRange(
+    from = 0
+) {
+    try {
+        const url =
+            `https://trackmania.exchange/mapsearch?from=${from}`;
 
+        const response =
+            await fetchWithTimeout(
+                url,
+                {
+                    headers: {
+                        "User-Agent":
+                            "trackmaniaevents.com",
+                    },
+                },
+                20000
+            );
+
+        if (!response.ok) {
+            console.warn(
+                `[TMX] Failed from=${from}`
+            );
+
+            return [];
+        }
+
+        const html =
+            await response.text();
+
+        const uidMatches =
+            [...html.matchAll(
+                /"TrackUID":"([^"]+)"/g
+            )];
+
+        const maps = [];
+
+        for (const match of uidMatches) {
+            const mapUid =
+                match?.[1];
+
+            if (!mapUid) continue;
+
+            maps.push({
+                mapUid,
+                sourceType: "tmx",
+            });
+        }
+
+        return maps;
+    } catch (e) {
+        console.error(
+            "TMX range fetch failed:",
+            e?.message || e
+        );
+
+        return [];
+    }
+}
+async function loadTMXUniverse() {
+    if (!TMX_ENABLE) {
+        return [];
+    }
+
+    const cached =
+        readJson(
+            TMX_CACHE_FILE,
+            {
+                maps: []
+            }
+        );
+
+    const state =
+        readJson(
+            TMX_STATE_FILE,
+            {
+                lastFrom: 318449
+            }
+        );
+
+    const maps = [
+        ...(cached?.maps || [])
+    ];
+
+    const existing =
+        new Set(
+            maps.map(
+                (m) => m.mapUid
+            )
+        );
+
+    const from =
+        state.lastFrom;
+
+    const result =
+        await fetchTMXRange(
+            from
+        );
+
+    for (const map of result) {
+        if (
+            !existing.has(
+                map.mapUid
+            )
+        ) {
+            maps.push(map);
+
+            existing.add(
+                map.mapUid
+            );
+        }
+    }
+
+    state.lastFrom =
+        Math.max(
+            0,
+            from - 50
+        );
+
+    writeJson(
+        TMX_STATE_FILE,
+        state
+    );
+
+    writeJson(
+        TMX_CACHE_FILE,
+        {
+            builtAt:
+                Date.now(),
+            maps,
+        }
+    );
+
+    console.log(
+        `[TMX] Added ${result.length} maps (total ${maps.length})`
+    );
+
+    return maps;
+}
 async function computeUniversalMapIndex(
     accessToken,
     {
@@ -1797,7 +1795,8 @@ async function computeUniversalMapIndex(
 async function refreshWRCache(
     accessToken
 ) {
-    const rows = [];
+    const rows =
+        [...wrCache.rows];
 
     const mapUids =
         metaCache.allMapUids.slice(
@@ -2001,10 +2000,6 @@ async function harvestAllWRs(
                             clean.timestamp,
                     };
 
-                    writeJson(
-                        HARVEST_STATE_FILE,
-                        harvestState
-                    );
                 }
             } catch { }
 
@@ -2013,7 +2008,7 @@ async function harvestAllWRs(
                 rows.length % 100 === 0 &&
                 rows.length !== lastLoggedCount
             ) {
-                
+
                 lastLoggedCount = rows.length;
                 wrCache = {
                     ts: Date.now(),
@@ -2063,6 +2058,11 @@ async function harvestAllWRs(
         `[WR] Full harvest complete (${rows.length})`
     );
 }
+
+writeJson(
+    HARVEST_STATE_FILE,
+    harvestState
+);
 function inferSourceType(
     uid
 ) {
@@ -2229,25 +2229,6 @@ setInterval(async () => {
     }
 }, 1000 * 60 * 30);
 ;
-app.get("/api/recent-wrs", (req, res) => {
-    const rows =
-        [...wrCache.rows]
-            .sort(
-                (a, b) =>
-                    b.timestamp -
-                    a.timestamp
-            )
-            .slice(0, 100);
-
-    sendJsonETag(
-        req,
-        res,
-        {
-            ok: true,
-            rows,
-        }
-    );
-});
 app.get("/api/top-monthly", (req, res) => {
     const limit = Math.max(
         1,
