@@ -935,21 +935,26 @@ async function loadTMXUniverse() {
         return [];
     }
 
-    const cached =
-        readJson(
-            TMX_CACHE_FILE,
-            null
-        );
+   let cached =
+    readJson(
+        TMX_CACHE_FILE,
+        {
+            maps: []
+        }
+    );
 
-    if (
-        cached &&
-        Array.isArray(cached.maps) &&
-        cached.maps.length
-    ) {
-        return cached.maps;
-    }
+   if (
+    cached &&
+    Array.isArray(cached.maps)
+) {
+    console.log(
+        `[TMX] Loaded cached maps (${cached.maps.length})`
+    );
+}
 
-    const maps = [];
+    const maps = [
+    ...(cached?.maps || [])
+];
 
     for (
         let page = 1;
