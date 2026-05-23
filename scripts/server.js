@@ -152,6 +152,23 @@ const DISK_MAP_INDEX =
 const MANUAL_MAPS_FILE =
     process.env.MANUAL_MAPS_FILE ||
     path.join(METADATA_DIR, "manual-maps.json");
+const WEEKLY_SHORTS_DIR =
+    path.join(DATA_ROOT, "weekly-shorts");
+
+const WEEKLY_GRANDS_DIR =
+    path.join(DATA_ROOT, "weekly-grands");
+
+const TMX_CACHE_FILE =
+    path.join(METADATA_DIR, "tmx-maps.json");
+
+const TMX_PAGE_LIMIT = Math.max(
+    1,
+    Number(process.env.TMX_PAGE_LIMIT || 250)
+);
+
+const TMX_ENABLE =
+    (process.env.TMX_ENABLE ?? "true").toLowerCase() ===
+    "true";
 
 let runtimeRefreshToken = cleanToken(
     process.env.REFRESH_TOKEN || ""
@@ -177,6 +194,9 @@ let metaCache = {
     officialSet: new Set(),
     totdSet: new Set(),
     clubSet: new Set(),
+    shortsSet: new Set(),
+    grandsSet: new Set(),
+    tmxSet: new Set(),
     manualSet: new Set(),
     mapMeta: new Map(),
 };
@@ -241,7 +261,7 @@ function getRefreshToken() {
 
             if (token) return token;
         }
-    } catch {}
+    } catch { }
 
     return runtimeRefreshToken;
 }
@@ -327,8 +347,7 @@ async function getLiveAccessToken() {
             .catch(() => "");
 
         throw new Error(
-            `refresh failed ${response.status} ${
-                body || "(no body)"
+            `refresh failed ${response.status} ${body || "(no body)"
             }`
         );
     }
@@ -412,8 +431,7 @@ async function getOAuthToken() {
 
     if (!response.ok) {
         throw new Error(
-            `OAuth token failed ${
-                response.status
+            `OAuth token failed ${response.status
             } ${await response.text()}`
         );
     }
@@ -502,12 +520,12 @@ function sendJsonETag(
         noStore
             ? "no-store"
             : `public, max-age=${Math.max(
-                  0,
-                  maxAge
-              )}, stale-while-revalidate=${Math.max(
-                  0,
-                  stale
-              )}`
+                0,
+                maxAge
+            )}, stale-while-revalidate=${Math.max(
+                0,
+                stale
+            )}`
     );
 
     if (
@@ -639,11 +657,14 @@ function mapSourcePriority(
     sourceType
 ) {
     const order = {
-        manual_event: 100,
-        official_campaign: 90,
-        totd: 80,
-        club_campaign: 70,
-        arcade: 60,
+        manual_event: 120,
+        weekly_grands: 115,
+        weekly_shorts: 110,
+        official_campaign: 100,
+        totd: 90,
+        club_campaign: 80,
+        arcade: 70,
+        tmx: 60,
         discovered: 10,
     };
 
@@ -686,9 +707,9 @@ function addMapMeta(
         mapSourcePriority(
             sourceType
         ) >=
-            mapSourcePriority(
-                existing.sourceType
-            )
+        mapSourcePriority(
+            existing.sourceType
+        )
     ) {
         next.sourceType =
             sourceType;
@@ -773,6 +794,193 @@ function loadManualMaps() {
         .filter(
             (item) => item.mapUid
         );
+}
+function loadWeeklyEventMaps(dir, sourceType) {
+    const out = [];
+
+    try {
+        if (!fs.existsSync(dir)) {
+            return [];
+        }
+
+        const files = fs
+            .readdirSync(dir)
+            .filter((f) => f.endsWith(".json"));
+
+        for (const file of files) {
+            try {
+                const fullPath = path.join(dir, file);
+
+                const json = readJson(fullPath, null);
+
+                if (!json) continue;
+
+                const maps =
+                    json.maps ||
+                    json.playlist ||
+                    json.mapList ||
+                    [];
+
+                const week =
+                    json.week ||
+                    json.weekNumber ||
+                    null;
+
+                for (const map of maps) {
+                    const mapUid =
+                        map?.mapUid ||
+                        map?.uid;
+
+                    if (!mapUid) continue;
+
+                    out.push({
+                        mapUid,
+                        sourceType,
+                        week,
+                        eventName:
+                            sourceType === "weekly_shorts"
+                                ? "Weekly Shorts"
+                                : "Weekly Grands",
+                        name:
+                            map?.name ||
+                            map?.mapName ||
+                            null,
+                    });
+                }
+            } catch (e) {
+                console.error(
+                    `Failed parsing ${file}:`,
+                    e?.message || e
+                );
+            }
+        }
+    } catch (e) {
+        console.error(
+            "Weekly event loader failed:",
+            e?.message || e
+        );
+    }
+
+    return out;
+}
+
+async function fetchTMXPage(page = 1) {
+    try {
+        const url =
+            `https://trackmania.exchange/api/maps/search?page=${page}`;
+
+        const response =
+            await fetchWithTimeout(
+                url,
+                {
+                    headers: {
+                        "User-Agent":
+                            "trackmaniaevents.com",
+                    },
+                },
+                20000
+            );
+
+        if (!response.ok) {
+            return [];
+        }
+
+        const json =
+            await response.json();
+
+        if (!Array.isArray(json)) {
+            return [];
+        }
+
+        return json.map((m) => ({
+            mapUid:
+                m.TrackUID,
+            tmxId:
+                m.TrackID,
+            name:
+                m.Name ||
+                null,
+            author:
+                m.Username ||
+                null,
+            authorTime:
+                m.AuthorTime ||
+                null,
+            uploadedAt:
+                m.UploadedAt ||
+                null,
+            thumbnailUrl:
+                m.ThumbnailUrl ||
+                null,
+            tags:
+                Array.isArray(m.Tags)
+                    ? m.Tags
+                    : [],
+        }));
+    } catch (e) {
+        console.error(
+            "TMX page fetch failed:",
+            e?.message || e
+        );
+
+        return [];
+    }
+}
+
+async function loadTMXUniverse() {
+    if (!TMX_ENABLE) {
+        return [];
+    }
+
+    const cached =
+        readJson(
+            TMX_CACHE_FILE,
+            null
+        );
+
+    if (
+        cached &&
+        Array.isArray(cached.maps) &&
+        cached.maps.length
+    ) {
+        return cached.maps;
+    }
+
+    const maps = [];
+
+    for (
+        let page = 1;
+        page <= TMX_PAGE_LIMIT;
+        page++
+    ) {
+        const result =
+            await fetchTMXPage(page);
+
+        if (!result.length) {
+            break;
+        }
+
+        maps.push(...result);
+
+        console.log(
+            `[TMX] Loaded page ${page} (${maps.length} maps)`
+        );
+
+        await new Promise(
+            (resolve) =>
+                setTimeout(resolve, 120)
+        );
+    }
+
+    writeJson(
+        TMX_CACHE_FILE,
+        {
+            builtAt: Date.now(),
+            maps,
+        }
+    );
+
+    return maps;
 }
 
 function countMonthsFrom2020July() {
@@ -943,8 +1151,8 @@ async function listAllClubCampaignRefsWithPlaylists(accessToken) {
             const updatedAt =
                 new Date(
                     item?.updated ||
-                        item?.updatedAt ||
-                        0
+                    item?.updatedAt ||
+                    0
                 ).getTime() || 0;
 
             const campaignName =
@@ -1084,6 +1292,7 @@ async function computeUniversalMapIndex(
         officialCampaigns,
         totdMonths,
         arcadeRooms,
+        tmxMaps,
     ] = await Promise.all([
         getOfficialCampaigns(
             accessToken
@@ -1094,6 +1303,7 @@ async function computeUniversalMapIndex(
         getArcadeRooms(
             accessToken
         ),
+        loadTMXUniverse(),
     ]);
 
     for (const campaign of officialCampaigns) {
@@ -1194,7 +1404,66 @@ async function computeUniversalMapIndex(
             );
         }
     }
+    for (const map of tmxMaps) {
+        if (!map?.mapUid)
+            continue;
 
+        addMapMeta(
+            mapMeta,
+            map.mapUid,
+            "tmx",
+            {
+                tmxId:
+                    map.tmxId,
+                author:
+                    map.author,
+                authorTime:
+                    map.authorTime,
+                uploadedAt:
+                    map.uploadedAt,
+                thumbnailUrl:
+                    map.thumbnailUrl,
+                tags:
+                    map.tags || [],
+                name:
+                    map.name || null,
+            }
+        );
+    }
+
+    // WEEKLY SHORTS
+
+    const weeklyShortsMaps =
+        loadWeeklyEventMaps(
+            WEEKLY_SHORTS_DIR,
+            "weekly_shorts"
+        );
+
+    for (const map of weeklyShortsMaps) {
+        addMapMeta(
+            mapMeta,
+            map.mapUid,
+            "weekly_shorts",
+            map
+        );
+    }
+
+    // WEEKLY GRANDS
+
+    const weeklyGrandsMaps =
+        loadWeeklyEventMaps(
+            WEEKLY_GRANDS_DIR,
+            "weekly_grands"
+        );
+
+    for (const map of weeklyGrandsMaps) {
+        addMapMeta(
+            mapMeta,
+            map.mapUid,
+            "weekly_grands",
+            map
+        );
+    }
     let clubRefs = [];
 
     if (includeClub) {
@@ -1207,8 +1476,8 @@ async function computeUniversalMapIndex(
         const fresh =
             disk &&
             Date.now() -
-                (disk.ts || 0) <
-                CLUB_UID_TTL &&
+            (disk.ts || 0) <
+            CLUB_UID_TTL &&
             Array.isArray(
                 disk.maps
             ) &&
@@ -1239,20 +1508,20 @@ async function computeUniversalMapIndex(
                 ) {
                     for (const uid of ref.playlist) {
                         const item =
-                            {
-                                mapUid:
-                                    uid,
-                                campaignName:
-                                    ref.campaignName ||
-                                    null,
-                                clubName:
-                                    ref.clubName ||
-                                    null,
-                                clubId:
-                                    ref.clubId,
-                                campaignId:
-                                    ref.campaignId,
-                            };
+                        {
+                            mapUid:
+                                uid,
+                            campaignName:
+                                ref.campaignName ||
+                                null,
+                            clubName:
+                                ref.clubName ||
+                                null,
+                            clubId:
+                                ref.clubId,
+                            campaignId:
+                                ref.campaignId,
+                        };
 
                         clubMaps.push(
                             item
@@ -1267,7 +1536,7 @@ async function computeUniversalMapIndex(
                     }
                 }
             }
-                        writeJson(
+            writeJson(
                 DISK_CLUB,
                 {
                     ts: Date.now(),
@@ -1285,7 +1554,7 @@ async function computeUniversalMapIndex(
             mapMeta,
             item.mapUid,
             item.sourceType ||
-                "manual_event",
+            "manual_event",
             item
         );
     }
@@ -1331,6 +1600,46 @@ async function computeUniversalMapIndex(
                     )
                     .map(([k]) => k)
             ),
+
+        shortsSet:
+            new Set(
+                Array.from(
+                    mapMeta.entries()
+                )
+                    .filter(([, v]) =>
+                        v.sources.includes(
+                            "weekly_shorts"
+                        )
+                    )
+                    .map(([k]) => k)
+            ),
+
+        grandsSet:
+            new Set(
+                Array.from(
+                    mapMeta.entries()
+                )
+                    .filter(([, v]) =>
+                        v.sources.includes(
+                            "weekly_grands"
+                        )
+                    )
+                    .map(([k]) => k)
+            ),
+
+        tmxSet:
+            new Set(
+                Array.from(
+                    mapMeta.entries()
+                )
+                    .filter(([, v]) =>
+                        v.sources.includes(
+                            "tmx"
+                        )
+                    )
+                    .map(([k]) => k)
+            ),
+
         manualSet:
             new Set(
                 manualMaps.map(
@@ -1342,16 +1651,16 @@ async function computeUniversalMapIndex(
     };
 
     const mapIndexPayload =
-        {
-            builtAt:
-                Date.now(),
-            totalMaps:
-                mapMeta.size,
-            maps:
-                Array.from(
-                    mapMeta.values()
-                ),
-        };
+    {
+        builtAt:
+            Date.now(),
+        totalMaps:
+            mapMeta.size,
+        maps:
+            Array.from(
+                mapMeta.values()
+            ),
+    };
 
     writeJson(
         DISK_MAP_INDEX,
@@ -1381,7 +1690,26 @@ function inferSourceType(
 
     if (!meta)
         return "unknown";
+    if (
+        meta?.sources?.includes(
+            "weekly_grands"
+        )
+    )
+        return "weekly_grands";
 
+    if (
+        meta?.sources?.includes(
+            "weekly_shorts"
+        )
+    )
+        return "weekly_shorts";
+
+    if (
+        meta?.sources?.includes(
+            "tmx"
+        )
+    )
+        return "tmx";
     if (
         meta?.sources?.includes(
             "manual_event"
@@ -1435,7 +1763,31 @@ app.get("/api/ready", async (req, res) => {
             rows: wrCache.rows.length,
             mapUniverse: metaCache.mapMeta.size,
             fetchedAt: wrCache.ts || null,
+
             counts,
+
+            breakdown: {
+                officialCampaigns:
+                    metaCache.officialSet.size,
+
+                totd:
+                    metaCache.totdSet.size,
+
+                clubCampaigns:
+                    metaCache.clubSet.size,
+
+                weeklyShorts:
+                    metaCache.shortsSet.size,
+
+                weeklyGrands:
+                    metaCache.grandsSet.size,
+
+                tmx:
+                    metaCache.tmxSet.size,
+
+                manual:
+                    metaCache.manualSet.size,
+            },
         });
     } catch (e) {
         res.status(500).json({
