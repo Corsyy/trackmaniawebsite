@@ -892,12 +892,27 @@ async function maybeRefreshUidUniverse() {
 
 let building = false;
 async function warmBuildInBackground() {
-    if (wrCache.rows.length || building) return;
+    if (building) return;
+
     try {
         building = true;
-        await buildAllWRs({ includeClub: includeClubByDefault() });
+
+        if (!wrCache.rows.length) {
+            console.log("[WR] Performing initial build...");
+            await buildAllWRs({
+                includeClub: includeClubByDefault(),
+            });
+        } else {
+            console.log("[WR] Performing incremental rebuild...");
+            await rebuildNow({
+                includeClub: includeClubByDefault(),
+            });
+        }
     } catch (e) {
-        console.error("Warm build failed:", e?.message || e);
+        console.error(
+            "Warm build failed:",
+            e?.message || e
+        );
     } finally {
         building = false;
     }
