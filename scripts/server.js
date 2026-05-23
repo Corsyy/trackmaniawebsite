@@ -163,7 +163,7 @@ const TMX_CACHE_FILE =
 
 const TMX_PAGE_LIMIT = Math.max(
     1,
-    Number(process.env.TMX_PAGE_LIMIT || 250)
+    Number(process.env.TMX_PAGE_LIMIT || 25)
 );
 
 const TMX_ENABLE =
@@ -867,7 +867,7 @@ function loadWeeklyEventMaps(dir, sourceType) {
 async function fetchTMXPage(page = 1) {
     try {
         const url =
-            `https://trackmania.exchange/mapsearch2/search?api=on&page=${page}`;
+            `https://trackmania.exchange/mapsearch2/search?api=on&mode=1&page=${page}`
 
         const response =
             await fetchWithTimeout(
