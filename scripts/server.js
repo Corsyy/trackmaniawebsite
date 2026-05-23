@@ -1816,6 +1816,36 @@ app.get("/api/ready", async (req, res) => {
         });
     }
 });
+(async () => {
+    try {
+        building = true;
+
+        const accessToken =
+            await getLiveAccessToken();
+
+        await computeUniversalMapIndex(
+            accessToken
+        );
+
+        wrCache = {
+            ts: Date.now(),
+            rows: [],
+        };
+
+        building = false;
+
+        console.log(
+            `Loaded ${metaCache.mapMeta.size} maps`
+        );
+    } catch (e) {
+        building = false;
+
+        console.error(
+            "Startup build failed:",
+            e?.message || e
+        );
+    }
+})();
 setInterval(async () => {
     try {
         const accessToken =
