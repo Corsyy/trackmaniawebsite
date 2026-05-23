@@ -1351,6 +1351,45 @@ async function fetchMapWR(
         return null;
     }
 }
+async function resolveDisplayNames(
+    accountIds
+) {
+    try {
+        const ids =
+            [...new Set(accountIds)]
+                .filter(Boolean)
+                .slice(0, 50);
+
+        if (!ids.length) {
+            return {};
+        }
+
+        const qs =
+            ids.map(
+                (id) =>
+                    `accountId[]=${encodeURIComponent(id)}`
+            ).join("&");
+
+        const response =
+            await fetch(
+                `https://api.trackmania.com/api/display-names?${qs}`,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${await getOAuthToken()}`
+                    }
+                }
+            );
+
+        if (!response.ok) {
+            return {};
+        }
+
+        return await response.json();
+    } catch {
+        return {};
+    }
+}
 
 async function computeUniversalMapIndex(
     accessToken,
@@ -1814,7 +1853,18 @@ async function refreshWRCache(
             () => worker()
         )
     );
+    const names =
+        await resolveDisplayNames(
+            rows.map(
+                (r) => r.accountId
+            )
+        );
 
+    for (const row of rows) {
+        row.displayName =
+            names[row.accountId] ||
+            row.accountId;
+    }
     wrCache = {
         ts: Date.now(),
         rows,
@@ -1837,7 +1887,108 @@ async function refreshWRCache(
         `[WR] Loaded ${rows.length} WR rows`
     );
 }
+async function harvestAllWRs(
+    accessToken
+) {
+    const rows =
+        [...wrCache.rows];
 
+    const existing =
+        new Set(
+            rows.map(
+                (r) => r.mapUid
+            )
+        );
+
+    const mapUids =
+        metaCache.allMapUids.filter(
+            (uid) =>
+                !existing.has(uid)
+        );
+
+    console.log(
+        `[WR] Starting full harvest (${mapUids.length} maps)`
+    );
+
+    let index = 0;
+
+    async function worker() {
+        while (
+            index < mapUids.length
+        ) {
+            const mapUid =
+                mapUids[index++];
+
+            try {
+                const row =
+                    await fetchMapWR(
+                        accessToken,
+                        mapUid
+                    );
+
+                const clean =
+                    sanitizeRow(
+                        row
+                    );
+
+                if (clean) {
+                    rows.push(
+                        clean
+                    );
+                }
+            } catch { }
+
+            if (
+                rows.length % 100 === 0
+            ) {
+                wrCache = {
+                    ts: Date.now(),
+                    rows,
+                };
+
+                writeJson(
+                    DISK_WR,
+                    wrCache
+                );
+
+                console.log(
+                    `[WR] Harvested ${rows.length}`
+                );
+            }
+
+            await new Promise(
+                (resolve) =>
+                    setTimeout(
+                        resolve,
+                        75
+                    )
+            );
+        }
+    }
+
+    await Promise.all(
+        Array.from(
+            {
+                length: 4
+            },
+            () => worker()
+        )
+    );
+
+    wrCache = {
+        ts: Date.now(),
+        rows,
+    };
+
+    writeJson(
+        DISK_WR,
+        wrCache
+    );
+
+    console.log(
+        `[WR] Full harvest complete (${rows.length})`
+    );
+}
 function inferSourceType(
     uid
 ) {
@@ -1967,6 +2118,9 @@ app.get("/api/ready", async (req, res) => {
         await refreshWRCache(
             accessToken
         );
+        harvestAllWRs(
+            accessToken
+        ).catch(console.error);
         building = false;
 
         console.log(
@@ -2001,23 +2155,6 @@ setInterval(async () => {
     }
 }, 1000 * 60 * 30);
 ;
-app.get("/api/admin/clear-tmx-cache", (req, res) => {
-    const auth = req.headers["x-admin-secret"] || req.query.secret;
-
-    if (!ADMIN_SECRET || auth !== ADMIN_SECRET) {
-        return res.status(403).json({ ok: false, error: "forbidden" });
-    }
-
-    try {
-        if (fs.existsSync(TMX_CACHE_FILE)) {
-            fs.unlinkSync(TMX_CACHE_FILE);
-        }
-
-        res.json({ ok: true, deleted: TMX_CACHE_FILE });
-    } catch (e) {
-        res.status(500).json({ ok: false, error: e?.message || String(e) });
-    }
-});
 app.get("/api/recent-wrs", (req, res) => {
     const rows =
         [...wrCache.rows]
