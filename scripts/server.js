@@ -1308,7 +1308,7 @@ async function fetchMapWR(
         const url =
             `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(
                 mapUid
-            )}/top?length=1&offset=0`;
+            )}/top`;
 
         const json =
             await jget(
@@ -1967,12 +1967,6 @@ app.get("/api/ready", async (req, res) => {
         await refreshWRCache(
             accessToken
         );
-
-        wrCache = {
-            ts: Date.now(),
-            rows: [],
-        };
-
         building = false;
 
         console.log(
