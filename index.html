@@ -23,12 +23,14 @@
 <style>
 .auth-user-dropdown {
   position: relative;
+  display: inline-flex;
 }
 
 .auth-user-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: .45rem;
+  white-space: nowrap;
 }
 
 .auth-caret {
@@ -40,17 +42,18 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  min-width: 220px;
-  background: rgba(10,16,28,.98);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
-  padding: .7rem;
+  min-width: 230px;
   display: none;
   flex-direction: column;
   gap: .45rem;
-  z-index: 9999;
-  box-shadow: 0 12px 35px rgba(0,0,0,.45);
-  backdrop-filter: blur(18px);
+  z-index: 999999;
+  padding: .7rem;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  background: rgba(10,16,28,.98);
+  box-shadow: 0 18px 45px rgba(0,0,0,.45);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
 }
 
 .auth-user-menu.show {
@@ -69,27 +72,37 @@
 .auth-user-info strong {
   color: #fff;
   font-size: .95rem;
+  font-weight: 900;
 }
 
 .auth-user-info span {
-  color: rgba(255,255,255,.6);
+  color: rgba(255,255,255,.62);
   font-size: .82rem;
   word-break: break-word;
 }
 
 .auth-user-menu button {
+  width: 100%;
   border: 0;
-  background: rgba(255,255,255,.04);
+  background: rgba(255,255,255,.045);
   color: #fff;
-  padding: .75rem .85rem;
+  padding: .72rem .82rem;
   border-radius: 12px;
   text-align: left;
   cursor: pointer;
-  transition: .18s ease;
+  font-weight: 800;
+  transition: background .16s ease, transform .16s ease;
 }
 
 .auth-user-menu button:hover {
-  background: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.085);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .auth-user-dropdown {
+    display: none;
+  }
 }
 </style>
 
@@ -112,24 +125,22 @@
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
       <div class="cta" id="authArea">
-        
-<div class="auth-user-dropdown">
-  <button id="authUserBtn" class="btn auth-user-btn" type="button">
+        <div class="auth-user-dropdown">
+  <button id="authUserBtn" class="btn auth-user-btn" type="button" aria-expanded="false" aria-controls="authUserMenu">
     <span id="authUserLabel">Login / Register</span>
-    <span class="auth-caret">▾</span>
+    <span class="auth-caret" aria-hidden="true">▾</span>
   </button>
 
-  <div id="authUserMenu" class="auth-user-menu">
+  <div id="authUserMenu" class="auth-user-menu" role="menu">
     <div class="auth-user-info">
       <strong id="authMenuUsername">Guest</strong>
       <span id="authMenuEmail"></span>
     </div>
 
-    <button id="authMenuAccountBtn" type="button">Account</button>
-    <button id="authMenuLogoutBtn" type="button">Logout</button>
+    <button id="authMenuAccountBtn" type="button" role="menuitem">Account</button>
+    <button id="authMenuLogoutBtn" type="button" role="menuitem">Logout</button>
   </div>
 </div>
-
         <a class="btn" href="#contact">Contact</a>
       </div>
     </div>
@@ -3133,122 +3144,150 @@
 
 <script>
 (function () {
-  const authUserBtn = document.getElementById("authUserBtn");
-  const authUserMenu = document.getElementById("authUserMenu");
-  const authUserLabel = document.getElementById("authUserLabel");
-  const authMenuUsername = document.getElementById("authMenuUsername");
-  const authMenuEmail = document.getElementById("authMenuEmail");
-  const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
+  function getSupabaseClient() {
+    if (window.tmeSupabase) return window.tmeSupabase;
+    if (typeof tmeSupabase !== "undefined" && tmeSupabase) return tmeSupabase;
+    return null;
+  }
 
-  async function updateDropdownUser() {
-    if (!window.tmeSupabase && !window.supabase && typeof tmeSupabase === "undefined") return;
+  function getDisplayName(user) {
+    return (
+      user?.user_metadata?.username ||
+      user?.user_metadata?.name ||
+      user?.email?.split("@")[0] ||
+      "User"
+    );
+  }
 
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+  function openExistingAuthModal() {
+    const modal = document.getElementById("authModal");
+    if (!modal) return;
+    modal.classList.add("show");
+    modal.classList.add("open");
+    document.body.classList.add("modal-open");
+  }
 
-    if (!sb) return;
+  function closeAccountMenu() {
+    const menu = document.getElementById("authUserMenu");
+    const btn = document.getElementById("authUserBtn");
+    menu?.classList.remove("show");
+    btn?.setAttribute("aria-expanded", "false");
+  }
+
+  async function updateAccountDropdown() {
+    const sb = getSupabaseClient();
+    const label = document.getElementById("authUserLabel");
+    const usernameEl = document.getElementById("authMenuUsername");
+    const emailEl = document.getElementById("authMenuEmail");
+    const logoutBtn = document.getElementById("authMenuLogoutBtn");
+    const accountBtn = document.getElementById("authMenuAccountBtn");
+
+    if (!label || !usernameEl || !emailEl) return;
+
+    if (!sb) {
+      label.textContent = "Login / Register";
+      usernameEl.textContent = "Guest";
+      emailEl.textContent = "";
+      return;
+    }
 
     const { data } = await sb.auth.getUser();
     const user = data?.user;
 
     if (!user) {
-      authUserLabel.textContent = "Login / Register";
-      authMenuUsername.textContent = "Guest";
-      authMenuEmail.textContent = "";
+      label.textContent = "Login / Register";
+      usernameEl.textContent = "Guest";
+      emailEl.textContent = "";
+      if (logoutBtn) logoutBtn.style.display = "none";
+      if (accountBtn) accountBtn.style.display = "none";
       return;
     }
 
-    const username =
-      user.user_metadata?.username ||
-      user.email?.split("@")[0] ||
-      "User";
-
-    authUserLabel.textContent = username;
-    authMenuUsername.textContent = username;
-    authMenuEmail.textContent = user.email || "";
+    const displayName = getDisplayName(user);
+    label.textContent = displayName;
+    usernameEl.textContent = displayName;
+    emailEl.textContent = user.email || "";
+    if (logoutBtn) logoutBtn.style.display = "";
+    if (accountBtn) accountBtn.style.display = "";
   }
 
-  authUserBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+  function initAccountDropdown() {
+    const btn = document.getElementById("authUserBtn");
+    const menu = document.getElementById("authUserMenu");
+    const logoutBtn = document.getElementById("authMenuLogoutBtn");
+    const accountBtn = document.getElementById("authMenuAccountBtn");
 
-    if (!sb) return;
+    if (!btn || !menu || btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
 
-    const { data } = await sb.auth.getUser();
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (!data?.user) {
-      document.getElementById("authModal")?.classList.add("open");
-      return;
-    }
+      const sb = getSupabaseClient();
+      if (!sb) {
+        openExistingAuthModal();
+        return;
+      }
 
-    authUserMenu?.classList.toggle("show");
-  });
+      const { data } = await sb.auth.getUser();
 
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".auth-user-dropdown")) {
-      authUserMenu?.classList.remove("show");
-    }
-  });
+      if (!data?.user) {
+        closeAccountMenu();
+        openExistingAuthModal();
+        return;
+      }
 
-  document.getElementById("authMenuAccountBtn")?.addEventListener("click", () => {
-    authUserMenu?.classList.remove("show");
-  });
-
-  authMenuLogoutBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-    if (!sb) return;
-
-    await sb.auth.signOut();
-    authUserMenu?.classList.remove("show");
-    updateDropdownUser();
-
-    window.location.reload();
-  });
-
-  setTimeout(updateDropdownUser, 500);
-
-  const sb =
-    window.tmeSupabase ||
-    window.supabase ||
-    (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-  if (sb) {
-    sb.auth.onAuthStateChange(() => {
-      updateDropdownUser();
+      const isOpen = menu.classList.toggle("show");
+      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
-  }
-})();
-</script>
 
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".auth-user-dropdown")) {
+        closeAccountMenu();
+      }
+    });
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const authUserBtn = document.getElementById("authUserBtn");
+    accountBtn?.addEventListener("click", () => {
+      closeAccountMenu();
+      openExistingAuthModal();
+    });
 
-  authUserBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+    logoutBtn?.addEventListener("click", async () => {
+      const sb = getSupabaseClient();
+      if (!sb) return;
 
-    if (!sb) return;
+      await sb.auth.signOut();
+      localStorage.removeItem("tme_login_started_at");
+      closeAccountMenu();
+      await updateAccountDropdown();
 
-    const { data } = await sb.auth.getUser();
+      if (typeof updateAuthUI === "function") {
+        await updateAuthUI();
+      }
 
-    if (!data?.user) {
-      const authModal = document.getElementById("authModal");
-      authModal?.classList.add("open");
-      document.body.classList.add("modal-open");
+      window.location.reload();
+    });
+
+    const sb = getSupabaseClient();
+    if (sb) {
+      sb.auth.onAuthStateChange(() => {
+        updateAccountDropdown();
+      });
     }
-  });
-});
+
+    updateAccountDropdown();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAccountDropdown);
+  } else {
+    initAccountDropdown();
+  }
+
+  setTimeout(initAccountDropdown, 400);
+  setTimeout(updateAccountDropdown, 700);
+})();
 </script>
 
 </body>
