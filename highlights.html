@@ -13,6 +13,80 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="stylesheet" href="/style.css">
+
+<style>
+.auth-user-dropdown {
+  position: relative;
+}
+
+.auth-user-btn {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+.auth-caret {
+  font-size: .8rem;
+  opacity: .8;
+}
+
+.auth-user-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: rgba(10,16,28,.98);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: .7rem;
+  display: none;
+  flex-direction: column;
+  gap: .45rem;
+  z-index: 9999;
+  box-shadow: 0 12px 35px rgba(0,0,0,.45);
+  backdrop-filter: blur(18px);
+}
+
+.auth-user-menu.show {
+  display: flex;
+}
+
+.auth-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding-bottom: .55rem;
+  margin-bottom: .35rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.auth-user-info strong {
+  color: #fff;
+  font-size: .95rem;
+}
+
+.auth-user-info span {
+  color: rgba(255,255,255,.6);
+  font-size: .82rem;
+  word-break: break-word;
+}
+
+.auth-user-menu button {
+  border: 0;
+  background: rgba(255,255,255,.04);
+  color: #fff;
+  padding: .75rem .85rem;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.auth-user-menu button:hover {
+  background: rgba(255,255,255,.08);
+}
+</style>
+
 </head>
 
 <body class="bg-aurora">
@@ -36,7 +110,24 @@
       </nav>
 
       <div class="cta" id="authArea">
-        <button class="btn auth-open" type="button">Login / Register</button>
+        
+<div class="auth-user-dropdown">
+  <button id="authUserBtn" class="btn auth-user-btn" type="button">
+    <span id="authUserLabel">Login / Register</span>
+    <span class="auth-caret">▾</span>
+  </button>
+
+  <div id="authUserMenu" class="auth-user-menu">
+    <div class="auth-user-info">
+      <strong id="authMenuUsername">Guest</strong>
+      <span id="authMenuEmail"></span>
+    </div>
+
+    <button id="authMenuAccountBtn" type="button">Account</button>
+    <button id="authMenuLogoutBtn" type="button">Logout</button>
+  </div>
+</div>
+
         <a href="/" class="btn ghost">Home</a>
         <button id="openModal" class="btn primary" type="button">Submit Highlight</button>
       </div>
@@ -748,6 +839,104 @@
 
     updateAuthUI();
   </script>
+
+
+<script>
+(function () {
+  const authUserBtn = document.getElementById("authUserBtn");
+  const authUserMenu = document.getElementById("authUserMenu");
+  const authUserLabel = document.getElementById("authUserLabel");
+  const authMenuUsername = document.getElementById("authMenuUsername");
+  const authMenuEmail = document.getElementById("authMenuEmail");
+  const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
+
+  async function updateDropdownUser() {
+    if (!window.tmeSupabase && !window.supabase && typeof tmeSupabase === "undefined") return;
+
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    const { data } = await sb.auth.getUser();
+    const user = data?.user;
+
+    if (!user) {
+      authUserLabel.textContent = "Login / Register";
+      authMenuUsername.textContent = "Guest";
+      authMenuEmail.textContent = "";
+      return;
+    }
+
+    const username =
+      user.user_metadata?.username ||
+      user.email?.split("@")[0] ||
+      "User";
+
+    authUserLabel.textContent = username;
+    authMenuUsername.textContent = username;
+    authMenuEmail.textContent = user.email || "";
+  }
+
+  authUserBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    const { data } = await sb.auth.getUser();
+
+    if (!data?.user) {
+      document.getElementById("authModal")?.classList.add("open");
+      return;
+    }
+
+    authUserMenu?.classList.toggle("show");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".auth-user-dropdown")) {
+      authUserMenu?.classList.remove("show");
+    }
+  });
+
+  document.getElementById("authMenuAccountBtn")?.addEventListener("click", () => {
+    authUserMenu?.classList.remove("show");
+  });
+
+  authMenuLogoutBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    await sb.auth.signOut();
+    authUserMenu?.classList.remove("show");
+    updateDropdownUser();
+
+    window.location.reload();
+  });
+
+  setTimeout(updateDropdownUser, 500);
+
+  const sb =
+    window.tmeSupabase ||
+    window.supabase ||
+    (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+  if (sb) {
+    sb.auth.onAuthStateChange(() => {
+      updateDropdownUser();
+    });
+  }
+})();
+</script>
 
 </body>
 
