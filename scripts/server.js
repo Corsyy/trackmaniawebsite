@@ -517,20 +517,38 @@ async function getTMXMapUids() {
     const disk = loadJson(DISK_TMX);
 
     let state = {
-        lastId: TMX_START_ID,
-        uids: [],
+        newestIdScanned: TMX_START_ID,
+        oldestIdScanned: TMX_START_ID,
+        maps: {},
     };
 
-    if (disk?.lastId && Array.isArray(disk?.uids)) {
+    if (
+        typeof disk?.newestIdScanned === "number" &&
+        typeof disk?.oldestIdScanned === "number" &&
+        typeof disk?.maps === "object"
+    ) {
         state = disk;
     }
 
-    const discovered = new Set(state.uids);
+    const maps = state.maps || {};
 
-    const start = state.lastId;
-    const end = Math.max(0, start - TMX_FETCH_COUNT);
+    /* ---------------- FORWARD CRAWL ---------------- */
 
-    for (let id = start; id >= end; id--) {
+    const forwardStart =
+        state.newestIdScanned + 1;
+
+    const forwardEnd =
+        forwardStart + TMX_FETCH_COUNT;
+
+    console.log(
+        `[TMX FORWARD] ${forwardStart} -> ${forwardEnd}`
+    );
+
+    for (
+        let id = forwardStart;
+        id <= forwardEnd;
+        id++
+    ) {
         try {
             const r = await fetchWithTimeout(
                 `https://trackmania.exchange/api/maps/get_map_info/id/${id}`,
@@ -554,7 +572,12 @@ async function getTMXMapUids() {
                 j?.uid;
 
             if (uid) {
-                discovered.add(uid);
+                if (!maps[uid]) {
+                    maps[uid] = {
+                        hasWR: false,
+                        lastChecked: 0,
+                    };
+                }
             }
         } catch { }
 
@@ -565,18 +588,79 @@ async function getTMXMapUids() {
         }
     }
 
-    const result = {
-        lastId: end,
-        uids: Array.from(discovered),
-    };
+    state.newestIdScanned =
+        forwardEnd;
 
-    saveJson(DISK_TMX, result);
+    /* ---------------- BACKWARD CRAWL ---------------- */
+
+    const backwardStart =
+        state.oldestIdScanned;
+
+    const backwardEnd =
+        Math.max(
+            0,
+            backwardStart - TMX_FETCH_COUNT
+        );
 
     console.log(
-        `[TMX] Stored ${result.uids.length} TMX UIDs`
+        `[TMX BACKWARD] ${backwardStart} -> ${backwardEnd}`
     );
 
-    return result.uids;
+    for (
+        let id = backwardStart;
+        id >= backwardEnd;
+        id--
+    ) {
+        try {
+            const r = await fetchWithTimeout(
+                `https://trackmania.exchange/api/maps/get_map_info/id/${id}`,
+                {
+                    headers: {
+                        "User-Agent":
+                            "trackmaniaevents.com",
+                        Accept: "application/json",
+                    },
+                },
+                10000
+            );
+
+            if (!r.ok) continue;
+
+            const j = await r.json();
+
+            const uid =
+                j?.TrackUID ||
+                j?.trackuid ||
+                j?.uid;
+
+            if (uid) {
+                if (!maps[uid]) {
+                    maps[uid] = {
+                        hasWR: false,
+                        lastChecked: 0,
+                    };
+                }
+            }
+        } catch { }
+
+        if (id % 25 === 0) {
+            await new Promise((r) =>
+                setTimeout(r, 100)
+            );
+        }
+    }
+
+    state.oldestIdScanned =
+        backwardEnd;
+
+    saveJson(DISK_TMX, state);
+
+    console.log(
+        `[TMX] Stored ${Object.keys(maps).length
+        } TMX maps`
+    );
+
+    return Object.keys(maps);
 }
 
 async function fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet) {
@@ -915,7 +999,28 @@ app.post("/api/admin/set-refresh", express.json(), (req, res) => {
         res.status(500).json({ ok: false, error: String(e) });
     }
 });
+app.post("/api/reset-tmx", (_req, res) => {
+    try {
+        if (fs.existsSync(DISK_TMX)) {
+            fs.unlinkSync(DISK_TMX);
+        }
 
+        metaCache.tmxSet = new Set();
+        metaCache.tmxMaps = {};
+        metaCache.allMapUids = [];
+
+        res.json({
+            ok: true,
+            deleted: true,
+            path: DISK_TMX,
+        });
+    } catch (e) {
+        res.status(500).json({
+            ok: false,
+            error: e?.message || String(e),
+        });
+    }
+});
 // Common middleware: ensure cache once; never block responses later
 async function ensureCacheOnce(_req, res, next) {
     try {
@@ -1186,22 +1291,4 @@ process.on("unhandledRejection", (err) => console.error("UNHANDLED_REJECTION:", 
 process.on("uncaughtException", (err) => console.error("UNCAUGHT_EXCEPTION:", err));
 
 const PORT = process.env.PORT || 3000;
-app.post("/api/reset-tmx", (_req, res) => {
-    try {
-        saveJson(DISK_TMX, {
-            lastId: TMX_START_ID,
-            uids: [],
-        });
-
-        res.json({
-            ok: true,
-            message: "TMX cache reset",
-        });
-    } catch (e) {
-        res.status(500).json({
-            ok: false,
-            error: e?.message || String(e),
-        });
-    }
-});
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ API running on port ${PORT}`));
