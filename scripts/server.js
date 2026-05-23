@@ -867,7 +867,7 @@ function loadWeeklyEventMaps(dir, sourceType) {
 async function fetchTMXPage(page = 1) {
     try {
         const url =
-            `https://trackmania.exchange/api/maps/search?page=${page}`;
+            `https://trackmania.exchange/mapsearch2/search?api=on&page=${page}`;
 
         const response =
             await fetchWithTimeout(
@@ -882,34 +882,34 @@ async function fetchTMXPage(page = 1) {
             );
 
         if (!response.ok) {
+            console.error(
+                `TMX failed ${response.status}`
+            );
+
             return [];
         }
 
         const json =
             await response.json();
 
-        if (!Array.isArray(json)) {
-            return [];
-        }
+        const results =
+            json?.results || [];
 
-        return json.map((m) => ({
+        return results.map((m) => ({
             mapUid:
                 m.TrackUID,
             tmxId:
                 m.TrackID,
             name:
-                m.Name ||
-                null,
+                m.Name || null,
             author:
-                m.Username ||
-                null,
+                m.Username || null,
             authorTime:
-                m.AuthorTime ||
-                null,
+                m.AuthorTime || null,
             uploadedAt:
-                m.UploadedAt ||
-                null,
+                m.UploadedAt || null,
             thumbnailUrl:
+                m.ThumbnailURL ||
                 m.ThumbnailUrl ||
                 null,
             tags:
@@ -1823,6 +1823,23 @@ app.get("/api/ready", async (req, res) => {
         );
     }
 })();
+app.post("/api/admin/clear-tmx-cache", (req, res) => {
+    const auth = req.headers["x-admin-secret"] || req.query.secret;
+
+    if (!ADMIN_SECRET || auth !== ADMIN_SECRET) {
+        return res.status(403).json({ ok: false, error: "forbidden" });
+    }
+
+    try {
+        if (fs.existsSync(TMX_CACHE_FILE)) {
+            fs.unlinkSync(TMX_CACHE_FILE);
+        }
+
+        res.json({ ok: true, deleted: TMX_CACHE_FILE });
+    } catch (e) {
+        res.status(500).json({ ok: false, error: e?.message || String(e) });
+    }
+});
 app.listen(
     process.env.PORT || 3000,
     () => {
