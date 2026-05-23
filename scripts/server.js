@@ -450,7 +450,7 @@ async function resolveDisplayNames(_liveAccessToken, ids) {
 
 /* ------------------------- Cache & disk -------------------- */
 let wrCache = { ts: 0, rows: [] };
-let metaCache = { officialSet: new Set(), clubSet: new Set(), tmxSet: new Set(), allMapUids: [] };
+let metaCache = { officialSet: new Set(), clubSet: new Set(), tmxSet: new Set(), tmxMaps: {}, allMapUids: [] };
 
 const WR_CONCURRENCY = Number(process.env.WR_CONCURRENCY || 8);
 const CLUB_UID_TTL = Number(process.env.CLUB_UID_TTL_HOURS || 24) * 3600 * 1000;
@@ -508,24 +508,32 @@ async function computeAllMapUids(access, { includeClub }) {
         }
         clubSet = new Set(clubUids);
     }
-    tmxUids = await getTMXMapUids();
+    const tmxState =
+        loadJson(DISK_TMX);
+
+    tmxUids =
+        await getTMXMapUids();
     tmxSet = new Set(tmxUids);
     const allMapUids = Array.from(new Set([...officialSet, ...totdUids, ...clubSet, ...tmxSet]));
-    return { officialSet, clubSet, tmxSet, allMapUids };
+    return { officialSet, clubSet, tmxSet, tmxMaps: tmxState?.maps || {}, allMapUids };
 }
 async function getTMXMapUids() {
     const disk = loadJson(DISK_TMX);
 
     let state = {
         lastId: TMX_START_ID,
-        uids: [],
+        maps: {},
     };
 
-    if (disk?.lastId && Array.isArray(disk?.uids)) {
+    if (
+        disk?.lastId &&
+        typeof disk?.maps === "object"
+    ) {
         state = disk;
     }
 
-    const discovered = new Set(state.uids);
+    const maps =
+        state.maps || {};
 
     const start = state.lastId;
     const end = Math.max(0, start - TMX_FETCH_COUNT);
@@ -554,7 +562,12 @@ async function getTMXMapUids() {
                 j?.uid;
 
             if (uid) {
-                discovered.add(uid);
+                if (!maps[uid]) {
+                    maps[uid] = {
+                        hasWR: false,
+                        lastChecked: 0,
+                    };
+                }
             }
         } catch { }
 
@@ -567,16 +580,17 @@ async function getTMXMapUids() {
 
     const result = {
         lastId: end,
-        uids: Array.from(discovered),
+        maps,
     };
 
     saveJson(DISK_TMX, result);
 
     console.log(
-        `[TMX] Stored ${result.uids.length} TMX UIDs`
+        `[TMX] Stored ${Object.keys(result.maps).length
+        } TMX maps`
     );
 
-    return result.uids;
+    return Object.keys(result.maps);
 }
 
 async function fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet) {
@@ -613,7 +627,7 @@ function swapCache(rows) {
 
 async function buildAllWRs({ includeClub = true } = {}) {
     const access = await getLiveAccessToken();
-    const { officialSet, clubSet, tmxSet, allMapUids } = await computeAllMapUids(access, { includeClub });
+    const { officialSet, clubSet, tmxSet, tmxMaps, allMapUids } = await computeAllMapUids(access, { includeClub });
     const wrs = await fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet);
 
     const ids = wrs.map((r) => r.accountId).filter(Boolean);
@@ -621,7 +635,7 @@ async function buildAllWRs({ includeClub = true } = {}) {
     for (const r of wrs) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
     swapCache(wrs);
-    metaCache = { officialSet, clubSet, tmxSet, allMapUids };
+    metaCache = { officialSet, clubSet, tmxSet, tmxMaps, allMapUids };
     return wrCache.rows;
 }
 
@@ -654,17 +668,17 @@ function diffAndMergeByMap(oldRows, newRows) {
 async function rebuildNow({ includeClub }) {
     const access = await getLiveAccessToken();
 
-    let { officialSet, clubSet, tmxSet, allMapUids } = metaCache;
+    let { officialSet, clubSet, tmxSet, tmxMaps, allMapUids } = metaCache;
     if (!allMapUids.length || (includeClub && clubSet.size === 0)) {
         const meta = await computeAllMapUids(access, { includeClub });
         officialSet = meta.officialSet;
         clubSet = meta.clubSet;
         tmxSet = meta.tmxSet;
         allMapUids = meta.allMapUids;
-        metaCache = { officialSet, clubSet, tmxSet, allMapUids };
+        metaCache = { officialSet, clubSet, tmxSet, tmxMaps, allMapUids };
     }
 
-    const newRows = await fetchAllWRs(access, allMapUids, officialSet, tmxSet, clubSet);
+    const newRows = await fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet);
     const ids = newRows.map((r) => r.accountId).filter(Boolean);
     await resolveDisplayNames(access, ids);
     for (const r of newRows) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
@@ -695,6 +709,18 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
             const row = sanitizeRow(await getMapWR(access, prev.mapUid));
             if (!row) return null;
             row.sourceType = prev.sourceType;
+            if (
+                metaCache?.tmxMaps?.[uid]
+            ) {
+                metaCache.tmxMaps[
+                    uid
+                ].hasWR = true;
+
+                metaCache.tmxMaps[
+                    uid
+                ].lastChecked =
+                    Date.now();
+            }
             return row;
         })
     );
@@ -795,7 +821,7 @@ async function maybeRefreshUidUniverse() {
     wrCache = { ts: Date.now(), rows: merged };
 
     const combined = new Set([...metaCache.allMapUids, ...newUids]);
-    metaCache = { officialSet, clubSet, tmxSet, allMapUids: Array.from(combined) };
+    metaCache = { officialSet, clubSet, tmxSet, tmxMaps, allMapUids: Array.from(combined) };
 }
 
 /* -------------------- Warm start & background build -------- */
