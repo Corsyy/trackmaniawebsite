@@ -2272,6 +2272,27 @@ app.get("/api/wr-players", (req, res) => {
         }
     );
 });
+app.get("/api/recent-wrs", (req, res) => {
+    const rows =
+        [...wrCache.rows]
+            .sort(
+                (a, b) =>
+                    b.timestamp -
+                    a.timestamp
+            )
+            .slice(0, 100);
+
+    sendJsonETag(
+        req,
+        res,
+        {
+            ok: true,
+            rows,
+            fetchedAt:
+                Date.now(),
+        }
+    );
+});
 app.listen(
     process.env.PORT || 3000,
     () => {
