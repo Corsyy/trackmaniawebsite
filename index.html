@@ -3228,6 +3228,29 @@
 })();
 </script>
 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const authUserBtn = document.getElementById("authUserBtn");
+
+  authUserBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    const { data } = await sb.auth.getUser();
+
+    if (!data?.user) {
+      const authModal = document.getElementById("authModal");
+      authModal?.classList.add("open");
+      document.body.classList.add("modal-open");
+    }
+  });
+});
+</script>
+
 </body>
 
 </html>
