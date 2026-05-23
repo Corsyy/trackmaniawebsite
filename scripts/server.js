@@ -60,6 +60,7 @@ const WR_EVENTS_DIR = path.join(DATA_ROOT, "wr-events");
 const FEEDS_DIR = path.join(DATA_ROOT, "feeds");
 const LEADERBOARDS_DIR = path.join(DATA_ROOT, "leaderboards");
 const METADATA_DIR = path.join(DATA_ROOT, "metadata");
+const HARVEST_STATE_FILE = path.join(METADATA_DIR, "harvest-state.json");
 const RECENT_WRS_DIR = path.join(DATA_ROOT, "recent-wrs");
 const WR_LEADERBOARD_DIR = path.join(DATA_ROOT, "wr-leaderboard");
 
@@ -866,15 +867,9 @@ function loadWeeklyEventMaps(dir, sourceType) {
 
 async function fetchTMXPage(page = 1) {
     try {
-        const from =
-            Math.max(
-                0,
-                latestKnownId - offset
-            );
-
         const url =
-            `https://trackmania.exchange/mapsearch?from=${from}`;
-            
+            `https://trackmania.exchange/mapsearch2/search?api=on&page=${page}`;
+
         const response =
             await fetchWithTimeout(
                 url,
@@ -892,7 +887,6 @@ async function fetchTMXPage(page = 1) {
             console.warn(
                 `[TMX] Failed page ${page}`
             );
-
 
             return [];
         }
@@ -964,7 +958,7 @@ async function loadTMXUniverse() {
     ];
 
     const randomStart =
-        Math.floor(Math.random() * 50) + 1;
+        Math.floor(Math.random() * 5) + 1;
 
     for (
         let page = randomStart;
@@ -1834,9 +1828,21 @@ async function refreshWRCache(
                     );
 
                 if (clean) {
-                    rows.push(
-                        clean
-                    );
+                    try {
+                        const names =
+                            await resolveDisplayNames([
+                                clean.accountId
+                            ]);
+
+                        clean.displayName =
+                            names[clean.accountId] ||
+                            clean.accountId;
+                    } catch {
+                        clean.displayName =
+                            clean.accountId;
+                    }
+
+                    rows.push(clean);
                 }
             } catch { }
 
@@ -1899,17 +1905,32 @@ async function harvestAllWRs(
     const rows =
         [...wrCache.rows];
 
-    const existing =
-        new Set(
-            rows.map(
-                (r) => r.mapUid
-            )
+    const harvestState =
+        readJson(
+            HARVEST_STATE_FILE,
+            {}
         );
+
+    const STALE_AFTER_MS =
+        1000 * 60 * 60 * 24;
+
+    const now = Date.now();
 
     const mapUids =
         metaCache.allMapUids.filter(
-            (uid) =>
-                !existing.has(uid)
+            (uid) => {
+                const state =
+                    harvestState[uid];
+
+                if (!state) {
+                    return true;
+                }
+
+                return (
+                    now -
+                    (state.lastChecked || 0)
+                ) > STALE_AFTER_MS;
+            }
         );
 
     console.log(
