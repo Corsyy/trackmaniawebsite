@@ -935,35 +935,35 @@ async function loadTMXUniverse() {
         return [];
     }
 
-   let cached =
-    readJson(
-        TMX_CACHE_FILE,
-        {
-            maps: []
-        }
-    );
+    let cached =
+        readJson(
+            TMX_CACHE_FILE,
+            {
+                maps: []
+            }
+        );
 
-   if (
-    cached &&
-    Array.isArray(cached.maps)
-) {
-    console.log(
-        `[TMX] Loaded cached maps (${cached.maps.length})`
-    );
-}
+    if (
+        cached &&
+        Array.isArray(cached.maps)
+    ) {
+        console.log(
+            `[TMX] Loaded cached maps (${cached.maps.length})`
+        );
+    }
 
     const maps = [
-    ...(cached?.maps || [])
-];
+        ...(cached?.maps || [])
+    ];
 
     const randomStart =
-    Math.floor(Math.random() * 5000);
+        Math.floor(Math.random() * 50) + 1;
 
-for (
-    let page = randomStart;
-    page < randomStart + 3;
-    page++
-) {
+    for (
+        let page = randomStart;
+        page < randomStart + 3;
+        page++
+    ) {
         const result =
             await fetchTMXPage(page);
 
@@ -971,7 +971,16 @@ for (
             break;
         }
 
-        maps.push(...result);
+        const existing = new Set(
+            maps.map((m) => m.mapUid)
+        );
+
+        for (const map of result) {
+            if (!existing.has(map.mapUid)) {
+                maps.push(map);
+                existing.add(map.mapUid);
+            }
+        }
 
         console.log(
             `[TMX] Loaded page ${page} (${maps.length} maps)`
@@ -1807,33 +1816,23 @@ app.get("/api/ready", async (req, res) => {
         });
     }
 });
-(async () => {
+setInterval(async () => {
     try {
-        building = true;
+        const accessToken =
+            await getLiveAccessToken();
 
-        const accessToken = await getLiveAccessToken();
-
-        await computeUniversalMapIndex(accessToken);
-
-        wrCache = {
-            ts: Date.now(),
-            rows: [],
-        };
-
-        building = false;
+        await computeUniversalMapIndex(
+            accessToken
+        );
 
         console.log(
-            `Loaded ${metaCache.mapMeta.size} maps`
+            "Map universe refreshed."
         );
     } catch (e) {
-        building = false;
-
-        console.error(
-            "Startup build failed:",
-            e?.message || e
-        );
+        console.error(e);
     }
-})();
+}, 1000 * 60 * 30);
+    ;
 app.get("/api/admin/clear-tmx-cache", (req, res) => {
     const auth = req.headers["x-admin-secret"] || req.query.secret;
 
