@@ -957,12 +957,11 @@ async function loadTMXUniverse() {
         ...(cached?.maps || [])
     ];
 
-    const randomStart =
-        Math.floor(Math.random() * 5) + 1;
+    const randomStart = 1;
 
     for (
         let page = randomStart;
-        page < randomStart + 3;
+        page <= 3;
         page++
     ) {
         const result =
@@ -1807,7 +1806,7 @@ async function refreshWRCache(
         );
 
     let index = 0;
-
+    let lastLoggedCount = 0;
     async function worker() {
         while (
             index < mapUids.length
@@ -2010,8 +2009,12 @@ async function harvestAllWRs(
             } catch { }
 
             if (
-                rows.length % 100 === 0
+                rows.length > 0 &&
+                rows.length % 100 === 0 &&
+                rows.length !== lastLoggedCount
             ) {
+                
+                lastLoggedCount = rows.length;
                 wrCache = {
                     ts: Date.now(),
                     rows,
@@ -2269,13 +2272,37 @@ app.get("/api/top-monthly", (req, res) => {
         }
     );
 });
+
 app.get("/api/wr-podium", (req, res) => {
-    const top =
-        [...wrCache.rows]
+    const counts = new Map();
+
+    for (const row of wrCache.rows) {
+        if (!row?.accountId) continue;
+
+        const existing =
+            counts.get(row.accountId) || {
+                accountId:
+                    row.accountId,
+                displayName:
+                    row.displayName ||
+                    row.accountId,
+                wrCount: 0,
+            };
+
+        existing.wrCount++;
+
+        counts.set(
+            row.accountId,
+            existing
+        );
+    }
+
+    const podium =
+        [...counts.values()]
             .sort(
                 (a, b) =>
-                    a.timeMs -
-                    b.timeMs
+                    b.wrCount -
+                    a.wrCount
             )
             .slice(0, 3);
 
@@ -2284,10 +2311,11 @@ app.get("/api/wr-podium", (req, res) => {
         res,
         {
             ok: true,
-            podium: top,
+            podium,
         }
     );
 });
+
 app.get("/api/wr-players", (req, res) => {
     const limit = Math.max(
         1,
