@@ -611,6 +611,18 @@ async function fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet) {
                         : tmxSet.has(uid)
                             ? "tmx"
                             : "totd";
+                if (
+                    metaCache?.tmxMaps?.[uid]
+                ) {
+                    metaCache.tmxMaps[
+                        uid
+                    ].hasWR = true;
+
+                    metaCache.tmxMaps[
+                        uid
+                    ].lastChecked =
+                        Date.now();
+                }
                 return row;
             })
         );
@@ -711,14 +723,16 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
             if (!row) return null;
             row.sourceType = prev.sourceType;
             if (
-                metaCache?.tmxMaps?.[uid]
+                metaCache?.tmxMaps?.[
+                prev.mapUid
+                ]
             ) {
                 metaCache.tmxMaps[
-                    uid
+                    prev.mapUid
                 ].hasWR = true;
 
                 metaCache.tmxMaps[
-                    uid
+                    prev.mapUid
                 ].lastChecked =
                     Date.now();
             }
@@ -757,6 +771,8 @@ async function maybeRefreshUidUniverse() {
     if (!metaCache.allMapUids.length) return;
 
     const access = await getLiveAccessToken();
+    const tmxMaps =
+        metaCache.tmxMaps || {};
     await getTMXMapUids();
 
     const official = await getAllOfficialCampaigns(access);
@@ -867,7 +883,7 @@ setInterval(
 
 setInterval(() => {
     getLiveAccessToken()
-        .catch(() => {});
+        .catch(() => { });
 }, 6 * 60 * 60 * 1000);
 
 setInterval(() => {
