@@ -834,21 +834,28 @@ async function maybeRefreshUidUniverse() {
 
 let building = false;
 async function warmBuildInBackground() {
-    if (wrCache.rows.length || building) return;
+    if (building) return;
+
     try {
         building = true;
-        await buildAllWRs({ includeClub: includeClubByDefault() });
+
+        if (!wrCache.rows.length) {
+            await buildAllWRs({
+                includeClub:
+                    includeClubByDefault()
+            });
+        } else {
+            await maybeRefreshUidUniverse();
+        }
     } catch (e) {
-        console.error("Warm build failed:", e?.message || e);
+        console.error(
+            "Warm build failed:",
+            e?.message || e
+        );
     } finally {
         building = false;
     }
 }
-warmBuildInBackground();
-setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
-setInterval(() => {
-    getLiveAccessToken().catch(() => { });
-}, 6 * 60 * 60 * 1000);
 
 /* -------------------- Debounced refresh guards ------------- */
 function makeDebounced(fn, waitMs) {
