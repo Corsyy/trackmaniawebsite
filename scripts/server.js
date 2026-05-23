@@ -883,9 +883,10 @@ async function fetchTMXPage(page = 1) {
             );
 
         if (!response.ok) {
-            console.error(
-                `TMX failed ${response.status}`
+            console.warn(
+                `[TMX] Failed page ${page}`
             );
+
 
             return [];
         }
@@ -968,9 +969,12 @@ async function loadTMXUniverse() {
             await fetchTMXPage(page);
 
         if (!result.length) {
-            break;
-        }
+            console.log(
+                `[TMX] Empty page ${page}`
+            );
 
+            continue;
+        }
         const existing = new Set(
             maps.map((m) => m.mapUid)
         );
@@ -1293,6 +1297,58 @@ async function fetchClubCampaignPlaylist(
             );
     } catch {
         return [];
+    }
+}
+
+async function fetchMapWR(
+    accessToken,
+    mapUid
+) {
+    try {
+        const url =
+            `${LIVE_BASE}/api/token/leaderboard/group/Personal_Best/map/${encodeURIComponent(
+                mapUid
+            )}/top?length=1&offset=0`;
+
+        const json =
+            await jget(
+                url,
+                accessToken
+            );
+
+        const top =
+            json?.tops?.[0]
+                ?.top?.[0];
+
+        if (!top) {
+            return null;
+        }
+
+        const timeMs =
+            Number(top.score);
+
+        if (
+            !Number.isFinite(timeMs) ||
+            timeMs <= 0
+        ) {
+            return null;
+        }
+
+        return {
+            mapUid,
+            accountId:
+                top.accountId,
+            timeMs,
+            position:
+                top.position || 1,
+            timestamp:
+                normalizeToSeconds(
+                    top.timestamp ||
+                    Date.now()
+                ),
+        };
+    } catch (e) {
+        return null;
     }
 }
 
@@ -1700,6 +1756,88 @@ async function computeUniversalMapIndex(
     return mapMeta;
 }
 
+async function refreshWRCache(
+    accessToken
+) {
+    const rows = [];
+
+    const mapUids =
+        metaCache.allMapUids.slice(
+            0,
+            QUICK_REFRESH_COUNT
+        );
+
+    let index = 0;
+
+    async function worker() {
+        while (
+            index < mapUids.length
+        ) {
+            const current =
+                mapUids[index++];
+
+            try {
+                const row =
+                    await fetchMapWR(
+                        accessToken,
+                        current
+                    );
+
+                const clean =
+                    sanitizeRow(
+                        row
+                    );
+
+                if (clean) {
+                    rows.push(
+                        clean
+                    );
+                }
+            } catch { }
+
+            await new Promise(
+                (resolve) =>
+                    setTimeout(
+                        resolve,
+                        25
+                    )
+            );
+        }
+    }
+
+    await Promise.all(
+        Array.from(
+            {
+                length:
+                    WR_CONCURRENCY,
+            },
+            () => worker()
+        )
+    );
+
+    wrCache = {
+        ts: Date.now(),
+        rows,
+    };
+
+    writeJson(
+        DISK_WR,
+        wrCache
+    );
+
+    writeJson(
+        path.join(
+            RECENT_WRS_DIR,
+            "latest.json"
+        ),
+        wrCache
+    );
+
+    console.log(
+        `[WR] Loaded ${rows.length} WR rows`
+    );
+}
+
 function inferSourceType(
     uid
 ) {
@@ -1826,6 +1964,9 @@ app.get("/api/ready", async (req, res) => {
         await computeUniversalMapIndex(
             accessToken
         );
+        await refreshWRCache(
+            accessToken
+        );
 
         wrCache = {
             ts: Date.now(),
@@ -1854,6 +1995,9 @@ setInterval(async () => {
         await computeUniversalMapIndex(
             accessToken
         );
+        await refreshWRCache(
+            accessToken
+        );
 
         console.log(
             "Map universe refreshed."
@@ -1862,7 +2006,7 @@ setInterval(async () => {
         console.error(e);
     }
 }, 1000 * 60 * 30);
-    ;
+;
 app.get("/api/admin/clear-tmx-cache", (req, res) => {
     const auth = req.headers["x-admin-secret"] || req.query.secret;
 
