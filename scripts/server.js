@@ -748,7 +748,7 @@ async function rebuildNow({ includeClub }) {
         metaCache = { officialSet, clubSet, tmxSet, allMapUids };
     }
 
-    const newRows = await fetchAllWRs(access, allMapUids, officialSet, tmxSet, clubSet);
+    const newRows = await fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet);
     const ids = newRows.map((r) => r.accountId).filter(Boolean);
     await resolveDisplayNames(access, ids);
     for (const r of newRows) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
@@ -907,7 +907,10 @@ setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
 setInterval(() => {
     getLiveAccessToken().catch(() => { });
 }, 6 * 60 * 60 * 1000);
-
+setInterval(() => {
+    getTMXMapUids()
+        .catch(console.error);
+}, 10 * 60 * 1000);
 /* -------------------- Debounced refresh guards ------------- */
 function makeDebounced(fn, waitMs) {
     let last = 0,
