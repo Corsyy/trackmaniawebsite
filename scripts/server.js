@@ -866,11 +866,8 @@ function loadWeeklyEventMaps(dir, sourceType) {
 
 async function fetchTMXPage(page = 1) {
     try {
-        const offset =
-            (page - 1) * 100;
-
         const url =
-            `https://trackmania.exchange/api/maps?count=100&after=${offset}`;
+            `https://trackmania.exchange/mapsearch2/search?api=on&mode=1&priord=8&page=${page}`;
 
         const response =
             await fetchWithTimeout(
@@ -879,6 +876,7 @@ async function fetchTMXPage(page = 1) {
                     headers: {
                         "User-Agent":
                             "trackmaniaevents.com",
+                        Accept: "application/json",
                     },
                 },
                 20000
@@ -895,11 +893,12 @@ async function fetchTMXPage(page = 1) {
         const json =
             await response.json();
 
-        if (!Array.isArray(json)) {
-            return [];
-        }
+        const results =
+            Array.isArray(json)
+                ? json
+                : json?.results || [];
 
-        return json.map((m) => ({
+        return results.map((m) => ({
             mapUid:
                 m.TrackUID,
             tmxId:
