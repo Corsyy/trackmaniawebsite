@@ -450,7 +450,7 @@ async function resolveDisplayNames(_liveAccessToken, ids) {
 
 /* ------------------------- Cache & disk -------------------- */
 let wrCache = { ts: 0, rows: [] };
-let metaCache = { officialSet: new Set(), clubSet: new Set(), tmxSet: new Set(), tmxMaps: {}, allMapUids: [] };
+let metaCache = { officialSet: new Set(), clubSet: new Set(), tmxSet: new Set(), allMapUids: [] };
 
 const WR_CONCURRENCY = Number(process.env.WR_CONCURRENCY || 8);
 const CLUB_UID_TTL = Number(process.env.CLUB_UID_TTL_HOURS || 24) * 3600 * 1000;
@@ -461,7 +461,7 @@ const DISK_WR = process.env.CACHE_PATH_WR || "/tmp/wr_cache.json";
 const DISK_CLUB = process.env.CACHE_PATH_CLUB || "/tmp/club_uids.json";
 const DISK_TMX = process.env.CACHE_PATH_TMX || "/tmp/tmx_uids.json";
 const TMX_START_ID = Number(process.env.TMX_START_ID || 318449);
-const TMX_FETCH_COUNT = Number(process.env.TMX_FETCH_COUNT || 10000);
+const TMX_FETCH_COUNT = Number(process.env.TMX_FETCH_COUNT || 2000);
 
 function loadJson(pathname) {
     try {
@@ -508,32 +508,24 @@ async function computeAllMapUids(access, { includeClub }) {
         }
         clubSet = new Set(clubUids);
     }
-    const tmxState =
-        loadJson(DISK_TMX);
-
-    tmxUids =
-        await getTMXMapUids();
+    tmxUids = await getTMXMapUids();
     tmxSet = new Set(tmxUids);
     const allMapUids = Array.from(new Set([...officialSet, ...totdUids, ...clubSet, ...tmxSet]));
-    return { officialSet, clubSet, tmxSet, tmxMaps: tmxState?.maps || {}, allMapUids };
+    return { officialSet, clubSet, tmxSet, allMapUids };
 }
 async function getTMXMapUids() {
     const disk = loadJson(DISK_TMX);
 
     let state = {
         lastId: TMX_START_ID,
-        maps: {},
+        uids: [],
     };
 
-    if (
-        disk?.lastId &&
-        typeof disk?.maps === "object"
-    ) {
+    if (disk?.lastId && Array.isArray(disk?.uids)) {
         state = disk;
     }
 
-    const maps =
-        state.maps || {};
+    const discovered = new Set(state.uids);
 
     const start = state.lastId;
     const end = Math.max(0, start - TMX_FETCH_COUNT);
@@ -562,12 +554,7 @@ async function getTMXMapUids() {
                 j?.uid;
 
             if (uid) {
-                if (!maps[uid]) {
-                    maps[uid] = {
-                        hasWR: false,
-                        lastChecked: 0,
-                    };
-                }
+                discovered.add(uid);
             }
         } catch { }
 
@@ -580,17 +567,16 @@ async function getTMXMapUids() {
 
     const result = {
         lastId: end,
-        maps,
+        uids: Array.from(discovered),
     };
 
     saveJson(DISK_TMX, result);
 
     console.log(
-        `[TMX] Stored ${Object.keys(result.maps).length
-        } TMX maps`
+        `[TMX] Stored ${result.uids.length} TMX UIDs`
     );
 
-    return Object.keys(result.maps);
+    return result.uids;
 }
 
 async function fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet) {
@@ -611,18 +597,6 @@ async function fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet) {
                         : tmxSet.has(uid)
                             ? "tmx"
                             : "totd";
-                if (
-                    metaCache?.tmxMaps?.[uid]
-                ) {
-                    metaCache.tmxMaps[
-                        uid
-                    ].hasWR = true;
-
-                    metaCache.tmxMaps[
-                        uid
-                    ].lastChecked =
-                        Date.now();
-                }
                 return row;
             })
         );
@@ -639,8 +613,7 @@ function swapCache(rows) {
 
 async function buildAllWRs({ includeClub = true } = {}) {
     const access = await getLiveAccessToken();
-    await getTMXMapUids();
-    const { officialSet, clubSet, tmxSet, tmxMaps, allMapUids } = await computeAllMapUids(access, { includeClub });
+    const { officialSet, clubSet, tmxSet, allMapUids } = await computeAllMapUids(access, { includeClub });
     const wrs = await fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet);
 
     const ids = wrs.map((r) => r.accountId).filter(Boolean);
@@ -648,7 +621,7 @@ async function buildAllWRs({ includeClub = true } = {}) {
     for (const r of wrs) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
     swapCache(wrs);
-    metaCache = { officialSet, clubSet, tmxSet, tmxMaps, allMapUids };
+    metaCache = { officialSet, clubSet, tmxSet, allMapUids };
     return wrCache.rows;
 }
 
@@ -681,17 +654,17 @@ function diffAndMergeByMap(oldRows, newRows) {
 async function rebuildNow({ includeClub }) {
     const access = await getLiveAccessToken();
 
-    let { officialSet, clubSet, tmxSet, tmxMaps, allMapUids } = metaCache;
+    let { officialSet, clubSet, tmxSet, allMapUids } = metaCache;
     if (!allMapUids.length || (includeClub && clubSet.size === 0)) {
         const meta = await computeAllMapUids(access, { includeClub });
         officialSet = meta.officialSet;
         clubSet = meta.clubSet;
         tmxSet = meta.tmxSet;
         allMapUids = meta.allMapUids;
-        metaCache = { officialSet, clubSet, tmxSet, tmxMaps, allMapUids };
+        metaCache = { officialSet, clubSet, tmxSet, allMapUids };
     }
 
-    const newRows = await fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet);
+    const newRows = await fetchAllWRs(access, allMapUids, officialSet, tmxSet, clubSet);
     const ids = newRows.map((r) => r.accountId).filter(Boolean);
     await resolveDisplayNames(access, ids);
     for (const r of newRows) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
@@ -722,20 +695,6 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
             const row = sanitizeRow(await getMapWR(access, prev.mapUid));
             if (!row) return null;
             row.sourceType = prev.sourceType;
-            if (
-                metaCache?.tmxMaps?.[
-                prev.mapUid
-                ]
-            ) {
-                metaCache.tmxMaps[
-                    prev.mapUid
-                ].hasWR = true;
-
-                metaCache.tmxMaps[
-                    prev.mapUid
-                ].lastChecked =
-                    Date.now();
-            }
             return row;
         })
     );
@@ -771,9 +730,6 @@ async function maybeRefreshUidUniverse() {
     if (!metaCache.allMapUids.length) return;
 
     const access = await getLiveAccessToken();
-    const tmxMaps =
-        metaCache.tmxMaps || {};
-    await getTMXMapUids();
 
     const official = await getAllOfficialCampaigns(access);
     const latestOfficialSet = new Set(
@@ -839,7 +795,7 @@ async function maybeRefreshUidUniverse() {
     wrCache = { ts: Date.now(), rows: merged };
 
     const combined = new Set([...metaCache.allMapUids, ...newUids]);
-    metaCache = { officialSet, clubSet, tmxSet, tmxMaps, allMapUids: Array.from(combined) };
+    metaCache = { officialSet, clubSet, tmxSet, allMapUids: Array.from(combined) };
 }
 
 /* -------------------- Warm start & background build -------- */
@@ -852,44 +808,22 @@ async function maybeRefreshUidUniverse() {
 
 let building = false;
 async function warmBuildInBackground() {
-    if (building) return;
-
+    if (wrCache.rows.length || building) return;
     try {
         building = true;
-
-        if (!wrCache.rows.length) {
-            await buildAllWRs({
-                includeClub:
-                    includeClubByDefault()
-            });
-        } else {
-            await maybeRefreshUidUniverse();
-        }
+        await buildAllWRs({ includeClub: includeClubByDefault() });
     } catch (e) {
-        console.error(
-            "Warm build failed:",
-            e?.message || e
-        );
+        console.error("Warm build failed:", e?.message || e);
     } finally {
         building = false;
     }
 }
 warmBuildInBackground();
-
-setInterval(
-    () => warmBuildInBackground(),
-    30 * 60 * 1000
-);
-
+setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
 setInterval(() => {
-    getLiveAccessToken()
-        .catch(() => { });
+    getLiveAccessToken().catch(() => { });
 }, 6 * 60 * 60 * 1000);
 
-setInterval(() => {
-    maybeRefreshUidUniverse()
-        .catch(console.error);
-}, 10 * 60 * 1000);
 /* -------------------- Debounced refresh guards ------------- */
 function makeDebounced(fn, waitMs) {
     let last = 0,
