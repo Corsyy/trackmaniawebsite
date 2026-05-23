@@ -408,16 +408,33 @@ async function getMapWR(accessToken, mapUid) {
 const nameCache = new Map();
 
 async function resolveDisplayNames(_liveAccessToken, ids) {
-    const all = Array.from(new Set((ids || []).filter(Boolean)));
-    const need = all.filter((id) => !nameCache.has(id));
+    const all = Array.from(
+        new Set((ids || []).filter(Boolean))
+    );
+
+    const need = all.filter((id) => {
+        const cached = nameCache.get(id);
+
+        return (
+            !cached ||
+            cached === id
+        );
+    });
+
     if (!need.length) return nameCache;
 
     const oToken = await getOAuthToken();
+
     const CHUNK = 50;
+
     for (let i = 0; i < need.length; i += CHUNK) {
         const batch = need.slice(i, i + CHUNK);
+
         const params = new URLSearchParams();
-        for (const id of batch) params.append("accountId[]", id);
+
+        for (const id of batch) {
+            params.append("accountId[]", id);
+        }
 
         try {
             const r = await fetchWithTimeout(
@@ -426,25 +443,45 @@ async function resolveDisplayNames(_liveAccessToken, ids) {
                     headers: {
                         Authorization: `Bearer ${oToken}`,
                         Accept: "application/json",
-                        "User-Agent": "trackmaniaevents.com/1.0 (Render)",
+                        "User-Agent":
+                            "trackmaniaevents.com/1.0 (Render)",
                     },
                 },
                 15000
             );
+
             if (!r.ok) {
-                for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
+                console.log(
+                    `[NAMES] Failed batch ${r.status}`
+                );
+
                 continue;
             }
+
             const j = await r.json();
+
             for (const id of batch) {
                 const dn = j?.[id];
-                nameCache.set(id, (typeof dn === "string" && dn) || id);
+
+                if (
+                    typeof dn === "string" &&
+                    dn.trim()
+                ) {
+                    nameCache.set(id, dn.trim());
+                }
             }
-        } catch {
-            for (const id of batch) if (!nameCache.has(id)) nameCache.set(id, id);
+        } catch (e) {
+            console.log(
+                "[NAMES] Resolve failed:",
+                e?.message || e
+            );
         }
-        await new Promise((r) => setTimeout(r, 40));
+
+        await new Promise((r) =>
+            setTimeout(r, 40)
+        );
     }
+
     return nameCache;
 }
 
@@ -461,7 +498,7 @@ const DISK_WR = process.env.CACHE_PATH_WR || "/tmp/wr_cache.json";
 const DISK_CLUB = process.env.CACHE_PATH_CLUB || "/tmp/club_uids.json";
 const DISK_TMX = process.env.CACHE_PATH_TMX || "/tmp/tmx_uids.json";
 const TMX_START_ID = Number(process.env.TMX_START_ID || 318449);
-const TMX_FETCH_COUNT = Number(process.env.TMX_FETCH_COUNT || 2000);
+const TMX_FETCH_COUNT = Number(process.env.TMX_FETCH_COUNT || 500);
 
 function loadJson(pathname) {
     try {
@@ -753,8 +790,39 @@ async function rebuildNow({ includeClub }) {
     await resolveDisplayNames(access, ids);
     for (const r of newRows) if (r.accountId) r.displayName = nameCache.get(r.accountId) || r.accountId;
 
-    const { merged, updatedCount } = diffAndMergeByMap(wrCache.rows || [], newRows);
-    wrCache = { ts: Date.now(), rows: merged };
+    const { merged, updatedCount } =
+        diffAndMergeByMap(
+            wrCache.rows || [],
+            newRows
+        );
+
+    /* resolve names for ALL merged rows */
+
+    const allIds = [
+        ...new Set(
+            merged
+                .map((r) => r.accountId)
+                .filter(Boolean)
+        ),
+    ];
+
+    await resolveDisplayNames(
+        access,
+        allIds
+    );
+
+    for (const r of merged) {
+        if (r.accountId) {
+            r.displayName =
+                nameCache.get(r.accountId) ||
+                r.accountId;
+        }
+    }
+
+    wrCache = {
+        ts: Date.now(),
+        rows: merged,
+    };
     saveJson(DISK_WR, wrCache);
 
     return {
@@ -807,6 +875,7 @@ async function quickRefreshRecent({ count = QUICK_REFRESH_COUNT } = {}) {
 
     const merged = Array.from(byMap.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     wrCache = { ts: Date.now(), rows: merged };
+    saveJson(DISK_WR, wrCache);
 }
 
 async function maybeRefreshUidUniverse() {
@@ -844,6 +913,7 @@ async function maybeRefreshUidUniverse() {
 
     const officialSet = new Set([...metaCache.officialSet, ...latestOfficialSet]);
     const clubSet = new Set([...metaCache.clubSet, ...latestClubSet]);
+    const tmxSet = metaCache.tmxSet || new Set();
 
     const freshRows = [];
     for (let i = 0; i < newUids.length; i += WR_CONCURRENCY) {
@@ -877,6 +947,7 @@ async function maybeRefreshUidUniverse() {
     for (const r of freshRows) byMap.set(r.mapUid, r);
     const merged = Array.from(byMap.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     wrCache = { ts: Date.now(), rows: merged };
+    saveJson(DISK_WR, wrCache);
 
     const combined = new Set([...metaCache.allMapUids, ...newUids]);
     metaCache = { officialSet, clubSet, tmxSet, allMapUids: Array.from(combined) };
@@ -891,6 +962,7 @@ async function maybeRefreshUidUniverse() {
 })();
 
 let building = false;
+let tmxCrawling = false;
 async function warmBuildInBackground() {
     if (building) return;
 
@@ -922,9 +994,20 @@ setInterval(() => warmBuildInBackground(), 30 * 60 * 1000);
 setInterval(() => {
     getLiveAccessToken().catch(() => { });
 }, 6 * 60 * 60 * 1000);
-setInterval(() => {
-    getTMXMapUids()
-        .catch(console.error);
+setInterval(async () => {
+    if (tmxCrawling) {
+        console.log("[TMX] Crawl already running");
+        return;
+    }
+
+    try {
+        tmxCrawling = true;
+        await getTMXMapUids();
+    } catch (e) {
+        console.error(e);
+    } finally {
+        tmxCrawling = false;
+    }
 }, 10 * 60 * 1000);
 /* -------------------- Debounced refresh guards ------------- */
 function makeDebounced(fn, waitMs) {
