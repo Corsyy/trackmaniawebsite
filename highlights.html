@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Community Highlights — Trackmania Events</title>
-  <meta name="description" content="Submit and browse Trackmania community highlights, WR attempts, saves, fails, and stylish lines."/>
-  <meta name="theme-color" content="#08101c"/>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' https: data: blob:; media-src 'self' https: blob:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;">
-  <meta name="referrer" content="strict-origin-when-cross-origin"/>
+  <meta name="description"
+    content="Submit and browse Trackmania community highlights, WR attempts, saves, fails, and stylish lines." />
+  <meta name="theme-color" content="#08101c" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' https: data: blob:; media-src 'self' https: blob:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;">
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="stylesheet" href="/style.css">
 </head>
@@ -84,7 +87,8 @@
 
         <div class="side-card muted-card">
           <h2>Submission tips</h2>
-          <p>Use a YouTube/Twitch URL when possible. If you upload a file, keep it short and make sure you own the content.</p>
+          <p>Use a YouTube/Twitch URL when possible. If you upload a file, keep it short and make sure you own the
+            content.</p>
         </div>
       </aside>
 
@@ -157,13 +161,15 @@
 
         <div class="field row-2">
           <label for="description">Description</label>
-          <textarea id="description" name="description" maxlength="300" placeholder="Short context, max 300 chars"></textarea>
+          <textarea id="description" name="description" maxlength="300"
+            placeholder="Short context, max 300 chars"></textarea>
           <div class="small"><span id="descLen">0</span>/300</div>
         </div>
 
         <div class="field row-2">
           <label for="videoUrl">Video URL <span>YouTube or Twitch</span></label>
-          <input id="videoUrl" name="videoUrl" type="url" placeholder="https://youtu.be/... or https://twitch.tv/videos/...">
+          <input id="videoUrl" name="videoUrl" type="url"
+            placeholder="https://youtu.be/... or https://twitch.tv/videos/...">
           <div class="small">Provide a URL or upload a file. Not both.</div>
         </div>
 
@@ -175,7 +181,8 @@
               <span>or</span>
               <button id="pick" type="button" class="btn ghost">Choose file</button>
             </div>
-            <input id="file" name="file" type="file" accept=".mp4,.webm,.mov,.mkv,.gbx,video/mp4,video/webm,video/quicktime,application/octet-stream" hidden>
+            <input id="file" name="file" type="file"
+              accept=".mp4,.webm,.mov,.mkv,.gbx,video/mp4,video/webm,video/quicktime,application/octet-stream" hidden>
           </div>
           <div class="small" id="fileInfo">No file selected.</div>
         </div>
@@ -199,7 +206,7 @@
     </div>
   </div>
 
-  
+
   <div id="authModal" role="dialog" aria-modal="true" aria-label="Account login and registration">
     <div class="auth-dialog">
       <div class="auth-head">
@@ -218,15 +225,18 @@
 
         <div class="auth-panel active" id="authLoginPanel">
           <input id="authLoginEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
-          <input id="authLoginPassword" class="input" type="password" placeholder="Password" autocomplete="current-password" />
+          <input id="authLoginPassword" class="input" type="password" placeholder="Password"
+            autocomplete="current-password" />
           <button id="authLoginBtn" class="btn primary" type="button">Login</button>
           <button id="authForgotBtn" class="auth-link-btn" type="button">Forgot password?</button>
         </div>
 
         <div class="auth-panel" id="authRegisterPanel">
-          <input id="authRegisterUsername" class="input" type="text" maxlength="24" placeholder="Username" autocomplete="username" />
+          <input id="authRegisterUsername" class="input" type="text" maxlength="24" placeholder="Username"
+            autocomplete="username" />
           <input id="authRegisterEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
-          <input id="authRegisterPassword" class="input" type="password" placeholder="Password" autocomplete="new-password" />
+          <input id="authRegisterPassword" class="input" type="password" placeholder="Password"
+            autocomplete="new-password" />
           <button id="authRegisterBtn" class="btn primary" type="button">Create Account</button>
         </div>
 
@@ -475,7 +485,7 @@
         descLen.textContent = String(desc.value.length);
       });
 
-      
+
       form?.addEventListener("submit", async (e) => {
         e.preventDefault();
         setStatus("");
@@ -649,7 +659,10 @@
 
       if (user) {
         document.querySelectorAll(".auth-open").forEach(btn => {
-          btn.textContent = user.email || "Logged In";
+          btn.textContent =
+            user.user_metadata?.username ||
+            user.email?.split("@")[0] ||
+            "Logged In";
         });
 
         if (authLogoutBtn) {
@@ -737,4 +750,5 @@
   </script>
 
 </body>
+
 </html>
