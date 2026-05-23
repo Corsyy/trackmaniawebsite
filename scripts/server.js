@@ -2018,6 +2018,68 @@ app.get("/api/admin/clear-tmx-cache", (req, res) => {
         res.status(500).json({ ok: false, error: e?.message || String(e) });
     }
 });
+app.get("/api/recent-wrs", (req, res) => {
+    const rows =
+        [...wrCache.rows]
+            .sort(
+                (a, b) =>
+                    b.timestamp -
+                    a.timestamp
+            )
+            .slice(0, 100);
+
+    sendJsonETag(
+        req,
+        res,
+        {
+            ok: true,
+            rows,
+        }
+    );
+});
+app.get("/api/top-monthly", (req, res) => {
+    const limit = Math.max(
+        1,
+        Number(req.query.limit || 10)
+    );
+
+    const leaderboard =
+        [...wrCache.rows]
+            .sort(
+                (a, b) =>
+                    a.timeMs -
+                    b.timeMs
+            )
+            .slice(0, limit);
+
+    sendJsonETag(
+        req,
+        res,
+        {
+            ok: true,
+            leaderboard,
+        }
+    );
+});
+app.get("/api/wr-podium", (req, res) => {
+    const top =
+        [...wrCache.rows]
+            .sort(
+                (a, b) =>
+                    a.timeMs -
+                    b.timeMs
+            )
+            .slice(0, 3);
+
+    sendJsonETag(
+        req,
+        res,
+        {
+            ok: true,
+            podium: top,
+        }
+    );
+});
 app.listen(
     process.env.PORT || 3000,
     () => {
