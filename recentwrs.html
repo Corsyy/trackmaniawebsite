@@ -642,16 +642,25 @@
     async function load() {
       try {
         document.getElementById("rows").innerHTML = `<tr><td colspan="5" class="skeleton">Loading…</td></tr>`;
-        const res = await fetch(`${STATIC_BASE}/recent-wrs/latest.json`);
-        if (!res.ok) throw new Error(await res.text());
+        const res = await fetch(
+          `${API_BASE}/api/recent-wrs`,
+          {
+            cache: "no-store"
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
 
         const j = await res.json();
 
-        const rows = Array.isArray(j.rows)
-          ? j.rows
-          : Array.isArray(j.records)
-            ? j.records
-            : [];
+        const rows =
+          Array.isArray(j.rows)
+            ? j.rows
+            : Array.isArray(j.records)
+              ? j.records
+              : [];
 
         allRows = rows.map(r => ({
           ...r,
