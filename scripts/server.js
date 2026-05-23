@@ -461,7 +461,7 @@ const DISK_WR = process.env.CACHE_PATH_WR || "/tmp/wr_cache.json";
 const DISK_CLUB = process.env.CACHE_PATH_CLUB || "/tmp/club_uids.json";
 const DISK_TMX = process.env.CACHE_PATH_TMX || "/tmp/tmx_uids.json";
 const TMX_START_ID = Number(process.env.TMX_START_ID || 318449);
-const TMX_FETCH_COUNT = Number(process.env.TMX_FETCH_COUNT || 200);
+const TMX_FETCH_COUNT = Number(process.env.TMX_FETCH_COUNT || 2000);
 
 function loadJson(pathname) {
     try {
