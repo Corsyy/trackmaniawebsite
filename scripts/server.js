@@ -1823,7 +1823,7 @@ app.get("/api/ready", async (req, res) => {
         );
     }
 })();
-app.post("/api/admin/clear-tmx-cache", (req, res) => {
+app.get("/api/admin/clear-tmx-cache", (req, res) => {
     const auth = req.headers["x-admin-secret"] || req.query.secret;
 
     if (!ADMIN_SECRET || auth !== ADMIN_SECRET) {
