@@ -606,25 +606,41 @@
         const q = (document.getElementById("q").value || "").trim();
         if (q) url.searchParams.set("q", q);
 
-        const r = await fetch(`${STATIC_BASE}/wr-leaderboard/latest.json`);
-        if (!r.ok) throw new Error(await r.text());
+        const r = await fetch(url, {
+  signal: fetchCtrl.signal,
+  cache: "no-store"
+});
 
-        const j = await r.json();
+if (!r.ok) {
+  throw new Error(await r.text());
+}
 
-        const players = Array.isArray(j.players)
-          ? j.players
-          : [];
+const j = await r.json();
 
-        allPlayers = players.map(p => ({
-          ...p,
-          prettyName:
-            p.displayName ||
-            p.prettyName ||
-            p.name ||
-            p.accountId
-        }));
+const players =
+  Array.isArray(j.players)
+    ? j.players
+    : Array.isArray(j.rows)
+      ? j.rows
+      : [];
 
-        const builtAt = j.builtAt || j.fetchedAt || Date.now();
+allPlayers = players.map(p => ({
+  ...p,
+  prettyName:
+    p.displayName ||
+    p.prettyName ||
+    p.name ||
+    p.accountId,
+  wrCount:
+    p.wrCount ||
+    p.wrs ||
+    0
+}));
+
+const builtAt =
+  j.builtAt ||
+  j.fetchedAt ||
+  Date.now();
 
         const ago = Math.max(0, Date.now() - new Date(builtAt).getTime());
 
