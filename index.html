@@ -8,6 +8,7 @@
   <meta name="description"
     content="Live Trackmania events, schedule, and stream hub. Watch live on Twitch, see upcoming events, and get in touch." />
   <meta name="theme-color" content="#0a0f1a" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://trackmaniawebsite.onrender.com; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; frame-src https://player.twitch.tv; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests;" />
   <meta property="og:title" content="Trackmania Events — Official Site" />
   <meta property="og:description" content="Live Trackmania events, schedule, and stream hub." />
   <meta property="og:type" content="website" />
@@ -564,11 +565,30 @@
     }
 
     function normalizeHref(raw) {
-      if (!raw) return "";
-      const t = String(raw).trim();
+      const t = String(raw || "").trim();
       if (!t) return "";
-      if (/^https?:\/\//i.test(t)) return t;
-      return `https://${t.replace(/^\/+/, "")}`;
+
+      try {
+        const url = new URL(/^https?:\/\//i.test(t) ? t : `https://${t.replace(/^\/+/, "")}`);
+        if (url.protocol !== "https:" && url.protocol !== "http:") return "";
+        return url.href;
+      } catch {
+        return "";
+      }
+    }
+
+    function safeImageUrl(raw) {
+      const t = String(raw || "").trim();
+      if (!t) return "";
+      if (t.startsWith("/") && !t.startsWith("//")) return t.replace(/["'()\\]/g, "");
+
+      try {
+        const url = new URL(t);
+        if (url.protocol !== "https:" && url.protocol !== "http:") return "";
+        return url.href.replace(/["'()\\]/g, "");
+      } catch {
+        return "";
+      }
     }
 
     function makeEventElement(e, options = {}) {
@@ -583,21 +603,26 @@
 
       const range = getDisplayRange(e);
       const hasSegments = Array.isArray(e.segments) && e.segments.length > 0;
+      const safeTag = escapeHtml(tag);
+      const safeTitle = escapeHtml(e.title || "Untitled event");
+      const safeSubline = escapeHtml(subline || "");
+      const safeLabel = escapeHtml(range.label || "");
       const segmentText = hasSegments
-        ? `<div class="meta" style="margin-top:.35rem;color:#9fb2df">${e.segments.length} stages${range.label ? ` • ${range.label}` : ""}</div>`
+        ? `<div class="meta" style="margin-top:.35rem;color:#9fb2df">${Number(e.segments.length)} stages${safeLabel ? ` • ${safeLabel}` : ""}</div>`
         : "";
 
       article.innerHTML = `
-      <span class="tag">${tag}</span>
-      <div class="meta">${fmtDate(range.start_iso)} — ${fmtDate(range.end_iso)}</div>
-      <h4>${e.title}</h4>
-      <div class="meta">${subline}</div>
+      <span class="tag">${safeTag}</span>
+      <div class="meta">${escapeHtml(fmtDate(range.start_iso))} — ${escapeHtml(fmtDate(range.end_iso))}</div>
+      <h4>${safeTitle}</h4>
+      <div class="meta">${safeSubline}</div>
       ${segmentText}
     `;
 
-      if (e.image) {
+      const safeImg = safeImageUrl(e.image);
+      if (safeImg) {
         article.classList.add("with-bg");
-        article.style.setProperty("--event-img", `url("${e.image}")`);
+        article.style.setProperty("--event-img", `url("${safeImg}")`);
       }
 
       const href =
@@ -719,13 +744,13 @@
           matches.forEach(({ event: ev, range }, idx) => {
             if (idx > 0) html += `<div class="cal-popup-spacer"></div>`;
             html += `
-            <div class="cal-popup-title">${ev.title}</div>
+            <div class="cal-popup-title">${escapeHtml(ev.title || "Event")}</div>
             <div class="cal-popup-date">
-              ${fmtDate(range?.start_iso || getEventStartIso(ev))} –
-              ${fmtDate(range?.end_iso || getEventEndIso(ev))}
+              ${escapeHtml(fmtDate(range?.start_iso || getEventStartIso(ev)))} –
+              ${escapeHtml(fmtDate(range?.end_iso || getEventEndIso(ev)))}
             </div>
             <div class="cal-popup-desc">
-              ${range?.label ? `${range.label} • ` : ""}${ev.location || ""}
+              ${range?.label ? `${escapeHtml(range.label)} • ` : ""}${escapeHtml(ev.location || "")}
             </div>
           `;
           });
@@ -1154,14 +1179,15 @@
         const el = document.createElement("article");
         el.className = "event reveal";
         el.innerHTML = `
-        <span class="tag">${e.tag || "Event"}</span>
-        <div class="meta">${fmtDate(startIso)} — ${fmtDate(endIso)}</div>
-        <h4>${e.title}</h4>
-        <div class="meta">${e.location || ""}</div>
+        <span class="tag">${escapeHtml(e.tag || "Event")}</span>
+        <div class="meta">${escapeHtml(fmtDate(startIso))} — ${escapeHtml(fmtDate(endIso))}</div>
+        <h4>${escapeHtml(e.title || "Event")}</h4>
+        <div class="meta">${escapeHtml(e.location || "")}</div>
       `;
-        if (e.image) {
+        const safeImg = safeImageUrl(e.image);
+        if (safeImg) {
           el.classList.add("with-bg");
-          el.style.setProperty("--event-img", `url("${e.image}")`);
+          el.style.setProperty("--event-img", `url("${safeImg}")`);
         }
         pastGrid.appendChild(el);
       });
@@ -1184,8 +1210,8 @@
 
         pills.innerHTML = `
         <div class="pill">🟢 Live</div>
-        <div class="pill">📍 ${cur.location || "Online"}</div>
-        <div class="pill">🏁 ${curRange.label || cur.description || ""}</div>
+        <div class="pill">📍 ${escapeHtml(cur.location || "Online")}</div>
+        <div class="pill">🏁 ${escapeHtml(curRange.label || cur.description || "")}</div>
       `;
 
         header.textContent = "Live now!";
@@ -1200,9 +1226,9 @@
 
         chip.textContent = `Next Event • ${next.title}`;
         pills.innerHTML = `
-        <div class="pill">🗓️ ${fmtDate(nextRange.start_iso)}</div>
-        <div class="pill">📍 ${next.location || "Online"}</div>
-        <div class="pill">🏁 ${nextRange.label || next.description || ""}</div>
+        <div class="pill">🗓️ ${escapeHtml(fmtDate(nextRange.start_iso))}</div>
+        <div class="pill">📍 ${escapeHtml(next.location || "Online")}</div>
+        <div class="pill">🏁 ${escapeHtml(nextRange.label || next.description || "")}</div>
       `;
 
         startCountdown(nextRange.start_iso, header);
@@ -1907,7 +1933,7 @@
           data-react-shout="${escapeHtml(msg.id)}"
           data-emoji="${escapeHtml(emoji)}"
           title="React ${escapeHtml(emoji)}"
-        >${escapeHtml(emoji)} ${item.count}</button>
+        >${escapeHtml(emoji)} ${Number(item.count) || 0}</button>
       `;
         })
         .join("");
