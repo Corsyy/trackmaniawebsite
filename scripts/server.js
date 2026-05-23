@@ -1959,8 +1959,52 @@ async function harvestAllWRs(
                     );
 
                 if (clean) {
-                    rows.push(
-                        clean
+                    try {
+                        const names =
+                            await resolveDisplayNames([
+                                clean.accountId
+                            ]);
+
+                        clean.displayName =
+                            names[clean.accountId] ||
+                            clean.accountId;
+                    } catch {
+                        clean.displayName =
+                            clean.accountId;
+                    }
+
+                    const existingIndex =
+                        rows.findIndex(
+                            (r) =>
+                                r.mapUid ===
+                                clean.mapUid
+                        );
+
+                    if (existingIndex >= 0) {
+                        rows.splice(
+                            existingIndex,
+                            1
+                        );
+                    }
+
+                    rows.push(clean);
+
+                    harvestState[
+                        clean.mapUid
+                    ] = {
+                        lastChecked:
+                            Date.now(),
+                        lastWRHolder:
+                            clean.accountId,
+                        lastWRTime:
+                            clean.timeMs,
+                        timestamp:
+                            clean.timestamp,
+                    };
+
+                    writeJson(
+                        HARVEST_STATE_FILE,
+                        harvestState
                     );
                 }
             } catch { }
