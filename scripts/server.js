@@ -2080,6 +2080,61 @@ app.get("/api/wr-podium", (req, res) => {
         }
     );
 });
+app.get("/api/wr-players", (req, res) => {
+    const limit = Math.max(
+        1,
+        Number(req.query.limit || 100)
+    );
+
+    const counts = new Map();
+
+    for (const row of wrCache.rows) {
+        if (!row?.accountId) continue;
+
+        const existing =
+            counts.get(row.accountId) || {
+                accountId:
+                    row.accountId,
+                displayName:
+                    row.displayName ||
+                    row.accountId,
+                wrCount: 0,
+                latestTs: 0,
+            };
+
+        existing.wrCount++;
+
+        existing.latestTs = Math.max(
+            existing.latestTs,
+            row.timestamp || 0
+        );
+
+        counts.set(
+            row.accountId,
+            existing
+        );
+    }
+
+    const players =
+        [...counts.values()]
+            .sort(
+                (a, b) =>
+                    b.wrCount -
+                    a.wrCount
+            )
+            .slice(0, limit);
+
+    sendJsonETag(
+        req,
+        res,
+        {
+            ok: true,
+            players,
+            fetchedAt:
+                Date.now(),
+        }
+    );
+});
 app.listen(
     process.env.PORT || 3000,
     () => {
