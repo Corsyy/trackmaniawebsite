@@ -1,573 +1,584 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Most WRs — Trackmania Events</title>
-  <meta name="description"
-    content="Players with the most Trackmania world records across all official campaigns, TOTD, and club campaigns." />
-  <meta name="theme-color" content="#0a0f1a" />
+  <meta name="description" content="Players with the most Trackmania world records across all official campaigns, TOTD, and club campaigns."/>
+  <meta name="theme-color" content="#0a0f1a"/>
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="shortcut icon" href="/logo.png">
-  <style>
-    :root {
-      --bg: #05070c;
-      --panel: rgba(255, 255, 255, .035);
-      --panel-2: rgba(255, 255, 255, .025);
-
-      --text: #f3f5f7;
-      --muted: #a7adb8;
-
-      --border: rgba(255, 255, 255, .07);
-      --border-strong: rgba(255, 255, 255, .12);
-
-      --shadow-sm: 0 10px 26px rgba(0, 0, 0, .22);
-      --shadow-md: 0 18px 42px rgba(0, 0, 0, .32);
-
-      --radius: 18px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html,
-    body {
-      height: 100%;
-    }
-
-    body.bg-track-curves {
-      background: #05070c;
-      color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    body.bg-track-curves::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -1;
-      opacity: .015;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
-      background-size: 220px 220px;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(5, 7, 12, .82);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .container {
-      width: min(1200px, 92vw);
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: .9rem 0;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      font-weight: 900;
-      letter-spacing: -.02em;
-    }
-
-    .brand-badge {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-
-      background: rgba(255, 255, 255, .045);
-
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-
-      border: 1px solid var(--border);
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .navlinks {
-      display: flex;
-      gap: 1.2rem;
-    }
-
-    .navlinks a {
-      color: var(--muted);
-      white-space: nowrap;
-      font-weight: 650;
-      opacity: .88;
-      transition: .18s ease;
-    }
-
-    .navlinks a:hover {
-      opacity: 1;
-      color: #fff;
-    }
-
-    .navlinks a.active {
-      opacity: 1;
-      color: #fff;
-      position: relative;
-    }
-
-    .navlinks a.active::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -6px;
-      height: 2px;
-      background: rgba(255, 255, 255, .24);
-      border-radius: 999px;
-    }
+<style>
+:root{
+--bg:#05070c;
+--panel:rgba(255,255,255,.035);
+--panel-2:rgba(255,255,255,.025);
+
+--text:#f3f5f7;
+--muted:#a7adb8;
+
+--border:rgba(255,255,255,.07);
+--border-strong:rgba(255,255,255,.12);
+
+--shadow-sm:0 10px 26px rgba(0,0,0,.22);
+--shadow-md:0 18px 42px rgba(0,0,0,.32);
+
+--radius:18px;
+}
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+html,body{
+height:100%;
+}
+
+body.bg-track-curves{
+background:#05070c;
+color:var(--text);
+font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+-webkit-font-smoothing:antialiased;
+overflow-x:hidden;
+}
+
+body.bg-track-curves::before{
+content:"";
+position:fixed;
+inset:0;
+pointer-events:none;
+z-index:-1;
+opacity:.015;
+background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.9'/></svg>");
+background-size:220px 220px;
+}
+
+a{
+color:inherit;
+text-decoration:none;
+}
+
+header{
+position:sticky;
+top:0;
+z-index:50;
+background:rgba(5,7,12,.82);
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+border-bottom:1px solid var(--border);
+}
+
+.container{
+width:min(1200px,92vw);
+margin:0 auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:.9rem 0;
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:.75rem;
+font-weight:900;
+letter-spacing:-.02em;
+}
+
+.brand-badge{
+width:36px;
+height:36px;
+border-radius:12px;
+display:grid;
+place-items:center;
+
+background:rgba(255,255,255,.045);
+
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+
+border:1px solid var(--border);
+}
+
+.nav{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:1rem;
+}
+
+.navlinks{
+display:flex;
+gap:1.2rem;
+}
+
+.navlinks a{
+color:var(--muted);
+white-space:nowrap;
+font-weight:650;
+opacity:.88;
+transition:.18s ease;
+}
+
+.navlinks a:hover{
+opacity:1;
+color:#fff;
+}
+
+.navlinks a.active{
+opacity:1;
+color:#fff;
+position:relative;
+}
 
-    .cta {
-      display: flex;
-      gap: .6rem;
-    }
+.navlinks a.active::after{
+content:"";
+position:absolute;
+left:0;
+right:0;
+bottom:-6px;
+height:2px;
+background:rgba(255,255,255,.24);
+border-radius:999px;
+}
 
-    .btn {
-      padding: .65rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-
-      background: rgba(255, 255, 255, .045);
+.cta{
+display:flex;
+gap:.6rem;
+}
 
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-
-      color: var(--text);
-      font-weight: 750;
-
-      transition: .18s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
+.btn{
+padding:.65rem 1rem;
+border:1px solid var(--border);
+border-radius:14px;
+
+background:rgba(255,255,255,.045);
 
-      border-color: var(--border-strong);
+backdrop-filter:blur(16px);
+-webkit-backdrop-filter:blur(16px);
+
+color:var(--text);
+font-weight:750;
+
+transition:.18s ease;
+}
 
-      background: rgba(255, 255, 255, .065);
+.btn:hover{
+transform:translateY(-2px);
 
-      box-shadow: var(--shadow-sm);
-    }
+border-color:var(--border-strong);
 
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 1.6rem;
-    }
+background:rgba(255,255,255,.065);
 
-    h1 {
-      font-size: 1.9rem;
-      margin-bottom: .45rem;
-      font-weight: 950;
-      letter-spacing: -.03em;
-    }
+box-shadow:var(--shadow-sm);
+}
 
-    .meta {
-      color: var(--muted);
-      font-size: .95rem;
-      margin-bottom: 1rem;
-    }
+main{
+max-width:1100px;
+margin:0 auto;
+padding:1.6rem;
+}
 
-    .controls {
-      display: flex;
-      gap: .7rem;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
+h1{
+font-size:1.9rem;
+margin-bottom:.45rem;
+font-weight:950;
+letter-spacing:-.03em;
+}
 
-    .input {
-      width: 280px;
-      max-width: 60vw;
+.meta{
+color:var(--muted);
+font-size:.95rem;
+margin-bottom:1rem;
+}
 
-      padding: .72rem .9rem;
+.controls{
+display:flex;
+gap:.7rem;
+align-items:center;
+margin-bottom:1rem;
+}
 
-      border-radius: 14px;
+.input{
+width:280px;
+max-width:60vw;
 
-      border: 1px solid var(--border);
+padding:.72rem .9rem;
 
-      background: rgba(255, 255, 255, .03);
+border-radius:14px;
 
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+border:1px solid var(--border);
 
-      color: var(--text);
+background:rgba(255,255,255,.03);
 
-      outline: none;
-    }
+backdrop-filter:blur(12px);
+-webkit-backdrop-filter:blur(12px);
 
-    .input:focus {
-      border-color: rgba(255, 255, 255, .14);
-    }
+color:var(--text);
 
-    .card {
-      border: 1px solid var(--border);
+outline:none;
+}
 
-      background: rgba(255, 255, 255, .035);
+.input:focus{
+border-color:rgba(255,255,255,.14);
+}
 
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-
-      border-radius: var(--radius);
+.card{
+border:1px solid var(--border);
 
-      box-shadow: var(--shadow-sm);
-
-      padding: 1rem;
-    }
+background:rgba(255,255,255,.035);
 
-    .podium-head {
-      display: flex;
-      gap: .6rem;
-      align-items: center;
-      justify-content: space-between;
-      margin: .25rem 0 .8rem;
-    }
+backdrop-filter:blur(20px);
+-webkit-backdrop-filter:blur(20px);
 
-    .podium-ctrls {
-      display: flex;
-      gap: .5rem;
-      align-items: center;
-    }
+border-radius:var(--radius);
 
-    .podium-list {
-      display: flex;
-      gap: .8rem;
-      flex-wrap: wrap;
-    }
+box-shadow:var(--shadow-sm);
 
-    .podium-item {
-      flex: 1 1 220px;
-      min-width: 220px;
+padding:1rem;
+}
 
-      border: 1px solid var(--border);
+.podium-head{
+display:flex;
+gap:.6rem;
+align-items:center;
+justify-content:space-between;
+margin:.25rem 0 .8rem;
+}
 
-      background: rgba(255, 255, 255, .03);
+.podium-ctrls{
+display:flex;
+gap:.5rem;
+align-items:center;
+}
 
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+.podium-list{
+display:flex;
+gap:.8rem;
+flex-wrap:wrap;
+}
 
-      border-radius: 16px;
+.podium-item{
+flex:1 1 220px;
+min-width:220px;
 
-      padding: .8rem .95rem;
+border:1px solid var(--border);
 
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-    }
+background:rgba(255,255,255,.03);
 
-    .podium-medal {
-      font-size: 1.3rem;
-    }
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
 
-    .badge {
-      border: 1px solid var(--border);
+border-radius:16px;
 
-      padding: .24rem .58rem;
+padding:.8rem .95rem;
 
-      border-radius: 999px;
+display:flex;
+align-items:center;
+gap:.7rem;
+}
 
-      font-size: .82rem;
+.podium-medal{
+font-size:1.3rem;
+}
 
-      background: rgba(255, 255, 255, .04);
-    }
+.badge{
+border:1px solid var(--border);
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+padding:.24rem .58rem;
 
-    th,
-    td {
-      padding: .82rem;
-      border-bottom: 1px solid rgba(255, 255, 255, .06);
-      text-align: left;
-    }
+border-radius:999px;
 
-    th {
-      opacity: .92;
-      font-weight: 850;
-    }
+font-size:.82rem;
 
-    .ts {
-      opacity: .72;
-    }
+background:rgba(255,255,255,.04);
+}
 
-    .pager {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: .8rem 0;
-    }
+table{
+width:100%;
+border-collapse:collapse;
+}
 
-    #pageInfo {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      color: var(--muted);
-      font-weight: 500;
-      pointer-events: none;
-    }
+th,td{
+padding:.82rem;
+border-bottom:1px solid rgba(255,255,255,.06);
+text-align:left;
+}
 
-    .nav-toggle {
-      display: none;
+th{
+opacity:.92;
+font-weight:850;
+}
 
-      border: 1px solid var(--border);
+.ts{
+opacity:.72;
+}
 
-      background: rgba(255, 255, 255, .045);
+.pager{
+position:relative;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:.8rem 0;
+}
 
-      color: var(--text);
+#pageInfo{
+position:absolute;
+left:50%;
+transform:translateX(-50%);
+color:var(--muted);
+font-weight:500;
+pointer-events:none;
+}
 
-      border-radius: 12px;
+.nav-toggle{
+display:none;
 
-      padding: .45rem .65rem;
+border:1px solid var(--border);
 
-      cursor: pointer;
-    }
+background:rgba(255,255,255,.045);
 
-    .mobile-only {
-      display: none;
-    }
+color:var(--text);
 
-    * {
-      scrollbar-color:
-        rgba(255, 255, 255, .16) transparent;
-    }
+border-radius:12px;
 
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
+padding:.45rem .65rem;
 
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
+cursor:pointer;
+}
 
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, .16);
-      border-radius: 999px;
-    }
+.mobile-only{
+display:none;
+}
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, .24);
-    }
+*{
+scrollbar-color:
+rgba(255,255,255,.16)
+transparent;
+}
 
-    @media (max-width:640px) {
+::-webkit-scrollbar{
+width:8px;
+height:8px;
+}
 
-      .nav-toggle {
-        display: block !important;
-      }
+::-webkit-scrollbar-track{
+background:transparent;
+}
 
-      .cta {
-        display: none !important;
-      }
+::-webkit-scrollbar-thumb{
+background:rgba(255,255,255,.16);
+border-radius:999px;
+}
 
-      .navlinks {
-        position: absolute;
-        top: 58px;
-        left: 0;
-        right: 0;
+::-webkit-scrollbar-thumb:hover{
+background:rgba(255,255,255,.24);
+}
 
-        padding: .9rem;
+@media (max-width:640px){
 
-        background: rgba(5, 7, 12, .96);
+.nav-toggle{
+display:block !important;
+}
 
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
+.cta{
+display:none !important;
+}
 
-        flex-direction: column;
-        gap: .85rem;
+.navlinks{
+position:absolute;
+top:58px;
+left:0;
+right:0;
 
-        display: none;
+padding:.9rem;
 
-        border-bottom: 1px solid var(--border);
-      }
+background:rgba(5,7,12,.96);
 
-      .navlinks.show {
-        display: flex !important;
-      }
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
 
-      .mobile-only {
-        display: block !important;
-      }
+flex-direction:column;
+gap:.85rem;
 
-    }
-  </style>
+display:none;
+
+border-bottom:1px solid var(--border);
+}
+
+.navlinks.show{
+display:flex !important;
+}
+
+.mobile-only{
+display:block !important;
+}
+
+}
+</style>
   <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
   <link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
   <link rel="prefetch" href="/wrleaderboard" as="document">
   <link rel="prefetch" href="/recentwrs" as="document">
 </head>
-
 <body class="bg-track-curves">
-  <header>
-    <div class="container nav">
-      <a class="brand" href="/index"><span class="brand-badge">🏁</span><span>Most WRs</span></a>
-      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-      <nav id="primary-nav" class="navlinks" aria-label="Primary">
-        <a href="/kacky">Kacky Finishes</a>
-        <a href="/totd">Track of the Day</a>
-        <a href="/highlights">Community Highlights</a>
-        <a href="/weeklyshorts">Weekly Shorts Stats</a>
+<header>
+  <div class="container nav">
+    <a class="brand" href="/index"><span class="brand-badge">🏁</span><span>Most WRs</span></a>
+    <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+    <nav id="primary-nav" class="navlinks" aria-label="Primary">
+      <a href="/kacky">Kacky Finishes</a>
+      <a href="/totd">Track of the Day</a>
+      <a href="/highlights">Community Highlights</a>
+      <a href="/weeklyshorts">Weekly Shorts Stats</a>
+      
 
-
-        <a href="/" class="mobile-only btn-as-link">Home</a>
-        <a href="/recentwrs" class="mobile-only btn-as-link">Recent WRs</a>
-      </nav>
-      <div class="cta">
-        <a href="/" class="btn">Home</a>
-        <a href="/recentwrs" class="btn">Recent WRs</a>
-      </div>
+       <a href="/" class="mobile-only btn-as-link">Home</a>
+       <a href="/recentwrs" class="mobile-only btn-as-link">Recent WRs</a>
+    </nav>
+    <div class="cta">
+ <a href="/" class="btn">Home</a>
+       <a href="/recentwrs" class="btn">Recent WRs</a>
     </div>
+  </div>
 
-  </header>
-  <div id="globalMentionToast" class="mention-toast"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+</header>
+<div id="globalMentionToast" class="mention-toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
-    window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: window.localStorage,
-        storageKey: "tme-supabase-auth",
-        flowType: "implicit",
-      },
+  window.tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage,
+      storageKey: "tme-supabase-auth",
+      flowType: "implicit",
+    },
+  });
+</script>
+
+<script>
+  (function(){
+    const btn = document.getElementById('navToggle');
+    const nav = document.getElementById('primary-nav');
+    if (!btn || !nav) return;
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('show');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-  </script>
+  })();
+</script>
+ 
+<main>
+  <h1>Players With The Most World Records on TOTD, official campaigns and official club campaigns</h1>
+  <div id="meta" class="meta">Loading…</div>
 
-  <script>
-    (function () {
-      const btn = document.getElementById('navToggle');
-      const nav = document.getElementById('primary-nav');
-      if (!btn || !nav) return;
-      btn.addEventListener('click', () => {
-        const open = nav.classList.toggle('show');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    })();
-  </script>
+  <div class="controls">
+    <input id="q" class="input" type="search" placeholder="Search player or accountId…">
+    <button class="btn" id="clear">Clear</button>
+  </div>
 
-  <main>
-    <h1>Players With The Most World Records on TOTD, official campaigns and official club campaigns</h1>
-    <div id="meta" class="meta">Loading…</div>
-
-    <div class="controls">
-      <input id="q" class="input" type="search" placeholder="Search player or accountId…">
-      <button class="btn" id="clear">Clear</button>
-    </div>
-
-    <!-- Monthly Podium Card -->
-    <section class="card" style="margin-bottom:1rem;">
-      <div class="podium-head">
-        <div>
-          <strong>Monthly WR Podium</strong>
-          <span id="podiumMeta" class="meta" style="margin-left:.4rem; font-size:.9rem"></span>
-        </div>
-        <div class="podium-ctrls">
-          <label for="ym" class="meta">Month:</label>
-          <input id="ym" type="month" class="input" style="width:auto; padding:.4rem .6rem">
-          <button id="loadPodium" class="btn">Load</button>
-        </div>
+  <!-- Monthly Podium Card -->
+  <section class="card" style="margin-bottom:1rem;">
+    <div class="podium-head">
+      <div>
+        <strong>Monthly WR Podium</strong>
+        <span id="podiumMeta" class="meta" style="margin-left:.4rem; font-size:.9rem"></span>
       </div>
-      <div id="podiumList" class="podium-list">
-        <div class="meta">Loading podium…</div>
+      <div class="podium-ctrls">
+        <label for="ym" class="meta">Month:</label>
+        <input id="ym" type="month" class="input" style="width:auto; padding:.4rem .6rem">
+        <button id="loadPodium" class="btn">Load</button>
       </div>
-    </section>
-
-    <div class="pager">
-      <button id="prevBtn" class="btn">Prev</button>
-      <span id="pageInfo" class="meta"></span>
-      <button id="nextBtn" class="btn">Next</button>
     </div>
-
-    <div class="card">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Player</th>
-            <th>WRs</th>
-            <th class="ts">Most Recent</th>
-          </tr>
-        </thead>
-        <tbody id="rows">
-          <tr>
-            <td colspan="4" class="skeleton">Loading…</td>
-          </tr>
-        </tbody>
-      </table>
+    <div id="podiumList" class="podium-list">
+      <div class="meta">Loading podium…</div>
     </div>
-  </main>
+  </section>
 
-  <script>
-    const STATIC_BASE = "/data";
-    const API_BASE = "https://trackmaniawebsite.onrender.com";
-    const PAGE_SIZE = 25;
-    const FETCH_LIMIT = 100;
+  <div class="pager">
+    <button id="prevBtn" class="btn">Prev</button>
+    <span id="pageInfo" class="meta"></span>
+    <button id="nextBtn" class="btn">Next</button>
+  </div>
 
-    let allPlayers = [];
-    let page = Number(new URLSearchParams(location.search).get('page')) || 1;
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>WRs</th>
+          <th class="ts">Most Recent</th>
+        </tr>
+      </thead>
+      <tbody id="rows"><tr><td colspan="4" class="skeleton">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</main>
 
-    function fmtTs(ts) {
-      if (ts === null || ts === undefined) return "—";
-      const n = Number(ts);
-      const ms = Number.isFinite(n) ? (n > 1e12 ? n : n * 1000) : Date.parse(ts);
-      return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
+<script>
+const API_BASE = "https://trackmaniawebsite.onrender.com";
+const PAGE_SIZE = 25;
+const FETCH_LIMIT = 100;
+
+let allPlayers = [];
+let page = Number(new URLSearchParams(location.search).get('page')) || 1;
+
+function fmtTs(ts){
+  if (ts === null || ts === undefined) return "—";
+  const n = Number(ts);
+  const ms = Number.isFinite(n) ? (n > 1e12 ? n : n*1000) : Date.parse(ts);
+  return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
+}
+
+/* ===================== New helpers (links & HTML safety) ===================== */
+function escapeHTML(s=''){
+  return s.replace(/[&<>"']/g, m => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+  ));
+}
+function playerLinkHTML({ id, name }) {
+  return escapeHTML(name || id || '—');
+}
+
+/* ============================================================================ */
+
+async function resolveNames(ids = []) {
+  if (!ids.length) return {};
+  try {
+    const url = `${API_BASE}/api/debug-names?ids=${encodeURIComponent(ids.join(","))}`;
+    const r = await fetch(url);
+    if (!r.ok) return {};
+    const data = await r.json();
+    const arr = Array.isArray(data?.data) ? data.data : [];
+    const map = {};
+    for (const row of arr) {
+      if (row && row.id) map[row.id] = row.name || row.id;
     }
+    return map;
+  } catch {
+    return {};
+  }
+}
 
-    /* ===================== New helpers (links & HTML safety) ===================== */
-    function escapeHTML(s = '') {
-      return s.replace(/[&<>"']/g, m => (
-        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
-      ));
-    }
-    function playerLinkHTML({ id, name }) {
-      return escapeHTML(name || id || '—');
-    }
+function renderPage(p=1){
+  const total = allPlayers.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  page = Math.min(Math.max(1, p), totalPages);
 
-    function renderPage(p = 1) {
-      const total = allPlayers.length;
-      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-      page = Math.min(Math.max(1, p), totalPages);
+  const start = (page - 1) * PAGE_SIZE;
+  const slice = allPlayers.slice(start, start + PAGE_SIZE);
 
-      const start = (page - 1) * PAGE_SIZE;
-      const slice = allPlayers.slice(start, start + PAGE_SIZE);
-
-      const tb = document.getElementById("rows");
-      tb.innerHTML = slice.map((pl, i) => `
+  const tb = document.getElementById("rows");
+  tb.innerHTML = slice.map((pl, i) => `
     <tr>
       <td>${start + i + 1}</td>
       <td>${playerLinkHTML({ id: pl.accountId, name: pl.prettyName || pl.displayName })}</td>
@@ -576,141 +587,122 @@
     </tr>
   `).join("");
 
-      document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
-      const prev = document.getElementById("prevBtn");
-      const next = document.getElementById("nextBtn");
-      prev.disabled = page <= 1;
-      next.disabled = page >= totalPages;
-      prev.onclick = () => goTo(page - 1);
-      next.onclick = () => goTo(page + 1);
+  document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
+  const prev = document.getElementById("prevBtn");
+  const next = document.getElementById("nextBtn");
+  prev.disabled = page <= 1;
+  next.disabled = page >= totalPages;
+  prev.onclick = () => goTo(page - 1);
+  next.onclick = () => goTo(page + 1);
 
-      const params = new URLSearchParams(location.search);
-      params.set('page', page);
-      history.replaceState({}, '', `${location.pathname}?${params}`);
-    }
-
-    function goTo(p) { if (p >= 1) renderPage(p); }
-
-    let fetchCtrl = null;
-    let debounce = null;
-
-    async function load() {
-      try {
-        if (fetchCtrl) fetchCtrl.abort();
-        fetchCtrl = new AbortController();
-
-        document.getElementById("rows").innerHTML = `<tr><td colspan="4" class="skeleton">Loading…</td></tr>`;
-
-        const url = new URL(API_BASE + "/api/wr-players");
-        url.searchParams.set("limit", FETCH_LIMIT);
-        const q = (document.getElementById("q").value || "").trim();
-        if (q) url.searchParams.set("q", q);
-
-        const r = await fetch(url, {
-  signal: fetchCtrl.signal,
-  cache: "no-store"
-});
-
-if (!r.ok) {
-  throw new Error(await r.text());
+  const params = new URLSearchParams(location.search);
+  params.set('page', page);
+  history.replaceState({}, '', `${location.pathname}?${params}`);
 }
 
-const j = await r.json();
+function goTo(p){ if (p >= 1) renderPage(p); }
 
-const players =
-  Array.isArray(j.players)
-    ? j.players
-    : Array.isArray(j.rows)
-      ? j.rows
-      : [];
+let fetchCtrl = null;
+let debounce = null;
 
-allPlayers = players.map(p => ({
-  ...p,
-  prettyName:
-    p.displayName ||
-    p.prettyName ||
-    p.name ||
-    p.accountId,
-  wrCount:
-    p.wrCount ||
-    p.wrs ||
-    0
-}));
+async function load(){
+  try{
+    if (fetchCtrl) fetchCtrl.abort();
+    fetchCtrl = new AbortController();
 
-const builtAt =
-  j.builtAt ||
-  j.fetchedAt ||
-  Date.now();
+    document.getElementById("rows").innerHTML = `<tr><td colspan="4" class="skeleton">Loading…</td></tr>`;
 
-        const ago = Math.max(0, Date.now() - new Date(builtAt).getTime());
+    const url = new URL(API_BASE + "/api/wr-players");
+    url.searchParams.set("limit", FETCH_LIMIT);
+    const q = (document.getElementById("q").value || "").trim();
+    if (q) url.searchParams.set("q", q);
 
-        document.getElementById("meta").textContent =
-          `Updated ${Math.round(ago / 1000)}s ago — ${new Date(builtAt).toLocaleTimeString()}`;
+    const r = await fetch(url, { signal: fetchCtrl.signal, cache: "no-store" });
+    if (!r.ok) throw new Error(await r.text());
+    const j = await r.json();
 
-        renderPage(page);
-      } catch (e) {
-        if (e.name === "AbortError") return;
-        console.error(e);
-        document.getElementById("meta").textContent = "Failed to load player leaderboard.";
-        document.getElementById("rows").innerHTML = `<tr><td colspan="4">Error loading data.</td></tr>`;
-      }
-    }
+    const players = Array.isArray(j.players) ? j.players : [];
 
-    document.getElementById("q").addEventListener("input", () => {
-      clearTimeout(debounce);
-      debounce = setTimeout(() => { page = 1; load(); }, 250);
-    });
-    document.getElementById("clear").onclick = () => { document.getElementById("q").value = ""; page = 1; load(); };
+    const needIds = [...new Set(
+      players.filter(p => p.accountId && (!p.displayName || p.displayName === p.accountId))
+             .map(p => p.accountId)
+    )];
 
-    /* -------- Monthly podium (tries /api/wr-podium, then /api/top-monthly) -------- */
-    function ymDefaultUTC() {
-      const now = new Date();
-      const y = now.getUTCFullYear();
-      const m = String(now.getUTCMonth() + 1).padStart(2, "0");
-      return `${y}-${m}`;
-    }
-    function fmtNum(n) { try { return Number(n).toLocaleString(); } catch { return String(n); } }
+    const names = await resolveNames(needIds);
 
-    async function fetchJSONWithFallback(ym) {
-      const try1 = `${API_BASE}/api/wr-podium?month=${encodeURIComponent(ym)}`;
-      const try2 = `${API_BASE}/api/top-monthly?ym=${encodeURIComponent(ym)}&limit=3`;
+    allPlayers = players.map(p => ({
+      ...p,
+      prettyName: names[p.accountId] || p.displayName || p.accountId
+    }));
 
-      const one = async (url) => {
-        const r = await fetch(url, { cache: "no-store" });
-        if (!r.ok) throw new Error(await r.text());
-        return r.json();
-      };
+    const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
+    document.getElementById("meta").textContent =
+      `Fetched ${Math.round(ago/1000)}s ago — ${new Date(j.fetchedAt || Date.now()).toLocaleTimeString()}`;
 
-      try {
-        const j = await one(try1);
-        if (Array.isArray(j.top)) return { ym: j.ym || ym, top: j.top };
-        if (Array.isArray(j.podium)) return { ym: j.month || ym, top: j.podium };
-        return { ym: j.ym || j.month || ym, top: j.top || j.podium || [] };
-      } catch {
-        const k = await one(try2);
-        return { ym: k.ym || ym, top: Array.isArray(k.top) ? k.top : [] };
-      }
-    }
+    renderPage(page);
+  }catch(e){
+    if (e.name === "AbortError") return;
+    console.error(e);
+    document.getElementById("meta").textContent = "Failed to load player leaderboard.";
+    document.getElementById("rows").innerHTML = `<tr><td colspan="4">Error loading data.</td></tr>`;
+  }
+}
 
-    async function loadPodium() {
-      const ym = document.getElementById("ym").value || ymDefaultUTC();
-      const list = document.getElementById("podiumList");
-      const meta = document.getElementById("podiumMeta");
-      list.innerHTML = `<div class="meta">Loading podium…</div>`;
+document.getElementById("q").addEventListener("input", ()=>{
+  clearTimeout(debounce);
+  debounce = setTimeout(()=>{ page = 1; load(); }, 250);
+});
+document.getElementById("clear").onclick = () => { document.getElementById("q").value=""; page=1; load(); };
+
+/* -------- Monthly podium (tries /api/wr-podium, then /api/top-monthly) -------- */
+function ymDefaultUTC(){
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const m = String(now.getUTCMonth()+1).padStart(2,"0");
+  return `${y}-${m}`;
+}
+function fmtNum(n){ try { return Number(n).toLocaleString(); } catch { return String(n); } }
+
+async function fetchJSONWithFallback(ym){
+  const try1 = `${API_BASE}/api/wr-podium?month=${encodeURIComponent(ym)}`;
+  const try2 = `${API_BASE}/api/top-monthly?ym=${encodeURIComponent(ym)}&limit=3`;
+
+  const one = async (url) => {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  };
+
+  try {
+    const j = await one(try1);
+    if (Array.isArray(j.top))   return { ym: j.ym || ym,     top: j.top };
+    if (Array.isArray(j.podium))return { ym: j.month || ym,  top: j.podium };
+    return { ym: j.ym || j.month || ym, top: j.top || j.podium || [] };
+  } catch {
+    const k = await one(try2);
+    return { ym: k.ym || ym, top: Array.isArray(k.top) ? k.top : [] };
+  }
+}
+
+async function loadPodium(){
+  const ym = document.getElementById("ym").value || ymDefaultUTC();
+  const list = document.getElementById("podiumList");
+  const meta = document.getElementById("podiumMeta");
+  list.innerHTML = `<div class="meta">Loading podium…</div>`;
+  meta.textContent = "";
+
+  try{
+    const { ym: resolvedYm, top } = await fetchJSONWithFallback(ym);
+
+    if (!top.length) {
+      list.innerHTML = `<div class="meta">No records yet for ${resolvedYm}.</div>`;
       meta.textContent = "";
+      return;
+    }
 
-      try {
-        const { ym: resolvedYm, top } = await fetchJSONWithFallback(ym);
-
-        if (!top.length) {
-          list.innerHTML = `<div class="meta">No records yet for ${resolvedYm}.</div>`;
-          meta.textContent = "";
-          return;
-        }
-
-        // ✅ Only show total WRs (no per-source breakdown)
-        const medals = ["🥇", "🥈", "🥉"];
-        list.innerHTML = top.slice(0, 3).map((p, idx) => `
+    // ✅ Only show total WRs (no per-source breakdown)
+    const medals = ["🥇","🥈","🥉"];
+    list.innerHTML = top.slice(0,3).map((p, idx) => `
       <div class="podium-item">
         <div class="podium-medal">${medals[idx] || ""}</div>
         <div style="min-width:0">
@@ -724,47 +716,47 @@ const builtAt =
       </div>
     `).join("");
 
-        meta.textContent = `Month: ${resolvedYm}`;
-      } catch (e) {
-        console.error(e);
-        list.innerHTML = `<div class="meta">Failed to load podium.</div>`;
-      }
-    }
+    meta.textContent = `Month: ${resolvedYm}`;
+  }catch(e){
+    console.error(e);
+    list.innerHTML = `<div class="meta">Failed to load podium.</div>`;
+  }
+}
 
-    // init podium
-    (function initPodium() {
-      const ymIn = document.getElementById("ym");
-      const btn = document.getElementById("loadPodium");
-      if (ymIn) ymIn.value = ymDefaultUTC();
-      if (btn) btn.addEventListener("click", loadPodium);
-      loadPodium(); // load current month on page load
-    })();
+// init podium
+(function initPodium(){
+  const ymIn = document.getElementById("ym");
+  const btn  = document.getElementById("loadPodium");
+  if (ymIn) ymIn.value = ymDefaultUTC();
+  if (btn) btn.addEventListener("click", loadPodium);
+  loadPodium(); // load current month on page load
+})();
 
-    // initial table load
-    load();
-    setInterval(() => load(), 5 * 60 * 1000);
-  </script>
+// initial table load
+load();
+// occasional refresh
+setInterval(() => load(), 60 * 60 * 1000);
+</script>
 
-  <script>
-    // keep server warm
-    setInterval(() => {
-      fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(() => { });
-    }, 5 * 60 * 1000);
-    // prefetches
-    const prefetch = (url) => {
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = url;
-      link.as = 'fetch';
-      link.crossOrigin = 'anonymous';
-      document.head.appendChild(link);
-    };
-    const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
-    const tblBtn = document.querySelector('a[href="/recentwrs"]');
-    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once: true });
-    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once: true });
-  </script>
+<script>
+  // keep server warm
+  setInterval(() => {
+    fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
+  }, 5 * 60 * 1000);
+  // prefetches
+  const prefetch = (url) => {
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = url;
+    link.as = 'fetch';
+    link.crossOrigin = 'anonymous';
+    document.head.appendChild(link);
+  };
+  const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
+  const tblBtn = document.querySelector('a[href="/recentwrs"]');
+  if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once:true });
+  if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once:true });
+</script>
 
 </body>
-
 </html>
