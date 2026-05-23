@@ -866,9 +866,15 @@ function loadWeeklyEventMaps(dir, sourceType) {
 
 async function fetchTMXPage(page = 1) {
     try {
-        const url =
-            `https://trackmania.exchange/mapsearch2/search?api=on&mode=1&priord=8&page=${page}`;
+        const from =
+            Math.max(
+                0,
+                latestKnownId - offset
+            );
 
+        const url =
+            `https://trackmania.exchange/mapsearch?from=${from}`;
+            
         const response =
             await fetchWithTimeout(
                 url,
