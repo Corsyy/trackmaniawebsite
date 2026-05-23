@@ -627,6 +627,7 @@ function swapCache(rows) {
 
 async function buildAllWRs({ includeClub = true } = {}) {
     const access = await getLiveAccessToken();
+    await getTMXMapUids();
     const { officialSet, clubSet, tmxSet, tmxMaps, allMapUids } = await computeAllMapUids(access, { includeClub });
     const wrs = await fetchAllWRs(access, allMapUids, officialSet, clubSet, tmxSet);
 
@@ -756,6 +757,7 @@ async function maybeRefreshUidUniverse() {
     if (!metaCache.allMapUids.length) return;
 
     const access = await getLiveAccessToken();
+    await getTMXMapUids();
 
     const official = await getAllOfficialCampaigns(access);
     const latestOfficialSet = new Set(
@@ -856,7 +858,22 @@ async function warmBuildInBackground() {
         building = false;
     }
 }
+warmBuildInBackground();
 
+setInterval(
+    () => warmBuildInBackground(),
+    30 * 60 * 1000
+);
+
+setInterval(() => {
+    getLiveAccessToken()
+        .catch(() => {});
+}, 6 * 60 * 60 * 1000);
+
+setInterval(() => {
+    maybeRefreshUidUniverse()
+        .catch(console.error);
+}, 10 * 60 * 1000);
 /* -------------------- Debounced refresh guards ------------- */
 function makeDebounced(fn, waitMs) {
     let last = 0,
