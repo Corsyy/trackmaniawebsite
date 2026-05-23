@@ -1186,4 +1186,22 @@ process.on("unhandledRejection", (err) => console.error("UNHANDLED_REJECTION:", 
 process.on("uncaughtException", (err) => console.error("UNCAUGHT_EXCEPTION:", err));
 
 const PORT = process.env.PORT || 3000;
+app.post("/api/reset-tmx", (_req, res) => {
+    try {
+        saveJson(DISK_TMX, {
+            lastId: TMX_START_ID,
+            uids: [],
+        });
+
+        res.json({
+            ok: true,
+            message: "TMX cache reset",
+        });
+    } catch (e) {
+        res.status(500).json({
+            ok: false,
+            error: e?.message || String(e),
+        });
+    }
+});
 app.listen(PORT, "0.0.0.0", () => console.log(`✅ API running on port ${PORT}`));
