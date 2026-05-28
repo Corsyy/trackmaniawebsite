@@ -29,6 +29,15 @@
   display: flex;
   align-items: center;
   gap: .45rem;
+  white-space: nowrap;
+}
+
+#authUserLabel {
+  white-space: nowrap;
+}
+
+.cta .submit-event-open {
+  white-space: nowrap;
 }
 
 .auth-caret {
@@ -245,11 +254,10 @@
         <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
         <a href="/totd">Track of the Day</a>
         <a href="/highlights">Community Highlights</a>
-        <button class="btn submit-event-open nav-auth-mobile" type="button">Submit Event</button>
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
       <div class="cta" id="authArea">
-        <button class="btn primary submit-event-open" type="button">Submit Event</button>
+        <button class="btn submit-event-open" type="button">Submit Event</button>
         
 <div class="auth-user-dropdown">
   <button id="authUserBtn" class="btn auth-user-btn" type="button">
