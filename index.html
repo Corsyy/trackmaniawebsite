@@ -329,25 +329,7 @@
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
       <div class="cta" id="authArea">
-        <button class="btn submit-event-open" type="button">Submit Event</button>
-        
-<div class="auth-user-dropdown">
-  <button id="authUserBtn" class="btn auth-user-btn" type="button">
-    <span id="authUserLabel">Login / Register</span>
-    <span class="auth-caret">▾</span>
-  </button>
-
-  <div id="authUserMenu" class="auth-user-menu">
-    <div class="auth-user-info">
-      <strong id="authMenuUsername">Guest</strong>
-      <span id="authMenuEmail"></span>
-    </div>
-
-    <button id="authMenuAccountBtn" type="button">Account</button>
-    <button id="authMenuLogoutBtn" type="button">Logout</button>
-  </div>
-</div>
-
+        <button class="btn auth-open" type="button">Login / Register</button>
         <a class="btn" href="#contact">Contact</a>
       </div>
     </div>
@@ -3869,125 +3851,10 @@
   </script>
 
 
-<script>
-(function () {
-  const authUserBtn = document.getElementById("authUserBtn");
-  const authUserMenu = document.getElementById("authUserMenu");
-  const authUserLabel = document.getElementById("authUserLabel");
-  const authMenuUsername = document.getElementById("authMenuUsername");
-  const authMenuEmail = document.getElementById("authMenuEmail");
-  const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
-
-  async function updateDropdownUser() {
-    if (!window.tmeSupabase && !window.supabase && typeof tmeSupabase === "undefined") return;
-
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-    if (!sb) return;
-
-    const { data } = await sb.auth.getUser();
-    const user = data?.user;
-
-    if (!user) {
-      authUserLabel.textContent = "Login / Register";
-      authMenuUsername.textContent = "Guest";
-      authMenuEmail.textContent = "";
-      return;
-    }
-
-    const username =
-      user.user_metadata?.username ||
-      user.email?.split("@")[0] ||
-      "User";
-
-    authUserLabel.textContent = username;
-    authMenuUsername.textContent = username;
-    authMenuEmail.textContent = user.email || "";
-  }
-
-  authUserBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-    if (!sb) return;
-
-    const { data } = await sb.auth.getUser();
-
-    if (!data?.user) {
-      document.getElementById("authModal")?.classList.add("open");
-      return;
-    }
-
-    authUserMenu?.classList.toggle("show");
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".auth-user-dropdown")) {
-      authUserMenu?.classList.remove("show");
-    }
-  });
-
-  document.getElementById("authMenuAccountBtn")?.addEventListener("click", () => {
-    authUserMenu?.classList.remove("show");
-  });
-
-  authMenuLogoutBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-    if (!sb) return;
-
-    await sb.auth.signOut();
-    authUserMenu?.classList.remove("show");
-    updateDropdownUser();
-
-    window.location.reload();
-  });
-
-  setTimeout(updateDropdownUser, 500);
-
-  const sb =
-    window.tmeSupabase ||
-    window.supabase ||
-    (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-  if (sb) {
-    sb.auth.onAuthStateChange(() => {
-      updateDropdownUser();
-    });
-  }
-})();
-</script>
 
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const authUserBtn = document.getElementById("authUserBtn");
 
-  authUserBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
 
-    if (!sb) return;
-
-    const { data } = await sb.auth.getUser();
-
-    if (!data?.user) {
-      const authModal = document.getElementById("authModal");
-      authModal?.classList.add("open");
-      document.body.classList.add("modal-open");
-    }
-  });
-});
-</script>
 
 </body>
 
