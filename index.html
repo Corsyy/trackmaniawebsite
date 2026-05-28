@@ -36,20 +36,6 @@
   white-space: nowrap;
 }
 
-.cta {
-  flex-shrink: 0;
-}
-
-.auth-user-dropdown {
-  flex-shrink: 0;
-}
-
-.auth-user-btn {
-  min-width: 142px;
-  justify-content: center;
-}
-
-
 .cta .submit-event-open {
   white-space: nowrap;
 }
@@ -244,8 +230,80 @@
   font-size: .92rem;
 }
 
+
+.submit-event-dialog select.input,
+.submit-event-dialog input.input,
+.submit-event-dialog textarea.textarea {
+  background: rgba(255,255,255,.055);
+  color: rgba(255,255,255,.92);
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.submit-event-dialog select.input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.72) 50%),
+    linear-gradient(135deg, rgba(255,255,255,.72) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 2.4rem;
+}
+
+.submit-event-dialog select.input option {
+  background: #0b1220;
+  color: #f7fbff;
+}
+
+.submit-event-dialog input[type="text"].input::placeholder,
+.submit-event-dialog textarea.textarea::placeholder {
+  color: rgba(255,255,255,.42);
+}
+
+.submit-event-split-box {
+  grid-column: 1 / -1;
+  display: none;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: .9rem;
+  background: rgba(255,255,255,.03);
+}
+
+.submit-event-split-box.show {
+  display: block;
+}
+
+.submit-event-split-title {
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+
+.submit-event-split-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+  margin-top: .75rem;
+}
+
+.submit-event-split-item {
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-top: .85rem;
+  margin-top: .85rem;
+}
+
+.submit-event-time-hint {
+  color: rgba(255,255,255,.52);
+  font-size: .8rem;
+  margin-top: .25rem;
+}
+
 @media (max-width: 680px) {
-  .submit-event-grid {
+  .submit-event-grid,
+  .submit-event-split-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -627,6 +685,24 @@
             </div>
 
             <div class="field">
+              <label for="submitEventTimezone">Event timezone</label>
+              <select id="submitEventTimezone" class="input" required>
+                <option value="America/New_York">Eastern Time — America/New_York</option>
+                <option value="America/Chicago">Central Time — America/Chicago</option>
+                <option value="America/Denver">Mountain Time — America/Denver</option>
+                <option value="America/Los_Angeles">Pacific Time — America/Los_Angeles</option>
+                <option value="Europe/London">UK — Europe/London</option>
+                <option value="Europe/Paris">Central Europe — Europe/Paris</option>
+                <option value="Europe/Berlin">Germany — Europe/Berlin</option>
+                <option value="Australia/Sydney">Australia Eastern — Australia/Sydney</option>
+                <option value="Australia/Perth">Australia Western — Australia/Perth</option>
+                <option value="Asia/Tokyo">Japan — Asia/Tokyo</option>
+                <option value="UTC">UTC</option>
+              </select>
+              <div class="submit-event-help">Times are entered in this timezone. Visitors will see the correct converted time locally.</div>
+            </div>
+
+            <div class="field">
               <label for="submitEventTag">Card tag</label>
               <input id="submitEventTag" class="input" type="text" maxlength="24" placeholder="Cup, Race, Tournament..." required />
             </div>
@@ -643,7 +719,8 @@
 
             <div class="field">
               <label for="submitEventStartTime">Start time</label>
-              <input id="submitEventStartTime" class="input" type="time" required />
+              <input id="submitEventStartTime" class="input" type="text" inputmode="numeric" maxlength="5" placeholder="14:00" required />
+              <div class="submit-event-time-hint">Use 24-hour time, example: 14:00</div>
             </div>
 
             <div class="field">
@@ -653,7 +730,33 @@
 
             <div class="field">
               <label for="submitEventEndTime">End time</label>
-              <input id="submitEventEndTime" class="input" type="time" required />
+              <input id="submitEventEndTime" class="input" type="text" inputmode="numeric" maxlength="5" placeholder="16:00" required />
+              <div class="submit-event-time-hint">Use 24-hour time, example: 16:00</div>
+            </div>
+
+            <div class="field">
+              <label for="submitEventHasSplits">Does this event have multiple splits?</label>
+              <select id="submitEventHasSplits" class="input">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+
+            <div class="field" id="submitEventSplitCountWrap" style="display:none">
+              <label for="submitEventSplitCount">How many splits?</label>
+              <select id="submitEventSplitCount" class="input">
+                <option value="2">2 splits</option>
+                <option value="3">3 splits</option>
+                <option value="4">4 splits</option>
+                <option value="5">5 splits</option>
+                <option value="6">6 splits</option>
+              </select>
+            </div>
+
+            <div id="submitEventSplitBox" class="submit-event-split-box">
+              <div class="submit-event-split-title">Split dates and times</div>
+              <div class="submit-event-help">Each split uses the event timezone selected above.</div>
+              <div id="submitEventSplitFields"></div>
             </div>
 
             <div class="field submit-event-full">
@@ -1225,11 +1328,12 @@
       );
     }
 
-    function normalizeSegment(seg) {
+    function normalizeSegment(seg, eventTimeZone = EVENT_TIME_ZONE) {
       if (!seg) return seg;
 
       if (seg.start_iso && seg.end_iso) return seg;
 
+      const timeZone = seg.timezone || eventTimeZone || EVENT_TIME_ZONE;
       const startDate = seg.start_date || seg.date;
       const startTime = seg.start_time || seg.time;
       const endDate = seg.end_date || startDate;
@@ -1241,19 +1345,20 @@
       const [sy, smo, sd] = String(startDate).split("-").map(Number);
       const [sh, sm] = String(startTime).split(":").map(Number);
 
-      const start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm);
+      const start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm, timeZone);
 
       let end_iso = "";
       if (endTime) {
         const [eh, em] = String(endTime).split(":").map(Number);
         const [ey, emo, ed] = String(endDate).split("-").map(Number);
-        end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em);
+        end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em, timeZone);
       } else {
-        end_iso = buildEndIsoFromDuration(start_iso, durationMinutes || 60);
+        end_iso = buildEndIsoFromDuration(start_iso, durationMinutes || 60, timeZone);
       }
 
       return {
         ...seg,
+        timezone: timeZone,
         start_iso,
         end_iso,
       };
@@ -1264,8 +1369,10 @@
 
       const normalized = { ...e };
 
+      const eventTimeZone = normalized.timezone || EVENT_TIME_ZONE;
+
       if (Array.isArray(normalized.segments) && normalized.segments.length) {
-        normalized.segments = normalized.segments.map(normalizeSegment);
+        normalized.segments = normalized.segments.map((seg) => normalizeSegment(seg, eventTimeZone));
 
         if (!normalized.start_iso && normalized.segments[0]?.start_iso) {
           normalized.start_iso = normalized.segments[0].start_iso;
@@ -1294,16 +1401,17 @@
       const [sy, smo, sd] = String(startDate).split("-").map(Number);
       const [sh, sm] = String(startTime).split(":").map(Number);
 
-      normalized.start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm);
+      normalized.start_iso = buildIsoForEasternLocal(sy, smo, sd, sh, sm, eventTimeZone);
 
       if (endTime) {
         const [eh, em] = String(endTime).split(":").map(Number);
         const [ey, emo, ed] = String(endDate).split("-").map(Number);
-        normalized.end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em);
+        normalized.end_iso = buildIsoForEasternLocal(ey, emo, ed, eh, em, eventTimeZone);
       } else {
         normalized.end_iso = buildEndIsoFromDuration(
           normalized.start_iso,
-          durationMinutes || 60
+          durationMinutes || 60,
+          eventTimeZone
         );
       }
 
@@ -1649,6 +1757,7 @@
         end_date: row.end_date || row.start_date,
         end_time: row.end_time,
         category,
+        timezone: row.timezone || EVENT_TIME_ZONE,
         location: row.location || "Online",
         discordUrl: row.discord_url || "",
         url: row.event_url || row.discord_url || "",
@@ -1670,7 +1779,7 @@
       try {
         const { data, error } = await tmeSupabase
           .from("event_submissions")
-          .select("id,tag,title,start_date,start_time,end_date,end_time,submitted_type,approved_category,location,discord_url,event_url,description,image,hero_image,image_fit,image_pos,recurrence,segments,status")
+          .select("id,tag,title,start_date,start_time,end_date,end_time,timezone,submitted_type,approved_category,location,discord_url,event_url,description,image,hero_image,image_fit,image_pos,recurrence,segments,status")
           .eq("status", "approved")
           .order("start_date", { ascending: true });
 
@@ -2167,8 +2276,119 @@
       if (startDate && !startDate.value) startDate.value = today;
       if (endDate && !endDate.value) endDate.value = startDate?.value || today;
 
+      try {
+        const guessedZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const zoneSelect = document.getElementById("submitEventTimezone");
+        if (zoneSelect && guessedZone && [...zoneSelect.options].some((opt) => opt.value === guessedZone)) {
+          zoneSelect.value = guessedZone;
+        }
+      } catch { }
+
+      syncSubmitEventSplitControls();
       setSubmitEventStatus("");
       modal?.classList.add("show");
+    }
+
+    function isValidTimeValue(value) {
+      return /^([01]\d|2[0-3]):[0-5]\d$/.test(String(value || "").trim());
+    }
+
+    function getSubmitEventTimezone() {
+      return document.getElementById("submitEventTimezone")?.value || EVENT_TIME_ZONE;
+    }
+
+    function buildSubmitEventSplitFields() {
+      const fields = document.getElementById("submitEventSplitFields");
+      const count = Number(document.getElementById("submitEventSplitCount")?.value || 2);
+      if (!fields) return;
+
+      fields.innerHTML = "";
+
+      for (let i = 1; i <= count; i++) {
+        const item = document.createElement("div");
+        item.className = "submit-event-split-item";
+        item.innerHTML = `
+          <div class="submit-event-split-title">Split ${i}</div>
+          <div class="submit-event-split-grid">
+            <div class="field">
+              <label for="submitSplit${i}Label">Split label</label>
+              <input id="submitSplit${i}Label" class="input" type="text" maxlength="40" value="Split ${i}" />
+            </div>
+            <div class="field">
+              <label for="submitSplit${i}StartDate">Split ${i} start date</label>
+              <input id="submitSplit${i}StartDate" class="input" type="date" />
+            </div>
+            <div class="field">
+              <label for="submitSplit${i}StartTime">Split ${i} start time</label>
+              <input id="submitSplit${i}StartTime" class="input" type="text" inputmode="numeric" maxlength="5" placeholder="14:00" />
+              <div class="submit-event-time-hint">Use 24-hour time, example: 14:00</div>
+            </div>
+            <div class="field">
+              <label for="submitSplit${i}EndDate">Split ${i} end date</label>
+              <input id="submitSplit${i}EndDate" class="input" type="date" />
+            </div>
+            <div class="field">
+              <label for="submitSplit${i}EndTime">Split ${i} end time</label>
+              <input id="submitSplit${i}EndTime" class="input" type="text" inputmode="numeric" maxlength="5" placeholder="16:00" />
+              <div class="submit-event-time-hint">Use 24-hour time, example: 16:00</div>
+            </div>
+          </div>
+        `;
+        fields.appendChild(item);
+      }
+    }
+
+    function syncSubmitEventSplitControls() {
+      const hasSplits = document.getElementById("submitEventHasSplits")?.value === "yes";
+      const countWrap = document.getElementById("submitEventSplitCountWrap");
+      const box = document.getElementById("submitEventSplitBox");
+
+      if (countWrap) countWrap.style.display = hasSplits ? "" : "none";
+      box?.classList.toggle("show", hasSplits);
+
+      if (hasSplits) buildSubmitEventSplitFields();
+    }
+
+    function collectSubmitEventSegments(timezone) {
+      const hasSplits = document.getElementById("submitEventHasSplits")?.value === "yes";
+      if (!hasSplits) return [];
+
+      const count = Number(document.getElementById("submitEventSplitCount")?.value || 2);
+      const segments = [];
+
+      for (let i = 1; i <= count; i++) {
+        const label = cleanSubmissionText(document.getElementById(`submitSplit${i}Label`)?.value || `Split ${i}`, 40);
+        const startDate = document.getElementById(`submitSplit${i}StartDate`)?.value;
+        const startTime = cleanSubmissionText(document.getElementById(`submitSplit${i}StartTime`)?.value, 5);
+        const endDate = document.getElementById(`submitSplit${i}EndDate`)?.value;
+        const endTime = cleanSubmissionText(document.getElementById(`submitSplit${i}EndTime`)?.value, 5);
+
+        if (!startDate || !startTime || !endDate || !endTime) {
+          throw new Error(`Fill out all dates and times for Split ${i}.`);
+        }
+
+        if (!isValidTimeValue(startTime) || !isValidTimeValue(endTime)) {
+          throw new Error(`Split ${i} times must use 24-hour format like 14:00.`);
+        }
+
+        const start = new Date(`${startDate}T${startTime}:00`);
+        const end = new Date(`${endDate}T${endTime}:00`);
+
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
+          throw new Error(`Split ${i} end date/time must be after its start date/time.`);
+        }
+
+        segments.push({
+          label,
+          start_date: startDate,
+          start_time: startTime,
+          end_date: endDate,
+          end_time: endTime,
+          timezone,
+        });
+      }
+
+      return segments;
     }
 
     function bindSubmitEventFeature() {
@@ -2176,6 +2396,8 @@
       const form = document.getElementById("submitEventForm");
       const closeBtn = document.getElementById("submitEventClose");
       const cancelBtn = document.getElementById("submitEventCancel");
+      const hasSplitsSelect = document.getElementById("submitEventHasSplits");
+      const splitCountSelect = document.getElementById("submitEventSplitCount");
 
       document.querySelectorAll(".submit-event-open").forEach((btn) => {
         btn.addEventListener("click", openSubmitEventModal);
@@ -2183,6 +2405,9 @@
 
       closeBtn?.addEventListener("click", closeSubmitEventModal);
       cancelBtn?.addEventListener("click", closeSubmitEventModal);
+      hasSplitsSelect?.addEventListener("change", syncSubmitEventSplitControls);
+      splitCountSelect?.addEventListener("change", buildSubmitEventSplitFields);
+      syncSubmitEventSplitControls();
 
       modal?.addEventListener("click", (event) => {
         if (event.target === modal) closeSubmitEventModal();
@@ -2214,15 +2439,37 @@
         const submittedType = cleanSubmissionText(document.getElementById("submitEventType")?.value, 24);
         const tag = cleanSubmissionText(document.getElementById("submitEventTag")?.value, 24);
         const location = cleanSubmissionText(document.getElementById("submitEventLocation")?.value || "Online", 80);
-        const startDate = document.getElementById("submitEventStartDate")?.value;
-        const startTime = document.getElementById("submitEventStartTime")?.value;
-        const endDate = document.getElementById("submitEventEndDate")?.value;
-        const endTime = document.getElementById("submitEventEndTime")?.value;
+        let startDate = document.getElementById("submitEventStartDate")?.value;
+        let startTime = cleanSubmissionText(document.getElementById("submitEventStartTime")?.value, 5);
+        let endDate = document.getElementById("submitEventEndDate")?.value;
+        let endTime = cleanSubmissionText(document.getElementById("submitEventEndTime")?.value, 5);
+        const timezone = getSubmitEventTimezone();
         const link = cleanSubmissionText(document.getElementById("submitEventUrl")?.value, 300);
         const description = cleanSubmissionText(document.getElementById("submitEventDescription")?.value, 700);
 
+        let segments = [];
+
+        try {
+          segments = collectSubmitEventSegments(timezone);
+        } catch (err) {
+          setSubmitEventStatus(err.message || "Check your split dates and times.", "error");
+          return;
+        }
+
+        if (segments.length) {
+          startDate = segments[0].start_date;
+          startTime = segments[0].start_time;
+          endDate = segments[segments.length - 1].end_date;
+          endTime = segments[segments.length - 1].end_time;
+        }
+
         if (!title || !submittedType || !tag || !startDate || !startTime || !endDate || !endTime || !description) {
           setSubmitEventStatus("Please fill out all required fields.", "error");
+          return;
+        }
+
+        if (!isValidTimeValue(startTime) || !isValidTimeValue(endTime)) {
+          setSubmitEventStatus("Times must use 24-hour format like 14:00.", "error");
           return;
         }
 
@@ -2254,6 +2501,7 @@
           start_time: startTime,
           end_date: endDate,
           end_time: endTime,
+          timezone,
           location,
           discord_url: link,
           event_url: link,
@@ -2261,6 +2509,7 @@
           status: "pending",
           image_fit: "contain",
           image_pos: "center",
+          segments: segments.length ? segments : null,
         };
 
         const { error } = await tmeSupabase.from("event_submissions").insert(payload);
@@ -2279,6 +2528,7 @@
         form.reset();
         const loc = document.getElementById("submitEventLocation");
         if (loc) loc.value = "Online";
+        syncSubmitEventSplitControls();
 
         setSubmitEventStatus("Submitted! Your event is pending admin review.", "success");
       });
@@ -3628,60 +3878,56 @@
   const authMenuEmail = document.getElementById("authMenuEmail");
   const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
 
-  function getSupabaseClient() {
-    return typeof tmeSupabase !== "undefined" ? tmeSupabase : null;
-  }
+  async function updateDropdownUser() {
+    if (!window.tmeSupabase && !window.supabase && typeof tmeSupabase === "undefined") return;
 
-  function setDropdownUser(user) {
-    const username = user
-      ? user.user_metadata?.username || user.user_metadata?.name || user.email?.split("@")[0] || "User"
-      : "Login / Register";
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
 
-    if (authUserLabel) authUserLabel.textContent = username;
-    if (authMenuUsername) authMenuUsername.textContent = user ? username : "Guest";
-    if (authMenuEmail) authMenuEmail.textContent = user?.email || "";
-  }
+    if (!sb) return;
 
-  async function refreshDropdownUser() {
-    const sb = getSupabaseClient();
-    if (!sb) {
-      setDropdownUser(null);
-      return null;
-    }
-
-    try {
-      const { data } = await sb.auth.getUser();
-      const user = data?.user || null;
-      setDropdownUser(user);
-      return user;
-    } catch (err) {
-      console.warn("Could not update auth dropdown:", err);
-      setDropdownUser(null);
-      return null;
-    }
-  }
-
-  authUserBtn?.addEventListener("click", async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const user = await refreshDropdownUser();
+    const { data } = await sb.auth.getUser();
+    const user = data?.user;
 
     if (!user) {
-      authUserMenu?.classList.remove("show");
-      if (typeof openAuthModal === "function") {
-        openAuthModal("login");
-      } else {
-        document.getElementById("authModal")?.classList.add("show");
-      }
+      authUserLabel.textContent = "Login / Register";
+      authMenuUsername.textContent = "Guest";
+      authMenuEmail.textContent = "";
+      return;
+    }
+
+    const username =
+      user.user_metadata?.username ||
+      user.email?.split("@")[0] ||
+      "User";
+
+    authUserLabel.textContent = username;
+    authMenuUsername.textContent = username;
+    authMenuEmail.textContent = user.email || "";
+  }
+
+  authUserBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    const { data } = await sb.auth.getUser();
+
+    if (!data?.user) {
+      document.getElementById("authModal")?.classList.add("open");
       return;
     }
 
     authUserMenu?.classList.toggle("show");
   });
 
-  document.addEventListener("click", (event) => {
-    if (!event.target.closest(".auth-user-dropdown")) {
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".auth-user-dropdown")) {
       authUserMenu?.classList.remove("show");
     }
   });
@@ -3691,32 +3937,56 @@
   });
 
   authMenuLogoutBtn?.addEventListener("click", async () => {
-    const sb = getSupabaseClient();
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
     if (!sb) return;
 
-    try {
-      localStorage.removeItem("tme_login_started_at");
-      await sb.auth.signOut();
-      authUserMenu?.classList.remove("show");
-      setDropdownUser(null);
-      await window.clearLogoutTimer?.();
-      if (typeof updateAuthUI === "function") await updateAuthUI();
-      if (typeof loadShoutboxMessages === "function") await loadShoutboxMessages(false);
-    } catch (err) {
-      console.warn("Dropdown logout failed:", err);
-    }
+    await sb.auth.signOut();
+    authUserMenu?.classList.remove("show");
+    updateDropdownUser();
+
+    window.location.reload();
   });
 
-  setTimeout(refreshDropdownUser, 300);
-  setTimeout(refreshDropdownUser, 1200);
+  setTimeout(updateDropdownUser, 500);
 
-  const sb = getSupabaseClient();
+  const sb =
+    window.tmeSupabase ||
+    window.supabase ||
+    (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
   if (sb) {
     sb.auth.onAuthStateChange(() => {
-      refreshDropdownUser();
+      updateDropdownUser();
     });
   }
 })();
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const authUserBtn = document.getElementById("authUserBtn");
+
+  authUserBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    const { data } = await sb.auth.getUser();
+
+    if (!data?.user) {
+      const authModal = document.getElementById("authModal");
+      authModal?.classList.add("open");
+      document.body.classList.add("modal-open");
+    }
+  });
+});
 </script>
 
 </body>
