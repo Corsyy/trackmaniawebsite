@@ -23,14 +23,12 @@
 <style>
 .auth-user-dropdown {
   position: relative;
-  display: inline-flex;
 }
 
 .auth-user-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: .45rem;
-  white-space: nowrap;
 }
 
 .auth-caret {
@@ -42,18 +40,17 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  min-width: 230px;
+  min-width: 220px;
+  background: rgba(10,16,28,.98);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: .7rem;
   display: none;
   flex-direction: column;
   gap: .45rem;
-  z-index: 999999;
-  padding: .7rem;
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
-  background: rgba(10,16,28,.98);
-  box-shadow: 0 18px 45px rgba(0,0,0,.45);
-  backdrop-filter: blur(18px) saturate(120%);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  z-index: 9999;
+  box-shadow: 0 12px 35px rgba(0,0,0,.45);
+  backdrop-filter: blur(18px);
 }
 
 .auth-user-menu.show {
@@ -72,38 +69,164 @@
 .auth-user-info strong {
   color: #fff;
   font-size: .95rem;
-  font-weight: 900;
 }
 
 .auth-user-info span {
-  color: rgba(255,255,255,.62);
+  color: rgba(255,255,255,.6);
   font-size: .82rem;
   word-break: break-word;
 }
 
 .auth-user-menu button {
-  width: 100%;
   border: 0;
-  background: rgba(255,255,255,.045);
+  background: rgba(255,255,255,.04);
   color: #fff;
-  padding: .72rem .82rem;
+  padding: .75rem .85rem;
   border-radius: 12px;
   text-align: left;
   cursor: pointer;
-  font-weight: 800;
-  transition: background .16s ease, transform .16s ease;
+  transition: .18s ease;
 }
 
 .auth-user-menu button:hover {
-  background: rgba(255,255,255,.085);
-  transform: translateY(-1px);
+  background: rgba(255,255,255,.08);
 }
 
-@media (max-width: 640px) {
-  .auth-user-dropdown {
-    display: none;
+.submit-event-open {
+  white-space: nowrap;
+}
+
+.submit-event-panel {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(0,0,0,.62);
+  z-index: 10000;
+}
+
+.submit-event-panel.show {
+  display: flex;
+}
+
+.submit-event-dialog {
+  width: min(760px, 100%);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+  background: rgba(10,16,28,.98);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 22px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+  backdrop-filter: blur(18px);
+}
+
+.submit-event-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.submit-event-head strong {
+  display: block;
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.submit-event-head span {
+  display: block;
+  margin-top: .2rem;
+  color: rgba(255,255,255,.62);
+  font-size: .9rem;
+  line-height: 1.35;
+}
+
+.submit-event-close {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  color: #fff;
+  font-size: 1.45rem;
+  cursor: pointer;
+}
+
+.submit-event-body {
+  padding: 1.2rem;
+}
+
+.submit-event-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .85rem;
+}
+
+.submit-event-full {
+  grid-column: 1 / -1;
+}
+
+.submit-event-help {
+  color: rgba(255,255,255,.6);
+  font-size: .85rem;
+  line-height: 1.45;
+  margin-top: .35rem;
+}
+
+.submit-event-actions {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.submit-event-status {
+  color: rgba(255,255,255,.72);
+  font-size: .9rem;
+}
+
+.submit-event-status.success {
+  color: #8ef0ad;
+}
+
+.submit-event-status.error {
+  color: #ff9b9b;
+}
+
+.submit-event-card {
+  margin: 0 0 1.25rem;
+  padding: 1rem;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.submit-event-card strong {
+  color: #fff;
+}
+
+.submit-event-card p {
+  margin: .25rem 0 0;
+  color: rgba(255,255,255,.64);
+  font-size: .92rem;
+}
+
+@media (max-width: 680px) {
+  .submit-event-grid {
+    grid-template-columns: 1fr;
   }
 }
+
 </style>
 
 </head>
@@ -122,25 +245,29 @@
         <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
         <a href="/totd">Track of the Day</a>
         <a href="/highlights">Community Highlights</a>
+        <button class="btn submit-event-open nav-auth-mobile" type="button">Submit Event</button>
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
       <div class="cta" id="authArea">
-        <div class="auth-user-dropdown">
-  <button id="authUserBtn" class="btn auth-user-btn" type="button" aria-expanded="false" aria-controls="authUserMenu">
+        <button class="btn primary submit-event-open" type="button">Submit Event</button>
+        
+<div class="auth-user-dropdown">
+  <button id="authUserBtn" class="btn auth-user-btn" type="button">
     <span id="authUserLabel">Login / Register</span>
-    <span class="auth-caret" aria-hidden="true">▾</span>
+    <span class="auth-caret">▾</span>
   </button>
 
-  <div id="authUserMenu" class="auth-user-menu" role="menu">
+  <div id="authUserMenu" class="auth-user-menu">
     <div class="auth-user-info">
       <strong id="authMenuUsername">Guest</strong>
       <span id="authMenuEmail"></span>
     </div>
 
-    <button id="authMenuAccountBtn" type="button" role="menuitem">Account</button>
-    <button id="authMenuLogoutBtn" type="button" role="menuitem">Logout</button>
+    <button id="authMenuAccountBtn" type="button">Account</button>
+    <button id="authMenuLogoutBtn" type="button">Logout</button>
   </div>
 </div>
+
         <a class="btn" href="#contact">Contact</a>
       </div>
     </div>
@@ -151,7 +278,7 @@
     <div class="hero-top">
       <span class="hero-kicker" id="hero-chip">Next Event</span>
 
-      <h1 class="h1"><h1 class="h1">Trackmania events, records, and community races.</h1></h1>
+      <h1 class="h1">Trackmania events, records, and community races.</h1>
 
       <p class="lead">
         Schedules, streams, world records, Track of the Day data, and community updates in one place.
@@ -279,6 +406,14 @@
 
   <section id="schedule" class="section">
     <div class="container">
+      <div class="submit-event-card reveal">
+        <div>
+          <strong>Want your event listed?</strong>
+          <p>Signed-in users can submit events for review. Approved events will appear under Main Events or Fun / Weekly Events.</p>
+        </div>
+        <button class="btn primary submit-event-open" type="button">Submit Event</button>
+      </div>
+
       <h2 class="title">Main Events (click cards for discord invites for event info)</h2>
       <div class="grid" id="main-events-grid">
         <article class="event">
@@ -436,6 +571,90 @@
       </div>
     </div>
   </div>
+
+  <div id="submitEventModal" class="submit-event-panel" role="dialog" aria-modal="true" aria-label="Submit a Trackmania event">
+    <div class="submit-event-dialog">
+      <div class="submit-event-head">
+        <div>
+          <strong>Submit Event</strong>
+          <span>Submit your Trackmania event for review. Events are saved as pending until an admin approves them.</span>
+        </div>
+        <button id="submitEventClose" class="submit-event-close" type="button" aria-label="Close submit event window">×</button>
+      </div>
+
+      <div class="submit-event-body">
+        <form id="submitEventForm">
+          <div class="submit-event-grid">
+            <div class="field">
+              <label for="submitEventTitle">Event title</label>
+              <input id="submitEventTitle" class="input" type="text" maxlength="90" placeholder="Example: Weekly Cup" required />
+            </div>
+
+            <div class="field">
+              <label for="submitEventType">Event type</label>
+              <select id="submitEventType" class="input" required>
+                <option value="weekly">Weekly Event</option>
+                <option value="fun">Fun Event</option>
+                <option value="cup">Cup</option>
+                <option value="tournament">Tournament</option>
+                <option value="campaign">Campaign</option>
+                <option value="kacky">Kacky</option>
+                <option value="other">Other</option>
+              </select>
+              <div class="submit-event-help">Public submissions cannot choose Main. Admins choose Main or Weekly during review.</div>
+            </div>
+
+            <div class="field">
+              <label for="submitEventTag">Card tag</label>
+              <input id="submitEventTag" class="input" type="text" maxlength="24" placeholder="Cup, Race, Tournament..." required />
+            </div>
+
+            <div class="field">
+              <label for="submitEventLocation">Location</label>
+              <input id="submitEventLocation" class="input" type="text" maxlength="80" placeholder="Online" value="Online" />
+            </div>
+
+            <div class="field">
+              <label for="submitEventStartDate">Start date</label>
+              <input id="submitEventStartDate" class="input" type="date" required />
+            </div>
+
+            <div class="field">
+              <label for="submitEventStartTime">Start time</label>
+              <input id="submitEventStartTime" class="input" type="time" required />
+            </div>
+
+            <div class="field">
+              <label for="submitEventEndDate">End date</label>
+              <input id="submitEventEndDate" class="input" type="date" required />
+            </div>
+
+            <div class="field">
+              <label for="submitEventEndTime">End time</label>
+              <input id="submitEventEndTime" class="input" type="time" required />
+            </div>
+
+            <div class="field submit-event-full">
+              <label for="submitEventUrl">Discord or event link</label>
+              <input id="submitEventUrl" class="input" type="url" maxlength="300" placeholder="https://discord.gg/..." />
+            </div>
+
+            <div class="field submit-event-full">
+              <label for="submitEventDescription">Description</label>
+              <textarea id="submitEventDescription" class="textarea" rows="4" maxlength="700" placeholder="Tell people what the event is, where to register, prize pool, format, etc." required></textarea>
+            </div>
+          </div>
+
+          <div class="submit-event-actions">
+            <button id="submitEventSend" class="btn primary" type="submit">Submit for Review</button>
+            <button id="submitEventCancel" class="btn" type="button">Cancel</button>
+            <span id="submitEventStatus" class="submit-event-status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div id="reactionPickerMenu" class="reaction-picker-menu"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -1387,12 +1606,97 @@
       });
     }
 
+
+    function cleanSubmissionText(value, maxLen = 500) {
+      return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLen);
+    }
+
+    function submissionToEvent(row) {
+      if (!row || row.status !== "approved") return null;
+
+      const category =
+        row.approved_category === "main" || row.approved_category === "weekly"
+          ? row.approved_category
+          : "weekly";
+
+      return {
+        tag: row.tag || row.submitted_type || "Event",
+        title: row.title || "Community Event",
+        start_date: row.start_date,
+        start_time: row.start_time,
+        end_date: row.end_date || row.start_date,
+        end_time: row.end_time,
+        category,
+        location: row.location || "Online",
+        discordUrl: row.discord_url || "",
+        url: row.event_url || row.discord_url || "",
+        image: row.image || "/img/community-event.png",
+        hero_image: row.hero_image || row.image || "/img/community-event.png",
+        description: row.description || "",
+        image_fit: row.image_fit || "contain",
+        image_pos: row.image_pos || "center",
+        recurrence: row.recurrence || undefined,
+        segments: row.segments || undefined,
+        submitted_type: row.submitted_type || "other",
+        _submissionId: row.id,
+      };
+    }
+
+    async function fetchApprovedEventSubmissions() {
+      if (!tmeSupabase) return [];
+
+      try {
+        const { data, error } = await tmeSupabase
+          .from("event_submissions")
+          .select("id,tag,title,start_date,start_time,end_date,end_time,submitted_type,approved_category,location,discord_url,event_url,description,image,hero_image,image_fit,image_pos,recurrence,segments,status")
+          .eq("status", "approved")
+          .order("start_date", { ascending: true });
+
+        if (error) {
+          console.warn("Approved event submissions could not be loaded:", error.message);
+          return [];
+        }
+
+        return (Array.isArray(data) ? data : [])
+          .map(submissionToEvent)
+          .filter(Boolean);
+      } catch (err) {
+        console.warn("Approved event submissions failed:", err);
+        return [];
+      }
+    }
+
+    function mergeEventsWithoutDuplicates(baseEvents, submittedEvents) {
+      const out = [];
+      const seen = new Set();
+
+      for (const event of [...(baseEvents || []), ...(submittedEvents || [])]) {
+        const key = [
+          String(event?.title || "").toLowerCase().trim(),
+          event?.start_date || "",
+          event?.start_time || "",
+          event?.end_date || "",
+          event?.end_time || "",
+        ].join("|");
+
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(event);
+      }
+
+      return out;
+    }
+
     async function loadEvents() {
       try {
         const res = await fetch("/events.json?cb=" + Date.now());
         if (!res.ok) throw new Error("Failed to fetch events.json");
+
         const data = await res.json();
-        renderFromData(Array.isArray(data) ? data : []);
+        const jsonEvents = Array.isArray(data) ? data : [];
+        const submittedEvents = await fetchApprovedEventSubmissions();
+
+        renderFromData(mergeEventsWithoutDuplicates(jsonEvents, submittedEvents));
       } catch (err) {
         console.error(err);
 
@@ -1806,6 +2110,156 @@
     async function getCurrentUser() {
       const session = await getCurrentSession();
       return session?.user || null;
+    }
+
+    function setSubmitEventStatus(text, type = "") {
+      const el = document.getElementById("submitEventStatus");
+      if (!el) return;
+      el.textContent = text || "";
+      el.className = `submit-event-status ${type}`.trim();
+    }
+
+    function closeSubmitEventModal() {
+      document.getElementById("submitEventModal")?.classList.remove("show");
+      setSubmitEventStatus("");
+    }
+
+    async function openSubmitEventModal() {
+      if (!tmeSupabase) {
+        alert("Event submissions are not available yet.");
+        return;
+      }
+
+      const user = await getCurrentUser();
+      if (!user) {
+        openAuthModal("login");
+        setAuthMessage("Login or create an account to submit an event.", "error");
+        return;
+      }
+
+      const modal = document.getElementById("submitEventModal");
+      const startDate = document.getElementById("submitEventStartDate");
+      const endDate = document.getElementById("submitEventEndDate");
+
+      const today = new Date().toISOString().slice(0, 10);
+      if (startDate && !startDate.value) startDate.value = today;
+      if (endDate && !endDate.value) endDate.value = startDate?.value || today;
+
+      setSubmitEventStatus("");
+      modal?.classList.add("show");
+    }
+
+    function bindSubmitEventFeature() {
+      const modal = document.getElementById("submitEventModal");
+      const form = document.getElementById("submitEventForm");
+      const closeBtn = document.getElementById("submitEventClose");
+      const cancelBtn = document.getElementById("submitEventCancel");
+
+      document.querySelectorAll(".submit-event-open").forEach((btn) => {
+        btn.addEventListener("click", openSubmitEventModal);
+      });
+
+      closeBtn?.addEventListener("click", closeSubmitEventModal);
+      cancelBtn?.addEventListener("click", closeSubmitEventModal);
+
+      modal?.addEventListener("click", (event) => {
+        if (event.target === modal) closeSubmitEventModal();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal?.classList.contains("show")) {
+          closeSubmitEventModal();
+        }
+      });
+
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!tmeSupabase) {
+          setSubmitEventStatus("Supabase is not configured.", "error");
+          return;
+        }
+
+        const user = await getCurrentUser();
+        if (!user) {
+          closeSubmitEventModal();
+          openAuthModal("login");
+          setAuthMessage("Login or create an account to submit an event.", "error");
+          return;
+        }
+
+        const title = cleanSubmissionText(document.getElementById("submitEventTitle")?.value, 90);
+        const submittedType = cleanSubmissionText(document.getElementById("submitEventType")?.value, 24);
+        const tag = cleanSubmissionText(document.getElementById("submitEventTag")?.value, 24);
+        const location = cleanSubmissionText(document.getElementById("submitEventLocation")?.value || "Online", 80);
+        const startDate = document.getElementById("submitEventStartDate")?.value;
+        const startTime = document.getElementById("submitEventStartTime")?.value;
+        const endDate = document.getElementById("submitEventEndDate")?.value;
+        const endTime = document.getElementById("submitEventEndTime")?.value;
+        const link = cleanSubmissionText(document.getElementById("submitEventUrl")?.value, 300);
+        const description = cleanSubmissionText(document.getElementById("submitEventDescription")?.value, 700);
+
+        if (!title || !submittedType || !tag || !startDate || !startTime || !endDate || !endTime || !description) {
+          setSubmitEventStatus("Please fill out all required fields.", "error");
+          return;
+        }
+
+        const start = new Date(`${startDate}T${startTime}:00`);
+        const end = new Date(`${endDate}T${endTime}:00`);
+
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
+          setSubmitEventStatus("End date/time must be after the start date/time.", "error");
+          return;
+        }
+
+        const submitBtn = document.getElementById("submitEventSend");
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting...";
+        }
+
+        setSubmitEventStatus("Submitting event...", "");
+
+        const username = getUsernameFromUser(user);
+
+        const payload = {
+          user_id: user.id,
+          username,
+          title,
+          tag,
+          submitted_type: submittedType,
+          start_date: startDate,
+          start_time: startTime,
+          end_date: endDate,
+          end_time: endTime,
+          location,
+          discord_url: link,
+          event_url: link,
+          description,
+          status: "pending",
+          image_fit: "contain",
+          image_pos: "center",
+        };
+
+        const { error } = await tmeSupabase.from("event_submissions").insert(payload);
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit for Review";
+        }
+
+        if (error) {
+          console.warn("Event submission failed:", error);
+          setSubmitEventStatus(error.message || "Event submission failed.", "error");
+          return;
+        }
+
+        form.reset();
+        const loc = document.getElementById("submitEventLocation");
+        if (loc) loc.value = "Online";
+
+        setSubmitEventStatus("Submitted! Your event is pending admin review.", "success");
+      });
     }
 
     async function updateAuthUI() {
@@ -2971,6 +3425,7 @@
       };
     }
     bindAuthAndShoutbox();
+    bindSubmitEventFeature();
     if (!window.__emojiBound) {
       window.__emojiBound = true;
       bindEmojiPicker();
@@ -3144,150 +3599,122 @@
 
 <script>
 (function () {
-  function getSupabaseClient() {
-    if (window.tmeSupabase) return window.tmeSupabase;
-    if (typeof tmeSupabase !== "undefined" && tmeSupabase) return tmeSupabase;
-    return null;
-  }
+  const authUserBtn = document.getElementById("authUserBtn");
+  const authUserMenu = document.getElementById("authUserMenu");
+  const authUserLabel = document.getElementById("authUserLabel");
+  const authMenuUsername = document.getElementById("authMenuUsername");
+  const authMenuEmail = document.getElementById("authMenuEmail");
+  const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
 
-  function getDisplayName(user) {
-    return (
-      user?.user_metadata?.username ||
-      user?.user_metadata?.name ||
-      user?.email?.split("@")[0] ||
-      "User"
-    );
-  }
+  async function updateDropdownUser() {
+    if (!window.tmeSupabase && !window.supabase && typeof tmeSupabase === "undefined") return;
 
-  function openExistingAuthModal() {
-    const modal = document.getElementById("authModal");
-    if (!modal) return;
-    modal.classList.add("show");
-    modal.classList.add("open");
-    document.body.classList.add("modal-open");
-  }
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
 
-  function closeAccountMenu() {
-    const menu = document.getElementById("authUserMenu");
-    const btn = document.getElementById("authUserBtn");
-    menu?.classList.remove("show");
-    btn?.setAttribute("aria-expanded", "false");
-  }
-
-  async function updateAccountDropdown() {
-    const sb = getSupabaseClient();
-    const label = document.getElementById("authUserLabel");
-    const usernameEl = document.getElementById("authMenuUsername");
-    const emailEl = document.getElementById("authMenuEmail");
-    const logoutBtn = document.getElementById("authMenuLogoutBtn");
-    const accountBtn = document.getElementById("authMenuAccountBtn");
-
-    if (!label || !usernameEl || !emailEl) return;
-
-    if (!sb) {
-      label.textContent = "Login / Register";
-      usernameEl.textContent = "Guest";
-      emailEl.textContent = "";
-      return;
-    }
+    if (!sb) return;
 
     const { data } = await sb.auth.getUser();
     const user = data?.user;
 
     if (!user) {
-      label.textContent = "Login / Register";
-      usernameEl.textContent = "Guest";
-      emailEl.textContent = "";
-      if (logoutBtn) logoutBtn.style.display = "none";
-      if (accountBtn) accountBtn.style.display = "none";
+      authUserLabel.textContent = "Login / Register";
+      authMenuUsername.textContent = "Guest";
+      authMenuEmail.textContent = "";
       return;
     }
 
-    const displayName = getDisplayName(user);
-    label.textContent = displayName;
-    usernameEl.textContent = displayName;
-    emailEl.textContent = user.email || "";
-    if (logoutBtn) logoutBtn.style.display = "";
-    if (accountBtn) accountBtn.style.display = "";
+    const username =
+      user.user_metadata?.username ||
+      user.email?.split("@")[0] ||
+      "User";
+
+    authUserLabel.textContent = username;
+    authMenuUsername.textContent = username;
+    authMenuEmail.textContent = user.email || "";
   }
 
-  function initAccountDropdown() {
-    const btn = document.getElementById("authUserBtn");
-    const menu = document.getElementById("authUserMenu");
-    const logoutBtn = document.getElementById("authMenuLogoutBtn");
-    const accountBtn = document.getElementById("authMenuAccountBtn");
+  authUserBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
 
-    if (!btn || !menu || btn.dataset.bound === "1") return;
-    btn.dataset.bound = "1";
+    if (!sb) return;
 
-    btn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+    const { data } = await sb.auth.getUser();
 
-      const sb = getSupabaseClient();
-      if (!sb) {
-        openExistingAuthModal();
-        return;
-      }
-
-      const { data } = await sb.auth.getUser();
-
-      if (!data?.user) {
-        closeAccountMenu();
-        openExistingAuthModal();
-        return;
-      }
-
-      const isOpen = menu.classList.toggle("show");
-      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest(".auth-user-dropdown")) {
-        closeAccountMenu();
-      }
-    });
-
-    accountBtn?.addEventListener("click", () => {
-      closeAccountMenu();
-      openExistingAuthModal();
-    });
-
-    logoutBtn?.addEventListener("click", async () => {
-      const sb = getSupabaseClient();
-      if (!sb) return;
-
-      await sb.auth.signOut();
-      localStorage.removeItem("tme_login_started_at");
-      closeAccountMenu();
-      await updateAccountDropdown();
-
-      if (typeof updateAuthUI === "function") {
-        await updateAuthUI();
-      }
-
-      window.location.reload();
-    });
-
-    const sb = getSupabaseClient();
-    if (sb) {
-      sb.auth.onAuthStateChange(() => {
-        updateAccountDropdown();
-      });
+    if (!data?.user) {
+      document.getElementById("authModal")?.classList.add("open");
+      return;
     }
 
-    updateAccountDropdown();
-  }
+    authUserMenu?.classList.toggle("show");
+  });
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAccountDropdown);
-  } else {
-    initAccountDropdown();
-  }
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".auth-user-dropdown")) {
+      authUserMenu?.classList.remove("show");
+    }
+  });
 
-  setTimeout(initAccountDropdown, 400);
-  setTimeout(updateAccountDropdown, 700);
+  document.getElementById("authMenuAccountBtn")?.addEventListener("click", () => {
+    authUserMenu?.classList.remove("show");
+  });
+
+  authMenuLogoutBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    await sb.auth.signOut();
+    authUserMenu?.classList.remove("show");
+    updateDropdownUser();
+
+    window.location.reload();
+  });
+
+  setTimeout(updateDropdownUser, 500);
+
+  const sb =
+    window.tmeSupabase ||
+    window.supabase ||
+    (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+  if (sb) {
+    sb.auth.onAuthStateChange(() => {
+      updateDropdownUser();
+    });
+  }
 })();
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const authUserBtn = document.getElementById("authUserBtn");
+
+  authUserBtn?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    if (!sb) return;
+
+    const { data } = await sb.auth.getUser();
+
+    if (!data?.user) {
+      const authModal = document.getElementById("authModal");
+      authModal?.classList.add("open");
+      document.body.classList.add("modal-open");
+    }
+  });
+});
 </script>
 
 </body>
