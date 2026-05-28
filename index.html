@@ -36,6 +36,20 @@
   white-space: nowrap;
 }
 
+.cta {
+  flex-shrink: 0;
+}
+
+.auth-user-dropdown {
+  flex-shrink: 0;
+}
+
+.auth-user-btn {
+  min-width: 142px;
+  justify-content: center;
+}
+
+
 .cta .submit-event-open {
   white-space: nowrap;
 }
@@ -257,7 +271,6 @@
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
       <div class="cta" id="authArea">
-        <button class="btn submit-event-open" type="button">Submit Event</button>
         
 <div class="auth-user-dropdown">
   <button id="authUserBtn" class="btn auth-user-btn" type="button">
@@ -3614,56 +3627,60 @@
   const authMenuEmail = document.getElementById("authMenuEmail");
   const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
 
-  async function updateDropdownUser() {
-    if (!window.tmeSupabase && !window.supabase && typeof tmeSupabase === "undefined") return;
-
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-    if (!sb) return;
-
-    const { data } = await sb.auth.getUser();
-    const user = data?.user;
-
-    if (!user) {
-      authUserLabel.textContent = "Login / Register";
-      authMenuUsername.textContent = "Guest";
-      authMenuEmail.textContent = "";
-      return;
-    }
-
-    const username =
-      user.user_metadata?.username ||
-      user.email?.split("@")[0] ||
-      "User";
-
-    authUserLabel.textContent = username;
-    authMenuUsername.textContent = username;
-    authMenuEmail.textContent = user.email || "";
+  function getSupabaseClient() {
+    return typeof tmeSupabase !== "undefined" ? tmeSupabase : null;
   }
 
-  authUserBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+  function setDropdownUser(user) {
+    const username = user
+      ? user.user_metadata?.username || user.user_metadata?.name || user.email?.split("@")[0] || "User"
+      : "Login / Register";
 
-    if (!sb) return;
+    if (authUserLabel) authUserLabel.textContent = username;
+    if (authMenuUsername) authMenuUsername.textContent = user ? username : "Guest";
+    if (authMenuEmail) authMenuEmail.textContent = user?.email || "";
+  }
 
-    const { data } = await sb.auth.getUser();
+  async function refreshDropdownUser() {
+    const sb = getSupabaseClient();
+    if (!sb) {
+      setDropdownUser(null);
+      return null;
+    }
 
-    if (!data?.user) {
-      document.getElementById("authModal")?.classList.add("open");
+    try {
+      const { data } = await sb.auth.getUser();
+      const user = data?.user || null;
+      setDropdownUser(user);
+      return user;
+    } catch (err) {
+      console.warn("Could not update auth dropdown:", err);
+      setDropdownUser(null);
+      return null;
+    }
+  }
+
+  authUserBtn?.addEventListener("click", async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const user = await refreshDropdownUser();
+
+    if (!user) {
+      authUserMenu?.classList.remove("show");
+      if (typeof openAuthModal === "function") {
+        openAuthModal("login");
+      } else {
+        document.getElementById("authModal")?.classList.add("show");
+      }
       return;
     }
 
     authUserMenu?.classList.toggle("show");
   });
 
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".auth-user-dropdown")) {
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".auth-user-dropdown")) {
       authUserMenu?.classList.remove("show");
     }
   });
@@ -3673,56 +3690,32 @@
   });
 
   authMenuLogoutBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      window.supabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
+    const sb = getSupabaseClient();
     if (!sb) return;
 
-    await sb.auth.signOut();
-    authUserMenu?.classList.remove("show");
-    updateDropdownUser();
-
-    window.location.reload();
+    try {
+      localStorage.removeItem("tme_login_started_at");
+      await sb.auth.signOut();
+      authUserMenu?.classList.remove("show");
+      setDropdownUser(null);
+      await window.clearLogoutTimer?.();
+      if (typeof updateAuthUI === "function") await updateAuthUI();
+      if (typeof loadShoutboxMessages === "function") await loadShoutboxMessages(false);
+    } catch (err) {
+      console.warn("Dropdown logout failed:", err);
+    }
   });
 
-  setTimeout(updateDropdownUser, 500);
+  setTimeout(refreshDropdownUser, 300);
+  setTimeout(refreshDropdownUser, 1200);
 
-  const sb =
-    window.tmeSupabase ||
-    window.supabase ||
-    (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
+  const sb = getSupabaseClient();
   if (sb) {
     sb.auth.onAuthStateChange(() => {
-      updateDropdownUser();
+      refreshDropdownUser();
     });
   }
 })();
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const authUserBtn = document.getElementById("authUserBtn");
-
-  authUserBtn?.addEventListener("click", async () => {
-    const sb =
-      window.tmeSupabase ||
-      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-    if (!sb) return;
-
-    const { data } = await sb.auth.getUser();
-
-    if (!data?.user) {
-      const authModal = document.getElementById("authModal");
-      authModal?.classList.add("open");
-      document.body.classList.add("modal-open");
-    }
-  });
-});
 </script>
 
 </body>
