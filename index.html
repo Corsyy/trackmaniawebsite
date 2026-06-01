@@ -8,7 +8,8 @@
   <meta name="description"
     content="Live Trackmania events, schedule, and stream hub. Watch live on Twitch, see upcoming events, and get in touch." />
   <meta name="theme-color" content="#0a0f1a" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://trackmaniawebsite.onrender.com; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; frame-src https://player.twitch.tv; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests;" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://trackmaniawebsite.onrender.com; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; frame-src https://player.twitch.tv; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests;" />
   <meta property="og:title" content="Trackmania Events — Official Site" />
   <meta property="og:description" content="Live Trackmania events, schedule, and stream hub." />
   <meta property="og:type" content="website" />
@@ -20,311 +21,311 @@
   <link rel="shortcut icon" href="/logo.png">
   <link rel="stylesheet" href="/css/styles.css">
 
-<style>
-.auth-user-dropdown {
-  position: relative;
-}
+  <style>
+    .auth-user-dropdown {
+      position: relative;
+    }
 
-.auth-user-btn {
-  display: flex;
-  align-items: center;
-  gap: .45rem;
-  white-space: nowrap;
-}
+    .auth-user-btn {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      white-space: nowrap;
+    }
 
-#authUserLabel {
-  white-space: nowrap;
-}
+    #authUserLabel {
+      white-space: nowrap;
+    }
 
-.cta .submit-event-open {
-  white-space: nowrap;
-}
+    .cta .submit-event-open {
+      white-space: nowrap;
+    }
 
-.auth-caret {
-  font-size: .8rem;
-  opacity: .8;
-}
+    .auth-caret {
+      font-size: .8rem;
+      opacity: .8;
+    }
 
-.auth-user-menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  min-width: 220px;
-  background: rgba(10,16,28,.98);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
-  padding: .7rem;
-  display: none;
-  flex-direction: column;
-  gap: .45rem;
-  z-index: 9999;
-  box-shadow: 0 12px 35px rgba(0,0,0,.45);
-  backdrop-filter: blur(18px);
-}
+    .auth-user-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 220px;
+      background: rgba(10, 16, 28, .98);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 16px;
+      padding: .7rem;
+      display: none;
+      flex-direction: column;
+      gap: .45rem;
+      z-index: 9999;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, .45);
+      backdrop-filter: blur(18px);
+    }
 
-.auth-user-menu.show {
-  display: flex;
-}
+    .auth-user-menu.show {
+      display: flex;
+    }
 
-.auth-user-info {
-  display: flex;
-  flex-direction: column;
-  gap: .15rem;
-  padding-bottom: .55rem;
-  margin-bottom: .35rem;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-}
+    .auth-user-info {
+      display: flex;
+      flex-direction: column;
+      gap: .15rem;
+      padding-bottom: .55rem;
+      margin-bottom: .35rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
 
-.auth-user-info strong {
-  color: #fff;
-  font-size: .95rem;
-}
+    .auth-user-info strong {
+      color: #fff;
+      font-size: .95rem;
+    }
 
-.auth-user-info span {
-  color: rgba(255,255,255,.6);
-  font-size: .82rem;
-  word-break: break-word;
-}
+    .auth-user-info span {
+      color: rgba(255, 255, 255, .6);
+      font-size: .82rem;
+      word-break: break-word;
+    }
 
-.auth-user-menu button {
-  border: 0;
-  background: rgba(255,255,255,.04);
-  color: #fff;
-  padding: .75rem .85rem;
-  border-radius: 12px;
-  text-align: left;
-  cursor: pointer;
-  transition: .18s ease;
-}
+    .auth-user-menu button {
+      border: 0;
+      background: rgba(255, 255, 255, .04);
+      color: #fff;
+      padding: .75rem .85rem;
+      border-radius: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: .18s ease;
+    }
 
-.auth-user-menu button:hover {
-  background: rgba(255,255,255,.08);
-}
+    .auth-user-menu button:hover {
+      background: rgba(255, 255, 255, .08);
+    }
 
-.submit-event-open {
-  white-space: nowrap;
-}
+    .submit-event-open {
+      white-space: nowrap;
+    }
 
-.submit-event-panel {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 1.25rem;
-  background: rgba(0,0,0,.62);
-  z-index: 10000;
-}
+    .submit-event-panel {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, .62);
+      z-index: 10000;
+    }
 
-.submit-event-panel.show {
-  display: flex;
-}
+    .submit-event-panel.show {
+      display: flex;
+    }
 
-.submit-event-dialog {
-  width: min(760px, 100%);
-  max-height: min(90vh, 900px);
-  overflow: auto;
-  background: rgba(10,16,28,.98);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 22px;
-  box-shadow: 0 24px 80px rgba(0,0,0,.55);
-  backdrop-filter: blur(18px);
-}
+    .submit-event-dialog {
+      width: min(760px, 100%);
+      max-height: min(90vh, 900px);
+      overflow: auto;
+      background: rgba(10, 16, 28, .98);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 22px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .55);
+      backdrop-filter: blur(18px);
+    }
 
-.submit-event-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.1rem 1.2rem;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-}
+    .submit-event-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
 
-.submit-event-head strong {
-  display: block;
-  color: #fff;
-  font-size: 1.05rem;
-}
+    .submit-event-head strong {
+      display: block;
+      color: #fff;
+      font-size: 1.05rem;
+    }
 
-.submit-event-head span {
-  display: block;
-  margin-top: .2rem;
-  color: rgba(255,255,255,.62);
-  font-size: .9rem;
-  line-height: 1.35;
-}
+    .submit-event-head span {
+      display: block;
+      margin-top: .2rem;
+      color: rgba(255, 255, 255, .62);
+      font-size: .9rem;
+      line-height: 1.35;
+    }
 
-.submit-event-close {
-  width: 38px;
-  height: 38px;
-  border: 0;
-  border-radius: 12px;
-  background: rgba(255,255,255,.06);
-  color: #fff;
-  font-size: 1.45rem;
-  cursor: pointer;
-}
+    .submit-event-close {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .06);
+      color: #fff;
+      font-size: 1.45rem;
+      cursor: pointer;
+    }
 
-.submit-event-body {
-  padding: 1.2rem;
-}
+    .submit-event-body {
+      padding: 1.2rem;
+    }
 
-.submit-event-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .85rem;
-}
+    .submit-event-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .85rem;
+    }
 
-.submit-event-full {
-  grid-column: 1 / -1;
-}
+    .submit-event-full {
+      grid-column: 1 / -1;
+    }
 
-.submit-event-help {
-  color: rgba(255,255,255,.6);
-  font-size: .85rem;
-  line-height: 1.45;
-  margin-top: .35rem;
-}
+    .submit-event-help {
+      color: rgba(255, 255, 255, .6);
+      font-size: .85rem;
+      line-height: 1.45;
+      margin-top: .35rem;
+    }
 
-.submit-event-actions {
-  display: flex;
-  align-items: center;
-  gap: .7rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
+    .submit-event-actions {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
 
-.submit-event-status {
-  color: rgba(255,255,255,.72);
-  font-size: .9rem;
-}
+    .submit-event-status {
+      color: rgba(255, 255, 255, .72);
+      font-size: .9rem;
+    }
 
-.submit-event-status.success {
-  color: #8ef0ad;
-}
+    .submit-event-status.success {
+      color: #8ef0ad;
+    }
 
-.submit-event-status.error {
-  color: #ff9b9b;
-}
+    .submit-event-status.error {
+      color: #ff9b9b;
+    }
 
-.submit-event-card {
-  margin: 0 0 1.25rem;
-  padding: 1rem;
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 18px;
-  background: rgba(255,255,255,.035);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
+    .submit-event-card {
+      margin: 0 0 1.25rem;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .035);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
 
-.submit-event-card strong {
-  color: #fff;
-}
+    .submit-event-card strong {
+      color: #fff;
+    }
 
-.submit-event-card p {
-  margin: .25rem 0 0;
-  color: rgba(255,255,255,.64);
-  font-size: .92rem;
-}
-
-
-.submit-event-dialog select.input,
-.submit-event-dialog input.input,
-.submit-event-dialog textarea.textarea {
-  background: rgba(255,255,255,.055);
-  color: rgba(255,255,255,.92);
-  border: 1px solid rgba(255,255,255,.12);
-}
-
-.submit-event-dialog select.input {
-  appearance: none;
-  -webkit-appearance: none;
-  background-image:
-    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.72) 50%),
-    linear-gradient(135deg, rgba(255,255,255,.72) 50%, transparent 50%);
-  background-position:
-    calc(100% - 18px) 50%,
-    calc(100% - 12px) 50%;
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-  padding-right: 2.4rem;
-}
-
-.submit-event-dialog select.input option {
-  background: #0b1220;
-  color: #f7fbff;
-}
-
-.submit-event-dialog input[type="text"].input::placeholder,
-.submit-event-dialog textarea.textarea::placeholder {
-  color: rgba(255,255,255,.42);
-}
-
-.submit-event-split-box {
-  grid-column: 1 / -1;
-  display: none;
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
-  padding: .9rem;
-  background: rgba(255,255,255,.03);
-}
-
-.submit-event-split-box.show {
-  display: block;
-}
-
-.submit-event-split-title {
-  color: #fff;
-  font-weight: 700;
-  margin-bottom: .75rem;
-}
-
-.submit-event-split-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .75rem;
-  margin-top: .75rem;
-}
-
-.submit-event-split-item {
-  border-top: 1px solid rgba(255,255,255,.08);
-  padding-top: .85rem;
-  margin-top: .85rem;
-}
-
-.submit-event-time-hint {
-  color: rgba(255,255,255,.52);
-  font-size: .8rem;
-  margin-top: .25rem;
-}
-
-@media (max-width: 680px) {
-  .submit-event-grid,
-  .submit-event-split-grid {
-    grid-template-columns: 1fr;
-  }
-}
+    .submit-event-card p {
+      margin: .25rem 0 0;
+      color: rgba(255, 255, 255, .64);
+      font-size: .92rem;
+    }
 
 
-.navlinks .nav-submit {
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: none;
-  white-space: nowrap;
-}
+    .submit-event-dialog select.input,
+    .submit-event-dialog input.input,
+    .submit-event-dialog textarea.textarea {
+      background: rgba(255, 255, 255, .055);
+      color: rgba(255, 255, 255, .92);
+      border: 1px solid rgba(255, 255, 255, .12);
+    }
 
-.navlinks .nav-submit:hover {
-  color: #fff;
-}
+    .submit-event-dialog select.input {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, .72) 50%),
+        linear-gradient(135deg, rgba(255, 255, 255, .72) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 12px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 2.4rem;
+    }
 
-</style>
+    .submit-event-dialog select.input option {
+      background: #0b1220;
+      color: #f7fbff;
+    }
+
+    .submit-event-dialog input[type="text"].input::placeholder,
+    .submit-event-dialog textarea.textarea::placeholder {
+      color: rgba(255, 255, 255, .42);
+    }
+
+    .submit-event-split-box {
+      grid-column: 1 / -1;
+      display: none;
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 16px;
+      padding: .9rem;
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .submit-event-split-box.show {
+      display: block;
+    }
+
+    .submit-event-split-title {
+      color: #fff;
+      font-weight: 700;
+      margin-bottom: .75rem;
+    }
+
+    .submit-event-split-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .75rem;
+      margin-top: .75rem;
+    }
+
+    .submit-event-split-item {
+      border-top: 1px solid rgba(255, 255, 255, .08);
+      padding-top: .85rem;
+      margin-top: .85rem;
+    }
+
+    .submit-event-time-hint {
+      color: rgba(255, 255, 255, .52);
+      font-size: .8rem;
+      margin-top: .25rem;
+    }
+
+    @media (max-width: 680px) {
+
+      .submit-event-grid,
+      .submit-event-split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    .navlinks .nav-submit {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .navlinks .nav-submit:hover {
+      color: #fff;
+    }
+  </style>
 
 </head>
 
@@ -346,23 +347,23 @@
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
       <div class="cta" id="authArea">
-        
-<div class="auth-user-dropdown">
-  <button id="authUserBtn" class="btn auth-user-btn" type="button">
-    <span id="authUserLabel">Login / Register</span>
-    <span class="auth-caret">▾</span>
-  </button>
 
-  <div id="authUserMenu" class="auth-user-menu">
-    <div class="auth-user-info">
-      <strong id="authMenuUsername">Guest</strong>
-      <span id="authMenuEmail"></span>
-    </div>
+        <div class="auth-user-dropdown">
+          <button id="authUserBtn" class="btn auth-user-btn" type="button">
+            <span id="authUserLabel">Login / Register</span>
+            <span class="auth-caret">▾</span>
+          </button>
 
-    <button id="authMenuAccountBtn" type="button">Account</button>
-    <button id="authMenuLogoutBtn" type="button">Logout</button>
-  </div>
-</div>
+          <div id="authUserMenu" class="auth-user-menu">
+            <div class="auth-user-info">
+              <strong id="authMenuUsername">Guest</strong>
+              <span id="authMenuEmail"></span>
+            </div>
+
+            <button id="authMenuAccountBtn" type="button">Account</button>
+            <button id="authMenuLogoutBtn" type="button">Logout</button>
+          </div>
+        </div>
 
         <a class="btn" href="#contact">Contact</a>
       </div>
@@ -370,69 +371,74 @@
   </header>
 
   <section class="hero" id="home">
-  <div class="container hero-grid">
-    <div class="hero-top">
-      <span class="hero-kicker" id="hero-chip">Next Event</span>
+    <div class="container hero-grid">
+      <div class="hero-top">
+        <span class="hero-kicker" id="hero-chip">Next Event</span>
 
-      <h1 class="h1">Trackmania events, records, and community races.</h1>
+        <h1 class="h1">Trackmania events, records, and community races.</h1>
 
-      <p class="lead">
-        Schedules, streams, world records, Track of the Day data, and community updates in one place.
-      </p>
-      <div class="hero-stats" id="hero-pills">
-        <div class="hero-stat">
-          <span>Status</span>
-          <strong>Loading</strong>
-        </div>
-        <div class="hero-stat">
-          <span>Location</span>
-          <strong>Online</strong>
-        </div>
-        <div class="hero-stat">
-          <span>Format</span>
-          <strong>Community</strong>
-        </div>
-      </div>
-    </div>
+        <p class="lead">
+          Schedules, streams, world records, Track of the Day data, and community updates in one place.
+        </p>
+        <div class="hero-event-card" id="hero-event-card">
+          <div class="hero-event-label">Next Event</div>
+          <h3 id="hero-event-title">Loading event…</h3>
 
-    <div class="hero-row">
-      <div>
-        <div class="card" id="countdown-card" aria-live="polite">
-          <div class="card-header">
-            <strong id="countdown-title">Countdown to green light</strong>
-          </div>
-
-          <div class="card-body">
-            <div class="countdown" id="countdown">
-              <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
-              <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
-              <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
-              <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+          <div class="hero-event-grid">
+            <div>
+              <span>Date</span>
+              <strong id="hero-event-date">Loading…</strong>
             </div>
 
-            <div id="miniCalendar" class="calendar-container">
-              <div class="cal-header">
-                <button id="cal-prev" type="button">←</button>
-                <div id="cal-title"></div>
-                <button id="cal-next" type="button">→</button>
+            <div>
+              <span>Location</span>
+              <strong id="hero-event-location">Online</strong>
+            </div>
+          </div>
+
+          <p id="hero-event-desc">Finding the next Trackmania event.</p>
+          <a id="hero-event-link" href="#schedule">View event details</a>
+        </div>
+      </div>
+
+      <div class="hero-row">
+        <div>
+          <div class="card" id="countdown-card" aria-live="polite">
+            <div class="card-header">
+              <strong id="countdown-title">Countdown to green light</strong>
+            </div>
+
+            <div class="card-body">
+              <div class="countdown" id="countdown">
+                <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+                <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+                <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+                <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
               </div>
-              <table id="cal-grid"></table>
+
+              <div id="miniCalendar" class="calendar-container">
+                <div class="cal-header">
+                  <button id="cal-prev" type="button">←</button>
+                  <div id="cal-title"></div>
+                  <button id="cal-next" type="button">→</button>
+                </div>
+                <table id="cal-grid"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="live" class="live">
+          <div class="card reveal">
+            <div class="card-header"><strong>Live on Twitch</strong></div>
+            <div class="card-body">
+              <div id="twitch-embed"></div>
             </div>
           </div>
         </div>
       </div>
-
-      <div id="live" class="live">
-        <div class="card reveal">
-          <div class="card-header"><strong>Live on Twitch</strong></div>
-          <div class="card-body">
-            <div id="twitch-embed"></div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <section id="shoutbox-section" class="section" aria-label="Community shoutbox">
     <div class="container">
@@ -660,14 +666,17 @@
     </div>
   </div>
 
-  <div id="submitEventModal" class="submit-event-panel" role="dialog" aria-modal="true" aria-label="Submit a Trackmania event">
+  <div id="submitEventModal" class="submit-event-panel" role="dialog" aria-modal="true"
+    aria-label="Submit a Trackmania event">
     <div class="submit-event-dialog">
       <div class="submit-event-head">
         <div>
           <strong>Submit Event</strong>
-          <span>Submit your Trackmania event for review. Events are saved as pending until an admin approves them.</span>
+          <span>Submit your Trackmania event for review. Events are saved as pending until an admin approves
+            them.</span>
         </div>
-        <button id="submitEventClose" class="submit-event-close" type="button" aria-label="Close submit event window">×</button>
+        <button id="submitEventClose" class="submit-event-close" type="button"
+          aria-label="Close submit event window">×</button>
       </div>
 
       <div class="submit-event-body">
@@ -675,7 +684,8 @@
           <div class="submit-event-grid">
             <div class="field">
               <label for="submitEventTitle">Event title</label>
-              <input id="submitEventTitle" class="input" type="text" maxlength="90" placeholder="Example: Weekly Cup" required />
+              <input id="submitEventTitle" class="input" type="text" maxlength="90" placeholder="Example: Weekly Cup"
+                required />
             </div>
 
             <div class="field">
@@ -689,7 +699,8 @@
                 <option value="kacky">Kacky</option>
                 <option value="other">Other</option>
               </select>
-              <div class="submit-event-help">Public submissions cannot choose Main. Admins choose Main or Weekly during review.</div>
+              <div class="submit-event-help">Public submissions cannot choose Main. Admins choose Main or Weekly during
+                review.</div>
             </div>
 
             <div class="field">
@@ -707,17 +718,20 @@
                 <option value="Asia/Tokyo">Japan — Asia/Tokyo</option>
                 <option value="UTC">UTC</option>
               </select>
-              <div class="submit-event-help">Times are entered in this timezone. Visitors will see the correct converted time locally.</div>
+              <div class="submit-event-help">Times are entered in this timezone. Visitors will see the correct converted
+                time locally.</div>
             </div>
 
             <div class="field">
               <label for="submitEventTag">Card tag</label>
-              <input id="submitEventTag" class="input" type="text" maxlength="24" placeholder="Cup, Race, Tournament..." required />
+              <input id="submitEventTag" class="input" type="text" maxlength="24" placeholder="Cup, Race, Tournament..."
+                required />
             </div>
 
             <div class="field">
               <label for="submitEventLocation">Location</label>
-              <input id="submitEventLocation" class="input" type="text" maxlength="80" placeholder="Online" value="Online" />
+              <input id="submitEventLocation" class="input" type="text" maxlength="80" placeholder="Online"
+                value="Online" />
             </div>
 
             <div class="field">
@@ -727,7 +741,8 @@
 
             <div class="field">
               <label for="submitEventStartTime">Start time</label>
-              <input id="submitEventStartTime" class="input" type="text" inputmode="numeric" maxlength="5" placeholder="14:00" required />
+              <input id="submitEventStartTime" class="input" type="text" inputmode="numeric" maxlength="5"
+                placeholder="14:00" required />
               <div class="submit-event-time-hint">Use 24-hour time, example: 14:00</div>
             </div>
 
@@ -738,7 +753,8 @@
 
             <div class="field">
               <label for="submitEventEndTime">End time</label>
-              <input id="submitEventEndTime" class="input" type="text" inputmode="numeric" maxlength="5" placeholder="16:00" required />
+              <input id="submitEventEndTime" class="input" type="text" inputmode="numeric" maxlength="5"
+                placeholder="16:00" required />
               <div class="submit-event-time-hint">Use 24-hour time, example: 16:00</div>
             </div>
 
@@ -769,12 +785,15 @@
 
             <div class="field submit-event-full">
               <label for="submitEventUrl">Discord or event link</label>
-              <input id="submitEventUrl" class="input" type="url" maxlength="300" placeholder="https://discord.gg/..." />
+              <input id="submitEventUrl" class="input" type="url" maxlength="300"
+                placeholder="https://discord.gg/..." />
             </div>
 
             <div class="field submit-event-full">
               <label for="submitEventDescription">Description</label>
-              <textarea id="submitEventDescription" class="textarea" rows="4" maxlength="700" placeholder="Tell people what the event is, where to register, prize pool, format, etc." required></textarea>
+              <textarea id="submitEventDescription" class="textarea" rows="4" maxlength="700"
+                placeholder="Tell people what the event is, where to register, prize pool, format, etc."
+                required></textarea>
             </div>
           </div>
 
@@ -1541,6 +1560,52 @@
 
       await loadShoutboxMessages();
     }
+    function updateHeroEventCard(state, event, range) {
+      const card = document.getElementById("hero-event-card");
+      const label = card?.querySelector(".hero-event-label");
+      const title = document.getElementById("hero-event-title");
+      const date = document.getElementById("hero-event-date");
+      const location = document.getElementById("hero-event-location");
+      const desc = document.getElementById("hero-event-desc");
+      const link = document.getElementById("hero-event-link");
+
+      if (!card || !label || !title || !date || !location || !desc || !link) return;
+
+      if (!event) {
+        card.classList.add("is-empty");
+        label.textContent = "No upcoming event";
+        title.textContent = "No upcoming events right now.";
+        link.href = "#schedule";
+        link.textContent = "View schedule";
+        return;
+      }
+
+      card.classList.remove("is-empty");
+
+      label.textContent = state === "live" ? "Live Now" : "Next Event";
+      title.textContent = event.title || "Untitled event";
+      date.textContent = range?.start_iso ? fmtDate(range.start_iso) : "TBA";
+      location.textContent = event.location || "Online";
+
+      const cleanDesc = String(range?.label || event.description || "").trim();
+      desc.textContent = cleanDesc || "More event details are available below.";
+
+      const href =
+        normalizeHref(event.discordUrl) ||
+        normalizeHref(event.url) ||
+        "#schedule";
+
+      link.href = href;
+      link.textContent = href === "#schedule" ? "View schedule" : "Visit event website";
+
+      if (href !== "#schedule") {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      } else {
+        link.removeAttribute("target");
+        link.removeAttribute("rel");
+      }
+    }
     function renderFromData(rawEvents) {
       const events = expandRecurringEvents(normalizeEvents(Array.isArray(rawEvents) ? rawEvents : []));
 
@@ -1656,7 +1721,6 @@
       const next = upcomingMain[0] || upcoming[0] || null;
 
       const chip = document.getElementById("hero-chip");
-      const pills = document.getElementById("hero-pills");
       const header = document.getElementById("countdown-title");
       const cdCard = document.getElementById("countdown-card");
 
@@ -1667,11 +1731,7 @@
         chip.textContent =
           live.length > 1 ? `🟢 ${live.length} events live — ${cur.title}` : `Live now • ${cur.title}`;
 
-        pills.innerHTML = `
-        <div class="pill">🟢 Live</div>
-        <div class="pill">📍 ${escapeHtml(cur.location || "Online")}</div>
-        <div class="pill">🏁 ${escapeHtml(curRange.label || cur.description || "")}</div>
-      `;
+        updateHeroEventCard("next", next, nextRange);
 
         header.textContent = "Live now!";
         setCountdown(0, 0, 0, 0);
@@ -1684,17 +1744,13 @@
         const nextRange = getDisplayRange(next, nowDate);
 
         chip.textContent = `Next Event • ${next.title}`;
-        pills.innerHTML = `
-        <div class="pill">🗓️ ${escapeHtml(fmtDate(nextRange.start_iso))}</div>
-        <div class="pill">📍 ${escapeHtml(next.location || "Online")}</div>
-        <div class="pill">🏁 ${escapeHtml(nextRange.label || next.description || "")}</div>
-      `;
+        updateHeroEventCard("next", next, nextRange);
 
         startCountdown(nextRange.start_iso, header);
         cdCard?.style.removeProperty("--cd-img");
       } else {
         chip.textContent = "No upcoming event";
-        pills.innerHTML = '<div class="pill">Check back soon</div>';
+        updateHeroEventCard("empty", null, null);
         header.textContent = "Countdown";
         setCountdown(0, 0, 0, 0);
         cdCard?.style.removeProperty("--cd-img");
@@ -3877,125 +3933,125 @@
   </script>
 
 
-<script>
-(function () {
-  const authUserBtn = document.getElementById("authUserBtn");
-  const authUserMenu = document.getElementById("authUserMenu");
-  const authUserLabel = document.getElementById("authUserLabel");
-  const authMenuUsername = document.getElementById("authMenuUsername");
-  const authMenuEmail = document.getElementById("authMenuEmail");
-  const authMenuAccountBtn = document.getElementById("authMenuAccountBtn");
-  const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
+  <script>
+    (function () {
+      const authUserBtn = document.getElementById("authUserBtn");
+      const authUserMenu = document.getElementById("authUserMenu");
+      const authUserLabel = document.getElementById("authUserLabel");
+      const authMenuUsername = document.getElementById("authMenuUsername");
+      const authMenuEmail = document.getElementById("authMenuEmail");
+      const authMenuAccountBtn = document.getElementById("authMenuAccountBtn");
+      const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
 
-  function getClient() {
-    return typeof tmeSupabase !== "undefined" ? tmeSupabase : null;
-  }
+      function getClient() {
+        return typeof tmeSupabase !== "undefined" ? tmeSupabase : null;
+      }
 
-  function openLoginModal() {
-    authUserMenu?.classList.remove("show");
+      function openLoginModal() {
+        authUserMenu?.classList.remove("show");
 
-    if (typeof openAuthModal === "function") {
-      openAuthModal("login");
-      return;
-    }
+        if (typeof openAuthModal === "function") {
+          openAuthModal("login");
+          return;
+        }
 
-    const modal = document.getElementById("authModal");
-    modal?.classList.add("show");
-  }
+        const modal = document.getElementById("authModal");
+        modal?.classList.add("show");
+      }
 
-  async function getDropdownUser() {
-    const sb = getClient();
-    if (!sb) return null;
+      async function getDropdownUser() {
+        const sb = getClient();
+        if (!sb) return null;
 
-    try {
-      const { data } = await sb.auth.getUser();
-      return data?.user || null;
-    } catch (err) {
-      console.warn("Could not read auth user:", err);
-      return null;
-    }
-  }
+        try {
+          const { data } = await sb.auth.getUser();
+          return data?.user || null;
+        } catch (err) {
+          console.warn("Could not read auth user:", err);
+          return null;
+        }
+      }
 
-  async function updateDropdownUser() {
-    const user = await getDropdownUser();
+      async function updateDropdownUser() {
+        const user = await getDropdownUser();
 
-    if (!user) {
-      if (authUserLabel) authUserLabel.textContent = "Login / Register";
-      if (authMenuUsername) authMenuUsername.textContent = "Guest";
-      if (authMenuEmail) authMenuEmail.textContent = "";
-      authUserMenu?.classList.remove("show");
-      return;
-    }
+        if (!user) {
+          if (authUserLabel) authUserLabel.textContent = "Login / Register";
+          if (authMenuUsername) authMenuUsername.textContent = "Guest";
+          if (authMenuEmail) authMenuEmail.textContent = "";
+          authUserMenu?.classList.remove("show");
+          return;
+        }
 
-    const username =
-      user.user_metadata?.username ||
-      user.user_metadata?.name ||
-      user.email?.split("@")[0] ||
-      "User";
+        const username =
+          user.user_metadata?.username ||
+          user.user_metadata?.name ||
+          user.email?.split("@")[0] ||
+          "User";
 
-    if (authUserLabel) authUserLabel.textContent = username;
-    if (authMenuUsername) authMenuUsername.textContent = username;
-    if (authMenuEmail) authMenuEmail.textContent = user.email || "";
-  }
+        if (authUserLabel) authUserLabel.textContent = username;
+        if (authMenuUsername) authMenuUsername.textContent = username;
+        if (authMenuEmail) authMenuEmail.textContent = user.email || "";
+      }
 
-  authUserBtn?.addEventListener("click", async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+      authUserBtn?.addEventListener("click", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
 
-    const user = await getDropdownUser();
+        const user = await getDropdownUser();
 
-    if (!user) {
-      openLoginModal();
-      return;
-    }
+        if (!user) {
+          openLoginModal();
+          return;
+        }
 
-    authUserMenu?.classList.toggle("show");
-  });
+        authUserMenu?.classList.toggle("show");
+      });
 
-  authMenuAccountBtn?.addEventListener("click", () => {
-    authUserMenu?.classList.remove("show");
-  });
+      authMenuAccountBtn?.addEventListener("click", () => {
+        authUserMenu?.classList.remove("show");
+      });
 
-  authMenuLogoutBtn?.addEventListener("click", async () => {
-    const sb = getClient();
-    if (!sb) return;
+      authMenuLogoutBtn?.addEventListener("click", async () => {
+        const sb = getClient();
+        if (!sb) return;
 
-    try {
-      localStorage.removeItem("tme_login_started_at");
-      await sb.auth.signOut();
-      authUserMenu?.classList.remove("show");
-      await updateDropdownUser();
-      if (typeof updateAuthUI === "function") await updateAuthUI();
-      if (typeof loadShoutboxMessages === "function") await loadShoutboxMessages(false);
-      await window.clearLogoutTimer?.();
-    } catch (err) {
-      console.warn("Dropdown logout failed:", err);
-    }
-  });
+        try {
+          localStorage.removeItem("tme_login_started_at");
+          await sb.auth.signOut();
+          authUserMenu?.classList.remove("show");
+          await updateDropdownUser();
+          if (typeof updateAuthUI === "function") await updateAuthUI();
+          if (typeof loadShoutboxMessages === "function") await loadShoutboxMessages(false);
+          await window.clearLogoutTimer?.();
+        } catch (err) {
+          console.warn("Dropdown logout failed:", err);
+        }
+      });
 
-  document.addEventListener("click", (event) => {
-    if (!event.target.closest(".auth-user-dropdown")) {
-      authUserMenu?.classList.remove("show");
-    }
-  });
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".auth-user-dropdown")) {
+          authUserMenu?.classList.remove("show");
+        }
+      });
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      authUserMenu?.classList.remove("show");
-    }
-  });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          authUserMenu?.classList.remove("show");
+        }
+      });
 
-  const sb = getClient();
-  if (sb) {
-    sb.auth.onAuthStateChange(() => {
+      const sb = getClient();
+      if (sb) {
+        sb.auth.onAuthStateChange(() => {
+          updateDropdownUser().catch(console.warn);
+        });
+      }
+
       updateDropdownUser().catch(console.warn);
-    });
-  }
-
-  updateDropdownUser().catch(console.warn);
-  setTimeout(() => updateDropdownUser().catch(console.warn), 800);
-})();
-</script>
+      setTimeout(() => updateDropdownUser().catch(console.warn), 800);
+    })();
+  </script>
 
 </body>
 
