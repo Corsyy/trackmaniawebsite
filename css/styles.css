@@ -679,27 +679,47 @@ header {
   grid-template-columns: repeat(3, 1fr);
   gap: 1.05rem;
 }
+
 .hero-event-card {
   margin-top: 2rem;
   width: min(620px, 100%);
   padding: 1.1rem;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 22px;
-  background: rgba(255,255,255,.035);
-  box-shadow: 0 18px 42px rgba(0,0,0,.25);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02)),
+    rgba(255,255,255,.025);
+  box-shadow: 0 18px 42px rgba(0,0,0,.28);
+  backdrop-filter: blur(18px) saturate(105%);
+  -webkit-backdrop-filter: blur(18px) saturate(105%);
 }
 
 .hero-event-label {
-  margin-bottom: .7rem;
-  color: rgba(255,255,255,.7);
-  font-size: .9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  margin-bottom: .75rem;
+  color: rgba(255,255,255,.72);
+  font-size: .86rem;
   font-weight: 850;
+}
+
+.hero-event-label::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent-3);
+  box-shadow: 0 0 12px rgba(54, 242, 178, .22);
 }
 
 .hero-event-card h3 {
   margin: 0 0 1rem;
-  font-size: 1.05rem;
+  color: #f7fbff;
+  font-size: 1.08rem;
   line-height: 1.35;
+  font-weight: 900;
+  letter-spacing: -.02em;
 }
 
 .hero-event-grid {
@@ -710,7 +730,7 @@ header {
 }
 
 .hero-event-grid div {
-  padding: .75rem .85rem;
+  padding: .78rem .85rem;
   border: 1px solid rgba(255,255,255,.07);
   border-radius: 16px;
   background: rgba(255,255,255,.03);
@@ -718,39 +738,127 @@ header {
 
 .hero-event-grid span {
   display: block;
-  margin-bottom: .25rem;
+  margin-bottom: .3rem;
   color: rgba(255,255,255,.52);
-  font-size: .78rem;
+  font-size: .76rem;
   font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: .035em;
 }
 
 .hero-event-grid strong {
   display: block;
   color: #f7fbff;
-  font-size: .9rem;
+  font-size: .92rem;
   line-height: 1.35;
-}
-
-.hero-event-card p {
-  margin: 0 0 .9rem;
-  color: rgba(255,255,255,.68);
-  line-height: 1.5;
-  font-size: .94rem;
-}
-
-.hero-event-card a {
-  display: inline-flex;
-  padding: .65rem .9rem;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.1);
-  background: rgba(255,255,255,.045);
-  color: #f7fbff;
   font-weight: 850;
 }
 
-.hero-event-card a:hover {
-  background: rgba(255,255,255,.07);
+.hero-event-card p {
+  margin: 0 0 1rem;
+  max-width: 560px;
+  color: rgba(255,255,255,.68);
+  line-height: 1.55;
+  font-size: .94rem;
 }
+
+.hero-event-actions,
+.event-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .55rem;
+  margin-top: .85rem;
+}
+
+.hero-event-card a,
+.hero-event-card .hero-website-btn,
+#hero-event-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 40px;
+  padding: .65rem .95rem;
+  border-radius: 14px;
+  border: 1px solid rgba(126, 232, 255, .18);
+  background:
+    linear-gradient(180deg, rgba(126,232,255,.09), rgba(255,255,255,.02)),
+    rgba(255,255,255,.035);
+  color: #f7fbff;
+  font-size: .88rem;
+  font-weight: 850;
+  text-decoration: none;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+
+.hero-event-card a:hover,
+.hero-event-card .hero-website-btn:hover,
+#hero-event-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(126, 232, 255, .30);
+  background:
+    linear-gradient(180deg, rgba(126,232,255,.13), rgba(255,255,255,.028)),
+    rgba(255,255,255,.045);
+  box-shadow: 0 10px 24px rgba(0,0,0,.22);
+}
+
+.event-discord-btn,
+.event-website-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 36px;
+  padding: .55rem .82rem;
+  border-radius: 13px;
+  color: #f7fbff;
+  font-size: .84rem;
+  font-weight: 850;
+  line-height: 1;
+  text-decoration: none;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+
+.event-discord-btn {
+  border: 1px solid rgba(139, 124, 255, .22);
+  background:
+    linear-gradient(180deg, rgba(139,124,255,.12), rgba(255,255,255,.02)),
+    rgba(255,255,255,.035);
+}
+
+.event-website-btn {
+  border: 1px solid rgba(126, 232, 255, .18);
+  background:
+    linear-gradient(180deg, rgba(126,232,255,.09), rgba(255,255,255,.02)),
+    rgba(255,255,255,.035);
+}
+
+.event-discord-btn:hover,
+.event-website-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.20);
+}
+
+.event-discord-btn:hover {
+  border-color: rgba(139, 124, 255, .34);
+  background:
+    linear-gradient(180deg, rgba(139,124,255,.16), rgba(255,255,255,.028)),
+    rgba(255,255,255,.045);
+}
+
+.event-website-btn:hover {
+  border-color: rgba(126, 232, 255, .30);
+  background:
+    linear-gradient(180deg, rgba(126,232,255,.13), rgba(255,255,255,.028)),
+    rgba(255,255,255,.045);
+}
+
+.hero-event-card.is-empty .hero-event-grid,
+.hero-event-card.is-empty p {
+  display: none;
+}
+
 .event {
   position: relative;
   min-height: 180px;
@@ -1868,5 +1976,15 @@ footer {
 
   #shoutboxMessages {
     height: 220px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-event-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-event-card {
+    margin-top: 1.35rem;
   }
 }
