@@ -784,9 +784,19 @@
             </div>
 
             <div class="field submit-event-full">
-              <label for="submitEventUrl">Discord or event link</label>
-              <input id="submitEventUrl" class="input" type="url" maxlength="300"
+              <label for="submitEventDiscordUrl">Discord / registration link</label>
+              <input id="submitEventDiscordUrl" class="input" type="url" maxlength="300"
                 placeholder="https://discord.gg/..." />
+              <div class="submit-event-help">Use this for Discord invites, registration pages, or where players should
+                join/sign up.</div>
+            </div>
+
+            <div class="field submit-event-full">
+              <label for="submitEventWebsiteUrl">Official website link</label>
+              <input id="submitEventWebsiteUrl" class="input" type="url" maxlength="300"
+                placeholder="https://example.com" />
+              <div class="submit-event-help">Optional. This is used for the hero “Visit event website” button when
+                provided.</div>
             </div>
 
             <div class="field submit-event-full">
@@ -2508,7 +2518,8 @@
         let endDate = document.getElementById("submitEventEndDate")?.value;
         let endTime = cleanSubmissionText(document.getElementById("submitEventEndTime")?.value, 5);
         const timezone = getSubmitEventTimezone();
-        const link = cleanSubmissionText(document.getElementById("submitEventUrl")?.value, 300);
+        const discordUrl = cleanSubmissionText(document.getElementById("submitEventDiscordUrl")?.value, 300);
+        const websiteUrl = cleanSubmissionText(document.getElementById("submitEventWebsiteUrl")?.value, 300);
         const description = cleanSubmissionText(document.getElementById("submitEventDescription")?.value, 700);
 
         let segments = [];
@@ -2567,8 +2578,8 @@
           end_time: endTime,
           timezone,
           location,
-          discord_url: link,
-          event_url: link,
+          discord_url: discordUrl,
+          event_url: websiteUrl,
           description,
           status: "pending",
           image_fit: "contain",
