@@ -1601,8 +1601,10 @@
       desc.textContent = cleanDesc || "More event details are available below.";
 
       const href =
-        normalizeHref(event.discordUrl) ||
         normalizeHref(event.url) ||
+        normalizeHref(event.event_url) ||
+        normalizeHref(event.website) ||
+        normalizeHref(event.discordUrl) ||
         "#schedule";
 
       link.href = href;
@@ -1741,7 +1743,7 @@
         chip.textContent =
           live.length > 1 ? `🟢 ${live.length} events live — ${cur.title}` : `Live now • ${cur.title}`;
 
-        updateHeroEventCard("next", next, nextRange);
+        updateHeroEventCard("live", cur, curRange);
 
         header.textContent = "Live now!";
         setCountdown(0, 0, 0, 0);
@@ -1834,7 +1836,7 @@
         timezone: row.timezone || EVENT_TIME_ZONE,
         location: row.location || "Online",
         discordUrl: row.discord_url || "",
-        url: row.event_url || row.discord_url || "",
+        url: row.event_url || "",
         image: row.image || "/img/community-event.png",
         hero_image: row.hero_image || row.image || "/img/community-event.png",
         description: row.description || "",
