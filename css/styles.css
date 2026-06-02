@@ -771,86 +771,74 @@ header {
   margin-top: .85rem;
 }
 
-.hero-event-card a,
-.hero-event-card .hero-website-btn,
-#hero-event-link {
+.hero-website-btn,
+.hero-discord-btn,
+.event-website-btn,
+.event-discord-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: fit-content;
+  text-decoration: none;
+  color: #f7fbff;
+  font-weight: 850;
+  line-height: 1;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+
+.hero-website-btn,
+.hero-discord-btn {
   min-height: 40px;
   padding: .65rem .95rem;
   border-radius: 14px;
+  font-size: .88rem;
+}
+
+.event-website-btn,
+.event-discord-btn {
+  min-height: 36px;
+  padding: .55rem .82rem;
+  border-radius: 13px;
+  font-size: .84rem;
+}
+
+.hero-website-btn,
+.event-website-btn {
   border: 1px solid rgba(126, 232, 255, .18);
   background:
     linear-gradient(180deg, rgba(126,232,255,.09), rgba(255,255,255,.02)),
     rgba(255,255,255,.035);
-  color: #f7fbff;
-  font-size: .88rem;
-  font-weight: 850;
-  text-decoration: none;
-  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
 }
 
-.hero-event-card a:hover,
-.hero-event-card .hero-website-btn:hover,
-#hero-event-link:hover {
-  transform: translateY(-1px);
-  border-color: rgba(126, 232, 255, .30);
-  background:
-    linear-gradient(180deg, rgba(126,232,255,.13), rgba(255,255,255,.028)),
-    rgba(255,255,255,.045);
-  box-shadow: 0 10px 24px rgba(0,0,0,.22);
-}
-
-.event-discord-btn,
-.event-website-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: fit-content;
-  min-height: 36px;
-  padding: .55rem .82rem;
-  border-radius: 13px;
-  color: #f7fbff;
-  font-size: .84rem;
-  font-weight: 850;
-  line-height: 1;
-  text-decoration: none;
-  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
-}
-
+.hero-discord-btn,
 .event-discord-btn {
-  border: 1px solid rgba(139, 124, 255, .22);
+  border: 1px solid rgba(139, 124, 255, .24);
   background:
     linear-gradient(180deg, rgba(139,124,255,.12), rgba(255,255,255,.02)),
     rgba(255,255,255,.035);
 }
 
-.event-website-btn {
-  border: 1px solid rgba(126, 232, 255, .18);
-  background:
-    linear-gradient(180deg, rgba(126,232,255,.09), rgba(255,255,255,.02)),
-    rgba(255,255,255,.035);
-}
-
-.event-discord-btn:hover,
-.event-website-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(0,0,0,.20);
-}
-
+.hero-website-btn:hover,
+.hero-discord-btn:hover,
+.event-website-btn:hover,
 .event-discord-btn:hover {
-  border-color: rgba(139, 124, 255, .34);
-  background:
-    linear-gradient(180deg, rgba(139,124,255,.16), rgba(255,255,255,.028)),
-    rgba(255,255,255,.045);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.22);
 }
 
+.hero-website-btn:hover,
 .event-website-btn:hover {
   border-color: rgba(126, 232, 255, .30);
   background:
     linear-gradient(180deg, rgba(126,232,255,.13), rgba(255,255,255,.028)),
+    rgba(255,255,255,.045);
+}
+
+.hero-discord-btn:hover,
+.event-discord-btn:hover {
+  border-color: rgba(139, 124, 255, .36);
+  background:
+    linear-gradient(180deg, rgba(139,124,255,.17), rgba(255,255,255,.028)),
     rgba(255,255,255,.045);
 }
 
