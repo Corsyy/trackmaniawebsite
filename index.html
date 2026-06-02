@@ -397,7 +397,10 @@
           </div>
 
           <p id="hero-event-desc">Finding the next Trackmania event.</p>
-          <a id="hero-event-link" href="#schedule">View event details</a>
+          <div class="hero-event-actions">
+            <a id="hero-event-website-link" class="hero-website-btn" href="#schedule">Visit event website</a>
+            <a id="hero-event-discord-link" class="hero-discord-btn" href="#schedule">Discord / Register</a>
+          </div>
         </div>
       </div>
 
@@ -1577,16 +1580,24 @@
       const date = document.getElementById("hero-event-date");
       const location = document.getElementById("hero-event-location");
       const desc = document.getElementById("hero-event-desc");
-      const link = document.getElementById("hero-event-link");
+      const websiteLink = document.getElementById("hero-event-website-link");
+      const discordLink = document.getElementById("hero-event-discord-link");
 
-      if (!card || !label || !title || !date || !location || !desc || !link) return;
+      if (!card || !label || !title || !date || !location || !desc || !websiteLink || !discordLink) return;
 
       if (!event) {
         card.classList.add("is-empty");
         label.textContent = "No upcoming event";
         title.textContent = "No upcoming events right now.";
-        link.href = "#schedule";
-        link.textContent = "View schedule";
+        date.textContent = "TBA";
+        location.textContent = "Online";
+        desc.textContent = "";
+
+        websiteLink.style.display = "none";
+        discordLink.style.display = "none";
+
+        websiteLink.removeAttribute("href");
+        discordLink.removeAttribute("href");
         return;
       }
 
@@ -1597,25 +1608,50 @@
       date.textContent = range?.start_iso ? fmtDate(range.start_iso) : "TBA";
       location.textContent = event.location || "Online";
 
-      const cleanDesc = String(range?.label || event.description || "").trim();
+      let cleanDesc = String(range?.label || event.description || "").trim();
+
+      cleanDesc = cleanDesc
+        .replace(/(?:^|\s)-?\s*website:\s*https?:\/\/\S+/gi, "")
+        .replace(/https?:\/\/\S+/gi, "")
+        .replace(/\s+-\s*$/g, "")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
       desc.textContent = cleanDesc || "More event details are available below.";
 
-      const href =
+      const websiteHref =
         normalizeHref(event.url) ||
         normalizeHref(event.event_url) ||
-        normalizeHref(event.website) ||
+        normalizeHref(event.website);
+
+      const discordHref =
         normalizeHref(event.discordUrl) ||
-        "#schedule";
+        normalizeHref(event.discord_url);
 
-      link.href = href;
-      link.textContent = href === "#schedule" ? "View schedule" : "Visit event website";
-
-      if (href !== "#schedule") {
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
+      if (websiteHref) {
+        websiteLink.style.display = "";
+        websiteLink.href = websiteHref;
+        websiteLink.textContent = "Visit event website";
+        websiteLink.target = "_blank";
+        websiteLink.rel = "noopener noreferrer";
       } else {
-        link.removeAttribute("target");
-        link.removeAttribute("rel");
+        websiteLink.style.display = "none";
+        websiteLink.removeAttribute("href");
+        websiteLink.removeAttribute("target");
+        websiteLink.removeAttribute("rel");
+      }
+
+      if (discordHref) {
+        discordLink.style.display = "";
+        discordLink.href = discordHref;
+        discordLink.textContent = "Discord / Register";
+        discordLink.target = "_blank";
+        discordLink.rel = "noopener noreferrer";
+      } else {
+        discordLink.style.display = "none";
+        discordLink.removeAttribute("href");
+        discordLink.removeAttribute("target");
+        discordLink.removeAttribute("rel");
       }
     }
     function renderFromData(rawEvents) {
