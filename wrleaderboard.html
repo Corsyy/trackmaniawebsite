@@ -447,8 +447,6 @@
 
     }
   </style>
-  <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
-  <link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
   <link rel="prefetch" href="/wrleaderboard" as="document">
   <link rel="prefetch" href="/recentwrs" as="document">
 </head>
@@ -506,7 +504,7 @@
   </script>
 
   <main>
-    <h1>Players With The Most World Records on TOTD, official campaigns and official club campaigns</h1>
+    <h1>Players With The Most World Records</h1>
     <div id="meta" class="meta">Loading…</div>
 
      <div id="rebuildBanner" class="rebuild-banner" role="status" aria-live="polite">
@@ -563,47 +561,54 @@
   </main>
 
   <script>
-    const API_BASE = "https://trackmaniawebsite.onrender.com";
+    const WR_PLAYERS_URL = "/data/wr/players.json";
+    const WR_ROWS_URL = "/data/wr/rows.json";
+    const WR_STATUS_URL = "/data/wr/status.json";
     const PAGE_SIZE = 25;
     const FETCH_LIMIT = 100;
 
+    let allPlayersRaw = [];
     let allPlayers = [];
-    let page = Number(new URLSearchParams(location.search).get('page')) || 1;
+    let allRowsForPodium = [];
+    let page = Number(new URLSearchParams(location.search).get("page")) || 1;
+    let debounce = null;
 
     function fmtTs(ts) {
       if (ts === null || ts === undefined) return "—";
       const n = Number(ts);
       const ms = Number.isFinite(n) ? (n > 1e12 ? n : n * 1000) : Date.parse(ts);
-      return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
+      return Number.isNaN(ms) ? "—" : new Date(ms).toLocaleString();
     }
 
-    /* ===================== New helpers (links & HTML safety) ===================== */
-    function escapeHTML(s = '') {
-      return s.replace(/[&<>"']/g, m => (
-        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+    function escapeHTML(s = "") {
+      return String(s).replace(/[&<>"']/g, m => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
       ));
     }
-    function playerLinkHTML({ id, name }) {
-      return escapeHTML(name || id || '—');
+
+    function playerDisplayName(p) {
+      return p.player || p.displayName || p.accountId || "—";
     }
 
-    /* ============================================================================ */
+    function playerWrCount(p) {
+      return Number(p.wrs ?? p.wrCount ?? 0);
+    }
 
-    async function resolveNames(ids = []) {
-      if (!ids.length) return {};
-      try {
-        const url = `${API_BASE}/api/debug-names?ids=${encodeURIComponent(ids.join(","))}`;
-        const r = await fetch(url);
-        if (!r.ok) return {};
-        const data = await r.json();
-        const arr = Array.isArray(data?.data) ? data.data : [];
-        const map = {};
-        for (const row of arr) {
-          if (row && row.id) map[row.id] = row.name || row.id;
-        }
-        return map;
-      } catch {
-        return {};
+    function playerLatestTs(p) {
+      if (p.latestTs) return p.latestTs;
+      const maps = Array.isArray(p.maps) ? p.maps : [];
+      return maps.reduce((max, m) => Math.max(max, Number(m.timestamp || 0)), 0);
+    }
+
+    function applySearch() {
+      const q = (document.getElementById("q").value || "").trim().toLowerCase();
+      if (!q) {
+        allPlayers = allPlayersRaw.slice(0, FETCH_LIMIT);
+      } else {
+        allPlayers = allPlayersRaw.filter((p) => {
+          const haystack = `${p.accountId || ""} ${playerDisplayName(p)}`.toLowerCase();
+          return haystack.includes(q);
+        }).slice(0, FETCH_LIMIT);
       }
     }
 
@@ -616,14 +621,18 @@
       const slice = allPlayers.slice(start, start + PAGE_SIZE);
 
       const tb = document.getElementById("rows");
-      tb.innerHTML = slice.map((pl, i) => `
-    <tr>
-      <td>${start + i + 1}</td>
-      <td>${playerLinkHTML({ id: pl.accountId, name: pl.prettyName || pl.displayName })}</td>
-      <td>${pl.wrCount}</td>
-      <td class="ts">${fmtTs(pl.latestTs)}</td>
-    </tr>
-  `).join("");
+      if (!slice.length) {
+        tb.innerHTML = `<tr><td colspan="4" class="skeleton">No players found.</td></tr>`;
+      } else {
+        tb.innerHTML = slice.map((pl, i) => `
+          <tr>
+            <td>${start + i + 1}</td>
+            <td>${escapeHTML(playerDisplayName(pl))}</td>
+            <td>${playerWrCount(pl).toLocaleString()}</td>
+            <td class="ts">${fmtTs(playerLatestTs(pl))}</td>
+          </tr>
+        `).join("");
+      }
 
       document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
       const prev = document.getElementById("prevBtn");
@@ -634,198 +643,168 @@
       next.onclick = () => goTo(page + 1);
 
       const params = new URLSearchParams(location.search);
-      params.set('page', page);
-      history.replaceState({}, '', `${location.pathname}?${params}`);
+      params.set("page", page);
+      history.replaceState({}, "", `${location.pathname}?${params}`);
     }
 
-    function goTo(p) { if (p >= 1) renderPage(p); }
+    function goTo(p) {
+      if (p >= 1) renderPage(p);
+    }
 
-    let fetchCtrl = null;
-    let debounce = null;
-
-    async function updateRebuildBanner() {
+    async function updateRebuildBanner(status) {
       const banner = document.getElementById("rebuildBanner");
       if (!banner) return;
 
-      try {
-        const r = await fetch(`${API_BASE}/api/ready`, { cache: "no-store" });
-        if (!r.ok) throw new Error("ready check failed");
+      const crawlComplete = status?.tmx?.crawlComplete === true;
+      const nextId = Number(status?.tmx?.nextId || 0);
+      const endId = Number(status?.tmx?.endId || 0);
+      const verifiedTmxRows = Number(status?.verifiedTmxRows || 0);
+      const show = !crawlComplete || (endId && nextId && nextId <= endId) || verifiedTmxRows < 1000;
 
-        const ready = await r.json();
-
-        const isRebuilding =
-          ready?.building === true ||
-          ready?.wrBuilding === true ||
-          ready?.tmxCrawling === true ||
-          ready?.tmxEnrichStats?.running === true ||
-          ready?.buildStats?.running === true;
-
-        const rows = Number(ready?.rows || 0);
-        const tmxRows = Number(ready?.counts?.tmx || 0);
-
-        // Also show it while your TMX leaderboard is clearly incomplete.
-        const looksIncomplete = rows > 0 && tmxRows < 1000;
-
-        banner.classList.toggle("show", isRebuilding || looksIncomplete);
-      } catch {
-        // If the ready check fails, don't block the page.
-        banner.classList.remove("show");
+      banner.classList.toggle("show", show);
+      if (show) {
+        const p = banner.querySelector("p");
+        if (p) {
+          p.textContent = `The WR JSON is still building through GitHub Actions. TMX crawl cursor: ${nextId || "?"}/${endId || "?"}. Verified TMX rows: ${verifiedTmxRows.toLocaleString()}.`;
+        }
       }
     }
 
     async function load() {
+      const tb = document.getElementById("rows");
+      const meta = document.getElementById("meta");
+
       try {
-        if (fetchCtrl) fetchCtrl.abort();
-        fetchCtrl = new AbortController();
+        tb.innerHTML = `<tr><td colspan="4" class="skeleton">Loading…</td></tr>`;
 
-        document.getElementById("rows").innerHTML = `<tr><td colspan="4" class="skeleton">Loading…</td></tr>`;
-        await updateRebuildBanner();
-        const url = new URL(API_BASE + "/api/wr-players");
-        url.searchParams.set("limit", FETCH_LIMIT);
-        const q = (document.getElementById("q").value || "").trim();
-        if (q) url.searchParams.set("q", q);
+        const [playersRes, rowsRes, statusRes] = await Promise.all([
+          fetch(`${WR_PLAYERS_URL}?v=${Date.now()}`, { cache: "no-store" }),
+          fetch(`${WR_ROWS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
+          fetch(`${WR_STATUS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
+        ]);
 
-        const r = await fetch(url, { signal: fetchCtrl.signal, cache: "no-store" });
-        if (!r.ok) throw new Error(await r.text());
-        const j = await r.json();
+        if (!playersRes.ok) throw new Error(await playersRes.text());
+        const playersJson = await playersRes.json();
+        const rowsJson = rowsRes && rowsRes.ok ? await rowsRes.json() : null;
+        const statusJson = statusRes && statusRes.ok ? await statusRes.json() : null;
 
-        const players = Array.isArray(j.players) ? j.players : [];
+        allPlayersRaw = Array.isArray(playersJson.players) ? playersJson.players : [];
+        allRowsForPodium = Array.isArray(rowsJson?.rows) ? rowsJson.rows : [];
+        applySearch();
 
-        const needIds = [...new Set(
-          players.filter(p => p.accountId && (!p.displayName || p.displayName === p.accountId))
-            .map(p => p.accountId)
-        )];
+        const stamp = Number(playersJson.ts || statusJson?.lastRunAt && Date.parse(statusJson.lastRunAt) || Date.now());
+        const ageMs = Math.max(0, Date.now() - stamp);
+        const totalRows = Number(statusJson?.rows || 0).toLocaleString();
+        meta.textContent = `Loaded ${allPlayersRaw.length.toLocaleString()} players / ${totalRows} WR rows — updated ${Math.round(ageMs / 1000)}s ago`;
 
-        const names = await resolveNames(needIds);
-
-        allPlayers = players.map(p => ({
-          ...p,
-          prettyName: names[p.accountId] || p.displayName || p.accountId
-        }));
-
-        const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
-        document.getElementById("meta").textContent =
-          `Fetched ${Math.round(ago / 1000)}s ago — ${new Date(j.fetchedAt || Date.now()).toLocaleTimeString()}`;
-
+        await updateRebuildBanner(statusJson || {});
         renderPage(page);
+        loadPodium();
       } catch (e) {
-        if (e.name === "AbortError") return;
         console.error(e);
-        document.getElementById("meta").textContent = "Failed to load player leaderboard.";
-        document.getElementById("rows").innerHTML = `<tr><td colspan="4">Error loading data.</td></tr>`;
+        meta.textContent = "Failed to load player leaderboard.";
+        tb.innerHTML = `<tr><td colspan="4">Error loading /data/wr/players.json. Run the WR GitHub Action first.</td></tr>`;
+        const banner = document.getElementById("rebuildBanner");
+        if (banner) banner.classList.remove("show");
       }
     }
 
     document.getElementById("q").addEventListener("input", () => {
       clearTimeout(debounce);
-      debounce = setTimeout(() => { page = 1; load(); }, 250);
+      debounce = setTimeout(() => {
+        page = 1;
+        applySearch();
+        renderPage(page);
+      }, 200);
     });
-    document.getElementById("clear").onclick = () => { document.getElementById("q").value = ""; page = 1; load(); };
 
-    /* -------- Monthly podium (tries /api/wr-podium, then /api/top-monthly) -------- */
+    document.getElementById("clear").onclick = () => {
+      document.getElementById("q").value = "";
+      page = 1;
+      applySearch();
+      renderPage(page);
+    };
+
     function ymDefaultUTC() {
       const now = new Date();
       const y = now.getUTCFullYear();
       const m = String(now.getUTCMonth() + 1).padStart(2, "0");
       return `${y}-${m}`;
     }
-    function fmtNum(n) { try { return Number(n).toLocaleString(); } catch { return String(n); } }
 
-    async function fetchJSONWithFallback(ym) {
-      const try1 = `${API_BASE}/api/wr-podium?month=${encodeURIComponent(ym)}`;
-      const try2 = `${API_BASE}/api/top-monthly?ym=${encodeURIComponent(ym)}&limit=3`;
-
-      const one = async (url) => {
-        const r = await fetch(url, { cache: "no-store" });
-        if (!r.ok) throw new Error(await r.text());
-        return r.json();
-      };
-
-      try {
-        const j = await one(try1);
-        if (Array.isArray(j.top)) return { ym: j.ym || ym, top: j.top };
-        if (Array.isArray(j.podium)) return { ym: j.month || ym, top: j.podium };
-        return { ym: j.ym || j.month || ym, top: j.top || j.podium || [] };
-      } catch {
-        const k = await one(try2);
-        return { ym: k.ym || ym, top: Array.isArray(k.top) ? k.top : [] };
-      }
+    function monthFromTimestamp(ts) {
+      const n = Number(ts);
+      const ms = Number.isFinite(n) ? (n > 1e12 ? n : n * 1000) : Date.parse(ts);
+      if (!Number.isFinite(ms) || Number.isNaN(ms)) return "";
+      const d = new Date(ms);
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
     }
 
-    async function loadPodium() {
+    function fmtNum(n) {
+      return Number(n || 0).toLocaleString();
+    }
+
+    function buildMonthlyPodium(ym) {
+      const byPlayer = new Map();
+      for (const row of allRowsForPodium) {
+        if (!row?.accountId || monthFromTimestamp(row.timestamp) !== ym) continue;
+        const key = row.accountId;
+        if (!byPlayer.has(key)) {
+          byPlayer.set(key, {
+            accountId: key,
+            displayName: row.displayName || row.player || row.accountId,
+            wrs: 0,
+            latestTs: 0,
+          });
+        }
+        const rec = byPlayer.get(key);
+        rec.wrs++;
+        rec.latestTs = Math.max(rec.latestTs, Number(row.timestamp || 0));
+      }
+      return Array.from(byPlayer.values()).sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs).slice(0, 3);
+    }
+
+    function loadPodium() {
       const ym = document.getElementById("ym").value || ymDefaultUTC();
       const list = document.getElementById("podiumList");
       const meta = document.getElementById("podiumMeta");
-      list.innerHTML = `<div class="meta">Loading podium…</div>`;
-      meta.textContent = "";
+      if (!list || !meta) return;
 
-      try {
-        const { ym: resolvedYm, top } = await fetchJSONWithFallback(ym);
+      const top = buildMonthlyPodium(ym);
+      if (!top.length) {
+        list.innerHTML = `<div class="meta">No records yet for ${escapeHTML(ym)}.</div>`;
+        meta.textContent = "";
+        return;
+      }
 
-        if (!top.length) {
-          list.innerHTML = `<div class="meta">No records yet for ${resolvedYm}.</div>`;
-          meta.textContent = "";
-          return;
-        }
-
-        // ✅ Only show total WRs (no per-source breakdown)
-        const medals = ["🥇", "🥈", "🥉"];
-        list.innerHTML = top.slice(0, 3).map((p, idx) => `
-      <div class="podium-item">
-        <div class="podium-medal">${medals[idx] || ""}</div>
-        <div style="min-width:0">
-          <div style="font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            ${playerLinkHTML({ id: p.accountId, name: p.displayName })}
-          </div>
-          <div class="meta" style="font-size:.95rem">
-            <span class="badge">${fmtNum(p.wrs ?? p.wrCount ?? 0)} WRs</span>
+      const medals = ["🥇", "🥈", "🥉"];
+      list.innerHTML = top.map((p, idx) => `
+        <div class="podium-item">
+          <div class="podium-medal">${medals[idx] || ""}</div>
+          <div style="min-width:0">
+            <div style="font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${escapeHTML(p.displayName || p.accountId)}
+            </div>
+            <div class="meta" style="font-size:.95rem">
+              <span class="badge">${fmtNum(p.wrs)} WRs</span>
+            </div>
           </div>
         </div>
-      </div>
-    `).join("");
+      `).join("");
 
-        meta.textContent = `Month: ${resolvedYm}`;
-      } catch (e) {
-        console.error(e);
-        list.innerHTML = `<div class="meta">Failed to load podium.</div>`;
-      }
+      meta.textContent = `Month: ${ym}`;
     }
 
-    // init podium
     (function initPodium() {
       const ymIn = document.getElementById("ym");
       const btn = document.getElementById("loadPodium");
       if (ymIn) ymIn.value = ymDefaultUTC();
       if (btn) btn.addEventListener("click", loadPodium);
-      loadPodium(); // load current month on page load
     })();
 
-    // initial table load
     load();
-    // occasional refresh
-    setInterval(() => load(), 60 * 60 * 1000);
+    setInterval(load, 60 * 60 * 1000);
   </script>
-
-  <script>
-    // keep server warm
-    setInterval(() => {
-      fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(() => { });
-    }, 5 * 60 * 1000);
-    // prefetches
-    const prefetch = (url) => {
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = url;
-      link.as = 'fetch';
-      link.crossOrigin = 'anonymous';
-      document.head.appendChild(link);
-    };
-    const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
-    const tblBtn = document.querySelector('a[href="/recentwrs"]');
-    if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once: true });
-    if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once: true });
-  </script>
-
 </body>
 
 </html>
