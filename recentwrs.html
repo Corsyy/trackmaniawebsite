@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Recent World Records — Trackmania Events</title>
-  <meta name="description" content="Most recent Trackmania world records across all official campaigns, TOTD, and club campaigns."/>
+  <meta name="description" content="Most recent Trackmania world records across official campaigns, TOTD, club campaigns, and verified TMX maps."/>
   <meta name="theme-color" content="#0a0f1a"/>
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
@@ -484,8 +484,6 @@ font-weight:800;
 
 }
 </style>
-  <link rel="dns-prefetch" href="https://trackmaniawebsite.onrender.com">
-  <link rel="preconnect" href="https://trackmaniawebsite.onrender.com" crossorigin>
   <link rel="prefetch" href="/recentwrs" as="document">
 </head>
 <body class="bg-track-curves">
@@ -537,7 +535,7 @@ font-weight:800;
 </script>
  
 <main>
-  <h1>Most Recent World Records on TOTD, official campaign and official club campaigns</h1>
+  <h1>Most Recent World Records</h1>
   <div id="meta" class="meta">Loading…</div>
 
   <div class="pager">
@@ -565,53 +563,37 @@ font-weight:800;
 </main>
 
 <script>
-const API_BASE = "https://trackmaniawebsite.onrender.com";
-const PAGE_SIZE = 25;    // rows per page
-const FETCH_LIMIT = 100; // how many records to fetch once
+const WR_LATEST_URL = "/data/wr/latest.json";
+const WR_STATUS_URL = "/data/wr/status.json";
+const PAGE_SIZE = 25;
+const FETCH_LIMIT = 100;
 
 let allRows = [];
-let page = Number(new URLSearchParams(location.search).get('page')) || 1;
+let page = Number(new URLSearchParams(location.search).get("page")) || 1;
 
 function fmt(ms){
-  if(!Number.isFinite(ms)) return "—";
-  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000), x=ms%1000;
-  const pad=(n,w=2)=>String(n).padStart(w,"0");
+  const n = Number(ms);
+  if(!Number.isFinite(n)) return "—";
+  const m=Math.floor(n/60000), s=Math.floor((n%60000)/1000), x=n%1000;
+  const pad=(v,w=2)=>String(v).padStart(w,"0");
   return `${pad(m)}:${pad(s)}:${String(x).padStart(3,"0")}`;
 }
+
 function fmtTs(ts){
   if (ts === null || ts === undefined) return "—";
   const n = Number(ts);
-  const ms = Number.isFinite(n) ? (n > 1e12 ? n : n*1000) : Date.parse(ts);
-  return isNaN(ms) ? "—" : new Date(ms).toLocaleString();
+  const ms = Number.isFinite(n) ? (n > 1e12 ? n : n * 1000) : Date.parse(ts);
+  return Number.isNaN(ms) ? "—" : new Date(ms).toLocaleString();
 }
 
-/* ========== NEW: helpers to safely render clickable player links ========== */
 function escapeHTML(s=''){
-  return s.replace(/[&<>"']/g, m => (
+  return String(s).replace(/[&<>"']/g, m => (
     {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
   ));
 }
-function playerLinkHTML({ id, name }) {
-  return escapeHTML(name || id || '—');
-}
-/* ======================================================================== */
 
-async function resolveNames(ids = []) {
-  if (!ids.length) return {};
-  try {
-    const url = `${API_BASE}/api/debug-names?ids=${encodeURIComponent(ids.join(","))}`;
-    const r = await fetch(url);
-    if (!r.ok) return {};
-    const data = await r.json();
-    const arr = Array.isArray(data?.data) ? data.data : [];
-    const map = {};
-    for (const row of arr) {
-      if (row && row.id) map[row.id] = row.name || row.id;
-    }
-    return map;
-  } catch {
-    return {};
-  }
+function playerName(row) {
+  return row.displayName || row.player || row.accountId || "—";
 }
 
 function renderPage(p = 1) {
@@ -622,22 +604,24 @@ function renderPage(p = 1) {
   const start = (page - 1) * PAGE_SIZE;
   const slice = allRows.slice(start, start + PAGE_SIZE);
 
-  const $rows = document.getElementById("rows");
-  $rows.innerHTML = "";
+  const tbody = document.getElementById("rows");
+  tbody.innerHTML = "";
 
-  slice.forEach((row, i) => {
-    const pretty = row.prettyName || row.displayName || row.accountId || "—";
-    const tr = document.createElement("tr");
-    tr.innerHTML =
-      `<td data-label="#">${start + i + 1}</td>` +
-      `<td data-label="Map UID"><span class="truncate">${escapeHTML(row.mapUid || '')}</span></td>` +
-      `<td data-label="Holder"><span class="truncate">${playerLinkHTML({ id: row.accountId, name: pretty })}</span></td>` +
-      `<td data-label="WR Time" class="time">${row.timeMs != null ? fmt(row.timeMs) : "—"}</td>` +
-      `<td data-label="Set" class="ts">${fmtTs(row.timestamp)}</td>`;
-    $rows.appendChild(tr);
-  });
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="skeleton">No WR rows found yet.</td></tr>`;
+  } else {
+    for (const [i, row] of slice.entries()) {
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        `<td data-label="#">${start + i + 1}</td>` +
+        `<td data-label="Map UID"><span class="truncate">${escapeHTML(row.mapUid || "")}</span></td>` +
+        `<td data-label="Holder"><span class="truncate">${escapeHTML(playerName(row))}</span></td>` +
+        `<td data-label="WR Time" class="time">${row.timeMs != null ? fmt(row.timeMs) : "—"}</td>` +
+        `<td data-label="Set" class="ts">${fmtTs(row.timestamp)}</td>`;
+      tbody.appendChild(tr);
+    }
+  }
 
-  // pager controls
   document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
   const prev = document.getElementById("prevBtn");
   const next = document.getElementById("nextBtn");
@@ -646,68 +630,49 @@ function renderPage(p = 1) {
   prev.onclick = () => goTo(page - 1);
   next.onclick = () => goTo(page + 1);
 
-  // keep ?page in URL
   const params = new URLSearchParams(location.search);
-  params.set('page', page);
-  history.replaceState({}, '', `${location.pathname}?${params}`);
+  params.set("page", page);
+  history.replaceState({}, "", `${location.pathname}?${params}`);
 }
 
-function goTo(p){ if (p >= 1) renderPage(p); }
+function goTo(p){
+  if (p >= 1) renderPage(p);
+}
 
 async function load(){
+  const tbody = document.getElementById("rows");
+  const meta = document.getElementById("meta");
+
   try {
-    document.getElementById("rows").innerHTML = `<tr><td colspan="5" class="skeleton">Loading…</td></tr>`;
-    const res = await fetch(`${API_BASE}/api/wr-latest?limit=${FETCH_LIMIT}`, { cache: "no-store" });
-    if (!res.ok) throw new Error(await res.text());
-    const j = await res.json();
-    const rows = Array.isArray(j.rows) ? j.rows : [];
+    tbody.innerHTML = `<tr><td colspan="5" class="skeleton">Loading…</td></tr>`;
 
-    // collect ids lacking proper names
-    const needIds = [...new Set(rows
-      .filter(r => r.accountId && (!r.displayName || r.displayName === r.accountId))
-      .map(r => r.accountId))];
+    const [latestRes, statusRes] = await Promise.all([
+      fetch(`${WR_LATEST_URL}?v=${Date.now()}`, { cache: "no-store" }),
+      fetch(`${WR_STATUS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
+    ]);
 
-    const names = await resolveNames(needIds);
+    if (!latestRes.ok) throw new Error(await latestRes.text());
+    const latestJson = await latestRes.json();
+    const statusJson = statusRes && statusRes.ok ? await statusRes.json() : null;
 
-    // attach prettyName once
-    allRows = rows.map(r => ({ ...r, prettyName: names[r.accountId] || r.displayName || r.accountId }));
+    const rows = Array.isArray(latestJson.rows) ? latestJson.rows : [];
+    allRows = rows.slice(0, FETCH_LIMIT);
 
-    const ago = Math.max(0, Date.now() - (j.fetchedAt || 0));
-    document.getElementById("meta").textContent =
-      `Fetched ${Math.round(ago/1000)}s ago — ${new Date(j.fetchedAt || Date.now()).toLocaleTimeString()}`;
+    const stamp = Number(latestJson.ts || statusJson?.lastRunAt && Date.parse(statusJson.lastRunAt) || Date.now());
+    const ageMs = Math.max(0, Date.now() - stamp);
+    const totalRows = Number(statusJson?.rows || rows.length || 0).toLocaleString();
+    meta.textContent = `Loaded ${allRows.length.toLocaleString()} recent WRs of ${totalRows} total — updated ${Math.round(ageMs / 1000)}s ago`;
 
     renderPage(page);
   } catch (e) {
     console.error(e);
-    document.getElementById("meta").textContent = "Failed to load recent WRs.";
-    document.getElementById("rows").innerHTML = `<tr><td colspan="5">Error loading data.</td></tr>`;
+    meta.textContent = "Failed to load recent WRs.";
+    tbody.innerHTML = `<tr><td colspan="5">Error loading /data/wr/latest.json. Run the WR GitHub Action first.</td></tr>`;
   }
 }
 
-// initial
 load();
-// optional light auto-refresh
-setInterval(() => load(), 60 * 60 * 1000); // once every hour
-</script>
-
-<script>
-  // keep server warm
-  setInterval(() => {
-    fetch('https://trackmaniawebsite.onrender.com/api/ping').catch(()=>{});
-  }, 5 * 60 * 1000);
-  // prefetches
-  const prefetch = (url) => {
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = url;
-    link.as = 'fetch';
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
-  };
-  const wrBtn = document.querySelector('a[href="/wrleaderboard"]');
-  const tblBtn = document.querySelector('a[href="/recentwrs"]');
-  if (wrBtn) wrBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-players?limit=100'), { once:true });
-  if (tblBtn) tblBtn.addEventListener('mouseenter', () => prefetch('https://trackmaniawebsite.onrender.com/api/wr-latest?limit=100'), { once:true });
+setInterval(load, 60 * 60 * 1000);
 </script>
 
 </body>
