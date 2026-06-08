@@ -223,6 +223,81 @@
       margin-bottom: 1rem;
     }
 
+
+
+    .wr-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 1rem 0 1.2rem;
+    }
+
+    .wr-stat-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 18px;
+      padding: 1rem;
+      background:
+        radial-gradient(circle at top right, rgba(255, 255, 255, .075), transparent 36%),
+        linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .025));
+      box-shadow: var(--shadow-sm);
+      min-height: 112px;
+    }
+
+    .wr-stat-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .095), transparent 40%);
+      opacity: .7;
+    }
+
+    .wr-stat-label,
+    .wr-stat-value,
+    .wr-stat-meta {
+      position: relative;
+      z-index: 1;
+    }
+
+    .wr-stat-label {
+      color: rgba(243, 245, 247, .62);
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+
+    .wr-stat-value {
+      margin-top: .45rem;
+      color: #fff;
+      font-size: clamp(1.65rem, 4vw, 2.35rem);
+      font-weight: 950;
+      letter-spacing: -.045em;
+      line-height: 1;
+    }
+
+    .wr-stat-meta {
+      margin-top: .55rem;
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 900px) {
+      .wr-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .wr-stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .controls {
       display: flex;
       gap: .7rem;
@@ -512,6 +587,40 @@
     <p>This page’s leaderboard is currently being rebuilt. Some rankings and WR counts may be temporarily incomplete while the data updates.</p>
   </div>
 
+    <section id="wrStatsGrid" class="wr-stats-grid" aria-label="World record statistics">
+      <article class="wr-stat-card">
+        <div class="wr-stat-label">Total World Records</div>
+        <div class="wr-stat-value">—</div>
+        <div class="wr-stat-meta">Loading verified record rows…</div>
+      </article>
+      <article class="wr-stat-card">
+        <div class="wr-stat-label">Tracked Players</div>
+        <div class="wr-stat-value">—</div>
+        <div class="wr-stat-meta">Loading player totals…</div>
+      </article>
+      <article class="wr-stat-card">
+        <div class="wr-stat-label">New WR Changes</div>
+        <div class="wr-stat-value">—</div>
+        <div class="wr-stat-meta">Loading latest changelog…</div>
+      </article>
+      <article class="wr-stat-card">
+        <div class="wr-stat-label">TMX Records</div>
+        <div class="wr-stat-value">—</div>
+        <div class="wr-stat-meta">Verified from TMX maps</div>
+      </article>
+      <article class="wr-stat-card">
+        <div class="wr-stat-label">Weekly Shorts</div>
+        <div class="wr-stat-value">—</div>
+        <div class="wr-stat-meta">Imported Weekly Shorts WRs</div>
+      </article>
+      <article class="wr-stat-card">
+        <div class="wr-stat-label">Weekly Grands</div>
+        <div class="wr-stat-value">—</div>
+        <div class="wr-stat-meta">Imported Weekly Grands WRs</div>
+      </article>
+    </section>
+
+
     <div class="controls">
       <input id="q" class="input" type="search" placeholder="Search player or accountId…">
       <button class="btn" id="clear">Clear</button>
@@ -564,6 +673,7 @@
     const WR_PLAYERS_URL = "/data/wr/players.json";
     const WR_ROWS_URL = "/data/wr/rows.json";
     const WR_STATUS_URL = "/data/wr/status.json";
+    const WR_CHANGELOG_URL = "/data/wr/history/changelog.json";
     const PAGE_SIZE = 25;
     const FETCH_LIMIT = 100;
 
@@ -677,16 +787,20 @@
       try {
         tb.innerHTML = `<tr><td colspan="4" class="skeleton">Loading…</td></tr>`;
 
-        const [playersRes, rowsRes, statusRes] = await Promise.all([
+        const [playersRes, rowsRes, statusRes, changelogRes] = await Promise.all([
           fetch(`${WR_PLAYERS_URL}?v=${Date.now()}`, { cache: "no-store" }),
           fetch(`${WR_ROWS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
           fetch(`${WR_STATUS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
+          fetch(`${WR_CHANGELOG_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
         ]);
 
         if (!playersRes.ok) throw new Error(await playersRes.text());
         const playersJson = await playersRes.json();
         const rowsJson = rowsRes && rowsRes.ok ? await rowsRes.json() : null;
         const statusJson = statusRes && statusRes.ok ? await statusRes.json() : null;
+        const changelogJson = changelogRes && changelogRes.ok ? await changelogRes.json() : null;
+
+        renderWrStats(statusJson || {}, playersJson || {}, changelogJson || {});
 
         allPlayersRaw = Array.isArray(playersJson.players) ? playersJson.players : [];
         allRowsForPodium = Array.isArray(rowsJson?.rows) ? rowsJson.rows : [];
@@ -743,6 +857,39 @@
     function fmtNum(n) {
       return Number(n || 0).toLocaleString();
     }
+
+    function setStatCard(index, label, value, meta) {
+      const grid = document.getElementById("wrStatsGrid");
+      if (!grid) return;
+
+      const card = grid.children[index];
+      if (!card) return;
+
+      const labelEl = card.querySelector(".wr-stat-label");
+      const valueEl = card.querySelector(".wr-stat-value");
+      const metaEl = card.querySelector(".wr-stat-meta");
+
+      if (labelEl) labelEl.textContent = label;
+      if (valueEl) valueEl.textContent = value;
+      if (metaEl) metaEl.textContent = meta;
+    }
+
+    function renderWrStats(statusJson, playersJson, changelogJson) {
+      const counts = statusJson?.counts || {};
+      const totalRows = Number(statusJson?.rows || 0);
+      const players = Array.isArray(playersJson?.players) ? playersJson.players : [];
+      const changesThisRun = Number(statusJson?.history?.changesThisRun ?? changelogJson?.changesThisRun ?? 0);
+      const totalChanges = Number(statusJson?.history?.totalChanges ?? changelogJson?.totalChanges ?? 0);
+      const lastRun = statusJson?.lastRunAt ? fmtTs(statusJson.lastRunAt) : "latest build";
+
+      setStatCard(0, "Total World Records", totalRows ? fmtNum(totalRows) : "—", "All countable verified WR rows");
+      setStatCard(1, "Tracked Players", players.length ? fmtNum(players.length) : "—", "Players with at least 1 WR");
+      setStatCard(2, "New WR Changes", fmtNum(changesThisRun), `${fmtNum(totalChanges)} total feed items tracked`);
+      setStatCard(3, "TMX Records", fmtNum(counts.tmx || 0), "Verified from TMX maps");
+      setStatCard(4, "Weekly Shorts", fmtNum(counts.weekly_shorts || 0), "Imported Weekly Shorts WRs");
+      setStatCard(5, "Weekly Grands", fmtNum(counts.weekly_grands || 0), `Last build: ${lastRun}`);
+    }
+
 
     function buildMonthlyPodium(ym) {
       const byPlayer = new Map();
