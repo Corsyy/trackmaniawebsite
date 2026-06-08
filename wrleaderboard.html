@@ -298,6 +298,125 @@
       }
     }
 
+
+
+    .wr-live-feed {
+      margin: 0 0 1rem;
+    }
+
+    .wr-feed-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: .85rem;
+    }
+
+    .wr-feed-title {
+      font-size: 1rem;
+      font-weight: 950;
+      letter-spacing: -.02em;
+    }
+
+    .wr-feed-subtitle {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.45;
+      margin-top: .18rem;
+    }
+
+    .wr-feed-list {
+      display: grid;
+      gap: .65rem;
+    }
+
+    .wr-feed-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: .75rem;
+      align-items: center;
+      padding: .85rem .9rem;
+      border: 1px solid rgba(255, 255, 255, .065);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .025);
+    }
+
+    .wr-feed-pill {
+      min-width: 86px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 999px;
+      padding: .3rem .55rem;
+      background: rgba(255, 255, 255, .04);
+      color: rgba(243, 245, 247, .82);
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .wr-feed-main {
+      min-width: 0;
+    }
+
+    .wr-feed-line {
+      font-weight: 850;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wr-feed-map {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: .15rem;
+    }
+
+    .wr-feed-time {
+      text-align: right;
+      color: rgba(243, 245, 247, .9);
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .wr-feed-source {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 650;
+      margin-top: .16rem;
+    }
+
+    @media (max-width: 680px) {
+      .wr-feed-head {
+        flex-direction: column;
+      }
+
+      .wr-feed-item {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .wr-feed-pill {
+        min-width: 0;
+        width: fit-content;
+      }
+
+      .wr-feed-line,
+      .wr-feed-map {
+        white-space: normal;
+      }
+
+      .wr-feed-time {
+        text-align: left;
+      }
+    }
+
     .controls {
       display: flex;
       gap: .7rem;
@@ -621,6 +740,19 @@
     </section>
 
 
+    <section class="card wr-live-feed" aria-labelledby="wrFeedTitle">
+      <div class="wr-feed-head">
+        <div>
+          <div id="wrFeedTitle" class="wr-feed-title">Live WR Feed</div>
+          <div class="wr-feed-subtitle">Latest detected world record changes from the WR updater.</div>
+        </div>
+        <span id="wrFeedMeta" class="badge">Loading…</span>
+      </div>
+      <div id="wrFeedList" class="wr-feed-list">
+        <div class="meta">Loading recent WR activity…</div>
+      </div>
+    </section>
+
     <div class="controls">
       <input id="q" class="input" type="search" placeholder="Search player or accountId…">
       <button class="btn" id="clear">Clear</button>
@@ -801,6 +933,7 @@
         const changelogJson = changelogRes && changelogRes.ok ? await changelogRes.json() : null;
 
         renderWrStats(statusJson || {}, playersJson || {}, changelogJson || {});
+        renderWrLiveFeed(changelogJson || {}, statusJson || {});
 
         allPlayersRaw = Array.isArray(playersJson.players) ? playersJson.players : [];
         allRowsForPodium = Array.isArray(rowsJson?.rows) ? rowsJson.rows : [];
@@ -888,6 +1021,127 @@
       setStatCard(3, "TMX Records", fmtNum(counts.tmx || 0), "Verified from TMX maps");
       setStatCard(4, "Weekly Shorts", fmtNum(counts.weekly_shorts || 0), "Imported Weekly Shorts WRs");
       setStatCard(5, "Weekly Grands", fmtNum(counts.weekly_grands || 0), `Last build: ${lastRun}`);
+    }
+
+
+    function sourceLabel(sourceType = "") {
+      const labels = {
+        official: "Official",
+        totd: "TOTD",
+        club: "Club",
+        weekly_shorts: "Weekly Shorts",
+        weekly_grands: "Weekly Grands",
+        tmx: "TMX",
+        unknown: "Unknown",
+      };
+      return labels[sourceType] || sourceType || "WR";
+    }
+
+    function feedTypeLabel(type = "") {
+      if (type === "wr_changed") return "Overtake";
+      if (type === "wr_removed") return "Removed";
+      if (type === "new_wr") return "New WR";
+      return "WR Update";
+    }
+
+    function feedTimeAgo(value) {
+      const ms = Date.parse(value || "");
+      if (!Number.isFinite(ms)) return "recently";
+      const diff = Math.max(0, Date.now() - ms);
+      const min = Math.floor(diff / 60000);
+      if (min < 1) return "just now";
+      if (min < 60) return `${min}m ago`;
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return `${hr}h ago`;
+      const day = Math.floor(hr / 24);
+      if (day < 14) return `${day}d ago`;
+      return new Date(ms).toLocaleDateString();
+    }
+
+    function feedDisplayTime(item, side = "new") {
+      const display = side === "old" ? item.oldDisplayTime : item.newDisplayTime;
+      const ms = side === "old" ? item.oldTimeMs : item.newTimeMs;
+      if (display) return display;
+      if (ms === null || ms === undefined) return "—";
+      return formatTimeMsCompact(ms);
+    }
+
+    function formatTimeMsCompact(ms) {
+      const n = Number(ms);
+      if (!Number.isFinite(n)) return "—";
+      let remaining = Math.abs(Math.trunc(n));
+      const hours = Math.floor(remaining / 3600000);
+      remaining -= hours * 3600000;
+      const minutes = Math.floor(remaining / 60000);
+      remaining -= minutes * 60000;
+      const seconds = Math.floor(remaining / 1000);
+      const millis = remaining - seconds * 1000;
+      if (hours > 0) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
+      return `${minutes}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
+    }
+
+    function feedDescription(item) {
+      const newHolder = item.newHolder || item.newHolderAccountId || "Unknown player";
+      const oldHolder = item.oldHolder || item.oldHolderAccountId || "previous holder";
+      const mapName = item.mapName || item.mapUid || "Unknown map";
+
+      if (item.type === "wr_changed") {
+        if (item.oldHolderAccountId && item.newHolderAccountId && item.oldHolderAccountId !== item.newHolderAccountId) {
+          return `${newHolder} overtook ${oldHolder}`;
+        }
+        return `${newHolder} improved a world record`;
+      }
+
+      if (item.type === "wr_removed") return `${oldHolder} record was removed from the tracked set`;
+      return `${newHolder} set a new tracked world record`;
+    }
+
+    function renderWrLiveFeed(changelogJson, statusJson = {}) {
+      const list = document.getElementById("wrFeedList");
+      const meta = document.getElementById("wrFeedMeta");
+      if (!list || !meta) return;
+
+      const items = Array.isArray(changelogJson?.items) ? changelogJson.items.slice(0, 8) : [];
+      const changesThisRun = Number(statusJson?.history?.changesThisRun ?? changelogJson?.changesThisRun ?? 0);
+      const totalChanges = Number(statusJson?.history?.totalChanges ?? changelogJson?.totalChanges ?? items.length);
+
+      meta.textContent = `${fmtNum(changesThisRun)} this run`;
+
+      if (!items.length) {
+        list.innerHTML = `<div class="meta">No WR feed items yet. The feed will populate as the WR updater detects new records or changes.</div>`;
+        return;
+      }
+
+      list.innerHTML = items.map((item) => {
+        const type = feedTypeLabel(item.type);
+        const source = sourceLabel(item.sourceType);
+        const mapName = item.mapName || item.mapUid || "Unknown map";
+        const line = feedDescription(item);
+        const newTime = feedDisplayTime(item, "new");
+        const oldTime = feedDisplayTime(item, "old");
+        const timeText = item.type === "wr_changed" && oldTime !== "—"
+          ? `${escapeHTML(oldTime)} → ${escapeHTML(newTime)}`
+          : escapeHTML(newTime);
+        const when = feedTimeAgo(item.at || item.ts);
+
+        return `
+          <article class="wr-feed-item">
+            <div class="wr-feed-pill">${escapeHTML(type)}</div>
+            <div class="wr-feed-main">
+              <div class="wr-feed-line">${escapeHTML(line)}</div>
+              <div class="wr-feed-map">${escapeHTML(mapName)}</div>
+            </div>
+            <div class="wr-feed-time">
+              ${timeText}
+              <span class="wr-feed-source">${escapeHTML(source)} · ${escapeHTML(when)}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      if (totalChanges > items.length) {
+        meta.textContent = `${fmtNum(changesThisRun)} this run · ${fmtNum(totalChanges)} tracked`;
+      }
     }
 
 
