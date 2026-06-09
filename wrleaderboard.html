@@ -600,6 +600,60 @@
       background: rgba(255, 255, 255, .24);
     }
 
+    @media (max-width: 640px) {
+      main {
+        padding: 1rem .85rem;
+      }
+
+      .wr-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin: .9rem 0 1rem;
+      }
+
+      .wr-stat-card {
+        min-height: 104px;
+        border-radius: 16px;
+        padding: .85rem;
+      }
+
+      .wr-stat-label {
+        font-size: .58rem;
+        letter-spacing: .105em;
+        line-height: 1.2;
+      }
+
+      .wr-stat-value {
+        margin-top: .38rem;
+        font-size: clamp(1.45rem, 7vw, 2.1rem);
+        line-height: 1.18;
+        letter-spacing: -.035em;
+        white-space: nowrap;
+        padding-bottom: .05rem;
+      }
+
+      .wr-stat-meta {
+        margin-top: .35rem;
+        font-size: .72rem;
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .wr-feed-head {
+        gap: .75rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .wr-stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
     @media (max-width:640px) {
 
       .nav-toggle {
