@@ -862,12 +862,15 @@
     const WR_ROWS_URL = "/data/wr/rows.json";
     const WR_STATUS_URL = "/data/wr/status.json";
     const WR_CHANGELOG_URL = "/data/wr/history/changelog.json";
+    const WR_LIVE_FEED_URL = "/data/wr/live-feed.json";
     const PAGE_SIZE = 25;
     const FETCH_LIMIT = 100;
 
     let allPlayersRaw = [];
     let allPlayers = [];
     let allRowsForPodium = [];
+    let podiumRowsPromise = null;
+    let podiumRowsLoaded = false;
     let page = Number(new URLSearchParams(location.search).get("page")) || 1;
     let debounce = null;
 
@@ -975,24 +978,23 @@
       try {
         tb.innerHTML = `<tr><td colspan="4" class="skeleton">Loading…</td></tr>`;
 
-        const [playersRes, rowsRes, statusRes, changelogRes] = await Promise.all([
+        const [playersRes, statusRes, liveFeedRes, changelogRes] = await Promise.all([
           fetch(`${WR_PLAYERS_URL}?v=${Date.now()}`, { cache: "no-store" }),
-          fetch(`${WR_ROWS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
           fetch(`${WR_STATUS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
+          fetch(`${WR_LIVE_FEED_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
           fetch(`${WR_CHANGELOG_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
         ]);
 
         if (!playersRes.ok) throw new Error(await playersRes.text());
         const playersJson = await playersRes.json();
-        const rowsJson = rowsRes && rowsRes.ok ? await rowsRes.json() : null;
         const statusJson = statusRes && statusRes.ok ? await statusRes.json() : null;
+        const liveFeedJson = liveFeedRes && liveFeedRes.ok ? await liveFeedRes.json() : null;
         const changelogJson = changelogRes && changelogRes.ok ? await changelogRes.json() : null;
 
-        renderWrStats(statusJson || {}, playersJson || {}, changelogJson || {});
-        renderWrLiveFeed(changelogJson || {}, statusJson || {});
+        renderWrStats(statusJson || {}, playersJson || {}, liveFeedJson || changelogJson || {});
+        renderWrLiveFeed(liveFeedJson || changelogJson || {}, statusJson || {});
 
         allPlayersRaw = Array.isArray(playersJson.players) ? playersJson.players : [];
-        allRowsForPodium = Array.isArray(rowsJson?.rows) ? rowsJson.rows : [];
         applySearch();
 
         const stamp = Number(playersJson.ts || statusJson?.lastRunAt && Date.parse(statusJson.lastRunAt) || Date.now());
@@ -1002,7 +1004,7 @@
 
         await updateRebuildBanner(statusJson || {});
         renderPage(page);
-        loadPodium();
+        schedulePodiumLoad();
       } catch (e) {
         console.error(e);
         meta.textContent = "Failed to load player leaderboard.";
@@ -1067,8 +1069,8 @@
       const counts = statusJson?.counts || {};
       const totalRows = Number(statusJson?.rows || 0);
       const players = Array.isArray(playersJson?.players) ? playersJson.players : [];
-      const changesThisRun = Number(statusJson?.history?.changesThisRun ?? changelogJson?.changesThisRun ?? 0);
-      const totalChanges = Number(statusJson?.history?.totalChanges ?? changelogJson?.totalChanges ?? 0);
+      const changesThisRun = Number(statusJson?.history?.changesThisRun ?? changelogJson?.changesThisRun ?? changelogJson?.changesDetected ?? 0);
+      const totalChanges = Number(statusJson?.history?.totalChanges ?? changelogJson?.totalChanges ?? changelogJson?.items?.length ?? 0);
       const lastRun = statusJson?.lastRunAt ? fmtTs(statusJson.lastRunAt) : "latest build";
 
       setStatCard(0, "Total World Records", totalRows ? fmtNum(totalRows) : "—", "All countable verified WR rows");
@@ -1178,7 +1180,7 @@
         const timeText = item.type === "wr_changed" && oldTime !== "—"
           ? `${escapeHTML(oldTime)} → ${escapeHTML(newTime)}`
           : escapeHTML(newTime);
-        const when = feedTimeAgo(item.at || item.ts);
+        const when = feedTimeAgo(item.detectedAt || item.createdAt || item.at || item.ts);
 
         return `
           <article class="wr-feed-item">
@@ -1221,11 +1223,59 @@
       return Array.from(byPlayer.values()).sort((a, b) => b.wrs - a.wrs || b.latestTs - a.latestTs).slice(0, 3);
     }
 
-    function loadPodium() {
+    async function ensurePodiumRowsLoaded() {
+      if (podiumRowsLoaded) return allRowsForPodium;
+      if (!podiumRowsPromise) {
+        podiumRowsPromise = fetch(`${WR_ROWS_URL}?v=${Date.now()}`, { cache: "no-store" })
+          .then((res) => {
+            if (!res.ok) throw new Error(`rows.json failed ${res.status}`);
+            return res.json();
+          })
+          .then((json) => {
+            allRowsForPodium = Array.isArray(json?.rows) ? json.rows : [];
+            podiumRowsLoaded = true;
+            return allRowsForPodium;
+          })
+          .catch((err) => {
+            console.error(err);
+            podiumRowsPromise = null;
+            throw err;
+          });
+      }
+      return podiumRowsPromise;
+    }
+
+    function schedulePodiumLoad() {
+      const list = document.getElementById("podiumList");
+      const meta = document.getElementById("podiumMeta");
+      if (list && !podiumRowsLoaded) {
+        list.innerHTML = `<div class="meta">Loading monthly podium in the background…</div>`;
+      }
+      if (meta && !podiumRowsLoaded) meta.textContent = "";
+
+      const runner = () => loadPodium().catch((err) => {
+        console.error(err);
+        const list = document.getElementById("podiumList");
+        if (list) list.innerHTML = `<div class="meta">Monthly podium could not load right now.</div>`;
+      });
+
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(runner, { timeout: 2500 });
+      } else {
+        setTimeout(runner, 600);
+      }
+    }
+
+    async function loadPodium() {
       const ym = document.getElementById("ym").value || ymDefaultUTC();
       const list = document.getElementById("podiumList");
       const meta = document.getElementById("podiumMeta");
       if (!list || !meta) return;
+
+      if (!podiumRowsLoaded) {
+        list.innerHTML = `<div class="meta">Loading monthly podium in the background…</div>`;
+        await ensurePodiumRowsLoaded();
+      }
 
       const top = buildMonthlyPodium(ym);
       if (!top.length) {
@@ -1259,7 +1309,22 @@
       if (btn) btn.addEventListener("click", loadPodium);
     })();
 
+    async function refreshLiveFeedOnly() {
+      try {
+        const [liveFeedRes, statusRes] = await Promise.all([
+          fetch(`${WR_LIVE_FEED_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
+          fetch(`${WR_STATUS_URL}?v=${Date.now()}`, { cache: "no-store" }).catch(() => null),
+        ]);
+        const liveFeedJson = liveFeedRes && liveFeedRes.ok ? await liveFeedRes.json() : null;
+        const statusJson = statusRes && statusRes.ok ? await statusRes.json() : null;
+        if (liveFeedJson) renderWrLiveFeed(liveFeedJson, statusJson || {});
+      } catch (err) {
+        console.warn("Live WR feed refresh failed", err);
+      }
+    }
+
     load();
+    setInterval(refreshLiveFeedOnly, 60 * 1000);
     setInterval(load, 60 * 60 * 1000);
   </script>
 </body>
