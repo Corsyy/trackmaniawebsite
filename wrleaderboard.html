@@ -1219,6 +1219,28 @@
     }
 
 
+
+    async function loadRowsForPodiumInBackground() {
+      const list = document.getElementById("podiumList");
+      const meta = document.getElementById("podiumMeta");
+
+      try {
+        if (list) list.innerHTML = `<div class="meta">Loading monthly podium in the background…</div>`;
+        if (meta) meta.textContent = "";
+
+        const res = await fetch(`${WR_ROWS_URL}?v=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(await res.text());
+
+        const rowsJson = await res.json();
+        allRowsForPodium = Array.isArray(rowsJson?.rows) ? rowsJson.rows : [];
+        loadPodium();
+      } catch (err) {
+        console.warn("Monthly podium background load failed", err);
+        if (list) list.innerHTML = `<div class="meta">Monthly podium is unavailable right now, but the leaderboard loaded normally.</div>`;
+        if (meta) meta.textContent = "";
+      }
+    }
+
     function buildMonthlyPodium(ym) {
       const byPlayer = new Map();
       for (const row of allRowsForPodium) {
