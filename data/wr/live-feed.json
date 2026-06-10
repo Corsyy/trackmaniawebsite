@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-10T18:20:19.293Z",
+  "generatedAt": "2026-06-10T22:33:08.632Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 10,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|DhZGksZ_O27SfKI_AsDs1eaQRy6|d620091b-876b-4af4-8f98-ed3625d234e9|dae14a5d-54d7-46fa-bd8b-c00613a32b7d|38782|38776|2026-06-10T22:33:08.632Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-10T22:33:08.632Z",
+      "at": "2026-06-10T22:33:08.632Z",
+      "mapUid": "DhZGksZ_O27SfKI_AsDs1eaQRy6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "oldHolder": "C50.94975-6.947",
+      "oldTimeMs": 38782,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:38.782",
+      "oldScoreKey": "38782",
+      "newHolderAccountId": "dae14a5d-54d7-46fa-bd8b-c00613a32b7d",
+      "newHolder": "Fleu..",
+      "newTimeMs": 38776,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:38.776",
+      "newScoreKey": "38776",
+      "text": "Fleu.. overtook C50.94975-6.947 on Unknown map with 00:00:38.776."
+    },
     {
       "id": "wr_changed|FRzOzbs9_ZhdtT0fgXr0R0A24jb|8c6768f0-fe42-42fa-a6c3-09f0b6dc1ab1|8cfe5e6e-f8aa-4e78-82ea-03746716f457|12941|12907|2026-06-10T18:20:19.293Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:50.864",
       "newScoreKey": "50864",
       "text": "Sample3 overtook ALAN-TM on Unknown map with 00:00:50.864."
-    },
-    {
-      "id": "wr_changed|UlC_h6pTwaXalPxoCZNprf50gr8|5dcc4566-2e1c-4355-b726-f199e2eed4e8|452e7a4b-5b3f-4103-b509-e1cc5d0620db|63698|63002|2026-06-09T11:49:49.020Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-09T11:49:49.020Z",
-      "at": "2026-06-09T11:49:49.020Z",
-      "mapUid": "UlC_h6pTwaXalPxoCZNprf50gr8",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "5dcc4566-2e1c-4355-b726-f199e2eed4e8",
-      "oldHolder": "JarCrab",
-      "oldTimeMs": 63698,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:03.698",
-      "oldScoreKey": "63698",
-      "newHolderAccountId": "452e7a4b-5b3f-4103-b509-e1cc5d0620db",
-      "newHolder": "Wiggity..",
-      "newTimeMs": 63002,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:03.002",
-      "newScoreKey": "63002",
-      "text": "Wiggity.. overtook JarCrab on Unknown map with 00:01:03.002."
     }
   ]
 }
