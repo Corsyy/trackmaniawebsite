@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-17T23:10:08.893Z",
+  "generatedAt": "2026-06-18T01:39:00.672Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 9,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|_allkPCDNXTx2ech7txHuAvvpfd|dae14a5d-54d7-46fa-bd8b-c00613a32b7d|d620091b-876b-4af4-8f98-ed3625d234e9|41272|41267|2026-06-18T01:39:00.672Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-18T01:39:00.672Z",
+      "at": "2026-06-18T01:39:00.672Z",
+      "mapUid": "_allkPCDNXTx2ech7txHuAvvpfd",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "dae14a5d-54d7-46fa-bd8b-c00613a32b7d",
+      "oldHolder": "Fleu..",
+      "oldTimeMs": 41272,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:41.272",
+      "oldScoreKey": "41272",
+      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "newHolder": "C50.94975-6.947",
+      "newTimeMs": 41267,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.267",
+      "newScoreKey": "41267",
+      "text": "C50.94975-6.947 overtook Fleu.. on Unknown map with 00:00:41.267."
+    },
     {
       "id": "wr_changed|dPP57O2axw2Jzd7k8WWeE0RjGP6|d620f42d-6779-4a76-9bf5-2bd92a3618d8|6efadff8-1cad-4a6f-bdc7-6c1b96b522bd|34411|34214|2026-06-17T23:10:08.893Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:38.036",
       "newScoreKey": "38036",
       "text": "Flohex overtook NotForwards on Unknown map with 00:00:38.036."
-    },
-    {
-      "id": "wr_changed|fEns0hwThcLDJdFkeitxp25_9fj|89554b2f-ff66-42ca-9f95-2c5320af6694|c18787da-7e70-4c0e-831d-93aecf1a9b15|16257|15832|2026-06-16T14:27:05.156Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-16T14:27:05.156Z",
-      "at": "2026-06-16T14:27:05.156Z",
-      "mapUid": "fEns0hwThcLDJdFkeitxp25_9fj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "89554b2f-ff66-42ca-9f95-2c5320af6694",
-      "oldHolder": "davedawave91",
-      "oldTimeMs": 16257,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:16.257",
-      "oldScoreKey": "16257",
-      "newHolderAccountId": "c18787da-7e70-4c0e-831d-93aecf1a9b15",
-      "newHolder": "enemygoat-",
-      "newTimeMs": 15832,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:15.832",
-      "newScoreKey": "15832",
-      "text": "enemygoat- overtook davedawave91 on Unknown map with 00:00:15.832."
     }
   ]
 }
