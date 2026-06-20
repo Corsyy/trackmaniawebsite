@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-20T16:00:07.251Z",
+  "generatedAt": "2026-06-20T17:38:08.355Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 5,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|R9Q2UOCP77I6UrGWYAUk0UzdhVm|652069fa-48df-4d58-b0c9-d686ef445103|c1e8bbec-8bb3-40b3-9b0e-52e3cb36015e|168848|168155|2026-06-20T17:38:08.355Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-20T17:38:08.355Z",
+      "at": "2026-06-20T17:38:08.355Z",
+      "mapUid": "R9Q2UOCP77I6UrGWYAUk0UzdhVm",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "652069fa-48df-4d58-b0c9-d686ef445103",
+      "oldHolder": "KevinStrike_Tm",
+      "oldTimeMs": 168848,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:02:48.848",
+      "oldScoreKey": "168848",
+      "newHolderAccountId": "c1e8bbec-8bb3-40b3-9b0e-52e3cb36015e",
+      "newHolder": "SkandeaR",
+      "newTimeMs": 168155,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:02:48.155",
+      "newScoreKey": "168155",
+      "text": "SkandeaR overtook KevinStrike_Tm on Unknown map with 00:02:48.155."
+    },
     {
       "id": "wr_changed|p81ToO02hPM1LVnFGccBkUxZbMk|cad1553b-0748-4207-82e3-7b6d55e5bb20|cf0ca8c0-78ef-4a79-a414-98dfd22ab4da|5126|5106|2026-06-20T16:00:07.251Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:41.622",
       "newScoreKey": "41622",
       "text": "T3V5. overtook rowy_201 on Unknown map with 00:00:41.622."
-    },
-    {
-      "id": "wr_changed|TkNOhowGUgLW6U0oRPwLZolyG3|aed062f7-33c8-468d-ba53-94fdce92988e|cf24c6f0-d877-4928-be50-cb85cda0d776|19894|19544|2026-06-16T21:37:32.762Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-16T21:37:32.762Z",
-      "at": "2026-06-16T21:37:32.762Z",
-      "mapUid": "TkNOhowGUgLW6U0oRPwLZolyG3",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "aed062f7-33c8-468d-ba53-94fdce92988e",
-      "oldHolder": "BAYT_TSR",
-      "oldTimeMs": 19894,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:19.894",
-      "oldScoreKey": "19894",
-      "newHolderAccountId": "cf24c6f0-d877-4928-be50-cb85cda0d776",
-      "newHolder": "RunnyMcGee",
-      "newTimeMs": 19544,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:19.544",
-      "newScoreKey": "19544",
-      "text": "RunnyMcGee overtook BAYT_TSR on Unknown map with 00:00:19.544."
     }
   ]
 }
