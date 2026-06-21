@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-21T18:46:30.516Z",
+  "generatedAt": "2026-06-21T20:18:18.438Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|uvGBpGFqnkUPXlGoy4I2Pj6QEwg|0691c70d-c69d-46a9-a209-6600d708b4bd|95f2b15a-cf1e-4e41-b826-21889fdb26d8|45959|45825|2026-06-21T20:18:18.438Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-21T20:18:18.438Z",
+      "at": "2026-06-21T20:18:18.438Z",
+      "mapUid": "uvGBpGFqnkUPXlGoy4I2Pj6QEwg",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "0691c70d-c69d-46a9-a209-6600d708b4bd",
+      "oldHolder": "AYNYXAMER_74",
+      "oldTimeMs": 45959,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:45.959",
+      "oldScoreKey": "45959",
+      "newHolderAccountId": "95f2b15a-cf1e-4e41-b826-21889fdb26d8",
+      "newHolder": "Jann.-",
+      "newTimeMs": 45825,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:45.825",
+      "newScoreKey": "45825",
+      "text": "Jann.- overtook AYNYXAMER_74 on Unknown map with 00:00:45.825."
+    },
     {
       "id": "self_improve|TNqguzMmF8awkKafLefYbLn4F_1|0c1d3748-2613-441e-b238-4a949a71b3a8|0c1d3748-2613-441e-b238-4a949a71b3a8|22026|21996|2026-06-21T18:46:30.516Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:14.758",
       "newScoreKey": "14758",
       "text": "RealityOne overtook Padelateldrog on Unknown map with 00:00:14.758."
-    },
-    {
-      "id": "wr_changed|g_w0exXHuIgPvfs7ZSQ8cBcCqdc|bb70c124-b2de-4dde-ac76-7713b9f3f9d0|7516c986-6d23-4371-9b5b-e826c0d8936c|18718|18233|2026-06-16T23:13:35.624Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-16T23:13:35.624Z",
-      "at": "2026-06-16T23:13:35.624Z",
-      "mapUid": "g_w0exXHuIgPvfs7ZSQ8cBcCqdc",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "bb70c124-b2de-4dde-ac76-7713b9f3f9d0",
-      "oldHolder": "Padelateldrog",
-      "oldTimeMs": 18718,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:18.718",
-      "oldScoreKey": "18718",
-      "newHolderAccountId": "7516c986-6d23-4371-9b5b-e826c0d8936c",
-      "newHolder": "Sheltered_Storm",
-      "newTimeMs": 18233,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:18.233",
-      "newScoreKey": "18233",
-      "text": "Sheltered_Storm overtook Padelateldrog on Unknown map with 00:00:18.233."
     }
   ]
 }
