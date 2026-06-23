@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-23T04:33:19.325Z",
+  "generatedAt": "2026-06-23T08:05:37.898Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|vSfGG3Ug27wXafGP7VutrqlJeV4|66b78c2a-1481-40d7-b8cd-a318dee16c00|da2b3afe-7610-4d1a-a45c-1430dfbacf86|9127|9120|2026-06-23T08:05:37.898Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-23T08:05:37.898Z",
+      "at": "2026-06-23T08:05:37.898Z",
+      "mapUid": "vSfGG3Ug27wXafGP7VutrqlJeV4",
+      "mapId": null,
+      "mapName": "Weekly Shorts Week 64 Map 5",
+      "sourceType": "weekly_shorts",
+      "oldHolderAccountId": "66b78c2a-1481-40d7-b8cd-a318dee16c00",
+      "oldHolder": "Its_Cam.",
+      "oldTimeMs": 9127,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.127",
+      "oldScoreKey": "9127",
+      "newHolderAccountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
+      "newHolder": "in-.-",
+      "newTimeMs": 9120,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.120",
+      "newScoreKey": "9120",
+      "text": "in-.- overtook Its_Cam. on Weekly Shorts Week 64 Map 5 with 00:00:09.120."
+    },
     {
       "id": "wr_changed|Ygt9nXfCTn2FCJZ1gwtmW_e9jVe|17c0f2e9-625c-45f0-b705-2ffee97058f4|bce4d579-dc66-43b5-9d57-eb1fb58dd450|5369|5364|2026-06-23T00:18:59.154Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.956",
       "newScoreKey": "10956",
       "text": "uelen. improved their WR on Unknown map from 00:00:12.668 to 00:00:10.956."
-    },
-    {
-      "id": "wr_changed|RXiTCSL13x8oAvvjTZNgHNY2qCk|716d855f-eb71-4bfa-843a-ff962c1bb734|47deaeb4-6a90-46cf-9b2b-f986c282076f|19799|19764|2026-06-17T11:47:31.846Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-17T11:47:31.846Z",
-      "at": "2026-06-17T11:47:31.846Z",
-      "mapUid": "RXiTCSL13x8oAvvjTZNgHNY2qCk",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "716d855f-eb71-4bfa-843a-ff962c1bb734",
-      "oldHolder": "rattarme23",
-      "oldTimeMs": 19799,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:19.799",
-      "oldScoreKey": "19799",
-      "newHolderAccountId": "47deaeb4-6a90-46cf-9b2b-f986c282076f",
-      "newHolder": "LeinAdmiral",
-      "newTimeMs": 19764,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:19.764",
-      "newScoreKey": "19764",
-      "text": "LeinAdmiral overtook rattarme23 on Unknown map with 00:00:19.764."
     }
   ]
 }
