@@ -141,6 +141,99 @@
       border-bottom: 1px solid rgba(255, 255, 255, .08);
     }
 
+    .navlinks .nav-support-link {
+      border: 1px solid rgba(104, 240, 255, .28);
+      background: rgba(104, 240, 255, .07);
+      color: inherit;
+      border-radius: 999px;
+      padding: .45rem .8rem;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .navlinks .nav-support-link:hover {
+      color: #fff;
+      background: rgba(104, 240, 255, .13);
+      border-color: rgba(104, 240, 255, .5);
+    }
+
+    .support-preview-section {
+      padding-top: 1rem;
+    }
+
+    .support-preview-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      padding: 1.25rem 1.35rem;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at top left, rgba(104, 240, 255, .12), transparent 34%),
+        rgba(10, 16, 28, .86);
+      border: 1px solid rgba(104, 240, 255, .18);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .28);
+    }
+
+    .support-preview-kicker {
+      display: inline-flex;
+      margin-bottom: .45rem;
+      color: #68f0ff;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .support-preview-card h2 {
+      margin: 0 0 .35rem;
+      color: #fff;
+      font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    }
+
+    .support-preview-card p {
+      margin: 0;
+      max-width: 680px;
+      color: rgba(234, 240, 255, .72);
+      line-height: 1.55;
+    }
+
+    .support-preview-muted {
+      margin-top: .35rem !important;
+      color: rgba(234, 240, 255, .52) !important;
+      font-size: .92rem;
+    }
+
+    .support-preview-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      padding: .75rem 1rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #53a6ff, #68f0ff);
+      color: #07101f;
+      font-weight: 900;
+      text-decoration: none;
+      box-shadow: 0 12px 28px rgba(83, 166, 255, .22);
+    }
+
+    .support-preview-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    @media (max-width: 720px) {
+      .support-preview-card {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .support-preview-btn {
+        width: 100%;
+      }
+    }
+
     .submit-event-head strong {
       display: block;
       color: #fff;
@@ -343,6 +436,7 @@
         <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
         <a href="/totd">Track of the Day</a>
         <a href="/highlights">Community Highlights</a>
+        <a class="nav-support-link" href="/support">Support</a>
         <button class="nav-submit submit-event-open" type="button">Submit Event</button>
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
@@ -527,7 +621,25 @@
       </div>
     </div>
   </section>
+  <section id="support-preview" class="section support-preview-section">
+    <div class="container">
+      <div class="support-preview-card reveal">
+        <div class="support-preview-text">
+          <span class="support-preview-kicker">Community supported</span>
+          <h2>Enjoying Trackmania Events?</h2>
+          <p>
+            Trackmania Events is free to use. Optional support helps with hosting,
+            tools, data updates, and future site features.
+          </p>
+          <p class="support-preview-muted">
+            No pressure — using the site, sharing it, and submitting events already helps a ton.
+          </p>
+        </div>
 
+        <a class="support-preview-btn" href="/support">Support the Site</a>
+      </div>
+    </div>
+  </section>
   <section id="showcase" class="section">
     <div class="container">
       <h2 class="title">Highlights</h2>
@@ -617,7 +729,8 @@
     <div class="container"
       style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
       <div>© <span id="year"></span> Trackmania Events</div>
-      <div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a> • <a href="#contact">Contact</a></div>
+      <div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a> • <a href="/support">Support</a> • <a
+          href="#contact">Contact</a></div>
     </div>
   </footer>
 
