@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Support Trackmania Events</title>
+  <meta name="description"
+    content="Support Trackmania Events, a free community hub for Trackmania events, records, stats, and community updates." />
+  <meta name="theme-color" content="#0a0f1a" />
+
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;" />
+
+  <meta property="og:title" content="Support Trackmania Events" />
+  <meta property="og:description"
+    content="Trackmania Events is free to use. Optional support helps cover hosting, tools, updates, and development time." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://trackmaniaevents.com/support" />
+  <meta property="og:image" content="https://trackmaniaevents.com/img/trackmania-events-support.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="shortcut icon" href="/logo.png">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    .support-nav-link {
+      border: 1px solid rgba(104, 240, 255, .35);
+      background: rgba(104, 240, 255, .08);
+      border-radius: 999px;
+      padding: .45rem .85rem;
+      color: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .support-nav-link:hover {
+      color: #fff;
+      background: rgba(104, 240, 255, .14);
+      border-color: rgba(104, 240, 255, .58);
+    }
+
+    .support-page {
+      padding: 4.5rem 0 3.5rem;
+    }
+
+    .support-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(320px, .96fr);
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .support-copy {
+      min-width: 0;
+    }
+
+    .support-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      margin-bottom: .8rem;
+      padding: .42rem .7rem;
+      border: 1px solid rgba(104, 240, 255, .22);
+      border-radius: 999px;
+      background: rgba(104, 240, 255, .07);
+      color: #68f0ff;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .support-title {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(2.25rem, 6vw, 4.65rem);
+      line-height: .96;
+      letter-spacing: -.055em;
+    }
+
+    .support-title span {
+      color: #68f0ff;
+    }
+
+    .support-lead {
+      max-width: 760px;
+      margin: 1.15rem 0 0;
+      color: rgba(234, 240, 255, .76);
+      font-size: clamp(1rem, 1.9vw, 1.2rem);
+      line-height: 1.7;
+    }
+
+    .support-note {
+      max-width: 720px;
+      margin: .9rem 0 0;
+      color: rgba(234, 240, 255, .55);
+      line-height: 1.6;
+    }
+
+    .support-actions {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .support-primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: .82rem 1.12rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #53a6ff, #68f0ff);
+      color: #07101f;
+      font-weight: 900;
+      text-decoration: none;
+      box-shadow: 0 14px 34px rgba(83, 166, 255, .26);
+    }
+
+    .support-primary-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+
+    .support-secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: .82rem 1.12rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .045);
+      color: #eaf0ff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .support-secondary-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .075);
+    }
+
+    .support-image-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 26px;
+      border: 1px solid rgba(104, 240, 255, .2);
+      background:
+        radial-gradient(circle at top, rgba(104, 240, 255, .12), transparent 36%),
+        rgba(10, 16, 28, .72);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, .42);
+    }
+
+    .support-image-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .support-mini-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .9rem;
+      margin-top: 2rem;
+    }
+
+    .support-mini {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background: rgba(10, 16, 28, .78);
+    }
+
+    .support-mini strong {
+      display: block;
+      color: #fff;
+      margin-bottom: .25rem;
+    }
+
+    .support-mini span {
+      display: block;
+      color: rgba(234, 240, 255, .58);
+      line-height: 1.45;
+      font-size: .92rem;
+    }
+
+    .support-section {
+      margin-top: 3rem;
+    }
+
+    .support-panel {
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background:
+        radial-gradient(circle at top right, rgba(83, 166, 255, .1), transparent 30%),
+        rgba(10, 16, 28, .82);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .28);
+      padding: 1.4rem;
+    }
+
+    .support-panel h2 {
+      margin: 0 0 .8rem;
+      color: #fff;
+      font-size: clamp(1.45rem, 3vw, 2rem);
+    }
+
+    .support-panel p {
+      color: rgba(234, 240, 255, .68);
+      line-height: 1.65;
+      margin: 0 0 .9rem;
+    }
+
+    .support-list {
+      display: grid;
+      gap: .7rem;
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .support-list li {
+      display: flex;
+      gap: .65rem;
+      align-items: flex-start;
+      color: rgba(234, 240, 255, .72);
+      line-height: 1.5;
+    }
+
+    .support-list li::before {
+      content: "✓";
+      flex: 0 0 auto;
+      width: 1.35rem;
+      height: 1.35rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(104, 240, 255, .12);
+      color: #68f0ff;
+      font-weight: 900;
+      font-size: .82rem;
+      margin-top: .05rem;
+    }
+
+    .support-two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .support-muted-box {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid rgba(104, 240, 255, .14);
+      background: rgba(104, 240, 255, .055);
+      color: rgba(234, 240, 255, .68);
+      line-height: 1.55;
+    }
+
+    .support-footer-line {
+      margin-top: 3rem;
+      text-align: center;
+      color: rgba(234, 240, 255, .5);
+      font-size: .95rem;
+    }
+
+    footer a.support-footer-link {
+      color: #68f0ff;
+    }
+
+    @media (max-width: 900px) {
+      .support-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .support-image-card {
+        max-width: 620px;
+      }
+
+      .support-mini-strip,
+      .support-two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .support-page {
+        padding-top: 3rem;
+      }
+
+      .support-actions a {
+        width: 100%;
+      }
+
+      .support-panel {
+        padding: 1.1rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-track-curves">
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Trackmania Events Home">
+        <span class="brand-badge" aria-hidden="true">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
+
+      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
+        <a href="/kacky">Kacky Finishes</a>
+        <a href="/wrleaderboard">WR Leaderboard</a>
+        <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+        <a href="/totd">Track of the Day</a>
+        <a href="/highlights">Community Highlights</a>
+        <a class="support-nav-link" href="/support">Support</a>
+      </nav>
+
+      <div class="cta">
+        <a class="btn" href="/#contact">Contact</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="support-page">
+    <section class="container support-hero">
+      <div class="support-copy">
+        <span class="support-kicker">Community supported</span>
+
+        <h1 class="support-title">
+          Support <span>Trackmania Events</span>
+        </h1>
+
+        <p class="support-lead">
+          Trackmania Events is built and maintained as a free community resource for schedules,
+          live events, records, Track of the Day data, Weekly Shorts stats, and community updates.
+        </p>
+
+        <p class="support-note">
+          Optional support helps cover hosting, tools, data updates, and development time.
+          There is zero pressure — using the site, sharing it, and submitting events already helps a lot.
+        </p>
+
+        <div class="support-actions">
+          <a class="support-primary-btn" href="https://ko-fi.com/trackmaniaevents" target="_blank" rel="noopener noreferrer">
+            Support on Ko-fi
+          </a>
+          <a class="support-secondary-btn" href="/">
+            Back to Home
+          </a>
+        </div>
+
+        <div class="support-mini-strip" aria-label="Support benefits">
+          <div class="support-mini">
+            <strong>Free to use</strong>
+            <span>The main site features stay available to everyone.</span>
+          </div>
+
+          <div class="support-mini">
+            <strong>Community-first</strong>
+            <span>Support goes toward improving the Trackmania community hub.</span>
+          </div>
+
+          <div class="support-mini">
+            <strong>Optional only</strong>
+            <span>No pressure, no popups, no locked leaderboards.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="support-image-card">
+        <img src="/img/trackmania-events-support.png" alt="Trackmania Events support graphic">
+      </div>
+    </section>
+
+    <section class="container support-section">
+      <div class="support-two-col">
+        <article class="support-panel">
+          <h2>What support helps with</h2>
+          <p>
+            Trackmania Events takes time to build, test, maintain, and keep updated.
+            Support helps make future improvements easier to keep working on.
+          </p>
+
+          <ul class="support-list">
+            <li>Hosting, domain, and site-related costs.</li>
+            <li>Keeping event pages, stats, and records updated.</li>
+            <li>Adding new features for players, organizers, and viewers.</li>
+            <li>Improving mobile layouts, performance, and reliability.</li>
+          </ul>
+        </article>
+
+        <article class="support-panel">
+          <h2>No pressure at all</h2>
+          <p>
+            The site is meant to stay useful and accessible for the community.
+            Supporting is simply a way to help out if you enjoy the project and want to contribute.
+          </p>
+
+          <ul class="support-list">
+            <li>Sharing the site helps.</li>
+            <li>Submitting events helps.</li>
+            <li>Reporting bugs helps.</li>
+            <li>Optional Ko-fi support helps too.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="container support-section">
+      <div class="support-panel">
+        <h2>Supporter perks</h2>
+        <p>
+          The useful parts of Trackmania Events are not locked behind payment. Any perks are meant to be small,
+          cosmetic, and community-focused.
+        </p>
+
+        <ul class="support-list">
+          <li>Supporter name listed on a future supporters section.</li>
+          <li>Possible supporter badge in the shoutbox.</li>
+          <li>Early previews or feedback on upcoming site features.</li>
+          <li>A simple way to help keep the project active.</li>
+        </ul>
+
+        <div class="support-muted-box">
+          Leaderboards, event browsing, Track of the Day data, Weekly Shorts stats, and core site features are intended
+          to stay free for everyone.
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <p class="support-footer-line">
+        Thank you for using Trackmania Events — support is appreciated, but never required.
+      </p>
+    </div>
+  </main>
+
+  <button id="toTop" aria-label="Back to top"><span>Top</span></button>
+
+  <footer>
+    <div class="container"
+      style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div>
+        <a href="/privacy">Privacy</a> •
+        <a href="/terms">Terms</a> •
+        <a class="support-footer-link" href="/support">Support</a> •
+        <a href="/#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const navToggle = document.getElementById("navToggle");
+    const primaryNav = document.getElementById("primary-nav");
+    const toTop = document.getElementById("toTop");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    if (navToggle && primaryNav) {
+      navToggle.addEventListener("click", () => {
+        const isOpen = primaryNav.classList.toggle("open");
+        navToggle.setAttribute("aria-expanded", String(isOpen));
+      });
+    }
+
+    if (toTop) {
+      window.addEventListener("scroll", () => {
+        toTop.classList.toggle("show", window.scrollY > 500);
+      }, { passive: true });
+
+      toTop.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+  </script>
+</body>
+
+</html>
