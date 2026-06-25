@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-25T20:31:28.232Z",
+  "generatedAt": "2026-06-25T22:06:17.825Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|kf6bG3cRu_Ncp7fENx8hOc18fNd|ee763e0b-90a4-4707-825a-a0c62b308726|2343ca67-a77c-47c8-83bd-74f99c6f0a37|24735|24708|2026-06-25T22:06:17.825Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-25T22:06:17.825Z",
+      "at": "2026-06-25T22:06:17.825Z",
+      "mapUid": "kf6bG3cRu_Ncp7fENx8hOc18fNd",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "ee763e0b-90a4-4707-825a-a0c62b308726",
+      "oldHolder": "LordQuacked",
+      "oldTimeMs": 24735,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:24.735",
+      "oldScoreKey": "24735",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 24708,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:24.708",
+      "newScoreKey": "24708",
+      "text": "hobbi. overtook LordQuacked on Unknown map with 00:00:24.708."
+    },
     {
       "id": "wr_changed|XOHDLPbgM6_BkRCoeGOdjOdKKS6|efb1ceca-bfe1-4b53-8e7a-be13b84bc533|ee99ebb0-b4a6-4bb4-84e8-6f8654cd60d3|4700|7557|2026-06-25T08:42:18.744Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.609",
       "newScoreKey": "9609",
       "text": "DRAGON_DM7 overtook poruzu4 on Unknown map with 00:00:09.609."
-    },
-    {
-      "id": "wr_changed|_AihuKp6lP8TAs_dfTSLa3RLd45|296a77c2-1c19-4236-9a3e-28c8c01e6312|e3dfa7a6-35c5-41ba-85cf-da78b5274210|10068|10048|2026-06-17T19:52:38.302Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-17T19:52:38.302Z",
-      "at": "2026-06-17T19:52:38.302Z",
-      "mapUid": "_AihuKp6lP8TAs_dfTSLa3RLd45",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "296a77c2-1c19-4236-9a3e-28c8c01e6312",
-      "oldHolder": "luddekuddekofot",
-      "oldTimeMs": 10068,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.068",
-      "oldScoreKey": "10068",
-      "newHolderAccountId": "e3dfa7a6-35c5-41ba-85cf-da78b5274210",
-      "newHolder": "Francesco.tm",
-      "newTimeMs": 10048,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.048",
-      "newScoreKey": "10048",
-      "text": "Francesco.tm overtook luddekuddekofot on Unknown map with 00:00:10.048."
     }
   ]
 }
