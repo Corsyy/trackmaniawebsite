@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-25T01:51:48.159Z",
+  "generatedAt": "2026-06-25T05:53:19.928Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 5,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|Z9xKPfm4pUjmrrz1c6Yz25NiG08|421f5292-f81f-4e46-a896-3569b2bfd5c5|121353cc-d7a8-4e60-bfb3-8ddcf3c6f9f7|4647|4614|2026-06-25T05:53:19.928Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-25T05:53:19.928Z",
+      "at": "2026-06-25T05:53:19.928Z",
+      "mapUid": "Z9xKPfm4pUjmrrz1c6Yz25NiG08",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "421f5292-f81f-4e46-a896-3569b2bfd5c5",
+      "oldHolder": "Miami560.",
+      "oldTimeMs": 4647,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:04.647",
+      "oldScoreKey": "4647",
+      "newHolderAccountId": "121353cc-d7a8-4e60-bfb3-8ddcf3c6f9f7",
+      "newHolder": "Flippington5",
+      "newTimeMs": 4614,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:04.614",
+      "newScoreKey": "4614",
+      "text": "Flippington5 overtook Miami560. on Unknown map with 00:00:04.614."
+    },
     {
       "id": "wr_changed|jLCsI43VEbYARHx8bMOPRYeankd|27031ba7-1b84-44b1-993f-7bc3e9d3da31|1dc2651c-7fda-4b65-97a6-9f750256d5db|47249|46841|2026-06-25T01:51:48.159Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.566",
       "newScoreKey": "8566",
       "text": "stardestoyer06 overtook EepyMocha on Unknown map with 00:00:08.566."
-    },
-    {
-      "id": "wr_changed|8gu5Qv__NHrgEpusCREH6vj0cD5|278052ab-0630-47af-989f-d49c21d9e59a|2a1b8cbd-c4c0-4936-ab35-2f8e9fec332b|25060|25048|2026-06-17T19:52:38.302Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-17T19:52:38.302Z",
-      "at": "2026-06-17T19:52:38.302Z",
-      "mapUid": "8gu5Qv__NHrgEpusCREH6vj0cD5",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "278052ab-0630-47af-989f-d49c21d9e59a",
-      "oldHolder": "Br0kk0lli",
-      "oldTimeMs": 25060,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:25.060",
-      "oldScoreKey": "25060",
-      "newHolderAccountId": "2a1b8cbd-c4c0-4936-ab35-2f8e9fec332b",
-      "newHolder": "SlimyTim",
-      "newTimeMs": 25048,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:25.048",
-      "newScoreKey": "25048",
-      "text": "SlimyTim overtook Br0kk0lli on Unknown map with 00:00:25.048."
     }
   ]
 }
