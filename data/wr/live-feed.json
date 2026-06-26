@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-26T18:19:09.270Z",
+  "generatedAt": "2026-06-26T20:14:14.785Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 4,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|HM3KPyoeHVj5p29FOmHohUsZ5Kc|39e40aaa-07de-4fbc-bd0d-d4961f18a15e|b988378b-bd0f-42d2-ae61-4b3e25b63909|33605|32978|2026-06-26T20:14:14.785Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-26T20:14:14.785Z",
+      "at": "2026-06-26T20:14:14.785Z",
+      "mapUid": "HM3KPyoeHVj5p29FOmHohUsZ5Kc",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "39e40aaa-07de-4fbc-bd0d-d4961f18a15e",
+      "oldHolder": "Eppindro",
+      "oldTimeMs": 33605,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:33.605",
+      "oldScoreKey": "33605",
+      "newHolderAccountId": "b988378b-bd0f-42d2-ae61-4b3e25b63909",
+      "newHolder": "Sczn.z",
+      "newTimeMs": 32978,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:32.978",
+      "newScoreKey": "32978",
+      "text": "Sczn.z overtook Eppindro on Unknown map with 00:00:32.978."
+    },
     {
       "id": "wr_changed|JL5JLpYbKaDveqlJoM990tGtGY7|ccb9b18c-fbe7-458c-9041-757cd9c8dea3|a198e640-779a-47c0-97b5-9d38a351e7fa|9112|9111|2026-06-26T18:19:09.270Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:02:33.221",
       "newScoreKey": "153221",
       "text": "Kozhy_ improved their WR on Unknown map from 00:02:35.590 to 00:02:33.221."
-    },
-    {
-      "id": "wr_changed|4AkNh3oLgChEd9wXZ83qu1B2K81|2f69c2f3-a17b-4f03-8943-821535d32a08|5748344a-4548-4be8-8546-68d9903e2827|9664|8938|2026-06-18T21:52:43.253Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-18T21:52:43.253Z",
-      "at": "2026-06-18T21:52:43.253Z",
-      "mapUid": "4AkNh3oLgChEd9wXZ83qu1B2K81",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "2f69c2f3-a17b-4f03-8943-821535d32a08",
-      "oldHolder": "THCwasTaken",
-      "oldTimeMs": 9664,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.664",
-      "oldScoreKey": "9664",
-      "newHolderAccountId": "5748344a-4548-4be8-8546-68d9903e2827",
-      "newHolder": "Natnavis",
-      "newTimeMs": 8938,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.938",
-      "newScoreKey": "8938",
-      "text": "Natnavis overtook THCwasTaken on Unknown map with 00:00:08.938."
     }
   ]
 }
