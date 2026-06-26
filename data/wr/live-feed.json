@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-26T20:14:14.785Z",
+  "generatedAt": "2026-06-26T21:43:56.710Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|YmWb3MhdafcJ6OkXyR3goi4t5la|8a8b7112-c33b-4608-a617-37b7798b78d5|8496b1d0-0825-4175-bcd3-aa54cd0ebe07|40014|39479|2026-06-26T21:43:56.710Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-26T21:43:56.710Z",
+      "at": "2026-06-26T21:43:56.710Z",
+      "mapUid": "YmWb3MhdafcJ6OkXyR3goi4t5la",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8a8b7112-c33b-4608-a617-37b7798b78d5",
+      "oldHolder": "HarmfullTM",
+      "oldTimeMs": 40014,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:40.014",
+      "oldScoreKey": "40014",
+      "newHolderAccountId": "8496b1d0-0825-4175-bcd3-aa54cd0ebe07",
+      "newHolder": "andrenator5000",
+      "newTimeMs": 39479,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:39.479",
+      "newScoreKey": "39479",
+      "text": "andrenator5000 overtook HarmfullTM on Unknown map with 00:00:39.479."
+    },
     {
       "id": "wr_changed|HM3KPyoeHVj5p29FOmHohUsZ5Kc|39e40aaa-07de-4fbc-bd0d-d4961f18a15e|b988378b-bd0f-42d2-ae61-4b3e25b63909|33605|32978|2026-06-26T20:14:14.785Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.418",
       "newScoreKey": "9418",
       "text": "klmrs overtook MazsTM on Unknown map with 00:00:09.418."
-    },
-    {
-      "id": "self_improve|dQMUoX7JVuX_EyRk9Ynb5BK3CBc|02b0b103-be81-4945-a980-3147ced69634|02b0b103-be81-4945-a980-3147ced69634|155590|153221|2026-06-18T21:52:43.253Z",
-      "type": "self_improve",
-      "detectedAt": "2026-06-18T21:52:43.253Z",
-      "at": "2026-06-18T21:52:43.253Z",
-      "mapUid": "dQMUoX7JVuX_EyRk9Ynb5BK3CBc",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "02b0b103-be81-4945-a980-3147ced69634",
-      "oldHolder": "Kozhy_",
-      "oldTimeMs": 155590,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:02:35.590",
-      "oldScoreKey": "155590",
-      "newHolderAccountId": "02b0b103-be81-4945-a980-3147ced69634",
-      "newHolder": "Kozhy_",
-      "newTimeMs": 153221,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:02:33.221",
-      "newScoreKey": "153221",
-      "text": "Kozhy_ improved their WR on Unknown map from 00:02:35.590 to 00:02:33.221."
     }
   ]
 }
