@@ -3461,7 +3461,13 @@
           resetBtn.textContent = "Send Password Reset";
         }
       };
+      const authMenuAccountBtn = document.getElementById("authMenuAccountBtn");
 
+      if (authMenuAccountBtn) {
+        authMenuAccountBtn.onclick = () => {
+          window.location.href = "/account";
+        };
+      }
       if (authLogoutBtn) authLogoutBtn.onclick = async () => {
         if (!tmeSupabase) return;
 
