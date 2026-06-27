@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account — Trackmania Events</title>
+  <meta name="description" content="Manage your Trackmania Events account, event submissions, preferences, and linked Trackmania stats." />
+  <meta name="theme-color" content="#0a0f1a" />
+
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="shortcut icon" href="/logo.png">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    .account-page {
+      padding: 4rem 0 3.5rem;
+    }
+
+    .account-hero {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .account-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      margin-bottom: .65rem;
+      padding: .4rem .7rem;
+      border: 1px solid rgba(104, 240, 255, .22);
+      border-radius: 999px;
+      background: rgba(104, 240, 255, .07);
+      color: #68f0ff;
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .account-title {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(2.1rem, 5vw, 4rem);
+      line-height: .98;
+      letter-spacing: -.05em;
+    }
+
+    .account-subtitle {
+      max-width: 760px;
+      margin: .85rem 0 0;
+      color: rgba(234, 240, 255, .66);
+      line-height: 1.6;
+    }
+
+    .account-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .account-stack {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .account-card {
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background:
+        radial-gradient(circle at top left, rgba(83, 166, 255, .09), transparent 34%),
+        rgba(10, 16, 28, .86);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .28);
+      overflow: hidden;
+    }
+
+    .account-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .account-card-head strong {
+      display: block;
+      color: #fff;
+      font-size: 1.05rem;
+    }
+
+    .account-card-head span {
+      display: block;
+      margin-top: .18rem;
+      color: rgba(234, 240, 255, .52);
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+
+    .account-card-body {
+      padding: 1.1rem;
+    }
+
+    .account-info-list {
+      display: grid;
+      gap: .75rem;
+    }
+
+    .account-info-row {
+      display: grid;
+      grid-template-columns: 130px minmax(0, 1fr);
+      gap: .85rem;
+      align-items: center;
+      padding: .78rem .85rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .035);
+      border: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .account-info-row span {
+      color: rgba(234, 240, 255, .52);
+      font-size: .86rem;
+      font-weight: 700;
+    }
+
+    .account-info-row strong {
+      color: #fff;
+      overflow-wrap: anywhere;
+    }
+
+    .account-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: .34rem .65rem;
+      border-radius: 999px;
+      background: rgba(104, 240, 255, .1);
+      border: 1px solid rgba(104, 240, 255, .25);
+      color: #68f0ff;
+      font-weight: 900;
+      font-size: .82rem;
+      text-transform: capitalize;
+    }
+
+    .account-form-grid {
+      display: grid;
+      gap: .8rem;
+    }
+
+    .account-field label {
+      display: block;
+      color: rgba(234, 240, 255, .74);
+      font-weight: 800;
+      font-size: .88rem;
+      margin-bottom: .4rem;
+    }
+
+    .account-field .help {
+      margin-top: .35rem;
+      color: rgba(234, 240, 255, .48);
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+
+    .account-actions {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      flex-wrap: wrap;
+      margin-top: .95rem;
+    }
+
+    .account-status {
+      color: rgba(234, 240, 255, .62);
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
+    .account-status.success {
+      color: #8ef0ad;
+    }
+
+    .account-status.error {
+      color: #ff9b9b;
+    }
+
+    .account-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .9rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .035);
+      border: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .account-toggle-row strong {
+      display: block;
+      color: #fff;
+      margin-bottom: .18rem;
+    }
+
+    .account-toggle-row span {
+      color: rgba(234, 240, 255, .52);
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+
+    .account-toggle-row input {
+      width: 20px;
+      height: 20px;
+      accent-color: #68f0ff;
+      flex: 0 0 auto;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .75rem;
+    }
+
+    .stat-box {
+      padding: .9rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .035);
+      border: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .stat-box span {
+      display: block;
+      color: rgba(234, 240, 255, .52);
+      font-size: .8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .stat-box strong {
+      display: block;
+      margin-top: .25rem;
+      color: #fff;
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .linked-player {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: .9rem;
+      border-radius: 18px;
+      background: rgba(104, 240, 255, .06);
+      border: 1px solid rgba(104, 240, 255, .14);
+    }
+
+    .linked-player strong {
+      color: #fff;
+    }
+
+    .linked-player span {
+      display: block;
+      margin-top: .15rem;
+      color: rgba(234, 240, 255, .56);
+      font-size: .86rem;
+      overflow-wrap: anywhere;
+    }
+
+    .submission-list {
+      display: grid;
+      gap: .75rem;
+    }
+
+    .submission-item {
+      padding: .9rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .035);
+      border: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .submission-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: .8rem;
+      margin-bottom: .45rem;
+    }
+
+    .submission-title {
+      color: #fff;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .submission-meta {
+      color: rgba(234, 240, 255, .55);
+      font-size: .86rem;
+      line-height: 1.45;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: .28rem .55rem;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .06);
+      color: rgba(234, 240, 255, .76);
+    }
+
+    .status-badge.pending {
+      color: #ffd36d;
+      background: rgba(255, 211, 109, .1);
+      border-color: rgba(255, 211, 109, .22);
+    }
+
+    .status-badge.approved {
+      color: #8ef0ad;
+      background: rgba(142, 240, 173, .1);
+      border-color: rgba(142, 240, 173, .22);
+    }
+
+    .status-badge.rejected {
+      color: #ff9b9b;
+      background: rgba(255, 155, 155, .1);
+      border-color: rgba(255, 155, 155, .22);
+    }
+
+    .empty-state {
+      color: rgba(234, 240, 255, .56);
+      line-height: 1.55;
+      padding: .9rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .account-locked {
+      display: none;
+      max-width: 720px;
+      margin: 2rem auto 0;
+      text-align: center;
+    }
+
+    .account-locked.show {
+      display: block;
+    }
+
+    .account-authed {
+      display: none;
+    }
+
+    .account-authed.show {
+      display: block;
+    }
+
+    .navlinks .nav-support-link {
+      border: 1px solid rgba(104, 240, 255, .28);
+      background: rgba(104, 240, 255, .07);
+      color: inherit;
+      border-radius: 999px;
+      padding: .45rem .8rem;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .navlinks .nav-support-link:hover {
+      color: #fff;
+      background: rgba(104, 240, 255, .13);
+      border-color: rgba(104, 240, 255, .5);
+    }
+
+    @media (max-width: 920px) {
+      .account-hero {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .account-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .account-page {
+        padding-top: 3rem;
+      }
+
+      .account-info-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .account-toggle-row,
+      .linked-player,
+      .submission-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .account-actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-track-curves">
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Trackmania Events Home">
+        <span class="brand-badge" aria-hidden="true">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
+
+      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
+        <a href="/kacky">Kacky Finishes</a>
+        <a href="/wrleaderboard">WR Leaderboard</a>
+        <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+        <a href="/totd">Track of the Day</a>
+        <a href="/highlights">Community Highlights</a>
+        <a class="nav-support-link" href="/support">Support</a>
+      </nav>
+
+      <div class="cta">
+        <a class="btn" href="/">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="account-page">
+    <section class="container">
+      <div class="account-hero">
+        <div>
+          <span class="account-kicker">Account</span>
+          <h1 class="account-title">Your Trackmania Events profile</h1>
+          <p class="account-subtitle">
+            Manage your account, check event submissions, link your Trackmania account, view your site stats,
+            and update simple preferences.
+          </p>
+        </div>
+      </div>
+
+      <div id="accountLocked" class="account-card account-locked">
+        <div class="account-card-head">
+          <div>
+            <strong>Login required</strong>
+            <span>You need to be signed in before viewing your account page.</span>
+          </div>
+        </div>
+        <div class="account-card-body">
+          <p class="empty-state">
+            Go back to the homepage and use Login / Register, then return to this page.
+          </p>
+          <div class="account-actions">
+            <a class="btn primary" href="/">Go to homepage</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="accountAuthed" class="account-authed">
+        <div class="account-grid">
+          <div class="account-stack">
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>Account Overview</strong>
+                  <span>Your basic Trackmania Events account details.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div class="account-info-list">
+                  <div class="account-info-row">
+                    <span>Username</span>
+                    <strong id="profileUsername">Loading…</strong>
+                  </div>
+
+                  <div class="account-info-row">
+                    <span>Email</span>
+                    <strong id="profileEmail">Loading…</strong>
+                  </div>
+
+                  <div class="account-info-row">
+                    <span>Role</span>
+                    <strong><span id="profileRole" class="account-pill">User</span></strong>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>Trackmania Profile</strong>
+                  <span>Link your Trackmania account ID to show your stats.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div class="linked-player">
+                  <div>
+                    <strong id="linkedTmName">No Trackmania account linked</strong>
+                    <span id="linkedTmId">Paste your Trackmania account ID below.</span>
+                  </div>
+                  <span id="tmLinkedStatus" class="status-badge">Not linked</span>
+                </div>
+
+                <div class="account-form-grid">
+                  <div class="account-field">
+                    <label for="tmAccountIdInput">Trackmania account ID</label>
+                    <input id="tmAccountIdInput" class="input" type="text"
+                      placeholder="Example: 7682d76f-3e07-4bd3-a2f7-76bbd194423a" autocomplete="off">
+                    <div class="help">
+                      Use the Trackmania account ID, not just the display name. Display names can change, account IDs are stable.
+                    </div>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="tmDisplayNameInput">Display name</label>
+                    <input id="tmDisplayNameInput" class="input" type="text" placeholder="Optional display name"
+                      maxlength="60" autocomplete="off">
+                    <div class="help">
+                      This will auto-fill when the account ID is found in your site data.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="account-actions">
+                  <button id="saveTmBtn" class="btn primary" type="button">Save Trackmania Account</button>
+                  <button id="clearTmBtn" class="btn" type="button">Unlink</button>
+                  <span id="tmStatus" class="account-status" aria-live="polite"></span>
+                </div>
+              </div>
+            </article>
+
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>Preferences</strong>
+                  <span>Simple profile and shoutbox settings.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div class="account-form-grid">
+                  <label class="account-toggle-row">
+                    <div>
+                      <strong>Shoutbox mention sound</strong>
+                      <span>Allow mention/ping sounds while using the site.</span>
+                    </div>
+                    <input id="prefSound" type="checkbox">
+                  </label>
+
+                  <label class="account-toggle-row">
+                    <div>
+                      <strong>Display supporter badge</strong>
+                      <span>Show a supporter badge if your account is eligible later.</span>
+                    </div>
+                    <input id="prefBadge" type="checkbox">
+                  </label>
+                </div>
+
+                <div class="account-actions">
+                  <button id="savePrefsBtn" class="btn primary" type="button">Save Preferences</button>
+                  <span id="prefsStatus" class="account-status" aria-live="polite"></span>
+                </div>
+              </div>
+            </article>
+
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>Security</strong>
+                  <span>Manage your session and password access.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div class="account-actions">
+                  <button id="resetPasswordBtn" class="btn" type="button">Send Password Reset</button>
+                  <button id="logoutBtn" class="btn primary" type="button">Logout</button>
+                  <span id="securityStatus" class="account-status" aria-live="polite"></span>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="account-stack">
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>My Stats</strong>
+                  <span>Stats based on your linked Trackmania account ID.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div id="statsEmpty" class="empty-state">
+                  Link your Trackmania account ID to load your Weekly Shorts and GOAT stats.
+                </div>
+
+                <div id="statsWrap" style="display:none">
+                  <div class="stats-grid">
+                    <div class="stat-box">
+                      <span>WS Wins</span>
+                      <strong id="statWins">0</strong>
+                    </div>
+
+                    <div class="stat-box">
+                      <span>WS WRs</span>
+                      <strong id="statWrs">0</strong>
+                    </div>
+
+                    <div class="stat-box">
+                      <span>WS Top 5s</span>
+                      <strong id="statTop5">0</strong>
+                    </div>
+
+                    <div class="stat-box">
+                      <span>GOAT Points</span>
+                      <strong id="statGoatPoints">0</strong>
+                    </div>
+
+                    <div class="stat-box">
+                      <span>GOAT Wins</span>
+                      <strong id="statGoatWins">0</strong>
+                    </div>
+
+                    <div class="stat-box">
+                      <span>GOAT WRs</span>
+                      <strong id="statGoatWrs">0</strong>
+                    </div>
+                  </div>
+
+                  <div style="height:.85rem"></div>
+
+                  <div class="empty-state" id="statsDetails">
+                    Loading linked stats…
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>My Event Submissions</strong>
+                  <span>Pending, approved, and rejected events submitted from your account.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div id="submissionSummary" class="stats-grid" style="margin-bottom:.85rem">
+                  <div class="stat-box">
+                    <span>Pending</span>
+                    <strong id="subPending">0</strong>
+                  </div>
+                  <div class="stat-box">
+                    <span>Approved</span>
+                    <strong id="subApproved">0</strong>
+                  </div>
+                  <div class="stat-box">
+                    <span>Rejected</span>
+                    <strong id="subRejected">0</strong>
+                  </div>
+                </div>
+
+                <div id="submissionList" class="submission-list">
+                  <div class="empty-state">Loading submissions…</div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button id="toTop" aria-label="Back to top"><span>Top</span></button>
+
+  <footer>
+    <div class="container"
+      style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div>
+        <a href="/privacy">Privacy</a> •
+        <a href="/terms">Terms</a> •
+        <a href="/support">Support</a> •
+        <a href="/#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+    const tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentUser = null;
+    let currentProfile = null;
+    let cachedStatsData = null;
+
+    function escapeHtml(value) {
+      const div = document.createElement("div");
+      div.textContent = String(value ?? "");
+      return div.innerHTML;
+    }
+
+    function cleanText(value, maxLen = 500) {
+      return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLen);
+    }
+
+    function getUsernameFromUser(user) {
+      return (
+        user?.user_metadata?.username ||
+        user?.user_metadata?.name ||
+        user?.email?.split("@")[0] ||
+        "User"
+      );
+    }
+
+    function setStatus(id, text, type = "") {
+      const el = $(id);
+      if (!el) return;
+      el.textContent = text || "";
+      el.className = `account-status ${type}`.trim();
+    }
+
+    function fmtDateParts(row) {
+      const startDate = row?.start_date || "";
+      const startTime = row?.start_time || "";
+      const endDate = row?.end_date || "";
+      const endTime = row?.end_time || "";
+
+      if (!startDate && !startTime) return "No date set";
+      if (endDate && endTime) return `${startDate} ${startTime} → ${endDate} ${endTime}`;
+      return `${startDate} ${startTime}`.trim();
+    }
+
+    function isLikelyAccountId(value) {
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(value || "").trim());
+    }
+
+    async function fetchJsonSafe(url, fallback) {
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) return fallback;
+        return await res.json();
+      } catch {
+        return fallback;
+      }
+    }
+
+    async function getOrCreateProfile(user) {
+      const username = getUsernameFromUser(user);
+      const email = user.email || "";
+
+      let { data, error } = await tmeSupabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        const insertPayload = {
+          id: user.id,
+          username,
+          email,
+          role: "user",
+          shoutbox_sound_enabled: true,
+          show_supporter_badge: true,
+          supporter_status: "none",
+          updated_at: new Date().toISOString(),
+        };
+
+        const inserted = await tmeSupabase
+          .from("profiles")
+          .insert(insertPayload)
+          .select("*")
+          .single();
+
+        if (inserted.error) {
+          throw inserted.error;
+        }
+
+        data = inserted.data;
+      }
+
+      return data;
+    }
+
+    function renderProfile(user, profile) {
+      $("profileUsername").textContent = profile?.username || getUsernameFromUser(user);
+      $("profileEmail").textContent = profile?.email || user.email || "No email";
+      $("profileRole").textContent = profile?.role || "user";
+
+      $("prefSound").checked = profile?.shoutbox_sound_enabled !== false;
+      $("prefBadge").checked = profile?.show_supporter_badge !== false;
+
+      const tmId = profile?.trackmania_account_id || "";
+      const tmName = profile?.trackmania_display_name || "";
+
+      $("tmAccountIdInput").value = tmId;
+      $("tmDisplayNameInput").value = tmName;
+
+      renderLinkedTrackmania(tmId, tmName);
+    }
+
+    function renderLinkedTrackmania(tmId, tmName) {
+      const linked = Boolean(tmId);
+
+      $("linkedTmName").textContent = linked ? (tmName || "Linked Trackmania account") : "No Trackmania account linked";
+      $("linkedTmId").textContent = linked ? tmId : "Paste your Trackmania account ID below.";
+      $("tmLinkedStatus").textContent = linked ? "Linked" : "Not linked";
+      $("tmLinkedStatus").className = `status-badge ${linked ? "approved" : ""}`.trim();
+    }
+
+    async function loadStatsData() {
+      if (cachedStatsData) return cachedStatsData;
+
+      const [aggregate, goatAggregate, nameCache] = await Promise.all([
+        fetchJsonSafe("/data/weekly-shorts/aggregate.json", { players: [] }),
+        fetchJsonSafe("/data/weekly-shorts/goat-aggregate.json", { players: [] }),
+        fetchJsonSafe("/data/weekly-shorts/name-cache.json", {}),
+      ]);
+
+      cachedStatsData = {
+        aggregate,
+        goatAggregate,
+        nameCache,
+      };
+
+      return cachedStatsData;
+    }
+
+    function findPlayerByAccountId(list, accountId) {
+      return (Array.isArray(list) ? list : []).find((p) => p?.accountId === accountId) || null;
+    }
+
+    function listWeeks(values, max = 12) {
+      const arr = Array.isArray(values) ? values.filter((v) => Number.isFinite(Number(v))).map(Number) : [];
+      if (!arr.length) return "None yet";
+      const sorted = Array.from(new Set(arr)).sort((a, b) => a - b);
+      const shown = sorted.slice(0, max).join(", ");
+      return sorted.length > max ? `${shown}, +${sorted.length - max} more` : shown;
+    }
+
+    async function renderStatsForAccount(accountId) {
+      if (!accountId) {
+        $("statsEmpty").style.display = "";
+        $("statsWrap").style.display = "none";
+        return;
+      }
+
+      const data = await loadStatsData();
+
+      const regular = findPlayerByAccountId(data.aggregate.players, accountId);
+      const goat = findPlayerByAccountId(data.goatAggregate.players, accountId);
+
+      const displayName =
+        regular?.player ||
+        goat?.player ||
+        data.nameCache?.[accountId] ||
+        currentProfile?.trackmania_display_name ||
+        "";
+
+      if (displayName && !$("tmDisplayNameInput").value) {
+        $("tmDisplayNameInput").value = displayName;
+      }
+
+      if (!regular && !goat) {
+        $("statsEmpty").style.display = "";
+        $("statsEmpty").textContent = "No Weekly Shorts / GOAT stats found for this linked account ID yet.";
+        $("statsWrap").style.display = "none";
+        return;
+      }
+
+      $("statsEmpty").style.display = "none";
+      $("statsWrap").style.display = "";
+
+      $("statWins").textContent = Number(regular?.wins || 0).toLocaleString();
+      $("statWrs").textContent = Number(regular?.wrs || 0).toLocaleString();
+      $("statTop5").textContent = Number(regular?.top5 || 0).toLocaleString();
+
+      $("statGoatPoints").textContent = Number(goat?.goatPoints || 0).toLocaleString();
+      $("statGoatWins").textContent = Number(goat?.weekWins || 0).toLocaleString();
+      $("statGoatWrs").textContent = Number(goat?.wrs || 0).toLocaleString();
+
+      $("statsDetails").innerHTML = `
+        <strong style="display:block;color:#fff;margin-bottom:.35rem">${escapeHtml(displayName || "Linked player")}</strong>
+        <div><b>Weekly Shorts weeks won:</b> ${escapeHtml(listWeeks(regular?.weeksWon || []))}</div>
+        <div><b>Weekly Shorts WR entries:</b> ${Number(Array.isArray(regular?.wrWeeks) ? regular.wrWeeks.length : 0).toLocaleString()}</div>
+        <div><b>Weekly Shorts Top 5 entries:</b> ${Number(Array.isArray(regular?.top5Weeks) ? regular.top5Weeks.length : 0).toLocaleString()}</div>
+      `;
+    }
+
+    async function loadSubmissions(userId) {
+      const list = $("submissionList");
+
+      try {
+        const { data, error } = await tmeSupabase
+          .from("event_submissions")
+          .select("id,title,tag,submitted_type,status,start_date,start_time,end_date,end_time,timezone,approved_category,created_at")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        const rows = Array.isArray(data) ? data : [];
+
+        const pending = rows.filter((r) => String(r.status || "").toLowerCase() === "pending").length;
+        const approved = rows.filter((r) => String(r.status || "").toLowerCase() === "approved").length;
+        const rejected = rows.filter((r) => String(r.status || "").toLowerCase() === "rejected").length;
+
+        $("subPending").textContent = pending.toLocaleString();
+        $("subApproved").textContent = approved.toLocaleString();
+        $("subRejected").textContent = rejected.toLocaleString();
+
+        if (!rows.length) {
+          list.innerHTML = `<div class="empty-state">You have not submitted any events yet.</div>`;
+          return;
+        }
+
+        list.innerHTML = rows.map((row) => {
+          const status = String(row.status || "pending").toLowerCase();
+          const type = row.submitted_type || row.tag || "Event";
+          const category = row.approved_category ? ` • ${row.approved_category}` : "";
+
+          return `
+            <article class="submission-item">
+              <div class="submission-top">
+                <div>
+                  <div class="submission-title">${escapeHtml(row.title || "Untitled event")}</div>
+                  <div class="submission-meta">${escapeHtml(type)}${escapeHtml(category)}</div>
+                </div>
+                <span class="status-badge ${escapeHtml(status)}">${escapeHtml(status)}</span>
+              </div>
+              <div class="submission-meta">
+                ${escapeHtml(fmtDateParts(row))}
+                ${row.timezone ? ` • ${escapeHtml(row.timezone)}` : ""}
+              </div>
+            </article>
+          `;
+        }).join("");
+      } catch (err) {
+        console.warn("Could not load event submissions:", err);
+        list.innerHTML = `<div class="empty-state">Could not load your event submissions: ${escapeHtml(err.message || "Unknown error")}</div>`;
+      }
+    }
+
+    async function savePreferences() {
+      if (!currentUser) return;
+
+      setStatus("prefsStatus", "Saving…");
+
+      const payload = {
+        id: currentUser.id,
+        username: currentProfile?.username || getUsernameFromUser(currentUser),
+        email: currentProfile?.email || currentUser.email || "",
+        role: currentProfile?.role || "user",
+        shoutbox_sound_enabled: $("prefSound").checked,
+        show_supporter_badge: $("prefBadge").checked,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await tmeSupabase
+        .from("profiles")
+        .upsert(payload, { onConflict: "id" })
+        .select("*")
+        .single();
+
+      if (error) {
+        setStatus("prefsStatus", error.message || "Could not save preferences.", "error");
+        return;
+      }
+
+      currentProfile = data;
+      setStatus("prefsStatus", "Preferences saved.", "success");
+    }
+
+    async function saveTrackmaniaAccount() {
+      if (!currentUser) return;
+
+      const tmId = cleanText($("tmAccountIdInput").value, 80);
+      let tmName = cleanText($("tmDisplayNameInput").value, 60);
+
+      if (tmId && !isLikelyAccountId(tmId)) {
+        setStatus("tmStatus", "That does not look like a valid Trackmania account ID.", "error");
+        return;
+      }
+
+      setStatus("tmStatus", "Saving…");
+
+      if (tmId) {
+        const data = await loadStatsData();
+        const regular = findPlayerByAccountId(data.aggregate.players, tmId);
+        const goat = findPlayerByAccountId(data.goatAggregate.players, tmId);
+        tmName = tmName || regular?.player || goat?.player || data.nameCache?.[tmId] || "";
+      }
+
+      const payload = {
+        id: currentUser.id,
+        username: currentProfile?.username || getUsernameFromUser(currentUser),
+        email: currentProfile?.email || currentUser.email || "",
+        role: currentProfile?.role || "user",
+        trackmania_account_id: tmId || null,
+        trackmania_display_name: tmName || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await tmeSupabase
+        .from("profiles")
+        .upsert(payload, { onConflict: "id" })
+        .select("*")
+        .single();
+
+      if (error) {
+        setStatus("tmStatus", error.message || "Could not save Trackmania account.", "error");
+        return;
+      }
+
+      currentProfile = data;
+      $("tmDisplayNameInput").value = data.trackmania_display_name || "";
+      renderLinkedTrackmania(data.trackmania_account_id, data.trackmania_display_name);
+      await renderStatsForAccount(data.trackmania_account_id);
+
+      setStatus("tmStatus", "Trackmania account saved.", "success");
+    }
+
+    async function clearTrackmaniaAccount() {
+      $("tmAccountIdInput").value = "";
+      $("tmDisplayNameInput").value = "";
+      await saveTrackmaniaAccount();
+    }
+
+    async function sendPasswordReset() {
+      if (!currentUser?.email) return;
+
+      setStatus("securityStatus", "Sending password reset…");
+
+      const { error } = await tmeSupabase.auth.resetPasswordForEmail(currentUser.email, {
+        redirectTo: `${window.location.origin}/account`,
+      });
+
+      if (error) {
+        setStatus("securityStatus", error.message || "Could not send password reset.", "error");
+        return;
+      }
+
+      setStatus("securityStatus", "Password reset email sent. Check your inbox/spam folder.", "success");
+    }
+
+    async function logout() {
+      await tmeSupabase.auth.signOut();
+      window.location.href = "/";
+    }
+
+    async function bootAccountPage() {
+      $("year").textContent = new Date().getFullYear();
+
+      const navToggle = $("navToggle");
+      const primaryNav = $("primary-nav");
+      const toTop = $("toTop");
+
+      if (navToggle && primaryNav) {
+        navToggle.addEventListener("click", () => {
+          const isOpen = primaryNav.classList.toggle("open");
+          navToggle.setAttribute("aria-expanded", String(isOpen));
+        });
+      }
+
+      if (toTop) {
+        window.addEventListener("scroll", () => {
+          toTop.classList.toggle("show", window.scrollY > 500);
+        }, { passive: true });
+
+        toTop.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      }
+
+      $("savePrefsBtn").addEventListener("click", savePreferences);
+      $("saveTmBtn").addEventListener("click", saveTrackmaniaAccount);
+      $("clearTmBtn").addEventListener("click", clearTrackmaniaAccount);
+      $("resetPasswordBtn").addEventListener("click", sendPasswordReset);
+      $("logoutBtn").addEventListener("click", logout);
+
+      try {
+        const { data } = await tmeSupabase.auth.getSession();
+        currentUser = data?.session?.user || null;
+
+        if (!currentUser) {
+          $("accountLocked").classList.add("show");
+          $("accountAuthed").classList.remove("show");
+          return;
+        }
+
+        $("accountLocked").classList.remove("show");
+        $("accountAuthed").classList.add("show");
+
+        currentProfile = await getOrCreateProfile(currentUser);
+
+        renderProfile(currentUser, currentProfile);
+        await Promise.all([
+          loadSubmissions(currentUser.id),
+          renderStatsForAccount(currentProfile?.trackmania_account_id || ""),
+        ]);
+      } catch (err) {
+        console.warn("Account page failed:", err);
+        $("accountLocked").classList.add("show");
+        $("accountLocked").querySelector(".empty-state").textContent =
+          err.message || "Account page failed to load.";
+      }
+    }
+
+    bootAccountPage();
+  </script>
+</body>
+
+</html>
