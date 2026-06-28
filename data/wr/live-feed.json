@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-06-28T17:15:30.227Z",
+  "generatedAt": "2026-06-28T18:38:02.737Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 6,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|cqVMeRh9fS278VSGJQSWwomqv16|31133d2b-7ee9-4952-982e-a72c34d4134d|7fc7bc9c-67b2-4003-b1a3-29006486f71e|12589|11174|2026-06-28T18:38:02.737Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-28T18:38:02.737Z",
+      "at": "2026-06-28T18:38:02.737Z",
+      "mapUid": "cqVMeRh9fS278VSGJQSWwomqv16",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "31133d2b-7ee9-4952-982e-a72c34d4134d",
+      "oldHolder": "Skifset",
+      "oldTimeMs": 12589,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:12.589",
+      "oldScoreKey": "12589",
+      "newHolderAccountId": "7fc7bc9c-67b2-4003-b1a3-29006486f71e",
+      "newHolder": "ailiei.",
+      "newTimeMs": 11174,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.174",
+      "newScoreKey": "11174",
+      "text": "ailiei. overtook Skifset on Unknown map with 00:00:11.174."
+    },
     {
       "id": "wr_changed|N_MnODQ3tXN1hYhkuWbXj0RXFYm|62e613eb-0999-42ad-ae8b-2b1476e7ef2f|cd198e21-ed93-4d01-aab9-4bb84d303368|24683|24583|2026-06-28T17:15:30.227Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.126",
       "newScoreKey": "10126",
       "text": "OuweBoefx overtook SilverbackTM on Unknown map with 00:00:10.126."
-    },
-    {
-      "id": "wr_changed|tixQ3sSX_b7GjDrkBhCS__YVCSh|8e0bacf0-084b-4b9c-bb65-bf6ad478f1ce|3a96e825-e60d-4cef-97a4-deda1f05666c|9786|9776|2026-06-20T12:13:35.409Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-20T12:13:35.409Z",
-      "at": "2026-06-20T12:13:35.409Z",
-      "mapUid": "tixQ3sSX_b7GjDrkBhCS__YVCSh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "8e0bacf0-084b-4b9c-bb65-bf6ad478f1ce",
-      "oldHolder": "TimmyT1232022",
-      "oldTimeMs": 9786,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.786",
-      "oldScoreKey": "9786",
-      "newHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "newHolder": "Danyy912",
-      "newTimeMs": 9776,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.776",
-      "newScoreKey": "9776",
-      "text": "Danyy912 overtook TimmyT1232022 on Unknown map with 00:00:09.776."
     }
   ]
 }
