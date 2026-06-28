@@ -5,7 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Account — Trackmania Events</title>
-  <meta name="description" content="Manage your Trackmania Events account, submissions, preferences, and linked Trackmania stats." />
+  <meta name="description"
+    content="Manage your Trackmania Events account, submissions, preferences, and linked Trackmania stats." />
   <meta name="theme-color" content="#0a0f1a" />
 
   <meta http-equiv="Content-Security-Policy"
@@ -28,8 +29,14 @@
       --account-radius: 20px;
     }
 
-    .account-page { padding: 2.25rem 0 3.5rem; }
-    .account-shell { display: grid; gap: 1.15rem; }
+    .account-page {
+      padding: 2.25rem 0 3.5rem;
+    }
+
+    .account-shell {
+      display: grid;
+      gap: 1.15rem;
+    }
 
     .account-hero {
       border: 1px solid var(--account-border);
@@ -77,7 +84,10 @@
       align-items: start;
     }
 
-    .account-stack { display: grid; gap: 1rem; }
+    .account-stack {
+      display: grid;
+      gap: 1rem;
+    }
 
     .account-card {
       border-radius: var(--account-radius);
@@ -112,8 +122,14 @@
       line-height: 1.4;
     }
 
-    .account-card-body { padding: 1.1rem; }
-    .account-info-list { display: grid; gap: .7rem; }
+    .account-card-body {
+      padding: 1.1rem;
+    }
+
+    .account-info-list {
+      display: grid;
+      gap: .7rem;
+    }
 
     .account-info-row {
       display: grid;
@@ -156,7 +172,11 @@
       white-space: nowrap;
     }
 
-    .status-badge { text-transform: uppercase; font-size: .72rem; }
+    .status-badge {
+      text-transform: uppercase;
+      font-size: .72rem;
+    }
+
     .status-badge.pending,
     .status-badge.approved,
     .status-badge.rejected {
@@ -165,7 +185,10 @@
       border-color: rgba(255, 255, 255, .12);
     }
 
-    .account-form-grid { display: grid; gap: .8rem; }
+    .account-form-grid {
+      display: grid;
+      gap: .8rem;
+    }
 
     .account-field label {
       display: block;
@@ -190,9 +213,19 @@
       margin-top: .95rem;
     }
 
-    .account-status { color: var(--account-muted); font-size: .9rem; line-height: 1.45; }
-    .account-status.success { color: #dfeee4; }
-    .account-status.error { color: #f0d8d8; }
+    .account-status {
+      color: var(--account-muted);
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
+    .account-status.success {
+      color: #dfeee4;
+    }
+
+    .account-status.error {
+      color: #f0d8d8;
+    }
 
     .account-toggle-row {
       display: flex;
@@ -205,9 +238,24 @@
       border: 1px solid rgba(255, 255, 255, .055);
     }
 
-    .account-toggle-row strong { display: block; color: var(--account-text); margin-bottom: .18rem; }
-    .account-toggle-row span { color: var(--account-muted); font-size: .86rem; line-height: 1.35; }
-    .account-toggle-row input { width: 20px; height: 20px; accent-color: #d7dbe2; flex: 0 0 auto; }
+    .account-toggle-row strong {
+      display: block;
+      color: var(--account-text);
+      margin-bottom: .18rem;
+    }
+
+    .account-toggle-row span {
+      color: var(--account-muted);
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+
+    .account-toggle-row input {
+      width: 20px;
+      height: 20px;
+      accent-color: #d7dbe2;
+      flex: 0 0 auto;
+    }
 
     .stats-grid {
       display: grid;
@@ -254,7 +302,10 @@
       border: 1px solid rgba(255, 255, 255, .06);
     }
 
-    .linked-player strong { color: var(--account-text); }
+    .linked-player strong {
+      color: var(--account-text);
+    }
+
     .linked-player span {
       display: block;
       margin-top: .15rem;
@@ -263,7 +314,11 @@
       overflow-wrap: anywhere;
     }
 
-    .source-breakdown { display: grid; gap: .55rem; margin-top: .85rem; }
+    .source-breakdown {
+      display: grid;
+      gap: .55rem;
+      margin-top: .85rem;
+    }
 
     .source-row {
       display: flex;
@@ -278,8 +333,14 @@
       font-size: .9rem;
     }
 
-    .source-row strong { color: var(--account-text); }
-    .submission-list { display: grid; gap: .75rem; }
+    .source-row strong {
+      color: var(--account-text);
+    }
+
+    .submission-list {
+      display: grid;
+      gap: .75rem;
+    }
 
     .submission-item {
       padding: .9rem;
@@ -296,8 +357,17 @@
       margin-bottom: .45rem;
     }
 
-    .submission-title { color: var(--account-text); font-weight: 900; overflow-wrap: anywhere; }
-    .submission-meta { color: var(--account-muted); font-size: .86rem; line-height: 1.45; }
+    .submission-title {
+      color: var(--account-text);
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .submission-meta {
+      color: var(--account-muted);
+      font-size: .86rem;
+      line-height: 1.45;
+    }
 
     .empty-state {
       color: var(--account-muted);
@@ -308,53 +378,458 @@
       border: 1px solid rgba(255, 255, 255, .055);
     }
 
-    .account-locked { display: none; max-width: 720px; margin: 2rem auto 0; text-align: center; }
-    .account-locked.show { display: block; }
-    .account-authed { display: none; }
-    .account-authed.show { display: block; }
+    .account-locked {
+      display: none;
+      max-width: 720px;
+      margin: 2rem auto 0;
+      text-align: center;
+    }
 
-    @media (max-width: 980px) { .account-grid { grid-template-columns: 1fr; } }
+    .account-locked.show {
+      display: block;
+    }
+
+    .account-authed {
+      display: none;
+    }
+
+    .account-authed.show {
+      display: block;
+    }
+
+    @media (max-width: 980px) {
+      .account-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
     @media (max-width: 720px) {
-      .account-page { padding-top: 1.4rem; }
-      .account-info-row { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .account-page {
+        padding-top: 1.4rem;
+      }
+
+      .account-info-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .account-toggle-row,
       .linked-player,
-      .submission-top { align-items: flex-start; flex-direction: column; }
+      .submission-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
 
     @media (max-width: 520px) {
-      .stats-grid { grid-template-columns: 1fr; }
-      .account-actions .btn { width: 100%; }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .account-actions .btn {
+        width: 100%;
+      }
+    }
+
+
+    /* Unified Trackmania Events header */
+    .tme-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(5, 7, 12, .86);
+      border-bottom: 1px solid rgba(255, 255, 255, .07);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .tme-header .container.nav {
+      width: min(1220px, 92vw);
+      margin: 0 auto;
+      padding: .75rem 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tme-header .brand {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      color: #f7faff;
+      font-weight: 950;
+      font-size: 1.02rem;
+      letter-spacing: -.025em;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .tme-header .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .045);
+      border: 1px solid rgba(255, 255, 255, .08);
+      box-shadow: none;
+    }
+
+    .tme-header .navlinks {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      min-width: 0;
+    }
+
+    .tme-header .nav-group {
+      position: relative;
+    }
+
+    .tme-header .nav-drop-btn,
+    .tme-header .navlinks>a {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .35rem;
+      padding: .5rem .35rem;
+      border: 1px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: rgba(243, 245, 247, .72);
+      font: inherit;
+      font-size: .9rem;
+      font-weight: 850;
+      line-height: 1;
+      letter-spacing: -.005em;
+      white-space: nowrap;
+      text-decoration: none;
+      opacity: 1;
+      cursor: pointer;
+      transition: color .16s ease, transform .16s ease;
+      box-shadow: none;
+    }
+
+    .tme-header .nav-drop-btn:hover,
+    .tme-header .nav-drop-btn:focus,
+    .tme-header .nav-group:hover .nav-drop-btn,
+    .tme-header .nav-group:focus-within .nav-drop-btn,
+    .tme-header .navlinks>a:hover,
+    .tme-header .navlinks>a:focus {
+      color: #fff;
+      background: transparent;
+      border-color: transparent;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .tme-header .navlinks a.active::after,
+    .tme-header .nav a.active::after {
+      display: none !important;
+    }
+
+    .tme-header .nav-drop-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 230px;
+      display: none;
+      flex-direction: column;
+      gap: .25rem;
+      padding: .55rem;
+      border-radius: 16px;
+      background: rgba(8, 11, 18, .98);
+      border: 1px solid rgba(255, 255, 255, .085);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .42);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 1001;
+    }
+
+    @media (min-width:901px) {
+      .tme-header .nav-group::after {
+        content: "";
+        position: absolute;
+        left: -14px;
+        right: -14px;
+        top: 100%;
+        height: 22px;
+        background: transparent;
+        pointer-events: auto;
+      }
+
+      .tme-header .nav-group:hover .nav-drop-menu,
+      .tme-header .nav-group:focus-within .nav-drop-menu,
+      .tme-header .nav-group.open .nav-drop-menu,
+      .tme-header .nav-drop-menu:hover {
+        display: flex;
+      }
+    }
+
+    .tme-header .nav-group.open .nav-drop-menu {
+      display: flex;
+    }
+
+    .tme-header .nav-drop-menu a {
+      display: flex;
+      align-items: center;
+      min-height: 38px;
+      padding: .65rem .72rem;
+      border-radius: 12px;
+      color: rgba(243, 245, 247, .68);
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    .tme-header .nav-drop-menu a:hover,
+    .tme-header .nav-drop-menu a:focus,
+    .tme-header .nav-drop-menu a.active {
+      color: #fff;
+      background: rgba(255, 255, 255, .06);
+    }
+
+    .tme-header .nav-support-link,
+    .tme-header .nav-support-link.active {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: .58rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(104, 240, 255, .42);
+      background: rgba(104, 240, 255, .095);
+      color: #f7fbff;
+      font-weight: 950;
+      font-size: .9rem;
+      line-height: 1;
+      text-decoration: none;
+      box-shadow: 0 0 0 1px rgba(104, 240, 255, .035) inset;
+    }
+
+    .tme-header .nav-support-link:hover,
+    .tme-header .nav-support-link:focus {
+      background: rgba(104, 240, 255, .15);
+      border-color: rgba(104, 240, 255, .62);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .tme-header .cta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: .55rem;
+      position: static;
+      transform: none;
+    }
+
+    .tme-header .btn,
+    .tme-header .nav-account {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      padding: .62rem .9rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, .085);
+      background: rgba(255, 255, 255, .045);
+      color: #f3f5f7;
+      font-weight: 850;
+      font-size: .9rem;
+      line-height: 1;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: background .16s ease, border-color .16s ease, transform .16s ease;
+      box-shadow: none;
+    }
+
+    .tme-header .btn:hover,
+    .tme-header .nav-account:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, .16);
+      background: rgba(255, 255, 255, .075);
+      box-shadow: none;
+    }
+
+    .tme-header .nav-mobile-action {
+      display: none;
+    }
+
+    .tme-header .nav-toggle {
+      display: none;
+      min-height: 38px;
+      width: 42px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .045);
+      color: #f3f5f7;
+      font-size: 1.05rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    @media (max-width:1050px) {
+      .tme-header .brand span:last-child {
+        display: none
+      }
+    }
+
+    @media (max-width:900px) {
+      .tme-header .container.nav {
+        grid-template-columns: auto auto;
+      }
+
+      .tme-header .brand span:last-child {
+        display: inline
+      }
+
+      .tme-header .nav-toggle {
+        display: inline-flex !important;
+        justify-self: end;
+      }
+
+      .tme-header .cta {
+        display: none !important;
+      }
+
+      .tme-header .navlinks {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        padding: .75rem min(4vw, 1rem) 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, .07);
+        background: rgba(5, 7, 12, .97);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: .45rem;
+        z-index: 1000;
+      }
+
+      .tme-header .navlinks.show,
+      .tme-header .navlinks.open {
+        display: flex !important;
+      }
+
+      .tme-header .nav-group {
+        width: 100%;
+      }
+
+      .tme-header .nav-drop-btn,
+      .tme-header .navlinks>a {
+        width: 100%;
+        justify-content: space-between;
+        min-height: 44px;
+        padding: .75rem .85rem;
+        border-radius: 14px;
+        border-color: rgba(255, 255, 255, .06);
+        background: rgba(255, 255, 255, .035);
+      }
+
+      .tme-header .nav-drop-menu {
+        position: static;
+        display: none;
+        min-width: 0;
+        width: 100%;
+        margin: .35rem 0 .15rem;
+        padding: .45rem;
+        box-shadow: none;
+        background: rgba(255, 255, 255, .03);
+        border-color: rgba(255, 255, 255, .06);
+      }
+
+      .tme-header .nav-group.open .nav-drop-menu {
+        display: flex;
+      }
+
+      .tme-header .nav-mobile-action {
+        display: flex;
+      }
+
+      .tme-header .nav-support-link,
+      .tme-header .nav-support-link.active {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width:520px) {
+      .tme-header .brand span:last-child {
+        max-width: 190px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   </style>
 </head>
 
 <body class="bg-track-curves">
-  <header>
+
+  <header class="tme-header">
     <div class="container nav">
       <a class="brand" href="/" aria-label="Trackmania Events Home">
         <span class="brand-badge" aria-hidden="true">🎮</span>
         <span>Trackmania Events</span>
       </a>
 
-      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+      <button id="navToggle" class="nav-toggle" type="button" aria-expanded="false"
+        aria-controls="primary-nav">☰</button>
 
       <nav id="primary-nav" class="navlinks" aria-label="Primary">
-        <a href="/kacky">Kacky Finishes</a>
-        <a href="/wrleaderboard">WR Leaderboard</a>
-        <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
-        <a href="/totd">Track of the Day</a>
-        <a href="/highlights">Community Highlights</a>
-        <a href="/support">Support</a>
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Events <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/">Home</a>
+            <a href="/kacky">Kacky Finishes</a>
+            <a href="/totd">Track of the Day</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Stats <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/wrleaderboard">WR Leaderboard</a>
+            <a href="/recentwrs">Recent WRs</a>
+            <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Community <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/highlights">Community Highlights</a>
+            <a href="/#contact">Contact</a>
+            <a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noopener noreferrer">Discord</a>
+          </div>
+        </div>
+
+        <a class="nav-support-link" href="/support">Support</a>
+        <a class="nav-account nav-mobile-action active" href="/account">Account</a>
       </nav>
 
       <div class="cta">
-        <a class="btn" href="/">Home</a>
+        <a class="nav-account active" href="/account">Account</a>
       </div>
     </div>
   </header>
+
 
   <main class="account-page">
     <section class="container account-shell">
@@ -362,7 +837,8 @@
         <span class="account-kicker">Account</span>
         <h1 class="account-title">Your Trackmania Events profile</h1>
         <p class="account-subtitle">
-          Manage your profile, check event submissions, link your Trackmania account, and view stats pulled from the public data used across the site.
+          Manage your profile, check event submissions, link your Trackmania account, and view stats pulled from the
+          public data used across the site.
         </p>
       </div>
 
@@ -435,7 +911,8 @@
                     <input id="tmAccountIdInput" class="input" type="text"
                       placeholder="Example: 7682d76f-3e07-4bd3-a2f7-76bbd194423a" autocomplete="off">
                     <div class="help">
-                      Use the Trackmania account ID, not just the display name. Display names can change, account IDs are stable.
+                      Use the Trackmania account ID, not just the display name. Display names can change, account IDs
+                      are stable.
                     </div>
                   </div>
 
@@ -569,7 +1046,8 @@
   <button id="toTop" aria-label="Back to top"><span>Top</span></button>
 
   <footer>
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+    <div class="container"
+      style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
       <div>© <span id="year"></span> Trackmania Events</div>
       <div>
         <a href="/privacy">Privacy</a> •
@@ -579,6 +1057,60 @@
       </div>
     </div>
   </footer>
+
+
+  <script>
+    (function () {
+      const btn = document.getElementById("navToggle");
+      const nav = document.getElementById("primary-nav");
+      if (!btn || !nav) return;
+
+      function closeGroups() {
+        nav.querySelectorAll(".nav-group.open").forEach((group) => group.classList.remove("open"));
+      }
+
+      function setOpen(open) {
+        nav.classList.toggle("show", open);
+        nav.classList.toggle("open", open);
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (!open) closeGroups();
+      }
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(!nav.classList.contains("show") && !nav.classList.contains("open"));
+      });
+
+      nav.querySelectorAll(".nav-drop-btn").forEach((dropBtn) => {
+        dropBtn.addEventListener("click", (e) => {
+          if (window.innerWidth > 900) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const group = dropBtn.closest(".nav-group");
+          const wasOpen = group.classList.contains("open");
+          closeGroups();
+          group.classList.toggle("open", !wasOpen);
+        });
+      });
+
+      nav.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", () => setOpen(false));
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!nav.contains(e.target) && e.target !== btn) setOpen(false);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") setOpen(false);
+      });
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 900) setOpen(false);
+      });
+    })();
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
