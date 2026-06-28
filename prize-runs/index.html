@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prize Runs — Trackmania Events</title>
+  <meta name="description" content="Start a daily Trackmania Events Prize Run, hit checkpoints, and unlock Paddock cosmetics." />
+  <meta name="theme-color" content="#0a0f1a" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="shortcut icon" href="/logo.png">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+
+    :root {
+      --pr-panel: rgba(255, 255, 255, .035);
+      --pr-text: #f3f5f7;
+      --pr-muted: #a7adb8;
+      --pr-soft: #d7dbe2;
+      --pr-border: rgba(255, 255, 255, .075);
+      --pr-border-strong: rgba(255, 255, 255, .14);
+      --pr-blue: #68f0ff;
+      --pr-radius: 22px;
+      --pr-shadow: 0 18px 46px rgba(0,0,0,.34);
+    }
+
+    .prize-page { padding: 2.25rem 0 3.75rem; }
+    .prize-shell { display: grid; gap: 1rem; }
+
+    .prize-hero {
+      border: 1px solid var(--pr-border);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(104,240,255,.12), transparent 34%),
+        radial-gradient(circle at 88% 28%, rgba(83,166,255,.10), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,.048), rgba(255,255,255,.022));
+      box-shadow: var(--pr-shadow);
+      padding: clamp(1.15rem, 3vw, 1.8rem);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .prize-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      margin-bottom: .78rem;
+      padding: .38rem .72rem;
+      border: 1px solid var(--pr-border);
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      color: var(--pr-muted);
+      font-size: .78rem;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .prize-title {
+      margin: 0;
+      color: var(--pr-text);
+      font-size: clamp(2.05rem, 5vw, 4rem);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+
+    .prize-subtitle {
+      max-width: 820px;
+      margin: .8rem 0 0;
+      color: var(--pr-muted);
+      line-height: 1.6;
+    }
+
+    .prize-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .prize-card {
+      border-radius: var(--pr-radius);
+      border: 1px solid var(--pr-border);
+      background: rgba(255,255,255,.032);
+      box-shadow: 0 12px 32px rgba(0,0,0,.25);
+      overflow: hidden;
+    }
+
+    .prize-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.018);
+    }
+
+    .prize-card-head strong { display: block; color: var(--pr-text); font-size: 1.02rem; }
+    .prize-card-head span { display: block; margin-top: .2rem; color: var(--pr-muted); font-size: .88rem; line-height: 1.4; }
+    .prize-card-body { padding: 1.1rem; }
+
+    .run-status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+
+    .run-stat {
+      padding: .9rem;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.046), rgba(255,255,255,.022));
+      border: 1px solid rgba(255,255,255,.065);
+      min-height: 90px;
+    }
+
+    .run-stat span { display: block; color: var(--pr-muted); font-size: .74rem; font-weight: 950; text-transform: uppercase; letter-spacing: .065em; }
+    .run-stat strong { display: block; margin-top: .35rem; color: var(--pr-text); font-size: 1.55rem; letter-spacing: -.035em; }
+
+    .track-stage {
+      position: relative;
+      min-height: 310px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.075);
+      background:
+        radial-gradient(circle at 12% 14%, rgba(104,240,255,.10), transparent 32%),
+        radial-gradient(circle at 80% 76%, rgba(255,255,255,.06), transparent 34%),
+        linear-gradient(135deg, rgba(9,14,26,.92), rgba(5,7,13,.96));
+      overflow: hidden;
+      padding: 1.1rem;
+    }
+
+    .track-stage::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: repeating-linear-gradient(115deg, rgba(255,255,255,.028) 0 2px, transparent 2px 24px);
+      transform: rotate(0deg);
+      opacity: .42;
+      pointer-events: none;
+    }
+
+    .track-theme-label {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      color: var(--pr-muted);
+      font-weight: 900;
+      font-size: .86rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .theme-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      border: 1px solid rgba(104,240,255,.22);
+      background: rgba(104,240,255,.075);
+      color: #f7fbff;
+      border-radius: 999px;
+      padding: .38rem .66rem;
+      white-space: nowrap;
+    }
+
+    .route-wrap {
+      position: relative;
+      z-index: 2;
+      margin: 2.7rem .25rem 1rem;
+      height: 96px;
+    }
+
+    .route-line {
+      position: absolute;
+      top: 45px;
+      left: 7%;
+      right: 7%;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(104,240,255,.25), rgba(255,255,255,.16));
+      box-shadow: 0 0 24px rgba(104,240,255,.13);
+    }
+
+    .route-progress {
+      position: absolute;
+      top: 45px;
+      left: 7%;
+      width: 0%;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(104,240,255,.85), rgba(255,255,255,.75));
+      box-shadow: 0 0 26px rgba(104,240,255,.28);
+      transition: width .8s cubic-bezier(.19,1,.22,1);
+    }
+
+    .route-point {
+      position: absolute;
+      top: 24px;
+      transform: translateX(-50%);
+      width: 48px;
+      display: grid;
+      place-items: center;
+      gap: .28rem;
+      color: rgba(255,255,255,.65);
+      font-size: .72rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .route-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      border: 2px solid rgba(255,255,255,.24);
+      box-shadow: 0 0 0 rgba(104,240,255,0);
+    }
+
+    .route-point.hit { color: #fff; }
+    .route-point.hit .route-dot {
+      background: rgba(104,240,255,.9);
+      border-color: rgba(255,255,255,.82);
+      box-shadow: 0 0 22px rgba(104,240,255,.35);
+    }
+
+    .route-car {
+      position: absolute;
+      top: 8px;
+      left: 7%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 14px 32px rgba(0,0,0,.24), 0 0 24px rgba(104,240,255,.12);
+      font-size: 1.65rem;
+      transition: left .8s cubic-bezier(.19,1,.22,1), transform .2s ease;
+      z-index: 4;
+    }
+
+    .route-car.going { transform: translateX(-50%) translateY(-4px) rotate(-2deg); }
+
+    .countdown {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      background: rgba(5,7,12,.56);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: clamp(3rem, 12vw, 7rem);
+      font-weight: 1000;
+      letter-spacing: -.06em;
+      text-shadow: 0 0 30px rgba(104,240,255,.28);
+    }
+
+    .countdown.show { display: flex; }
+
+    .run-actions {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .run-note { color: var(--pr-muted); font-size: .9rem; line-height: 1.45; }
+
+    .run-status-msg { color: var(--pr-muted); font-size: .92rem; line-height: 1.45; margin-top: .7rem; }
+    .run-status-msg.success { color: #dfeee4; }
+    .run-status-msg.error { color: #f0d8d8; }
+
+    .reward-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .75rem;
+    }
+
+    .reward-card {
+      opacity: .45;
+      transform: translateY(8px);
+      min-height: 142px;
+      padding: .9rem;
+      border-radius: 18px;
+      background: rgba(255,255,255,.028);
+      border: 1px solid rgba(255,255,255,.065);
+      transition: opacity .3s ease, transform .3s ease, border-color .3s ease, background .3s ease;
+    }
+
+    .reward-card.revealed {
+      opacity: 1;
+      transform: translateY(0);
+      background: linear-gradient(180deg, rgba(255,255,255,.052), rgba(255,255,255,.025));
+      border-color: rgba(255,255,255,.14);
+    }
+
+    .reward-slot { color: var(--pr-muted); font-size: .74rem; font-weight: 950; text-transform: uppercase; letter-spacing: .065em; }
+    .reward-name { margin-top: .45rem; color: var(--pr-text); font-size: 1.05rem; font-weight: 950; line-height: 1.15; overflow-wrap: anywhere; }
+    .reward-desc { margin-top: .38rem; color: var(--pr-muted); font-size: .86rem; line-height: 1.35; }
+
+    .tier-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      margin-top: .65rem;
+      border-radius: 999px;
+      padding: .33rem .58rem;
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--pr-soft);
+      background: rgba(255,255,255,.045);
+      font-size: .72rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .tier-standard { border-color: rgba(255,255,255,.10); }
+    .tier-clean { border-color: rgba(150,255,210,.22); }
+    .tier-fast { border-color: rgba(104,240,255,.28); }
+    .tier-apex { border-color: rgba(190,150,255,.34); }
+    .tier-champion { border-color: rgba(255,220,110,.42); }
+    .tier-iconic { border-color: rgba(255,255,255,.50); box-shadow: 0 0 22px rgba(104,240,255,.12); }
+
+    .empty-state {
+      color: var(--pr-muted);
+      line-height: 1.55;
+      padding: .9rem;
+      border-radius: 16px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.055);
+    }
+
+    .history-list { display: grid; gap: .65rem; }
+    .history-item {
+      padding: .82rem;
+      border-radius: 16px;
+      background: rgba(255,255,255,.026);
+      border: 1px solid rgba(255,255,255,.055);
+    }
+    .history-top { display: flex; justify-content: space-between; gap: .8rem; color: var(--pr-text); font-weight: 900; }
+    .history-meta { margin-top: .25rem; color: var(--pr-muted); font-size: .84rem; line-height: 1.4; }
+
+    .locked-card { max-width: 760px; margin: 0 auto; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 980px) {
+      .prize-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .prize-page { padding-top: 1.35rem; }
+      .run-status-grid { grid-template-columns: 1fr; }
+      .reward-grid { grid-template-columns: 1fr; }
+      .route-wrap { margin-left: -.1rem; margin-right: -.1rem; }
+      .route-point { font-size: .64rem; }
+    }
+
+/* Unified Trackmania Events header */
+.tme-header{position:sticky;top:0;z-index:1000;background:rgba(5,7,12,.86);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.tme-header .container.nav{width:min(1220px,92vw);margin:0 auto;padding:.75rem 0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:1rem}.tme-header .brand{display:flex;align-items:center;gap:.7rem;color:#f7faff;font-weight:950;font-size:1.02rem;letter-spacing:-.025em;white-space:nowrap;text-decoration:none}.tme-header .brand-badge{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);box-shadow:none}.tme-header .navlinks{display:flex;align-items:center;justify-content:center;gap:.45rem;min-width:0}.tme-header .nav-group{position:relative}.tme-header .nav-drop-btn,.tme-header .navlinks>a{min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding:.5rem .35rem;border:1px solid transparent;border-radius:0;background:transparent;color:rgba(243,245,247,.72);font:inherit;font-size:.9rem;font-weight:850;line-height:1;letter-spacing:-.005em;white-space:nowrap;text-decoration:none;opacity:1;cursor:pointer;transition:color .16s ease,transform .16s ease;box-shadow:none}.tme-header .nav-drop-btn:hover,.tme-header .nav-drop-btn:focus,.tme-header .nav-group:hover .nav-drop-btn,.tme-header .nav-group:focus-within .nav-drop-btn,.tme-header .navlinks>a:hover,.tme-header .navlinks>a:focus{color:#fff;background:transparent;border-color:transparent;transform:none;box-shadow:none}.tme-header .navlinks a.active::after,.tme-header .nav a.active::after{display:none!important}.tme-header .nav-drop-menu{position:absolute;top:calc(100% + 10px);left:0;min-width:230px;display:none;flex-direction:column;gap:.25rem;padding:.55rem;border-radius:16px;background:rgba(8,11,18,.98);border:1px solid rgba(255,255,255,.085);box-shadow:0 18px 45px rgba(0,0,0,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:1001}@media (min-width:901px){.tme-header .nav-group::after{content:"";position:absolute;left:-14px;right:-14px;top:100%;height:22px;background:transparent;pointer-events:auto}.tme-header .nav-group:hover .nav-drop-menu,.tme-header .nav-group:focus-within .nav-drop-menu,.tme-header .nav-group.open .nav-drop-menu,.tme-header .nav-drop-menu:hover{display:flex}}.tme-header .nav-group.open .nav-drop-menu{display:flex}.tme-header .nav-drop-menu a{display:flex;align-items:center;min-height:38px;padding:.65rem .72rem;border-radius:12px;color:rgba(243,245,247,.68);text-decoration:none;font-size:.9rem;font-weight:800;white-space:nowrap;transition:background .16s ease,color .16s ease}.tme-header .nav-drop-menu a:hover,.tme-header .nav-drop-menu a:focus,.tme-header .nav-drop-menu a.active{color:#fff;background:rgba(255,255,255,.06)}.tme-header .nav-support-link,.tme-header .nav-support-link.active{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:.58rem 1rem;border-radius:999px;border:1px solid rgba(104,240,255,.42);background:rgba(104,240,255,.095);color:#f7fbff;font-weight:950;font-size:.9rem;line-height:1;text-decoration:none;box-shadow:0 0 0 1px rgba(104,240,255,.035) inset}.tme-header .nav-support-link:hover,.tme-header .nav-support-link:focus{background:rgba(104,240,255,.15);border-color:rgba(104,240,255,.62);color:#fff;transform:translateY(-1px)}.tme-header .cta{display:flex;align-items:center;justify-content:flex-end;gap:.55rem;position:static;transform:none}.tme-header .btn,.tme-header .nav-account{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.62rem .9rem;border-radius:14px;border:1px solid rgba(255,255,255,.085);background:rgba(255,255,255,.045);color:#f3f5f7;font-weight:850;font-size:.9rem;line-height:1;white-space:nowrap;text-decoration:none;transition:background .16s ease,border-color .16s ease,transform .16s ease;box-shadow:none}.tme-header .btn:hover,.tme-header .nav-account:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.075);box-shadow:none}.tme-header .nav-mobile-action{display:none}.tme-header .nav-toggle{display:none;min-height:38px;width:42px;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.045);color:#f3f5f7;font-size:1.05rem;font-weight:900;cursor:pointer}@media (max-width:1050px){.tme-header .brand span:last-child{display:none}}@media (max-width:900px){.tme-header .container.nav{grid-template-columns:auto auto}.tme-header .brand span:last-child{display:inline}.tme-header .nav-toggle{display:inline-flex!important;justify-self:end}.tme-header .cta{display:none!important}.tme-header .navlinks{display:none;position:absolute;top:100%;left:0;right:0;width:100%;padding:.75rem min(4vw,1rem) 1rem;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(5,7,12,.97);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);flex-direction:column;align-items:stretch;justify-content:flex-start;gap:.45rem;z-index:1000}.tme-header .navlinks.show,.tme-header .navlinks.open{display:flex!important}.tme-header .nav-group{width:100%}.tme-header .nav-drop-btn,.tme-header .navlinks>a{width:100%;justify-content:space-between;min-height:44px;padding:.75rem .85rem;border-radius:14px;border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.035)}.tme-header .nav-drop-menu{position:static;display:none;min-width:0;width:100%;margin:.35rem 0 .15rem;padding:.45rem;box-shadow:none;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}.tme-header .nav-group.open .nav-drop-menu{display:flex}.tme-header .nav-mobile-action{display:flex}.tme-header .nav-support-link,.tme-header .nav-support-link.active{width:100%;justify-content:center}}@media (max-width:520px){.tme-header .brand span:last-child{max-width:190px;overflow:hidden;text-overflow:ellipsis}}
+.tme-header .auth-user-dropdown,header .auth-user-dropdown{position:relative}.tme-header .auth-user-btn,header .auth-user-btn{display:inline-flex;align-items:center;gap:.45rem;min-height:40px;padding:.62rem 1rem;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.045);color:var(--text,#f3f5f7);font-weight:850;cursor:pointer;white-space:nowrap}.tme-header .auth-user-btn:hover,header .auth-user-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}.tme-header .auth-caret,header .auth-caret{font-size:.78rem;opacity:.82}.tme-header .auth-user-menu,header .auth-user-menu{position:absolute;top:calc(100% + 10px);right:0;min-width:230px;display:none;flex-direction:column;gap:.45rem;padding:.7rem;border-radius:16px;border:1px solid rgba(255,255,255,.09);background:rgba(10,16,28,.98);box-shadow:0 18px 45px rgba(0,0,0,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:99999}.tme-header .auth-user-menu.show,header .auth-user-menu.show{display:flex}.tme-header .auth-user-info,header .auth-user-info{display:flex;flex-direction:column;gap:.15rem;padding-bottom:.55rem;margin-bottom:.35rem;border-bottom:1px solid rgba(255,255,255,.08)}.tme-header .auth-user-info strong,header .auth-user-info strong{color:#fff;font-size:.95rem}.tme-header .auth-user-info span,header .auth-user-info span{color:rgba(255,255,255,.6);font-size:.82rem;word-break:break-word}.tme-header .auth-user-menu button,header .auth-user-menu button{border:0;width:100%;background:rgba(255,255,255,.04);color:#fff;padding:.75rem .85rem;border-radius:12px;text-align:left;cursor:pointer;font-weight:800;transition:.18s ease}.tme-header .auth-user-menu button:hover,header .auth-user-menu button:hover{background:rgba(255,255,255,.08)}
+.tme-header .nav-drop-menu,.nav-drop-menu{display:none;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:.25rem!important;top:calc(100% + 10px)!important;left:0!important;right:auto!important;width:max-content!important;min-width:220px!important;max-width:280px!important;transform:none!important;white-space:nowrap!important}.tme-header .nav-drop-menu a,.nav-drop-menu a{display:flex!important;width:100%!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;white-space:nowrap!important}.tme-header .nav-group:hover .nav-drop-menu,.tme-header .nav-group:focus-within .nav-drop-menu,.tme-header .nav-group.open .nav-drop-menu,.nav-group:hover .nav-drop-menu,.nav-group:focus-within .nav-drop-menu,.nav-group.open .nav-drop-menu{display:flex!important}.tme-header .auth-user-menu,.auth-user-menu{display:none;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:.42rem!important;right:0!important;left:auto!important;width:230px!important;min-width:230px!important;transform:none!important}.tme-header .auth-user-menu.show,.auth-user-menu.show{display:flex!important}.tme-header .auth-user-menu button,.auth-user-menu button{display:flex!important;width:100%!important;justify-content:flex-start!important;text-align:left!important}@media (max-width:900px){.tme-header .nav-drop-menu,.nav-drop-menu{position:static!important;width:100%!important;min-width:0!important;max-width:none!important;margin-top:.35rem!important}.tme-header .auth-user-menu,.auth-user-menu{right:0!important;width:min(260px,86vw)!important;min-width:min(260px,86vw)!important}}
+
+  </style>
+</head>
+<body class="bg-track-curves">
+<header class="tme-header">
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Trackmania Events Home">
+        <span class="brand-badge" aria-hidden="true">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
+
+      <button id="navToggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">☰</button>
+
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Events <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/">Home</a>
+            <a href="/kacky">Kacky Finishes</a>
+            <a href="/totd">Track of the Day</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Stats <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/wrleaderboard">WR Leaderboard</a>
+            <a href="/recentwrs">Recent WRs</a>
+            <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Community <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/highlights">Community Highlights</a>
+            <a href="/prize-runs">Prize Runs</a>
+            <a href="/#contact">Contact</a>
+            <a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noopener noreferrer">Discord</a>
+          </div>
+        </div>
+
+        <a class="nav-support-link" href="/support">Support</a>
+      </nav>
+
+      <div class="cta" id="authArea">
+        <div class="auth-user-dropdown">
+          <button id="authUserBtn" class="btn auth-user-btn" type="button">
+            <span id="authUserLabel">Login / Register</span>
+            <span class="auth-caret">▾</span>
+          </button>
+
+          <div id="authUserMenu" class="auth-user-menu">
+            <div class="auth-user-info">
+              <strong id="authMenuUsername">Guest</strong>
+              <span id="authMenuEmail"></span>
+            </div>
+
+            <button id="authMenuAccountBtn" type="button">Account</button>
+            <button id="authMenuLogoutBtn" type="button">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="prize-page">
+    <section class="container prize-shell">
+      <div class="prize-hero">
+        <span class="prize-kicker">Daily Prize Runs</span>
+        <h1 class="prize-title">Start a run. Hit checkpoints. Unlock rewards.</h1>
+        <p class="prize-subtitle">Prize Runs are daily Trackmania-style reward runs. Each checkpoint reveals a Paddock item you can collect and later equip from your Account page.</p>
+      </div>
+
+      <div id="lockedWrap" class="prize-card locked-card hidden">
+        <div class="prize-card-head">
+          <div>
+            <strong>Login required</strong>
+            <span>You need to be signed in before starting a Prize Run.</span>
+          </div>
+        </div>
+        <div class="prize-card-body">
+          <p id="lockedMessage" class="empty-state">Go back to the homepage and use Login / Register, then return to Prize Runs.</p>
+          <div class="run-actions">
+            <a class="btn primary" href="/">Go to homepage</a>
+            <a class="btn" href="/account">Account</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="authedWrap" class="prize-grid hidden">
+        <section class="prize-card">
+          <div class="prize-card-head">
+            <div>
+              <strong>Daily Run</strong>
+              <span>One free run per day. Extra tickets are used after your daily run is already claimed.</span>
+            </div>
+          </div>
+          <div class="prize-card-body">
+            <div class="run-status-grid">
+              <div class="run-stat"><span>Daily Run</span><strong id="freeRunValue">—</strong></div>
+              <div class="run-stat"><span>Extra Tickets</span><strong id="ticketValue">0</strong></div>
+              <div class="run-stat"><span>Can Run</span><strong id="canRunValue">—</strong></div>
+            </div>
+
+            <div class="track-stage" id="trackStage">
+              <div id="countdown" class="countdown">3</div>
+              <div class="track-theme-label">
+                <span>Current route</span>
+                <span id="themeLabel" class="theme-pill">🏟️ Stadium Sprint</span>
+              </div>
+              <div class="route-wrap" aria-hidden="true">
+                <div class="route-line"></div>
+                <div id="routeProgress" class="route-progress"></div>
+                <div id="routeCar" class="route-car">🏎️</div>
+                <div class="route-point hit" style="left:7%"><div class="route-dot"></div><span>Start</span></div>
+                <div class="route-point" data-slot="cp1" style="left:28%"><div class="route-dot"></div><span>CP1</span></div>
+                <div class="route-point" data-slot="cp2" style="left:50%"><div class="route-dot"></div><span>CP2</span></div>
+                <div class="route-point" data-slot="cp3" style="left:72%"><div class="route-dot"></div><span>CP3</span></div>
+                <div class="route-point" data-slot="finish" style="left:93%"><div class="route-dot"></div><span>Finish</span></div>
+              </div>
+              <div class="run-actions">
+                <button id="startRunBtn" class="btn primary" type="button">Start Daily Run</button>
+                <button id="refreshStatusBtn" class="btn" type="button">Refresh</button>
+                <a class="btn" href="/account">Equip Rewards</a>
+              </div>
+              <div id="runMessage" class="run-status-msg" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="prize-card">
+          <div class="prize-card-head">
+            <div>
+              <strong>Reward Reveal</strong>
+              <span>Rewards are saved to your Paddock automatically after the run starts.</span>
+            </div>
+          </div>
+          <div class="prize-card-body">
+            <div id="rewardGrid" class="reward-grid"></div>
+          </div>
+        </aside>
+
+        <section class="prize-card" style="grid-column:1 / -1">
+          <div class="prize-card-head">
+            <div>
+              <strong>Recent Prize Runs</strong>
+              <span>Your latest runs and unlocked rewards.</span>
+            </div>
+          </div>
+          <div class="prize-card-body">
+            <div id="historyList" class="history-list">
+              <div class="empty-state">Loading run history…</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <button id="toTop" aria-label="Back to top"><span>Top</span></button>
+
+  <footer>
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>© <span id="year"></span> Trackmania Events</div>
+      <div>
+        <a href="/privacy">Privacy</a> •
+        <a href="/terms">Terms</a> •
+        <a href="/support">Support</a> •
+        <a href="/#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+
+(function(){
+  const btn = document.getElementById("navToggle");
+  const nav = document.getElementById("primary-nav");
+  if (!btn || !nav) return;
+
+  function closeGroups(){
+    nav.querySelectorAll(".nav-group.open").forEach((group) => group.classList.remove("open"));
+  }
+
+  function setOpen(open){
+    nav.classList.toggle("show", open);
+    nav.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (!open) closeGroups();
+  }
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(!nav.classList.contains("show") && !nav.classList.contains("open"));
+  });
+
+  nav.querySelectorAll(".nav-drop-btn").forEach((dropBtn) => {
+    dropBtn.addEventListener("click", (e) => {
+      if (window.innerWidth > 900) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const group = dropBtn.closest(".nav-group");
+      const wasOpen = group.classList.contains("open");
+      closeGroups();
+      group.classList.toggle("open", !wasOpen);
+    });
+  });
+
+  nav.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => setOpen(false));
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!nav.contains(e.target) && e.target !== btn) setOpen(false);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) setOpen(false);
+  });
+})();
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+
+    const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+    const tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+
+    const $ = (id) => document.getElementById(id);
+    let currentUser = null;
+    let isRunning = false;
+
+    const THEME_LABELS = {
+      stadium_sprint: "🏟️ Stadium Sprint",
+      snow_drift: "❄️ Snow Drift",
+      rally_rush: "🌲 Rally Rush",
+      desert_dash: "🌵 Desert Dash",
+      night_circuit: "🌙 Night Circuit",
+      sunset_speedway: "☀️ Sunset Speedway",
+      weekly_shorts_rush: "🏁 Weekly Shorts Rush",
+      totd_run: "🏆 TOTD Run",
+      kacky_chaos: "🧱 Kacky Chaos",
+      champion_circuit: "👑 Champion Circuit",
+    };
+
+    const SLOT_LABELS = { cp1: "Checkpoint 1", cp2: "Checkpoint 2", cp3: "Checkpoint 3", finish: "Finish" };
+    const CAR_BY_THEME = {
+      stadium_sprint: "🏎️",
+      snow_drift: "🚙",
+      rally_rush: "🚗",
+      desert_dash: "🏜️",
+      night_circuit: "🌙",
+      sunset_speedway: "☀️",
+      weekly_shorts_rush: "🏁",
+      totd_run: "🏆",
+      kacky_chaos: "🧱",
+      champion_circuit: "👑",
+    };
+
+    function escapeHtml(value) {
+      const div = document.createElement("div");
+      div.textContent = String(value ?? "");
+      return div.innerHTML;
+    }
+
+    function prettyTier(tier) {
+      return String(tier || "standard").replace(/_/g, " ").replace(/\w/g, (c) => c.toUpperCase());
+    }
+
+    function prettyTheme(theme) {
+      return THEME_LABELS[theme] || String(theme || "Prize Run").replace(/_/g, " ").replace(/\w/g, (c) => c.toUpperCase());
+    }
+
+    function formatDate(value) {
+      try { return new Date(value).toLocaleString(); } catch { return ""; }
+    }
+
+    function setMsg(text, type = "") {
+      const el = $("runMessage");
+      if (!el) return;
+      el.textContent = text || "";
+      el.className = `run-status-msg ${type}`.trim();
+    }
+
+    function resetTrack() {
+      $("routeProgress").style.width = "0%";
+      $("routeCar").style.left = "7%";
+      $("routeCar").classList.remove("going");
+      document.querySelectorAll(".route-point").forEach((p) => p.classList.remove("hit"));
+      $("rewardGrid").innerHTML = ["cp1", "cp2", "cp3", "finish"].map((slot) => `
+        <article class="reward-card" id="reward-${slot}">
+          <div class="reward-slot">${SLOT_LABELS[slot]}</div>
+          <div class="reward-name">Waiting for reward…</div>
+          <div class="reward-desc">Start a run to reveal this checkpoint.</div>
+          <span class="tier-chip tier-standard">Locked</span>
+        </article>
+      `).join("");
+    }
+
+    function updateStatusCards(status) {
+      const freeUsed = Boolean(status?.free_run_used_today);
+      const tickets = Number(status?.extra_tickets || 0);
+      const canRun = Boolean(status?.can_start_run);
+      $("freeRunValue").textContent = freeUsed ? "Used" : "Ready";
+      $("ticketValue").textContent = tickets.toLocaleString();
+      $("canRunValue").textContent = canRun ? "Yes" : "No";
+      $("startRunBtn").disabled = !canRun || isRunning;
+      $("startRunBtn").textContent = freeUsed ? "Use Extra Ticket" : "Start Daily Run";
+    }
+
+    async function loadPrizeStatus() {
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_my_prize_status");
+        if (error) throw error;
+        const status = Array.isArray(data) ? data[0] : data;
+        updateStatusCards(status || {});
+        return status;
+      } catch (err) {
+        console.warn("Could not load prize status:", err);
+        setMsg(err.message || "Could not load Prize Run status.", "error");
+        $("startRunBtn").disabled = true;
+        return null;
+      }
+    }
+
+    async function loadRecentHistory() {
+      const box = $("historyList");
+      try {
+        const { data, error } = await tmeSupabase
+          .from("prize_run_history")
+          .select("id,run_type,theme,rewards,used_ticket,created_at")
+          .order("created_at", { ascending: false })
+          .limit(6);
+        if (error) throw error;
+        const rows = Array.isArray(data) ? data : [];
+        if (!rows.length) {
+          box.innerHTML = `<div class="empty-state">No Prize Runs yet. Start your first run above.</div>`;
+          return;
+        }
+        box.innerHTML = rows.map((row) => {
+          const rewards = Array.isArray(row.rewards) ? row.rewards : [];
+          const names = rewards.map((r) => `${r.icon || "🎁"} ${r.name || "Reward"}`).join(" • ");
+          return `
+            <article class="history-item">
+              <div class="history-top">
+                <span>${escapeHtml(prettyTheme(row.theme))}</span>
+                <span>${escapeHtml(row.used_ticket ? "Ticket" : "Daily")}</span>
+              </div>
+              <div class="history-meta">${escapeHtml(formatDate(row.created_at))}</div>
+              <div class="history-meta">${escapeHtml(names || "Rewards saved")}</div>
+            </article>
+          `;
+        }).join("");
+      } catch (err) {
+        console.warn("Could not load Prize Run history:", err);
+        box.innerHTML = `<div class="empty-state">Could not load run history.</div>`;
+      }
+    }
+
+    function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+    async function showCountdown() {
+      const el = $("countdown");
+      el.classList.add("show");
+      for (const part of ["3", "2", "1", "GO!"]) {
+        el.textContent = part;
+        await sleep(part === "GO!" ? 520 : 620);
+      }
+      el.classList.remove("show");
+    }
+
+    function revealReward(reward) {
+      const slot = reward?.slot || "cp1";
+      const card = $(`reward-${slot}`);
+      if (!card) return;
+      const duplicate = reward.was_duplicate ? ` <span style="color:rgba(255,255,255,.65)">Duplicate +${Number(reward.duplicate_count || 0)}</span>` : "";
+      card.innerHTML = `
+        <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • ${escapeHtml(reward.category || "reward")}</div>
+        <div class="reward-name">${escapeHtml(reward.icon || "🎁")} ${escapeHtml(reward.name || "Reward")}</div>
+        <div class="reward-desc">${escapeHtml(reward.description || "Saved to your Paddock collection.")}${duplicate}</div>
+        <span class="tier-chip tier-${escapeHtml(reward.tier || "standard")}">${escapeHtml(prettyTier(reward.tier))}</span>
+      `;
+      card.classList.add("revealed");
+    }
+
+    async function animateRun(result) {
+      const rewards = Array.isArray(result?.rewards) ? result.rewards : [];
+      const theme = result?.theme || "stadium_sprint";
+      $("themeLabel").textContent = prettyTheme(theme);
+      $("routeCar").textContent = CAR_BY_THEME[theme] || "🏎️";
+      resetTrack();
+      await showCountdown();
+      const positions = { cp1: 28, cp2: 50, cp3: 72, finish: 93 };
+      const progress = { cp1: 21, cp2: 43, cp3: 65, finish: 86 };
+      for (const slot of ["cp1", "cp2", "cp3", "finish"]) {
+        $("routeCar").classList.add("going");
+        $("routeCar").style.left = `${positions[slot]}%`;
+        $("routeProgress").style.width = `${progress[slot]}%`;
+        await sleep(850);
+        $("routeCar").classList.remove("going");
+        const point = document.querySelector(`.route-point[data-slot="${slot}"]`);
+        if (point) point.classList.add("hit");
+        const reward = rewards.find((r) => r.slot === slot);
+        if (reward) revealReward(reward);
+        await sleep(slot === "finish" ? 650 : 520);
+      }
+    }
+
+    async function startRun() {
+      if (isRunning) return;
+      isRunning = true;
+      $("startRunBtn").disabled = true;
+      setMsg("Starting your Prize Run…");
+      try {
+        const { data, error } = await tmeSupabase.rpc("start_prize_run");
+        if (error) throw error;
+        setMsg("Run started. Hit the checkpoints!", "success");
+        await animateRun(data);
+        setMsg("Prize Run complete. Rewards saved to your Paddock.", "success");
+        await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
+      } catch (err) {
+        console.warn("Prize Run failed:", err);
+        setMsg(err.message || "Could not start Prize Run.", "error");
+        await loadPrizeStatus();
+      } finally {
+        isRunning = false;
+      }
+    }
+
+    async function bootPrizePage() {
+      $("year").textContent = new Date().getFullYear();
+      resetTrack();
+      const toTop = $("toTop");
+      if (toTop) {
+        window.addEventListener("scroll", () => { toTop.classList.toggle("show", window.scrollY > 500); }, { passive: true });
+        toTop.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      }
+      $("startRunBtn").addEventListener("click", startRun);
+      $("refreshStatusBtn").addEventListener("click", async () => {
+        setMsg("Refreshing status…");
+        await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
+        setMsg("Status refreshed.", "success");
+      });
+      try {
+        const { data } = await tmeSupabase.auth.getSession();
+        currentUser = data?.session?.user || null;
+        if (!currentUser) {
+          $("lockedWrap").classList.remove("hidden");
+          $("authedWrap").classList.add("hidden");
+          return;
+        }
+        $("lockedWrap").classList.add("hidden");
+        $("authedWrap").classList.remove("hidden");
+        await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
+      } catch (err) {
+        console.warn("Prize page failed:", err);
+        $("lockedWrap").classList.remove("hidden");
+        $("lockedMessage").textContent = err.message || "Prize Runs failed to load.";
+      }
+    }
+
+    bootPrizePage();
+
+</script>
+<script>
+
+(function () {
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+  const label = document.getElementById("authUserLabel");
+  const usernameEl = document.getElementById("authMenuUsername");
+  const emailEl = document.getElementById("authMenuEmail");
+  const accountBtn = document.getElementById("authMenuAccountBtn");
+  const logoutBtn = document.getElementById("authMenuLogoutBtn");
+  if (!label || !usernameEl || !emailEl || !accountBtn || !logoutBtn) return;
+
+  function fallbackName(user) {
+    return user?.user_metadata?.username || user?.user_metadata?.name || user?.email?.split("@")[0] || "Account";
+  }
+
+  function setGuest() {
+    label.textContent = "Login / Register";
+    usernameEl.textContent = "Guest";
+    emailEl.textContent = "";
+    accountBtn.textContent = "Login / Register";
+    logoutBtn.style.display = "none";
+  }
+
+  function setUser(name, email) {
+    label.textContent = name || "Account";
+    usernameEl.textContent = name || "Account";
+    emailEl.textContent = email || "";
+    accountBtn.textContent = "Account";
+    logoutBtn.style.display = "";
+  }
+
+  async function syncHeaderAuth() {
+    if (!window.supabase?.createClient) {
+      setGuest();
+      return;
+    }
+
+    const client = window.__tmeHeaderSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+    window.__tmeHeaderSupabase = client;
+
+    try {
+      const { data } = await client.auth.getSession();
+      const user = data?.session?.user || null;
+      if (!user) {
+        setGuest();
+        return;
+      }
+
+      let displayName = fallbackName(user);
+      try {
+        const res = await client
+          .from("profiles")
+          .select("username,email")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!res.error && res.data?.username) displayName = res.data.username;
+      } catch {}
+
+      setUser(displayName, user.email || "");
+    } catch (err) {
+      console.warn("Header auth sync failed:", err);
+      setGuest();
+    }
+  }
+
+  accountBtn.addEventListener("click", () => {
+    window.location.href = label.textContent === "Login / Register" ? "/" : "/account";
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const client = window.__tmeHeaderSupabase;
+      if (client?.auth?.signOut) await client.auth.signOut();
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    }
+    window.location.href = "/";
+  });
+
+  syncHeaderAuth();
+})();
+
+</script>
+<script>
+
+(function () {
+  const wrap = document.querySelector(".auth-user-dropdown");
+  const btn = document.getElementById("authUserBtn");
+  const menu = document.getElementById("authUserMenu");
+  if (!wrap || !btn || !menu || btn.dataset.tmeAuthToggleBound) return;
+  btn.dataset.tmeAuthToggleBound = "1";
+
+  btn.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    menu.classList.toggle("show");
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!wrap.contains(event.target)) menu.classList.remove("show");
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") menu.classList.remove("show");
+  });
+})();
+
+</script>
+</body>
+</html>
