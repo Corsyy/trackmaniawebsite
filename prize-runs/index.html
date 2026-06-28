@@ -288,6 +288,12 @@
       z-index: 4;
     }
 
+    .route-car-icon {
+      display: inline-block;
+      transform: scaleX(-1);
+      line-height: 1;
+    }
+
     .route-car.going { transform: translateX(-50%) translateY(-4px) rotate(-2deg); }
 
     .prize-countdown {
@@ -540,7 +546,7 @@
               <div class="route-wrap" aria-hidden="true">
                 <div class="route-line"></div>
                 <div id="routeProgress" class="route-progress"></div>
-                <div id="routeCar" class="route-car">🏎️</div>
+                <div id="routeCar" class="route-car"><span class="route-car-icon">🏎️</span></div>
                 <div class="route-point hit" style="left:7%"><div class="route-dot"></div><span>Start</span></div>
                 <div class="route-point" data-slot="cp1" style="left:28%"><div class="route-dot"></div><span>CP1</span></div>
                 <div class="route-point" data-slot="cp2" style="left:50%"><div class="route-dot"></div><span>CP2</span></div>
@@ -731,6 +737,9 @@
       $("routeProgress").style.width = "0%";
       $("routeCar").style.left = "7%";
       $("routeCar").classList.remove("going");
+      if (!$("routeCar").querySelector(".route-car-icon")) {
+        $("routeCar").innerHTML = '<span class="route-car-icon">🏎️</span>';
+      }
       document.querySelectorAll(".route-point").forEach((p) => p.classList.remove("hit"));
       $("rewardGrid").innerHTML = ["cp1", "cp2", "cp3", "finish"].map((slot) => `
         <article class="reward-card" id="reward-${slot}">
@@ -832,8 +841,8 @@
       const rewards = Array.isArray(result?.rewards) ? result.rewards : [];
       const theme = result?.theme || "stadium_sprint";
       $("themeLabel").textContent = prettyTheme(theme);
-      $("routeCar").textContent = CAR_BY_THEME[theme] || "🏎️";
       resetTrack();
+      $("routeCar").innerHTML = `<span class="route-car-icon">${escapeHtml(CAR_BY_THEME[theme] || "🏎️")}</span>`;
       await showCountdown();
       const positions = { cp1: 28, cp2: 50, cp3: 72, finish: 93 };
       const progress = { cp1: 21, cp2: 43, cp3: 65, finish: 86 };
