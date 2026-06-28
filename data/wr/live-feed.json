@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T18:38:02.737Z",
+  "generatedAt": "2026-06-28T20:02:07.393Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|oTfmWzTh8jvfLpqbil0kLIOlcu8|3157005b-b19b-42b2-8a9f-ea91fc249bf2|f338668e-5d57-4395-93ac-ef514f2fb898|53458|53380|2026-06-28T20:02:07.393Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-28T20:02:07.393Z",
+      "at": "2026-06-28T20:02:07.393Z",
+      "mapUid": "oTfmWzTh8jvfLpqbil0kLIOlcu8",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "3157005b-b19b-42b2-8a9f-ea91fc249bf2",
+      "oldHolder": "TiwiTM",
+      "oldTimeMs": 53458,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:53.458",
+      "oldScoreKey": "53458",
+      "newHolderAccountId": "f338668e-5d57-4395-93ac-ef514f2fb898",
+      "newHolder": "ultimatehippie",
+      "newTimeMs": 53380,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:53.380",
+      "newScoreKey": "53380",
+      "text": "ultimatehippie overtook TiwiTM on Unknown map with 00:00:53.380."
+    },
     {
       "id": "wr_changed|cqVMeRh9fS278VSGJQSWwomqv16|31133d2b-7ee9-4952-982e-a72c34d4134d|7fc7bc9c-67b2-4003-b1a3-29006486f71e|12589|11174|2026-06-28T18:38:02.737Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:04.988",
       "newScoreKey": "4988",
       "text": "Vulpecia overtook Danyy912 on Unknown map with 00:00:04.988."
-    },
-    {
-      "id": "wr_changed|oChGfnpc0GvYUSz2EDbzRduvuZm|ce30675a-5c60-4590-a1c7-81d31c82e2e7|1acbd7b5-2b93-44ae-8ea1-752c1cb35403|10148|10126|2026-06-20T16:00:07.251Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-20T16:00:07.251Z",
-      "at": "2026-06-20T16:00:07.251Z",
-      "mapUid": "oChGfnpc0GvYUSz2EDbzRduvuZm",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "ce30675a-5c60-4590-a1c7-81d31c82e2e7",
-      "oldHolder": "SilverbackTM",
-      "oldTimeMs": 10148,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.148",
-      "oldScoreKey": "10148",
-      "newHolderAccountId": "1acbd7b5-2b93-44ae-8ea1-752c1cb35403",
-      "newHolder": "OuweBoefx",
-      "newTimeMs": 10126,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.126",
-      "newScoreKey": "10126",
-      "text": "OuweBoefx overtook SilverbackTM on Unknown map with 00:00:10.126."
     }
   ]
 }
