@@ -473,7 +473,7 @@
 
 
     
-/* Shoutbox stable cosmetics v4 - inline only, no message-card frame effects */
+/* Shoutbox stable cosmetics v5 - compact messages, frame changes message color only */
 #shoutboxMessages {
   display: block !important;
 }
@@ -483,11 +483,11 @@
   position: relative !important;
   min-height: 0 !important;
   height: auto !important;
-  margin: .62rem 0 !important;
-  padding: .82rem .92rem !important;
-  border-radius: 16px !important;
+  margin: .42rem 0 !important;
+  padding: .58rem .72rem !important;
+  border-radius: 13px !important;
   border: 1px solid rgba(255,255,255,.075) !important;
-  background: rgba(255,255,255,.026) !important;
+  background: rgba(255,255,255,.023) !important;
   overflow: visible !important;
 }
 
@@ -496,20 +496,40 @@
   background: rgba(245,217,138,.042) !important;
 }
 
+/* Equipped frames tint the message bubble only. The frame name is not displayed. */
+.shout-msg.has-frame {
+  border-left-width: 3px !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.018), 0 8px 18px rgba(0,0,0,.12) !important;
+}
+
+.shout-msg.frame-theme-stadium { border-left-color: rgba(83,166,255,.82) !important; background: linear-gradient(90deg, rgba(83,166,255,.075), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-theme-snow { border-left-color: rgba(200,238,255,.86) !important; background: linear-gradient(90deg, rgba(180,230,255,.075), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-theme-rally { border-left-color: rgba(120,220,150,.78) !important; background: linear-gradient(90deg, rgba(120,220,150,.065), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-theme-desert { border-left-color: rgba(255,190,110,.82) !important; background: linear-gradient(90deg, rgba(255,190,110,.072), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-theme-night { border-left-color: rgba(120,140,255,.80) !important; background: linear-gradient(90deg, rgba(120,140,255,.070), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-theme-weekly,
+.shout-msg.frame-theme-totd,
+.shout-msg.frame-theme-wr,
+.shout-msg.frame-theme-champion { border-left-color: rgba(245,217,138,.84) !important; background: linear-gradient(90deg, rgba(245,217,138,.068), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-theme-support { border-left-color: rgba(104,240,255,.84) !important; background: linear-gradient(90deg, rgba(104,240,255,.070), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-theme-kacky { border-left-color: rgba(190,120,255,.82) !important; background: linear-gradient(90deg, rgba(190,120,255,.070), rgba(255,255,255,.020)) !important; }
+.shout-msg.frame-tier-champion { box-shadow: inset 0 0 0 1px rgba(245,217,138,.055), 0 8px 18px rgba(0,0,0,.12) !important; }
+.shout-msg.frame-tier-iconic { box-shadow: inset 0 0 0 1px rgba(104,240,255,.065), 0 8px 20px rgba(0,0,0,.14) !important; }
+
 .shout-meta {
   display: flex !important;
   align-items: flex-start !important;
   justify-content: space-between !important;
-  gap: .75rem !important;
+  gap: .55rem !important;
   width: 100% !important;
-  margin: 0 0 .4rem !important;
+  margin: 0 0 .25rem !important;
 }
 
 .shout-identity {
   display: flex !important;
   align-items: center !important;
   flex-wrap: wrap !important;
-  gap: .28rem .34rem !important;
+  gap: .22rem .28rem !important;
   min-width: 0 !important;
   max-width: 100% !important;
 }
@@ -518,25 +538,32 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: .35rem !important;
+  gap: .28rem !important;
   flex: 0 0 auto !important;
   margin-left: auto !important;
   color: rgba(234,240,255,.62) !important;
-  font-size: .82rem !important;
+  font-size: .78rem !important;
+}
+
+.shout-actions-inline {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .22rem !important;
 }
 
 .shout-name {
   display: inline-flex !important;
   align-items: center !important;
-  min-height: 22px !important;
+  min-height: 20px !important;
   line-height: 1.1 !important;
   color: #fff !important;
   font-weight: 950 !important;
   white-space: nowrap !important;
+  font-size: .84rem !important;
 }
 
 .shout-name.has-nameplate {
-  padding: .18rem .48rem !important;
+  padding: .12rem .42rem !important;
   border-radius: 999px !important;
   border: 1px solid rgba(255,255,255,.10) !important;
   background: rgba(255,255,255,.045) !important;
@@ -558,18 +585,18 @@
   display: inline-flex !important;
   align-items: center !important;
   flex-wrap: wrap !important;
-  gap: .24rem !important;
+  gap: .2rem !important;
   min-width: 0 !important;
 }
 
 .shout-badge-label {
   display: inline-flex !important;
   align-items: center !important;
-  gap: .18rem !important;
-  min-height: 22px !important;
+  gap: .14rem !important;
+  min-height: 20px !important;
   line-height: 1 !important;
   white-space: nowrap !important;
-  font-size: .78rem !important;
+  font-size: .76rem !important;
   font-weight: 900 !important;
   color: rgba(234,240,255,.72) !important;
 }
@@ -577,7 +604,7 @@
 .shout-badge-label::before {
   content: "·" !important;
   color: rgba(234,240,255,.36) !important;
-  margin-right: .02rem !important;
+  margin-right: .01rem !important;
 }
 
 .shout-badge-label.admin,
@@ -588,30 +615,31 @@
 .shout-badge-label.highlight { color: #d7dbe2 !important; }
 
 .shout-badge-label.cosmetic {
-  padding: .16rem .42rem !important;
+  padding: .12rem .36rem !important;
   border-radius: 999px !important;
   border: 1px solid rgba(104,240,255,.14) !important;
-  background: rgba(104,240,255,.055) !important;
+  background: rgba(104,240,255,.052) !important;
   color: #dffcff !important;
 }
 
 .shout-stickers {
   display: inline-flex !important;
   align-items: center !important;
-  gap: .22rem !important;
-  padding: .16rem .42rem !important;
+  gap: .18rem !important;
+  padding: .12rem .34rem !important;
   border-radius: 999px !important;
   border: 1px solid rgba(255,255,255,.08) !important;
-  background: rgba(255,255,255,.035) !important;
+  background: rgba(255,255,255,.032) !important;
   line-height: 1 !important;
+  font-size: .76rem !important;
 }
 
 .shout-text {
   display: block !important;
-  margin: .2rem 0 0 !important;
+  margin: .1rem 0 0 !important;
   color: rgba(246,248,255,.94) !important;
-  font-size: .95rem !important;
-  line-height: 1.45 !important;
+  font-size: .90rem !important;
+  line-height: 1.32 !important;
   white-space: pre-wrap !important;
   overflow-wrap: anywhere !important;
 }
@@ -620,18 +648,29 @@
 .reaction-row {
   display: flex !important;
   flex-wrap: wrap !important;
-  gap: .35rem !important;
-  margin-top: .45rem !important;
+  gap: .25rem !important;
+  margin-top: .28rem !important;
+}
+
+.shout-reaction,
+.reaction-btn {
+  min-height: 24px !important;
+  padding: .18rem .34rem !important;
+  border-radius: 9px !important;
+  font-size: .78rem !important;
 }
 
 @media (max-width: 560px) {
   .shout-meta {
     display: grid !important;
-    gap: .42rem !important;
+    gap: .32rem !important;
   }
   .shout-meta-right {
     justify-content: flex-start !important;
     margin-left: 0 !important;
+  }
+  .shout-msg {
+    padding: .54rem .62rem !important;
   }
 }
 
@@ -3735,7 +3774,7 @@
     function renderShoutBadges(userId) {
       const verifiedBadges = shoutBadgesByUserId[userId] || [];
       const loadout = shoutCosmeticsByUserId[userId] || {};
-      const cosmetics = [loadout.flair, loadout.title, loadout.frame].filter(Boolean).slice(0, 3);
+      const cosmetics = [loadout.flair, loadout.title].filter(Boolean).slice(0, 2);
       const badges = [
         ...verifiedBadges,
         ...cosmetics.map((item) => ({
@@ -3763,7 +3802,14 @@
     }
 
     function getShoutFrameClasses(userId) {
-      return "";
+      const frame = shoutCosmeticsByUserId[userId]?.frame;
+      if (!frame) return "";
+      return [
+        "has-frame",
+        `frame-tier-${cleanCssToken(frame.tier)}`,
+        `frame-theme-${cleanCssToken(frame.theme)}`,
+        `frame-item-${cleanCssToken(frame.item_key)}`,
+      ].join(" ");
     }
 
     function getShoutNameplateClasses(userId) {
