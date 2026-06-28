@@ -745,35 +745,471 @@ grid-template-columns:1fr;
 }
 
 }
+
+
+/* Unified Trackmania Events header */
+.tme-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(5,7,12,.86);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.tme-header .container.nav{
+  width:min(1220px,92vw);
+  margin:0 auto;
+  padding:.75rem 0;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:1rem;
+}
+
+.tme-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  color:#f7faff;
+  font-weight:950;
+  font-size:1.02rem;
+  letter-spacing:-.025em;
+  white-space:nowrap;
+  text-decoration:none;
+}
+
+.tme-header .brand-badge{
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:none;
+}
+
+.tme-header .navlinks{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.45rem;
+  min-width:0;
+}
+
+.tme-header .nav-group{
+  position:relative;
+}
+
+.tme-header .nav-drop-btn,
+.tme-header .navlinks > a{
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding:.5rem .66rem;
+  border:1px solid transparent;
+  border-radius:12px;
+  background:transparent;
+  color:rgba(243,245,247,.72);
+  font:inherit;
+  font-size:.9rem;
+  font-weight:850;
+  line-height:1;
+  letter-spacing:-.005em;
+  white-space:nowrap;
+  text-decoration:none;
+  opacity:1;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+  box-shadow:none;
+}
+
+.tme-header .nav-drop-btn:hover,
+.tme-header .nav-drop-btn:focus,
+.tme-header .navlinks > a:hover,
+.tme-header .navlinks > a:focus,
+.tme-header .nav-drop-btn.active,
+.tme-header .navlinks > a.active{
+  color:#fff;
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.075);
+  transform:none;
+  box-shadow:none;
+}
+
+.tme-header .nav-drop-btn.active,
+.tme-header .navlinks > .nav-support-link.active{
+  background:rgba(255,255,255,.075);
+  border-color:rgba(255,255,255,.11);
+}
+
+.tme-header .navlinks a.active::after,
+.tme-header .nav a.active::after{
+  display:none !important;
+}
+
+.tme-header .nav-drop-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  left:0;
+  min-width:230px;
+  display:none;
+  flex-direction:column;
+  gap:.25rem;
+  padding:.55rem;
+  border-radius:16px;
+  background:rgba(8,11,18,.98);
+  border:1px solid rgba(255,255,255,.085);
+  box-shadow:0 18px 45px rgba(0,0,0,.42);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  z-index:1001;
+}
+
+.tme-header .nav-group:hover .nav-drop-menu,
+.tme-header .nav-group:focus-within .nav-drop-menu,
+.tme-header .nav-group.open .nav-drop-menu{
+  display:flex;
+}
+
+.tme-header .nav-drop-menu a{
+  display:flex;
+  align-items:center;
+  min-height:38px;
+  padding:.65rem .72rem;
+  border-radius:12px;
+  color:rgba(243,245,247,.68);
+  text-decoration:none;
+  font-size:.9rem;
+  font-weight:800;
+  white-space:nowrap;
+  transition:background .16s ease,color .16s ease;
+}
+
+.tme-header .nav-drop-menu a:hover,
+.tme-header .nav-drop-menu a:focus,
+.tme-header .nav-drop-menu a.active{
+  color:#fff;
+  background:rgba(255,255,255,.06);
+}
+
+.tme-header .nav-support-link{
+  border-color:rgba(255,255,255,.10) !important;
+  background:rgba(255,255,255,.045) !important;
+}
+
+.tme-header .nav-support-link:hover,
+.tme-header .nav-support-link.active{
+  background:rgba(255,255,255,.075) !important;
+  border-color:rgba(255,255,255,.14) !important;
+}
+
+.tme-header .cta{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.55rem;
+  position:static;
+  transform:none;
+}
+
+.tme-header .btn,
+.tme-header .nav-submit,
+.tme-header .nav-account{
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.4rem;
+  padding:.62rem .9rem;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.085);
+  background:rgba(255,255,255,.045);
+  color:#f3f5f7;
+  font-weight:850;
+  font-size:.9rem;
+  line-height:1;
+  white-space:nowrap;
+  text-decoration:none;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+  box-shadow:none;
+}
+
+.tme-header .nav-submit{
+  background:rgba(255,255,255,.075);
+  border-color:rgba(255,255,255,.13);
+}
+
+.tme-header .btn:hover,
+.tme-header .nav-submit:hover,
+.tme-header .nav-account:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,255,255,.16);
+  background:rgba(255,255,255,.075);
+  box-shadow:none;
+}
+
+.tme-header .nav-mobile-action{
+  display:none;
+}
+
+.tme-header .nav-toggle{
+  display:none;
+  min-height:38px;
+  width:42px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:12px;
+  background:rgba(255,255,255,.045);
+  color:#f3f5f7;
+  font-size:1.05rem;
+  font-weight:900;
+  cursor:pointer;
+}
+
+@media (max-width:1050px){
+  .tme-header .brand span:last-child{display:none}
+}
+
+@media (max-width:900px){
+  .tme-header .container.nav{
+    grid-template-columns:auto auto;
+  }
+
+  .tme-header .brand span:last-child{display:inline}
+
+  .tme-header .nav-toggle{
+    display:inline-flex !important;
+    justify-self:end;
+  }
+
+  .tme-header .cta{
+    display:none !important;
+  }
+
+  .tme-header .navlinks{
+    display:none;
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    width:100%;
+    padding:.75rem min(4vw,1rem) 1rem;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    background:rgba(5,7,12,.97);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:.45rem;
+    z-index:1000;
+  }
+
+  .tme-header .navlinks.show,
+  .tme-header .navlinks.open{
+    display:flex !important;
+  }
+
+  .tme-header .nav-group{
+    width:100%;
+  }
+
+  .tme-header .nav-drop-btn,
+  .tme-header .navlinks > a{
+    width:100%;
+    justify-content:space-between;
+    min-height:44px;
+    padding:.75rem .85rem;
+    background:rgba(255,255,255,.035);
+    border-color:rgba(255,255,255,.06);
+  }
+
+  .tme-header .nav-drop-menu{
+    position:static;
+    display:none;
+    min-width:0;
+    width:100%;
+    margin:.35rem 0 .15rem;
+    padding:.45rem;
+    box-shadow:none;
+    background:rgba(255,255,255,.03);
+    border-color:rgba(255,255,255,.06);
+  }
+
+  .tme-header .nav-group.open .nav-drop-menu{
+    display:flex;
+  }
+
+  .tme-header .nav-mobile-action{
+    display:flex;
+  }
+}
+
+@media (max-width:520px){
+  .tme-header .brand span:last-child{
+    max-width:190px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
+
+.tme-header .auth-user-dropdown{
+  position:relative;
+}
+
+.tme-header .auth-user-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.42rem;
+}
+
+.tme-header .auth-caret{
+  font-size:.78rem;
+  opacity:.72;
+}
+
+.tme-header .auth-user-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  min-width:220px;
+  display:none;
+  flex-direction:column;
+  gap:.42rem;
+  padding:.68rem;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.085);
+  background:rgba(8,11,18,.98);
+  box-shadow:0 18px 45px rgba(0,0,0,.42);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  z-index:1002;
+}
+
+.tme-header .auth-user-menu.show{
+  display:flex;
+}
+
+.tme-header .auth-user-info{
+  display:flex;
+  flex-direction:column;
+  gap:.14rem;
+  padding:0 0 .55rem;
+  margin:0 0 .28rem;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.tme-header .auth-user-info strong{
+  color:#fff;
+  font-size:.95rem;
+  line-height:1.2;
+}
+
+.tme-header .auth-user-info span{
+  color:rgba(243,245,247,.56);
+  font-size:.82rem;
+  overflow-wrap:anywhere;
+}
+
+.tme-header .auth-user-menu button{
+  width:100%;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:.68rem .75rem;
+  border:0;
+  border-radius:12px;
+  background:rgba(255,255,255,.04);
+  color:#f3f5f7;
+  font:inherit;
+  font-size:.9rem;
+  font-weight:800;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:none;
+}
+
+.tme-header .auth-user-menu button:hover{
+  transform:none;
+  background:rgba(255,255,255,.075);
+  box-shadow:none;
+}
+
+@media (max-width:900px){
+  .tme-header .auth-user-dropdown{
+    display:none;
+  }
+}
+
 </style>
 </head>
 
 <body class="bg-track-curves">
-  <header>
+  <header class="tme-header">
     <div class="container nav">
-      <h1>Track of the Day</h1>
+      <a class="brand" href="/" aria-label="Trackmania Events Home">
+        <span class="brand-badge" aria-hidden="true">🎮</span>
+        <span>Trackmania Events</span>
+      </a>
 
-      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
+      <button id="navToggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">☰</button>
 
-      <div class="nav-center">
-        <nav id="primary-nav" class="navlinks" aria-label="Primary">
-          <a href="/kacky">Kacky Finishes</a>
-          <a href="/recentwrs">Recent WRs</a>
-          <a href="/highlights">Community Highlights</a>
-          <a href="/weeklys-shorts-stats">Weekly Shorts Stats</a>
-          <a href="/" class="mobile-only btn-as-link">Home</a>
-        </nav>
-      </div>
+      <nav id="primary-nav" class="navlinks" aria-label="Primary">
+        <div class="nav-group">
+          <button class="nav-drop-btn active" type="button">Events <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/">Home</a>
+            <a class="" href="/kacky">Kacky Finishes</a>
+            <a class="active" href="/totd">Track of the Day</a>
+          </div>
+        </div>
 
-      <div class="cta">
-        <a href="/" class="btn">Home</a>
-      </div>
-    </div>
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Stats <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a class="" href="/wrleaderboard">WR Leaderboard</a>
+            <a class="" href="/recentwrs">Recent WRs</a>
+            <a class="" href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+            <a href="/account">Account / My Stats</a>
+          </div>
+        </div>
 
-    <div class="container month-row">
-      <div class="select">
-        <span>Month:</span>
-        <select id="month"></select>
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button">Community <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a class="" href="/highlights">Community Highlights</a>
+            <a href="/#contact">Contact</a>
+            <a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noopener noreferrer">Discord</a>
+          </div>
+        </div>
+
+        <a class="nav-support-link" href="/support">Support</a>
+        <a class="nav-account nav-mobile-action" href="/account">Account</a>
+      </nav>
+
+        <div class="auth-user-dropdown">
+          <button id="authUserBtn" class="btn auth-user-btn" type="button">
+            <span id="authUserLabel">Account</span>
+            <span class="auth-caret">▾</span>
+          </button>
+
+          <div id="authUserMenu" class="auth-user-menu">
+            <div class="auth-user-info">
+              <strong id="authMenuUsername">Guest</strong>
+              <span id="authMenuEmail"></span>
+            </div>
+
+            <button id="authMenuAccountBtn" type="button">Account</button>
+            <button id="authMenuLogoutBtn" type="button">Logout</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -1139,6 +1575,101 @@ grid-template-columns:1fr;
       });
     })();
   </script>
+
+<script>
+(function () {
+  const header = document.querySelector(".tme-header");
+  if (!header) return;
+
+  const btn = header.querySelector("#navToggle");
+  const nav = header.querySelector("#primary-nav");
+
+  function closeGroups(except) {
+    header.querySelectorAll(".nav-group.open").forEach((group) => {
+      if (group !== except) group.classList.remove("open");
+    });
+  }
+
+  header.querySelectorAll(".nav-drop-btn").forEach((dropBtn) => {
+    dropBtn.addEventListener("click", (event) => {
+      if (window.innerWidth > 900) return;
+      event.preventDefault();
+      const group = dropBtn.closest(".nav-group");
+      if (!group) return;
+      const open = !group.classList.contains("open");
+      closeGroups(group);
+      group.classList.toggle("open", open);
+    });
+  });
+
+  if (btn && nav && !btn.dataset.tmeHeaderBound) {
+    btn.dataset.tmeHeaderBound = "1";
+
+    function setOpen(open) {
+      nav.classList.toggle("show", open);
+      nav.classList.toggle("open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) closeGroups();
+    }
+
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(!nav.classList.contains("show") && !nav.classList.contains("open"));
+    });
+
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!header.contains(event.target)) setOpen(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) setOpen(false);
+    });
+  }
+
+  const accountBtn = header.querySelector("#authMenuAccountBtn");
+  const accountMenu = header.querySelector("#authUserMenu");
+  const accountToggle = header.querySelector("#authUserBtn");
+
+  accountToggle?.addEventListener("click", () => {
+    accountMenu?.classList.toggle("show");
+  });
+
+  accountBtn?.addEventListener("click", () => {
+    window.location.href = "/account";
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".auth-user-dropdown")) {
+      accountMenu?.classList.remove("show");
+    }
+  });
+
+  header.querySelector("#authMenuLogoutBtn")?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    try {
+      if (sb?.auth?.signOut) await sb.auth.signOut();
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    }
+
+    window.location.href = "/";
+  });
+})();
+</script>
+
 </body>
 
 </html>
