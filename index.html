@@ -624,6 +624,98 @@
       .shout-stickers { font-size: .72rem; }
     }
 
+
+/* Shoutbox cosmetic display polish v9 */
+.shout-meta {
+  align-items: flex-start !important;
+}
+
+.shout-identity {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: .28rem .34rem !important;
+  min-width: 0 !important;
+}
+
+.shout-name {
+  font-weight: 950 !important;
+  color: #fff !important;
+}
+
+.shout-badge-line {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: .22rem !important;
+  min-width: 0 !important;
+}
+
+.shout-badge-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .22rem !important;
+  min-height: 22px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  font-size: .78rem !important;
+  font-weight: 900 !important;
+}
+
+.shout-badge-label::before {
+  content: "·" !important;
+  color: rgba(234,240,255,.36) !important;
+  margin-right: .02rem !important;
+}
+
+.shout-badge-label.cosmetic {
+  margin-left: .08rem !important;
+  padding: .16rem .42rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(104,240,255,.14) !important;
+  background: rgba(104,240,255,.055) !important;
+  color: #dffcff !important;
+}
+
+.shout-badge-label.cosmetic::before {
+  content: "·" !important;
+  margin-left: -.2rem !important;
+  margin-right: .08rem !important;
+}
+
+.shout-stickers {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .22rem !important;
+  padding: .16rem .42rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  background: rgba(255,255,255,.035) !important;
+}
+
+.shout-msg.has-frame {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(104,240,255,.035), transparent 38%),
+    rgba(255,255,255,.025) !important;
+}
+
+.shout-meta-right {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+}
+
+@media (max-width: 560px) {
+  .shout-meta {
+    display: grid !important;
+    gap: .4rem !important;
+  }
+
+  .shout-meta-right {
+    margin-left: 0 !important;
+    justify-content: flex-start !important;
+  }
+}
+
 </style>
 
 </head>
@@ -3550,23 +3642,39 @@
       }
     }
 
-    async function loadPublicPrizeLoadouts(userIds) {
+    async async function loadPublicPrizeLoadouts(userIds) {
       if (!tmeSupabase) return {};
       const uniqueIds = normalizeUuidList(userIds);
       if (!uniqueIds.length) return {};
 
-      try {
-        const { data, error } = await tmeSupabase.rpc("get_public_prize_loadouts", {
-          user_ids_input: uniqueIds,
-        });
-
+      async function callLoadouts(params) {
+        const { data, error } = await tmeSupabase.rpc("get_public_prize_loadouts", params);
         if (error) throw error;
+        return Array.isArray(data) ? data : [];
+      }
+
+      try {
+        let rows = [];
+        try {
+          rows = await callLoadouts({ p_user_ids: uniqueIds });
+        } catch (firstErr) {
+          rows = await callLoadouts({ user_ids_input: uniqueIds });
+        }
 
         const out = {};
-        for (const row of data || []) {
+        for (const row of rows) {
           if (!row.user_id) continue;
+
+          const hasFlair = Boolean(row.flair_item_key || row.flair_name || row.flair_item_id);
+          const hasTitle = Boolean(row.title_item_key || row.title_name || row.title_item_id);
+          const hasFrame = Boolean(row.frame_item_key || row.frame_name || row.frame_item_id);
+          const hasNameplate = Boolean(row.nameplate_item_key || row.nameplate_name || row.nameplate_item_id);
+          const hasSticker1 = Boolean(row.sticker_1_item_key || row.sticker_1_name || row.sticker_1_item_id);
+          const hasSticker2 = Boolean(row.sticker_2_item_key || row.sticker_2_name || row.sticker_2_item_id);
+          const hasSticker3 = Boolean(row.sticker_3_item_key || row.sticker_3_name || row.sticker_3_item_id);
+
           out[row.user_id] = {
-            flair: row.flair_item_id ? {
+            flair: hasFlair ? {
               key: "flair",
               icon: row.flair_icon || "💬",
               label: row.flair_name || "Flair",
@@ -3574,7 +3682,7 @@
               tier: row.flair_tier || "",
               theme: row.flair_theme || "",
             } : null,
-            title: row.title_item_id ? {
+            title: hasTitle ? {
               key: "title",
               icon: row.title_icon || "🏷️",
               label: row.title_name || "Title",
@@ -3582,7 +3690,7 @@
               tier: row.title_tier || "",
               theme: row.title_theme || "",
             } : null,
-            frame: row.frame_item_id ? {
+            frame: hasFrame ? {
               key: "frame",
               icon: row.frame_icon || "🖼️",
               label: row.frame_name || "Frame",
@@ -3590,7 +3698,7 @@
               tier: row.frame_tier || "",
               theme: row.frame_theme || "",
             } : null,
-            nameplate: row.nameplate_item_id ? {
+            nameplate: hasNameplate ? {
               key: "nameplate",
               icon: row.nameplate_icon || "🔷",
               label: row.nameplate_name || "Nameplate",
@@ -3599,9 +3707,9 @@
               theme: row.nameplate_theme || "",
             } : null,
             stickers: [
-              row.sticker_1_item_id ? { key: "sticker", icon: row.sticker_1_icon || "✨", label: row.sticker_1_name || "Sticker", item_key: row.sticker_1_item_key || "", tier: row.sticker_1_tier || "", theme: row.sticker_1_theme || "" } : null,
-              row.sticker_2_item_id ? { key: "sticker", icon: row.sticker_2_icon || "✨", label: row.sticker_2_name || "Sticker", item_key: row.sticker_2_item_key || "", tier: row.sticker_2_tier || "", theme: row.sticker_2_theme || "" } : null,
-              row.sticker_3_item_id ? { key: "sticker", icon: row.sticker_3_icon || "✨", label: row.sticker_3_name || "Sticker", item_key: row.sticker_3_item_key || "", tier: row.sticker_3_tier || "", theme: row.sticker_3_theme || "" } : null,
+              hasSticker1 ? { key: "sticker", icon: row.sticker_1_icon || "✨", label: row.sticker_1_name || "Sticker", item_key: row.sticker_1_item_key || "", tier: row.sticker_1_tier || "", theme: row.sticker_1_theme || "" } : null,
+              hasSticker2 ? { key: "sticker", icon: row.sticker_2_icon || "✨", label: row.sticker_2_name || "Sticker", item_key: row.sticker_2_item_key || "", tier: row.sticker_2_tier || "", theme: row.sticker_2_theme || "" } : null,
+              hasSticker3 ? { key: "sticker", icon: row.sticker_3_icon || "✨", label: row.sticker_3_name || "Sticker", item_key: row.sticker_3_item_key || "", tier: row.sticker_3_tier || "", theme: row.sticker_3_theme || "" } : null,
             ].filter(Boolean),
           };
         }
