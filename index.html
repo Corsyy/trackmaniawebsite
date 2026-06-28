@@ -9,7 +9,7 @@
     content="Live Trackmania events, schedule, and stream hub. Watch live on Twitch, see upcoming events, and get in touch." />
   <meta name="theme-color" content="#0a0f1a" />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://trackmaniawebsite.onrender.com; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; frame-src https://player.twitch.tv; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests;" />
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://trackmaniawebsite.onrender.com; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; frame-src https://player.twitch.tv; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; upgrade-insecure-requests;" />
   <meta property="og:title" content="Trackmania Events — Official Site" />
   <meta property="og:description" content="Live Trackmania events, schedule, and stream hub." />
   <meta property="og:type" content="website" />
@@ -1516,7 +1516,7 @@
 
     try {
       if (supabaseConfigured) {
-        tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        tmeSupabase = window.__tmeSupabase = window.__tmeSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           auth: {
             persistSession: true,
             autoRefreshToken: true,
@@ -1525,7 +1525,7 @@
             storageKey: "tme-supabase-auth",
             flowType: "implicit",
           },
-        });
+    });
 
         const AUTO_LOGOUT_MS = 3 * 60 * 60 * 1000;
         const LOGIN_TIME_KEY = "tme_login_started_at";
