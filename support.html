@@ -10,7 +10,7 @@
   <meta name="theme-color" content="#0a0f1a" />
 
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;" />
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;" />
 
   <meta property="og:title" content="Support Trackmania Events" />
   <meta property="og:description"
@@ -303,508 +303,677 @@
         padding: 1.1rem;
       }
     }
+  
 
+/* Unified Trackmania Events header */
+.tme-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(5,7,12,.86);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
 
-    /* Unified Trackmania Events header */
-    .tme-header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(5, 7, 12, .86);
-      border-bottom: 1px solid rgba(255, 255, 255, .07);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-    }
+.tme-header .container.nav{
+  width:min(1220px,92vw);
+  margin:0 auto;
+  padding:.75rem 0;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:1rem;
+}
 
-    .tme-header .container.nav {
-      width: min(1220px, 92vw);
-      margin: 0 auto;
-      padding: .75rem 0;
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 1rem;
-    }
+.tme-header .brand{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  color:#f7faff;
+  font-weight:950;
+  font-size:1.02rem;
+  letter-spacing:-.025em;
+  white-space:nowrap;
+  text-decoration:none;
+}
 
-    .tme-header .brand {
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-      color: #f7faff;
-      font-weight: 950;
-      font-size: 1.02rem;
-      letter-spacing: -.025em;
-      white-space: nowrap;
-      text-decoration: none;
-    }
+.tme-header .brand-badge{
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:none;
+}
 
-    .tme-header .brand-badge {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      background: rgba(255, 255, 255, .045);
-      border: 1px solid rgba(255, 255, 255, .08);
-      box-shadow: none;
-    }
+.tme-header .navlinks{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.45rem;
+  min-width:0;
+}
 
-    .tme-header .navlinks {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: .45rem;
-      min-width: 0;
-    }
+.tme-header .nav-group{
+  position:relative;
+}
 
-    .tme-header .nav-group {
-      position: relative;
-    }
+.tme-header .nav-drop-btn,
+.tme-header .navlinks > a{
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding:.5rem .66rem;
+  border:1px solid transparent;
+  border-radius:12px;
+  background:transparent;
+  color:rgba(243,245,247,.72);
+  font:inherit;
+  font-size:.9rem;
+  font-weight:850;
+  line-height:1;
+  letter-spacing:-.005em;
+  white-space:nowrap;
+  text-decoration:none;
+  opacity:1;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+  box-shadow:none;
+}
 
-    .tme-header .nav-drop-btn,
-    .tme-header .navlinks>a {
-      min-height: 38px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: .35rem;
-      padding: .5rem .66rem;
-      border: 1px solid transparent;
-      border-radius: 12px;
-      background: transparent;
-      color: rgba(243, 245, 247, .72);
-      font: inherit;
-      font-size: .9rem;
-      font-weight: 850;
-      line-height: 1;
-      letter-spacing: -.005em;
-      white-space: nowrap;
-      text-decoration: none;
-      opacity: 1;
-      cursor: pointer;
-      transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
-      box-shadow: none;
-    }
+.tme-header .nav-drop-btn:hover,
+.tme-header .nav-drop-btn:focus,
+.tme-header .navlinks > a:hover,
+.tme-header .navlinks > a:focus,
+.tme-header .nav-drop-btn.active,
+.tme-header .navlinks > a.active{
+  color:#fff;
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.075);
+  transform:none;
+  box-shadow:none;
+}
 
-    .tme-header .nav-drop-btn:hover,
-    .tme-header .nav-drop-btn:focus,
-    .tme-header .navlinks>a:hover,
-    .tme-header .navlinks>a:focus,
-    .tme-header .nav-drop-btn.active,
-    .tme-header .navlinks>a.active {
-      color: #fff;
-      background: rgba(255, 255, 255, .055);
-      border-color: rgba(255, 255, 255, .075);
-      transform: none;
-      box-shadow: none;
-    }
+.tme-header .nav-drop-btn.active,
+.tme-header .navlinks > .nav-support-link.active{
+  background:rgba(255,255,255,.075);
+  border-color:rgba(255,255,255,.11);
+}
 
-    .tme-header .nav-drop-btn.active,
-    .tme-header .navlinks>.nav-support-link.active {
-      background: rgba(255, 255, 255, .075);
-      border-color: rgba(255, 255, 255, .11);
-    }
+.tme-header .navlinks a.active::after,
+.tme-header .nav a.active::after{
+  display:none !important;
+}
 
-    .tme-header .navlinks a.active::after,
-    .tme-header .nav a.active::after {
-      display: none !important;
-    }
+.tme-header .nav-drop-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  left:0;
+  min-width:230px;
+  display:none;
+  flex-direction:column;
+  gap:.25rem;
+  padding:.55rem;
+  border-radius:16px;
+  background:rgba(8,11,18,.98);
+  border:1px solid rgba(255,255,255,.085);
+  box-shadow:0 18px 45px rgba(0,0,0,.42);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  z-index:1001;
+}
 
-    .nav-group {
-      position: relative;
-    }
+.tme-header .nav-group:hover .nav-drop-menu,
+.tme-header .nav-group:focus-within .nav-drop-menu,
+.tme-header .nav-group.open .nav-drop-menu{
+  display:flex;
+}
 
-    .nav-group::after {
-      content: "";
-      position: absolute;
-      left: -12px;
-      right: -12px;
-      top: 100%;
-      height: 18px;
-      background: transparent;
-      pointer-events: auto;
-    }
+.tme-header .nav-drop-menu a{
+  display:flex;
+  align-items:center;
+  min-height:38px;
+  padding:.65rem .72rem;
+  border-radius:12px;
+  color:rgba(243,245,247,.68);
+  text-decoration:none;
+  font-size:.9rem;
+  font-weight:800;
+  white-space:nowrap;
+  transition:background .16s ease,color .16s ease;
+}
 
-    .nav-drop-menu {
-      top: calc(100% + 10px);
-    }
+.tme-header .nav-drop-menu a:hover,
+.tme-header .nav-drop-menu a:focus,
+.tme-header .nav-drop-menu a.active{
+  color:#fff;
+  background:rgba(255,255,255,.06);
+}
 
-    .nav-group:hover .nav-drop-menu,
-    .nav-group:focus-within .nav-drop-menu,
-    .nav-drop-menu:hover {
-      display: flex;
-    }
+.tme-header .nav-support-link{
+  border-color:rgba(255,255,255,.10) !important;
+  background:rgba(255,255,255,.045) !important;
+}
 
-    .tme-header .nav-drop-menu {
-      position: absolute;
-      top: calc(100% + 10px);
-      left: 0;
-      min-width: 230px;
-      display: none;
-      flex-direction: column;
-      gap: .25rem;
-      padding: .55rem;
-      border-radius: 16px;
-      background: rgba(8, 11, 18, .98);
-      border: 1px solid rgba(255, 255, 255, .085);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, .42);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      z-index: 1001;
-    }
+.tme-header .nav-support-link:hover,
+.tme-header .nav-support-link.active{
+  background:rgba(255,255,255,.075) !important;
+  border-color:rgba(255,255,255,.14) !important;
+}
 
-    .tme-header .nav-group:hover .nav-drop-menu,
-    .tme-header .nav-group:focus-within .nav-drop-menu,
-    .tme-header .nav-group.open .nav-drop-menu {
-      display: flex;
-    }
+.tme-header .cta{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:.55rem;
+  position:static;
+  transform:none;
+}
 
-    .tme-header .nav-drop-menu a {
-      display: flex;
-      align-items: center;
-      min-height: 38px;
-      padding: .65rem .72rem;
-      border-radius: 12px;
-      color: rgba(243, 245, 247, .68);
-      text-decoration: none;
-      font-size: .9rem;
-      font-weight: 800;
-      white-space: nowrap;
-      transition: background .16s ease, color .16s ease;
-    }
+.tme-header .btn,
+.tme-header .nav-submit,
+.tme-header .nav-account{
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.4rem;
+  padding:.62rem .9rem;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.085);
+  background:rgba(255,255,255,.045);
+  color:#f3f5f7;
+  font-weight:850;
+  font-size:.9rem;
+  line-height:1;
+  white-space:nowrap;
+  text-decoration:none;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+  box-shadow:none;
+}
 
-    .tme-header .nav-drop-menu a:hover,
-    .tme-header .nav-drop-menu a:focus,
-    .tme-header .nav-drop-menu a.active {
-      color: #fff;
-      background: rgba(255, 255, 255, .06);
-    }
+.tme-header .nav-submit{
+  background:rgba(255,255,255,.075);
+  border-color:rgba(255,255,255,.13);
+}
 
-    .tme-header .nav-support-link {
-      border-color: rgba(255, 255, 255, .10) !important;
-      background: rgba(255, 255, 255, .045) !important;
-    }
+.tme-header .btn:hover,
+.tme-header .nav-submit:hover,
+.tme-header .nav-account:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,255,255,.16);
+  background:rgba(255,255,255,.075);
+  box-shadow:none;
+}
 
-    .tme-header .nav-support-link:hover,
-    .tme-header .nav-support-link.active {
-      background: rgba(255, 255, 255, .075) !important;
-      border-color: rgba(255, 255, 255, .14) !important;
-    }
+.tme-header .nav-mobile-action{
+  display:none;
+}
 
-    .tme-header .cta {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: .55rem;
-      position: static;
-      transform: none;
-    }
+.tme-header .nav-toggle{
+  display:none;
+  min-height:38px;
+  width:42px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:12px;
+  background:rgba(255,255,255,.045);
+  color:#f3f5f7;
+  font-size:1.05rem;
+  font-weight:900;
+  cursor:pointer;
+}
 
-    .tme-header .btn,
-    .tme-header .nav-submit,
-    .tme-header .nav-account {
-      min-height: 40px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: .4rem;
-      padding: .62rem .9rem;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, .085);
-      background: rgba(255, 255, 255, .045);
-      color: #f3f5f7;
-      font-weight: 850;
-      font-size: .9rem;
-      line-height: 1;
-      white-space: nowrap;
-      text-decoration: none;
-      transition: background .16s ease, border-color .16s ease, transform .16s ease;
-      box-shadow: none;
-    }
+@media (max-width:1050px){
+  .tme-header .brand span:last-child{display:none}
+}
 
-    .tme-header .nav-submit {
-      background: rgba(255, 255, 255, .075);
-      border-color: rgba(255, 255, 255, .13);
-    }
+@media (max-width:900px){
+  .tme-header .container.nav{
+    grid-template-columns:auto auto;
+  }
 
-    .tme-header .btn:hover,
-    .tme-header .nav-submit:hover,
-    .tme-header .nav-account:hover {
-      transform: translateY(-1px);
-      border-color: rgba(255, 255, 255, .16);
-      background: rgba(255, 255, 255, .075);
-      box-shadow: none;
-    }
+  .tme-header .brand span:last-child{display:inline}
 
-    .tme-header .nav-mobile-action {
-      display: none;
-    }
+  .tme-header .nav-toggle{
+    display:inline-flex !important;
+    justify-self:end;
+  }
 
-    .tme-header .nav-toggle {
-      display: none;
-      min-height: 38px;
-      width: 42px;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, .09);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, .045);
-      color: #f3f5f7;
-      font-size: 1.05rem;
-      font-weight: 900;
-      cursor: pointer;
-    }
+  .tme-header .cta{
+    display:none !important;
+  }
 
-    @media (max-width:1050px) {
-      .tme-header .brand span:last-child {
-        display: none
-      }
-    }
+  .tme-header .navlinks{
+    display:none;
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    width:100%;
+    padding:.75rem min(4vw,1rem) 1rem;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    background:rgba(5,7,12,.97);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:.45rem;
+    z-index:1000;
+  }
 
-    @media (max-width:900px) {
-      .tme-header .container.nav {
-        grid-template-columns: auto auto;
-      }
+  .tme-header .navlinks.show,
+  .tme-header .navlinks.open{
+    display:flex !important;
+  }
 
-      .tme-header .brand span:last-child {
-        display: inline
-      }
+  .tme-header .nav-group{
+    width:100%;
+  }
 
-      .tme-header .nav-toggle {
-        display: inline-flex !important;
-        justify-self: end;
-      }
+  .tme-header .nav-drop-btn,
+  .tme-header .navlinks > a{
+    width:100%;
+    justify-content:space-between;
+    min-height:44px;
+    padding:.75rem .85rem;
+    background:rgba(255,255,255,.035);
+    border-color:rgba(255,255,255,.06);
+  }
 
-      .tme-header .cta {
-        display: none !important;
-      }
+  .tme-header .nav-drop-menu{
+    position:static;
+    display:none;
+    min-width:0;
+    width:100%;
+    margin:.35rem 0 .15rem;
+    padding:.45rem;
+    box-shadow:none;
+    background:rgba(255,255,255,.03);
+    border-color:rgba(255,255,255,.06);
+  }
 
-      .tme-header .navlinks {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        width: 100%;
-        padding: .75rem min(4vw, 1rem) 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, .07);
-        background: rgba(5, 7, 12, .97);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
-        gap: .45rem;
-        z-index: 1000;
-      }
+  .tme-header .nav-group.open .nav-drop-menu{
+    display:flex;
+  }
 
-      .tme-header .navlinks.show,
-      .tme-header .navlinks.open {
-        display: flex !important;
-      }
+  .tme-header .nav-mobile-action{
+    display:flex;
+  }
+}
 
-      .tme-header .nav-group {
-        width: 100%;
-      }
+@media (max-width:520px){
+  .tme-header .brand span:last-child{
+    max-width:190px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
 
-      .tme-header .nav-drop-btn,
-      .tme-header .navlinks>a {
-        width: 100%;
-        justify-content: space-between;
-        min-height: 44px;
-        padding: .75rem .85rem;
-        background: rgba(255, 255, 255, .035);
-        border-color: rgba(255, 255, 255, .06);
-      }
+.tme-header .auth-user-dropdown{
+  position:relative;
+}
 
-      .tme-header .nav-drop-menu {
-        position: static;
-        display: none;
-        min-width: 0;
-        width: 100%;
-        margin: .35rem 0 .15rem;
-        padding: .45rem;
-        box-shadow: none;
-        background: rgba(255, 255, 255, .03);
-        border-color: rgba(255, 255, 255, .06);
-      }
+.tme-header .auth-user-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.42rem;
+}
 
-      .tme-header .nav-group.open .nav-drop-menu {
-        display: flex;
-      }
+.tme-header .auth-caret{
+  font-size:.78rem;
+  opacity:.72;
+}
 
-      .tme-header .nav-mobile-action {
-        display: flex;
-      }
-    }
+.tme-header .auth-user-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  min-width:220px;
+  display:none;
+  flex-direction:column;
+  gap:.42rem;
+  padding:.68rem;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.085);
+  background:rgba(8,11,18,.98);
+  box-shadow:0 18px 45px rgba(0,0,0,.42);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  z-index:1002;
+}
 
-    @media (max-width:520px) {
-      .tme-header .brand span:last-child {
-        max-width: 190px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
+.tme-header .auth-user-menu.show{
+  display:flex;
+}
 
-    .tme-header .auth-user-dropdown {
-      position: relative;
-    }
+.tme-header .auth-user-info{
+  display:flex;
+  flex-direction:column;
+  gap:.14rem;
+  padding:0 0 .55rem;
+  margin:0 0 .28rem;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
 
-    .tme-header .auth-user-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: .42rem;
-    }
+.tme-header .auth-user-info strong{
+  color:#fff;
+  font-size:.95rem;
+  line-height:1.2;
+}
 
-    .tme-header .auth-caret {
-      font-size: .78rem;
-      opacity: .72;
-    }
+.tme-header .auth-user-info span{
+  color:rgba(243,245,247,.56);
+  font-size:.82rem;
+  overflow-wrap:anywhere;
+}
 
-    .tme-header .auth-user-menu {
-      position: absolute;
-      top: calc(100% + 10px);
-      right: 0;
-      min-width: 220px;
-      display: none;
-      flex-direction: column;
-      gap: .42rem;
-      padding: .68rem;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, .085);
-      background: rgba(8, 11, 18, .98);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, .42);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      z-index: 1002;
-    }
+.tme-header .auth-user-menu button{
+  width:100%;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:.68rem .75rem;
+  border:0;
+  border-radius:12px;
+  background:rgba(255,255,255,.04);
+  color:#f3f5f7;
+  font:inherit;
+  font-size:.9rem;
+  font-weight:800;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:none;
+}
 
-    .tme-header .auth-user-menu.show {
-      display: flex;
-    }
+.tme-header .auth-user-menu button:hover{
+  transform:none;
+  background:rgba(255,255,255,.075);
+  box-shadow:none;
+}
 
-    .tme-header .auth-user-info {
-      display: flex;
-      flex-direction: column;
-      gap: .14rem;
-      padding: 0 0 .55rem;
-      margin: 0 0 .28rem;
-      border-bottom: 1px solid rgba(255, 255, 255, .08);
-    }
-
-    .tme-header .auth-user-info strong {
-      color: #fff;
-      font-size: .95rem;
-      line-height: 1.2;
-    }
-
-    .tme-header .auth-user-info span {
-      color: rgba(243, 245, 247, .56);
-      font-size: .82rem;
-      overflow-wrap: anywhere;
-    }
-
-    .tme-header .auth-user-menu button {
-      width: 100%;
-      min-height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      padding: .68rem .75rem;
-      border: 0;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, .04);
-      color: #f3f5f7;
-      font: inherit;
-      font-size: .9rem;
-      font-weight: 800;
-      text-align: left;
-      cursor: pointer;
-      box-shadow: none;
-    }
-
-    .tme-header .auth-user-menu button:hover {
-      transform: none;
-      background: rgba(255, 255, 255, .075);
-      box-shadow: none;
-    }
-
-    @media (max-width:900px) {
-      .tme-header .auth-user-dropdown {
-        display: none;
-      }
-    }
+@media (max-width:900px){
+  .tme-header .auth-user-dropdown{
+    display:none;
+  }
+}
 
 
 
-    /* Header cleanup v3: plain dropdowns, blue Support pill, no Submit Event on subpages */
-    .tme-header .nav-drop-btn,
-    .tme-header .nav-drop-btn.active {
-      appearance: none !important;
-      background: transparent !important;
-      border-color: transparent !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      color: rgba(243, 245, 247, .72) !important;
-      padding: .5rem .35rem !important;
-      transform: none !important;
-    }
+/* Header cleanup v3: plain dropdowns, blue Support pill, no Submit Event on subpages */
+.tme-header .nav-drop-btn,
+.tme-header .nav-drop-btn.active{
+  appearance:none !important;
+  background:transparent !important;
+  border-color:transparent !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  color:rgba(243,245,247,.72) !important;
+  padding:.5rem .35rem !important;
+  transform:none !important;
+}
 
-    .tme-header .nav-drop-btn:hover,
-    .tme-header .nav-drop-btn:focus,
-    .tme-header .nav-group:hover .nav-drop-btn,
-    .tme-header .nav-group:focus-within .nav-drop-btn {
-      background: transparent !important;
-      border-color: transparent !important;
-      box-shadow: none !important;
-      color: #fff !important;
-      transform: none !important;
-    }
+.tme-header .nav-drop-btn:hover,
+.tme-header .nav-drop-btn:focus,
+.tme-header .nav-group:hover .nav-drop-btn,
+.tme-header .nav-group:focus-within .nav-drop-btn{
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  color:#fff !important;
+  transform:none !important;
+}
 
-    .tme-header .nav-drop-btn span {
-      color: rgba(243, 245, 247, .5) !important;
-    }
+.tme-header .nav-drop-btn span{
+  color:rgba(243,245,247,.5) !important;
+}
 
-    .tme-header .nav-support-link,
-    .tme-header .nav-support-link.active {
-      min-height: 40px !important;
-      padding: .58rem 1rem !important;
-      border-radius: 999px !important;
-      border: 1px solid rgba(104, 240, 255, .42) !important;
-      background: rgba(104, 240, 255, .095) !important;
-      color: #f7fbff !important;
-      font-weight: 950 !important;
-      box-shadow: 0 0 0 1px rgba(104, 240, 255, .035) inset !important;
-    }
+.tme-header .nav-support-link,
+.tme-header .nav-support-link.active{
+  min-height:40px !important;
+  padding:.58rem 1rem !important;
+  border-radius:999px !important;
+  border:1px solid rgba(104,240,255,.42) !important;
+  background:rgba(104,240,255,.095) !important;
+  color:#f7fbff !important;
+  font-weight:950 !important;
+  box-shadow:0 0 0 1px rgba(104,240,255,.035) inset !important;
+}
 
-    .tme-header .nav-support-link:hover,
-    .tme-header .nav-support-link:focus {
-      background: rgba(104, 240, 255, .15) !important;
-      border-color: rgba(104, 240, 255, .62) !important;
-      color: #fff !important;
-      transform: translateY(-1px) !important;
-    }
+.tme-header .nav-support-link:hover,
+.tme-header .nav-support-link:focus{
+  background:rgba(104,240,255,.15) !important;
+  border-color:rgba(104,240,255,.62) !important;
+  color:#fff !important;
+  transform:translateY(-1px) !important;
+}
 
-    @media (max-width:900px) {
+@media (max-width:900px){
+  .tme-header .nav-drop-btn,
+  .tme-header .nav-drop-btn.active{
+    width:100% !important;
+    min-height:44px !important;
+    justify-content:space-between !important;
+    padding:.75rem .85rem !important;
+    border-radius:14px !important;
+    border-color:rgba(255,255,255,.06) !important;
+    background:rgba(255,255,255,.035) !important;
+  }
 
-      .tme-header .nav-drop-btn,
-      .tme-header .nav-drop-btn.active {
-        width: 100% !important;
-        min-height: 44px !important;
-        justify-content: space-between !important;
-        padding: .75rem .85rem !important;
-        border-radius: 14px !important;
-        border-color: rgba(255, 255, 255, .06) !important;
-        background: rgba(255, 255, 255, .035) !important;
-      }
+  .tme-header .nav-support-link,
+  .tme-header .nav-support-link.active{
+    width:100% !important;
+    justify-content:center !important;
+  }
+}
 
-      .tme-header .nav-support-link,
-      .tme-header .nav-support-link.active {
-        width: 100% !important;
-        justify-content: center !important;
-      }
-    }
-  </style>
+
+
+/* Header dropdown hover bridge v4 */
+.tme-header .nav-group,
+.nav-group {
+  position: relative;
+}
+
+@media (min-width: 901px) {
+  .tme-header .nav-group::after,
+  .nav-group::after {
+    content: "";
+    position: absolute;
+    left: -14px;
+    right: -14px;
+    top: 100%;
+    height: 22px;
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    top: calc(100% + 10px);
+  }
+
+  .tme-header .nav-group:hover .nav-drop-menu,
+  .tme-header .nav-group:focus-within .nav-drop-menu,
+  .tme-header .nav-group.open .nav-drop-menu,
+  .tme-header .nav-drop-menu:hover,
+  .nav-group:hover .nav-drop-menu,
+  .nav-group:focus-within .nav-drop-menu,
+  .nav-group.open .nav-drop-menu,
+  .nav-drop-menu:hover {
+    display: flex;
+  }
+}
+
+/* Header cleanup v4: plain dropdown labels, Support is the only blue pill */
+.tme-header .nav-drop-btn,
+.tme-header .nav-drop-btn.active,
+.nav-drop-btn,
+.nav-drop-btn.active {
+  appearance: none !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: rgba(243,245,247,.72) !important;
+  padding: .5rem .35rem !important;
+  transform: none !important;
+}
+
+.tme-header .nav-drop-btn:hover,
+.tme-header .nav-drop-btn:focus,
+.tme-header .nav-group:hover .nav-drop-btn,
+.tme-header .nav-group:focus-within .nav-drop-btn,
+.nav-drop-btn:hover,
+.nav-drop-btn:focus,
+.nav-group:hover .nav-drop-btn,
+.nav-group:focus-within .nav-drop-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  transform: none !important;
+}
+
+.tme-header .nav-support-link,
+.tme-header .nav-support-link.active,
+.nav-support-link,
+.nav-support-link.active {
+  min-height: 40px !important;
+  padding: .58rem 1rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(104,240,255,.42) !important;
+  background: rgba(104,240,255,.095) !important;
+  color: #f7fbff !important;
+  font-weight: 950 !important;
+  box-shadow: 0 0 0 1px rgba(104,240,255,.035) inset !important;
+}
+
+.tme-header .nav-support-link:hover,
+.tme-header .nav-support-link:focus,
+.nav-support-link:hover,
+.nav-support-link:focus {
+  background: rgba(104,240,255,.15) !important;
+  border-color: rgba(104,240,255,.62) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-btn,
+  .tme-header .nav-drop-btn.active,
+  .nav-drop-btn,
+  .nav-drop-btn.active {
+    width: 100% !important;
+    min-height: 44px !important;
+    justify-content: space-between !important;
+    padding: .75rem .85rem !important;
+    border-radius: 14px !important;
+    border-color: rgba(255,255,255,.06) !important;
+    background: rgba(255,255,255,.035) !important;
+  }
+
+  .tme-header .nav-support-link,
+  .tme-header .nav-support-link.active,
+  .nav-support-link,
+  .nav-support-link.active {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+
+
+/* Header dropdown vertical alignment fix v6 */
+.tme-header .nav-drop-menu,
+.nav-drop-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .25rem !important;
+  top: calc(100% + 10px) !important;
+  left: 0 !important;
+  right: auto !important;
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: 280px !important;
+  transform: none !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-drop-menu a,
+.nav-drop-menu a {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-group:hover .nav-drop-menu,
+.tme-header .nav-group:focus-within .nav-drop-menu,
+.tme-header .nav-group.open .nav-drop-menu,
+.nav-group:hover .nav-drop-menu,
+.nav-group:focus-within .nav-drop-menu,
+.nav-group.open .nav-drop-menu {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu,
+.auth-user-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .42rem !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  transform: none !important;
+}
+
+.tme-header .auth-user-menu.show,
+.auth-user-menu.show {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu button,
+.auth-user-menu button {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-top: .35rem !important;
+  }
+
+  .tme-header .auth-user-menu,
+  .auth-user-menu {
+    right: 0 !important;
+    width: min(260px, 86vw) !important;
+    min-width: min(260px, 86vw) !important;
+  }
+}
+</style>
 </head>
 
 <body class="bg-track-curves">
@@ -815,8 +984,7 @@
         <span>Trackmania Events</span>
       </a>
 
-      <button id="navToggle" class="nav-toggle" type="button" aria-expanded="false"
-        aria-controls="primary-nav">☰</button>
+      <button id="navToggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">☰</button>
 
       <nav id="primary-nav" class="navlinks" aria-label="Primary">
         <div class="nav-group">
@@ -847,11 +1015,10 @@
         </div>
 
         <a class="nav-support-link active" href="/support">Support</a>
-        <a class="nav-account nav-mobile-action" href="/account">Account</a>
       </nav>
 
       <div class="cta" id="authArea">
-        <div class="auth-user-dropdown">
+<div class="auth-user-dropdown">
           <button id="authUserBtn" class="btn auth-user-btn" type="button">
             <span id="authUserLabel">Account</span>
             <span class="auth-caret">▾</span>
@@ -891,8 +1058,7 @@
         </p>
 
         <div class="support-actions">
-          <a class="support-primary-btn" href="https://ko-fi.com/trackmaniaevents" target="_blank"
-            rel="noopener noreferrer">
+          <a class="support-primary-btn" href="https://ko-fi.com/trackmaniaevents" target="_blank" rel="noopener noreferrer">
             Support on Ko-fi
           </a>
           <a class="support-secondary-btn" href="/">
@@ -1026,99 +1192,194 @@
     }
   </script>
 
-  <script>
-    (function () {
-      const header = document.querySelector(".tme-header");
-      if (!header) return;
+<script>
+(function () {
+  const header = document.querySelector(".tme-header");
+  if (!header) return;
 
-      const btn = header.querySelector("#navToggle");
-      const nav = header.querySelector("#primary-nav");
+  const btn = header.querySelector("#navToggle");
+  const nav = header.querySelector("#primary-nav");
 
-      function closeGroups(except) {
-        header.querySelectorAll(".nav-group.open").forEach((group) => {
-          if (group !== except) group.classList.remove("open");
-        });
+  function closeGroups(except) {
+    header.querySelectorAll(".nav-group.open").forEach((group) => {
+      if (group !== except) group.classList.remove("open");
+    });
+  }
+
+  header.querySelectorAll(".nav-drop-btn").forEach((dropBtn) => {
+    dropBtn.addEventListener("click", (event) => {
+      if (window.innerWidth > 900) return;
+      event.preventDefault();
+      const group = dropBtn.closest(".nav-group");
+      if (!group) return;
+      const open = !group.classList.contains("open");
+      closeGroups(group);
+      group.classList.toggle("open", open);
+    });
+  });
+
+  if (btn && nav && !btn.dataset.tmeHeaderBound) {
+    btn.dataset.tmeHeaderBound = "1";
+
+    function setOpen(open) {
+      nav.classList.toggle("show", open);
+      nav.classList.toggle("open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) closeGroups();
+    }
+
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(!nav.classList.contains("show") && !nav.classList.contains("open"));
+    });
+
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!header.contains(event.target)) setOpen(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) setOpen(false);
+    });
+  }
+
+  const accountBtn = header.querySelector("#authMenuAccountBtn");
+  const accountMenu = header.querySelector("#authUserMenu");
+  const accountToggle = header.querySelector("#authUserBtn");
+
+  accountToggle?.addEventListener("click", () => {
+    accountMenu?.classList.toggle("show");
+  });
+
+  accountBtn?.addEventListener("click", () => {
+    window.location.href = "/account";
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".auth-user-dropdown")) {
+      accountMenu?.classList.remove("show");
+    }
+  });
+
+  header.querySelector("#authMenuLogoutBtn")?.addEventListener("click", async () => {
+    const sb =
+      window.tmeSupabase ||
+      window.supabase ||
+      (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
+
+    try {
+      if (sb?.auth?.signOut) await sb.auth.signOut();
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    }
+
+    window.location.href = "/";
+  });
+})();
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+  const label = document.getElementById("authUserLabel");
+  const usernameEl = document.getElementById("authMenuUsername");
+  const emailEl = document.getElementById("authMenuEmail");
+  const accountBtn = document.getElementById("authMenuAccountBtn");
+  const logoutBtn = document.getElementById("authMenuLogoutBtn");
+  if (!label || !usernameEl || !emailEl || !accountBtn || !logoutBtn) return;
+
+  function fallbackName(user) {
+    return user?.user_metadata?.username || user?.user_metadata?.name || user?.email?.split("@")[0] || "Account";
+  }
+
+  function setGuest() {
+    label.textContent = "Login / Register";
+    usernameEl.textContent = "Guest";
+    emailEl.textContent = "";
+    accountBtn.textContent = "Login / Register";
+    logoutBtn.style.display = "none";
+  }
+
+  function setUser(name, email) {
+    label.textContent = name || "Account";
+    usernameEl.textContent = name || "Account";
+    emailEl.textContent = email || "";
+    accountBtn.textContent = "Account";
+    logoutBtn.style.display = "";
+  }
+
+  async function syncHeaderAuth() {
+    if (!window.supabase?.createClient) {
+      setGuest();
+      return;
+    }
+
+    const client = window.__tmeHeaderSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+    window.__tmeHeaderSupabase = client;
+
+    try {
+      const { data } = await client.auth.getSession();
+      const user = data?.session?.user || null;
+      if (!user) {
+        setGuest();
+        return;
       }
 
-      header.querySelectorAll(".nav-drop-btn").forEach((dropBtn) => {
-        dropBtn.addEventListener("click", (event) => {
-          if (window.innerWidth > 900) return;
-          event.preventDefault();
-          const group = dropBtn.closest(".nav-group");
-          if (!group) return;
-          const open = !group.classList.contains("open");
-          closeGroups(group);
-          group.classList.toggle("open", open);
-        });
-      });
+      let displayName = fallbackName(user);
+      try {
+        const res = await client
+          .from("profiles")
+          .select("username,email")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!res.error && res.data?.username) displayName = res.data.username;
+      } catch {}
 
-      if (btn && nav && !btn.dataset.tmeHeaderBound) {
-        btn.dataset.tmeHeaderBound = "1";
+      setUser(displayName, user.email || "");
+    } catch (err) {
+      console.warn("Header auth sync failed:", err);
+      setGuest();
+    }
+  }
 
-        function setOpen(open) {
-          nav.classList.toggle("show", open);
-          nav.classList.toggle("open", open);
-          btn.setAttribute("aria-expanded", open ? "true" : "false");
-          if (!open) closeGroups();
-        }
+  accountBtn.addEventListener("click", () => {
+    window.location.href = label.textContent === "Login / Register" ? "/" : "/account";
+  });
 
-        btn.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          setOpen(!nav.classList.contains("show") && !nav.classList.contains("open"));
-        });
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const client = window.__tmeHeaderSupabase;
+      if (client?.auth?.signOut) await client.auth.signOut();
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    }
+    window.location.href = "/";
+  });
 
-        nav.querySelectorAll("a").forEach((link) => {
-          link.addEventListener("click", () => setOpen(false));
-        });
-
-        document.addEventListener("click", (event) => {
-          if (!header.contains(event.target)) setOpen(false);
-        });
-
-        document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") setOpen(false);
-        });
-
-        window.addEventListener("resize", () => {
-          if (window.innerWidth > 900) setOpen(false);
-        });
-      }
-
-      const accountBtn = header.querySelector("#authMenuAccountBtn");
-      const accountMenu = header.querySelector("#authUserMenu");
-      const accountToggle = header.querySelector("#authUserBtn");
-
-      accountToggle?.addEventListener("click", () => {
-        accountMenu?.classList.toggle("show");
-      });
-
-      accountBtn?.addEventListener("click", () => {
-        window.location.href = "/account";
-      });
-
-      document.addEventListener("click", (event) => {
-        if (!event.target.closest(".auth-user-dropdown")) {
-          accountMenu?.classList.remove("show");
-        }
-      });
-
-      header.querySelector("#authMenuLogoutBtn")?.addEventListener("click", async () => {
-        const sb =
-          window.tmeSupabase ||
-          window.supabase ||
-          (typeof tmeSupabase !== "undefined" ? tmeSupabase : null);
-
-        try {
-          if (sb?.auth?.signOut) await sb.auth.signOut();
-        } catch (err) {
-          console.warn("Logout failed:", err);
-        }
-
-        window.location.href = "/";
-      });
-    })();
-  </script>
+  syncHeaderAuth();
+})();
+</script>
 
 </body>
 
