@@ -352,6 +352,98 @@
 
     .paddock-preview-line strong { color: #fff; }
 
+
+    .profile-preview-card {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      gap: .65rem;
+      margin-top: .65rem;
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+
+    .profile-preview-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,.10);
+      opacity: .9;
+    }
+
+    .profile-preview-card.frame-theme-stadium::before { border-color: rgba(83,166,255,.44); box-shadow: inset 0 0 26px rgba(83,166,255,.08); }
+    .profile-preview-card.frame-theme-snow::before { border-color: rgba(200,238,255,.48); box-shadow: inset 0 0 26px rgba(190,230,255,.08); }
+    .profile-preview-card.frame-theme-rally::before { border-color: rgba(120,220,150,.34); box-shadow: inset 0 0 26px rgba(120,220,150,.07); }
+    .profile-preview-card.frame-theme-desert::before { border-color: rgba(255,190,110,.38); box-shadow: inset 0 0 26px rgba(255,190,110,.07); }
+    .profile-preview-card.frame-theme-night::before { border-color: rgba(120,140,255,.38); box-shadow: inset 0 0 26px rgba(120,140,255,.07); }
+    .profile-preview-card.frame-theme-weekly::before,
+    .profile-preview-card.frame-theme-totd::before,
+    .profile-preview-card.frame-theme-wr::before,
+    .profile-preview-card.frame-theme-champion::before { border-color: rgba(245,217,138,.46); box-shadow: inset 0 0 28px rgba(245,217,138,.08); }
+    .profile-preview-card.frame-theme-support::before { border-color: rgba(104,240,255,.48); box-shadow: inset 0 0 28px rgba(104,240,255,.09); }
+    .profile-preview-card.frame-theme-kacky::before { border-color: rgba(190,120,255,.40); box-shadow: inset 0 0 28px rgba(190,120,255,.08); }
+    .profile-preview-card.frame-tier-champion { box-shadow: 0 0 26px rgba(245,217,138,.10), inset 0 0 0 1px rgba(255,255,255,.025); }
+    .profile-preview-card.frame-tier-iconic { box-shadow: 0 0 32px rgba(104,240,255,.13), inset 0 0 0 1px rgba(255,255,255,.04); }
+
+    .preview-nameplate {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 30px;
+      padding: .3rem .68rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.045);
+      color: #fff;
+      font-weight: 950;
+    }
+
+    .preview-nameplate.nameplate-theme-stadium { background: linear-gradient(90deg, rgba(83,166,255,.24), rgba(104,240,255,.10)); border-color: rgba(104,240,255,.22); }
+    .preview-nameplate.nameplate-theme-snow { background: linear-gradient(90deg, rgba(220,245,255,.24), rgba(90,160,255,.10)); border-color: rgba(190,230,255,.26); }
+    .preview-nameplate.nameplate-theme-rally { background: linear-gradient(90deg, rgba(120,220,150,.18), rgba(255,255,255,.06)); border-color: rgba(140,220,160,.20); }
+    .preview-nameplate.nameplate-theme-desert { background: linear-gradient(90deg, rgba(255,185,95,.22), rgba(255,255,255,.06)); border-color: rgba(255,200,120,.22); }
+    .preview-nameplate.nameplate-theme-night { background: linear-gradient(90deg, rgba(90,110,255,.22), rgba(255,255,255,.06)); border-color: rgba(120,140,255,.22); }
+    .preview-nameplate.nameplate-theme-weekly,
+    .preview-nameplate.nameplate-theme-totd,
+    .preview-nameplate.nameplate-theme-wr,
+    .preview-nameplate.nameplate-theme-champion { background: linear-gradient(90deg, rgba(245,217,138,.24), rgba(255,255,255,.06)); border-color: rgba(245,217,138,.28); }
+    .preview-nameplate.nameplate-theme-support { background: linear-gradient(90deg, rgba(104,240,255,.22), rgba(83,166,255,.10)); border-color: rgba(104,240,255,.26); }
+    .preview-nameplate.nameplate-theme-kacky { background: linear-gradient(90deg, rgba(190,120,255,.22), rgba(255,255,255,.06)); border-color: rgba(190,120,255,.24); }
+
+    .profile-preview-card .preview-meta,
+    .profile-preview-card .preview-stickers {
+      position: relative;
+      z-index: 1;
+      color: var(--account-soft);
+      line-height: 1.45;
+    }
+
+    .preview-stickers {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .35rem;
+    }
+
+    .preview-sticker-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+      padding: .25rem .5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      font-weight: 850;
+      font-size: .82rem;
+    }
+
     .badge-choice-list,
     .collection-grid,
     .loadout-grid {
@@ -2089,6 +2181,23 @@ header .auth-user-menu button:hover {
       return findOwnedItemById(getSelectValue(id));
     }
 
+    function cleanCssToken(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "default";
+    }
+
+    function previewFrameClasses(frame) {
+      if (!frame) return "";
+      return `frame-tier-${cleanCssToken(frame.tier)} frame-theme-${cleanCssToken(frame.theme)} frame-item-${cleanCssToken(frame.item_key)}`;
+    }
+
+    function previewNameplateClasses(nameplate) {
+      if (!nameplate) return "";
+      return `nameplate-tier-${cleanCssToken(nameplate.tier)} nameplate-theme-${cleanCssToken(nameplate.theme)} nameplate-item-${cleanCssToken(nameplate.item_key)}`;
+    }
+
     function updatePaddockPreview() {
       const username = currentProfile?.username || getUsernameFromUser(currentUser);
       const visibleBadges = BADGE_ORDER.filter(isBadgeVisible).map(getBadgeText);
@@ -2109,17 +2218,25 @@ header .auth-user-menu button:hover {
         $("shoutboxPreview").innerHTML = `<strong>Shoutbox:</strong> ${escapeHtml(shoutboxParts.join(" · "))}<br><span style="color:var(--account-muted)">message here...</span>`;
       }
 
-      const profileLines = [
-        `<strong>${escapeHtml(username)}</strong>`,
-        visibleBadges.length ? escapeHtml(visibleBadges.join(" · ")) : "No visible badges selected",
-        title ? `Title: ${escapeHtml(itemDisplayName(title))}` : "Title: None",
-        frame ? `Frame: ${escapeHtml(frame.name)}` : "Frame: None",
-        nameplate ? `Nameplate: ${escapeHtml(nameplate.name)}` : "Nameplate: None",
-        stickers.length ? `Stickers: ${escapeHtml(stickers.map((item) => item.icon || item.name).join(" "))}` : "Stickers: None",
-      ];
+      const stickerHtml = stickers.length
+        ? `<div class="preview-stickers">${stickers.map((item) => `
+            <span class="preview-sticker-chip" title="${escapeHtml(item.name || "Sticker")}">
+              ${escapeHtml(item.icon || "✨")} ${escapeHtml(item.name || "Sticker")}
+            </span>
+          `).join("")}</div>`
+        : `<div class="preview-meta">Stickers: None</div>`;
 
       if ($("profilePreview")) {
-        $("profilePreview").innerHTML = `<strong>Profile:</strong><br>${profileLines.join("<br>")}`;
+        $("profilePreview").innerHTML = `
+          <strong>Profile Preview:</strong>
+          <div class="profile-preview-card ${escapeHtml(previewFrameClasses(frame))}">
+            <div class="preview-nameplate ${escapeHtml(previewNameplateClasses(nameplate))}">${escapeHtml(username)}</div>
+            <div class="preview-meta">${visibleBadges.length ? escapeHtml(visibleBadges.join(" · ")) : "No visible badges selected"}</div>
+            <div class="preview-meta">${title ? `Title: ${escapeHtml(itemDisplayName(title))}` : "Title: None"}</div>
+            <div class="preview-meta">${frame ? `Frame: ${escapeHtml(frame.name)} is active on your profile/shoutbox cards.` : "Frame: None"}</div>
+            <div class="preview-meta">${nameplate ? `Nameplate: ${escapeHtml(nameplate.name)} is active behind your username.` : "Nameplate: None"}</div>
+            ${stickerHtml}
+          </div>`;
       }
     }
 
