@@ -502,6 +502,18 @@
     .shout-badge-label.supporter { color: #68f0ff; }
     .shout-badge-label.organizer { color: #d7dbe2; }
     .shout-badge-label.highlight { color: #d7dbe2; }
+    .shout-badge-label.flair { color: #68f0ff; }
+    .shout-badge-label.title { color: #f0e6b0; }
+    .shout-badge-label.cosmetic {
+      border: 1px solid rgba(255, 255, 255, .10);
+      background: rgba(255, 255, 255, .035);
+      border-radius: 999px;
+      padding: .13rem .38rem;
+      margin-left: .08rem;
+    }
+    .shout-badge-label.cosmetic::before {
+      margin-left: -.1rem;
+    }
 
     @media (max-width: 560px) {
       .shout-badge-line { font-size: .76rem; gap: .25rem; }
@@ -543,6 +555,7 @@
           <button class="nav-drop-btn" type="button" aria-haspopup="true">Community <span>▾</span></button>
           <div class="nav-drop-menu">
             <a href="/highlights">Community Highlights</a>
+            <a href="/prize-runs">Prize Runs</a>
             <a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noopener noreferrer">Discord</a>
             <a href="#contact">Contact</a>
           </div>
@@ -1070,6 +1083,7 @@
     const shoutRolesByUserId = {};
     const shoutBadgeProfilesByUserId = {};
     const shoutBadgesByUserId = {};
+    const shoutCosmeticsByUserId = {};
     let weeklyBadgeStatePromise = null;
     const supabaseConfigured =
       typeof window.supabase !== "undefined" &&
@@ -3403,6 +3417,73 @@
       return { eventUsers, highlightUsers };
     }
 
+    async function loadPublicBadgeVisibility(userIds) {
+      if (!tmeSupabase) return {};
+      const uniqueIds = normalizeUuidList(userIds);
+      if (!uniqueIds.length) return {};
+
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_public_visible_badges", {
+          user_ids_input: uniqueIds,
+        });
+
+        if (error) throw error;
+
+        const out = {};
+        for (const row of data || []) {
+          if (!row.user_id || !row.badge_key) continue;
+          if (!out[row.user_id]) out[row.user_id] = {};
+          out[row.user_id][row.badge_key] = {
+            is_visible: row.is_visible !== false,
+            display_order: Number(row.display_order || 0),
+          };
+        }
+        return out;
+      } catch (err) {
+        console.warn("Visible badge preference RPC unavailable:", err);
+        return {};
+      }
+    }
+
+    async function loadPublicPrizeLoadouts(userIds) {
+      if (!tmeSupabase) return {};
+      const uniqueIds = normalizeUuidList(userIds);
+      if (!uniqueIds.length) return {};
+
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_public_prize_loadouts", {
+          user_ids_input: uniqueIds,
+        });
+
+        if (error) throw error;
+
+        const out = {};
+        for (const row of data || []) {
+          if (!row.user_id) continue;
+          out[row.user_id] = {
+            flair: row.flair_item_id ? {
+              key: "flair",
+              icon: row.flair_icon || "💬",
+              label: row.flair_name || "Flair",
+              item_key: row.flair_item_key || "",
+              tier: row.flair_tier || "",
+            } : null,
+            title: row.title_item_id ? {
+              key: "title",
+              icon: row.title_icon || "🏷️",
+              label: row.title_name || "Title",
+              item_key: row.title_item_key || "",
+              tier: row.title_tier || "",
+            } : null,
+          };
+        }
+        return out;
+      } catch (err) {
+        console.warn("Prize loadout RPC unavailable:", err);
+        return {};
+      }
+    }
+
     async function getWeeklyBadgeState() {
       if (weeklyBadgeStatePromise) return weeklyBadgeStatePromise;
 
@@ -3431,17 +3512,40 @@
       return weeklyBadgeStatePromise;
     }
 
+    function visibleBadgeSort(a, b) {
+      const aOrder = Number(a.display_order || 0);
+      const bOrder = Number(b.display_order || 0);
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return Number(a.default_order || 0) - Number(b.default_order || 0);
+    }
+
+    function filterVisibleEarnedBadges(userId, earnedBadges, visiblePrefsByUser) {
+      const prefs = visiblePrefsByUser?.[userId] || {};
+      return earnedBadges
+        .map((badge) => ({
+          ...badge,
+          is_visible: prefs[badge.badge_key]?.is_visible !== false,
+          display_order: Number(prefs[badge.badge_key]?.display_order ?? badge.default_order ?? 0),
+        }))
+        .filter((badge) => badge.is_visible)
+        .sort(visibleBadgeSort)
+        .slice(0, 2);
+    }
+
     async function prepareShoutboxBadges(userIds) {
       const uniqueIds = normalizeUuidList(userIds);
       if (!uniqueIds.length) return;
 
-      const [profilesByUser, contributions, weeklyState] = await Promise.all([
+      const [profilesByUser, contributions, weeklyState, visiblePrefsByUser, prizeLoadoutsByUser] = await Promise.all([
         loadShoutboxBadgeProfiles(uniqueIds),
         loadPublicContributionBadges(uniqueIds),
         getWeeklyBadgeState(),
+        loadPublicBadgeVisibility(uniqueIds),
+        loadPublicPrizeLoadouts(uniqueIds),
       ]);
 
       Object.assign(shoutBadgeProfilesByUserId, profilesByUser);
+      Object.assign(shoutCosmeticsByUserId, prizeLoadoutsByUser);
 
       for (const userId of uniqueIds) {
         const profile = shoutBadgeProfilesByUserId[userId] || {};
@@ -3449,25 +3553,36 @@
         const tmAccountId = profile.trackmania_account_id || "";
         const weeklyWins = Number(weeklyState.winsByAccountId?.[tmAccountId] || 0);
         const isWeeklyChampion = weeklyWins > 0 && weeklyWins === Number(weeklyState.maxWins || 0);
-        const badges = [];
+        const earnedBadges = [];
 
-        if (role === "admin") badges.push({ key: "admin", icon: "🛡️", label: "Admin" });
-        if (isWeeklyChampion) badges.push({ key: "champion", icon: "👑", label: "Weekly Champion" });
-        else if (weeklyWins > 0) badges.push({ key: "winner", icon: "🏆", label: "Weekly Winner" });
+        if (role === "admin") earnedBadges.push({ badge_key: "admin", key: "admin", icon: "🛡️", label: "Admin", default_order: 10 });
+        if (isWeeklyChampion) earnedBadges.push({ badge_key: "weekly_champion", key: "champion", icon: "👑", label: "Weekly Champion", default_order: 20 });
+        else if (weeklyWins > 0) earnedBadges.push({ badge_key: "weekly_winner", key: "winner", icon: "🏆", label: "Weekly Winner", default_order: 30 });
 
         if (profile.supporter_status === "supporter" && profile.show_supporter_badge !== false) {
-          badges.push({ key: "supporter", icon: "💙", label: "Supporter" });
+          earnedBadges.push({ badge_key: "supporter", key: "supporter", icon: "💙", label: "Supporter", default_order: 40 });
         }
 
-        if (contributions.eventUsers.has(userId)) badges.push({ key: "organizer", icon: "📅", label: "Event Organizer" });
-        if (contributions.highlightUsers.has(userId)) badges.push({ key: "highlight", icon: "🎬", label: "Highlight Contributor" });
+        if (contributions.eventUsers.has(userId)) earnedBadges.push({ badge_key: "event_organizer", key: "organizer", icon: "📅", label: "Event Organizer", default_order: 50 });
+        if (contributions.highlightUsers.has(userId)) earnedBadges.push({ badge_key: "highlight_contributor", key: "highlight", icon: "🎬", label: "Highlight Contributor", default_order: 60 });
 
-        shoutBadgesByUserId[userId] = badges;
+        shoutBadgesByUserId[userId] = filterVisibleEarnedBadges(userId, earnedBadges, visiblePrefsByUser);
       }
     }
 
     function renderShoutBadges(userId) {
-      const badges = shoutBadgesByUserId[userId] || [];
+      const verifiedBadges = shoutBadgesByUserId[userId] || [];
+      const loadout = shoutCosmeticsByUserId[userId] || {};
+      const cosmetics = [loadout.flair, loadout.title].filter(Boolean).slice(0, 2);
+      const badges = [
+        ...verifiedBadges,
+        ...cosmetics.map((item) => ({
+          key: `${item.key} cosmetic`,
+          icon: item.icon,
+          label: item.label,
+        })),
+      ];
+
       if (!badges.length) return "";
 
       return `<span class="shout-badge-line">${badges.map((badge) => `
