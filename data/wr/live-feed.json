@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T21:12:22.094Z",
+  "generatedAt": "2026-06-28T22:14:52.211Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|ikNBc5qFA79CplzZm3sZcsmA8tk|cfc2a828-5573-429d-8455-a0b81967dd4b|48923baa-d04c-49e2-9743-aa8759d58fb5|44241|43837|2026-06-28T22:14:52.211Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-06-28T22:14:52.211Z",
+      "at": "2026-06-28T22:14:52.211Z",
+      "mapUid": "ikNBc5qFA79CplzZm3sZcsmA8tk",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "cfc2a828-5573-429d-8455-a0b81967dd4b",
+      "oldHolder": "scheepsjongen",
+      "oldTimeMs": 44241,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:44.241",
+      "oldScoreKey": "44241",
+      "newHolderAccountId": "48923baa-d04c-49e2-9743-aa8759d58fb5",
+      "newHolder": "Hokkanuilu",
+      "newTimeMs": 43837,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:43.837",
+      "newScoreKey": "43837",
+      "text": "Hokkanuilu overtook scheepsjongen on Unknown map with 00:00:43.837."
+    },
     {
       "id": "wr_changed|Y4ZeU_dRzThgTPP0kRNNC4wk3Fl|9f932e81-277c-4cb5-9c97-dd9b2d7b4d3d|4749ff87-438d-4d1e-9608-ad57a6db8163|9695|9602|2026-06-28T21:12:22.094Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.788",
       "newScoreKey": "6788",
       "text": "yuppp._. overtook personal.worst on Unknown map with 00:00:06.788."
-    },
-    {
-      "id": "wr_changed|TQJiNp27cF85cugQUunY3uvunke|71a490be-d5aa-46f1-9019-9893fb7be156|449bc7de-08de-4a90-8a31-3eb77af79b44|8958|7657|2026-06-20T16:00:07.251Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-20T16:00:07.251Z",
-      "at": "2026-06-20T16:00:07.251Z",
-      "mapUid": "TQJiNp27cF85cugQUunY3uvunke",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "71a490be-d5aa-46f1-9019-9893fb7be156",
-      "oldHolder": "x.3viE.x",
-      "oldTimeMs": 8958,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.958",
-      "oldScoreKey": "8958",
-      "newHolderAccountId": "449bc7de-08de-4a90-8a31-3eb77af79b44",
-      "newHolder": "NotToBlame",
-      "newTimeMs": 7657,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.657",
-      "newScoreKey": "7657",
-      "text": "NotToBlame overtook x.3viE.x on Unknown map with 00:00:07.657."
     }
   ]
 }
