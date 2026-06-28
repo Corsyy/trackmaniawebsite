@@ -404,6 +404,190 @@ main{padding-top:2rem}
   }
 }
 
+
+
+/* Shared account dropdown */
+.tme-header .auth-user-dropdown,
+header .auth-user-dropdown {
+  position: relative;
+}
+
+.tme-header .auth-user-btn,
+header .auth-user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 40px;
+  padding: .62rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.045);
+  color: var(--text, #f3f5f7);
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tme-header .auth-user-btn:hover,
+header .auth-user-btn:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.16);
+}
+
+.tme-header .auth-caret,
+header .auth-caret {
+  font-size: .78rem;
+  opacity: .82;
+}
+
+.tme-header .auth-user-menu,
+header .auth-user-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 230px;
+  display: none;
+  flex-direction: column;
+  gap: .45rem;
+  padding: .7rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(10,16,28,.98);
+  box-shadow: 0 18px 45px rgba(0,0,0,.42);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  z-index: 99999;
+}
+
+.tme-header .auth-user-menu.show,
+header .auth-user-menu.show {
+  display: flex;
+}
+
+.tme-header .auth-user-info,
+header .auth-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding-bottom: .55rem;
+  margin-bottom: .35rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.tme-header .auth-user-info strong,
+header .auth-user-info strong {
+  color: #fff;
+  font-size: .95rem;
+}
+
+.tme-header .auth-user-info span,
+header .auth-user-info span {
+  color: rgba(255,255,255,.6);
+  font-size: .82rem;
+  word-break: break-word;
+}
+
+.tme-header .auth-user-menu button,
+header .auth-user-menu button {
+  border: 0;
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  color: #fff;
+  padding: .75rem .85rem;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 800;
+  transition: .18s ease;
+}
+
+.tme-header .auth-user-menu button:hover,
+header .auth-user-menu button:hover {
+  background: rgba(255,255,255,.08);
+}
+
+
+/* Header dropdown vertical alignment fix v6 */
+.tme-header .nav-drop-menu,
+.nav-drop-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .25rem !important;
+  top: calc(100% + 10px) !important;
+  left: 0 !important;
+  right: auto !important;
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: 280px !important;
+  transform: none !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-drop-menu a,
+.nav-drop-menu a {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-group:hover .nav-drop-menu,
+.tme-header .nav-group:focus-within .nav-drop-menu,
+.tme-header .nav-group.open .nav-drop-menu,
+.nav-group:hover .nav-drop-menu,
+.nav-group:focus-within .nav-drop-menu,
+.nav-group.open .nav-drop-menu {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu,
+.auth-user-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .42rem !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  transform: none !important;
+}
+
+.tme-header .auth-user-menu.show,
+.auth-user-menu.show {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu button,
+.auth-user-menu button {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-top: .35rem !important;
+  }
+
+  .tme-header .auth-user-menu,
+  .auth-user-menu {
+    right: 0 !important;
+    width: min(260px, 86vw) !important;
+    min-width: min(260px, 86vw) !important;
+  }
+}
 </style>
 </head>
 
@@ -447,11 +631,25 @@ main{padding-top:2rem}
         </div>
 
         <a class="nav-support-link" href="/support">Support</a>
-        <a class="nav-account nav-mobile-action" href="/account">Account</a>
       </nav>
 
-      <div class="cta">
-        <a class="nav-account" href="/account">Account</a>
+      <div class="cta" id="authArea">
+        <div class="auth-user-dropdown">
+          <button id="authUserBtn" class="btn auth-user-btn" type="button">
+            <span id="authUserLabel">Login / Register</span>
+            <span class="auth-caret">▾</span>
+          </button>
+
+          <div id="authUserMenu" class="auth-user-menu">
+            <div class="auth-user-info">
+              <strong id="authMenuUsername">Guest</strong>
+              <span id="authMenuEmail"></span>
+            </div>
+
+            <button id="authMenuAccountBtn" type="button">Account</button>
+            <button id="authMenuLogoutBtn" type="button">Logout</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -600,5 +798,125 @@ document.getElementById("updated").textContent = new Date().toLocaleDateString(u
   day:"numeric"
 });
 </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+  const label = document.getElementById("authUserLabel");
+  const usernameEl = document.getElementById("authMenuUsername");
+  const emailEl = document.getElementById("authMenuEmail");
+  const accountBtn = document.getElementById("authMenuAccountBtn");
+  const logoutBtn = document.getElementById("authMenuLogoutBtn");
+  if (!label || !usernameEl || !emailEl || !accountBtn || !logoutBtn) return;
+
+  function fallbackName(user) {
+    return user?.user_metadata?.username || user?.user_metadata?.name || user?.email?.split("@")[0] || "Account";
+  }
+
+  function setGuest() {
+    label.textContent = "Login / Register";
+    usernameEl.textContent = "Guest";
+    emailEl.textContent = "";
+    accountBtn.textContent = "Login / Register";
+    logoutBtn.style.display = "none";
+  }
+
+  function setUser(name, email) {
+    label.textContent = name || "Account";
+    usernameEl.textContent = name || "Account";
+    emailEl.textContent = email || "";
+    accountBtn.textContent = "Account";
+    logoutBtn.style.display = "";
+  }
+
+  async function syncHeaderAuth() {
+    if (!window.supabase?.createClient) {
+      setGuest();
+      return;
+    }
+
+    const client = window.__tmeHeaderSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+    window.__tmeHeaderSupabase = client;
+
+    try {
+      const { data } = await client.auth.getSession();
+      const user = data?.session?.user || null;
+      if (!user) {
+        setGuest();
+        return;
+      }
+
+      let displayName = fallbackName(user);
+      try {
+        const res = await client
+          .from("profiles")
+          .select("username,email")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!res.error && res.data?.username) displayName = res.data.username;
+      } catch {}
+
+      setUser(displayName, user.email || "");
+    } catch (err) {
+      console.warn("Header auth sync failed:", err);
+      setGuest();
+    }
+  }
+
+  accountBtn.addEventListener("click", () => {
+    window.location.href = label.textContent === "Login / Register" ? "/" : "/account";
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const client = window.__tmeHeaderSupabase;
+      if (client?.auth?.signOut) await client.auth.signOut();
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    }
+    window.location.href = "/";
+  });
+
+  syncHeaderAuth();
+})();
+</script>
+
+
+<script>
+(function () {
+  const wrap = document.querySelector(".auth-user-dropdown");
+  const btn = document.getElementById("authUserBtn");
+  const menu = document.getElementById("authUserMenu");
+  if (!wrap || !btn || !menu || btn.dataset.tmeAuthToggleBound) return;
+  btn.dataset.tmeAuthToggleBound = "1";
+
+  btn.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    menu.classList.toggle("show");
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!wrap.contains(event.target)) menu.classList.remove("show");
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") menu.classList.remove("show");
+  });
+})();
+</script>
+
 </body>
 </html>
