@@ -752,6 +752,192 @@
   opacity: .92 !important;
 }
 
+
+/* ============================================================
+   Professional cosmetic pass v7
+   Purpose: every cosmetic remains visible/functional, but the UI
+   reads more like a polished chat/profile system and less like a
+   row of generated badges.
+   ============================================================ */
+
+/* Compact, readable message bubbles */
+.shout-msg {
+  margin: .42rem 0 !important;
+  padding: .58rem .74rem .56rem !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.026) !important;
+  box-shadow: none !important;
+}
+
+.shout-msg.has-frame {
+  border-left-width: 3px !important;
+  background: linear-gradient(90deg, rgba(255,255,255,.035), rgba(255,255,255,.021) 42%, rgba(255,255,255,.016)) !important;
+}
+
+/* Frame = bubble atmosphere, not a loud badge */
+.shout-msg.frame-theme-stadium { border-left-color: rgba(83,166,255,.58) !important; background: linear-gradient(90deg, rgba(83,166,255,.055), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-snow { border-left-color: rgba(200,242,255,.60) !important; background: linear-gradient(90deg, rgba(200,242,255,.052), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-rally { border-left-color: rgba(118,220,150,.56) !important; background: linear-gradient(90deg, rgba(118,220,150,.047), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-desert { border-left-color: rgba(255,189,114,.58) !important; background: linear-gradient(90deg, rgba(255,189,114,.050), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-night { border-left-color: rgba(124,140,255,.56) !important; background: linear-gradient(90deg, rgba(124,140,255,.050), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-wr { border-left-color: rgba(255,95,104,.58) !important; background: linear-gradient(90deg, rgba(255,95,104,.048), rgba(255,255,255,.021) 38%, rgba(245,217,138,.010)) !important; }
+.shout-msg.frame-theme-champion { border-left-color: rgba(245,217,138,.62) !important; background: linear-gradient(90deg, rgba(245,217,138,.055), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-weekly,
+.shout-msg.frame-theme-totd,
+.shout-msg.frame-theme-support { border-left-color: rgba(104,240,255,.58) !important; background: linear-gradient(90deg, rgba(104,240,255,.048), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-kacky { border-left-color: rgba(190,120,255,.58) !important; background: linear-gradient(90deg, rgba(190,120,255,.050), rgba(255,255,255,.021) 38%, rgba(255,200,80,.008)) !important; }
+.shout-msg.frame-theme-community { border-left-color: rgba(123,231,211,.58) !important; background: linear-gradient(90deg, rgba(123,231,211,.047), rgba(255,255,255,.021) 38%, rgba(255,255,255,.014)) !important; }
+.shout-msg.frame-theme-special { border-left-color: rgba(104,240,255,.62) !important; background: linear-gradient(90deg, rgba(104,240,255,.052), rgba(255,255,255,.021) 38%, rgba(245,217,138,.010)) !important; }
+
+.shout-msg.frame-tier-apex,
+.shout-msg.frame-tier-champion,
+.shout-msg.frame-tier-iconic {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.018) !important;
+}
+
+.shout-msg.frame-tier-champion { border-color: rgba(245,217,138,.13) !important; }
+.shout-msg.frame-tier-iconic { border-color: rgba(104,240,255,.14) !important; }
+
+/* Header line: username first, cosmetics second, no chunky generated-looking pills */
+.shout-meta {
+  margin-bottom: .18rem !important;
+}
+
+.shout-identity {
+  gap: .18rem .30rem !important;
+}
+
+.shout-name {
+  font-size: .84rem !important;
+  font-weight: 950 !important;
+  letter-spacing: -.01em !important;
+  color: #f8fbff !important;
+}
+
+/* Nameplate = subtle underline/identity accent, not a full button */
+.shout-name.has-nameplate {
+  padding: 0 .08rem .09rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  position: relative !important;
+}
+
+.shout-name.has-nameplate::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.22);
+  opacity: .9;
+}
+
+.shout-name.nameplate-theme-stadium::after { background: linear-gradient(90deg, rgba(83,166,255,.72), rgba(104,240,255,.28)); }
+.shout-name.nameplate-theme-snow::after { background: linear-gradient(90deg, rgba(224,248,255,.82), rgba(90,160,255,.30)); }
+.shout-name.nameplate-theme-rally::after { background: linear-gradient(90deg, rgba(118,220,150,.72), rgba(170,128,74,.26)); }
+.shout-name.nameplate-theme-desert::after { background: linear-gradient(90deg, rgba(255,189,114,.78), rgba(255,220,155,.28)); }
+.shout-name.nameplate-theme-night::after { background: linear-gradient(90deg, rgba(124,140,255,.72), rgba(180,190,255,.24)); }
+.shout-name.nameplate-theme-wr::after { background: linear-gradient(90deg, rgba(255,95,104,.74), rgba(245,217,138,.28)); }
+.shout-name.nameplate-theme-champion::after { background: linear-gradient(90deg, rgba(245,217,138,.88), rgba(255,255,255,.28)); }
+.shout-name.nameplate-theme-weekly::after,
+.shout-name.nameplate-theme-totd::after,
+.shout-name.nameplate-theme-support::after { background: linear-gradient(90deg, rgba(104,240,255,.78), rgba(83,166,255,.26)); }
+.shout-name.nameplate-theme-kacky::after { background: linear-gradient(90deg, rgba(190,120,255,.78), rgba(255,200,80,.22)); }
+.shout-name.nameplate-theme-community::after { background: linear-gradient(90deg, rgba(123,231,211,.74), rgba(104,240,255,.24)); }
+
+/* Verified badges stay official and restrained */
+.shout-badge-line {
+  gap: .14rem .26rem !important;
+}
+
+.shout-badge-label {
+  min-height: 18px !important;
+  font-size: .75rem !important;
+  font-weight: 850 !important;
+  color: rgba(235,240,250,.70) !important;
+}
+
+.shout-badge-label::before {
+  color: rgba(235,240,250,.32) !important;
+}
+
+.shout-badge-label.admin,
+.shout-badge-label.champion { color: rgba(245,217,138,.95) !important; }
+.shout-badge-label.winner { color: rgba(240,230,176,.88) !important; }
+.shout-badge-label.supporter { color: rgba(104,240,255,.90) !important; }
+.shout-badge-label.organizer,
+.shout-badge-label.highlight { color: rgba(215,219,226,.82) !important; }
+
+/* Flair/title cosmetics remain visible, but as clean inline text accents */
+.shout-badge-label.cosmetic {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-weight: 850 !important;
+  color: rgba(220,226,237,.76) !important;
+}
+
+.shout-badge-label.cosmetic.theme-stadium { color: rgba(184,215,255,.92) !important; }
+.shout-badge-label.cosmetic.theme-snow { color: rgba(232,250,255,.92) !important; }
+.shout-badge-label.cosmetic.theme-rally { color: rgba(194,238,205,.92) !important; }
+.shout-badge-label.cosmetic.theme-desert { color: rgba(255,222,184,.92) !important; }
+.shout-badge-label.cosmetic.theme-night { color: rgba(211,217,255,.92) !important; }
+.shout-badge-label.cosmetic.theme-wr { color: rgba(255,205,209,.92) !important; }
+.shout-badge-label.cosmetic.theme-champion { color: rgba(255,239,190,.94) !important; }
+.shout-badge-label.cosmetic.theme-weekly,
+.shout-badge-label.cosmetic.theme-totd,
+.shout-badge-label.cosmetic.theme-support { color: rgba(214,251,255,.92) !important; }
+.shout-badge-label.cosmetic.theme-kacky { color: rgba(235,213,255,.92) !important; }
+.shout-badge-label.cosmetic.theme-community { color: rgba(212,252,244,.92) !important; }
+
+/* Stickers: present but tucked in, like a small signature */
+.shout-stickers {
+  margin-left: .12rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  font-size: .74rem !important;
+  opacity: .80 !important;
+  gap: .14rem !important;
+}
+
+.shout-text {
+  margin-top: .16rem !important;
+  font-size: .90rem !important;
+  line-height: 1.36 !important;
+  color: rgba(248,250,255,.94) !important;
+}
+
+.shout-reactions,
+.reaction-row {
+  margin-top: .22rem !important;
+}
+
+.shout-reaction,
+.reaction-btn {
+  min-height: 22px !important;
+  padding: .14rem .32rem !important;
+}
+
+/* Theme matching: do not add more visual noise; just slightly refine border tone */
+.shout-msg.theme-set-active {
+  outline: 0 !important;
+}
+
+@media (max-width: 560px) {
+  .shout-msg { padding: .54rem .62rem !important; }
+  .shout-name { font-size: .82rem !important; }
+  .shout-badge-label { font-size: .72rem !important; }
+  .shout-text { font-size: .88rem !important; }
+}
+
 </style>
 
 </head>
