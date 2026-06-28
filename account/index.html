@@ -330,6 +330,162 @@
     }
   
 
+    /* Prize Runs / Paddock account sections */
+    .paddock-preview {
+      display: grid;
+      gap: .75rem;
+      padding: .9rem;
+      border-radius: 18px;
+      border: 1px solid rgba(104, 240, 255, .12);
+      background: linear-gradient(180deg, rgba(104, 240, 255, .055), rgba(255, 255, 255, .022));
+    }
+
+    .paddock-preview-line {
+      padding: .78rem .85rem;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, .16);
+      border: 1px solid rgba(255, 255, 255, .065);
+      color: var(--account-soft);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .paddock-preview-line strong { color: #fff; }
+
+    .badge-choice-list,
+    .collection-grid,
+    .loadout-grid {
+      display: grid;
+      gap: .65rem;
+    }
+
+    .badge-choice {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .8rem;
+      padding: .78rem .85rem;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, .025);
+      border: 1px solid rgba(255, 255, 255, .055);
+    }
+
+    .badge-choice strong {
+      display: block;
+      color: var(--account-text);
+      font-size: .92rem;
+    }
+
+    .badge-choice span {
+      display: block;
+      color: var(--account-muted);
+      font-size: .82rem;
+      line-height: 1.35;
+      margin-top: .16rem;
+    }
+
+    .badge-choice input {
+      width: 20px;
+      height: 20px;
+      accent-color: #68f0ff;
+      flex: 0 0 auto;
+    }
+
+    .loadout-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .loadout-grid .account-field select {
+      width: 100%;
+    }
+
+    .collection-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .collection-box {
+      min-height: 96px;
+      padding: .9rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .025);
+      border: 1px solid rgba(255, 255, 255, .055);
+    }
+
+    .collection-box span {
+      display: block;
+      color: var(--account-muted);
+      font-size: .74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .collection-box strong {
+      display: block;
+      margin-top: .38rem;
+      color: var(--account-text);
+      font-size: 1.4rem;
+      letter-spacing: -.03em;
+    }
+
+    .collection-box small {
+      display: block;
+      margin-top: .35rem;
+      color: var(--account-muted);
+      line-height: 1.35;
+    }
+
+    .inventory-list {
+      display: grid;
+      gap: .55rem;
+      max-height: 360px;
+      overflow: auto;
+      padding-right: .25rem;
+    }
+
+    .inventory-item {
+      display: flex;
+      justify-content: space-between;
+      gap: .7rem;
+      padding: .72rem .78rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .022);
+      border: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    .inventory-item strong {
+      color: var(--account-text);
+      overflow-wrap: anywhere;
+    }
+
+    .inventory-item span,
+    .inventory-item small {
+      color: var(--account-muted);
+      font-size: .82rem;
+    }
+
+    .tier-chip {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: .26rem .5rem;
+      border-radius: 999px;
+      background: rgba(104, 240, 255, .08);
+      border: 1px solid rgba(104, 240, 255, .16);
+      color: #effcff;
+      font-size: .7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .045em;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      .loadout-grid,
+      .collection-grid { grid-template-columns: 1fr; }
+    }
+
+
 /* Unified Trackmania Events header */
 .tme-header{
   position:sticky;
@@ -890,6 +1046,7 @@ header .auth-user-menu button:hover {
           <button class="nav-drop-btn" type="button">Community <span>▾</span></button>
           <div class="nav-drop-menu">
             <a href="/highlights">Community Highlights</a>
+            <a href="/prize-runs">Prize Runs</a>
             <a href="/#contact">Contact</a>
             <a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noopener noreferrer">Discord</a>
           </div>
@@ -1055,6 +1212,93 @@ header .auth-user-menu button:hover {
               </div>
             </article>
 
+
+
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>Badge Display</strong>
+                  <span>Choose which earned site badges should show beside your name.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div id="badgeChoiceList" class="badge-choice-list">
+                  <div class="empty-state">Loading earned badges…</div>
+                </div>
+
+                <div class="account-actions">
+                  <button id="saveBadgesBtn" class="btn primary" type="button">Save Badge Display</button>
+                  <span id="badgesStatus" class="account-status" aria-live="polite"></span>
+                </div>
+              </div>
+            </article>
+
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>Prize Run Loadout</strong>
+                  <span>Equip cosmetics you unlock from Prize Runs. These are separate from verified badges.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div id="prizeStatusBox" class="empty-state" style="margin-bottom:.85rem">Loading Prize Run status…</div>
+
+                <div class="paddock-preview" style="margin-bottom:.95rem">
+                  <div class="paddock-preview-line" id="shoutboxPreview">
+                    <strong>Preview:</strong> Loading…
+                  </div>
+                  <div class="paddock-preview-line" id="profilePreview">
+                    <strong>Profile:</strong> Loading…
+                  </div>
+                </div>
+
+                <div class="loadout-grid">
+                  <div class="account-field">
+                    <label for="loadoutFlair">Shoutbox flair</label>
+                    <select id="loadoutFlair" class="input"></select>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="loadoutTitle">Profile title</label>
+                    <select id="loadoutTitle" class="input"></select>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="loadoutFrame">Profile frame</label>
+                    <select id="loadoutFrame" class="input"></select>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="loadoutNameplate">Nameplate</label>
+                    <select id="loadoutNameplate" class="input"></select>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="loadoutSticker1">Sticker 1</label>
+                    <select id="loadoutSticker1" class="input"></select>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="loadoutSticker2">Sticker 2</label>
+                    <select id="loadoutSticker2" class="input"></select>
+                  </div>
+
+                  <div class="account-field">
+                    <label for="loadoutSticker3">Sticker 3</label>
+                    <select id="loadoutSticker3" class="input"></select>
+                  </div>
+                </div>
+
+                <div class="account-actions">
+                  <button id="saveLoadoutBtn" class="btn primary" type="button">Save Loadout</button>
+                  <a class="btn" href="/prize-runs">Open Prize Runs</a>
+                  <span id="loadoutStatus" class="account-status" aria-live="polite"></span>
+                </div>
+              </div>
+            </article>
+
             <article class="account-card">
               <div class="account-card-head">
                 <div>
@@ -1100,6 +1344,30 @@ header .auth-user-menu button:hover {
                   <div class="source-breakdown" id="sourceBreakdown"></div>
                   <div style="height:.85rem"></div>
                   <div class="empty-state" id="statsDetails">Loading linked stats…</div>
+                </div>
+              </div>
+            </article>
+
+
+
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>My Paddock Collection</strong>
+                  <span>Your unlocked Prize Run cosmetics and collectibles.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div id="collectionSummary" class="collection-grid" style="margin-bottom:.9rem">
+                  <div class="collection-box"><span>Total Items</span><strong id="collectionTotal">0</strong><small>Unlocked rewards</small></div>
+                  <div class="collection-box"><span>Duplicates</span><strong id="collectionDuplicates">0</strong><small>Extra copies found</small></div>
+                  <div class="collection-box"><span>Extra Tickets</span><strong id="collectionTickets">0</strong><small>Runs available after daily</small></div>
+                  <div class="collection-box"><span>Daily Run</span><strong id="collectionDaily">—</strong><small>Free run status</small></div>
+                </div>
+
+                <div id="inventoryList" class="inventory-list">
+                  <div class="empty-state">Loading your collection…</div>
                 </div>
               </div>
             </article>
@@ -1220,6 +1488,13 @@ header .auth-user-menu button:hover {
     let currentUser = null;
     let currentProfile = null;
     let cachedStatsData = null;
+    let approvedEventSubmissionCount = 0;
+    let approvedHighlightCount = 0;
+    let earnedBadgeState = {};
+    let visibleBadgeState = {};
+    let prizeInventory = [];
+    let prizeLoadout = null;
+    let prizeStatus = null;
 
     function escapeHtml(value) {
       const div = document.createElement("div");
@@ -1452,6 +1727,7 @@ header .auth-user-menu button:hover {
         const pending = rows.filter((r) => String(r.status || "").toLowerCase() === "pending").length;
         const approved = rows.filter((r) => String(r.status || "").toLowerCase() === "approved").length;
         const rejected = rows.filter((r) => String(r.status || "").toLowerCase() === "rejected").length;
+        approvedEventSubmissionCount = approved;
         $("subPending").textContent = pending.toLocaleString();
         $("subApproved").textContent = approved.toLocaleString();
         $("subRejected").textContent = rejected.toLocaleString();
@@ -1480,6 +1756,386 @@ header .auth-user-menu button:hover {
         console.warn("Could not load event submissions:", err);
         list.innerHTML = `<div class="empty-state">Could not load your event submissions: ${escapeHtml(err.message || "Unknown error")}</div>`;
       }
+    }
+
+
+    const VERIFIED_BADGE_DEFS = {
+      admin: { icon: "🛡️", label: "Admin", help: "Admin role on Trackmania Events." },
+      weekly_champion: { icon: "👑", label: "Weekly Champion", help: "Most Weekly Shorts wins among linked players." },
+      weekly_winner: { icon: "🏆", label: "Weekly Winner", help: "Linked Trackmania account has at least 1 Weekly Shorts win." },
+      supporter: { icon: "💙", label: "Supporter", help: "Supporter status is enabled on your profile." },
+      event_organizer: { icon: "📅", label: "Event Organizer", help: "At least 1 approved event submission." },
+      highlight_contributor: { icon: "🎬", label: "Highlight Contributor", help: "At least 1 approved community highlight." },
+    };
+
+    const BADGE_ORDER = ["admin", "weekly_champion", "weekly_winner", "supporter", "event_organizer", "highlight_contributor"];
+
+    function getBadgeText(key) {
+      const def = VERIFIED_BADGE_DEFS[key];
+      return def ? `${def.icon} ${def.label}` : key;
+    }
+
+    function prettyTier(tier) {
+      const s = String(tier || "").replace(/_/g, " ").trim();
+      return s ? s.charAt(0).toUpperCase() + s.slice(1) : "Standard";
+    }
+
+    function prettyCategory(category) {
+      const s = String(category || "").replace(/_/g, " ").trim();
+      return s ? s.charAt(0).toUpperCase() + s.slice(1) : "Item";
+    }
+
+    function getInventoryItem(row) {
+      return row?.item || row?.prize_items || row?.prize_item || null;
+    }
+
+    function itemDisplayName(item) {
+      if (!item) return "None";
+      return `${item.icon ? `${item.icon} ` : ""}${item.name || "Unnamed item"}`;
+    }
+
+    function findOwnedItemById(itemId) {
+      if (!itemId) return null;
+      return prizeInventory.map(getInventoryItem).find((item) => item?.id === itemId) || null;
+    }
+
+    function getSelectValue(id) {
+      const el = $(id);
+      return el && el.value ? el.value : null;
+    }
+
+    async function countApprovedHighlights(userId) {
+      const attempts = [
+        { table: "highlights", userColumn: "user_id" },
+        { table: "community_highlights", userColumn: "user_id" },
+        { table: "highlights", userColumn: "created_by" },
+        { table: "community_highlights", userColumn: "created_by" },
+      ];
+
+      for (const attempt of attempts) {
+        try {
+          const { count, error } = await tmeSupabase
+            .from(attempt.table)
+            .select("id", { count: "exact", head: true })
+            .eq(attempt.userColumn, userId)
+            .eq("status", "approved");
+          if (!error) return Number(count || 0);
+        } catch {}
+      }
+      return 0;
+    }
+
+    async function calculateEarnedBadges() {
+      const earned = {};
+      const role = String(currentProfile?.role || "user").toLowerCase();
+      if (role === "admin") earned.admin = true;
+
+      if (String(currentProfile?.supporter_status || "").toLowerCase() === "supporter" && currentProfile?.show_supporter_badge !== false) {
+        earned.supporter = true;
+      }
+
+      if (approvedEventSubmissionCount > 0) earned.event_organizer = true;
+
+      approvedHighlightCount = await countApprovedHighlights(currentUser.id);
+      if (approvedHighlightCount > 0) earned.highlight_contributor = true;
+
+      const accountId = currentProfile?.trackmania_account_id || "";
+      if (accountId) {
+        try {
+          const data = await loadStatsData(accountId);
+          const players = Array.isArray(data.weeklyAggregate?.players) ? data.weeklyAggregate.players : [];
+          const weekly = findPlayerByAccountId(players, accountId);
+          const wins = Number(weekly?.wins || 0);
+          const maxWins = players.reduce((max, player) => Math.max(max, Number(player?.wins || 0)), 0);
+          if (wins > 0) earned.weekly_winner = true;
+          if (wins > 0 && wins === maxWins) earned.weekly_champion = true;
+        } catch (err) {
+          console.warn("Could not calculate weekly badges:", err);
+        }
+      }
+
+      earnedBadgeState = earned;
+      return earned;
+    }
+
+    async function loadVisibleBadgePrefs() {
+      try {
+        const { data, error } = await tmeSupabase
+          .from("user_visible_badges")
+          .select("badge_key,is_visible,display_order")
+          .eq("user_id", currentUser.id);
+        if (error) throw error;
+        visibleBadgeState = {};
+        for (const row of data || []) visibleBadgeState[row.badge_key] = row.is_visible !== false;
+      } catch (err) {
+        console.warn("Could not load visible badge preferences:", err);
+        visibleBadgeState = {};
+      }
+    }
+
+    function isBadgeVisible(key) {
+      if (!earnedBadgeState[key]) return false;
+      return visibleBadgeState[key] !== false;
+    }
+
+    function renderBadgeChoices() {
+      const wrap = $("badgeChoiceList");
+      if (!wrap) return;
+      const earnedKeys = BADGE_ORDER.filter((key) => earnedBadgeState[key]);
+      if (!earnedKeys.length) {
+        wrap.innerHTML = `<div class="empty-state">You do not have any earned site badges yet. Badges unlock from roles, approved events, approved highlights, supporter status, and Weekly Shorts stats.</div>`;
+        updatePaddockPreview();
+        return;
+      }
+
+      wrap.innerHTML = earnedKeys.map((key) => {
+        const def = VERIFIED_BADGE_DEFS[key];
+        const checked = isBadgeVisible(key) ? "checked" : "";
+        return `
+          <label class="badge-choice">
+            <div>
+              <strong>${escapeHtml(def.icon)} ${escapeHtml(def.label)}</strong>
+              <span>${escapeHtml(def.help)}</span>
+            </div>
+            <input type="checkbox" class="badge-visibility-input" data-badge-key="${escapeHtml(key)}" ${checked}>
+          </label>
+        `;
+      }).join("");
+
+      wrap.querySelectorAll(".badge-visibility-input").forEach((input) => {
+        input.addEventListener("change", () => {
+          visibleBadgeState[input.dataset.badgeKey] = input.checked;
+          updatePaddockPreview();
+        });
+      });
+      updatePaddockPreview();
+    }
+
+    async function saveVisibleBadges() {
+      if (!currentUser) return;
+      setStatus("badgesStatus", "Saving…");
+      const earnedKeys = BADGE_ORDER.filter((key) => earnedBadgeState[key]);
+      const rows = earnedKeys.map((key, index) => ({
+        user_id: currentUser.id,
+        badge_key: key,
+        is_visible: Boolean(visibleBadgeState[key] !== false),
+        display_order: index,
+        updated_at: new Date().toISOString(),
+      }));
+
+      if (!rows.length) {
+        setStatus("badgesStatus", "No earned badges to save.");
+        return;
+      }
+
+      const { error } = await tmeSupabase
+        .from("user_visible_badges")
+        .upsert(rows, { onConflict: "user_id,badge_key" });
+
+      if (error) {
+        setStatus("badgesStatus", error.message || "Could not save badge display.", "error");
+        return;
+      }
+
+      setStatus("badgesStatus", "Badge display saved.", "success");
+      updatePaddockPreview();
+    }
+
+    async function loadPrizeInventory() {
+      try {
+        const { data, error } = await tmeSupabase
+          .from("user_prize_inventory")
+          .select("id,duplicate_count,obtained_at,source,item:prize_items(id,item_key,name,category,tier,icon,description,theme)")
+          .eq("user_id", currentUser.id)
+          .order("obtained_at", { ascending: false });
+        if (error) throw error;
+        prizeInventory = Array.isArray(data) ? data : [];
+      } catch (err) {
+        console.warn("Could not load prize inventory:", err);
+        prizeInventory = [];
+      }
+    }
+
+    async function loadPrizeLoadout() {
+      try {
+        const { data, error } = await tmeSupabase
+          .from("user_prize_loadouts")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+        if (error) throw error;
+        prizeLoadout = data || null;
+      } catch (err) {
+        console.warn("Could not load prize loadout:", err);
+        prizeLoadout = null;
+      }
+    }
+
+    async function loadPrizeStatus() {
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_my_prize_status");
+        if (error) throw error;
+        prizeStatus = Array.isArray(data) ? data[0] : data;
+      } catch (err) {
+        console.warn("Could not load prize status:", err);
+        prizeStatus = null;
+      }
+    }
+
+    function fillPrizeSelect(id, category, selectedId) {
+      const el = $(id);
+      if (!el) return;
+      const items = prizeInventory
+        .map(getInventoryItem)
+        .filter((item) => item?.category === category)
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+
+      el.innerHTML = `<option value="">None</option>` + items.map((item) => `
+        <option value="${escapeHtml(item.id)}" ${item.id === selectedId ? "selected" : ""}>
+          ${escapeHtml(itemDisplayName(item))} — ${escapeHtml(prettyTier(item.tier))}
+        </option>
+      `).join("");
+
+      el.addEventListener("change", updatePaddockPreview, { once: true });
+      el.addEventListener("change", updatePaddockPreview);
+    }
+
+    function renderPrizeLoadout() {
+      fillPrizeSelect("loadoutFlair", "flair", prizeLoadout?.equipped_flair_item_id || "");
+      fillPrizeSelect("loadoutTitle", "title", prizeLoadout?.equipped_title_item_id || "");
+      fillPrizeSelect("loadoutFrame", "frame", prizeLoadout?.equipped_frame_item_id || "");
+      fillPrizeSelect("loadoutNameplate", "nameplate", prizeLoadout?.equipped_nameplate_item_id || "");
+      fillPrizeSelect("loadoutSticker1", "sticker", prizeLoadout?.equipped_sticker_1_item_id || "");
+      fillPrizeSelect("loadoutSticker2", "sticker", prizeLoadout?.equipped_sticker_2_item_id || "");
+      fillPrizeSelect("loadoutSticker3", "sticker", prizeLoadout?.equipped_sticker_3_item_id || "");
+      updatePaddockPreview();
+    }
+
+    function renderPrizeStatus() {
+      const box = $("prizeStatusBox");
+      if (!box) return;
+      const freeUsed = Boolean(prizeStatus?.free_run_used_today);
+      const tickets = Number(prizeStatus?.extra_tickets || 0);
+      box.innerHTML = `
+        <strong style="display:block;color:#f3f5f7;margin-bottom:.25rem">Prize Runs</strong>
+        Daily free run: <b>${freeUsed ? "Used today" : "Available"}</b> • Extra tickets: <b>${tickets.toLocaleString()}</b>
+      `;
+      if ($("collectionTickets")) $("collectionTickets").textContent = tickets.toLocaleString();
+      if ($("collectionDaily")) $("collectionDaily").textContent = freeUsed ? "Used" : "Ready";
+    }
+
+    function renderPrizeCollection() {
+      const list = $("inventoryList");
+      if (!list) return;
+
+      const duplicates = prizeInventory.reduce((sum, row) => sum + Number(row?.duplicate_count || 0), 0);
+      if ($("collectionTotal")) $("collectionTotal").textContent = prizeInventory.length.toLocaleString();
+      if ($("collectionDuplicates")) $("collectionDuplicates").textContent = duplicates.toLocaleString();
+
+      if (!prizeInventory.length) {
+        list.innerHTML = `<div class="empty-state">No Prize Run items unlocked yet. Once the Prize Runs page is added, your unlocked items will appear here.</div>`;
+        return;
+      }
+
+      list.innerHTML = prizeInventory.slice(0, 80).map((row) => {
+        const item = getInventoryItem(row);
+        if (!item) return "";
+        const dupes = Number(row.duplicate_count || 0);
+        return `
+          <div class="inventory-item">
+            <div>
+              <strong>${escapeHtml(itemDisplayName(item))}</strong>
+              <span>${escapeHtml(prettyCategory(item.category))} • ${escapeHtml(item.description || "Prize Run item")}</span>
+            </div>
+            <div style="display:grid;justify-items:end;gap:.28rem">
+              <span class="tier-chip">${escapeHtml(prettyTier(item.tier))}</span>
+              ${dupes > 0 ? `<small>+${dupes} duplicate${dupes === 1 ? "" : "s"}</small>` : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function savePrizeLoadout() {
+      if (!currentUser) return;
+      const stickers = [getSelectValue("loadoutSticker1"), getSelectValue("loadoutSticker2"), getSelectValue("loadoutSticker3")].filter(Boolean);
+      if (new Set(stickers).size !== stickers.length) {
+        setStatus("loadoutStatus", "You cannot equip the same sticker more than once.", "error");
+        return;
+      }
+
+      setStatus("loadoutStatus", "Saving…");
+      const { data, error } = await tmeSupabase.rpc("save_prize_loadout", {
+        p_flair_item_id: getSelectValue("loadoutFlair"),
+        p_title_item_id: getSelectValue("loadoutTitle"),
+        p_frame_item_id: getSelectValue("loadoutFrame"),
+        p_nameplate_item_id: getSelectValue("loadoutNameplate"),
+        p_sticker_1_item_id: getSelectValue("loadoutSticker1"),
+        p_sticker_2_item_id: getSelectValue("loadoutSticker2"),
+        p_sticker_3_item_id: getSelectValue("loadoutSticker3"),
+      });
+
+      if (error) {
+        setStatus("loadoutStatus", error.message || "Could not save loadout.", "error");
+        return;
+      }
+
+      prizeLoadout = data;
+      setStatus("loadoutStatus", "Loadout saved.", "success");
+      updatePaddockPreview();
+    }
+
+    function selectedItemFromSelect(id) {
+      return findOwnedItemById(getSelectValue(id));
+    }
+
+    function updatePaddockPreview() {
+      const username = currentProfile?.username || getUsernameFromUser(currentUser);
+      const visibleBadges = BADGE_ORDER.filter(isBadgeVisible).map(getBadgeText);
+      const flair = selectedItemFromSelect("loadoutFlair") || findOwnedItemById(prizeLoadout?.equipped_flair_item_id);
+      const title = selectedItemFromSelect("loadoutTitle") || findOwnedItemById(prizeLoadout?.equipped_title_item_id);
+      const frame = selectedItemFromSelect("loadoutFrame") || findOwnedItemById(prizeLoadout?.equipped_frame_item_id);
+      const nameplate = selectedItemFromSelect("loadoutNameplate") || findOwnedItemById(prizeLoadout?.equipped_nameplate_item_id);
+      const stickers = [
+        selectedItemFromSelect("loadoutSticker1") || findOwnedItemById(prizeLoadout?.equipped_sticker_1_item_id),
+        selectedItemFromSelect("loadoutSticker2") || findOwnedItemById(prizeLoadout?.equipped_sticker_2_item_id),
+        selectedItemFromSelect("loadoutSticker3") || findOwnedItemById(prizeLoadout?.equipped_sticker_3_item_id),
+      ].filter(Boolean);
+
+      const shoutboxParts = [username, ...visibleBadges];
+      if (flair) shoutboxParts.push(`💬 ${flair.name}`);
+
+      if ($("shoutboxPreview")) {
+        $("shoutboxPreview").innerHTML = `<strong>Shoutbox:</strong> ${escapeHtml(shoutboxParts.join(" · "))}<br><span style="color:var(--account-muted)">message here...</span>`;
+      }
+
+      const profileLines = [
+        `<strong>${escapeHtml(username)}</strong>`,
+        visibleBadges.length ? escapeHtml(visibleBadges.join(" · ")) : "No visible badges selected",
+        title ? `Title: ${escapeHtml(itemDisplayName(title))}` : "Title: None",
+        frame ? `Frame: ${escapeHtml(frame.name)}` : "Frame: None",
+        nameplate ? `Nameplate: ${escapeHtml(nameplate.name)}` : "Nameplate: None",
+        stickers.length ? `Stickers: ${escapeHtml(stickers.map((item) => item.icon || item.name).join(" "))}` : "Stickers: None",
+      ];
+
+      if ($("profilePreview")) {
+        $("profilePreview").innerHTML = `<strong>Profile:</strong><br>${profileLines.join("<br>")}`;
+      }
+    }
+
+    async function loadPrizeAccountSystems() {
+      await calculateEarnedBadges();
+      await Promise.all([
+        loadVisibleBadgePrefs(),
+        loadPrizeInventory(),
+        loadPrizeLoadout(),
+        loadPrizeStatus(),
+      ]);
+      renderBadgeChoices();
+      renderPrizeLoadout();
+      renderPrizeStatus();
+      renderPrizeCollection();
+      updatePaddockPreview();
     }
 
     async function savePreferences() {
@@ -1576,6 +2232,8 @@ header .auth-user-menu button:hover {
         toTop.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
       }
       $("savePrefsBtn").addEventListener("click", savePreferences);
+      if ($("saveBadgesBtn")) $("saveBadgesBtn").addEventListener("click", saveVisibleBadges);
+      if ($("saveLoadoutBtn")) $("saveLoadoutBtn").addEventListener("click", savePrizeLoadout);
       $("saveTmBtn").addEventListener("click", saveTrackmaniaAccount);
       $("clearTmBtn").addEventListener("click", clearTrackmaniaAccount);
       $("resetPasswordBtn").addEventListener("click", sendPasswordReset);
@@ -1597,6 +2255,7 @@ header .auth-user-menu button:hover {
           loadSubmissions(currentUser.id),
           renderStatsForAccount(currentProfile?.trackmania_account_id || ""),
         ]);
+        await loadPrizeAccountSystems();
       } catch (err) {
         console.warn("Account page failed:", err);
         $("accountLocked").classList.add("show");
