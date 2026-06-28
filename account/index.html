@@ -1101,6 +1101,228 @@ header .auth-user-menu button:hover {
     min-width: min(260px, 86vw) !important;
   }
 }
+
+/* Account dashboard redesign v8 */
+.account-dashboard {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.account-profile-panel {
+  position: sticky;
+  top: 86px;
+}
+
+.account-profile-card {
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.085);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(104,240,255,.10), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.022));
+  box-shadow: 0 18px 42px rgba(0,0,0,.28);
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.account-profile-top {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding-bottom: .9rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.account-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.09);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+}
+
+.account-mini-label {
+  display: block;
+  color: var(--account-muted);
+  font-size: .72rem;
+  font-weight: 950;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  margin-bottom: .18rem;
+}
+
+.account-profile-top strong {
+  display: block;
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.account-profile-top small {
+  display: block;
+  margin-top: .22rem;
+  color: var(--account-muted);
+  font-size: .82rem;
+  overflow-wrap: anywhere;
+}
+
+.account-profile-preview {
+  margin-top: .95rem;
+}
+
+.account-quick-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .55rem;
+  margin-top: .95rem;
+}
+
+.account-quick-grid > div,
+.account-side-status {
+  padding: .72rem .78rem;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,.065);
+  background: rgba(0,0,0,.15);
+}
+
+.account-quick-grid span {
+  display: block;
+  color: var(--account-muted);
+  font-size: .72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .065em;
+}
+
+.account-quick-grid strong {
+  display: block;
+  margin-top: .22rem;
+  color: var(--account-text);
+  font-size: 1rem;
+}
+
+.account-side-status {
+  margin-top: .7rem;
+  color: var(--account-muted);
+  line-height: 1.45;
+}
+
+.account-side-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .55rem;
+  margin-top: .85rem;
+}
+
+.account-workspace {
+  min-width: 0;
+}
+
+.account-tabs {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: .45rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.075);
+  background: rgba(255,255,255,.028);
+}
+
+.account-tab {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .55rem .82rem;
+  border-radius: 13px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(243,245,247,.66);
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background .16s ease, border-color .16s ease, color .16s ease;
+}
+
+.account-tab:hover,
+.account-tab:focus {
+  color: #fff;
+  background: rgba(255,255,255,.045);
+}
+
+.account-tab.active {
+  color: #fff;
+  border-color: rgba(104,240,255,.24);
+  background: rgba(104,240,255,.085);
+}
+
+.account-tab-panels {
+  min-width: 0;
+}
+
+.account-tab-panel {
+  display: none;
+  gap: 1rem;
+}
+
+.account-tab-panel.active {
+  display: grid;
+}
+
+.account-tab-panel > .account-card + .account-card {
+  margin-top: 1rem;
+}
+
+.account-profile-card .profile-preview-card {
+  margin-top: 0;
+}
+
+.account-profile-card .profile-preview-card .preview-nameplate {
+  max-width: 100%;
+}
+
+@media (max-width: 980px) {
+  .account-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .account-profile-panel {
+    position: static;
+  }
+
+  .account-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    scrollbar-width: thin;
+  }
+
+  .account-tab {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .account-profile-card,
+  .account-card-body {
+    padding: .9rem;
+  }
+
+  .account-tabs {
+    margin-left: -.2rem;
+    margin-right: -.2rem;
+  }
+}
+
 </style>
 </head>
 
@@ -1195,296 +1417,347 @@ header .auth-user-menu button:hover {
       </div>
 
       <div id="accountAuthed" class="account-authed">
-        <div class="account-grid">
-          <div class="account-stack">
-            <article class="account-card">
-              <div class="account-card-head">
+        <div class="account-dashboard">
+          <aside class="account-profile-panel">
+            <div class="account-profile-card">
+              <div class="account-profile-top">
+                <span class="account-avatar" aria-hidden="true">🏁</span>
                 <div>
-                  <strong>Account Overview</strong>
-                  <span>Your basic Trackmania Events account details.</span>
+                  <span class="account-mini-label">Signed in as</span>
+                  <strong id="profileUsername">Loading…</strong>
+                  <small id="profileEmail">Loading…</small>
                 </div>
               </div>
 
-              <div class="account-card-body">
-                <div class="account-info-list">
-                  <div class="account-info-row">
-                    <span>Username</span>
-                    <strong id="profileUsername">Loading…</strong>
-                  </div>
-
-                  <div class="account-info-row">
-                    <span>Email</span>
-                    <strong id="profileEmail">Loading…</strong>
-                  </div>
-
-                  <div class="account-info-row">
-                    <span>Role</span>
-                    <strong><span id="profileRole" class="account-pill">User</span></strong>
-                  </div>
-                </div>
+              <div id="profilePreview" class="account-profile-preview">
+                <div class="empty-state">Loading profile preview…</div>
               </div>
-            </article>
 
-            <article class="account-card">
-              <div class="account-card-head">
+              <div class="account-quick-grid">
                 <div>
-                  <strong>Trackmania Profile</strong>
-                  <span>Link your Trackmania account ID to show your site stats.</span>
+                  <span>Role</span>
+                  <strong><span id="profileRole" class="account-pill">User</span></strong>
                 </div>
-              </div>
-
-              <div class="account-card-body">
-                <div class="linked-player">
-                  <div>
-                    <strong id="linkedTmName">No Trackmania account linked</strong>
-                    <span id="linkedTmId">Paste your Trackmania account ID below.</span>
-                  </div>
-                  <span id="tmLinkedStatus" class="status-badge">Not linked</span>
-                </div>
-
-                <div class="account-form-grid">
-                  <div class="account-field">
-                    <label for="tmAccountIdInput">Trackmania account ID</label>
-                    <input id="tmAccountIdInput" class="input" type="text"
-                      placeholder="Example: 7682d76f-3e07-4bd3-a2f7-76bbd194423a" autocomplete="off">
-                    <div class="help">
-                      Use the Trackmania account ID, not just the display name. Display names can change, account IDs are stable.
-                    </div>
-                  </div>
-
-                  <div class="account-field">
-                    <label for="tmDisplayNameInput">Display name</label>
-                    <input id="tmDisplayNameInput" class="input" type="text" placeholder="Optional display name"
-                      maxlength="60" autocomplete="off">
-                    <div class="help">
-                      This will auto-fill if the account ID is found in your public site data.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="account-actions">
-                  <button id="saveTmBtn" class="btn primary" type="button">Save Trackmania Account</button>
-                  <button id="clearTmBtn" class="btn" type="button">Unlink</button>
-                  <span id="tmStatus" class="account-status" aria-live="polite"></span>
-                </div>
-              </div>
-            </article>
-
-            <article class="account-card">
-              <div class="account-card-head">
                 <div>
-                  <strong>Preferences</strong>
-                  <span>Simple profile and shoutbox settings.</span>
+                  <span>Prize Tickets</span>
+                  <strong id="collectionTickets">0</strong>
+                </div>
+                <div>
+                  <span>Daily Run</span>
+                  <strong id="collectionDaily">—</strong>
                 </div>
               </div>
 
-              <div class="account-card-body">
-                <div class="account-form-grid">
-                  <label class="account-toggle-row">
+              <div id="prizeStatusBox" class="account-side-status">Loading Prize Run status…</div>
+
+              <div class="account-side-actions">
+                <a class="btn primary" href="/prize-runs">Start Prize Run</a>
+                <a class="btn" href="/">Back Home</a>
+              </div>
+            </div>
+          </aside>
+
+          <section class="account-workspace">
+            <div class="account-tabs" role="tablist" aria-label="Account sections">
+              <button class="account-tab active" type="button" data-account-tab="profile">Profile</button>
+              <button class="account-tab" type="button" data-account-tab="style">Badges & Style</button>
+              <button class="account-tab" type="button" data-account-tab="paddock">Paddock</button>
+              <button class="account-tab" type="button" data-account-tab="stats">Stats</button>
+              <button class="account-tab" type="button" data-account-tab="submissions">Submissions</button>
+              <button class="account-tab" type="button" data-account-tab="settings">Settings</button>
+            </div>
+
+            <div class="account-tab-panels">
+              <section class="account-tab-panel active" data-account-panel="profile">
+                <article class="account-card">
+                  <div class="account-card-head">
                     <div>
-                      <strong>Shoutbox mention sound</strong>
-                      <span>Allow mention/ping sounds while using the site.</span>
+                      <strong>Profile Summary</strong>
+                      <span>Your public account basics and linked Trackmania account.</span>
                     </div>
-                    <input id="prefSound" type="checkbox">
-                  </label>
+                  </div>
 
-                  <label class="account-toggle-row">
+                  <div class="account-card-body">
+                    <div class="account-info-list">
+                      <div class="account-info-row">
+                        <span>Username</span>
+                        <strong id="profileUsernameMirror">Loading…</strong>
+                      </div>
+
+                      <div class="account-info-row">
+                        <span>Email</span>
+                        <strong id="profileEmailMirror">Loading…</strong>
+                      </div>
+
+                      <div class="account-info-row">
+                        <span>Trackmania</span>
+                        <strong id="profileTmSummary">Not linked</strong>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="account-card">
+                  <div class="account-card-head">
                     <div>
-                      <strong>Display supporter badge</strong>
-                      <span>Show a supporter badge if your account is eligible later.</span>
+                      <strong>Trackmania Profile</strong>
+                      <span>Link your Trackmania account ID to show site stats and Weekly badges.</span>
                     </div>
-                    <input id="prefBadge" type="checkbox">
-                  </label>
-                </div>
-
-                <div class="account-actions">
-                  <button id="savePrefsBtn" class="btn primary" type="button">Save Preferences</button>
-                  <span id="prefsStatus" class="account-status" aria-live="polite"></span>
-                </div>
-              </div>
-            </article>
-
-
-
-            <article class="account-card">
-              <div class="account-card-head">
-                <div>
-                  <strong>Badge Display</strong>
-                  <span>Choose which earned site badges should show beside your name.</span>
-                </div>
-              </div>
-
-              <div class="account-card-body">
-                <div id="badgeChoiceList" class="badge-choice-list">
-                  <div class="empty-state">Loading earned badges…</div>
-                </div>
-
-                <div class="account-actions">
-                  <button id="saveBadgesBtn" class="btn primary" type="button">Save Badge Display</button>
-                  <span id="badgesStatus" class="account-status" aria-live="polite"></span>
-                </div>
-              </div>
-            </article>
-
-            <article class="account-card">
-              <div class="account-card-head">
-                <div>
-                  <strong>Prize Run Loadout</strong>
-                  <span>Equip cosmetics you unlock from Prize Runs. These are separate from verified badges.</span>
-                </div>
-              </div>
-
-              <div class="account-card-body">
-                <div id="prizeStatusBox" class="empty-state" style="margin-bottom:.85rem">Loading Prize Run status…</div>
-
-                <div class="paddock-preview" style="margin-bottom:.95rem">
-                  <div class="paddock-preview-line" id="shoutboxPreview">
-                    <strong>Preview:</strong> Loading…
-                  </div>
-                  <div class="paddock-preview-line" id="profilePreview">
-                    <strong>Profile:</strong> Loading…
-                  </div>
-                </div>
-
-                <div class="loadout-grid">
-                  <div class="account-field">
-                    <label for="loadoutFlair">Shoutbox flair</label>
-                    <select id="loadoutFlair" class="input"></select>
                   </div>
 
-                  <div class="account-field">
-                    <label for="loadoutTitle">Profile title</label>
-                    <select id="loadoutTitle" class="input"></select>
+                  <div class="account-card-body">
+                    <div class="linked-player">
+                      <div>
+                        <strong id="linkedTmName">No Trackmania account linked</strong>
+                        <span id="linkedTmId">Paste your Trackmania account ID below.</span>
+                      </div>
+                      <span id="tmLinkedStatus" class="status-badge">Not linked</span>
+                    </div>
+
+                    <div class="account-form-grid">
+                      <div class="account-field">
+                        <label for="tmAccountIdInput">Trackmania account ID</label>
+                        <input id="tmAccountIdInput" class="input" type="text"
+                          placeholder="Example: 7682d76f-3e07-4bd3-a2f7-76bbd194423a" autocomplete="off">
+                        <div class="help">Use the stable Trackmania account ID, not just the display name.</div>
+                      </div>
+
+                      <div class="account-field">
+                        <label for="tmDisplayNameInput">Display name</label>
+                        <input id="tmDisplayNameInput" class="input" type="text" placeholder="Optional display name"
+                          maxlength="60" autocomplete="off">
+                        <div class="help">This can auto-fill if the account ID is found in your public site data.</div>
+                      </div>
+                    </div>
+
+                    <div class="account-actions">
+                      <button id="saveTmBtn" class="btn primary" type="button">Save Trackmania Account</button>
+                      <button id="clearTmBtn" class="btn" type="button">Unlink</button>
+                      <span id="tmStatus" class="account-status" aria-live="polite"></span>
+                    </div>
+                  </div>
+                </article>
+              </section>
+
+              <section class="account-tab-panel" data-account-panel="style">
+                <article class="account-card">
+                  <div class="account-card-head">
+                    <div>
+                      <strong>Visible Verified Badges</strong>
+                      <span>Choose which earned site badges appear beside your name. This does not grant badges.</span>
+                    </div>
                   </div>
 
-                  <div class="account-field">
-                    <label for="loadoutFrame">Profile frame</label>
-                    <select id="loadoutFrame" class="input"></select>
+                  <div class="account-card-body">
+                    <div id="badgeChoiceList" class="badge-choice-list">
+                      <div class="empty-state">Loading earned badges…</div>
+                    </div>
+
+                    <div class="account-actions">
+                      <button id="saveBadgesBtn" class="btn primary" type="button">Save Badge Display</button>
+                      <span id="badgesStatus" class="account-status" aria-live="polite"></span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="account-card">
+                  <div class="account-card-head">
+                    <div>
+                      <strong>Profile Style Loadout</strong>
+                      <span>Equip Prize Run rewards. Frames, nameplates, stickers, titles, and flairs all affect your look.</span>
+                    </div>
                   </div>
 
-                  <div class="account-field">
-                    <label for="loadoutNameplate">Nameplate</label>
-                    <select id="loadoutNameplate" class="input"></select>
+                  <div class="account-card-body">
+                    <div class="paddock-preview" style="margin-bottom:.95rem">
+                      <div class="paddock-preview-line" id="shoutboxPreview">
+                        <strong>Shoutbox:</strong> Loading…
+                      </div>
+                    </div>
+
+                    <div class="loadout-grid">
+                      <div class="account-field">
+                        <label for="loadoutFlair">Shoutbox flair</label>
+                        <select id="loadoutFlair" class="input"></select>
+                        <div class="help">Shows beside your name in the shoutbox.</div>
+                      </div>
+
+                      <div class="account-field">
+                        <label for="loadoutTitle">Profile title</label>
+                        <select id="loadoutTitle" class="input"></select>
+                        <div class="help">Shows on your profile preview and can appear in shoutbox styling.</div>
+                      </div>
+
+                      <div class="account-field">
+                        <label for="loadoutFrame">Player frame</label>
+                        <select id="loadoutFrame" class="input"></select>
+                        <div class="help">Adds a border/glow to your profile and shoutbox message card.</div>
+                      </div>
+
+                      <div class="account-field">
+                        <label for="loadoutNameplate">Nameplate</label>
+                        <select id="loadoutNameplate" class="input"></select>
+                        <div class="help">Styles the username area.</div>
+                      </div>
+
+                      <div class="account-field">
+                        <label for="loadoutSticker1">Sticker 1</label>
+                        <select id="loadoutSticker1" class="input"></select>
+                      </div>
+
+                      <div class="account-field">
+                        <label for="loadoutSticker2">Sticker 2</label>
+                        <select id="loadoutSticker2" class="input"></select>
+                      </div>
+
+                      <div class="account-field">
+                        <label for="loadoutSticker3">Sticker 3</label>
+                        <select id="loadoutSticker3" class="input"></select>
+                      </div>
+                    </div>
+
+                    <div class="account-actions">
+                      <button id="saveLoadoutBtn" class="btn primary" type="button">Save Loadout</button>
+                      <a class="btn" href="/prize-runs">Open Prize Runs</a>
+                      <span id="loadoutStatus" class="account-status" aria-live="polite"></span>
+                    </div>
+                  </div>
+                </article>
+              </section>
+
+              <section class="account-tab-panel" data-account-panel="paddock">
+                <article class="account-card">
+                  <div class="account-card-head">
+                    <div>
+                      <strong>My Paddock Collection</strong>
+                      <span>Your unlocked Prize Run cosmetics and collectibles.</span>
+                    </div>
                   </div>
 
-                  <div class="account-field">
-                    <label for="loadoutSticker1">Sticker 1</label>
-                    <select id="loadoutSticker1" class="input"></select>
+                  <div class="account-card-body">
+                    <div id="collectionSummary" class="collection-grid" style="margin-bottom:.9rem">
+                      <div class="collection-box"><span>Total Items</span><strong id="collectionTotal">0</strong><small>Unlocked rewards</small></div>
+                      <div class="collection-box"><span>Duplicates</span><strong id="collectionDuplicates">0</strong><small>Extra copies found</small></div>
+                      <div class="collection-box"><span>Extra Tickets</span><strong id="collectionTicketsMirror">0</strong><small>Runs after daily</small></div>
+                      <div class="collection-box"><span>Daily Run</span><strong id="collectionDailyMirror">—</strong><small>Free run status</small></div>
+                    </div>
+
+                    <div id="inventoryList" class="inventory-list">
+                      <div class="empty-state">Loading your collection…</div>
+                    </div>
+                  </div>
+                </article>
+              </section>
+
+              <section class="account-tab-panel" data-account-panel="stats">
+                <article class="account-card">
+                  <div class="account-card-head">
+                    <div>
+                      <strong>My Site Stats</strong>
+                      <span>Stats from WR Leaderboard and Weekly Shorts. GOAT data is intentionally not counted here.</span>
+                    </div>
                   </div>
 
-                  <div class="account-field">
-                    <label for="loadoutSticker2">Sticker 2</label>
-                    <select id="loadoutSticker2" class="input"></select>
+                  <div class="account-card-body">
+                    <div id="statsEmpty" class="empty-state">
+                      Link your Trackmania account ID to load your site stats.
+                    </div>
+
+                    <div id="statsWrap" style="display:none">
+                      <div class="stats-grid">
+                        <div class="stat-box"><span>Total WRs</span><strong id="statTotalWrs">0</strong></div>
+                        <div class="stat-box"><span>Weekly Wins</span><strong id="statWsWins">0</strong></div>
+                        <div class="stat-box"><span>Weekly Top 5s</span><strong id="statWsTop5">0</strong></div>
+                        <div class="stat-box"><span>Weekly WRs</span><strong id="statWsWrs">0</strong></div>
+                        <div class="stat-box"><span>Latest WR Source</span><strong id="statLatestSource">—</strong></div>
+                        <div class="stat-box"><span>Tracked Sources</span><strong id="statSourceCount">0</strong></div>
+                      </div>
+
+                      <div class="source-breakdown" id="sourceBreakdown"></div>
+                      <div style="height:.85rem"></div>
+                      <div class="empty-state" id="statsDetails">Loading linked stats…</div>
+                    </div>
+                  </div>
+                </article>
+              </section>
+
+              <section class="account-tab-panel" data-account-panel="submissions">
+                <article class="account-card">
+                  <div class="account-card-head">
+                    <div>
+                      <strong>My Event Submissions</strong>
+                      <span>Pending, approved, and rejected events submitted from your account.</span>
+                    </div>
                   </div>
 
-                  <div class="account-field">
-                    <label for="loadoutSticker3">Sticker 3</label>
-                    <select id="loadoutSticker3" class="input"></select>
+                  <div class="account-card-body">
+                    <div id="submissionSummary" class="stats-grid" style="margin-bottom:.85rem">
+                      <div class="stat-box"><span>Pending</span><strong id="subPending">0</strong></div>
+                      <div class="stat-box"><span>Approved</span><strong id="subApproved">0</strong></div>
+                      <div class="stat-box"><span>Rejected</span><strong id="subRejected">0</strong></div>
+                    </div>
+
+                    <div id="submissionList" class="submission-list">
+                      <div class="empty-state">Loading submissions…</div>
+                    </div>
                   </div>
-                </div>
+                </article>
+              </section>
 
-                <div class="account-actions">
-                  <button id="saveLoadoutBtn" class="btn primary" type="button">Save Loadout</button>
-                  <a class="btn" href="/prize-runs">Open Prize Runs</a>
-                  <span id="loadoutStatus" class="account-status" aria-live="polite"></span>
-                </div>
-              </div>
-            </article>
-
-            <article class="account-card">
-              <div class="account-card-head">
-                <div>
-                  <strong>Security</strong>
-                  <span>Manage your session and password access.</span>
-                </div>
-              </div>
-
-              <div class="account-card-body">
-                <div class="account-actions">
-                  <button id="resetPasswordBtn" class="btn" type="button">Send Password Reset</button>
-                  <button id="logoutBtn" class="btn primary" type="button">Logout</button>
-                  <span id="securityStatus" class="account-status" aria-live="polite"></span>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <div class="account-stack">
-            <article class="account-card">
-              <div class="account-card-head">
-                <div>
-                  <strong>My Site Stats</strong>
-                  <span>Stats from WR Leaderboard and Weekly Shorts. GOAT data is intentionally not counted here.</span>
-                </div>
-              </div>
-
-              <div class="account-card-body">
-                <div id="statsEmpty" class="empty-state">
-                  Link your Trackmania account ID to load your site stats.
-                </div>
-
-                <div id="statsWrap" style="display:none">
-                  <div class="stats-grid">
-                    <div class="stat-box"><span>Total WRs</span><strong id="statTotalWrs">0</strong></div>
-                    <div class="stat-box"><span>Weekly Wins</span><strong id="statWsWins">0</strong></div>
-                    <div class="stat-box"><span>Weekly Top 5s</span><strong id="statWsTop5">0</strong></div>
-                    <div class="stat-box"><span>Weekly WRs</span><strong id="statWsWrs">0</strong></div>
-                    <div class="stat-box"><span>Latest WR Source</span><strong id="statLatestSource">—</strong></div>
-                    <div class="stat-box"><span>Tracked Sources</span><strong id="statSourceCount">0</strong></div>
+              <section class="account-tab-panel" data-account-panel="settings">
+                <article class="account-card">
+                  <div class="account-card-head">
+                    <div>
+                      <strong>Preferences</strong>
+                      <span>Simple profile and shoutbox settings.</span>
+                    </div>
                   </div>
 
-                  <div class="source-breakdown" id="sourceBreakdown"></div>
-                  <div style="height:.85rem"></div>
-                  <div class="empty-state" id="statsDetails">Loading linked stats…</div>
-                </div>
-              </div>
-            </article>
+                  <div class="account-card-body">
+                    <div class="account-form-grid">
+                      <label class="account-toggle-row">
+                        <div>
+                          <strong>Shoutbox mention sound</strong>
+                          <span>Allow mention/ping sounds while using the site.</span>
+                        </div>
+                        <input id="prefSound" type="checkbox">
+                      </label>
 
+                      <label class="account-toggle-row">
+                        <div>
+                          <strong>Display supporter badge</strong>
+                          <span>Show a supporter badge if your account is eligible.</span>
+                        </div>
+                        <input id="prefBadge" type="checkbox">
+                      </label>
+                    </div>
 
+                    <div class="account-actions">
+                      <button id="savePrefsBtn" class="btn primary" type="button">Save Preferences</button>
+                      <span id="prefsStatus" class="account-status" aria-live="polite"></span>
+                    </div>
+                  </div>
+                </article>
 
-            <article class="account-card">
-              <div class="account-card-head">
-                <div>
-                  <strong>My Paddock Collection</strong>
-                  <span>Your unlocked Prize Run cosmetics and collectibles.</span>
-                </div>
-              </div>
+                <article class="account-card">
+                  <div class="account-card-head">
+                    <div>
+                      <strong>Security</strong>
+                      <span>Manage your session and password access.</span>
+                    </div>
+                  </div>
 
-              <div class="account-card-body">
-                <div id="collectionSummary" class="collection-grid" style="margin-bottom:.9rem">
-                  <div class="collection-box"><span>Total Items</span><strong id="collectionTotal">0</strong><small>Unlocked rewards</small></div>
-                  <div class="collection-box"><span>Duplicates</span><strong id="collectionDuplicates">0</strong><small>Extra copies found</small></div>
-                  <div class="collection-box"><span>Extra Tickets</span><strong id="collectionTickets">0</strong><small>Runs available after daily</small></div>
-                  <div class="collection-box"><span>Daily Run</span><strong id="collectionDaily">—</strong><small>Free run status</small></div>
-                </div>
-
-                <div id="inventoryList" class="inventory-list">
-                  <div class="empty-state">Loading your collection…</div>
-                </div>
-              </div>
-            </article>
-
-            <article class="account-card">
-              <div class="account-card-head">
-                <div>
-                  <strong>My Event Submissions</strong>
-                  <span>Pending, approved, and rejected events submitted from your account.</span>
-                </div>
-              </div>
-
-              <div class="account-card-body">
-                <div id="submissionSummary" class="stats-grid" style="margin-bottom:.85rem">
-                  <div class="stat-box"><span>Pending</span><strong id="subPending">0</strong></div>
-                  <div class="stat-box"><span>Approved</span><strong id="subApproved">0</strong></div>
-                  <div class="stat-box"><span>Rejected</span><strong id="subRejected">0</strong></div>
-                </div>
-
-                <div id="submissionList" class="submission-list">
-                  <div class="empty-state">Loading submissions…</div>
-                </div>
-              </div>
-            </article>
-          </div>
+                  <div class="account-card-body">
+                    <div class="account-actions">
+                      <button id="resetPasswordBtn" class="btn" type="button">Send Password Reset</button>
+                      <button id="logoutBtn" class="btn primary" type="button">Logout</button>
+                      <span id="securityStatus" class="account-status" aria-live="polite"></span>
+                    </div>
+                  </div>
+                </article>
+              </section>
+            </div>
+          </section>
         </div>
       </div>
     </section>
@@ -1678,8 +1951,12 @@ header .auth-user-menu button:hover {
     }
 
     function renderProfile(user, profile) {
-      $("profileUsername").textContent = profile?.username || getUsernameFromUser(user);
-      $("profileEmail").textContent = profile?.email || user.email || "No email";
+      const usernameValue = profile?.username || getUsernameFromUser(user);
+      const emailValue = profile?.email || user.email || "No email";
+      $("profileUsername").textContent = usernameValue;
+      $("profileEmail").textContent = emailValue;
+      if ($("profileUsernameMirror")) $("profileUsernameMirror").textContent = usernameValue;
+      if ($("profileEmailMirror")) $("profileEmailMirror").textContent = emailValue;
       $("profileRole").textContent = profile?.role || "user";
       $("prefSound").checked = profile?.shoutbox_sound_enabled !== false;
       $("prefBadge").checked = profile?.show_supporter_badge !== false;
@@ -1696,6 +1973,7 @@ header .auth-user-menu button:hover {
       $("linkedTmId").textContent = linked ? tmId : "Paste your Trackmania account ID below.";
       $("tmLinkedStatus").textContent = linked ? "Linked" : "Not linked";
       $("tmLinkedStatus").className = `status-badge ${linked ? "approved" : ""}`.trim();
+      if ($("profileTmSummary")) $("profileTmSummary").textContent = linked ? (tmName || tmId) : "Not linked";
     }
 
     async function loadStatsData(accountId) {
@@ -2114,6 +2392,8 @@ header .auth-user-menu button:hover {
       `;
       if ($("collectionTickets")) $("collectionTickets").textContent = tickets.toLocaleString();
       if ($("collectionDaily")) $("collectionDaily").textContent = freeUsed ? "Used" : "Ready";
+      if ($("collectionTicketsMirror")) $("collectionTicketsMirror").textContent = tickets.toLocaleString();
+      if ($("collectionDailyMirror")) $("collectionDailyMirror").textContent = freeUsed ? "Used" : "Ready";
     }
 
     function renderPrizeCollection() {
@@ -2333,8 +2613,24 @@ header .auth-user-menu button:hover {
       window.location.href = "/";
     }
 
+
+    function initAccountTabs() {
+      const tabs = Array.from(document.querySelectorAll("[data-account-tab]"));
+      const panels = Array.from(document.querySelectorAll("[data-account-panel]"));
+      if (!tabs.length || !panels.length) return;
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const key = tab.dataset.accountTab;
+          tabs.forEach((btn) => btn.classList.toggle("active", btn === tab));
+          panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.accountPanel === key));
+        });
+      });
+    }
+
     async function bootAccountPage() {
       $("year").textContent = new Date().getFullYear();
+      initAccountTabs();
       const navToggle = $("navToggle");
       const primaryNav = $("primary-nav");
       const toTop = $("toTop");
