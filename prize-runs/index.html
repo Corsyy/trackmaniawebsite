@@ -421,7 +421,76 @@
 .tme-header .auth-user-dropdown,header .auth-user-dropdown{position:relative}.tme-header .auth-user-btn,header .auth-user-btn{display:inline-flex;align-items:center;gap:.45rem;min-height:40px;padding:.62rem 1rem;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.045);color:var(--text,#f3f5f7);font-weight:850;cursor:pointer;white-space:nowrap}.tme-header .auth-user-btn:hover,header .auth-user-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}.tme-header .auth-caret,header .auth-caret{font-size:.78rem;opacity:.82}.tme-header .auth-user-menu,header .auth-user-menu{position:absolute;top:calc(100% + 10px);right:0;min-width:230px;display:none;flex-direction:column;gap:.45rem;padding:.7rem;border-radius:16px;border:1px solid rgba(255,255,255,.09);background:rgba(10,16,28,.98);box-shadow:0 18px 45px rgba(0,0,0,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:99999}.tme-header .auth-user-menu.show,header .auth-user-menu.show{display:flex}.tme-header .auth-user-info,header .auth-user-info{display:flex;flex-direction:column;gap:.15rem;padding-bottom:.55rem;margin-bottom:.35rem;border-bottom:1px solid rgba(255,255,255,.08)}.tme-header .auth-user-info strong,header .auth-user-info strong{color:#fff;font-size:.95rem}.tme-header .auth-user-info span,header .auth-user-info span{color:rgba(255,255,255,.6);font-size:.82rem;word-break:break-word}.tme-header .auth-user-menu button,header .auth-user-menu button{border:0;width:100%;background:rgba(255,255,255,.04);color:#fff;padding:.75rem .85rem;border-radius:12px;text-align:left;cursor:pointer;font-weight:800;transition:.18s ease}.tme-header .auth-user-menu button:hover,header .auth-user-menu button:hover{background:rgba(255,255,255,.08)}
 .tme-header .nav-drop-menu,.nav-drop-menu{display:none;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:.25rem!important;top:calc(100% + 10px)!important;left:0!important;right:auto!important;width:max-content!important;min-width:220px!important;max-width:280px!important;transform:none!important;white-space:nowrap!important}.tme-header .nav-drop-menu a,.nav-drop-menu a{display:flex!important;width:100%!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;white-space:nowrap!important}.tme-header .nav-group:hover .nav-drop-menu,.tme-header .nav-group:focus-within .nav-drop-menu,.tme-header .nav-group.open .nav-drop-menu,.nav-group:hover .nav-drop-menu,.nav-group:focus-within .nav-drop-menu,.nav-group.open .nav-drop-menu{display:flex!important}.tme-header .auth-user-menu,.auth-user-menu{display:none;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:.42rem!important;right:0!important;left:auto!important;width:230px!important;min-width:230px!important;transform:none!important}.tme-header .auth-user-menu.show,.auth-user-menu.show{display:flex!important}.tme-header .auth-user-menu button,.auth-user-menu button{display:flex!important;width:100%!important;justify-content:flex-start!important;text-align:left!important}@media (max-width:900px){.tme-header .nav-drop-menu,.nav-drop-menu{position:static!important;width:100%!important;min-width:0!important;max-width:none!important;margin-top:.35rem!important}.tme-header .auth-user-menu,.auth-user-menu{right:0!important;width:min(260px,86vw)!important;min-width:min(260px,86vw)!important}}
 
-  </style>
+  
+
+/* Prize Runs depth pass: streaks, duplicate parts, completion, and sharing */
+.run-depth-panel {
+  display:grid;
+  gap:.7rem;
+  margin-top:.9rem;
+  padding:.9rem;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.024);
+}
+.run-depth-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.75rem;
+  color:var(--pr-muted);
+  font-size:.88rem;
+  line-height:1.4;
+}
+.run-depth-row strong { color:var(--pr-text); }
+.parts-chip {
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  padding:.28rem .58rem;
+  border-radius:999px;
+  border:1px solid rgba(245,217,138,.18);
+  background:rgba(245,217,138,.055);
+  color:#f5d98a;
+  font-weight:950;
+  white-space:nowrap;
+}
+.share-result-box {
+  display:none;
+  gap:.65rem;
+  margin-top:.9rem;
+  padding:.9rem;
+  border-radius:18px;
+  border:1px solid rgba(104,240,255,.12);
+  background:linear-gradient(180deg, rgba(104,240,255,.04), rgba(255,255,255,.018));
+}
+.share-result-box.show { display:grid; }
+.share-result-box textarea {
+  width:100%;
+  min-height:92px;
+  resize:vertical;
+  color:#eaf0ff;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  padding:.75rem;
+  font:inherit;
+  line-height:1.45;
+}
+.reward-card.duplicate-reward { border-color: rgba(245,217,138,.18); }
+.reward-parts {
+  display:inline-flex;
+  align-items:center;
+  gap:.25rem;
+  margin-top:.4rem;
+  color:#f5d98a;
+  font-weight:900;
+  font-size:.78rem;
+}
+.history-meta .rare-tag { color:#f5d98a; font-weight:950; }
+@media(max-width:720px){ .run-depth-row{align-items:flex-start;flex-direction:column;} }
+
+</style>
 </head>
 <body class="bg-track-curves">
 <header class="tme-header">
@@ -523,6 +592,19 @@
               <div class="run-stat"><span>Daily Run</span><strong id="freeRunValue">—</strong></div>
               <div class="run-stat"><span>Extra Tickets</span><strong id="ticketValue">0</strong></div>
               <div class="run-stat"><span>Can Run</span><strong id="canRunValue">—</strong></div>
+              <div class="run-stat"><span>Streak</span><strong id="streakValue">0</strong></div>
+              <div class="run-stat"><span>Parts</span><strong id="partsValue">0</strong></div>
+            </div>
+
+            <div class="run-depth-panel">
+              <div class="run-depth-row">
+                <span><strong>Collection depth:</strong> duplicates now become Paddock Parts and help upgrade item levels.</span>
+                <span id="bestStreakValue" class="parts-chip">Best streak: 0</span>
+              </div>
+              <div class="run-depth-row">
+                <span>Champion/Iconic pulls can create automatic shoutbox announcements.</span>
+                <span id="partsHint" class="parts-chip">Parts: 0</span>
+              </div>
             </div>
 
             <div class="run-control-panel">
@@ -567,6 +649,13 @@
           </div>
           <div class="prize-card-body">
             <div id="rewardGrid" class="reward-grid"></div>
+            <div id="shareResultBox" class="share-result-box">
+              <strong>Share your pull</strong>
+              <textarea id="shareResultText" readonly></textarea>
+              <div class="run-actions">
+                <button id="copyShareBtn" class="btn" type="button">Copy Discord Result</button>
+              </div>
+            </div>
           </div>
         </aside>
 
@@ -675,6 +764,7 @@
     const $ = (id) => document.getElementById(id);
     let currentUser = null;
     let isRunning = false;
+    let lastRunResult = null;
 
     const THEME_LABELS = {
       stadium_sprint: "🏟️ Stadium Sprint",
@@ -741,6 +831,8 @@
         $("routeCar").innerHTML = '<span class="route-car-icon">🏎️</span>';
       }
       document.querySelectorAll(".route-point").forEach((p) => p.classList.remove("hit"));
+      const shareBox = $("shareResultBox");
+      if (shareBox) shareBox.classList.remove("show");
       $("rewardGrid").innerHTML = ["cp1", "cp2", "cp3", "finish"].map((slot) => `
         <article class="reward-card" id="reward-${slot}">
           <div class="reward-slot">${SLOT_LABELS[slot]}</div>
@@ -755,9 +847,16 @@
       const freeUsed = Boolean(status?.free_run_used_today);
       const tickets = Number(status?.extra_tickets || 0);
       const canRun = Boolean(status?.can_start_run);
+      const parts = Number(status?.paddock_parts || 0);
+      const streak = Number(status?.current_streak || 0);
+      const best = Number(status?.best_streak || 0);
       $("freeRunValue").textContent = freeUsed ? "Used" : "Ready";
       $("ticketValue").textContent = tickets.toLocaleString();
       $("canRunValue").textContent = canRun ? "Yes" : "No";
+      if ($("partsValue")) $("partsValue").textContent = parts.toLocaleString();
+      if ($("streakValue")) $("streakValue").textContent = streak.toLocaleString();
+      if ($("bestStreakValue")) $("bestStreakValue").textContent = `Best streak: ${best.toLocaleString()}`;
+      if ($("partsHint")) $("partsHint").textContent = `Parts: ${parts.toLocaleString()}`;
       $("startRunBtn").disabled = !canRun || isRunning;
       $("startRunBtn").textContent = freeUsed ? "Use Extra Ticket" : "Start Prize Run";
     }
@@ -827,14 +926,17 @@
       const slot = reward?.slot || "cp1";
       const card = $(`reward-${slot}`);
       if (!card) return;
-      const duplicate = reward.was_duplicate ? ` <span style="color:rgba(255,255,255,.65)">Duplicate +${Number(reward.duplicate_count || 0)}</span>` : "";
+      const parts = Number(reward.parts_awarded || 0);
+      const duplicate = reward.was_duplicate ? ` <span style="color:rgba(255,255,255,.65)">Duplicate copy</span>` : "";
       card.innerHTML = `
         <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • ${escapeHtml(reward.category || "reward")}</div>
         <div class="reward-name">${escapeHtml(reward.icon || "🎁")} ${escapeHtml(reward.name || "Reward")}</div>
         <div class="reward-desc">${escapeHtml(reward.description || "Saved to your Paddock collection.")}${duplicate}</div>
+        ${parts > 0 ? `<div class="reward-parts">⚙️ +${parts.toLocaleString()} Paddock Parts</div>` : ""}
         <span class="tier-chip tier-${escapeHtml(reward.tier || "standard")}">${escapeHtml(prettyTier(reward.tier))}</span>
       `;
       card.classList.add("revealed");
+      if (reward.was_duplicate) card.classList.add("duplicate-reward");
     }
 
     async function animateRun(result) {
@@ -860,6 +962,30 @@
       }
     }
 
+    function buildShareText(result) {
+      const rewards = Array.isArray(result?.rewards) ? result.rewards : [];
+      const lines = [
+        "🏁 Prize Run Complete!",
+        `Theme: ${prettyTheme(result?.theme)}`,
+        "",
+        ...rewards.map((r) => {
+          const dupe = r.was_duplicate ? ` duplicate (+${Number(r.parts_awarded || 0)} parts)` : "";
+          return `${SLOT_LABELS[r.slot] || r.slot}: ${r.icon || "🎁"} ${r.name || "Reward"} [${prettyTier(r.tier)}]${dupe}`;
+        }),
+        "",
+        "trackmaniaevents.com/prize-runs"
+      ];
+      return lines.join("\n");
+    }
+
+    function showShareResult(result) {
+      const box = $("shareResultBox");
+      const text = $("shareResultText");
+      if (!box || !text) return;
+      text.value = buildShareText(result);
+      box.classList.add("show");
+    }
+
     async function startRun() {
       if (isRunning) return;
       isRunning = true;
@@ -870,6 +996,8 @@
         if (error) throw error;
         setMsg("Run started. Hit the checkpoints!", "success");
         await animateRun(data);
+        lastRunResult = data;
+        showShareResult(data);
         setMsg("Prize Run complete. Rewards saved to your Paddock.", "success");
         await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
       } catch (err) {
@@ -890,6 +1018,15 @@
         toTop.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
       }
       $("startRunBtn").addEventListener("click", startRun);
+      if ($("copyShareBtn")) $("copyShareBtn").addEventListener("click", async () => {
+        const text = $("shareResultText")?.value || (lastRunResult ? buildShareText(lastRunResult) : "");
+        try {
+          await navigator.clipboard.writeText(text);
+          setMsg("Prize Run result copied for Discord.", "success");
+        } catch {
+          setMsg("Could not copy automatically. Select the share text and copy it manually.", "error");
+        }
+      });
       $("refreshStatusBtn").addEventListener("click", async () => {
         setMsg("Refreshing status…");
         await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
