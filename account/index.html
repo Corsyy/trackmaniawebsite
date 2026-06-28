@@ -1652,6 +1652,94 @@ header .auth-user-menu button:hover {
   .theme-set-list, .paddock-slot-grid { grid-template-columns: 1fr; }
 }
 
+
+/* Paddock Parts Exchange / Shop */
+.paddock-shop-panel {
+  display: grid;
+  gap: .85rem;
+  margin-bottom: .95rem;
+  padding: .95rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.065);
+  background: linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,.018));
+}
+.paddock-shop-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.8rem;
+}
+.paddock-shop-head strong { display:block; color:var(--account-text); }
+.paddock-shop-head span { display:block; margin-top:.18rem; color:var(--account-muted); font-size:.85rem; line-height:1.35; }
+.paddock-shop-grid {
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:.65rem;
+}
+.paddock-shop-card {
+  display:grid;
+  gap:.45rem;
+  padding:.86rem;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.060);
+  background:rgba(255,255,255,.022);
+}
+.paddock-shop-card strong {
+  color:var(--account-text);
+  font-size:.95rem;
+  line-height:1.2;
+}
+.paddock-shop-card span {
+  color:var(--account-muted);
+  font-size:.82rem;
+  line-height:1.35;
+}
+.paddock-shop-card .shop-cost {
+  display:inline-flex;
+  align-items:center;
+  width:fit-content;
+  gap:.28rem;
+  margin-top:.12rem;
+  padding:.25rem .52rem;
+  border-radius:999px;
+  border:1px solid rgba(245,217,138,.18);
+  background:rgba(245,217,138,.055);
+  color:#f5d98a;
+  font-size:.72rem;
+  font-weight:950;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+}
+.paddock-shop-card button {
+  margin-top:.2rem;
+  width:fit-content;
+}
+.paddock-shop-card button[disabled] {
+  opacity:.48;
+  cursor:not-allowed;
+  transform:none !important;
+}
+.paddock-shop-result {
+  display:none;
+  padding:.82rem .9rem;
+  border-radius:16px;
+  border:1px solid rgba(104,240,255,.12);
+  background:rgba(104,240,255,.045);
+  color:var(--account-soft);
+  line-height:1.45;
+}
+.paddock-shop-result.show { display:block; }
+.paddock-shop-result strong { color:#fff; }
+.paddock-shop-result.error {
+  border-color:rgba(255,120,120,.18);
+  background:rgba(255,120,120,.055);
+  color:#f0d8d8;
+}
+@media (max-width: 720px) {
+  .paddock-shop-grid { grid-template-columns: 1fr; }
+  .paddock-shop-head { flex-direction:column; }
+}
+
 </style>
 </head>
 
@@ -1979,6 +2067,18 @@ header .auth-user-menu button:hover {
                       <div class="collection-box"><span>Daily Run</span><strong id="collectionDailyMirror">—</strong><small>Free run status</small></div>
                       <div class="collection-box"><span>Paddock Parts</span><strong id="collectionParts">0</strong><small>Duplicate reward value</small></div>
                       <div class="collection-box"><span>Current Streak</span><strong id="collectionStreak">0</strong><small>Daily Prize Run streak</small></div>
+                    </div>
+
+                    <div id="paddockShopPanel" class="paddock-shop-panel">
+                      <div class="paddock-shop-head">
+                        <div>
+                          <strong>Paddock Parts Exchange</strong>
+                          <span>Spend duplicate reward parts on targeted rolls. This gives duplicates a real use instead of just sitting in your inventory.</span>
+                        </div>
+                        <span id="paddockShopBalance" class="parts-balance">Parts: 0</span>
+                      </div>
+                      <div id="paddockShopGrid" class="paddock-shop-grid"></div>
+                      <div id="paddockShopResult" class="paddock-shop-result" aria-live="polite"></div>
                     </div>
 
                     <div id="collectionProgressPanel" class="collection-progress-panel">
@@ -2734,6 +2834,17 @@ header .auth-user-menu button:hover {
       updatePaddockPreview();
     }
 
+    const PADDOCK_EXCHANGE_OPTIONS = [
+      { type: "random_sticker", label: "Craft Random Sticker", cost: 50, help: "Roll a random sticker for profile/shoutbox decoration." },
+      { type: "random_flair", label: "Craft Random Flair", cost: 75, help: "Roll a random shoutbox flair." },
+      { type: "random_title", label: "Craft Random Title", cost: 100, help: "Roll a random profile title." },
+      { type: "random_paddock", label: "Craft Paddock Item", cost: 125, help: "Roll a garage/showcase collectible." },
+      { type: "random_frame", label: "Craft Random Frame", cost: 150, help: "Roll a message/profile frame style." },
+      { type: "random_nameplate", label: "Craft Random Nameplate", cost: 175, help: "Roll a username/nameplate style." },
+      { type: "missing_clean", label: "Missing Common/Clean", cost: 100, help: "Prioritizes an unowned Standard or Clean item." },
+      { type: "apex_roll", label: "Apex+ Roll", cost: 250, help: "Rolls Apex, Champion, or Iconic items only." },
+    ];
+
     async function loadPrizeInventory() {
       try {
         const { data, error } = await tmeSupabase
@@ -2766,7 +2877,7 @@ header .auth-user-menu button:hover {
 
     async function loadPrizeStatus() {
       try {
-        const { data, error } = await tmeSupabase.rpc("get_my_prize_status");
+        const { data, error } = await tmeSupabase.rpc("get_my_prize_status_v2");
         if (error) throw error;
         prizeStatus = Array.isArray(data) ? data[0] : data;
       } catch (err) {
@@ -2818,6 +2929,72 @@ header .auth-user-menu button:hover {
       updatePaddockPreview();
     }
 
+    function renderPaddockShop() {
+      const grid = $("paddockShopGrid");
+      if (!grid) return;
+      const parts = Number(prizeStatus?.paddock_parts || 0);
+      if ($("paddockShopBalance")) $("paddockShopBalance").textContent = `Parts: ${parts.toLocaleString()}`;
+
+      grid.innerHTML = PADDOCK_EXCHANGE_OPTIONS.map((opt) => {
+        const disabled = parts < opt.cost ? "disabled" : "";
+        return `
+          <div class="paddock-shop-card">
+            <strong>${escapeHtml(opt.label)}</strong>
+            <span>${escapeHtml(opt.help)}</span>
+            <span class="shop-cost">${Number(opt.cost).toLocaleString()} Parts</span>
+            <button class="btn paddock-shop-btn" type="button" data-exchange-type="${escapeHtml(opt.type)}" ${disabled}>
+              ${parts < opt.cost ? "Need More Parts" : "Exchange"}
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll(".paddock-shop-btn").forEach((btn) => {
+        btn.addEventListener("click", () => exchangePaddockParts(btn.dataset.exchangeType));
+      });
+    }
+
+    function setPaddockShopResult(message, type = "") {
+      const el = $("paddockShopResult");
+      if (!el) return;
+      el.className = `paddock-shop-result show ${type === "error" ? "error" : ""}`;
+      el.innerHTML = message;
+    }
+
+    async function exchangePaddockParts(exchangeType) {
+      if (!currentUser || !exchangeType) return;
+      const opt = PADDOCK_EXCHANGE_OPTIONS.find((entry) => entry.type === exchangeType);
+      setPaddockShopResult(`<strong>Exchanging parts…</strong><br>Rolling ${escapeHtml(opt?.label || exchangeType)}.`);
+
+      try {
+        const { data, error } = await tmeSupabase.rpc("exchange_paddock_parts", {
+          p_exchange_type: exchangeType,
+        });
+        if (error) throw error;
+        const result = data || {};
+        const item = result.item || {};
+        const duplicateText = result.was_duplicate
+          ? `<br><span>This was a duplicate, so its duplicate level increased.</span>`
+          : "";
+        setPaddockShopResult(`
+          <strong>Exchange complete!</strong><br>
+          You received ${escapeHtml(item.icon || "✨")} <b>${escapeHtml(item.name || "Prize Item")}</b>
+          <span>(${escapeHtml(prettyTier(item.tier || "standard"))}${item.category ? ` · ${escapeHtml(prettyCategory(item.category))}` : ""})</span>.
+          ${duplicateText}<br>
+          <span>Parts remaining: <b>${Number(result.parts_remaining || 0).toLocaleString()}</b></span>
+        `);
+
+        await Promise.all([loadPrizeInventory(), loadPrizeLoadout(), loadPrizeStatus(), loadAllPrizeItems()]);
+        renderPrizeLoadout();
+        renderPrizeStatus();
+        renderPrizeCollection();
+        updatePaddockPreview();
+      } catch (err) {
+        console.warn("Could not exchange Paddock Parts:", err);
+        setPaddockShopResult(`<strong>Exchange failed.</strong><br>${escapeHtml(err.message || "Could not exchange Paddock Parts.")}`, "error");
+      }
+    }
+
     function renderPrizeStatus() {
       const box = $("prizeStatusBox");
       const freeUsed = Boolean(prizeStatus?.free_run_used_today);
@@ -2842,6 +3019,7 @@ header .auth-user-menu button:hover {
       if ($("collectionPartsQuick")) $("collectionPartsQuick").textContent = parts.toLocaleString();
       if ($("collectionStreak")) $("collectionStreak").textContent = streak.toLocaleString();
       if ($("collectionStreakQuick")) $("collectionStreakQuick").textContent = streak.toLocaleString();
+      renderPaddockShop();
     }
 
     function renderCollectionProgress() {
