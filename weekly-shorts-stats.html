@@ -796,6 +796,75 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
   }
 }
 
+
+
+/* Header cleanup v3: plain dropdowns, blue Support pill, no Submit Event on subpages */
+.tme-header .nav-drop-btn,
+.tme-header .nav-drop-btn.active{
+  appearance:none !important;
+  background:transparent !important;
+  border-color:transparent !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  color:rgba(243,245,247,.72) !important;
+  padding:.5rem .35rem !important;
+  transform:none !important;
+}
+
+.tme-header .nav-drop-btn:hover,
+.tme-header .nav-drop-btn:focus,
+.tme-header .nav-group:hover .nav-drop-btn,
+.tme-header .nav-group:focus-within .nav-drop-btn{
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  color:#fff !important;
+  transform:none !important;
+}
+
+.tme-header .nav-drop-btn span{
+  color:rgba(243,245,247,.5) !important;
+}
+
+.tme-header .nav-support-link,
+.tme-header .nav-support-link.active{
+  min-height:40px !important;
+  padding:.58rem 1rem !important;
+  border-radius:999px !important;
+  border:1px solid rgba(104,240,255,.42) !important;
+  background:rgba(104,240,255,.095) !important;
+  color:#f7fbff !important;
+  font-weight:950 !important;
+  box-shadow:0 0 0 1px rgba(104,240,255,.035) inset !important;
+}
+
+.tme-header .nav-support-link:hover,
+.tme-header .nav-support-link:focus{
+  background:rgba(104,240,255,.15) !important;
+  border-color:rgba(104,240,255,.62) !important;
+  color:#fff !important;
+  transform:translateY(-1px) !important;
+}
+
+@media (max-width:900px){
+  .tme-header .nav-drop-btn,
+  .tme-header .nav-drop-btn.active{
+    width:100% !important;
+    min-height:44px !important;
+    justify-content:space-between !important;
+    padding:.75rem .85rem !important;
+    border-radius:14px !important;
+    border-color:rgba(255,255,255,.06) !important;
+    background:rgba(255,255,255,.035) !important;
+  }
+
+  .tme-header .nav-support-link,
+  .tme-header .nav-support-link.active{
+    width:100% !important;
+    justify-content:center !important;
+  }
+}
+
 </style>
 </head>
 
@@ -825,7 +894,6 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
             <a class="" href="/wrleaderboard">WR Leaderboard</a>
             <a class="" href="/recentwrs">Recent WRs</a>
             <a class="active" href="/weekly-shorts-stats">Weekly Shorts Stats</a>
-            <a href="/account">Account / My Stats</a>
           </div>
         </div>
 
@@ -843,8 +911,7 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
       </nav>
 
       <div class="cta" id="authArea">
-
-        <div class="auth-user-dropdown">
+<div class="auth-user-dropdown">
           <button id="authUserBtn" class="btn auth-user-btn" type="button">
             <span id="authUserLabel">Account</span>
             <span class="auth-caret">▾</span>
