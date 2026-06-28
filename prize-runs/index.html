@@ -863,7 +863,7 @@
 
     async function loadPrizeStatus() {
       try {
-        const { data, error } = await tmeSupabase.rpc("get_my_prize_status");
+        const { data, error } = await tmeSupabase.rpc("get_my_prize_status_v2");
         if (error) throw error;
         const status = Array.isArray(data) ? data[0] : data;
         updateStatusCards(status || {});
