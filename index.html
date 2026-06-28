@@ -716,6 +716,167 @@
   }
 }
 
+
+
+/* Shoutbox stable layout hotfix v10 - keeps cosmetics useful without breaking message height */
+.shout-msg {
+  display: block !important;
+  position: relative !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: .58rem 0 !important;
+  padding: .82rem .9rem !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.026) !important;
+  overflow: visible !important;
+}
+
+.shout-msg.system {
+  border-color: rgba(245,217,138,.24) !important;
+  background: rgba(245,217,138,.045) !important;
+}
+
+.shout-msg.grouped {
+  margin-top: .58rem !important;
+  padding: .82rem .9rem !important;
+}
+
+.shout-msg.has-frame {
+  border-left-width: 4px !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.16) !important;
+}
+
+.shout-msg.has-frame::before {
+  display: none !important;
+  content: none !important;
+}
+
+.shout-msg.frame-theme-stadium { border-left-color: rgba(83,166,255,.72) !important; }
+.shout-msg.frame-theme-snow { border-left-color: rgba(200,238,255,.78) !important; }
+.shout-msg.frame-theme-rally { border-left-color: rgba(120,220,150,.66) !important; }
+.shout-msg.frame-theme-desert { border-left-color: rgba(255,190,110,.72) !important; }
+.shout-msg.frame-theme-night { border-left-color: rgba(120,140,255,.72) !important; }
+.shout-msg.frame-theme-weekly,
+.shout-msg.frame-theme-totd,
+.shout-msg.frame-theme-wr,
+.shout-msg.frame-theme-champion { border-left-color: rgba(245,217,138,.78) !important; }
+.shout-msg.frame-theme-support { border-left-color: rgba(104,240,255,.78) !important; }
+.shout-msg.frame-theme-kacky { border-left-color: rgba(190,120,255,.74) !important; }
+
+.shout-meta {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: .75rem !important;
+  width: 100% !important;
+  margin: 0 0 .38rem !important;
+}
+
+.shout-identity {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: .28rem .34rem !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.shout-meta-right {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: .35rem !important;
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  color: rgba(234,240,255,.62) !important;
+  font-size: .82rem !important;
+}
+
+.shout-text {
+  display: block !important;
+  position: relative !important;
+  z-index: 1 !important;
+  margin: .18rem 0 0 !important;
+  color: rgba(246,248,255,.94) !important;
+  font-size: .95rem !important;
+  line-height: 1.45 !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
+
+.shout-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 22px !important;
+  line-height: 1.1 !important;
+  color: #fff !important;
+  font-weight: 950 !important;
+}
+
+.shout-name.has-nameplate {
+  padding: .2rem .5rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  background: rgba(255,255,255,.045) !important;
+}
+
+.shout-badge-line {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: .24rem !important;
+  min-width: 0 !important;
+}
+
+.shout-badge-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .18rem !important;
+  min-height: 22px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  font-size: .78rem !important;
+  font-weight: 900 !important;
+}
+
+.shout-badge-label.cosmetic {
+  padding: .16rem .42rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(104,240,255,.14) !important;
+  background: rgba(104,240,255,.055) !important;
+  color: #dffcff !important;
+}
+
+.shout-stickers {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .22rem !important;
+  padding: .16rem .42rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  background: rgba(255,255,255,.035) !important;
+}
+
+.shout-reactions,
+.reaction-row {
+  position: relative !important;
+  z-index: 1 !important;
+  margin-top: .42rem !important;
+}
+
+@media (max-width: 560px) {
+  .shout-meta {
+    display: grid !important;
+    gap: .42rem !important;
+  }
+  .shout-meta-right {
+    justify-content: flex-start !important;
+    margin-left: 0 !important;
+  }
+}
+
 </style>
 
 </head>
@@ -3924,11 +4085,7 @@
         const mentionedMe = messageMentionsCurrentUser(msg.message);
         const time = formatShoutTimeAgo(msg.created_at);
 
-        const shouldGroup =
-          !isSystem &&
-          !isLocal &&
-          msg.user_id &&
-          msg.user_id === lastUserId;
+        const shouldGroup = false;
 
         if (!isSystem && !isLocal && msg.user_id) {
           lastUserId = msg.user_id;
