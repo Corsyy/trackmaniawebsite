@@ -387,53 +387,90 @@
   }
 }
 
+
+
+/* Header dropdown vertical alignment fix v6 */
+.tme-header .nav-drop-menu,
+.nav-drop-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .25rem !important;
+  top: calc(100% + 10px) !important;
+  left: 0 !important;
+  right: auto !important;
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: 280px !important;
+  transform: none !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-drop-menu a,
+.nav-drop-menu a {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-group:hover .nav-drop-menu,
+.tme-header .nav-group:focus-within .nav-drop-menu,
+.tme-header .nav-group.open .nav-drop-menu,
+.nav-group:hover .nav-drop-menu,
+.nav-group:focus-within .nav-drop-menu,
+.nav-group.open .nav-drop-menu {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu,
+.auth-user-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .42rem !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  transform: none !important;
+}
+
+.tme-header .auth-user-menu.show,
+.auth-user-menu.show {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu button,
+.auth-user-menu button {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-top: .35rem !important;
+  }
+
+  .tme-header .auth-user-menu,
+  .auth-user-menu {
+    right: 0 !important;
+    width: min(260px, 86vw) !important;
+    min-width: min(260px, 86vw) !important;
+  }
+}
 </style>
-
-
-  <style>
-    .shout-name-line {
-      display: inline-flex;
-      align-items: center;
-      gap: .32rem;
-      flex-wrap: wrap;
-      min-width: 0;
-    }
-
-    .shout-badge-line {
-      display: inline-flex;
-      align-items: center;
-      gap: .32rem;
-      flex-wrap: wrap;
-      color: rgba(234, 240, 255, .72);
-      font-size: .82rem;
-      font-weight: 850;
-      line-height: 1.2;
-    }
-
-    .shout-badge-label {
-      display: inline-flex;
-      align-items: center;
-      gap: .22rem;
-      white-space: nowrap;
-    }
-
-    .shout-badge-label::before {
-      content: "·";
-      color: rgba(234, 240, 255, .38);
-      margin-right: .08rem;
-    }
-
-    .shout-badge-label.admin { color: #f5d98a; }
-    .shout-badge-label.champion { color: #f5d98a; }
-    .shout-badge-label.winner { color: #f0e6b0; }
-    .shout-badge-label.supporter { color: #68f0ff; }
-    .shout-badge-label.organizer { color: #d7dbe2; }
-    .shout-badge-label.highlight { color: #d7dbe2; }
-
-    @media (max-width: 560px) {
-      .shout-badge-line { font-size: .76rem; gap: .25rem; }
-    }
-  </style>
 
 </head>
 
@@ -994,9 +1031,6 @@
     const reactionPickerMenu = document.getElementById("reactionPickerMenu");
     let activeReactionMessageId = "";
     const shoutRolesByUserId = {};
-    const shoutBadgeProfilesByUserId = {};
-    const shoutBadgesByUserId = {};
-    let weeklyBadgeStatePromise = null;
     const supabaseConfigured =
       typeof window.supabase !== "undefined" &&
       /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) &&
@@ -3224,184 +3258,6 @@
       return roles;
     }
 
-
-
-    function normalizeUuidList(values) {
-      return [...new Set((Array.isArray(values) ? values : []).filter((id) =>
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id || ""))
-      ))];
-    }
-
-    async function loadShoutboxBadgeProfiles(userIds) {
-      if (!tmeSupabase) return {};
-      const uniqueIds = normalizeUuidList(userIds);
-      if (!uniqueIds.length) return {};
-
-      try {
-        const { data, error } = await tmeSupabase.rpc("get_public_badge_profiles", {
-          user_ids_input: uniqueIds,
-        });
-
-        if (!error && Array.isArray(data)) {
-          const out = {};
-          for (const row of data) {
-            out[row.user_id] = {
-              trackmania_account_id: row.trackmania_account_id || "",
-              supporter_status: row.supporter_status || "none",
-              show_supporter_badge: row.show_supporter_badge !== false,
-            };
-          }
-          return out;
-        }
-      } catch (err) {
-        console.warn("Badge profile RPC unavailable:", err);
-      }
-
-      try {
-        const { data, error } = await tmeSupabase
-          .from("profiles")
-          .select("id,trackmania_account_id,supporter_status,show_supporter_badge")
-          .in("id", uniqueIds);
-
-        if (error) throw error;
-
-        const out = {};
-        for (const row of data || []) {
-          out[row.id] = {
-            trackmania_account_id: row.trackmania_account_id || "",
-            supporter_status: row.supporter_status || "none",
-            show_supporter_badge: row.show_supporter_badge !== false,
-          };
-        }
-        return out;
-      } catch (err) {
-        console.warn("Could not load public badge profiles:", err);
-        return {};
-      }
-    }
-
-    async function loadPublicContributionBadges(userIds) {
-      if (!tmeSupabase) return { eventUsers: new Set(), highlightUsers: new Set() };
-      const uniqueIds = normalizeUuidList(userIds);
-      if (!uniqueIds.length) return { eventUsers: new Set(), highlightUsers: new Set() };
-
-      try {
-        const { data, error } = await tmeSupabase.rpc("get_public_contribution_badges", {
-          user_ids_input: uniqueIds,
-        });
-
-        if (!error && Array.isArray(data)) {
-          return {
-            eventUsers: new Set(data.filter((row) => row.event_organizer).map((row) => row.user_id)),
-            highlightUsers: new Set(data.filter((row) => row.highlight_contributor).map((row) => row.user_id)),
-          };
-        }
-      } catch (err) {
-        console.warn("Contribution badge RPC unavailable:", err);
-      }
-
-      const eventUsers = new Set();
-      const highlightUsers = new Set();
-
-      try {
-        const { data } = await tmeSupabase
-          .from("event_submissions")
-          .select("user_id")
-          .in("user_id", uniqueIds)
-          .eq("status", "approved");
-        for (const row of data || []) if (row.user_id) eventUsers.add(row.user_id);
-      } catch (err) {
-        console.warn("Could not load event organizer badges:", err);
-      }
-
-      try {
-        const { data } = await tmeSupabase
-          .from("community_highlights")
-          .select("user_id")
-          .in("user_id", uniqueIds)
-          .eq("status", "approved");
-        for (const row of data || []) if (row.user_id) highlightUsers.add(row.user_id);
-      } catch (err) {
-        console.warn("Could not load highlight contributor badges:", err);
-      }
-
-      return { eventUsers, highlightUsers };
-    }
-
-    async function getWeeklyBadgeState() {
-      if (weeklyBadgeStatePromise) return weeklyBadgeStatePromise;
-
-      weeklyBadgeStatePromise = fetch("/data/weekly-shorts/aggregate.json?cb=" + Date.now(), { cache: "no-store" })
-        .then((res) => res.ok ? res.json() : { players: [] })
-        .then((json) => {
-          const players = Array.isArray(json?.players) ? json.players : [];
-          const winsByAccountId = {};
-          let maxWins = 0;
-
-          for (const player of players) {
-            const accountId = player?.accountId;
-            const wins = Number(player?.wins || 0);
-            if (!accountId || !Number.isFinite(wins) || wins <= 0) continue;
-            winsByAccountId[accountId] = wins;
-            maxWins = Math.max(maxWins, wins);
-          }
-
-          return { winsByAccountId, maxWins };
-        })
-        .catch((err) => {
-          console.warn("Could not load weekly badge state:", err);
-          return { winsByAccountId: {}, maxWins: 0 };
-        });
-
-      return weeklyBadgeStatePromise;
-    }
-
-    async function prepareShoutboxBadges(userIds) {
-      const uniqueIds = normalizeUuidList(userIds);
-      if (!uniqueIds.length) return;
-
-      const [profilesByUser, contributions, weeklyState] = await Promise.all([
-        loadShoutboxBadgeProfiles(uniqueIds),
-        loadPublicContributionBadges(uniqueIds),
-        getWeeklyBadgeState(),
-      ]);
-
-      Object.assign(shoutBadgeProfilesByUserId, profilesByUser);
-
-      for (const userId of uniqueIds) {
-        const profile = shoutBadgeProfilesByUserId[userId] || {};
-        const role = shoutRolesByUserId[userId] || "user";
-        const tmAccountId = profile.trackmania_account_id || "";
-        const weeklyWins = Number(weeklyState.winsByAccountId?.[tmAccountId] || 0);
-        const isWeeklyChampion = weeklyWins > 0 && weeklyWins === Number(weeklyState.maxWins || 0);
-        const badges = [];
-
-        if (role === "admin") badges.push({ key: "admin", icon: "🛡️", label: "Admin" });
-        if (isWeeklyChampion) badges.push({ key: "champion", icon: "👑", label: "Weekly Champion" });
-        else if (weeklyWins > 0) badges.push({ key: "winner", icon: "🏆", label: "Weekly Winner" });
-
-        if (profile.supporter_status === "supporter" && profile.show_supporter_badge !== false) {
-          badges.push({ key: "supporter", icon: "💙", label: "Supporter" });
-        }
-
-        if (contributions.eventUsers.has(userId)) badges.push({ key: "organizer", icon: "📅", label: "Event Organizer" });
-        if (contributions.highlightUsers.has(userId)) badges.push({ key: "highlight", icon: "🎬", label: "Highlight Contributor" });
-
-        shoutBadgesByUserId[userId] = badges;
-      }
-    }
-
-    function renderShoutBadges(userId) {
-      const badges = shoutBadgesByUserId[userId] || [];
-      if (!badges.length) return "";
-
-      return `<span class="shout-badge-line">${badges.map((badge) => `
-        <span class="shout-badge-label ${escapeHtml(badge.key)}" title="${escapeHtml(badge.label)}">
-          <span aria-hidden="true">${escapeHtml(badge.icon)}</span>${escapeHtml(badge.label)}
-        </span>
-      `).join("")}</span>`;
-    }
-
     function getShoutRole(msg) {
       return shoutRolesByUserId[msg?.user_id] || "user";
     }
@@ -3486,10 +3342,7 @@
       <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""} ${shouldGroup ? "grouped" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
         ${!shouldGroup ? `
           <div class="shout-meta">
-            <span class="shout-name-line">
-              <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
-              ${!isSystem && !isLocal ? renderShoutBadges(msg.user_id) : ""}
-            </span>
+            <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
 
             <div class="shout-meta-right">
               <div class="shout-actions-inline">
@@ -3798,8 +3651,6 @@
         ]);
 
         Object.assign(shoutRolesByUserId, rolesByUser);
-
-        await prepareShoutboxBadges(userIds);
 
         currentShoutRole = shoutRolesByUserId[user?.id] || "user";
 
