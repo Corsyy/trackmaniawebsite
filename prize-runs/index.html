@@ -7,7 +7,7 @@
   <meta name="description" content="Start a daily Trackmania Events Prize Run, hit checkpoints, and unlock Paddock cosmetics." />
   <meta name="theme-color" content="#0a0f1a" />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;" />
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" />
   <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="shortcut icon" href="/logo.png">
@@ -750,7 +750,7 @@
     const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
-    const tmeSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const tmeSupabase = window.__tmeSupabase = window.__tmeSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -1092,16 +1092,7 @@
       return;
     }
 
-    const client = window.__tmeHeaderSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: window.localStorage,
-        storageKey: "tme-supabase-auth",
-        flowType: "implicit",
-      },
-    });
+    const client = window.__tmeSupabase || window.__tmeHeaderSupabase;
     window.__tmeHeaderSupabase = client;
 
     try {
