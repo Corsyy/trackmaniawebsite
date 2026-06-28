@@ -120,6 +120,47 @@
     .run-stat span { display: block; color: var(--pr-muted); font-size: .74rem; font-weight: 950; text-transform: uppercase; letter-spacing: .065em; }
     .run-stat strong { display: block; margin-top: .35rem; color: var(--pr-text); font-size: 1.55rem; letter-spacing: -.035em; }
 
+    .run-control-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .85rem;
+      flex-wrap: wrap;
+      margin: 0 0 1rem;
+      padding: .9rem;
+      border-radius: 18px;
+      border: 1px solid rgba(104,240,255,.16);
+      background: linear-gradient(180deg, rgba(104,240,255,.075), rgba(255,255,255,.025));
+    }
+
+    .run-control-copy {
+      color: var(--pr-muted);
+      font-size: .92rem;
+      line-height: 1.45;
+    }
+
+    .run-control-copy strong {
+      display: block;
+      color: var(--pr-text);
+      font-size: 1rem;
+      margin-bottom: .12rem;
+    }
+
+    .run-control-actions {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      flex-wrap: wrap;
+    }
+
+    #startRunBtn {
+      min-height: 48px;
+      padding-inline: 1.25rem;
+      font-size: .95rem;
+      font-weight: 1000;
+      box-shadow: 0 0 0 1px rgba(104,240,255,.08) inset, 0 14px 28px rgba(0,0,0,.22);
+    }
+
     .track-stage {
       position: relative;
       min-height: 310px;
@@ -249,10 +290,10 @@
 
     .route-car.going { transform: translateX(-50%) translateY(-4px) rotate(-2deg); }
 
-    .countdown {
+    .prize-countdown {
       position: absolute;
       inset: 0;
-      display: none;
+      display: none !important;
       align-items: center;
       justify-content: center;
       z-index: 10;
@@ -265,7 +306,7 @@
       text-shadow: 0 0 30px rgba(104,240,255,.28);
     }
 
-    .countdown.show { display: flex; }
+    .prize-countdown.show { display: flex !important; }
 
     .run-actions {
       position: relative;
@@ -478,8 +519,20 @@
               <div class="run-stat"><span>Can Run</span><strong id="canRunValue">—</strong></div>
             </div>
 
+            <div class="run-control-panel">
+              <div class="run-control-copy">
+                <strong>Ready to start?</strong>
+                Click the button to call Supabase, roll your rewards, then reveal them across the route.
+              </div>
+              <div class="run-control-actions">
+                <button id="startRunBtn" class="btn primary" type="button">Start Prize Run</button>
+                <button id="refreshStatusBtn" class="btn" type="button">Refresh</button>
+                <a class="btn" href="/account">Equip Rewards</a>
+              </div>
+            </div>
+
             <div class="track-stage" id="trackStage">
-              <div id="countdown" class="countdown">3</div>
+              <div id="prizeCountdown" class="prize-countdown" aria-hidden="true">3</div>
               <div class="track-theme-label">
                 <span>Current route</span>
                 <span id="themeLabel" class="theme-pill">🏟️ Stadium Sprint</span>
@@ -493,11 +546,6 @@
                 <div class="route-point" data-slot="cp2" style="left:50%"><div class="route-dot"></div><span>CP2</span></div>
                 <div class="route-point" data-slot="cp3" style="left:72%"><div class="route-dot"></div><span>CP3</span></div>
                 <div class="route-point" data-slot="finish" style="left:93%"><div class="route-dot"></div><span>Finish</span></div>
-              </div>
-              <div class="run-actions">
-                <button id="startRunBtn" class="btn primary" type="button">Start Daily Run</button>
-                <button id="refreshStatusBtn" class="btn" type="button">Refresh</button>
-                <a class="btn" href="/account">Equip Rewards</a>
               </div>
               <div id="runMessage" class="run-status-msg" aria-live="polite"></div>
             </div>
@@ -656,11 +704,11 @@
     }
 
     function prettyTier(tier) {
-      return String(tier || "standard").replace(/_/g, " ").replace(/\w/g, (c) => c.toUpperCase());
+      return String(tier || "standard").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
     function prettyTheme(theme) {
-      return THEME_LABELS[theme] || String(theme || "Prize Run").replace(/_/g, " ").replace(/\w/g, (c) => c.toUpperCase());
+      return THEME_LABELS[theme] || String(theme || "Prize Run").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
     function formatDate(value) {
@@ -675,6 +723,11 @@
     }
 
     function resetTrack() {
+      const countdownEl = $("prizeCountdown");
+      if (countdownEl) {
+        countdownEl.classList.remove("show");
+        countdownEl.textContent = "3";
+      }
       $("routeProgress").style.width = "0%";
       $("routeCar").style.left = "7%";
       $("routeCar").classList.remove("going");
@@ -697,7 +750,7 @@
       $("ticketValue").textContent = tickets.toLocaleString();
       $("canRunValue").textContent = canRun ? "Yes" : "No";
       $("startRunBtn").disabled = !canRun || isRunning;
-      $("startRunBtn").textContent = freeUsed ? "Use Extra Ticket" : "Start Daily Run";
+      $("startRunBtn").textContent = freeUsed ? "Use Extra Ticket" : "Start Prize Run";
     }
 
     async function loadPrizeStatus() {
@@ -752,7 +805,7 @@
     function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 
     async function showCountdown() {
-      const el = $("countdown");
+      const el = $("prizeCountdown");
       el.classList.add("show");
       for (const part of ["3", "2", "1", "GO!"]) {
         el.textContent = part;
