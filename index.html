@@ -472,51 +472,156 @@
 }
 
 
+    /* Prize Run / Paddock shoutbox display fixes */
+    .shout-meta {
+      display: flex !important;
+      align-items: flex-start !important;
+      justify-content: space-between !important;
+      gap: .75rem !important;
+    }
+
+    .shout-identity {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .28rem;
+      min-width: 0;
+      max-width: calc(100% - 95px);
+    }
+
+    .shout-name {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      line-height: 1.1;
+    }
+
+    .shout-name.has-nameplate {
+      padding: .18rem .48rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.045);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+
+    .shout-name.nameplate-theme-stadium { background: linear-gradient(90deg, rgba(83,166,255,.20), rgba(104,240,255,.08)); border-color: rgba(104,240,255,.20); }
+    .shout-name.nameplate-theme-snow { background: linear-gradient(90deg, rgba(220,245,255,.20), rgba(90,160,255,.08)); border-color: rgba(190,230,255,.24); }
+    .shout-name.nameplate-theme-rally { background: linear-gradient(90deg, rgba(120,220,150,.16), rgba(255,255,255,.05)); border-color: rgba(140,220,160,.18); }
+    .shout-name.nameplate-theme-desert { background: linear-gradient(90deg, rgba(255,185,95,.18), rgba(255,255,255,.05)); border-color: rgba(255,200,120,.20); }
+    .shout-name.nameplate-theme-night { background: linear-gradient(90deg, rgba(90,110,255,.18), rgba(255,255,255,.05)); border-color: rgba(120,140,255,.20); }
+    .shout-name.nameplate-theme-weekly,
+    .shout-name.nameplate-theme-totd,
+    .shout-name.nameplate-theme-wr,
+    .shout-name.nameplate-theme-champion { background: linear-gradient(90deg, rgba(245,217,138,.20), rgba(255,255,255,.05)); border-color: rgba(245,217,138,.25); }
+    .shout-name.nameplate-theme-support { background: linear-gradient(90deg, rgba(104,240,255,.18), rgba(83,166,255,.08)); border-color: rgba(104,240,255,.24); }
+    .shout-name.nameplate-theme-kacky { background: linear-gradient(90deg, rgba(190,120,255,.18), rgba(255,255,255,.05)); border-color: rgba(190,120,255,.22); }
+    .shout-name.nameplate-tier-iconic { box-shadow: 0 0 18px rgba(104,240,255,.14), inset 0 0 0 1px rgba(255,255,255,.05); }
+    .shout-name.nameplate-tier-champion { box-shadow: 0 0 18px rgba(245,217,138,.13), inset 0 0 0 1px rgba(255,255,255,.05); }
+
     .shout-badge-line {
       display: inline-flex;
       align-items: center;
-      gap: .32rem;
+      gap: .28rem;
       flex-wrap: wrap;
       color: rgba(234, 240, 255, .72);
-      font-size: .82rem;
+      font-size: .78rem;
       font-weight: 850;
-      line-height: 1.2;
+      line-height: 1.15;
+      min-width: 0;
     }
 
     .shout-badge-label {
       display: inline-flex;
       align-items: center;
-      gap: .22rem;
+      gap: .2rem;
       white-space: nowrap;
+      min-height: 22px;
     }
 
     .shout-badge-label::before {
       content: "·";
       color: rgba(234, 240, 255, .38);
-      margin-right: .08rem;
+      margin-right: .03rem;
     }
 
-    .shout-badge-label.admin { color: #f5d98a; }
+    .shout-badge-label.admin,
     .shout-badge-label.champion { color: #f5d98a; }
     .shout-badge-label.winner { color: #f0e6b0; }
-    .shout-badge-label.supporter { color: #68f0ff; }
-    .shout-badge-label.organizer { color: #d7dbe2; }
-    .shout-badge-label.highlight { color: #d7dbe2; }
+    .shout-badge-label.supporter,
     .shout-badge-label.flair { color: #68f0ff; }
+    .shout-badge-label.organizer,
+    .shout-badge-label.highlight { color: #d7dbe2; }
     .shout-badge-label.title { color: #f0e6b0; }
+
     .shout-badge-label.cosmetic {
-      border: 1px solid rgba(255, 255, 255, .10);
-      background: rgba(255, 255, 255, .035);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.035);
       border-radius: 999px;
       padding: .13rem .38rem;
       margin-left: .08rem;
     }
-    .shout-badge-label.cosmetic::before {
-      margin-left: -.1rem;
+
+    .shout-badge-label.cosmetic::before { margin-left: -.1rem; }
+
+    .shout-stickers {
+      display: inline-flex;
+      align-items: center;
+      gap: .18rem;
+      margin-left: .1rem;
+      padding: .12rem .34rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      font-size: .76rem;
+      line-height: 1;
+    }
+
+    .shout-msg.has-frame {
+      position: relative;
+      overflow: hidden;
+      border-color: rgba(255,255,255,.10) !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02), 0 10px 24px rgba(0,0,0,.16);
+    }
+
+    .shout-msg.has-frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,.10);
+      opacity: .9;
+    }
+
+    .shout-msg.frame-theme-stadium::before { border-color: rgba(83,166,255,.40); box-shadow: inset 0 0 24px rgba(83,166,255,.07); }
+    .shout-msg.frame-theme-snow::before { border-color: rgba(200,238,255,.44); box-shadow: inset 0 0 24px rgba(190,230,255,.07); }
+    .shout-msg.frame-theme-rally::before { border-color: rgba(120,220,150,.32); box-shadow: inset 0 0 24px rgba(120,220,150,.06); }
+    .shout-msg.frame-theme-desert::before { border-color: rgba(255,190,110,.34); box-shadow: inset 0 0 24px rgba(255,190,110,.06); }
+    .shout-msg.frame-theme-night::before { border-color: rgba(120,140,255,.35); box-shadow: inset 0 0 24px rgba(120,140,255,.06); }
+    .shout-msg.frame-theme-weekly::before,
+    .shout-msg.frame-theme-totd::before,
+    .shout-msg.frame-theme-wr::before,
+    .shout-msg.frame-theme-champion::before { border-color: rgba(245,217,138,.42); box-shadow: inset 0 0 26px rgba(245,217,138,.07); }
+    .shout-msg.frame-theme-support::before { border-color: rgba(104,240,255,.44); box-shadow: inset 0 0 26px rgba(104,240,255,.08); }
+    .shout-msg.frame-theme-kacky::before { border-color: rgba(190,120,255,.38); box-shadow: inset 0 0 26px rgba(190,120,255,.07); }
+
+    .shout-msg.frame-tier-apex { box-shadow: 0 0 0 1px rgba(255,255,255,.025), 0 0 20px rgba(104,240,255,.05); }
+    .shout-msg.frame-tier-champion { box-shadow: 0 0 0 1px rgba(245,217,138,.12), 0 0 22px rgba(245,217,138,.08); }
+    .shout-msg.frame-tier-iconic { box-shadow: 0 0 0 1px rgba(104,240,255,.16), 0 0 28px rgba(104,240,255,.10); }
+
+    .shout-msg .shout-meta,
+    .shout-msg .shout-text,
+    .shout-msg .shout-reactions,
+    .shout-msg .reaction-row {
+      position: relative;
+      z-index: 1;
     }
 
     @media (max-width: 560px) {
-      .shout-badge-line { font-size: .76rem; gap: .25rem; }
+      .shout-meta { gap: .5rem !important; }
+      .shout-identity { max-width: 100%; }
+      .shout-badge-line { font-size: .73rem; gap: .22rem; }
+      .shout-stickers { font-size: .72rem; }
     }
 
 </style>
@@ -3467,6 +3572,7 @@
               label: row.flair_name || "Flair",
               item_key: row.flair_item_key || "",
               tier: row.flair_tier || "",
+              theme: row.flair_theme || "",
             } : null,
             title: row.title_item_id ? {
               key: "title",
@@ -3474,7 +3580,29 @@
               label: row.title_name || "Title",
               item_key: row.title_item_key || "",
               tier: row.title_tier || "",
+              theme: row.title_theme || "",
             } : null,
+            frame: row.frame_item_id ? {
+              key: "frame",
+              icon: row.frame_icon || "🖼️",
+              label: row.frame_name || "Frame",
+              item_key: row.frame_item_key || "",
+              tier: row.frame_tier || "",
+              theme: row.frame_theme || "",
+            } : null,
+            nameplate: row.nameplate_item_id ? {
+              key: "nameplate",
+              icon: row.nameplate_icon || "🔷",
+              label: row.nameplate_name || "Nameplate",
+              item_key: row.nameplate_item_key || "",
+              tier: row.nameplate_tier || "",
+              theme: row.nameplate_theme || "",
+            } : null,
+            stickers: [
+              row.sticker_1_item_id ? { key: "sticker", icon: row.sticker_1_icon || "✨", label: row.sticker_1_name || "Sticker", item_key: row.sticker_1_item_key || "", tier: row.sticker_1_tier || "", theme: row.sticker_1_theme || "" } : null,
+              row.sticker_2_item_id ? { key: "sticker", icon: row.sticker_2_icon || "✨", label: row.sticker_2_name || "Sticker", item_key: row.sticker_2_item_key || "", tier: row.sticker_2_tier || "", theme: row.sticker_2_theme || "" } : null,
+              row.sticker_3_item_id ? { key: "sticker", icon: row.sticker_3_icon || "✨", label: row.sticker_3_name || "Sticker", item_key: row.sticker_3_item_key || "", tier: row.sticker_3_tier || "", theme: row.sticker_3_theme || "" } : null,
+            ].filter(Boolean),
           };
         }
         return out;
@@ -3570,6 +3698,13 @@
       }
     }
 
+    function cleanCssToken(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "default";
+    }
+
     function renderShoutBadges(userId) {
       const verifiedBadges = shoutBadgesByUserId[userId] || [];
       const loadout = shoutCosmeticsByUserId[userId] || {};
@@ -3591,6 +3726,37 @@
         </span>
       `).join("")}</span>`;
     }
+
+    function renderShoutStickers(userId) {
+      const stickers = shoutCosmeticsByUserId[userId]?.stickers || [];
+      if (!stickers.length) return "";
+      return `<span class="shout-stickers" title="Equipped stickers">${stickers.slice(0, 3).map((item) => `
+        <span title="${escapeHtml(item.label)}">${escapeHtml(item.icon || "✨")}</span>
+      `).join("")}</span>`;
+    }
+
+    function getShoutFrameClasses(userId) {
+      const frame = shoutCosmeticsByUserId[userId]?.frame;
+      if (!frame) return "";
+      return [
+        "has-frame",
+        `frame-tier-${cleanCssToken(frame.tier)}`,
+        `frame-theme-${cleanCssToken(frame.theme)}`,
+        `frame-item-${cleanCssToken(frame.item_key)}`,
+      ].join(" ");
+    }
+
+    function getShoutNameplateClasses(userId) {
+      const nameplate = shoutCosmeticsByUserId[userId]?.nameplate;
+      if (!nameplate) return "";
+      return [
+        "has-nameplate",
+        `nameplate-tier-${cleanCssToken(nameplate.tier)}`,
+        `nameplate-theme-${cleanCssToken(nameplate.theme)}`,
+        `nameplate-item-${cleanCssToken(nameplate.item_key)}`,
+      ].join(" ");
+    }
+
 
 
     function getShoutRole(msg) {
@@ -3673,12 +3839,18 @@
           ? `<button class="shout-edit" type="button" data-edit-shout="${escapeHtml(msg.id)}" title="Edit message">✎</button>`
           : "";
 
+        const frameClasses = (!isSystem && !isLocal && msg.user_id) ? getShoutFrameClasses(msg.user_id) : "";
+        const nameplateClasses = (!isSystem && !isLocal && msg.user_id) ? getShoutNameplateClasses(msg.user_id) : "";
+
         return `
-      <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""} ${shouldGroup ? "grouped" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
+      <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""} ${shouldGroup ? "grouped" : ""} ${escapeHtml(frameClasses)}" data-message-id="${escapeHtml(msg.id || "")}">
         ${!shouldGroup ? `
           <div class="shout-meta">
-            <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
-            ${!isSystem && !isLocal ? renderShoutBadges(msg.user_id) : ""}
+            <div class="shout-identity">
+              <span class="shout-name ${roleClass} ${escapeHtml(nameplateClasses)}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+              ${!isSystem && !isLocal ? renderShoutBadges(msg.user_id) : ""}
+              ${!isSystem && !isLocal ? renderShoutStickers(msg.user_id) : ""}
+            </div>
 
             <div class="shout-meta-right">
               <div class="shout-actions-inline">
