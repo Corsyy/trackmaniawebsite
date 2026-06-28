@@ -1323,6 +1323,91 @@ header .auth-user-menu button:hover {
   }
 }
 
+
+
+/* Constructed theme dashboard polish v2 */
+.theme-set-panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: .45rem;
+  padding: .75rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.075);
+  background: rgba(255,255,255,.026);
+}
+.theme-set-panel strong { color: #fff; }
+.theme-set-panel span { color: var(--account-muted); font-size: .86rem; line-height: 1.4; }
+.theme-chip-row { display:flex; align-items:center; flex-wrap:wrap; gap:.4rem; }
+.theme-chip {
+  display:inline-flex;
+  align-items:center;
+  gap:.32rem;
+  width:fit-content;
+  padding:.28rem .55rem;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);
+  color:#eef4ff;
+  font-size:.78rem;
+  font-weight:950;
+  text-transform:capitalize;
+}
+.theme-chip.theme-stadium { border-color:rgba(83,166,255,.32); background:rgba(83,166,255,.10); color:#dcecff; }
+.theme-chip.theme-snow { border-color:rgba(200,242,255,.34); background:rgba(200,242,255,.10); color:#f3fdff; }
+.theme-chip.theme-rally { border-color:rgba(118,220,150,.30); background:rgba(118,220,150,.09); color:#dfffe8; }
+.theme-chip.theme-desert { border-color:rgba(255,189,114,.34); background:rgba(255,189,114,.10); color:#ffe8c8; }
+.theme-chip.theme-night { border-color:rgba(124,140,255,.32); background:rgba(124,140,255,.10); color:#e4e8ff; }
+.theme-chip.theme-wr { border-color:rgba(255,95,104,.34); background:rgba(255,95,104,.10); color:#ffe1e3; }
+.theme-chip.theme-champion { border-color:rgba(245,217,138,.38); background:rgba(245,217,138,.10); color:#fff4cf; }
+.theme-chip.theme-weekly,
+.theme-chip.theme-totd,
+.theme-chip.theme-support { border-color:rgba(104,240,255,.32); background:rgba(104,240,255,.095); color:#e0fcff; }
+.theme-chip.theme-kacky { border-color:rgba(190,120,255,.36); background:rgba(190,120,255,.105); color:#f0dcff; }
+.theme-chip.theme-community { border-color:rgba(123,231,211,.32); background:rgba(123,231,211,.095); color:#ddfff8; }
+
+.cosmetic-preview-row {
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem;
+  align-items:center;
+}
+.preview-cosmetic-chip {
+  display:inline-flex;
+  align-items:center;
+  gap:.28rem;
+  padding:.28rem .56rem;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);
+  color:#eaf0ff;
+  font-size:.82rem;
+  font-weight:900;
+}
+.preview-cosmetic-chip.theme-stadium { border-color:rgba(83,166,255,.32); background:rgba(83,166,255,.10); }
+.preview-cosmetic-chip.theme-snow { border-color:rgba(200,242,255,.34); background:rgba(200,242,255,.10); }
+.preview-cosmetic-chip.theme-rally { border-color:rgba(118,220,150,.30); background:rgba(118,220,150,.09); }
+.preview-cosmetic-chip.theme-desert { border-color:rgba(255,189,114,.34); background:rgba(255,189,114,.10); }
+.preview-cosmetic-chip.theme-night { border-color:rgba(124,140,255,.32); background:rgba(124,140,255,.10); }
+.preview-cosmetic-chip.theme-wr { border-color:rgba(255,95,104,.34); background:rgba(255,95,104,.10); }
+.preview-cosmetic-chip.theme-champion { border-color:rgba(245,217,138,.38); background:rgba(245,217,138,.10); }
+.preview-cosmetic-chip.theme-weekly,
+.preview-cosmetic-chip.theme-totd,
+.preview-cosmetic-chip.theme-support { border-color:rgba(104,240,255,.32); background:rgba(104,240,255,.095); }
+.preview-cosmetic-chip.theme-kacky { border-color:rgba(190,120,255,.36); background:rgba(190,120,255,.105); }
+.preview-cosmetic-chip.theme-community { border-color:rgba(123,231,211,.32); background:rgba(123,231,211,.095); }
+
+.profile-preview-card.frame-theme-stadium { background: linear-gradient(135deg, rgba(83,166,255,.10), rgba(0,0,0,.16) 45%, rgba(255,255,255,.018)); }
+.profile-preview-card.frame-theme-snow { background: linear-gradient(135deg, rgba(200,242,255,.11), rgba(0,0,0,.16) 45%, rgba(255,255,255,.018)); }
+.profile-preview-card.frame-theme-rally { background: linear-gradient(135deg, rgba(118,220,150,.10), rgba(0,0,0,.16) 45%, rgba(255,255,255,.018)); }
+.profile-preview-card.frame-theme-desert { background: linear-gradient(135deg, rgba(255,189,114,.11), rgba(0,0,0,.16) 45%, rgba(255,255,255,.018)); }
+.profile-preview-card.frame-theme-night { background: linear-gradient(135deg, rgba(124,140,255,.11), rgba(0,0,0,.16) 45%, rgba(255,255,255,.018)); }
+.profile-preview-card.frame-theme-wr { background: linear-gradient(135deg, rgba(255,95,104,.11), rgba(0,0,0,.16) 45%, rgba(245,217,138,.025)); }
+.profile-preview-card.frame-theme-champion { background: linear-gradient(135deg, rgba(245,217,138,.12), rgba(0,0,0,.16) 45%, rgba(255,255,255,.018)); }
+.profile-preview-card.frame-theme-kacky { background: linear-gradient(135deg, rgba(190,120,255,.11), rgba(0,0,0,.16) 45%, rgba(255,200,80,.018)); }
+
 </style>
 </head>
 
@@ -2155,6 +2240,12 @@ header .auth-user-menu button:hover {
       return s ? s.charAt(0).toUpperCase() + s.slice(1) : "Item";
     }
 
+    function prettyTheme(theme) {
+      const s = String(theme || "").replace(/[-_]/g, " ").trim();
+      if (!s || s === "general") return "General";
+      return s.replace(/\w/g, (m) => m.toUpperCase());
+    }
+
     function getInventoryItem(row) {
       return row?.item || row?.prize_items || row?.prize_item || null;
     }
@@ -2362,7 +2453,7 @@ header .auth-user-menu button:hover {
 
       el.innerHTML = `<option value="">None</option>` + items.map((item) => `
         <option value="${escapeHtml(item.id)}" ${item.id === selectedId ? "selected" : ""}>
-          ${escapeHtml(itemDisplayName(item))} — ${escapeHtml(prettyTier(item.tier))}
+          ${escapeHtml(itemDisplayName(item))} — ${escapeHtml(prettyTier(item.tier))}${item.theme ? ` · ${escapeHtml(prettyTheme(item.theme))}` : ""}
         </option>
       `).join("");
 
@@ -2478,6 +2569,31 @@ header .auth-user-menu button:hover {
       return `nameplate-tier-${cleanCssToken(nameplate.tier)} nameplate-theme-${cleanCssToken(nameplate.theme)} nameplate-item-${cleanCssToken(nameplate.item_key)}`;
     }
 
+    function getDominantLoadoutTheme(items) {
+      const counts = {};
+      for (const item of items.filter(Boolean)) {
+        const theme = cleanCssToken(item.theme || "");
+        if (!theme || theme === "default" || theme === "general") continue;
+        counts[theme] = (counts[theme] || 0) + 1;
+      }
+      let bestTheme = "";
+      let bestCount = 0;
+      for (const [theme, count] of Object.entries(counts)) {
+        if (count > bestCount) {
+          bestTheme = theme;
+          bestCount = count;
+        }
+      }
+      return bestTheme ? { theme: bestTheme, count: bestCount } : null;
+    }
+
+    function previewChip(item, labelPrefix = "") {
+      if (!item) return "";
+      const theme = cleanCssToken(item.theme || "general");
+      const tier = cleanCssToken(item.tier || "standard");
+      return `<span class="preview-cosmetic-chip theme-${escapeHtml(theme)} tier-${escapeHtml(tier)}" title="${escapeHtml(prettyTier(item.tier))}${item.theme ? ` · ${escapeHtml(prettyTheme(item.theme))}` : ""}">${escapeHtml(item.icon || "✨")} ${labelPrefix ? `${escapeHtml(labelPrefix)}: ` : ""}${escapeHtml(item.name || "Item")}</span>`;
+    }
+
     function updatePaddockPreview() {
       const username = currentProfile?.username || getUsernameFromUser(currentUser);
       const visibleBadges = BADGE_ORDER.filter(isBadgeVisible).map(getBadgeText);
@@ -2491,20 +2607,34 @@ header .auth-user-menu button:hover {
         selectedItemFromSelect("loadoutSticker3") || findOwnedItemById(prizeLoadout?.equipped_sticker_3_item_id),
       ].filter(Boolean);
 
+      const allStyleItems = [flair, title, frame, nameplate, ...stickers].filter(Boolean);
+      const dominant = getDominantLoadoutTheme(allStyleItems);
+      const setBonusHtml = dominant && dominant.count >= 3
+        ? `<div class="theme-set-panel"><div class="theme-chip-row"><span class="theme-chip theme-${escapeHtml(dominant.theme)}">${escapeHtml(prettyTheme(dominant.theme))} Set ${Number(dominant.count)}/6</span><strong>Theme bonus active</strong></div><span>Your equipped cosmetics match, so your profile and shoutbox style get a more cohesive ${escapeHtml(prettyTheme(dominant.theme))} look.</span></div>`
+        : `<div class="theme-set-panel"><div class="theme-chip-row"><span class="theme-chip">No set bonus yet</span></div><span>Equip 3 or more cosmetics from the same theme to activate a cleaner matching style.</span></div>`;
+
       const shoutboxParts = [username, ...visibleBadges];
       if (flair) shoutboxParts.push(`💬 ${flair.name}`);
+      if (title) shoutboxParts.push(`🏷️ ${title.name}`);
 
       if ($("shoutboxPreview")) {
-        $("shoutboxPreview").innerHTML = `<strong>Shoutbox:</strong> ${escapeHtml(shoutboxParts.join(" · "))}<br><span style="color:var(--account-muted)">message here...</span>`;
+        $("shoutboxPreview").innerHTML = `<strong>Shoutbox:</strong> ${escapeHtml(shoutboxParts.join(" · "))}<br><span style="color:var(--account-muted)">Frame changes the message bubble style; nameplate changes the username chip; stickers sit beside the name.</span>`;
       }
 
       const stickerHtml = stickers.length
         ? `<div class="preview-stickers">${stickers.map((item) => `
-            <span class="preview-sticker-chip" title="${escapeHtml(item.name || "Sticker")}">
+            <span class="preview-sticker-chip theme-${escapeHtml(cleanCssToken(item.theme || "general"))}" title="${escapeHtml(item.name || "Sticker")}">
               ${escapeHtml(item.icon || "✨")} ${escapeHtml(item.name || "Sticker")}
             </span>
           `).join("")}</div>`
         : `<div class="preview-meta">Stickers: None</div>`;
+
+      const equippedChips = [
+        previewChip(flair, "Flair"),
+        previewChip(title, "Title"),
+        previewChip(frame, "Frame"),
+        previewChip(nameplate, "Nameplate"),
+      ].filter(Boolean).join("");
 
       if ($("profilePreview")) {
         $("profilePreview").innerHTML = `
@@ -2512,10 +2642,9 @@ header .auth-user-menu button:hover {
           <div class="profile-preview-card ${escapeHtml(previewFrameClasses(frame))}">
             <div class="preview-nameplate ${escapeHtml(previewNameplateClasses(nameplate))}">${escapeHtml(username)}</div>
             <div class="preview-meta">${visibleBadges.length ? escapeHtml(visibleBadges.join(" · ")) : "No visible badges selected"}</div>
-            <div class="preview-meta">${title ? `Title: ${escapeHtml(itemDisplayName(title))}` : "Title: None"}</div>
-            <div class="preview-meta">${frame ? `Frame: ${escapeHtml(frame.name)} is active on your profile/shoutbox cards.` : "Frame: None"}</div>
-            <div class="preview-meta">${nameplate ? `Nameplate: ${escapeHtml(nameplate.name)} is active behind your username.` : "Nameplate: None"}</div>
+            <div class="cosmetic-preview-row">${equippedChips || `<span class="preview-cosmetic-chip">No cosmetics equipped</span>`}</div>
             ${stickerHtml}
+            ${setBonusHtml}
           </div>`;
       }
     }
