@@ -21,6 +21,201 @@
   <link rel="shortcut icon" href="/logo.png">
   <link rel="stylesheet" href="/css/styles.css">
 
+  <style>
+    /* Header refresh: grouped navigation, cleaner spacing, and calmer button hierarchy. */
+    header .nav {
+      gap: .85rem;
+    }
+
+    .navlinks-clean {
+      align-items: center;
+      gap: .35rem;
+    }
+
+    .nav-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-drop-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      height: 40px;
+      padding: 0 .78rem;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: transparent;
+      color: rgba(234, 240, 255, .76);
+      font: inherit;
+      font-size: .94rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+    }
+
+    .nav-drop-btn span {
+      font-size: .72rem;
+      color: rgba(234, 240, 255, .42);
+      transform: translateY(1px);
+    }
+
+    .nav-group:hover .nav-drop-btn,
+    .nav-group:focus-within .nav-drop-btn {
+      color: #fff;
+      background: rgba(255, 255, 255, .055);
+      border-color: rgba(255, 255, 255, .08);
+    }
+
+    .nav-drop-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      z-index: 1000;
+      display: none;
+      min-width: 230px;
+      padding: .55rem;
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(18, 24, 38, .98), rgba(9, 14, 25, .98));
+      box-shadow: 0 22px 60px rgba(0, 0, 0, .46);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-group:hover .nav-drop-menu,
+    .nav-group:focus-within .nav-drop-menu {
+      display: grid;
+      gap: .25rem;
+    }
+
+    .nav-drop-menu a {
+      display: block;
+      padding: .72rem .78rem;
+      border-radius: 12px;
+      color: rgba(234, 240, 255, .72);
+      text-decoration: none;
+      white-space: nowrap;
+      line-height: 1.15;
+    }
+
+    .nav-drop-menu a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .06);
+    }
+
+    .navlinks-clean .nav-support-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 .9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .035);
+      color: rgba(234, 240, 255, .86);
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .navlinks-clean .nav-support-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .07);
+      border-color: rgba(255, 255, 255, .18);
+    }
+
+    .navlinks-clean .nav-submit {
+      height: 40px;
+      padding: 0 .95rem;
+      border-radius: 14px;
+      border: 1px solid rgba(83, 166, 255, .28);
+      background: linear-gradient(180deg, rgba(83, 166, 255, .18), rgba(83, 166, 255, .09));
+      color: #fff;
+      font-weight: 900;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: none;
+    }
+
+    .navlinks-clean .nav-submit:hover {
+      border-color: rgba(83, 166, 255, .48);
+      background: linear-gradient(180deg, rgba(83, 166, 255, .25), rgba(83, 166, 255, .12));
+    }
+
+    #authArea {
+      flex: 0 0 auto;
+    }
+
+    #authArea .auth-user-btn {
+      min-height: 40px;
+      border-radius: 14px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 1060px) {
+      .nav-drop-btn {
+        padding-inline: .62rem;
+      }
+
+      .navlinks-clean .nav-support-link,
+      .navlinks-clean .nav-submit {
+        padding-inline: .7rem;
+      }
+    }
+
+    @media (max-width: 900px) {
+      header .nav {
+        position: relative;
+      }
+
+      .navlinks-clean {
+        align-items: stretch;
+        gap: .55rem;
+      }
+
+      .navlinks-clean.show,
+      .navlinks-clean.open {
+        display: grid;
+      }
+
+      .nav-group {
+        display: grid;
+        width: 100%;
+      }
+
+      .nav-drop-btn {
+        justify-content: space-between;
+        width: 100%;
+        height: auto;
+        padding: .75rem .85rem;
+        border-color: rgba(255, 255, 255, .08);
+        background: rgba(255, 255, 255, .035);
+      }
+
+      .nav-drop-menu {
+        position: static;
+        display: grid;
+        min-width: 0;
+        margin-top: .4rem;
+        padding: .4rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, .025);
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+
+      .navlinks-clean .nav-support-link,
+      .navlinks-clean .nav-submit,
+      .navlinks-clean .nav-auth-mobile {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+
 </head>
 
 <body class="bg-track-curves">
@@ -30,19 +225,43 @@
         <span class="brand-badge" aria-hidden="true">🎮</span>
         <span>Trackmania Events</span>
       </a>
+
       <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-      <nav id="primary-nav" class="navlinks" aria-label="Primary">
-        <a href="/kacky">Kacky Finishes</a>
-        <a href="/wrleaderboard">WR Leaderboard</a>
-        <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
-        <a href="/totd">Track of the Day</a>
-        <a href="/highlights">Community Highlights</a>
+
+      <nav id="primary-nav" class="navlinks navlinks-clean" aria-label="Primary">
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button" aria-haspopup="true">Events <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/">Home</a>
+            <a href="/kacky">Kacky Finishes</a>
+            <a href="/totd">Track of the Day</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button" aria-haspopup="true">Stats <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/wrleaderboard">WR Leaderboard</a>
+            <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+            <a href="/account">My Stats</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-drop-btn" type="button" aria-haspopup="true">Community <span>▾</span></button>
+          <div class="nav-drop-menu">
+            <a href="/highlights">Community Highlights</a>
+            <a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noopener noreferrer">Discord</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+
         <a class="nav-support-link" href="/support">Support</a>
         <button class="nav-submit submit-event-open" type="button">Submit Event</button>
         <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
       </nav>
-      <div class="cta" id="authArea">
 
+      <div class="cta" id="authArea">
         <div class="auth-user-dropdown">
           <button id="authUserBtn" class="btn auth-user-btn" type="button">
             <span id="authUserLabel">Login / Register</span>
@@ -59,8 +278,6 @@
             <button id="authMenuLogoutBtn" type="button">Logout</button>
           </div>
         </div>
-
-        <a class="btn" href="#contact">Contact</a>
       </div>
     </div>
   </header>
@@ -1780,8 +1997,8 @@
         setOpen(!nav.classList.contains("show"));
       });
 
-      nav.querySelectorAll("a").forEach((a) => {
-        a.addEventListener("click", () => setOpen(false));
+      nav.querySelectorAll("a, .nav-submit, .nav-auth-mobile").forEach((item) => {
+        item.addEventListener("click", () => setOpen(false));
       });
 
       document.addEventListener("click", (e) => {
