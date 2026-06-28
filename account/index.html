@@ -313,35 +313,6 @@
     .account-authed { display: none; }
     .account-authed.show { display: block; }
 
-
-    .profile-badges {
-      display: flex;
-      align-items: center;
-      gap: .45rem;
-      flex-wrap: wrap;
-    }
-
-    .profile-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .35rem;
-      width: fit-content;
-      padding: .36rem .66rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, .10);
-      background: rgba(255, 255, 255, .042);
-      color: var(--account-soft);
-      font-size: .78rem;
-      font-weight: 900;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .profile-badge.admin,
-    .profile-badge.champion { border-color: rgba(245, 217, 138, .28); background: rgba(245, 217, 138, .08); color: #f5d98a; }
-    .profile-badge.winner { border-color: rgba(240, 230, 176, .22); background: rgba(240, 230, 176, .07); color: #f0e6b0; }
-    .profile-badge.supporter { border-color: rgba(104, 240, 255, .34); background: rgba(104, 240, 255, .10); color: #68f0ff; }
-
     @media (max-width: 980px) { .account-grid { grid-template-columns: 1fr; } }
 
     @media (max-width: 720px) {
@@ -698,6 +669,190 @@
   }
 }
 
+
+
+/* Shared account dropdown */
+.tme-header .auth-user-dropdown,
+header .auth-user-dropdown {
+  position: relative;
+}
+
+.tme-header .auth-user-btn,
+header .auth-user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 40px;
+  padding: .62rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.045);
+  color: var(--text, #f3f5f7);
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tme-header .auth-user-btn:hover,
+header .auth-user-btn:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.16);
+}
+
+.tme-header .auth-caret,
+header .auth-caret {
+  font-size: .78rem;
+  opacity: .82;
+}
+
+.tme-header .auth-user-menu,
+header .auth-user-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 230px;
+  display: none;
+  flex-direction: column;
+  gap: .45rem;
+  padding: .7rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(10,16,28,.98);
+  box-shadow: 0 18px 45px rgba(0,0,0,.42);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  z-index: 99999;
+}
+
+.tme-header .auth-user-menu.show,
+header .auth-user-menu.show {
+  display: flex;
+}
+
+.tme-header .auth-user-info,
+header .auth-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding-bottom: .55rem;
+  margin-bottom: .35rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.tme-header .auth-user-info strong,
+header .auth-user-info strong {
+  color: #fff;
+  font-size: .95rem;
+}
+
+.tme-header .auth-user-info span,
+header .auth-user-info span {
+  color: rgba(255,255,255,.6);
+  font-size: .82rem;
+  word-break: break-word;
+}
+
+.tme-header .auth-user-menu button,
+header .auth-user-menu button {
+  border: 0;
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  color: #fff;
+  padding: .75rem .85rem;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 800;
+  transition: .18s ease;
+}
+
+.tme-header .auth-user-menu button:hover,
+header .auth-user-menu button:hover {
+  background: rgba(255,255,255,.08);
+}
+
+
+/* Header dropdown vertical alignment fix v6 */
+.tme-header .nav-drop-menu,
+.nav-drop-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .25rem !important;
+  top: calc(100% + 10px) !important;
+  left: 0 !important;
+  right: auto !important;
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: 280px !important;
+  transform: none !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-drop-menu a,
+.nav-drop-menu a {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-group:hover .nav-drop-menu,
+.tme-header .nav-group:focus-within .nav-drop-menu,
+.tme-header .nav-group.open .nav-drop-menu,
+.nav-group:hover .nav-drop-menu,
+.nav-group:focus-within .nav-drop-menu,
+.nav-group.open .nav-drop-menu {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu,
+.auth-user-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .42rem !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  transform: none !important;
+}
+
+.tme-header .auth-user-menu.show,
+.auth-user-menu.show {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu button,
+.auth-user-menu button {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-top: .35rem !important;
+  }
+
+  .tme-header .auth-user-menu,
+  .auth-user-menu {
+    right: 0 !important;
+    width: min(260px, 86vw) !important;
+    min-width: min(260px, 86vw) !important;
+  }
+}
 </style>
 </head>
 
@@ -741,11 +896,25 @@
         </div>
 
         <a class="nav-support-link" href="/support">Support</a>
-        <a class="nav-account nav-mobile-action active" href="/account">Account</a>
       </nav>
 
-      <div class="cta">
-        <a class="nav-account active" href="/account">Account</a>
+      <div class="cta" id="authArea">
+        <div class="auth-user-dropdown">
+          <button id="authUserBtn" class="btn auth-user-btn" type="button">
+            <span id="authUserLabel">Login / Register</span>
+            <span class="auth-caret">▾</span>
+          </button>
+
+          <div id="authUserMenu" class="auth-user-menu">
+            <div class="auth-user-info">
+              <strong id="authMenuUsername">Guest</strong>
+              <span id="authMenuEmail"></span>
+            </div>
+
+            <button id="authMenuAccountBtn" type="button">Account</button>
+            <button id="authMenuLogoutBtn" type="button">Logout</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -802,11 +971,6 @@
                   <div class="account-info-row">
                     <span>Role</span>
                     <strong><span id="profileRole" class="account-pill">User</span></strong>
-                  </div>
-
-                  <div class="account-info-row">
-                    <span>Badges</span>
-                    <strong><span id="profileBadges" class="profile-badges">Loading…</span></strong>
                   </div>
                 </div>
               </div>
@@ -1159,102 +1323,6 @@
       renderLinkedTrackmania(tmId, tmName);
     }
 
-
-
-    function renderBadgeList(targetId, badges) {
-      const el = $(targetId);
-      if (!el) return;
-
-      if (!Array.isArray(badges) || !badges.length) {
-        el.innerHTML = `<span class="account-status">No badges yet</span>`;
-        return;
-      }
-
-      el.innerHTML = badges.map((badge) => `
-        <span class="profile-badge ${escapeHtml(badge.key)}" title="${escapeHtml(badge.label)}">
-          <span aria-hidden="true">${escapeHtml(badge.icon)}</span>${escapeHtml(badge.label)}
-        </span>
-      `).join("");
-    }
-
-    async function getAccountRole(userId, profile) {
-      if (profile?.role) return String(profile.role || "user").toLowerCase();
-
-      try {
-        const { data, error } = await tmeSupabase
-          .from("shoutbox_roles")
-          .select("role")
-          .eq("user_id", userId)
-          .maybeSingle();
-        if (error) throw error;
-        return String(data?.role || "user").toLowerCase();
-      } catch {
-        return "user";
-      }
-    }
-
-    async function getContributionBadges(userId) {
-      const out = { eventOrganizer: false, highlightContributor: false };
-
-      try {
-        const { data } = await tmeSupabase
-          .from("event_submissions")
-          .select("id")
-          .eq("user_id", userId)
-          .eq("status", "approved")
-          .limit(1);
-        out.eventOrganizer = Array.isArray(data) && data.length > 0;
-      } catch (err) {
-        console.warn("Could not check event organizer badge:", err);
-      }
-
-      try {
-        const { data } = await tmeSupabase
-          .from("community_highlights")
-          .select("id")
-          .eq("user_id", userId)
-          .eq("status", "approved")
-          .limit(1);
-        out.highlightContributor = Array.isArray(data) && data.length > 0;
-      } catch (err) {
-        console.warn("Could not check highlight contributor badge:", err);
-      }
-
-      return out;
-    }
-
-    async function getWeeklyBadgeForAccount(accountId) {
-      if (!accountId) return { wins: 0, champion: false };
-
-      const aggregate = await fetchJsonSafe("/data/weekly-shorts/aggregate.json", { players: [] });
-      const players = Array.isArray(aggregate?.players) ? aggregate.players : [];
-      const maxWins = players.reduce((max, player) => Math.max(max, Number(player?.wins || 0)), 0);
-      const player = players.find((p) => p?.accountId === accountId);
-      const wins = Number(player?.wins || 0);
-
-      return { wins, champion: wins > 0 && wins === maxWins };
-    }
-
-    async function renderProfileBadges(user, profile) {
-      const badges = [];
-      const role = await getAccountRole(user.id, profile);
-      const weekly = await getWeeklyBadgeForAccount(profile?.trackmania_account_id || "");
-      const contributions = await getContributionBadges(user.id);
-
-      if (role === "admin") badges.push({ key: "admin", icon: "🛡️", label: "Admin" });
-      if (weekly.champion) badges.push({ key: "champion", icon: "👑", label: "Weekly Champion" });
-      else if (weekly.wins > 0) badges.push({ key: "winner", icon: "🏆", label: "Weekly Winner" });
-
-      if (profile?.supporter_status === "supporter" && profile?.show_supporter_badge !== false) {
-        badges.push({ key: "supporter", icon: "💙", label: "Supporter" });
-      }
-
-      if (contributions.eventOrganizer) badges.push({ key: "organizer", icon: "📅", label: "Event Organizer" });
-      if (contributions.highlightContributor) badges.push({ key: "highlight", icon: "🎬", label: "Highlight Contributor" });
-
-      renderBadgeList("profileBadges", badges);
-    }
-
     function renderLinkedTrackmania(tmId, tmName) {
       const linked = Boolean(tmId);
       $("linkedTmName").textContent = linked ? (tmName || "Linked Trackmania account") : "No Trackmania account linked";
@@ -1431,7 +1499,6 @@
         return;
       }
       currentProfile = data;
-      await renderProfileBadges(currentUser, currentProfile);
       setStatus("prefsStatus", "Preferences saved.", "success");
     }
 
@@ -1467,10 +1534,7 @@
       cachedStatsData = null;
       $("tmDisplayNameInput").value = data.trackmania_display_name || "";
       renderLinkedTrackmania(data.trackmania_account_id, data.trackmania_display_name);
-      await Promise.all([
-        renderStatsForAccount(data.trackmania_account_id),
-        renderProfileBadges(currentUser, data),
-      ]);
+      await renderStatsForAccount(data.trackmania_account_id);
       setStatus("tmStatus", "Trackmania account saved.", "success");
     }
 
@@ -1532,7 +1596,6 @@
         await Promise.all([
           loadSubmissions(currentUser.id),
           renderStatsForAccount(currentProfile?.trackmania_account_id || ""),
-          renderProfileBadges(currentUser, currentProfile),
         ]);
       } catch (err) {
         console.warn("Account page failed:", err);
@@ -1543,6 +1606,125 @@
 
     bootAccountPage();
   </script>
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+  const label = document.getElementById("authUserLabel");
+  const usernameEl = document.getElementById("authMenuUsername");
+  const emailEl = document.getElementById("authMenuEmail");
+  const accountBtn = document.getElementById("authMenuAccountBtn");
+  const logoutBtn = document.getElementById("authMenuLogoutBtn");
+  if (!label || !usernameEl || !emailEl || !accountBtn || !logoutBtn) return;
+
+  function fallbackName(user) {
+    return user?.user_metadata?.username || user?.user_metadata?.name || user?.email?.split("@")[0] || "Account";
+  }
+
+  function setGuest() {
+    label.textContent = "Login / Register";
+    usernameEl.textContent = "Guest";
+    emailEl.textContent = "";
+    accountBtn.textContent = "Login / Register";
+    logoutBtn.style.display = "none";
+  }
+
+  function setUser(name, email) {
+    label.textContent = name || "Account";
+    usernameEl.textContent = name || "Account";
+    emailEl.textContent = email || "";
+    accountBtn.textContent = "Account";
+    logoutBtn.style.display = "";
+  }
+
+  async function syncHeaderAuth() {
+    if (!window.supabase?.createClient) {
+      setGuest();
+      return;
+    }
+
+    const client = window.__tmeHeaderSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+    window.__tmeHeaderSupabase = client;
+
+    try {
+      const { data } = await client.auth.getSession();
+      const user = data?.session?.user || null;
+      if (!user) {
+        setGuest();
+        return;
+      }
+
+      let displayName = fallbackName(user);
+      try {
+        const res = await client
+          .from("profiles")
+          .select("username,email")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!res.error && res.data?.username) displayName = res.data.username;
+      } catch {}
+
+      setUser(displayName, user.email || "");
+    } catch (err) {
+      console.warn("Header auth sync failed:", err);
+      setGuest();
+    }
+  }
+
+  accountBtn.addEventListener("click", () => {
+    window.location.href = label.textContent === "Login / Register" ? "/" : "/account";
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const client = window.__tmeHeaderSupabase;
+      if (client?.auth?.signOut) await client.auth.signOut();
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    }
+    window.location.href = "/";
+  });
+
+  syncHeaderAuth();
+})();
+</script>
+
+
+<script>
+(function () {
+  const wrap = document.querySelector(".auth-user-dropdown");
+  const btn = document.getElementById("authUserBtn");
+  const menu = document.getElementById("authUserMenu");
+  if (!wrap || !btn || !menu || btn.dataset.tmeAuthToggleBound) return;
+  btn.dataset.tmeAuthToggleBound = "1";
+
+  btn.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    menu.classList.toggle("show");
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!wrap.contains(event.target)) menu.classList.remove("show");
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") menu.classList.remove("show");
+  });
+})();
+</script>
+
 </body>
 
 </html>
