@@ -22,31 +22,7 @@
   <link rel="stylesheet" href="/css/styles.css">
 
   <style>
-    .nav-group {
-      position: relative;
-    }
-
-    .nav-group::after {
-      content: "";
-      position: absolute;
-      left: -12px;
-      right: -12px;
-      top: 100%;
-      height: 18px;
-      background: transparent;
-      pointer-events: auto;
-    }
-
-    .nav-drop-menu {
-      top: calc(100% + 10px);
-    }
-
-    .nav-group:hover .nav-drop-menu,
-    .nav-group:focus-within .nav-drop-menu,
-    .nav-drop-menu:hover {
-      display: flex;
-    }
-
+    /* Header refresh: grouped navigation, cleaner spacing, and calmer button hierarchy. */
     header .nav {
       gap: .85rem;
     }
@@ -238,6 +214,225 @@
         justify-content: center;
       }
     }
+  
+
+    /* Header cleanup v3: Support is the blue pill, dropdowns stay plain, Submit Event is neutral. */
+    .nav-drop-btn,
+    .nav-drop-btn.active,
+    .nav-group:hover .nav-drop-btn,
+    .nav-group:focus-within .nav-drop-btn {
+      background: transparent !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      color: rgba(234, 240, 255, .76) !important;
+      transform: none !important;
+    }
+
+    .nav-drop-btn:hover,
+    .nav-group:hover .nav-drop-btn,
+    .nav-group:focus-within .nav-drop-btn {
+      color: #fff !important;
+    }
+
+    .navlinks-clean .nav-support-link,
+    .navlinks-clean .nav-support-link.active {
+      border: 1px solid rgba(104, 240, 255, .42) !important;
+      background: rgba(104, 240, 255, .095) !important;
+      color: #f7fbff !important;
+      border-radius: 999px !important;
+      box-shadow: 0 0 0 1px rgba(104, 240, 255, .035) inset !important;
+    }
+
+    .navlinks-clean .nav-support-link:hover {
+      color: #fff !important;
+      background: rgba(104, 240, 255, .15) !important;
+      border-color: rgba(104, 240, 255, .62) !important;
+    }
+
+    .navlinks-clean .nav-submit {
+      border: 1px solid rgba(255, 255, 255, .12) !important;
+      background: rgba(255, 255, 255, .045) !important;
+      color: rgba(234, 240, 255, .92) !important;
+      box-shadow: none !important;
+    }
+
+    .navlinks-clean .nav-submit:hover {
+      border-color: rgba(255, 255, 255, .2) !important;
+      background: rgba(255, 255, 255, .075) !important;
+      color: #fff !important;
+    }
+
+    @media (max-width: 900px) {
+      .nav-drop-btn,
+      .nav-drop-btn.active {
+        border-radius: 14px !important;
+        border-color: rgba(255, 255, 255, .08) !important;
+        background: rgba(255, 255, 255, .035) !important;
+      }
+    }
+
+  
+
+/* Header dropdown hover bridge v4 */
+.tme-header .nav-group,
+.nav-group {
+  position: relative;
+}
+
+@media (min-width: 901px) {
+  .tme-header .nav-group::after,
+  .nav-group::after {
+    content: "";
+    position: absolute;
+    left: -14px;
+    right: -14px;
+    top: 100%;
+    height: 22px;
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    top: calc(100% + 10px);
+  }
+
+  .tme-header .nav-group:hover .nav-drop-menu,
+  .tme-header .nav-group:focus-within .nav-drop-menu,
+  .tme-header .nav-group.open .nav-drop-menu,
+  .tme-header .nav-drop-menu:hover,
+  .nav-group:hover .nav-drop-menu,
+  .nav-group:focus-within .nav-drop-menu,
+  .nav-group.open .nav-drop-menu,
+  .nav-drop-menu:hover {
+    display: flex;
+  }
+}
+
+/* Header cleanup v4: plain dropdown labels, Support is the only blue pill */
+.tme-header .nav-drop-btn,
+.tme-header .nav-drop-btn.active,
+.nav-drop-btn,
+.nav-drop-btn.active {
+  appearance: none !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: rgba(243,245,247,.72) !important;
+  padding: .5rem .35rem !important;
+  transform: none !important;
+}
+
+.tme-header .nav-drop-btn:hover,
+.tme-header .nav-drop-btn:focus,
+.tme-header .nav-group:hover .nav-drop-btn,
+.tme-header .nav-group:focus-within .nav-drop-btn,
+.nav-drop-btn:hover,
+.nav-drop-btn:focus,
+.nav-group:hover .nav-drop-btn,
+.nav-group:focus-within .nav-drop-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  transform: none !important;
+}
+
+.tme-header .nav-support-link,
+.tme-header .nav-support-link.active,
+.nav-support-link,
+.nav-support-link.active {
+  min-height: 40px !important;
+  padding: .58rem 1rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(104,240,255,.42) !important;
+  background: rgba(104,240,255,.095) !important;
+  color: #f7fbff !important;
+  font-weight: 950 !important;
+  box-shadow: 0 0 0 1px rgba(104,240,255,.035) inset !important;
+}
+
+.tme-header .nav-support-link:hover,
+.tme-header .nav-support-link:focus,
+.nav-support-link:hover,
+.nav-support-link:focus {
+  background: rgba(104,240,255,.15) !important;
+  border-color: rgba(104,240,255,.62) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-btn,
+  .tme-header .nav-drop-btn.active,
+  .nav-drop-btn,
+  .nav-drop-btn.active {
+    width: 100% !important;
+    min-height: 44px !important;
+    justify-content: space-between !important;
+    padding: .75rem .85rem !important;
+    border-radius: 14px !important;
+    border-color: rgba(255,255,255,.06) !important;
+    background: rgba(255,255,255,.035) !important;
+  }
+
+  .tme-header .nav-support-link,
+  .tme-header .nav-support-link.active,
+  .nav-support-link,
+  .nav-support-link.active {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+</style>
+
+
+  <style>
+    .shout-name-line {
+      display: inline-flex;
+      align-items: center;
+      gap: .32rem;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .shout-badge-line {
+      display: inline-flex;
+      align-items: center;
+      gap: .32rem;
+      flex-wrap: wrap;
+      color: rgba(234, 240, 255, .72);
+      font-size: .82rem;
+      font-weight: 850;
+      line-height: 1.2;
+    }
+
+    .shout-badge-label {
+      display: inline-flex;
+      align-items: center;
+      gap: .22rem;
+      white-space: nowrap;
+    }
+
+    .shout-badge-label::before {
+      content: "·";
+      color: rgba(234, 240, 255, .38);
+      margin-right: .08rem;
+    }
+
+    .shout-badge-label.admin { color: #f5d98a; }
+    .shout-badge-label.champion { color: #f5d98a; }
+    .shout-badge-label.winner { color: #f0e6b0; }
+    .shout-badge-label.supporter { color: #68f0ff; }
+    .shout-badge-label.organizer { color: #d7dbe2; }
+    .shout-badge-label.highlight { color: #d7dbe2; }
+
+    @media (max-width: 560px) {
+      .shout-badge-line { font-size: .76rem; gap: .25rem; }
+    }
   </style>
 
 </head>
@@ -267,7 +462,6 @@
           <div class="nav-drop-menu">
             <a href="/wrleaderboard">WR Leaderboard</a>
             <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
-            <a href="/account">My Stats</a>
           </div>
         </div>
 
@@ -800,6 +994,9 @@
     const reactionPickerMenu = document.getElementById("reactionPickerMenu");
     let activeReactionMessageId = "";
     const shoutRolesByUserId = {};
+    const shoutBadgeProfilesByUserId = {};
+    const shoutBadgesByUserId = {};
+    let weeklyBadgeStatePromise = null;
     const supabaseConfigured =
       typeof window.supabase !== "undefined" &&
       /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL) &&
@@ -3027,6 +3224,184 @@
       return roles;
     }
 
+
+
+    function normalizeUuidList(values) {
+      return [...new Set((Array.isArray(values) ? values : []).filter((id) =>
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id || ""))
+      ))];
+    }
+
+    async function loadShoutboxBadgeProfiles(userIds) {
+      if (!tmeSupabase) return {};
+      const uniqueIds = normalizeUuidList(userIds);
+      if (!uniqueIds.length) return {};
+
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_public_badge_profiles", {
+          user_ids_input: uniqueIds,
+        });
+
+        if (!error && Array.isArray(data)) {
+          const out = {};
+          for (const row of data) {
+            out[row.user_id] = {
+              trackmania_account_id: row.trackmania_account_id || "",
+              supporter_status: row.supporter_status || "none",
+              show_supporter_badge: row.show_supporter_badge !== false,
+            };
+          }
+          return out;
+        }
+      } catch (err) {
+        console.warn("Badge profile RPC unavailable:", err);
+      }
+
+      try {
+        const { data, error } = await tmeSupabase
+          .from("profiles")
+          .select("id,trackmania_account_id,supporter_status,show_supporter_badge")
+          .in("id", uniqueIds);
+
+        if (error) throw error;
+
+        const out = {};
+        for (const row of data || []) {
+          out[row.id] = {
+            trackmania_account_id: row.trackmania_account_id || "",
+            supporter_status: row.supporter_status || "none",
+            show_supporter_badge: row.show_supporter_badge !== false,
+          };
+        }
+        return out;
+      } catch (err) {
+        console.warn("Could not load public badge profiles:", err);
+        return {};
+      }
+    }
+
+    async function loadPublicContributionBadges(userIds) {
+      if (!tmeSupabase) return { eventUsers: new Set(), highlightUsers: new Set() };
+      const uniqueIds = normalizeUuidList(userIds);
+      if (!uniqueIds.length) return { eventUsers: new Set(), highlightUsers: new Set() };
+
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_public_contribution_badges", {
+          user_ids_input: uniqueIds,
+        });
+
+        if (!error && Array.isArray(data)) {
+          return {
+            eventUsers: new Set(data.filter((row) => row.event_organizer).map((row) => row.user_id)),
+            highlightUsers: new Set(data.filter((row) => row.highlight_contributor).map((row) => row.user_id)),
+          };
+        }
+      } catch (err) {
+        console.warn("Contribution badge RPC unavailable:", err);
+      }
+
+      const eventUsers = new Set();
+      const highlightUsers = new Set();
+
+      try {
+        const { data } = await tmeSupabase
+          .from("event_submissions")
+          .select("user_id")
+          .in("user_id", uniqueIds)
+          .eq("status", "approved");
+        for (const row of data || []) if (row.user_id) eventUsers.add(row.user_id);
+      } catch (err) {
+        console.warn("Could not load event organizer badges:", err);
+      }
+
+      try {
+        const { data } = await tmeSupabase
+          .from("community_highlights")
+          .select("user_id")
+          .in("user_id", uniqueIds)
+          .eq("status", "approved");
+        for (const row of data || []) if (row.user_id) highlightUsers.add(row.user_id);
+      } catch (err) {
+        console.warn("Could not load highlight contributor badges:", err);
+      }
+
+      return { eventUsers, highlightUsers };
+    }
+
+    async function getWeeklyBadgeState() {
+      if (weeklyBadgeStatePromise) return weeklyBadgeStatePromise;
+
+      weeklyBadgeStatePromise = fetch("/data/weekly-shorts/aggregate.json?cb=" + Date.now(), { cache: "no-store" })
+        .then((res) => res.ok ? res.json() : { players: [] })
+        .then((json) => {
+          const players = Array.isArray(json?.players) ? json.players : [];
+          const winsByAccountId = {};
+          let maxWins = 0;
+
+          for (const player of players) {
+            const accountId = player?.accountId;
+            const wins = Number(player?.wins || 0);
+            if (!accountId || !Number.isFinite(wins) || wins <= 0) continue;
+            winsByAccountId[accountId] = wins;
+            maxWins = Math.max(maxWins, wins);
+          }
+
+          return { winsByAccountId, maxWins };
+        })
+        .catch((err) => {
+          console.warn("Could not load weekly badge state:", err);
+          return { winsByAccountId: {}, maxWins: 0 };
+        });
+
+      return weeklyBadgeStatePromise;
+    }
+
+    async function prepareShoutboxBadges(userIds) {
+      const uniqueIds = normalizeUuidList(userIds);
+      if (!uniqueIds.length) return;
+
+      const [profilesByUser, contributions, weeklyState] = await Promise.all([
+        loadShoutboxBadgeProfiles(uniqueIds),
+        loadPublicContributionBadges(uniqueIds),
+        getWeeklyBadgeState(),
+      ]);
+
+      Object.assign(shoutBadgeProfilesByUserId, profilesByUser);
+
+      for (const userId of uniqueIds) {
+        const profile = shoutBadgeProfilesByUserId[userId] || {};
+        const role = shoutRolesByUserId[userId] || "user";
+        const tmAccountId = profile.trackmania_account_id || "";
+        const weeklyWins = Number(weeklyState.winsByAccountId?.[tmAccountId] || 0);
+        const isWeeklyChampion = weeklyWins > 0 && weeklyWins === Number(weeklyState.maxWins || 0);
+        const badges = [];
+
+        if (role === "admin") badges.push({ key: "admin", icon: "🛡️", label: "Admin" });
+        if (isWeeklyChampion) badges.push({ key: "champion", icon: "👑", label: "Weekly Champion" });
+        else if (weeklyWins > 0) badges.push({ key: "winner", icon: "🏆", label: "Weekly Winner" });
+
+        if (profile.supporter_status === "supporter" && profile.show_supporter_badge !== false) {
+          badges.push({ key: "supporter", icon: "💙", label: "Supporter" });
+        }
+
+        if (contributions.eventUsers.has(userId)) badges.push({ key: "organizer", icon: "📅", label: "Event Organizer" });
+        if (contributions.highlightUsers.has(userId)) badges.push({ key: "highlight", icon: "🎬", label: "Highlight Contributor" });
+
+        shoutBadgesByUserId[userId] = badges;
+      }
+    }
+
+    function renderShoutBadges(userId) {
+      const badges = shoutBadgesByUserId[userId] || [];
+      if (!badges.length) return "";
+
+      return `<span class="shout-badge-line">${badges.map((badge) => `
+        <span class="shout-badge-label ${escapeHtml(badge.key)}" title="${escapeHtml(badge.label)}">
+          <span aria-hidden="true">${escapeHtml(badge.icon)}</span>${escapeHtml(badge.label)}
+        </span>
+      `).join("")}</span>`;
+    }
+
     function getShoutRole(msg) {
       return shoutRolesByUserId[msg?.user_id] || "user";
     }
@@ -3111,7 +3486,10 @@
       <div class="shout-msg ${isSystem ? "system" : "user"} ${mentionedMe ? "mentioned-me" : ""} ${shouldGroup ? "grouped" : ""}" data-message-id="${escapeHtml(msg.id || "")}">
         ${!shouldGroup ? `
           <div class="shout-meta">
-            <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+            <span class="shout-name-line">
+              <span class="shout-name ${roleClass}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+              ${!isSystem && !isLocal ? renderShoutBadges(msg.user_id) : ""}
+            </span>
 
             <div class="shout-meta-right">
               <div class="shout-actions-inline">
@@ -3420,6 +3798,8 @@
         ]);
 
         Object.assign(shoutRolesByUserId, rolesByUser);
+
+        await prepareShoutboxBadges(userIds);
 
         currentShoutRole = shoutRolesByUserId[user?.id] || "user";
 
