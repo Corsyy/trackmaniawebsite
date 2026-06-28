@@ -1519,6 +1519,139 @@ header .auth-user-menu button:hover {
   font-size: .78rem !important;
 }
 
+
+
+/* Prize Runs depth pass: collection progress, parts, streaks, and Paddock showcase */
+.collection-progress-panel,
+.theme-set-panel,
+.paddock-showcase-panel,
+.parts-info-panel {
+  display: grid;
+  gap: .75rem;
+  margin-bottom: .95rem;
+  padding: .95rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.065);
+  background: rgba(255,255,255,.024);
+}
+.collection-progress-head,
+.theme-set-head,
+.paddock-showcase-head,
+.parts-info-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .8rem;
+}
+.collection-progress-head strong,
+.theme-set-head strong,
+.paddock-showcase-head strong,
+.parts-info-head strong {
+  display:block;
+  color: var(--account-text);
+}
+.collection-progress-head span,
+.theme-set-head span,
+.paddock-showcase-head span,
+.parts-info-head span {
+  display:block;
+  margin-top:.18rem;
+  color: var(--account-muted);
+  font-size:.85rem;
+  line-height:1.35;
+}
+.collection-progress-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 66px;
+  align-items: center;
+  gap: .7rem;
+  color: var(--account-soft);
+  font-size: .86rem;
+}
+.collection-progress-label { font-weight: 900; color: var(--account-text); }
+.collection-progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.055);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.045);
+}
+.collection-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(104,240,255,.75), rgba(245,217,138,.72));
+}
+.collection-progress-count { text-align:right; color: var(--account-muted); font-weight: 850; }
+.theme-set-list,
+.paddock-slot-grid {
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:.65rem;
+}
+.theme-set-card,
+.paddock-slot-card {
+  padding:.78rem .85rem;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.055);
+  background:rgba(255,255,255,.022);
+}
+.theme-set-card.active {
+  border-color: rgba(104,240,255,.18);
+  background: linear-gradient(180deg, rgba(104,240,255,.045), rgba(255,255,255,.022));
+}
+.theme-set-top,
+.paddock-slot-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.65rem;
+  color:var(--account-text);
+  font-weight:950;
+}
+.theme-set-meta,
+.paddock-slot-meta {
+  margin-top:.35rem;
+  color:var(--account-muted);
+  font-size:.82rem;
+  line-height:1.35;
+}
+.parts-balance {
+  display:inline-flex;
+  align-items:center;
+  gap:.38rem;
+  padding:.32rem .62rem;
+  border-radius:999px;
+  border:1px solid rgba(245,217,138,.20);
+  background:rgba(245,217,138,.06);
+  color:#f5d98a;
+  font-weight:950;
+  white-space:nowrap;
+}
+.inventory-item.is-upgraded {
+  border-color: rgba(104,240,255,.10);
+  background: linear-gradient(180deg, rgba(104,240,255,.026), rgba(255,255,255,.018));
+}
+.item-level-pill {
+  display:inline-flex;
+  align-items:center;
+  width:fit-content;
+  padding:.24rem .48rem;
+  border-radius:999px;
+  border:1px solid rgba(104,240,255,.15);
+  color:#dffbff;
+  background:rgba(104,240,255,.06);
+  font-size:.68rem;
+  font-weight:950;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+@media (max-width: 720px) {
+  .collection-progress-row { grid-template-columns: 1fr; gap:.35rem; }
+  .collection-progress-count { text-align:left; }
+  .theme-set-list, .paddock-slot-grid { grid-template-columns: 1fr; }
+}
+
 </style>
 </head>
 
@@ -1641,6 +1774,14 @@ header .auth-user-menu button:hover {
                 <div>
                   <span>Daily Run</span>
                   <strong id="collectionDaily">—</strong>
+                </div>
+                <div>
+                  <span>Paddock Parts</span>
+                  <strong id="collectionPartsQuick">0</strong>
+                </div>
+                <div>
+                  <span>Streak</span>
+                  <strong id="collectionStreakQuick">0</strong>
                 </div>
               </div>
 
@@ -1836,6 +1977,39 @@ header .auth-user-menu button:hover {
                       <div class="collection-box"><span>Duplicates</span><strong id="collectionDuplicates">0</strong><small>Extra copies found</small></div>
                       <div class="collection-box"><span>Extra Tickets</span><strong id="collectionTicketsMirror">0</strong><small>Runs after daily</small></div>
                       <div class="collection-box"><span>Daily Run</span><strong id="collectionDailyMirror">—</strong><small>Free run status</small></div>
+                      <div class="collection-box"><span>Paddock Parts</span><strong id="collectionParts">0</strong><small>Duplicate reward value</small></div>
+                      <div class="collection-box"><span>Current Streak</span><strong id="collectionStreak">0</strong><small>Daily Prize Run streak</small></div>
+                    </div>
+
+                    <div id="collectionProgressPanel" class="collection-progress-panel">
+                      <div class="collection-progress-head">
+                        <div>
+                          <strong>Collection Progress</strong>
+                          <span>Track how much of the full Prize Runs pool you have unlocked.</span>
+                        </div>
+                        <span id="collectionCompletion" class="parts-balance">0 / 220</span>
+                      </div>
+                      <div id="collectionProgressRows"></div>
+                    </div>
+
+                    <div id="themeSetPanel" class="theme-set-panel">
+                      <div class="theme-set-head">
+                        <div>
+                          <strong>Theme Sets</strong>
+                          <span>Matching cosmetics from the same theme activate cleaner, stronger visual identity.</span>
+                        </div>
+                      </div>
+                      <div id="themeSetList" class="theme-set-list"></div>
+                    </div>
+
+                    <div id="paddockShowcase" class="paddock-showcase-panel">
+                      <div class="paddock-showcase-head">
+                        <div>
+                          <strong>Paddock Showcase</strong>
+                          <span>Your garage collectibles now have a home: cars, wheels, trophies, signs, and display pieces.</span>
+                        </div>
+                      </div>
+                      <div id="paddockSlotGrid" class="paddock-slot-grid"></div>
                     </div>
 
                     <div id="inventoryList" class="inventory-list">
@@ -2056,6 +2230,7 @@ header .auth-user-menu button:hover {
     let prizeInventory = [];
     let prizeLoadout = null;
     let prizeStatus = null;
+    let allPrizeItems = [];
 
     function escapeHtml(value) {
       const div = document.createElement("div");
@@ -2371,6 +2546,52 @@ header .auth-user-menu button:hover {
       return prizeInventory.map(getInventoryItem).find((item) => item?.id === itemId) || null;
     }
 
+    function itemLevelFromDuplicates(duplicateCount) {
+      const dupes = Number(duplicateCount || 0);
+      return Math.max(1, Math.min(5, 1 + Math.floor(dupes / 2)));
+    }
+
+    function categoryPoolCounts() {
+      const counts = {};
+      for (const item of allPrizeItems) {
+        const cat = item?.category || "item";
+        counts[cat] = (counts[cat] || 0) + 1;
+      }
+      return counts;
+    }
+
+    function ownedCategoryCounts() {
+      const counts = {};
+      for (const row of prizeInventory) {
+        const item = getInventoryItem(row);
+        const cat = item?.category || "item";
+        counts[cat] = (counts[cat] || 0) + 1;
+      }
+      return counts;
+    }
+
+    function activeLoadoutItems() {
+      return [
+        findOwnedItemById(getSelectValue("loadoutFlair") || prizeLoadout?.equipped_flair_item_id),
+        findOwnedItemById(getSelectValue("loadoutTitle") || prizeLoadout?.equipped_title_item_id),
+        findOwnedItemById(getSelectValue("loadoutFrame") || prizeLoadout?.equipped_frame_item_id),
+        findOwnedItemById(getSelectValue("loadoutNameplate") || prizeLoadout?.equipped_nameplate_item_id),
+        findOwnedItemById(getSelectValue("loadoutSticker1") || prizeLoadout?.equipped_sticker_1_item_id),
+        findOwnedItemById(getSelectValue("loadoutSticker2") || prizeLoadout?.equipped_sticker_2_item_id),
+        findOwnedItemById(getSelectValue("loadoutSticker3") || prizeLoadout?.equipped_sticker_3_item_id),
+      ].filter(Boolean);
+    }
+
+    function loadoutThemeCounts() {
+      const counts = {};
+      for (const item of activeLoadoutItems()) {
+        const theme = item?.theme || "general";
+        if (!theme || theme === "general") continue;
+        counts[theme] = (counts[theme] || 0) + 1;
+      }
+      return counts;
+    }
+
     function getSelectValue(id) {
       const el = $(id);
       return el && el.value ? el.value : null;
@@ -2554,6 +2775,20 @@ header .auth-user-menu button:hover {
       }
     }
 
+    async function loadAllPrizeItems() {
+      try {
+        const { data, error } = await tmeSupabase
+          .from("prize_items")
+          .select("id,item_key,name,category,tier,icon,theme,is_active")
+          .eq("is_active", true);
+        if (error) throw error;
+        allPrizeItems = Array.isArray(data) ? data : [];
+      } catch (err) {
+        console.warn("Could not load full prize item pool:", err);
+        allPrizeItems = [];
+      }
+    }
+
     function fillPrizeSelect(id, category, selectedId) {
       const el = $(id);
       if (!el) return;
@@ -2585,17 +2820,124 @@ header .auth-user-menu button:hover {
 
     function renderPrizeStatus() {
       const box = $("prizeStatusBox");
-      if (!box) return;
       const freeUsed = Boolean(prizeStatus?.free_run_used_today);
       const tickets = Number(prizeStatus?.extra_tickets || 0);
-      box.innerHTML = `
-        <strong style="display:block;color:#f3f5f7;margin-bottom:.25rem">Prize Runs</strong>
-        Daily free run: <b>${freeUsed ? "Used today" : "Available"}</b> • Extra tickets: <b>${tickets.toLocaleString()}</b>
-      `;
+      const parts = Number(prizeStatus?.paddock_parts || 0);
+      const streak = Number(prizeStatus?.current_streak || 0);
+      const bestStreak = Number(prizeStatus?.best_streak || 0);
+
+      if (box) {
+        box.innerHTML = `
+          <strong style="display:block;color:#f3f5f7;margin-bottom:.25rem">Prize Runs</strong>
+          Daily free run: <b>${freeUsed ? "Used today" : "Available"}</b> • Extra tickets: <b>${tickets.toLocaleString()}</b><br>
+          Streak: <b>${streak.toLocaleString()}</b> day${streak === 1 ? "" : "s"} • Best: <b>${bestStreak.toLocaleString()}</b> • Parts: <b>${parts.toLocaleString()}</b>
+        `;
+      }
+
       if ($("collectionTickets")) $("collectionTickets").textContent = tickets.toLocaleString();
       if ($("collectionDaily")) $("collectionDaily").textContent = freeUsed ? "Used" : "Ready";
       if ($("collectionTicketsMirror")) $("collectionTicketsMirror").textContent = tickets.toLocaleString();
       if ($("collectionDailyMirror")) $("collectionDailyMirror").textContent = freeUsed ? "Used" : "Ready";
+      if ($("collectionParts")) $("collectionParts").textContent = parts.toLocaleString();
+      if ($("collectionPartsQuick")) $("collectionPartsQuick").textContent = parts.toLocaleString();
+      if ($("collectionStreak")) $("collectionStreak").textContent = streak.toLocaleString();
+      if ($("collectionStreakQuick")) $("collectionStreakQuick").textContent = streak.toLocaleString();
+    }
+
+    function renderCollectionProgress() {
+      const rowsEl = $("collectionProgressRows");
+      if (!rowsEl) return;
+
+      const pool = categoryPoolCounts();
+      const owned = ownedCategoryCounts();
+      const totalPool = allPrizeItems.length || 220;
+      const totalOwned = prizeInventory.length;
+      const totalPct = totalPool ? Math.round((totalOwned / totalPool) * 100) : 0;
+      if ($("collectionCompletion")) $("collectionCompletion").textContent = `${totalOwned.toLocaleString()} / ${totalPool.toLocaleString()} • ${totalPct}%`;
+
+      const order = ["flair", "title", "frame", "sticker", "nameplate", "paddock", "seasonal"];
+      rowsEl.innerHTML = order.map((cat) => {
+        const max = Number(pool[cat] || 0);
+        const got = Number(owned[cat] || 0);
+        if (!max) return "";
+        const pct = Math.min(100, Math.round((got / max) * 100));
+        return `
+          <div class="collection-progress-row">
+            <div class="collection-progress-label">${escapeHtml(prettyCategory(cat))}</div>
+            <div class="collection-progress-track"><div class="collection-progress-fill" style="width:${pct}%"></div></div>
+            <div class="collection-progress-count">${got}/${max}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderThemeSets() {
+      const el = $("themeSetList");
+      if (!el) return;
+      const loadoutCounts = loadoutThemeCounts();
+      const ownedThemes = {};
+      for (const row of prizeInventory) {
+        const item = getInventoryItem(row);
+        const theme = item?.theme || "general";
+        if (!theme || theme === "general") continue;
+        ownedThemes[theme] = (ownedThemes[theme] || 0) + 1;
+      }
+      const themes = Object.keys(ownedThemes).sort((a,b) => (loadoutCounts[b] || 0) - (loadoutCounts[a] || 0) || ownedThemes[b] - ownedThemes[a]).slice(0, 8);
+      if (!themes.length) {
+        el.innerHTML = `<div class="empty-state">Unlock themed items to start building sets like Stadium, Snow, Rally, Desert, WR, Champion, Kacky, and Community.</div>`;
+        return;
+      }
+      el.innerHTML = themes.map((theme) => {
+        const equipped = Number(loadoutCounts[theme] || 0);
+        const active = equipped >= 3;
+        return `
+          <div class="theme-set-card ${active ? "active" : ""}">
+            <div class="theme-set-top">
+              <span>${escapeHtml(prettyTheme(theme))}</span>
+              <span class="tier-chip">${equipped}/3 equipped</span>
+            </div>
+            <div class="theme-set-meta">${Number(ownedThemes[theme] || 0).toLocaleString()} owned • ${active ? "Theme bonus active" : "Equip 3 matching cosmetics to activate"}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function classifyPaddockItem(item) {
+      const key = String(item?.item_key || item?.name || "").toLowerCase();
+      if (/car/.test(key)) return "Car";
+      if (/wheel|tire/.test(key)) return "Wheels / Tires";
+      if (/trail|underglow|lights/.test(key)) return "Trail / Lights";
+      if (/trophy|podium|cabinet/.test(key)) return "Trophy Display";
+      if (/banner|sign|plaque/.test(key)) return "Banner / Sign";
+      return "Garage Item";
+    }
+
+    function renderPaddockShowcase() {
+      const el = $("paddockSlotGrid");
+      if (!el) return;
+      const paddockItems = prizeInventory.map(getInventoryItem).filter((item) => item?.category === "paddock");
+      if (!paddockItems.length) {
+        el.innerHTML = `<div class="empty-state">Paddock collectibles you unlock will appear here as a garage-style showcase.</div>`;
+        return;
+      }
+      const slots = {};
+      for (const item of paddockItems) {
+        const slot = classifyPaddockItem(item);
+        if (!slots[slot]) slots[slot] = [];
+        slots[slot].push(item);
+      }
+      el.innerHTML = Object.entries(slots).slice(0, 8).map(([slot, items]) => {
+        const featured = items[0];
+        return `
+          <div class="paddock-slot-card">
+            <div class="paddock-slot-top">
+              <span>${escapeHtml(slot)}</span>
+              <span>${escapeHtml(featured?.icon || "🏁")}</span>
+            </div>
+            <div class="paddock-slot-meta"><b>${escapeHtml(featured?.name || "Unlocked item")}</b><br>${items.length} item${items.length === 1 ? "" : "s"} in this showcase slot</div>
+          </div>
+        `;
+      }).join("");
     }
 
     function renderPrizeCollection() {
@@ -2606,23 +2948,29 @@ header .auth-user-menu button:hover {
       if ($("collectionTotal")) $("collectionTotal").textContent = prizeInventory.length.toLocaleString();
       if ($("collectionDuplicates")) $("collectionDuplicates").textContent = duplicates.toLocaleString();
 
+      renderCollectionProgress();
+      renderThemeSets();
+      renderPaddockShowcase();
+
       if (!prizeInventory.length) {
-        list.innerHTML = `<div class="empty-state">No Prize Run items unlocked yet. Once the Prize Runs page is added, your unlocked items will appear here.</div>`;
+        list.innerHTML = `<div class="empty-state">No Prize Run items unlocked yet. Start a Prize Run to begin your Paddock collection.</div>`;
         return;
       }
 
-      list.innerHTML = prizeInventory.slice(0, 80).map((row) => {
+      list.innerHTML = prizeInventory.slice(0, 100).map((row) => {
         const item = getInventoryItem(row);
         if (!item) return "";
         const dupes = Number(row.duplicate_count || 0);
+        const level = itemLevelFromDuplicates(dupes);
         return `
-          <div class="inventory-item">
+          <div class="inventory-item ${level > 1 ? "is-upgraded" : ""}">
             <div>
               <strong>${escapeHtml(itemDisplayName(item))}</strong>
               <span>${escapeHtml(prettyCategory(item.category))} • ${escapeHtml(item.description || "Prize Run item")}</span>
             </div>
             <div style="display:grid;justify-items:end;gap:.28rem">
               <span class="tier-chip">${escapeHtml(prettyTier(item.tier))}</span>
+              ${level > 1 ? `<span class="item-level-pill">Level ${level}</span>` : ""}
               ${dupes > 0 ? `<small>+${dupes} duplicate${dupes === 1 ? "" : "s"}</small>` : ""}
             </div>
           </div>
@@ -2657,6 +3005,7 @@ header .auth-user-menu button:hover {
       prizeLoadout = data;
       setStatus("loadoutStatus", "Loadout saved.", "success");
       updatePaddockPreview();
+      renderThemeSets();
     }
 
     function selectedItemFromSelect(id) {
@@ -2767,6 +3116,7 @@ header .auth-user-menu button:hover {
         loadPrizeInventory(),
         loadPrizeLoadout(),
         loadPrizeStatus(),
+        loadAllPrizeItems(),
       ]);
       renderBadgeChoices();
       renderPrizeLoadout();
