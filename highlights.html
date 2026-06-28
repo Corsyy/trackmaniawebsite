@@ -1536,6 +1536,7 @@
   const authMenuUsername = document.getElementById("authMenuUsername");
   const authMenuEmail = document.getElementById("authMenuEmail");
   const authMenuLogoutBtn = document.getElementById("authMenuLogoutBtn");
+  authUserMenu?.addEventListener("click", (event) => event.stopPropagation());
 
   async function updateDropdownUser() {
     if (!window.tmeSupabase && !window.supabase && typeof tmeSupabase === "undefined") return;
@@ -1567,7 +1568,9 @@
     authMenuEmail.textContent = user.email || "";
   }
 
-  authUserBtn?.addEventListener("click", async () => {
+  authUserBtn?.addEventListener("click", async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     const sb =
       window.tmeSupabase ||
       window.supabase ||
@@ -1689,9 +1692,6 @@
   const accountMenu = header.querySelector("#authUserMenu");
   const accountToggle = header.querySelector("#authUserBtn");
 
-  accountToggle?.addEventListener("click", () => {
-    accountMenu?.classList.toggle("show");
-  });
 
   accountBtn?.addEventListener("click", () => {
     window.location.href = "/account";
