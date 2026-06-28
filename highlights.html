@@ -557,6 +557,204 @@
   }
 }
 
+
+
+/* Header dropdown hover bridge v4 */
+.tme-header .nav-group,
+.nav-group {
+  position: relative;
+}
+
+@media (min-width: 901px) {
+  .tme-header .nav-group::after,
+  .nav-group::after {
+    content: "";
+    position: absolute;
+    left: -14px;
+    right: -14px;
+    top: 100%;
+    height: 22px;
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    top: calc(100% + 10px);
+  }
+
+  .tme-header .nav-group:hover .nav-drop-menu,
+  .tme-header .nav-group:focus-within .nav-drop-menu,
+  .tme-header .nav-group.open .nav-drop-menu,
+  .tme-header .nav-drop-menu:hover,
+  .nav-group:hover .nav-drop-menu,
+  .nav-group:focus-within .nav-drop-menu,
+  .nav-group.open .nav-drop-menu,
+  .nav-drop-menu:hover {
+    display: flex;
+  }
+}
+
+/* Header cleanup v4: plain dropdown labels, Support is the only blue pill */
+.tme-header .nav-drop-btn,
+.tme-header .nav-drop-btn.active,
+.nav-drop-btn,
+.nav-drop-btn.active {
+  appearance: none !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: rgba(243,245,247,.72) !important;
+  padding: .5rem .35rem !important;
+  transform: none !important;
+}
+
+.tme-header .nav-drop-btn:hover,
+.tme-header .nav-drop-btn:focus,
+.tme-header .nav-group:hover .nav-drop-btn,
+.tme-header .nav-group:focus-within .nav-drop-btn,
+.nav-drop-btn:hover,
+.nav-drop-btn:focus,
+.nav-group:hover .nav-drop-btn,
+.nav-group:focus-within .nav-drop-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  transform: none !important;
+}
+
+.tme-header .nav-support-link,
+.tme-header .nav-support-link.active,
+.nav-support-link,
+.nav-support-link.active {
+  min-height: 40px !important;
+  padding: .58rem 1rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(104,240,255,.42) !important;
+  background: rgba(104,240,255,.095) !important;
+  color: #f7fbff !important;
+  font-weight: 950 !important;
+  box-shadow: 0 0 0 1px rgba(104,240,255,.035) inset !important;
+}
+
+.tme-header .nav-support-link:hover,
+.tme-header .nav-support-link:focus,
+.nav-support-link:hover,
+.nav-support-link:focus {
+  background: rgba(104,240,255,.15) !important;
+  border-color: rgba(104,240,255,.62) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-btn,
+  .tme-header .nav-drop-btn.active,
+  .nav-drop-btn,
+  .nav-drop-btn.active {
+    width: 100% !important;
+    min-height: 44px !important;
+    justify-content: space-between !important;
+    padding: .75rem .85rem !important;
+    border-radius: 14px !important;
+    border-color: rgba(255,255,255,.06) !important;
+    background: rgba(255,255,255,.035) !important;
+  }
+
+  .tme-header .nav-support-link,
+  .tme-header .nav-support-link.active,
+  .nav-support-link,
+  .nav-support-link.active {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+
+
+/* Header dropdown vertical alignment fix v6 */
+.tme-header .nav-drop-menu,
+.nav-drop-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .25rem !important;
+  top: calc(100% + 10px) !important;
+  left: 0 !important;
+  right: auto !important;
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: 280px !important;
+  transform: none !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-drop-menu a,
+.nav-drop-menu a {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.tme-header .nav-group:hover .nav-drop-menu,
+.tme-header .nav-group:focus-within .nav-drop-menu,
+.tme-header .nav-group.open .nav-drop-menu,
+.nav-group:hover .nav-drop-menu,
+.nav-group:focus-within .nav-drop-menu,
+.nav-group.open .nav-drop-menu {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu,
+.auth-user-menu {
+  display: none;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .42rem !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  transform: none !important;
+}
+
+.tme-header .auth-user-menu.show,
+.auth-user-menu.show {
+  display: flex !important;
+}
+
+.tme-header .auth-user-menu button,
+.auth-user-menu button {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+@media (max-width: 900px) {
+  .tme-header .nav-drop-menu,
+  .nav-drop-menu {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-top: .35rem !important;
+  }
+
+  .tme-header .auth-user-menu,
+  .auth-user-menu {
+    right: 0 !important;
+    width: min(260px, 86vw) !important;
+    min-width: min(260px, 86vw) !important;
+  }
+}
 </style>
 
 </head>
@@ -600,7 +798,6 @@
         </div>
 
         <a class="nav-support-link" href="/support">Support</a>
-        <a class="nav-account nav-mobile-action" href="/account">Account</a>
       </nav>
 
       <div class="cta" id="authArea">
@@ -1520,6 +1717,100 @@
 
     window.location.href = "/";
   });
+})();
+</script>
+
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
+
+  const label = document.getElementById("authUserLabel");
+  const usernameEl = document.getElementById("authMenuUsername");
+  const emailEl = document.getElementById("authMenuEmail");
+  const accountBtn = document.getElementById("authMenuAccountBtn");
+  const logoutBtn = document.getElementById("authMenuLogoutBtn");
+  if (!label || !usernameEl || !emailEl || !accountBtn || !logoutBtn) return;
+
+  function fallbackName(user) {
+    return user?.user_metadata?.username || user?.user_metadata?.name || user?.email?.split("@")[0] || "Account";
+  }
+
+  function setGuest() {
+    label.textContent = "Login / Register";
+    usernameEl.textContent = "Guest";
+    emailEl.textContent = "";
+    accountBtn.textContent = "Login / Register";
+    logoutBtn.style.display = "none";
+  }
+
+  function setUser(name, email) {
+    label.textContent = name || "Account";
+    usernameEl.textContent = name || "Account";
+    emailEl.textContent = email || "";
+    accountBtn.textContent = "Account";
+    logoutBtn.style.display = "";
+  }
+
+  async function syncHeaderAuth() {
+    if (!window.supabase?.createClient) {
+      setGuest();
+      return;
+    }
+
+    const client = window.__tmeHeaderSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: "tme-supabase-auth",
+        flowType: "implicit",
+      },
+    });
+    window.__tmeHeaderSupabase = client;
+
+    try {
+      const { data } = await client.auth.getSession();
+      const user = data?.session?.user || null;
+      if (!user) {
+        setGuest();
+        return;
+      }
+
+      let displayName = fallbackName(user);
+      try {
+        const res = await client
+          .from("profiles")
+          .select("username,email")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!res.error && res.data?.username) displayName = res.data.username;
+      } catch {}
+
+      setUser(displayName, user.email || "");
+    } catch (err) {
+      console.warn("Header auth sync failed:", err);
+      setGuest();
+    }
+  }
+
+  accountBtn.addEventListener("click", () => {
+    window.location.href = label.textContent === "Login / Register" ? "/" : "/account";
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const client = window.__tmeHeaderSupabase;
+      if (client?.auth?.signOut) await client.auth.signOut();
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    }
+    window.location.href = "/";
+  });
+
+  syncHeaderAuth();
 })();
 </script>
 
