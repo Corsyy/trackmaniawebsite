@@ -1,4 +1,5 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
 
 (function () {
   "use strict";
@@ -7,6 +8,12 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
 
   const $ = (id) => document.getElementById(id);
+
+  const STADIUM_CAR_MODEL_URL = "/models/trackmania_2020_carsport.glb";
+  const STADIUM_CAR_TARGET_WIDTH = 2.72;
+  const STADIUM_CAR_TARGET_LENGTH = 4.48;
+  const STADIUM_CAR_BASE_Y = 0.04;
+  const STADIUM_CAR_YAW_OFFSET = 0;
 
   const SLOT_LABELS = {
     cp1: "Checkpoint 1",
@@ -739,72 +746,65 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       return group;
     }
 
-    function makeCarModel() {
+    function makeFallbackCarModel() {
       const carGroup = new THREE.Group();
 
-      // v23: simplified, readable Formula/Stadium-style silhouette.
-      // This intentionally uses clear car language first: long nose, wide hips,
-      // open wheels, front wing, rear wing, dark cockpit, and rear 888 panel.
+      // Cleaner Stadium-inspired car:
+      // no front wing, no random side cages, no oversized stacked boxes.
       // The model points down local -Z; rear is +Z.
-      const silver = new THREE.MeshStandardMaterial({
-        color: 0xb8c0bc,
-        emissive: 0x020303,
-        emissiveIntensity: 0.015,
-        roughness: 0.30,
-        metalness: 0.72,
-      });
-      const silverLight = new THREE.MeshStandardMaterial({
-        color: 0xd3dbd7,
-        emissive: 0x030404,
-        emissiveIntensity: 0.012,
-        roughness: 0.24,
-        metalness: 0.76,
-      });
-      const darkSilver = new THREE.MeshStandardMaterial({
-        color: 0x68706d,
+      const paint = new THREE.MeshStandardMaterial({
+        color: 0x1767d6,
+        emissive: 0x020812,
+        emissiveIntensity: 0.04,
         roughness: 0.38,
-        metalness: 0.62,
+        metalness: 0.5
+      });
+      const paintLight = new THREE.MeshStandardMaterial({
+        color: 0x3f9bff,
+        emissive: 0x031327,
+        emissiveIntensity: 0.06,
+        roughness: 0.34,
+        metalness: 0.46
+      });
+      const bodyGrey = new THREE.MeshStandardMaterial({
+        color: 0x9ca7ad,
+        roughness: 0.32,
+        metalness: 0.56
+      });
+      const dark = new THREE.MeshStandardMaterial({
+        color: 0x05070b,
+        roughness: 0.72,
+        metalness: 0.22
       });
       const carbon = new THREE.MeshStandardMaterial({
-        color: 0x06080a,
-        roughness: 0.72,
-        metalness: 0.25,
-      });
-      const black = new THREE.MeshStandardMaterial({
-        color: 0x030405,
-        roughness: 0.68,
-        metalness: 0.28,
+        color: 0x0b1118,
+        roughness: 0.66,
+        metalness: 0.34
       });
       const rubber = new THREE.MeshStandardMaterial({
-        color: 0x020203,
-        roughness: 0.93,
-        metalness: 0.02,
-      });
-      const tireGroove = new THREE.MeshStandardMaterial({
-        color: 0x171b1e,
-        roughness: 0.82,
-        metalness: 0.04,
+        color: 0x020305,
+        roughness: 0.9,
+        metalness: 0.03
       });
       const rim = new THREE.MeshStandardMaterial({
-        color: 0xcbd2cf,
-        roughness: 0.22,
-        metalness: 0.88,
+        color: 0xc4ccd2,
+        roughness: 0.26,
+        metalness: 0.82
       });
       const glass = new THREE.MeshPhysicalMaterial({
-        color: 0x101719,
-        emissive: 0x020909,
+        color: 0x8fdcf7,
+        emissive: 0x06192a,
         emissiveIntensity: 0.08,
-        roughness: 0.035,
+        roughness: 0.04,
         metalness: 0.02,
         transparent: true,
-        opacity: 0.9,
-        clearcoat: 1,
-        clearcoatRoughness: 0.05,
+        opacity: 0.72,
+        clearcoat: 0.95,
+        clearcoatRoughness: 0.08
       });
-      const whiteLight = new THREE.MeshBasicMaterial({ color: 0xf4f8f3, transparent: true, opacity: 0.95 });
-      const redLight = new THREE.MeshBasicMaterial({ color: 0xff304f, transparent: true, opacity: 0.92 });
-      const cyanAccent = new THREE.MeshBasicMaterial({ color: 0x8beaff, transparent: true, opacity: 0.42 });
-      const amberSeat = new THREE.MeshBasicMaterial({ color: 0xc99b28, transparent: true, opacity: 0.9 });
+      const redLight = new THREE.MeshBasicMaterial({ color: 0xff2e55, transparent: true, opacity: 0.92 });
+      const whiteLight = new THREE.MeshBasicMaterial({ color: 0xf2fbff, transparent: true, opacity: 0.92 });
+      const cyanLine = new THREE.MeshBasicMaterial({ color: 0x80f0ff, transparent: true, opacity: 0.72 });
 
       const add = (mesh, x, y, z, rx = 0, ry = 0, rz = 0) => {
         mesh.position.set(x, y, z);
@@ -819,152 +819,230 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         return add(m, x, y, z, rx, ry, rz);
       };
 
-      function makeBarBetween(a, b, radius, mat) {
-        const start = new THREE.Vector3(a.x, a.y, a.z);
-        const end = new THREE.Vector3(b.x, b.y, b.z);
-        const mid = start.clone().add(end).multiplyScalar(0.5);
-        const dir = end.clone().sub(start);
-        const len = Math.max(0.001, dir.length());
-        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len, 10), mat);
-        mesh.position.copy(mid);
-        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-        carGroup.add(mesh);
-        return mesh;
-      }
+      // Undertray: thin black floor visible below the blue body.
+      make(new THREE.BoxGeometry(1.55, 0.07, 3.35), carbon, 0, 0.20, 0.03);
 
-      // Ground-hugging undertray and diffuser so the car reads low/wide.
-      make(new THREE.BoxGeometry(0.86, 0.055, 3.65), carbon, 0, 0.19, -0.10);
-      make(new THREE.BoxGeometry(1.34, 0.06, 0.46), carbon, 0, 0.20, 1.58, 1, 1, 1, -0.08, 0, 0);
+      // Main low tub. Rounded, wide, and smooth instead of a brick.
+      const mainTub = makeRoundedBox(1.08, 0.34, 2.18, 0.26, paint, 5);
+      mainTub.scale.set(1.02, 0.76, 1.0);
+      add(mainTub, 0, 0.43, 0.06);
 
-      // Smooth main shell: ellipsoids give a clean rounded body instead of a tick/box.
-      make(new THREE.SphereGeometry(1, 42, 18), silver, 0, 0.47, 0.08, 0.50, 0.18, 1.34);
-      make(new THREE.SphereGeometry(1, 42, 18), silver, 0, 0.45, 0.82, 0.72, 0.20, 0.64);
-      make(new THREE.SphereGeometry(1, 36, 14), silverLight, 0, 0.54, -0.72, 0.34, 0.12, 0.86);
+      // Rear shoulders: gives the Stadium car that broad rear haunch look.
+      const rearDeck = makeRoundedBox(1.34, 0.30, 0.98, 0.24, paint, 5);
+      rearDeck.scale.set(1.02, 0.72, 1);
+      add(rearDeck, 0, 0.44, 0.91);
 
-      // Long pointed nose cone, closer to F1/Stadium shape.
-      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.36, 1.70, 36), silverLight);
+      // Long smooth nose/hood tapering toward the front. No front wing.
+      const hood = new THREE.Mesh(makeWedgeGeometry(0.82, 0.30, 1.62, 0.05, 0.28), paintLight);
+      hood.rotation.x = -0.015;
+      add(hood, 0, 0.34, -1.02);
+
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.02, 28), paintLight);
       nose.rotation.x = -Math.PI / 2;
-      nose.scale.set(0.78, 1.0, 0.30);
-      add(nose, 0, 0.42, -1.47);
+      nose.scale.set(0.86, 1.0, 0.30);
+      add(nose, 0, 0.35, -1.72);
 
-      // Center ridge/highlight line down the hood.
-      make(new THREE.BoxGeometry(0.042, 0.022, 2.18), darkSilver, 0, 0.675, -0.55, 1, 1, 1, -0.035, 0, 0);
-      make(new THREE.BoxGeometry(0.030, 0.014, 1.15), cyanAccent, 0, 0.704, -0.84, 1, 1, 1, -0.035, 0, 0);
+      // Subtle center crease like the real car's sculpted hood.
+      const crease = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.026, 2.46), bodyGrey);
+      crease.rotation.x = -0.025;
+      add(crease, 0, 0.58, -0.40);
 
-      // Wide sidepods/hips with visible black intakes. These stop the body reading like a thin bug/tick.
+      // Smooth cockpit/canopy, not a tall bubble.
+      const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.43, 36, 16, 0, Math.PI * 2, 0, Math.PI / 2), glass);
+      canopy.scale.set(0.60, 0.52, 1.02);
+      add(canopy, 0, 0.69, -0.05);
+
+      const canopyBase = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.025, 8, 40), dark);
+      canopyBase.rotation.x = Math.PI / 2;
+      canopyBase.scale.set(0.66, 0.40, 1);
+      add(canopyBase, 0, 0.665, -0.05);
+
+      // Low roof intake/slot.
+      make(new THREE.BoxGeometry(0.34, 0.035, 0.18), dark, 0, 0.84, 0.41, 1, 1, 1, -0.05, 0, 0);
+
+      // Side intakes integrated into the body, not random side objects.
       for (const side of [-1, 1]) {
-        make(new THREE.SphereGeometry(1, 32, 14), silver, side * 0.54, 0.43, 0.12, 0.28, 0.13, 0.82);
-        make(new THREE.SphereGeometry(1, 32, 14), silver, side * 0.63, 0.43, 0.82, 0.31, 0.14, 0.48);
+        const shoulder = makeRoundedBox(0.28, 0.22, 1.38, 0.14, paint, 4);
+        shoulder.scale.set(0.82, 0.70, 1);
+        add(shoulder, side * 0.66, 0.38, 0.20);
 
-        const intake = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.18, 0.50), black);
-        intake.rotation.y = side * -0.18;
-        intake.rotation.z = side * 0.04;
-        add(intake, side * 0.78, 0.47, 0.02);
+        const intake = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.13, 0.52), dark);
+        intake.rotation.y = side * -0.10;
+        add(intake, side * 0.78, 0.42, -0.18);
 
-        const lowerCut = new THREE.Mesh(new THREE.BoxGeometry(0.060, 0.07, 0.76), carbon);
-        lowerCut.rotation.y = side * -0.10;
-        add(lowerCut, side * 0.82, 0.30, -0.42);
+        const lowerSkirt = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.06, 2.08), carbon);
+        add(lowerSkirt, side * 0.78, 0.25, 0.14);
+
+        // Small cyan accent line similar to trim/LED detail, kept subtle.
+        const trimLine = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.018, 0.88), cyanLine);
+        add(trimLine, side * 0.80, 0.53, -0.32);
       }
 
-      // Compact dark cockpit/canopy with a tiny amber seat detail.
-      make(new THREE.BoxGeometry(0.50, 0.065, 0.72), black, 0, 0.695, -0.02, 1, 1, 1, -0.02, 0, 0);
-      make(new THREE.SphereGeometry(1, 34, 14, 0, Math.PI * 2, 0, Math.PI / 2), glass, 0, 0.72, -0.04, 0.27, 0.16, 0.43);
-      make(new THREE.BoxGeometry(0.20, 0.028, 0.33), carbon, 0, 0.765, -0.03, 1, 1, 1, -0.03, 0, 0);
-      make(new THREE.BoxGeometry(0.035, 0.026, 0.30), amberSeat, -0.055, 0.787, -0.035, 1, 1, 1, 0.04, 0, 0);
-      make(new THREE.BoxGeometry(0.035, 0.026, 0.30), amberSeat, 0.055, 0.787, -0.035, 1, 1, 1, 0.04, 0, 0);
-
-      // Front wing assembly. This makes it read as a proper open-wheel race car from every angle.
-      make(new THREE.BoxGeometry(1.72, 0.055, 0.18), carbon, 0, 0.25, -2.08);
-      make(new THREE.BoxGeometry(1.42, 0.045, 0.15), carbon, 0, 0.29, -1.84);
-      make(new THREE.BoxGeometry(0.045, 0.28, 0.34), carbon, -0.91, 0.31, -2.00, 1, 1, 1, 0, 0.10, 0);
-      make(new THREE.BoxGeometry(0.045, 0.28, 0.34), carbon, 0.91, 0.31, -2.00, 1, 1, 1, 0, -0.10, 0);
-
-      // Front black face and small headlights/intakes.
-      make(new THREE.BoxGeometry(0.46, 0.13, 0.055), black, 0, 0.405, -2.08);
-      make(new THREE.BoxGeometry(0.16, 0.032, 0.06), whiteLight, -0.18, 0.44, -2.115, 1, 1, 1, 0, 0.10, 0);
-      make(new THREE.BoxGeometry(0.16, 0.032, 0.06), whiteLight, 0.18, 0.44, -2.115, 1, 1, 1, 0, -0.10, 0);
-
-      // Rear 888 panel and rear wing, like the reference rear shot.
-      make(new THREE.BoxGeometry(1.05, 0.27, 0.075), black, 0, 0.43, 1.68);
-      for (const x of [-0.25, 0, 0.25]) {
-        make(new THREE.BoxGeometry(0.095, 0.13, 0.082), whiteLight, x, 0.455, 1.725);
+      // Front black grille/air intake with simple light details.
+      const frontPanel = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.14, 0.052), dark);
+      add(frontPanel, 0, 0.39, -2.18);
+      for (const x of [-0.24, 0, 0.24]) {
+        make(new THREE.BoxGeometry(0.12, 0.035, 0.055), whiteLight, x, 0.415, -2.212);
       }
-      make(new THREE.BoxGeometry(0.22, 0.035, 0.082), redLight, -0.43, 0.275, 1.725);
-      make(new THREE.BoxGeometry(0.22, 0.035, 0.082), redLight, 0.43, 0.275, 1.725);
+      make(new THREE.BoxGeometry(0.22, 0.025, 0.055), cyanLine, -0.43, 0.445, -2.21);
+      make(new THREE.BoxGeometry(0.22, 0.025, 0.055), cyanLine, 0.43, 0.445, -2.21);
 
-      make(new THREE.BoxGeometry(1.62, 0.075, 0.22), carbon, 0, 0.91, 1.84);
-      make(new THREE.BoxGeometry(1.44, 0.055, 0.16), carbon, 0, 0.78, 1.71);
-      make(new THREE.BoxGeometry(0.055, 0.36, 0.28), carbon, -0.86, 0.78, 1.82);
-      make(new THREE.BoxGeometry(0.055, 0.36, 0.28), carbon, 0.86, 0.78, 1.82);
-      makeBarBetween({ x: -0.42, y: 0.50, z: 1.42 }, { x: -0.58, y: 0.82, z: 1.78 }, 0.016, carbon);
-      makeBarBetween({ x: 0.42, y: 0.50, z: 1.42 }, { x: 0.58, y: 0.82, z: 1.78 }, 0.016, carbon);
+      // Rear black panel and "888" style blocks, visible from the route camera.
+      const rearPanel = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.22, 0.06), dark);
+      add(rearPanel, 0, 0.43, 1.82);
+      for (const x of [-0.22, 0, 0.22]) {
+        make(new THREE.BoxGeometry(0.095, 0.105, 0.065), whiteLight, x, 0.46, 1.858);
+      }
+      make(new THREE.BoxGeometry(0.26, 0.035, 0.065), redLight, -0.42, 0.29, 1.86);
+      make(new THREE.BoxGeometry(0.26, 0.035, 0.065), redLight, 0.42, 0.29, 1.86);
 
-      // Wheels: bigger, wider open-wheel stance.
+      // Rear diffuser, small and integrated.
+      const diffuser = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.10, 0.32), carbon);
+      diffuser.rotation.x = -0.16;
+      add(diffuser, 0, 0.24, 1.66);
+
+      // Wheels: larger, cleaner, open-wheel layout like Stadium.
       const wheels = [];
-      const wheelSpecs = [
-        { z: -1.40, r: 0.36, w: 0.31, x: 1.05 },
-        { z:  1.12, r: 0.43, w: 0.35, x: 1.12 },
-      ];
-      for (const spec of wheelSpecs) {
-        for (const side of [-1, 1]) {
+      for (const x of [-1.08, 1.08]) {
+        for (const z of [-1.05, 1.04]) {
           const wheelGroup = new THREE.Group();
-          const tireMesh = new THREE.Mesh(new THREE.CylinderGeometry(spec.r, spec.r, spec.w, 64), rubber);
+
+          const tireMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.39, 0.39, 0.30, 56), rubber);
           tireMesh.rotation.z = Math.PI / 2;
           wheelGroup.add(tireMesh);
 
-          const groove1 = new THREE.Mesh(new THREE.TorusGeometry(spec.r * 0.86, 0.014, 8, 52), tireGroove);
-          groove1.rotation.y = Math.PI / 2;
-          groove1.position.x = -0.012;
-          wheelGroup.add(groove1);
-
-          const groove2 = groove1.clone();
-          groove2.position.x = 0.012;
-          wheelGroup.add(groove2);
-
-          const rimOuter = new THREE.Mesh(new THREE.CylinderGeometry(spec.r * 0.56, spec.r * 0.56, spec.w + 0.014, 48), rim);
+          const rimOuter = new THREE.Mesh(new THREE.CylinderGeometry(0.245, 0.245, 0.312, 48), rim);
           rimOuter.rotation.z = Math.PI / 2;
           wheelGroup.add(rimOuter);
 
-          const rimInner = new THREE.Mesh(new THREE.CylinderGeometry(spec.r * 0.36, spec.r * 0.36, spec.w + 0.020, 40), black);
+          const rimInner = new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.135, 0.318, 40), dark);
           rimInner.rotation.z = Math.PI / 2;
           wheelGroup.add(rimInner);
 
-          const hub = new THREE.Mesh(new THREE.CylinderGeometry(spec.r * 0.13, spec.r * 0.13, spec.w + 0.026, 32), silverLight);
+          const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.326, 32), bodyGrey);
           hub.rotation.z = Math.PI / 2;
           wheelGroup.add(hub);
 
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(0.255, 0.012, 8, 48), cyanLine);
+          ring.rotation.y = Math.PI / 2;
+          wheelGroup.add(ring);
+
           for (let i = 0; i < 8; i++) {
-            const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.028, spec.r * 0.48), rim);
+            const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.035, 0.19), rim);
             spoke.rotation.z = Math.PI / 2;
-            spoke.rotation.y = (Math.PI * 2 / 8) * i;
+            spoke.rotation.y = (Math.PI / 4) * i;
             wheelGroup.add(spoke);
           }
 
-          wheelGroup.position.set(side * spec.x, 0.39, spec.z);
+          wheelGroup.position.set(x, 0.35, z);
           carGroup.add(wheelGroup);
           wheels.push(wheelGroup);
         }
       }
 
-      // Suspension arms, visible but clean.
-      const armMat = new THREE.MeshStandardMaterial({ color: 0x313a38, roughness: 0.45, metalness: 0.72 });
-      for (const side of [-1, 1]) {
-        makeBarBetween({ x: side * 0.28, y: 0.35, z: -1.26 }, { x: side * 0.86, y: 0.42, z: -1.50 }, 0.017, armMat);
-        makeBarBetween({ x: side * 0.32, y: 0.48, z: -1.06 }, { x: side * 0.86, y: 0.43, z: -1.28 }, 0.014, armMat);
-        makeBarBetween({ x: side * 0.20, y: 0.29, z: -1.72 }, { x: side * 0.82, y: 0.34, z: -1.58 }, 0.016, armMat);
-
-        makeBarBetween({ x: side * 0.46, y: 0.37, z: 0.88 }, { x: side * 0.94, y: 0.43, z: 1.15 }, 0.018, armMat);
-        makeBarBetween({ x: side * 0.48, y: 0.50, z: 1.30 }, { x: side * 0.94, y: 0.44, z: 1.02 }, 0.015, armMat);
-        makeBarBetween({ x: side * 0.55, y: 0.30, z: 1.52 }, { x: side * 0.92, y: 0.35, z: 1.32 }, 0.016, armMat);
+      // Suspension arms, thin and tucked. Avoids the spider/wing look from earlier.
+      const suspensionMat = new THREE.MeshStandardMaterial({ color: 0x111820, roughness: 0.55, metalness: 0.58 });
+      for (const z of [-1.05, 1.04]) {
+        make(new THREE.BoxGeometry(1.42, 0.028, 0.042), suspensionMat, 0, 0.36, z);
+        make(new THREE.BoxGeometry(1.18, 0.025, 0.035), suspensionMat, 0, 0.48, z - 0.05, 1, 1, 1, 0, 0, 0.06);
+        make(new THREE.BoxGeometry(1.18, 0.025, 0.035), suspensionMat, 0, 0.48, z + 0.05, 1, 1, 1, 0, 0, -0.06);
       }
 
       carGroup.userData.wheels = wheels;
-      carGroup.scale.set(1.13, 1.13, 1.13);
+      carGroup.scale.set(1.0, 1.0, 1.0);
       return carGroup;
     }
 
-    const car = makeCarModel();
+    const car = new THREE.Group();
+    car.userData.baseY = STADIUM_CAR_BASE_Y;
+    car.userData.yawOffset = STADIUM_CAR_YAW_OFFSET;
     scene.add(car);
+
+    function centerAndFitLoadedCar(model) {
+      model.updateMatrixWorld(true);
+
+      // Keep the GLB's own internal transforms, then fit it into the Prize Runs road scale.
+      let box = new THREE.Box3().setFromObject(model);
+      let size = new THREE.Vector3();
+      box.getSize(size);
+
+      // Safety: if a model's long axis imports sideways, rotate it so length is along route Z.
+      if (size.x > size.z * 1.22) {
+        model.rotation.y += Math.PI / 2;
+        model.updateMatrixWorld(true);
+        box = new THREE.Box3().setFromObject(model);
+        box.getSize(size);
+      }
+
+      const scale = Math.min(
+        STADIUM_CAR_TARGET_WIDTH / Math.max(size.x, 0.001),
+        STADIUM_CAR_TARGET_LENGTH / Math.max(size.z, 0.001)
+      );
+      model.scale.multiplyScalar(scale);
+      model.updateMatrixWorld(true);
+
+      box = new THREE.Box3().setFromObject(model);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+
+      // Center X/Z and place wheels on the road surface inside the parent car group.
+      model.position.x -= center.x;
+      model.position.z -= center.z;
+      model.position.y -= box.min.y;
+      model.updateMatrixWorld(true);
+    }
+
+    function applyLoadedCarQuality(model) {
+      model.traverse((obj) => {
+        if (!obj.isMesh) return;
+        obj.frustumCulled = true;
+        obj.castShadow = false;
+        obj.receiveShadow = false;
+        if (obj.material) {
+          const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+          materials.forEach((mat) => {
+            mat.depthWrite = true;
+            mat.needsUpdate = true;
+            if ("roughness" in mat && typeof mat.roughness === "number") mat.roughness = Math.max(mat.roughness, 0.34);
+            if ("metalness" in mat && typeof mat.metalness === "number") mat.metalness = Math.min(Math.max(mat.metalness, 0.18), 0.82);
+          });
+        }
+      });
+    }
+
+    function loadStadiumCarModel() {
+      const loader = new GLTFLoader();
+      loader.load(
+        STADIUM_CAR_MODEL_URL,
+        (gltf) => {
+          const model = gltf.scene || gltf.scenes?.[0];
+          if (!model) throw new Error("The Stadium car GLB loaded without a scene.");
+
+          car.clear();
+          centerAndFitLoadedCar(model);
+          applyLoadedCarQuality(model);
+          car.add(model);
+          car.userData.wheels = [];
+          car.userData.loadedModel = true;
+          reset();
+          console.info("Prize Runs loaded Stadium car GLB:", STADIUM_CAR_MODEL_URL);
+        },
+        undefined,
+        (err) => {
+          console.warn("Could not load Stadium car GLB. Using fallback car.", err);
+          car.clear();
+          const fallback = makeFallbackCarModel();
+          fallback.position.y = 0;
+          car.add(fallback);
+          car.userData.wheels = fallback.userData.wheels || [];
+          car.userData.loadedModel = false;
+          car.userData.baseY = 0.14;
+          reset();
+        }
+      );
+    }
+
+    loadStadiumCarModel();
 
     const path = {
       start: new THREE.Vector3(0, 0, 15.3),
@@ -1000,10 +1078,12 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     }
 
     function setCarAt(vec, yaw = 0) {
-      // The car model points down the local -Z axis, which is also the route direction.
-      // A yaw of 0 means the nose faces forward toward the finish.
-      car.position.set(vec.x, 0.14, vec.z);
-      car.rotation.y = yaw;
+      // The Stadium GLB points down route -Z after import. If a replacement model
+      // faces backward, only STADIUM_CAR_YAW_OFFSET needs changing.
+      const baseY = Number.isFinite(car.userData.baseY) ? car.userData.baseY : STADIUM_CAR_BASE_Y;
+      const yawOffset = Number.isFinite(car.userData.yawOffset) ? car.userData.yawOffset : STADIUM_CAR_YAW_OFFSET;
+      car.position.set(vec.x, baseY, vec.z);
+      car.rotation.y = yaw + yawOffset;
     }
 
     function reset() {
@@ -1043,19 +1123,15 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       return new Promise((resolve) => {
         const from = car.position.clone();
         const to = path[slot].clone();
-        // Drive cleanly through the checkpoint instead of settling back into the arch.
-        to.z -= slot === "finish" ? 1.85 : 1.35;
-        const duration = slot === "finish" ? 1780 : 1500;
+        const duration = slot === "finish" ? 1700 : 1450;
         const start = performance.now();
-        let gateHit = false;
-        const gateZ = path[slot].z;
 
         function step(now) {
           const raw = Math.min(1, (now - start) / duration);
           const t = raw < 0.5 ? 4 * raw * raw * raw : 1 - Math.pow(-2 * raw + 2, 3) / 2;
           const x = from.x + (to.x - from.x) * t;
           const z = from.z + (to.z - from.z) * t;
-          const nextT = Math.min(1, t + 0.018);
+          const nextT = Math.min(1, t + 0.02);
           const nx = from.x + (to.x - from.x) * nextT;
           const nz = from.z + (to.z - from.z) * nextT;
           const dx = nx - x;
@@ -1063,18 +1139,13 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
           const yaw = Math.atan2(-dx, -dz);
           setCarAt(new THREE.Vector3(x, 0, z), yaw);
 
-          targetCamera.set(x * 0.30, 5.95, z + 10.9);
-
-          if (!gateHit && z <= gateZ + 0.12) {
-            gateHit = true;
-            hitGate(slot);
-          }
+          targetCamera.set(x * 0.34, 6.1, z + 10.6);
 
           if (raw < 1) {
             requestAnimationFrame(step);
           } else {
             currentSlot = slot;
-            if (!gateHit) hitGate(slot);
+            hitGate(slot);
             resolve();
           }
         }
@@ -1088,8 +1159,9 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       Object.values(gates).forEach((gate, index) => {
         gate.position.y = Math.sin(elapsed * 1.1 + index) * 0.012;
       });
-      car.position.y = 0.14 + Math.sin(elapsed * 9) * 0.014;
-      if (car.userData.wheels) {
+      const baseY = Number.isFinite(car.userData.baseY) ? car.userData.baseY : STADIUM_CAR_BASE_Y;
+      car.position.y = baseY + Math.sin(elapsed * 9) * 0.01;
+      if (car.userData.wheels?.length) {
         car.userData.wheels.forEach((wheel) => {
           wheel.rotation.x -= 0.18;
         });
@@ -1130,7 +1202,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     reset();
     rafId = requestAnimationFrame(render);
 
-    console.info("Prize Runs 3D scene ready - v22 stadium car silhouette pass");
+    console.info("Prize Runs 3D scene ready - v24 Stadium GLB model");
     return { ready: true, reset, driveTo, resize };
   }
 
