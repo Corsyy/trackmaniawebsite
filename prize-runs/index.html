@@ -1011,12 +1011,58 @@
       try { return new Date(value).toLocaleString(); } catch { return ""; }
     }
 
-    function rewardHistoryLabel(r) {
-      if (r?.kind === "parts" || r?.category === "parts") {
-        return `⚙️ +${Number(r.parts_awarded || 0).toLocaleString()} Parts`;
+    function normalizeReward(raw) {
+      const reward = raw || {};
+      const item = reward.item && typeof reward.item === "object" ? reward.item : null;
+      const type = reward.type || reward.kind || (reward.category === "parts" ? "parts" : "item");
+      const parts = Number(reward.parts ?? reward.parts_awarded ?? reward.paddock_parts ?? 0);
+
+      if (type === "parts") {
+        return {
+          slot: reward.slot || "cp1",
+          label: reward.label || SLOT_LABELS[reward.slot] || reward.slot || "Checkpoint",
+          type: "parts",
+          parts,
+          title: reward.title || `+${parts.toLocaleString()} Paddock Parts`,
+          description: reward.description || "Checkpoint cleared. Parts were added to your Paddock balance.",
+          tier: reward.tier || "clean"
+        };
       }
-      if (r?.kind === "no_bonus") return "🎲 Bonus missed";
-      return `${r?.icon || "🎁"} ${r?.name || "Reward"}`;
+
+      if (type === "no_bonus" || type === "bonus_miss") {
+        return {
+          slot: reward.slot || "cp2",
+          label: reward.label || SLOT_LABELS[reward.slot] || "Checkpoint 2",
+          type: "no_bonus",
+          title: reward.title || "No bonus item",
+          description: reward.description || "You still cleared the checkpoint. The Finish reward is guaranteed.",
+          tier: reward.tier || "standard"
+        };
+      }
+
+      const source = item || reward;
+      return {
+        slot: reward.slot || "finish",
+        label: reward.label || SLOT_LABELS[reward.slot] || reward.slot || "Reward",
+        type: type === "bonus_item" ? "bonus_item" : "item",
+        id: source.id || reward.id || null,
+        item_key: source.item_key || reward.item_key || "",
+        icon: source.icon || reward.icon || "🎁",
+        name: source.name || reward.name || "Reward",
+        description: source.description || reward.description || "Saved to your Paddock collection.",
+        category: source.category || reward.category || "reward",
+        tier: source.tier || reward.tier || "standard",
+        theme: source.theme || reward.theme || "general",
+        parts: Number(reward.parts ?? reward.parts_awarded ?? 0),
+        was_duplicate: Boolean(reward.was_duplicate)
+      };
+    }
+
+    function rewardHistoryLabel(r) {
+      const reward = normalizeReward(r);
+      if (reward.type === "parts") return `⚙️ +${reward.parts.toLocaleString()} Parts`;
+      if (reward.type === "no_bonus") return "🎲 Bonus missed";
+      return `${reward.icon || "🎁"} ${reward.name || "Reward"}`;
     }
 
     function setMsg(text, type = "") {
@@ -1146,30 +1192,29 @@
       el.classList.remove("show");
     }
 
-    function revealReward(reward) {
-      const slot = reward?.slot || "cp1";
+    function revealReward(rawReward) {
+      const reward = normalizeReward(rawReward);
+      const slot = reward.slot || "cp1";
       const card = $(`reward-${slot}`);
       if (!card) return;
-      const kind = reward?.kind || (reward?.category === "parts" ? "parts" : "item");
-      const parts = Number(reward.parts_awarded || 0);
       const duplicate = reward.was_duplicate ? ` <span style="color:rgba(255,255,255,.65)">Duplicate copy</span>` : "";
 
-      if (kind === "parts") {
+      if (reward.type === "parts") {
         card.innerHTML = `
           <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • Parts</div>
-          <div class="reward-name">⚙️ +${parts.toLocaleString()} Paddock Parts</div>
-          <div class="reward-desc">Checkpoint cleared. Parts were added to your Paddock balance.</div>
+          <div class="reward-name">⚙️ +${reward.parts.toLocaleString()} Paddock Parts</div>
+          <div class="reward-desc">${escapeHtml(reward.description)}</div>
           <span class="tier-chip tier-clean">Checkpoint Bonus</span>
         `;
         card.classList.add("revealed", "reward-kind-parts");
         return;
       }
 
-      if (kind === "no_bonus") {
+      if (reward.type === "no_bonus") {
         card.innerHTML = `
           <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • Bonus Chance</div>
-          <div class="reward-name">🎲 No bonus item</div>
-          <div class="reward-desc">You still cleared the checkpoint. The Finish reward is guaranteed.</div>
+          <div class="reward-name">🎲 ${escapeHtml(reward.title)}</div>
+          <div class="reward-desc">${escapeHtml(reward.description)}</div>
           <span class="tier-chip tier-standard">Checkpoint Clear</span>
         `;
         card.classList.add("revealed");
@@ -1180,7 +1225,7 @@
         <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • ${escapeHtml(reward.category || "reward")}</div>
         <div class="reward-name">${escapeHtml(reward.icon || "🎁")} ${escapeHtml(reward.name || "Reward")}</div>
         <div class="reward-desc">${escapeHtml(reward.description || "Saved to your Paddock collection.")}${duplicate}</div>
-        ${parts > 0 ? `<div class="reward-parts">⚙️ +${parts.toLocaleString()} Paddock Parts</div>` : ""}
+        ${reward.parts > 0 ? `<div class="reward-parts">⚙️ +${reward.parts.toLocaleString()} Paddock Parts</div>` : ""}
         <span class="tier-chip tier-${escapeHtml(reward.tier || "standard")}">${escapeHtml(prettyTier(reward.tier))}</span>
       `;
       card.classList.add("revealed", slot === "finish" ? "reward-kind-finish" : "reward-kind-bonus");
@@ -1223,14 +1268,15 @@
         `Theme: ${prettyTheme(result?.theme)}`,
         "",
         ...rewards.map((r) => {
-          if (r.kind === "parts" || r.category === "parts") {
-            return `${SLOT_LABELS[r.slot] || r.slot}: ⚙️ +${Number(r.parts_awarded || 0).toLocaleString()} Paddock Parts`;
+          const reward = normalizeReward(r);
+          if (reward.type === "parts") {
+            return `${SLOT_LABELS[reward.slot] || reward.slot}: ⚙️ +${reward.parts.toLocaleString()} Paddock Parts`;
           }
-          if (r.kind === "no_bonus") {
-            return `${SLOT_LABELS[r.slot] || r.slot}: 🎲 No bonus item`;
+          if (reward.type === "no_bonus") {
+            return `${SLOT_LABELS[reward.slot] || reward.slot}: 🎲 No bonus item`;
           }
-          const dupe = r.was_duplicate ? ` duplicate (+${Number(r.parts_awarded || 0)} parts)` : "";
-          return `${SLOT_LABELS[r.slot] || r.slot}: ${r.icon || "🎁"} ${r.name || "Reward"} [${prettyTier(r.tier)}]${dupe}`;
+          const dupe = reward.was_duplicate ? ` duplicate (+${Number(reward.parts || 0)} parts)` : "";
+          return `${SLOT_LABELS[reward.slot] || reward.slot}: ${reward.icon || "🎁"} ${reward.name || "Reward"} [${prettyTier(reward.tier)}]${dupe}`;
         }),
         "",
         "trackmaniaevents.com/prize-runs"
