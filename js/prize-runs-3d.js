@@ -9,11 +9,12 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
   const $ = (id) => document.getElementById(id);
 
-  const STADIUM_CAR_MODEL_URL = "/models/trackmania_2020_carsport.glb";
-  const STADIUM_CAR_TARGET_WIDTH = 2.72;
-  const STADIUM_CAR_TARGET_LENGTH = 4.48;
-  const STADIUM_CAR_BASE_Y = 0.04;
+  const STADIUM_CAR_MODEL_URL = "/models/tme_formula_car_recolored.glb";
+  const STADIUM_CAR_TARGET_WIDTH = 3.05;
+  const STADIUM_CAR_TARGET_LENGTH = 5.20;
+  const STADIUM_CAR_BASE_Y = 0.035;
   const STADIUM_CAR_YAW_OFFSET = Math.PI;
+  const LOCK_CAR_FORWARD_YAW = true;
 
   const SLOT_LABELS = {
     cp1: "Checkpoint 1",
@@ -994,12 +995,14 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
     function applyLoadedCarQuality(model) {
       const colorConfig = {
-        body: 0x8d9494,
-        bodyAccent: 0x687070,
-        tires: 0x050608,
-        wheels: 0x1b1f22,
-        glass: 0x182329,
-        details: 0x14191d,
+        body: 0x10172a,       // custom dark navy body
+        bodyAccent: 0xb3172a, // deep red aero pieces
+        goldAccent: 0xc7a84a, // muted gold trim
+        tires: 0x030405,
+        rims: 0x23282d,
+        cockpit: 0x050608,
+        suspension: 0x07090c,
+        details: 0x11161c,
       };
 
       model.traverse((obj) => {
@@ -1018,40 +1021,47 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
           const label = `${matName} ${objName}`;
 
           mat.depthWrite = true;
-
-          // The original GLB imports very bright/white because several materials include
-          // emissive texture data. Kill that glow so the model reads like a clean car,
-          // not a blown-out white object inside the dark Prize Runs scene.
           if (mat.emissive?.setHex) mat.emissive.setHex(0x000000);
           if ("emissiveIntensity" in mat) mat.emissiveIntensity = 0;
 
-          if (label.includes("skin")) {
-            // Main Stadium body paint: neutral grey/silver.
+          // This model is recolored in the GLB too, but these runtime rules make
+          // sure the browser version stays clean even if a cached/original material loads.
+          if (label.includes("front2wheels") || label.includes("tire")) {
+            if (mat.map) mat.map = null;
+            if (mat.color?.setHex) mat.color.setHex(colorConfig.tires);
+            if ("metalness" in mat) mat.metalness = 0.03;
+            if ("roughness" in mat) mat.roughness = 0.92;
+          } else if (label.includes("jant") || label.includes("rim") || label.includes("wheel")) {
+            if (mat.map) mat.map = null;
+            if (mat.color?.setHex) mat.color.setHex(colorConfig.rims);
+            if ("metalness" in mat) mat.metalness = 0.65;
+            if ("roughness" in mat) mat.roughness = 0.44;
+          } else if (label.includes("formulachasis") || label.includes("chasis") || label.includes("chassis")) {
+            if (mat.map) mat.map = null;
             if (mat.color?.setHex) mat.color.setHex(colorConfig.body);
-            if ("metalness" in mat) mat.metalness = 0.22;
-            if ("roughness" in mat) mat.roughness = 0.42;
-            if ("clearcoat" in mat) mat.clearcoat = 0.7;
+            if ("metalness" in mat) mat.metalness = 0.45;
+            if ("roughness" in mat) mat.roughness = 0.34;
+            if ("clearcoat" in mat) mat.clearcoat = 0.55;
             if ("clearcoatRoughness" in mat) mat.clearcoatRoughness = 0.18;
-          } else if (label.includes("wheel")) {
-            // Tires/rims: darker so they stop looking white in-game.
-            if (mat.color?.setHex) mat.color.setHex(label.includes("tire") ? colorConfig.tires : colorConfig.wheels);
-            if ("metalness" in mat) mat.metalness = 0.18;
-            if ("roughness" in mat) mat.roughness = 0.78;
-          } else if (label.includes("glass")) {
-            // Cockpit glass: dark smoked glass.
-            if (mat.color?.setHex) mat.color.setHex(colorConfig.glass);
-            mat.transparent = true;
-            mat.opacity = 0.72;
-            if ("metalness" in mat) mat.metalness = 0.02;
-            if ("roughness" in mat) mat.roughness = 0.2;
-          } else if (label.includes("detail")) {
-            // Intakes, suspension, rear panel, trims.
-            if (mat.color?.setHex) mat.color.setHex(colorConfig.details);
-            if ("metalness" in mat) mat.metalness = 0.32;
-            if ("roughness" in mat) mat.roughness = 0.55;
+          } else if (label.includes("wing") || label.includes("spoiler")) {
+            if (mat.map) mat.map = null;
+            const isGold = label.includes("sapoielralt") || label.includes("alt7");
+            if (mat.color?.setHex) mat.color.setHex(isGold ? colorConfig.goldAccent : colorConfig.bodyAccent);
+            if ("metalness" in mat) mat.metalness = 0.38;
+            if ("roughness" in mat) mat.roughness = 0.34;
+          } else if (label.includes("suspan") || label.includes("susp")) {
+            if (mat.map) mat.map = null;
+            if (mat.color?.setHex) mat.color.setHex(colorConfig.suspension);
+            if ("metalness" in mat) mat.metalness = 0.35;
+            if ("roughness" in mat) mat.roughness = 0.70;
+          } else if (label.includes("koltuk") || label.includes("direksiyon") || label.includes("seat") || label.includes("steer")) {
+            if (mat.map) mat.map = null;
+            if (mat.color?.setHex) mat.color.setHex(colorConfig.cockpit);
+            if ("metalness" in mat) mat.metalness = 0.16;
+            if ("roughness" in mat) mat.roughness = 0.74;
           } else {
-            if ("roughness" in mat && typeof mat.roughness === "number") mat.roughness = Math.max(mat.roughness, 0.38);
-            if ("metalness" in mat && typeof mat.metalness === "number") mat.metalness = Math.min(Math.max(mat.metalness, 0.12), 0.72);
+            if ("roughness" in mat && typeof mat.roughness === "number") mat.roughness = Math.max(mat.roughness, 0.42);
+            if ("metalness" in mat && typeof mat.metalness === "number") mat.metalness = Math.min(Math.max(mat.metalness, 0.12), 0.68);
           }
 
           mat.needsUpdate = true;
@@ -1074,11 +1084,11 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
           car.userData.wheels = [];
           car.userData.loadedModel = true;
           reset();
-          console.info("Prize Runs loaded Stadium car GLB:", STADIUM_CAR_MODEL_URL);
+          console.info("Prize Runs loaded TME Formula car GLB:", STADIUM_CAR_MODEL_URL);
         },
         undefined,
         (err) => {
-          console.warn("Could not load Stadium car GLB. Using fallback car.", err);
+          console.warn("Could not load TME Formula car GLB. Using fallback car.", err);
           car.clear();
           const fallback = makeFallbackCarModel();
           fallback.position.y = 0;
@@ -1127,12 +1137,12 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     }
 
     function setCarAt(vec, yaw = 0) {
-      // The Stadium GLB points down route -Z after import. If a replacement model
-      // faces backward, only STADIUM_CAR_YAW_OFFSET needs changing.
+      // Keep the car pointed down the route. The old yaw interpolation could make
+      // imported GLB cars appear to turn around/snap at checkpoint stops.
       const baseY = Number.isFinite(car.userData.baseY) ? car.userData.baseY : STADIUM_CAR_BASE_Y;
       const yawOffset = Number.isFinite(car.userData.yawOffset) ? car.userData.yawOffset : STADIUM_CAR_YAW_OFFSET;
       car.position.set(vec.x, baseY, vec.z);
-      car.rotation.y = yaw + yawOffset;
+      car.rotation.y = LOCK_CAR_FORWARD_YAW ? yawOffset : yaw + yawOffset;
     }
 
     function reset() {
@@ -1171,30 +1181,37 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     function driveTo(slot) {
       return new Promise((resolve) => {
         const from = car.position.clone();
-        const to = path[slot].clone();
-        const duration = slot === "finish" ? 1700 : 1450;
+        const gate = path[slot].clone();
+        // Drive slightly through the gate before revealing the reward. This removes
+        // the visual stop/snap that made the car look like it turned around at CPs.
+        const through = gate.clone();
+        through.z -= slot === "finish" ? 0.95 : 0.70;
+        const duration = slot === "finish" ? 1780 : 1520;
         const start = performance.now();
+        let gateHit = false;
 
         function step(now) {
           const raw = Math.min(1, (now - start) / duration);
           const t = raw < 0.5 ? 4 * raw * raw * raw : 1 - Math.pow(-2 * raw + 2, 3) / 2;
-          const x = from.x + (to.x - from.x) * t;
-          const z = from.z + (to.z - from.z) * t;
-          const nextT = Math.min(1, t + 0.02);
-          const nx = from.x + (to.x - from.x) * nextT;
-          const nz = from.z + (to.z - from.z) * nextT;
-          const dx = nx - x;
-          const dz = nz - z;
-          const yaw = Math.atan2(-dx, -dz);
-          setCarAt(new THREE.Vector3(x, 0, z), yaw);
+          const x = from.x + (through.x - from.x) * t;
+          const z = from.z + (through.z - from.z) * t;
+          setCarAt(new THREE.Vector3(x, 0, z), 0);
 
           targetCamera.set(x * 0.34, 6.1, z + 10.6);
+
+          if (!gateHit && z <= gate.z + 0.08) {
+            gateHit = true;
+            currentSlot = slot;
+            hitGate(slot);
+          }
 
           if (raw < 1) {
             requestAnimationFrame(step);
           } else {
-            currentSlot = slot;
-            hitGate(slot);
+            if (!gateHit) {
+              currentSlot = slot;
+              hitGate(slot);
+            }
             resolve();
           }
         }
