@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Prize Runs — Trackmania Events</title>
-  <meta name="description" content="Start a daily Trackmania Events Prize Run, hit checkpoints, and unlock Paddock cosmetics." />
+  <meta name="description" content="Start a daily Trackmania Events Prize Run, clear 3D checkpoints, and unlock Paddock rewards." />
   <meta name="theme-color" content="#0a0f1a" />
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;" />
@@ -12,16 +12,18 @@
   <link rel="apple-touch-icon" href="/logo.png">
   <link rel="shortcut icon" href="/logo.png">
   <link rel="stylesheet" href="/css/styles.css">
-  <style>
 
+  <style>
     :root {
       --pr-panel: rgba(255, 255, 255, .035);
+      --pr-panel-2: rgba(255, 255, 255, .055);
       --pr-text: #f3f5f7;
       --pr-muted: #a7adb8;
       --pr-soft: #d7dbe2;
       --pr-border: rgba(255, 255, 255, .075);
       --pr-border-strong: rgba(255, 255, 255, .14);
       --pr-blue: #68f0ff;
+      --pr-gold: #f5d98a;
       --pr-radius: 22px;
       --pr-shadow: 0 18px 46px rgba(0,0,0,.34);
     }
@@ -34,7 +36,7 @@
       border-radius: 26px;
       background:
         radial-gradient(circle at 18% 16%, rgba(104,240,255,.12), transparent 34%),
-        radial-gradient(circle at 88% 28%, rgba(83,166,255,.10), transparent 32%),
+        radial-gradient(circle at 88% 28%, rgba(245,217,138,.08), transparent 34%),
         linear-gradient(180deg, rgba(255,255,255,.048), rgba(255,255,255,.022));
       box-shadow: var(--pr-shadow);
       padding: clamp(1.15rem, 3vw, 1.8rem);
@@ -67,7 +69,7 @@
     }
 
     .prize-subtitle {
-      max-width: 820px;
+      max-width: 850px;
       margin: .8rem 0 0;
       color: var(--pr-muted);
       line-height: 1.6;
@@ -75,625 +77,479 @@
 
     .prize-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, .88fr);
       gap: 1rem;
       align-items: start;
     }
 
     .prize-card {
-      border-radius: var(--pr-radius);
       border: 1px solid var(--pr-border);
-      background: rgba(255,255,255,.032);
-      box-shadow: 0 12px 32px rgba(0,0,0,.25);
+      border-radius: var(--pr-radius);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)),
+        rgba(255,255,255,.025);
+      box-shadow: var(--pr-shadow);
       overflow: hidden;
     }
 
     .prize-card-head {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
       gap: 1rem;
-      padding: 1rem 1.1rem;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      padding: .95rem 1rem;
+      border-bottom: 1px solid var(--pr-border);
       background: rgba(255,255,255,.018);
     }
 
-    .prize-card-head strong { display: block; color: var(--pr-text); font-size: 1.02rem; }
-    .prize-card-head span { display: block; margin-top: .2rem; color: var(--pr-muted); font-size: .88rem; line-height: 1.4; }
-    .prize-card-body { padding: 1.1rem; }
+    .prize-card-head strong {
+      display: block;
+      color: #fff;
+      font-size: .98rem;
+      font-weight: 950;
+    }
+
+    .prize-card-head span {
+      display: block;
+      margin-top: .24rem;
+      color: var(--pr-muted);
+      font-size: .84rem;
+      line-height: 1.35;
+    }
+
+    .prize-card-body { padding: 1rem; }
+    .hidden { display: none !important; }
+    .locked-card { max-width: 760px; }
+    .empty-state { color: var(--pr-muted); line-height: 1.55; margin: 0; }
 
     .run-status-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: .75rem;
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .62rem;
+      margin-bottom: .8rem;
     }
 
     .run-stat {
-      padding: .9rem;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,.046), rgba(255,255,255,.022));
-      border: 1px solid rgba(255,255,255,.065);
-      min-height: 90px;
+      padding: .72rem .72rem;
+      border: 1px solid var(--pr-border);
+      border-radius: 16px;
+      background: rgba(255,255,255,.032);
     }
 
-    .run-stat span { display: block; color: var(--pr-muted); font-size: .74rem; font-weight: 950; text-transform: uppercase; letter-spacing: .065em; }
-    .run-stat strong { display: block; margin-top: .35rem; color: var(--pr-text); font-size: 1.55rem; letter-spacing: -.035em; }
+    .run-stat span {
+      display: block;
+      color: rgba(215,219,226,.62);
+      font-size: .70rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .run-stat strong {
+      display: block;
+      margin-top: .22rem;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 950;
+    }
+
+    .run-depth-panel {
+      display: grid;
+      gap: .45rem;
+      margin: .78rem 0;
+      padding: .78rem .82rem;
+      border: 1px solid rgba(104,240,255,.10);
+      border-radius: 16px;
+      background: rgba(104,240,255,.035);
+      color: rgba(235,240,250,.78);
+      font-size: .86rem;
+      line-height: 1.45;
+    }
+
+    .run-depth-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .7rem;
+      flex-wrap: wrap;
+    }
+
+    .parts-chip,
+    .theme-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: .32rem .58rem;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 999px;
+      background: rgba(255,255,255,.035);
+      color: rgba(255,255,255,.82);
+      font-size: .78rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
 
     .run-control-panel {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: .85rem;
-      flex-wrap: wrap;
-      margin: 0 0 1rem;
+      align-items: center;
+      gap: 1rem;
+      margin: .9rem 0;
       padding: .9rem;
+      border: 1px solid var(--pr-border);
       border-radius: 18px;
-      border: 1px solid rgba(104,240,255,.16);
-      background: linear-gradient(180deg, rgba(104,240,255,.075), rgba(255,255,255,.025));
+      background: rgba(255,255,255,.026);
     }
 
     .run-control-copy {
       color: var(--pr-muted);
-      font-size: .92rem;
-      line-height: 1.45;
+      line-height: 1.48;
+      font-size: .9rem;
     }
 
     .run-control-copy strong {
       display: block;
-      color: var(--pr-text);
-      font-size: 1rem;
-      margin-bottom: .12rem;
+      color: #fff;
+      margin-bottom: .2rem;
     }
 
-    .run-control-actions {
+    .run-control-actions,
+    .run-actions {
       display: flex;
       align-items: center;
-      gap: .65rem;
+      justify-content: flex-end;
+      gap: .55rem;
       flex-wrap: wrap;
     }
 
-    #startRunBtn {
-      min-height: 48px;
-      padding-inline: 1.25rem;
-      font-size: .95rem;
-      font-weight: 1000;
-      box-shadow: 0 0 0 1px rgba(104,240,255,.08) inset, 0 14px 28px rgba(0,0,0,.22);
+    #startRunBtn:disabled {
+      opacity: .58;
+      cursor: not-allowed;
+      transform: none !important;
     }
 
     .track-stage {
       position: relative;
-      min-height: 310px;
+      min-height: 440px;
+      border: 1px solid var(--pr-border);
       border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.075);
       background:
-        radial-gradient(circle at 12% 14%, rgba(104,240,255,.10), transparent 32%),
-        radial-gradient(circle at 80% 76%, rgba(255,255,255,.06), transparent 34%),
-        linear-gradient(135deg, rgba(9,14,26,.92), rgba(5,7,13,.96));
+        radial-gradient(circle at 50% 20%, rgba(104,240,255,.10), transparent 34%),
+        radial-gradient(circle at 80% 74%, rgba(245,217,138,.07), transparent 36%),
+        linear-gradient(180deg, rgba(0,0,0,.20), rgba(255,255,255,.018));
       overflow: hidden;
-      padding: 1.1rem;
-    }
-
-    .track-stage::before {
-      content: "";
-      position: absolute;
-      inset: -30%;
-      background: repeating-linear-gradient(115deg, rgba(255,255,255,.028) 0 2px, transparent 2px 24px);
-      transform: rotate(0deg);
-      opacity: .42;
-      pointer-events: none;
     }
 
     .track-theme-label {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: .75rem;
-      color: var(--pr-muted);
-      font-weight: 900;
-      font-size: .86rem;
-      margin-bottom: 1.1rem;
-    }
-
-    .theme-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: .35rem;
-      border: 1px solid rgba(104,240,255,.22);
-      background: rgba(104,240,255,.075);
-      color: #f7fbff;
-      border-radius: 999px;
-      padding: .38rem .66rem;
-      white-space: nowrap;
-    }
-
-    .route-wrap {
-      position: relative;
-      z-index: 2;
-      margin: 2.7rem .25rem 1rem;
-      height: 96px;
-    }
-
-    .route-line {
       position: absolute;
-      top: 45px;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .7rem;
+      pointer-events: none;
+    }
+
+    .track-theme-label > span:first-child {
+      color: rgba(235,240,250,.68);
+      font-size: .75rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .three-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      min-height: 440px;
+      background:
+        linear-gradient(180deg, rgba(5,7,12,.10), rgba(5,7,12,.62)),
+        radial-gradient(circle at 50% 22%, rgba(104,240,255,.13), transparent 34%);
+    }
+
+    .three-stage canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .webgl-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      z-index: 2;
+      place-items: center;
+      padding: 1rem;
+      text-align: center;
+      color: rgba(235,240,250,.78);
+      background:
+        radial-gradient(circle at center, rgba(104,240,255,.09), transparent 42%),
+        rgba(5,7,12,.64);
+    }
+
+    .track-stage.no-webgl .webgl-fallback { display: grid; }
+
+    .mini-route {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 46px;
+      z-index: 6;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .42rem;
+      pointer-events: none;
+    }
+
+    .mini-route::before {
+      content: "";
+      position: absolute;
       left: 7%;
       right: 7%;
-      height: 8px;
+      top: 13px;
+      height: 3px;
       border-radius: 999px;
-      background: linear-gradient(90deg, rgba(104,240,255,.25), rgba(255,255,255,.16));
-      box-shadow: 0 0 24px rgba(104,240,255,.13);
+      background: rgba(255,255,255,.09);
     }
 
-    .route-progress {
+    .mini-route-progress {
       position: absolute;
-      top: 45px;
       left: 7%;
+      top: 13px;
       width: 0%;
-      height: 8px;
+      height: 3px;
       border-radius: 999px;
-      background: linear-gradient(90deg, rgba(104,240,255,.85), rgba(255,255,255,.75));
-      box-shadow: 0 0 26px rgba(104,240,255,.28);
-      transition: width .8s cubic-bezier(.19,1,.22,1);
+      background: linear-gradient(90deg, rgba(104,240,255,.95), rgba(245,217,138,.82));
+      box-shadow: 0 0 18px rgba(104,240,255,.26);
+      transition: width .75s ease;
     }
 
-    .route-point {
-      position: absolute;
-      top: 24px;
-      transform: translateX(-50%);
-      width: 48px;
+    .mini-step {
+      position: relative;
       display: grid;
       place-items: center;
-      gap: .28rem;
-      color: rgba(255,255,255,.65);
-      font-size: .72rem;
+      gap: .25rem;
+      color: rgba(235,240,250,.62);
+      font-size: .68rem;
       font-weight: 950;
       text-transform: uppercase;
       letter-spacing: .04em;
     }
 
-    .route-dot {
-      width: 18px;
-      height: 18px;
+    .mini-dot {
+      width: 26px;
+      height: 26px;
       border-radius: 999px;
-      background: rgba(255,255,255,.14);
-      border: 2px solid rgba(255,255,255,.24);
-      box-shadow: 0 0 0 rgba(104,240,255,0);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(5,7,12,.62);
+      box-shadow: 0 0 0 5px rgba(5,7,12,.52);
+      transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
     }
 
-    .route-point.hit { color: #fff; }
-    .route-point.hit .route-dot {
-      background: rgba(104,240,255,.9);
-      border-color: rgba(255,255,255,.82);
-      box-shadow: 0 0 22px rgba(104,240,255,.35);
+    .mini-step.hit { color: #fff; }
+    .mini-step.hit .mini-dot {
+      transform: scale(1.06);
+      border-color: rgba(104,240,255,.56);
+      background: rgba(104,240,255,.25);
+      box-shadow: 0 0 0 5px rgba(5,7,12,.52), 0 0 18px rgba(104,240,255,.32);
     }
-
-    .route-car {
-      position: absolute;
-      top: 8px;
-      left: 7%;
-      transform: translateX(-50%);
-      width: 52px;
-      height: 52px;
-      display: grid;
-      place-items: center;
-      border-radius: 18px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 14px 32px rgba(0,0,0,.24), 0 0 24px rgba(104,240,255,.12);
-      font-size: 1.65rem;
-      transition: left .8s cubic-bezier(.19,1,.22,1), transform .2s ease;
-      z-index: 4;
+    .mini-step.finish.hit .mini-dot {
+      border-color: rgba(245,217,138,.62);
+      background: rgba(245,217,138,.24);
+      box-shadow: 0 0 0 5px rgba(5,7,12,.52), 0 0 18px rgba(245,217,138,.28);
     }
-
-    .route-car-icon {
-      display: inline-block;
-      transform: scaleX(-1);
-      line-height: 1;
-    }
-
-    .route-car.going { transform: translateX(-50%) translateY(-4px) rotate(-2deg); }
 
     .prize-countdown {
       position: absolute;
       inset: 0;
-      display: none !important;
+      z-index: 10;
+      display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10;
-      background: rgba(5,7,12,.56);
-      backdrop-filter: blur(8px);
       color: #fff;
-      font-size: clamp(3rem, 12vw, 7rem);
+      font-size: clamp(3.5rem, 12vw, 8rem);
       font-weight: 1000;
-      letter-spacing: -.06em;
-      text-shadow: 0 0 30px rgba(104,240,255,.28);
+      letter-spacing: -.07em;
+      text-shadow: 0 0 34px rgba(104,240,255,.45);
+      background: rgba(5,7,12,.52);
+      backdrop-filter: blur(5px);
     }
 
-    .prize-countdown.show { display: flex !important; }
+    .prize-countdown.show { display: flex; }
 
-    .run-actions {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-      flex-wrap: wrap;
-      margin-top: 1.25rem;
+    .run-status-msg {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 12px;
+      z-index: 8;
+      min-height: 28px;
+      padding: .5rem .7rem;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 999px;
+      background: rgba(5,7,12,.74);
+      color: rgba(235,240,250,.76);
+      font-size: .84rem;
+      line-height: 1.25;
+      text-align: center;
+      backdrop-filter: blur(12px);
     }
 
-    .run-note { color: var(--pr-muted); font-size: .9rem; line-height: 1.45; }
-
-    .run-status-msg { color: var(--pr-muted); font-size: .92rem; line-height: 1.45; margin-top: .7rem; }
-    .run-status-msg.success { color: #dfeee4; }
-    .run-status-msg.error { color: #f0d8d8; }
+    .run-status-msg.success { color: rgba(190,255,220,.94); border-color: rgba(118,220,150,.20); }
+    .run-status-msg.error { color: rgba(255,190,198,.96); border-color: rgba(255,95,104,.28); }
 
     .reward-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: .75rem;
+      gap: .7rem;
     }
 
     .reward-card {
-      opacity: .45;
-      transform: translateY(8px);
-      min-height: 142px;
-      padding: .9rem;
-      border-radius: 18px;
-      background: rgba(255,255,255,.028);
-      border: 1px solid rgba(255,255,255,.065);
-      transition: opacity .3s ease, transform .3s ease, border-color .3s ease, background .3s ease;
+      min-height: 96px;
+      padding: .85rem;
+      border: 1px solid var(--pr-border);
+      border-radius: 17px;
+      background: rgba(255,255,255,.026);
+      transform: translateY(4px);
+      opacity: .78;
+      transition: transform .22s ease, opacity .22s ease, border-color .22s ease, background .22s ease;
     }
 
     .reward-card.revealed {
-      opacity: 1;
       transform: translateY(0);
-      background: linear-gradient(180deg, rgba(255,255,255,.052), rgba(255,255,255,.025));
-      border-color: rgba(255,255,255,.14);
+      opacity: 1;
+      border-color: rgba(104,240,255,.22);
+      background: rgba(104,240,255,.04);
     }
 
-    .reward-slot { color: var(--pr-muted); font-size: .74rem; font-weight: 950; text-transform: uppercase; letter-spacing: .065em; }
-    .reward-name { margin-top: .45rem; color: var(--pr-text); font-size: 1.05rem; font-weight: 950; line-height: 1.15; overflow-wrap: anywhere; }
-    .reward-desc { margin-top: .38rem; color: var(--pr-muted); font-size: .86rem; line-height: 1.35; }
+    .reward-card.reward-kind-parts { border-color: rgba(245,217,138,.20); background: rgba(245,217,138,.035); }
+    .reward-card.reward-kind-bonus { border-color: rgba(104,240,255,.18); }
+    .reward-card.reward-kind-finish { border-color: rgba(255,255,255,.17); background: rgba(255,255,255,.04); }
+    .reward-card.duplicate-reward { border-color: rgba(245,217,138,.22); }
+
+    .reward-slot {
+      color: rgba(235,240,250,.50);
+      font-size: .70rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    .reward-name {
+      margin-top: .28rem;
+      color: #fff;
+      font-size: 1.02rem;
+      font-weight: 950;
+      line-height: 1.28;
+    }
+
+    .reward-desc {
+      margin-top: .28rem;
+      color: var(--pr-muted);
+      font-size: .84rem;
+      line-height: 1.4;
+    }
+
+    .reward-parts {
+      margin-top: .42rem;
+      color: rgba(245,217,138,.92);
+      font-weight: 900;
+      font-size: .84rem;
+    }
 
     .tier-chip {
       display: inline-flex;
-      align-items: center;
-      gap: .3rem;
-      margin-top: .65rem;
+      width: fit-content;
+      margin-top: .55rem;
+      padding: .24rem .48rem;
       border-radius: 999px;
-      padding: .33rem .58rem;
-      border: 1px solid rgba(255,255,255,.12);
-      color: var(--pr-soft);
-      background: rgba(255,255,255,.045);
-      font-size: .72rem;
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.82);
+      background: rgba(255,255,255,.035);
+      font-size: .70rem;
       font-weight: 950;
       text-transform: uppercase;
       letter-spacing: .05em;
     }
 
-    .tier-standard { border-color: rgba(255,255,255,.10); }
-    .tier-clean { border-color: rgba(150,255,210,.22); }
-    .tier-fast { border-color: rgba(104,240,255,.28); }
-    .tier-apex { border-color: rgba(190,150,255,.34); }
-    .tier-champion { border-color: rgba(255,220,110,.42); }
-    .tier-iconic { border-color: rgba(255,255,255,.50); box-shadow: 0 0 22px rgba(104,240,255,.12); }
+    .tier-clean { color: #c9f7ff; border-color: rgba(104,240,255,.20); }
+    .tier-fast { color: #dcffe8; border-color: rgba(118,220,150,.20); }
+    .tier-apex { color: #ffe1b9; border-color: rgba(255,189,114,.22); }
+    .tier-champion { color: #fff0b8; border-color: rgba(245,217,138,.30); }
+    .tier-iconic { color: #e3d0ff; border-color: rgba(190,120,255,.30); }
 
-    .empty-state {
-      color: var(--pr-muted);
-      line-height: 1.55;
-      padding: .9rem;
-      border-radius: 16px;
-      background: rgba(255,255,255,.025);
-      border: 1px solid rgba(255,255,255,.055);
+    .share-result-box {
+      display: none;
+      margin-top: .8rem;
+      padding: .82rem;
+      border: 1px solid var(--pr-border);
+      border-radius: 17px;
+      background: rgba(255,255,255,.026);
+    }
+    .share-result-box.show { display: grid; gap: .62rem; }
+    .share-result-box strong { color: #fff; }
+    .share-result-box textarea {
+      width: 100%;
+      min-height: 130px;
+      resize: vertical;
+      padding: .72rem;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      background: rgba(0,0,0,.24);
+      color: rgba(235,240,250,.88);
+      line-height: 1.45;
     }
 
-    .history-list { display: grid; gap: .65rem; }
+    .history-list { display: grid; gap: .62rem; }
     .history-item {
-      padding: .82rem;
+      padding: .78rem .82rem;
+      border: 1px solid var(--pr-border);
       border-radius: 16px;
       background: rgba(255,255,255,.026);
-      border: 1px solid rgba(255,255,255,.055);
     }
-    .history-top { display: flex; justify-content: space-between; gap: .8rem; color: var(--pr-text); font-weight: 900; }
-    .history-meta { margin-top: .25rem; color: var(--pr-muted); font-size: .84rem; line-height: 1.4; }
-
-    .locked-card { max-width: 760px; margin: 0 auto; }
-    .hidden { display: none !important; }
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      gap: .7rem;
+      color: #fff;
+      font-weight: 950;
+    }
+    .history-meta {
+      margin-top: .25rem;
+      color: var(--pr-muted);
+      font-size: .84rem;
+      line-height: 1.4;
+    }
 
     @media (max-width: 980px) {
       .prize-grid { grid-template-columns: 1fr; }
+      .run-status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .track-stage, .three-stage { min-height: 390px; }
     }
 
-    @media (max-width: 720px) {
-      .prize-page { padding-top: 1.35rem; }
-      .run-status-grid { grid-template-columns: 1fr; }
-      .reward-grid { grid-template-columns: 1fr; }
-      .route-wrap { margin-left: -.1rem; margin-right: -.1rem; }
-      .route-point { font-size: .64rem; }
+    @media (max-width: 640px) {
+      .prize-page { padding-top: 1rem; }
+      .prize-card-body { padding: .82rem; }
+      .run-control-panel { display: grid; }
+      .run-control-actions { justify-content: stretch; }
+      .run-control-actions .btn { width: 100%; }
+      .run-status-grid { grid-template-columns: 1fr 1fr; }
+      .track-stage, .three-stage { min-height: 360px; }
+      .mini-route { left: 10px; right: 10px; bottom: 48px; gap: .15rem; }
+      .mini-step { font-size: .58rem; }
+      .mini-dot { width: 22px; height: 22px; }
+      .track-theme-label { display: grid; justify-items: start; }
+      .theme-pill { max-width: 100%; white-space: normal; }
     }
-
-/* Unified Trackmania Events header */
-.tme-header{position:sticky;top:0;z-index:1000;background:rgba(5,7,12,.86);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.tme-header .container.nav{width:min(1220px,92vw);margin:0 auto;padding:.75rem 0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:1rem}.tme-header .brand{display:flex;align-items:center;gap:.7rem;color:#f7faff;font-weight:950;font-size:1.02rem;letter-spacing:-.025em;white-space:nowrap;text-decoration:none}.tme-header .brand-badge{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);box-shadow:none}.tme-header .navlinks{display:flex;align-items:center;justify-content:center;gap:.45rem;min-width:0}.tme-header .nav-group{position:relative}.tme-header .nav-drop-btn,.tme-header .navlinks>a{min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding:.5rem .35rem;border:1px solid transparent;border-radius:0;background:transparent;color:rgba(243,245,247,.72);font:inherit;font-size:.9rem;font-weight:850;line-height:1;letter-spacing:-.005em;white-space:nowrap;text-decoration:none;opacity:1;cursor:pointer;transition:color .16s ease,transform .16s ease;box-shadow:none}.tme-header .nav-drop-btn:hover,.tme-header .nav-drop-btn:focus,.tme-header .nav-group:hover .nav-drop-btn,.tme-header .nav-group:focus-within .nav-drop-btn,.tme-header .navlinks>a:hover,.tme-header .navlinks>a:focus{color:#fff;background:transparent;border-color:transparent;transform:none;box-shadow:none}.tme-header .navlinks a.active::after,.tme-header .nav a.active::after{display:none!important}.tme-header .nav-drop-menu{position:absolute;top:calc(100% + 10px);left:0;min-width:230px;display:none;flex-direction:column;gap:.25rem;padding:.55rem;border-radius:16px;background:rgba(8,11,18,.98);border:1px solid rgba(255,255,255,.085);box-shadow:0 18px 45px rgba(0,0,0,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:1001}@media (min-width:901px){.tme-header .nav-group::after{content:"";position:absolute;left:-14px;right:-14px;top:100%;height:22px;background:transparent;pointer-events:auto}.tme-header .nav-group:hover .nav-drop-menu,.tme-header .nav-group:focus-within .nav-drop-menu,.tme-header .nav-group.open .nav-drop-menu,.tme-header .nav-drop-menu:hover{display:flex}}.tme-header .nav-group.open .nav-drop-menu{display:flex}.tme-header .nav-drop-menu a{display:flex;align-items:center;min-height:38px;padding:.65rem .72rem;border-radius:12px;color:rgba(243,245,247,.68);text-decoration:none;font-size:.9rem;font-weight:800;white-space:nowrap;transition:background .16s ease,color .16s ease}.tme-header .nav-drop-menu a:hover,.tme-header .nav-drop-menu a:focus,.tme-header .nav-drop-menu a.active{color:#fff;background:rgba(255,255,255,.06)}.tme-header .nav-support-link,.tme-header .nav-support-link.active{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:.58rem 1rem;border-radius:999px;border:1px solid rgba(104,240,255,.42);background:rgba(104,240,255,.095);color:#f7fbff;font-weight:950;font-size:.9rem;line-height:1;text-decoration:none;box-shadow:0 0 0 1px rgba(104,240,255,.035) inset}.tme-header .nav-support-link:hover,.tme-header .nav-support-link:focus{background:rgba(104,240,255,.15);border-color:rgba(104,240,255,.62);color:#fff;transform:translateY(-1px)}.tme-header .cta{display:flex;align-items:center;justify-content:flex-end;gap:.55rem;position:static;transform:none}.tme-header .btn,.tme-header .nav-account{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.62rem .9rem;border-radius:14px;border:1px solid rgba(255,255,255,.085);background:rgba(255,255,255,.045);color:#f3f5f7;font-weight:850;font-size:.9rem;line-height:1;white-space:nowrap;text-decoration:none;transition:background .16s ease,border-color .16s ease,transform .16s ease;box-shadow:none}.tme-header .btn:hover,.tme-header .nav-account:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.075);box-shadow:none}.tme-header .nav-mobile-action{display:none}.tme-header .nav-toggle{display:none;min-height:38px;width:42px;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.045);color:#f3f5f7;font-size:1.05rem;font-weight:900;cursor:pointer}@media (max-width:1050px){.tme-header .brand span:last-child{display:none}}@media (max-width:900px){.tme-header .container.nav{grid-template-columns:auto auto}.tme-header .brand span:last-child{display:inline}.tme-header .nav-toggle{display:inline-flex!important;justify-self:end}.tme-header .cta{display:none!important}.tme-header .navlinks{display:none;position:absolute;top:100%;left:0;right:0;width:100%;padding:.75rem min(4vw,1rem) 1rem;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(5,7,12,.97);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);flex-direction:column;align-items:stretch;justify-content:flex-start;gap:.45rem;z-index:1000}.tme-header .navlinks.show,.tme-header .navlinks.open{display:flex!important}.tme-header .nav-group{width:100%}.tme-header .nav-drop-btn,.tme-header .navlinks>a{width:100%;justify-content:space-between;min-height:44px;padding:.75rem .85rem;border-radius:14px;border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.035)}.tme-header .nav-drop-menu{position:static;display:none;min-width:0;width:100%;margin:.35rem 0 .15rem;padding:.45rem;box-shadow:none;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}.tme-header .nav-group.open .nav-drop-menu{display:flex}.tme-header .nav-mobile-action{display:flex}.tme-header .nav-support-link,.tme-header .nav-support-link.active{width:100%;justify-content:center}}@media (max-width:520px){.tme-header .brand span:last-child{max-width:190px;overflow:hidden;text-overflow:ellipsis}}
-.tme-header .auth-user-dropdown,header .auth-user-dropdown{position:relative}.tme-header .auth-user-btn,header .auth-user-btn{display:inline-flex;align-items:center;gap:.45rem;min-height:40px;padding:.62rem 1rem;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.045);color:var(--text,#f3f5f7);font-weight:850;cursor:pointer;white-space:nowrap}.tme-header .auth-user-btn:hover,header .auth-user-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}.tme-header .auth-caret,header .auth-caret{font-size:.78rem;opacity:.82}.tme-header .auth-user-menu,header .auth-user-menu{position:absolute;top:calc(100% + 10px);right:0;min-width:230px;display:none;flex-direction:column;gap:.45rem;padding:.7rem;border-radius:16px;border:1px solid rgba(255,255,255,.09);background:rgba(10,16,28,.98);box-shadow:0 18px 45px rgba(0,0,0,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:99999}.tme-header .auth-user-menu.show,header .auth-user-menu.show{display:flex}.tme-header .auth-user-info,header .auth-user-info{display:flex;flex-direction:column;gap:.15rem;padding-bottom:.55rem;margin-bottom:.35rem;border-bottom:1px solid rgba(255,255,255,.08)}.tme-header .auth-user-info strong,header .auth-user-info strong{color:#fff;font-size:.95rem}.tme-header .auth-user-info span,header .auth-user-info span{color:rgba(255,255,255,.6);font-size:.82rem;word-break:break-word}.tme-header .auth-user-menu button,header .auth-user-menu button{border:0;width:100%;background:rgba(255,255,255,.04);color:#fff;padding:.75rem .85rem;border-radius:12px;text-align:left;cursor:pointer;font-weight:800;transition:.18s ease}.tme-header .auth-user-menu button:hover,header .auth-user-menu button:hover{background:rgba(255,255,255,.08)}
-.tme-header .nav-drop-menu,.nav-drop-menu{display:none;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:.25rem!important;top:calc(100% + 10px)!important;left:0!important;right:auto!important;width:max-content!important;min-width:220px!important;max-width:280px!important;transform:none!important;white-space:nowrap!important}.tme-header .nav-drop-menu a,.nav-drop-menu a{display:flex!important;width:100%!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important;white-space:nowrap!important}.tme-header .nav-group:hover .nav-drop-menu,.tme-header .nav-group:focus-within .nav-drop-menu,.tme-header .nav-group.open .nav-drop-menu,.nav-group:hover .nav-drop-menu,.nav-group:focus-within .nav-drop-menu,.nav-group.open .nav-drop-menu{display:flex!important}.tme-header .auth-user-menu,.auth-user-menu{display:none;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:.42rem!important;right:0!important;left:auto!important;width:230px!important;min-width:230px!important;transform:none!important}.tme-header .auth-user-menu.show,.auth-user-menu.show{display:flex!important}.tme-header .auth-user-menu button,.auth-user-menu button{display:flex!important;width:100%!important;justify-content:flex-start!important;text-align:left!important}@media (max-width:900px){.tme-header .nav-drop-menu,.nav-drop-menu{position:static!important;width:100%!important;min-width:0!important;max-width:none!important;margin-top:.35rem!important}.tme-header .auth-user-menu,.auth-user-menu{right:0!important;width:min(260px,86vw)!important;min-width:min(260px,86vw)!important}}
-
-  
-
-/* Prize Runs depth pass: streaks, duplicate parts, completion, and sharing */
-.run-depth-panel {
-  display:grid;
-  gap:.7rem;
-  margin-top:.9rem;
-  padding:.9rem;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.07);
-  background:rgba(255,255,255,.024);
-}
-.run-depth-row {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:.75rem;
-  color:var(--pr-muted);
-  font-size:.88rem;
-  line-height:1.4;
-}
-.run-depth-row strong { color:var(--pr-text); }
-.parts-chip {
-  display:inline-flex;
-  align-items:center;
-  gap:.35rem;
-  padding:.28rem .58rem;
-  border-radius:999px;
-  border:1px solid rgba(245,217,138,.18);
-  background:rgba(245,217,138,.055);
-  color:#f5d98a;
-  font-weight:950;
-  white-space:nowrap;
-}
-.share-result-box {
-  display:none;
-  gap:.65rem;
-  margin-top:.9rem;
-  padding:.9rem;
-  border-radius:18px;
-  border:1px solid rgba(104,240,255,.12);
-  background:linear-gradient(180deg, rgba(104,240,255,.04), rgba(255,255,255,.018));
-}
-.share-result-box.show { display:grid; }
-.share-result-box textarea {
-  width:100%;
-  min-height:92px;
-  resize:vertical;
-  color:#eaf0ff;
-  background:rgba(0,0,0,.18);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:14px;
-  padding:.75rem;
-  font:inherit;
-  line-height:1.45;
-}
-.reward-card.duplicate-reward { border-color: rgba(245,217,138,.18); }
-.reward-parts {
-  display:inline-flex;
-  align-items:center;
-  gap:.25rem;
-  margin-top:.4rem;
-  color:#f5d98a;
-  font-weight:900;
-  font-size:.78rem;
-}
-.history-meta .rare-tag { color:#f5d98a; font-weight:950; }
-@media(max-width:720px){ .run-depth-row{align-items:flex-start;flex-direction:column;} }
-
-
-/* Prize Runs v8 faux-3D Trackmania-style route + balanced rewards */
-.track-stage {
-  min-height: 500px !important;
-  padding: 1rem !important;
-  overflow: hidden !important;
-  perspective: 1100px !important;
-  background:
-    radial-gradient(circle at 50% 4%, rgba(104,240,255,.16), transparent 34%),
-    radial-gradient(circle at 78% 24%, rgba(245,217,138,.07), transparent 30%),
-    linear-gradient(180deg, rgba(8,13,24,.98), rgba(3,5,10,.98)) !important;
-}
-.track-stage::before {
-  content:"";
-  position:absolute;
-  inset:0 !important;
-  opacity:.72 !important;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.045), transparent 30%),
-    repeating-linear-gradient(90deg, rgba(104,240,255,.055) 0 1px, transparent 1px 70px),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 46px) !important;
-  transform: none !important;
-  pointer-events:none;
-}
-.track-stage::after {
-  content:"";
-  position:absolute;
-  left:6%;
-  right:6%;
-  bottom:-42px;
-  height:390px;
-  z-index:1;
-  pointer-events:none;
-  background:
-    linear-gradient(90deg, transparent 0 46%, rgba(255,255,255,.13) 48% 52%, transparent 54% 100%),
-    repeating-linear-gradient(180deg, transparent 0 34px, rgba(255,255,255,.08) 35px 42px, transparent 43px 78px),
-    linear-gradient(90deg, rgba(104,240,255,.28), rgba(255,255,255,.035) 18%, rgba(255,255,255,.02) 50%, rgba(245,217,138,.22)),
-    linear-gradient(180deg, rgba(104,240,255,.12), rgba(255,255,255,.035));
-  clip-path: polygon(42% 0, 58% 0, 96% 100%, 4% 100%);
-  transform: rotateX(64deg) translateY(28px);
-  transform-origin: bottom center;
-  border-radius: 28px 28px 10px 10px;
-  box-shadow:
-    0 -30px 80px rgba(104,240,255,.08),
-    inset 0 0 0 1px rgba(255,255,255,.08),
-    inset 0 0 60px rgba(104,240,255,.08);
-}
-.route-wrap {
-  position: relative !important;
-  z-index: 3 !important;
-  height: 360px !important;
-  margin: .5rem 0 0 !important;
-  overflow: visible !important;
-  transform-style: preserve-3d !important;
-}
-.route-wrap::before {
-  content:"";
-  position:absolute;
-  left:50%;
-  top:24px;
-  width:220px;
-  height:230px;
-  transform: translateX(-50%) rotateX(64deg);
-  transform-origin: bottom center;
-  background: radial-gradient(ellipse at center, rgba(104,240,255,.16), transparent 64%);
-  filter: blur(2px);
-  opacity:.6;
-  pointer-events:none;
-}
-.route-line {
-  left:50% !important;
-  top:58px !important;
-  bottom:66px !important;
-  right:auto !important;
-  width:4px !important;
-  height:auto !important;
-  border-radius:999px !important;
-  background: linear-gradient(180deg, rgba(245,217,138,.18), rgba(255,255,255,.20), rgba(104,240,255,.18)) !important;
-  transform: translateX(-50%) perspective(700px) rotateX(54deg) !important;
-  transform-origin: bottom center !important;
-  opacity:.72 !important;
-  box-shadow: 0 0 24px rgba(104,240,255,.08) !important;
-}
-.route-progress {
-  left:50% !important;
-  bottom:66px !important;
-  top:auto !important;
-  width:5px !important;
-  max-width:none !important;
-  height:0% !important;
-  border-radius:999px !important;
-  background: linear-gradient(0deg, rgba(104,240,255,.95), rgba(245,217,138,.78)) !important;
-  transform: translateX(-50%) perspective(700px) rotateX(54deg) !important;
-  transform-origin: bottom center !important;
-  box-shadow: 0 0 28px rgba(104,240,255,.28), 0 0 46px rgba(245,217,138,.10) !important;
-}
-.route-point {
-  left:50% !important;
-  width:86px !important;
-  font-size:.68rem !important;
-  text-shadow: 0 8px 18px rgba(0,0,0,.75) !important;
-  transform: translateX(-50%) !important;
-}
-.route-point::before {
-  content:"";
-  width: 54px;
-  height: 70px;
-  border-radius: 999px 999px 12px 12px;
-  border: 3px solid rgba(104,240,255,.66);
-  border-bottom: 0;
-  background: linear-gradient(180deg, rgba(104,240,255,.14), rgba(104,240,255,.035) 58%, transparent);
-  box-shadow: 0 0 22px rgba(104,240,255,.18), inset 0 0 18px rgba(104,240,255,.06);
-  transform-origin: bottom center;
-}
-.route-dot {
-  position:absolute;
-  top: 53px;
-  width: 12px !important;
-  height: 12px !important;
-  box-shadow: 0 0 20px rgba(104,240,255,.40) !important;
-}
-.route-point:not([data-slot]) { top: 248px !important; }
-.route-point:not([data-slot])::before { transform: scale(1.22); }
-.route-point[data-slot="cp1"] { top: 204px !important; }
-.route-point[data-slot="cp1"]::before { transform: scale(1.08); }
-.route-point[data-slot="cp2"] { top: 156px !important; }
-.route-point[data-slot="cp2"]::before { transform: scale(.94); opacity:.94; }
-.route-point[data-slot="cp3"] { top: 108px !important; }
-.route-point[data-slot="cp3"]::before { transform: scale(.80); opacity:.88; }
-.route-point[data-slot="finish"] { top: 52px !important; }
-.route-point[data-slot="finish"]::before { transform: scale(.68); opacity:.84; border-color: rgba(245,217,138,.74); }
-.route-point span {
-  display:block;
-  margin-top:.25rem;
-  letter-spacing:.02em;
-}
-.route-point.hit::before {
-  border-color: rgba(104,240,255,.95);
-  box-shadow: 0 0 30px rgba(104,240,255,.36), inset 0 0 22px rgba(104,240,255,.12);
-}
-.route-point[data-slot="finish"].hit::before {
-  border-color: rgba(245,217,138,.96);
-  box-shadow: 0 0 34px rgba(245,217,138,.34), inset 0 0 22px rgba(245,217,138,.10);
-}
-.route-car {
-  top: 290px !important;
-  left: 50% !important;
-  width: 82px !important;
-  height: 50px !important;
-  border-radius: 22px 26px 16px 16px !important;
-  background: linear-gradient(180deg, rgba(104,240,255,.20), rgba(255,255,255,.060)) !important;
-  transform: translateX(-50%) scale(1.12) !important;
-  transition:
-    left .95s cubic-bezier(.19,1,.22,1),
-    top .95s cubic-bezier(.19,1,.22,1),
-    transform .95s cubic-bezier(.19,1,.22,1),
-    filter .25s ease !important;
-  box-shadow: 0 18px 40px rgba(0,0,0,.28), 0 0 26px rgba(104,240,255,.16) !important;
-}
-.route-car::after {
-  content:"";
-  position:absolute;
-  left:50%;
-  top:100%;
-  width:8px;
-  height:54px;
-  border-radius:999px;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, rgba(104,240,255,.68), transparent);
-  opacity:.0;
-  transition: opacity .18s ease;
-}
-.route-car.going::after { opacity:.9; }
-.route-car.going {
-  filter: drop-shadow(0 0 20px rgba(104,240,255,.26));
-}
-.route-car-icon {
-  display:block !important;
-  transform: scaleX(-1) !important;
-  font-size:1.35rem;
-}
-.route-car.car-depth-0 { transform: translateX(-50%) scale(1.16) !important; }
-.route-car.car-depth-1 { transform: translateX(-50%) scale(1.00) !important; }
-.route-car.car-depth-2 { transform: translateX(-50%) scale(.84) !important; }
-.route-car.car-depth-3 { transform: translateX(-50%) scale(.70) !important; }
-.route-car.car-depth-4 { transform: translateX(-50%) scale(.58) !important; }
-.reward-card.reward-kind-parts {
-  border-color: rgba(245,217,138,.16) !important;
-  background: linear-gradient(180deg, rgba(245,217,138,.045), rgba(255,255,255,.022)) !important;
-}
-.reward-card.reward-kind-bonus { border-color: rgba(104,240,255,.18) !important; }
-.reward-card.reward-kind-finish { border-color: rgba(255,255,255,.16) !important; }
-@media (max-width: 720px) {
-  .track-stage { min-height: 430px !important; }
-  .route-wrap { height: 310px !important; }
-  .route-point { width: 64px !important; font-size: .58rem !important; }
-  .route-car { width: 60px !important; height: 42px !important; }
-}
-
-
-</style>
+  </style>
 </head>
+
 <body class="bg-track-curves">
-<header class="tme-header">
+  <header class="tme-header">
     <div class="container nav">
       <a class="brand" href="/" aria-label="Trackmania Events Home">
         <span class="brand-badge" aria-hidden="true">🎮</span>
@@ -759,8 +615,8 @@
     <section class="container prize-shell">
       <div class="prize-hero">
         <span class="prize-kicker">Daily Prize Runs</span>
-        <h1 class="prize-title">Launch the run. Clear checkpoints. Claim the finish reward.</h1>
-        <p class="prize-subtitle">Prize Runs are daily Trackmania-style reward routes. Checkpoints now award Paddock Parts or bonus chances, while the Finish line gives the guaranteed cosmetic reward.</p>
+        <h1 class="prize-title">Start the run. Clear the gates. Claim the finish reward.</h1>
+        <p class="prize-subtitle">Prize Runs now use a lightweight real 3D scene. The car drives through checkpoint gates automatically, checkpoints award Paddock Parts or bonus chances, and the Finish line gives the guaranteed cosmetic reward.</p>
       </div>
 
       <div id="lockedWrap" class="prize-card locked-card hidden">
@@ -772,7 +628,7 @@
         </div>
         <div class="prize-card-body">
           <p id="lockedMessage" class="empty-state">Go back to the homepage and use Login / Register, then return to Prize Runs.</p>
-          <div class="run-actions">
+          <div class="run-actions" style="margin-top:.9rem">
             <a class="btn primary" href="/">Go to homepage</a>
             <a class="btn" href="/account">Account</a>
           </div>
@@ -787,6 +643,7 @@
               <span>One free run per day. Checkpoints give parts and bonus chances; the Finish line gives the main reward.</span>
             </div>
           </div>
+
           <div class="prize-card-body">
             <div class="run-status-grid">
               <div class="run-stat"><span>Daily Run</span><strong id="freeRunValue">—</strong></div>
@@ -798,11 +655,11 @@
 
             <div class="run-depth-panel">
               <div class="run-depth-row">
-                <span><strong>Run rewards:</strong> CP1 and CP3 give Paddock Parts, CP2 can hit a bonus drop, and Finish gives the guaranteed reward.</span>
+                <span><strong>Run rewards:</strong> CP1 and CP3 give Paddock Parts, CP2 can hit a bonus item, and Finish gives the guaranteed reward.</span>
                 <span id="bestStreakValue" class="parts-chip">Best streak: 0</span>
               </div>
               <div class="run-depth-row">
-                <span>Duplicates still convert into Paddock Parts, and Champion/Iconic finish pulls can create shoutbox announcements.</span>
+                <span>Rewards are rolled securely by Supabase before the animation starts, so the 3D scene is visual only.</span>
                 <span id="partsHint" class="parts-chip">Parts: 0</span>
               </div>
             </div>
@@ -810,7 +667,7 @@
             <div class="run-control-panel">
               <div class="run-control-copy">
                 <strong>Ready to start?</strong>
-                Click the button to launch the cinematic route, hit checkpoint gates, and reveal your Finish reward.
+                Click Start, then watch the car drive through each gate and reveal the checkpoint result.
               </div>
               <div class="run-control-actions">
                 <button id="startRunBtn" class="btn primary" type="button">Start Prize Run</button>
@@ -825,16 +682,24 @@
                 <span>Current route</span>
                 <span id="themeLabel" class="theme-pill">🏟️ Stadium Sprint</span>
               </div>
-              <div class="route-wrap" aria-hidden="true">
-                <div class="route-line"></div>
-                <div id="routeProgress" class="route-progress"></div>
-                <div id="routeCar" class="route-car"><span class="route-car-icon">🏎️</span></div>
-                <div class="route-point hit" style="left:7%"><div class="route-dot"></div><span>Start</span></div>
-                <div class="route-point" data-slot="cp1" style="left:28%"><div class="route-dot"></div><span>CP1</span></div>
-                <div class="route-point" data-slot="cp2" style="left:50%"><div class="route-dot"></div><span>CP2</span></div>
-                <div class="route-point" data-slot="cp3" style="left:72%"><div class="route-dot"></div><span>CP3</span></div>
-                <div class="route-point" data-slot="finish" style="left:93%"><div class="route-dot"></div><span>Finish</span></div>
+
+              <div id="threeMount" class="three-stage" aria-label="3D Prize Run scene"></div>
+              <div class="webgl-fallback">
+                <div>
+                  <strong>3D scene unavailable</strong><br>
+                  Your browser blocked WebGL, so rewards will still reveal with the fallback cards.
+                </div>
               </div>
+
+              <div class="mini-route" aria-hidden="true">
+                <div id="miniRouteProgress" class="mini-route-progress"></div>
+                <div class="mini-step hit" data-mini="start"><div class="mini-dot"></div><span>Start</span></div>
+                <div class="mini-step" data-mini="cp1"><div class="mini-dot"></div><span>CP1</span></div>
+                <div class="mini-step" data-mini="cp2"><div class="mini-dot"></div><span>CP2</span></div>
+                <div class="mini-step" data-mini="cp3"><div class="mini-dot"></div><span>CP3</span></div>
+                <div class="mini-step finish" data-mini="finish"><div class="mini-dot"></div><span>Finish</span></div>
+              </div>
+
               <div id="runMessage" class="run-status-msg" aria-live="polite"></div>
             </div>
           </div>
@@ -890,584 +755,8 @@
     </div>
   </footer>
 
-<script>
-
-(function(){
-  const btn = document.getElementById("navToggle");
-  const nav = document.getElementById("primary-nav");
-  if (!btn || !nav) return;
-
-  function closeGroups(){
-    nav.querySelectorAll(".nav-group.open").forEach((group) => group.classList.remove("open"));
-  }
-
-  function setOpen(open){
-    nav.classList.toggle("show", open);
-    nav.classList.toggle("open", open);
-    btn.setAttribute("aria-expanded", open ? "true" : "false");
-    if (!open) closeGroups();
-  }
-
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpen(!nav.classList.contains("show") && !nav.classList.contains("open"));
-  });
-
-  nav.querySelectorAll(".nav-drop-btn").forEach((dropBtn) => {
-    dropBtn.addEventListener("click", (e) => {
-      if (window.innerWidth > 900) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const group = dropBtn.closest(".nav-group");
-      const wasOpen = group.classList.contains("open");
-      closeGroups();
-      group.classList.toggle("open", !wasOpen);
-    });
-  });
-
-  nav.querySelectorAll("a").forEach((a) => {
-    a.addEventListener("click", () => setOpen(false));
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!nav.contains(e.target) && e.target !== btn) setOpen(false);
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") setOpen(false);
-  });
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 900) setOpen(false);
-  });
-})();
-
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-
-    const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
-
-    const tmeSupabase = window.__tmeSupabase = window.__tmeSupabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: window.localStorage,
-        storageKey: "tme-supabase-auth",
-        flowType: "implicit",
-      },
-    });
-
-    const $ = (id) => document.getElementById(id);
-    let currentUser = null;
-    let isRunning = false;
-    let lastRunResult = null;
-
-    const THEME_LABELS = {
-      stadium_sprint: "🏟️ Stadium Sprint",
-      snow_drift: "❄️ Snow Drift",
-      rally_rush: "🌲 Rally Rush",
-      desert_dash: "🌵 Desert Dash",
-      night_circuit: "🌙 Night Circuit",
-      sunset_speedway: "☀️ Sunset Speedway",
-      weekly_shorts_rush: "🏁 Weekly Shorts Rush",
-      totd_run: "🏆 TOTD Run",
-      kacky_chaos: "🧱 Kacky Chaos",
-      champion_circuit: "👑 Champion Circuit",
-    };
-
-    const SLOT_LABELS = { cp1: "Checkpoint 1", cp2: "Checkpoint 2", cp3: "Checkpoint 3", finish: "Finish" };
-    const CAR_BY_THEME = {
-      stadium_sprint: "🏎️",
-      snow_drift: "🚙",
-      rally_rush: "🚗",
-      desert_dash: "🏜️",
-      night_circuit: "🌙",
-      sunset_speedway: "☀️",
-      weekly_shorts_rush: "🏁",
-      totd_run: "🏆",
-      kacky_chaos: "🧱",
-      champion_circuit: "👑",
-    };
-
-    function escapeHtml(value) {
-      const div = document.createElement("div");
-      div.textContent = String(value ?? "");
-      return div.innerHTML;
-    }
-
-    function prettyTier(tier) {
-      return String(tier || "standard").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-    }
-
-    function prettyTheme(theme) {
-      return THEME_LABELS[theme] || String(theme || "Prize Run").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-    }
-
-    function formatDate(value) {
-      try { return new Date(value).toLocaleString(); } catch { return ""; }
-    }
-
-    function normalizeReward(raw) {
-      const reward = raw || {};
-      const item = reward.item && typeof reward.item === "object" ? reward.item : null;
-      const type = reward.type || reward.kind || (reward.category === "parts" ? "parts" : "item");
-      const parts = Number(reward.parts ?? reward.parts_awarded ?? reward.paddock_parts ?? 0);
-
-      if (type === "parts") {
-        return {
-          slot: reward.slot || "cp1",
-          label: reward.label || SLOT_LABELS[reward.slot] || reward.slot || "Checkpoint",
-          type: "parts",
-          parts,
-          title: reward.title || `+${parts.toLocaleString()} Paddock Parts`,
-          description: reward.description || "Checkpoint cleared. Parts were added to your Paddock balance.",
-          tier: reward.tier || "clean"
-        };
-      }
-
-      if (type === "no_bonus" || type === "bonus_miss") {
-        return {
-          slot: reward.slot || "cp2",
-          label: reward.label || SLOT_LABELS[reward.slot] || "Checkpoint 2",
-          type: "no_bonus",
-          title: reward.title || "No bonus item",
-          description: reward.description || "You still cleared the checkpoint. The Finish reward is guaranteed.",
-          tier: reward.tier || "standard"
-        };
-      }
-
-      const source = item || reward;
-      return {
-        slot: reward.slot || "finish",
-        label: reward.label || SLOT_LABELS[reward.slot] || reward.slot || "Reward",
-        type: type === "bonus_item" ? "bonus_item" : "item",
-        id: source.id || reward.id || null,
-        item_key: source.item_key || reward.item_key || "",
-        icon: source.icon || reward.icon || "🎁",
-        name: source.name || reward.name || "Reward",
-        description: source.description || reward.description || "Saved to your Paddock collection.",
-        category: source.category || reward.category || "reward",
-        tier: source.tier || reward.tier || "standard",
-        theme: source.theme || reward.theme || "general",
-        parts: Number(reward.parts ?? reward.parts_awarded ?? 0),
-        was_duplicate: Boolean(reward.was_duplicate)
-      };
-    }
-
-    function rewardHistoryLabel(r) {
-      const reward = normalizeReward(r);
-      if (reward.type === "parts") return `⚙️ +${reward.parts.toLocaleString()} Parts`;
-      if (reward.type === "no_bonus") return "🎲 Bonus missed";
-      return `${reward.icon || "🎁"} ${reward.name || "Reward"}`;
-    }
-
-    function setMsg(text, type = "") {
-      const el = $("runMessage");
-      if (!el) return;
-      el.textContent = text || "";
-      el.className = `run-status-msg ${type}`.trim();
-    }
-
-    function resetTrack() {
-      const countdownEl = $("prizeCountdown");
-      if (countdownEl) {
-        countdownEl.classList.remove("show");
-        countdownEl.textContent = "3";
-      }
-      $("routeProgress").style.height = "0%";
-      $("routeProgress").style.width = "5px";
-      $("routeCar").style.left = "50%";
-      $("routeCar").style.top = "290px";
-      $("routeCar").className = "route-car car-depth-0";
-      if (!$("routeCar").querySelector(".route-car-icon")) {
-        $("routeCar").innerHTML = '<span class="route-car-icon">🏎️</span>';
-      }
-      document.querySelectorAll(".route-point").forEach((p) => p.classList.remove("hit"));
-      const startPoint = document.querySelector(".route-point:not([data-slot])");
-      if (startPoint) startPoint.classList.add("hit");
-      const shareBox = $("shareResultBox");
-      if (shareBox) shareBox.classList.remove("show");
-      const placeholders = {
-        cp1: ["Paddock Parts", "Checkpoint 1 gives a small parts payout."],
-        cp2: ["Bonus Chance", "Checkpoint 2 can hit a bonus item or parts."],
-        cp3: ["Paddock Parts", "Checkpoint 3 gives a bigger parts payout."],
-        finish: ["Finish Reward", "The Finish line gives the guaranteed cosmetic reward."]
-      };
-      $("rewardGrid").innerHTML = ["cp1", "cp2", "cp3", "finish"].map((slot) => `
-        <article class="reward-card" id="reward-${slot}">
-          <div class="reward-slot">${SLOT_LABELS[slot]}</div>
-          <div class="reward-name">${placeholders[slot][0]}</div>
-          <div class="reward-desc">${placeholders[slot][1]}</div>
-          <span class="tier-chip tier-standard">Waiting</span>
-        </article>
-      `).join("");
-    }
-
-    function updateStatusCards(status) {
-      const freeUsed = Boolean(status?.free_run_used_today);
-      const tickets = Number(status?.extra_tickets || 0);
-      const canRun = Boolean(status?.can_start_run);
-      const parts = Number(status?.paddock_parts || 0);
-      const streak = Number(status?.current_streak || 0);
-      const best = Number(status?.best_streak || 0);
-      $("freeRunValue").textContent = freeUsed ? "Used" : "Ready";
-      $("ticketValue").textContent = tickets.toLocaleString();
-      $("canRunValue").textContent = canRun ? "Yes" : "No";
-      if ($("partsValue")) $("partsValue").textContent = parts.toLocaleString();
-      if ($("streakValue")) $("streakValue").textContent = streak.toLocaleString();
-      if ($("bestStreakValue")) $("bestStreakValue").textContent = `Best streak: ${best.toLocaleString()}`;
-      if ($("partsHint")) $("partsHint").textContent = `Parts: ${parts.toLocaleString()}`;
-      $("startRunBtn").disabled = !canRun || isRunning;
-      if (!canRun && freeUsed && tickets <= 0) {
-        $("startRunBtn").textContent = "Come Back Tomorrow";
-      } else if (freeUsed && tickets > 0) {
-        $("startRunBtn").textContent = "Use Extra Ticket";
-      } else {
-        $("startRunBtn").textContent = "Start Daily Run";
-      }
-    }
-
-    async function loadPrizeStatus() {
-      try {
-        const { data, error } = await tmeSupabase.rpc("get_my_prize_status_v2");
-        if (error) throw error;
-        const status = Array.isArray(data) ? data[0] : data;
-        updateStatusCards(status || {});
-        return status;
-      } catch (err) {
-        console.warn("Could not load prize status:", err);
-        setMsg(err.message || "Could not load Prize Run status.", "error");
-        $("startRunBtn").disabled = true;
-        return null;
-      }
-    }
-
-    async function loadRecentHistory() {
-      const box = $("historyList");
-      try {
-        const { data, error } = await tmeSupabase
-          .from("prize_run_history")
-          .select("id,run_type,theme,rewards,used_ticket,created_at")
-          .order("created_at", { ascending: false })
-          .limit(6);
-        if (error) throw error;
-        const rows = Array.isArray(data) ? data : [];
-        if (!rows.length) {
-          box.innerHTML = `<div class="empty-state">No Prize Runs yet. Start your first run above.</div>`;
-          return;
-        }
-        box.innerHTML = rows.map((row) => {
-          const rewards = Array.isArray(row.rewards) ? row.rewards : [];
-          const names = rewards.map((r) => rewardHistoryLabel(r)).join(" • ");
-          return `
-            <article class="history-item">
-              <div class="history-top">
-                <span>${escapeHtml(prettyTheme(row.theme))}</span>
-                <span>${escapeHtml(row.used_ticket ? "Ticket" : "Daily")}</span>
-              </div>
-              <div class="history-meta">${escapeHtml(formatDate(row.created_at))}</div>
-              <div class="history-meta">${escapeHtml(names || "Rewards saved")}</div>
-            </article>
-          `;
-        }).join("");
-      } catch (err) {
-        console.warn("Could not load Prize Run history:", err);
-        box.innerHTML = `<div class="empty-state">Could not load run history.</div>`;
-      }
-    }
-
-    function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
-
-    async function showCountdown() {
-      const el = $("prizeCountdown");
-      el.classList.add("show");
-      for (const part of ["3", "2", "1", "GO!"]) {
-        el.textContent = part;
-        await sleep(part === "GO!" ? 520 : 620);
-      }
-      el.classList.remove("show");
-    }
-
-    function revealReward(rawReward) {
-      const reward = normalizeReward(rawReward);
-      const slot = reward.slot || "cp1";
-      const card = $(`reward-${slot}`);
-      if (!card) return;
-      const duplicate = reward.was_duplicate ? ` <span style="color:rgba(255,255,255,.65)">Duplicate copy</span>` : "";
-
-      if (reward.type === "parts") {
-        card.innerHTML = `
-          <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • Parts</div>
-          <div class="reward-name">⚙️ +${reward.parts.toLocaleString()} Paddock Parts</div>
-          <div class="reward-desc">${escapeHtml(reward.description)}</div>
-          <span class="tier-chip tier-clean">Checkpoint Bonus</span>
-        `;
-        card.classList.add("revealed", "reward-kind-parts");
-        return;
-      }
-
-      if (reward.type === "no_bonus") {
-        card.innerHTML = `
-          <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • Bonus Chance</div>
-          <div class="reward-name">🎲 ${escapeHtml(reward.title)}</div>
-          <div class="reward-desc">${escapeHtml(reward.description)}</div>
-          <span class="tier-chip tier-standard">Checkpoint Clear</span>
-        `;
-        card.classList.add("revealed");
-        return;
-      }
-
-      card.innerHTML = `
-        <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • ${escapeHtml(reward.category || "reward")}</div>
-        <div class="reward-name">${escapeHtml(reward.icon || "🎁")} ${escapeHtml(reward.name || "Reward")}</div>
-        <div class="reward-desc">${escapeHtml(reward.description || "Saved to your Paddock collection.")}${duplicate}</div>
-        ${reward.parts > 0 ? `<div class="reward-parts">⚙️ +${reward.parts.toLocaleString()} Paddock Parts</div>` : ""}
-        <span class="tier-chip tier-${escapeHtml(reward.tier || "standard")}">${escapeHtml(prettyTier(reward.tier))}</span>
-      `;
-      card.classList.add("revealed", slot === "finish" ? "reward-kind-finish" : "reward-kind-bonus");
-      if (reward.was_duplicate) card.classList.add("duplicate-reward");
-    }
-
-    async function animateRun(result) {
-      const rewards = Array.isArray(result?.rewards) ? result.rewards : [];
-      const theme = result?.theme || "stadium_sprint";
-      $("themeLabel").textContent = prettyTheme(theme);
-      resetTrack();
-      $("routeCar").innerHTML = `<span class="route-car-icon">${escapeHtml(CAR_BY_THEME[theme] || "🏎️")}</span>`;
-      await showCountdown();
-      const positions = {
-        cp1: { left: 50, top: 238, progress: 22, depth: 1 },
-        cp2: { left: 50, top: 188, progress: 44, depth: 2 },
-        cp3: { left: 50, top: 138, progress: 66, depth: 3 },
-        finish: { left: 50, top: 84, progress: 88, depth: 4 }
-      };
-      for (const slot of ["cp1", "cp2", "cp3", "finish"]) {
-        const pos = positions[slot];
-        $("routeCar").className = `route-car going car-depth-${pos.depth || 0}`;
-        $("routeCar").style.left = `${pos.left}%`;
-        $("routeCar").style.top = `${pos.top}px`;
-        $("routeProgress").style.height = `${pos.progress}%`;
-        await sleep(950);
-        $("routeCar").className = `route-car car-depth-${pos.depth || 0}`;
-        const point = document.querySelector(`.route-point[data-slot="${slot}"]`);
-        if (point) point.classList.add("hit");
-        const reward = rewards.find((r) => r.slot === slot);
-        if (reward) revealReward(reward);
-        await sleep(slot === "finish" ? 760 : 560);
-      }
-    }
-
-    function buildShareText(result) {
-      const rewards = Array.isArray(result?.rewards) ? result.rewards : [];
-      const lines = [
-        "🏁 Prize Run Complete!",
-        `Theme: ${prettyTheme(result?.theme)}`,
-        "",
-        ...rewards.map((r) => {
-          const reward = normalizeReward(r);
-          if (reward.type === "parts") {
-            return `${SLOT_LABELS[reward.slot] || reward.slot}: ⚙️ +${reward.parts.toLocaleString()} Paddock Parts`;
-          }
-          if (reward.type === "no_bonus") {
-            return `${SLOT_LABELS[reward.slot] || reward.slot}: 🎲 No bonus item`;
-          }
-          const dupe = reward.was_duplicate ? ` duplicate (+${Number(reward.parts || 0)} parts)` : "";
-          return `${SLOT_LABELS[reward.slot] || reward.slot}: ${reward.icon || "🎁"} ${reward.name || "Reward"} [${prettyTier(reward.tier)}]${dupe}`;
-        }),
-        "",
-        "trackmaniaevents.com/prize-runs"
-      ];
-      return lines.join("\n");
-    }
-
-    function showShareResult(result) {
-      const box = $("shareResultBox");
-      const text = $("shareResultText");
-      if (!box || !text) return;
-      text.value = buildShareText(result);
-      box.classList.add("show");
-    }
-
-    async function startRun() {
-      if (isRunning) return;
-      isRunning = true;
-      $("startRunBtn").disabled = true;
-      setMsg("Starting your Prize Run…");
-      try {
-        const { data, error } = await tmeSupabase.rpc("start_prize_run");
-        if (error) throw error;
-        setMsg("Run started. Hit the checkpoints!", "success");
-        await animateRun(data);
-        lastRunResult = data;
-        showShareResult(data);
-        setMsg("Prize Run complete. Parts and reward saved to your Paddock.", "success");
-        await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
-      } catch (err) {
-        console.warn("Prize Run failed:", err);
-        setMsg(err.message || "Could not start Prize Run.", "error");
-        await loadPrizeStatus();
-      } finally {
-        isRunning = false;
-      }
-    }
-
-    async function bootPrizePage() {
-      $("year").textContent = new Date().getFullYear();
-      resetTrack();
-      const toTop = $("toTop");
-      if (toTop) {
-        window.addEventListener("scroll", () => { toTop.classList.toggle("show", window.scrollY > 500); }, { passive: true });
-        toTop.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
-      }
-      $("startRunBtn").addEventListener("click", startRun);
-      if ($("copyShareBtn")) $("copyShareBtn").addEventListener("click", async () => {
-        const text = $("shareResultText")?.value || (lastRunResult ? buildShareText(lastRunResult) : "");
-        try {
-          await navigator.clipboard.writeText(text);
-          setMsg("Prize Run result copied for Discord.", "success");
-        } catch {
-          setMsg("Could not copy automatically. Select the share text and copy it manually.", "error");
-        }
-      });
-      $("refreshStatusBtn").addEventListener("click", async () => {
-        setMsg("Refreshing status…");
-        await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
-        setMsg("Status refreshed.", "success");
-      });
-      try {
-        const { data } = await tmeSupabase.auth.getSession();
-        currentUser = data?.session?.user || null;
-        if (!currentUser) {
-          $("lockedWrap").classList.remove("hidden");
-          $("authedWrap").classList.add("hidden");
-          return;
-        }
-        $("lockedWrap").classList.add("hidden");
-        $("authedWrap").classList.remove("hidden");
-        await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
-      } catch (err) {
-        console.warn("Prize page failed:", err);
-        $("lockedWrap").classList.remove("hidden");
-        $("lockedMessage").textContent = err.message || "Prize Runs failed to load.";
-      }
-    }
-
-    bootPrizePage();
-
-</script>
-<script>
-
-(function () {
-  const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtweXBhY2d5dWRucXlzZ3hhcWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjk0NjAsImV4cCI6MjA5MjcwNTQ2MH0.m-FTFpALNBwk-ns10CmzCvTyHS4VApQsTbdnQZNG_cM";
-
-  const label = document.getElementById("authUserLabel");
-  const usernameEl = document.getElementById("authMenuUsername");
-  const emailEl = document.getElementById("authMenuEmail");
-  const accountBtn = document.getElementById("authMenuAccountBtn");
-  const logoutBtn = document.getElementById("authMenuLogoutBtn");
-  if (!label || !usernameEl || !emailEl || !accountBtn || !logoutBtn) return;
-
-  function fallbackName(user) {
-    return user?.user_metadata?.username || user?.user_metadata?.name || user?.email?.split("@")[0] || "Account";
-  }
-
-  function setGuest() {
-    label.textContent = "Login / Register";
-    usernameEl.textContent = "Guest";
-    emailEl.textContent = "";
-    accountBtn.textContent = "Login / Register";
-    logoutBtn.style.display = "none";
-  }
-
-  function setUser(name, email) {
-    label.textContent = name || "Account";
-    usernameEl.textContent = name || "Account";
-    emailEl.textContent = email || "";
-    accountBtn.textContent = "Account";
-    logoutBtn.style.display = "";
-  }
-
-  async function syncHeaderAuth() {
-    if (!window.supabase?.createClient) {
-      setGuest();
-      return;
-    }
-
-    const client = window.__tmeSupabase || window.__tmeHeaderSupabase;
-    window.__tmeHeaderSupabase = client;
-
-    try {
-      const { data } = await client.auth.getSession();
-      const user = data?.session?.user || null;
-      if (!user) {
-        setGuest();
-        return;
-      }
-
-      let displayName = fallbackName(user);
-      try {
-        const res = await client
-          .from("profiles")
-          .select("username,email")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (!res.error && res.data?.username) displayName = res.data.username;
-      } catch {}
-
-      setUser(displayName, user.email || "");
-    } catch (err) {
-      console.warn("Header auth sync failed:", err);
-      setGuest();
-    }
-  }
-
-  accountBtn.addEventListener("click", () => {
-    window.location.href = label.textContent === "Login / Register" ? "/" : "/account";
-  });
-
-  logoutBtn.addEventListener("click", async () => {
-    try {
-      const client = window.__tmeHeaderSupabase;
-      if (client?.auth?.signOut) await client.auth.signOut();
-    } catch (err) {
-      console.warn("Logout failed:", err);
-    }
-    window.location.href = "/";
-  });
-
-  syncHeaderAuth();
-})();
-
-</script>
-<script>
-
-(function () {
-  const wrap = document.querySelector(".auth-user-dropdown");
-  const btn = document.getElementById("authUserBtn");
-  const menu = document.getElementById("authUserMenu");
-  if (!wrap || !btn || !menu || btn.dataset.tmeAuthToggleBound) return;
-  btn.dataset.tmeAuthToggleBound = "1";
-
-  btn.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    menu.classList.toggle("show");
-  });
-
-  document.addEventListener("click", (event) => {
-    if (!wrap.contains(event.target)) menu.classList.remove("show");
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") menu.classList.remove("show");
-  });
-})();
-
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="/js/prize-runs-3d.js" defer></script>
 </body>
 </html>
