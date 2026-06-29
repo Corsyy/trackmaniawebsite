@@ -18,6 +18,7 @@
 <link href="/logo.png" rel="apple-touch-icon"/>
 <link href="/logo.png" rel="shortcut icon"/>
 <link href="/css/styles.css" rel="stylesheet"/>
+
 </head>
 <body class="bg-track-curves">
 <header>
@@ -27,7 +28,35 @@
 <span>Trackmania Events</span>
 </a>
 <button aria-controls="primary-nav" aria-expanded="false" class="nav-toggle" id="navToggle">☰</button>
-<nav aria-label="Primary" class="navlinks navlinks-simple" id="primary-nav"><a href="#schedule">Events</a><a href="/weekly-shorts-stats">Weekly Shorts</a><a href="/totd">Track of the Day</a><a href="/wrleaderboard">WR Leaderboard</a><a href="/highlights">Highlights</a><a href="/prize-runs">Prize Runs</a><a class="nav-support-link" href="/support">Support</a><button class="btn submit-event-open nav-submit" type="button">Submit Event</button><button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button></nav>
+<nav aria-label="Primary" class="navlinks navlinks-clean" id="primary-nav">
+<div class="nav-group">
+<button aria-haspopup="true" class="nav-drop-btn" type="button">Events <span>▾</span></button>
+<div class="nav-drop-menu">
+<a href="/">Home</a>
+<a href="/kacky">Kacky Finishes</a>
+<a href="/totd">Track of the Day</a>
+</div>
+</div>
+<div class="nav-group">
+<button aria-haspopup="true" class="nav-drop-btn" type="button">Stats <span>▾</span></button>
+<div class="nav-drop-menu">
+<a href="/wrleaderboard">WR Leaderboard</a>
+<a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
+</div>
+</div>
+<div class="nav-group">
+<button aria-haspopup="true" class="nav-drop-btn" type="button">Community <span>▾</span></button>
+<div class="nav-drop-menu">
+<a href="/highlights">Community Highlights</a>
+<a href="/prize-runs">Prize Runs</a>
+<a href="https://discord.gg/hmC97kXAwF" rel="noopener noreferrer" target="_blank">Discord</a>
+<a href="#contact">Contact</a>
+</div>
+</div>
+<a class="nav-support-link" href="/support">Support</a>
+<button class="nav-submit submit-event-open" type="button">Submit Event</button>
+<button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
+</nav>
 <div class="cta" id="authArea">
 <div class="auth-user-dropdown">
 <button class="btn auth-user-btn" id="authUserBtn" type="button">
@@ -50,18 +79,8 @@
 <div class="container hero-grid">
 <div class="hero-top">
 <span class="hero-kicker" id="hero-chip">Community Event Hub</span>
-<h1 class="h1">The community event hub for Trackmania.</h1>
-<p class="lead">Find upcoming races, submit community events, follow Weekly Shorts and TOTD stats, and keep up with recent records and highlights in one place.</p>
-<div aria-label="Primary actions" class="hero-actions"><a class="btn primary" href="#schedule">Browse Events</a><a class="btn" href="/weekly-shorts-stats">Weekly Shorts Stats</a><a class="btn" href="/prize-runs">Prize Runs</a></div>
-<div aria-label="Site focus" class="hero-intent-row">
-<span class="intent-chip">🏁 Event discovery</span>
-<span class="intent-chip">📅 Organizer submissions</span>
-<span class="intent-chip">📊 Weekly Shorts / TOTD</span>
-<span class="intent-chip">💬 Community updates</span>
-</div>
-<p class="homepage-intro-note">
-          Built to help players see what is happening and give event hosts another place to get their races seen.
-        </p>
+<h1 class="h1">Find Trackmania events before they happen.</h1>
+<p class="lead">Browse upcoming community races, submit events for review, and follow Weekly Shorts, TOTD, records, and highlights in one place.</p>
 <div class="hero-event-card" id="hero-event-card">
 <div class="hero-event-label">Featured Event</div>
 <h3 id="hero-event-title">Loading event…</h3>
@@ -77,7 +96,7 @@
 </div>
 <p id="hero-event-desc">Finding the next Trackmania event.</p>
 <div class="hero-event-actions">
-<a class="hero-website-btn" href="#schedule" id="hero-event-website-link">Event website</a>
+<a class="hero-website-btn" href="#schedule" id="hero-event-website-link">Visit event website</a>
 <a class="hero-discord-btn" href="#schedule" id="hero-event-discord-link">Discord</a>
 </div>
 </div>
@@ -86,7 +105,7 @@
 <div>
 <div aria-live="polite" class="card" id="countdown-card">
 <div class="card-header">
-<strong id="countdown-title">Next event countdown</strong>
+<strong id="countdown-title">Next Event Countdown</strong>
 </div>
 <div class="card-body">
 <div class="countdown" id="countdown">
@@ -115,32 +134,6 @@
 </div>
 </div>
 </div>
-</div>
-</section>
-
-<section class="section" id="schedule">
-<div class="container">
-<h2 class="title">Upcoming Main Events</h2>
-<p class="section-intro">The main event board is the heart of the site. These are the races and community competitions players should be able to find quickly.</p>
-<div class="grid" id="main-events-grid">
-<article class="event">
-<div class="meta">Loading schedule…</div>
-</article>
-</div>
-<h3 class="title" style="margin-top:2rem;font-size:1.8rem">Weekly &amp; Community Events</h3>
-<p class="section-intro">Recurring cups, casual races, community nights, and smaller events that deserve more visibility.</p>
-<div class="grid" id="weekly-events-grid">
-<article class="event">
-<div class="meta">Loading schedule…</div>
-</article>
-</div>
-</div>
-</section>
-<section class="section" id="live-events">
-<div class="container">
-<h2 class="title">Live Now</h2>
-<p class="section-intro">Events currently happening or highlighted as live by the site.</p>
-<div class="grid" id="live-events-grid"></div>
 </div>
 </section>
 <section aria-label="Community shoutbox" class="section" id="shoutbox-section">
@@ -196,6 +189,28 @@
 </div>
 </div>
 </section>
+<section class="section" id="live-events">
+<div class="container">
+<h2 class="title">Live Now</h2>
+<div class="grid" id="live-events-grid"></div>
+</div>
+</section>
+<section class="section" id="schedule">
+<div class="container">
+<h2 class="title">Upcoming Main Events</h2><p class="section-lead">Main competitions, recurring cups, and community races players should be able to find quickly.</p>
+<div class="grid" id="main-events-grid">
+<article class="event">
+<div class="meta">Loading schedule…</div>
+</article>
+</div>
+<h3 class="title section-subtitle">Weekly &amp; Community Events</h3>
+<div class="grid" id="weekly-events-grid">
+<article class="event">
+<div class="meta">Loading schedule…</div>
+</article>
+</div>
+</div>
+</section>
 <section class="section support-preview-section" id="support-preview">
 <div class="container">
 <div class="support-preview-card reveal">
@@ -214,26 +229,19 @@
 </div>
 </div>
 </section>
+<section class="section" id="showcase">
+<div class="container"><h2 class="title">Community Highlights</h2><div class="card reveal community-highlight-card"><div class="card-body"><p>Share clips, screenshots, memorable runs, and community moments from Trackmania players.</p><a class="btn" href="/highlights">View Highlights</a></div></div></div>
+</section>
 <section class="section" id="about">
 <div class="container">
 <h2 class="title">About</h2>
 <div class="card reveal">
 <div class="card-body">
-<div class="about-copy">
-<p>
-              Trackmania Events is a community-run hub built around one simple goal: make it easier to see what is
-              happening in the Trackmania scene.
-            </p>
-<p>
-              The main focus is events. Players should be able to find upcoming races, and organizers should have a
-              straightforward place to submit what they are hosting. Stats, recent records, highlights, shoutbox updates,
-              badges, and Prize Runs are supporting features that make the site feel active between events.
-            </p>
-<p>
-              The site is still growing, so feedback from players and event hosts is always welcome.
-            </p>
+<p>Trackmania Events is a community-run hub built around event discovery first. The goal is to help players see what is happening, help organizers get their races seen, and keep useful Trackmania community stats and updates in one place.</p>
+<div class="keyfacts" style="margin-top:1rem">
+<a class="btn" href="https://twitch.tv/Ryvennox" rel="noreferrer" target="_blank">Follow on Twitch</a>
+<a class="btn" href="#contact">Business / Collabs</a>
 </div>
-<div class="keyfacts" style="margin-top:1rem"><span class="pill">🏁 Upcoming events</span><span class="pill">📊 Weekly Shorts / TOTD</span><span class="pill">🏆 Recent WRs</span><span class="pill">💬 Highlights &amp; shoutbox</span></div>
 </div>
 </div>
 </div>
@@ -1476,6 +1484,7 @@
       });
     }
 
+
     function cleanSubmissionText(value, maxLen = 500) {
       return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLen);
     }
@@ -2699,6 +2708,9 @@
       return roles;
     }
 
+
+
+
     function normalizeUuidList(values) {
       return [...new Set((Array.isArray(values) ? values : []).filter((id) =>
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id || ""))
@@ -3092,6 +3104,8 @@
         `nameplate-item-${cleanCssToken(nameplate.item_key)}`,
       ].join(" ");
     }
+
+
 
     function getShoutRole(msg) {
       return shoutRolesByUserId[msg?.user_id] || "user";
