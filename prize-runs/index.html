@@ -545,6 +545,48 @@
       .track-theme-label { display: grid; justify-items: start; }
       .theme-pill { max-width: 100%; white-space: normal; }
     }
+
+    /* v13: keep the real Three.js canvas visible and hide the flat route when WebGL is ready */
+    .track-stage.three-ready .three-stage {
+      z-index: 4;
+      opacity: 1;
+    }
+
+    .track-stage.three-ready .three-stage canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+    }
+
+    .track-stage.three-ready .mini-route {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
+
+    .track-stage.three-loading::after {
+      content: "Loading 3D route...";
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      z-index: 8;
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 .8rem;
+      border: 1px solid rgba(104,240,255,.18);
+      border-radius: 999px;
+      background: rgba(5,7,12,.64);
+      color: rgba(235,240,250,.78);
+      font-size: .78rem;
+      font-weight: 850;
+    }
+
+    .track-stage.three-ready::after,
+    .track-stage.no-webgl::after {
+      display: none;
+    }
+
   </style>
 </head>
 
@@ -756,6 +798,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="/js/prize-runs-3d.js?v=12"></script>
+  <script type="module" src="/js/prize-runs-3d.js?v=13"></script>
 </body>
 </html>
