@@ -3772,3 +3772,114 @@ header .nav {
 #showcase {
   display: none !important;
 }
+
+
+/* ============================================================
+   Homepage v12 clean pass
+   Stable non-dropdown header + cleaner event-first homepage.
+   ============================================================ */
+.navlinks-simple {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .9rem !important;
+  min-width: 0 !important;
+}
+
+.navlinks-simple a {
+  color: #aab8ca !important;
+  font-size: .88rem !important;
+  font-weight: 830 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.navlinks-simple a:hover,
+.navlinks-simple a:focus {
+  color: #fff !important;
+}
+
+.navlinks-simple .nav-support-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 40px !important;
+  padding: .58rem 1rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(104,240,255,.42) !important;
+  background: rgba(104,240,255,.095) !important;
+  color: #f7fbff !important;
+  font-weight: 950 !important;
+}
+
+.navlinks-simple .nav-submit {
+  min-height: 40px !important;
+  padding: .58rem .92rem !important;
+  border-radius: 12px !important;
+  white-space: nowrap !important;
+}
+
+.navlinks-simple .nav-auth-mobile {
+  display: none !important;
+}
+
+.hero .h1 {
+  max-width: 760px !important;
+}
+
+.hero .lead {
+  max-width: 620px !important;
+}
+
+.keyfacts .pill {
+  min-width: 0 !important;
+}
+
+#hub-purpose,
+#community-tools {
+  display: none !important;
+}
+
+@media (max-width: 1040px) {
+  .navlinks-simple {
+    gap: .62rem !important;
+  }
+  .navlinks-simple a {
+    font-size: .82rem !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .navlinks-simple {
+    display: none !important;
+    position: absolute !important;
+    left: 4vw !important;
+    right: 4vw !important;
+    top: calc(100% + .45rem) !important;
+    z-index: 1000 !important;
+    padding: .75rem !important;
+    border: 1px solid rgba(255,255,255,.09) !important;
+    border-radius: 18px !important;
+    background: linear-gradient(180deg, rgba(18,24,38,.98), rgba(9,14,25,.98)) !important;
+    box-shadow: 0 22px 60px rgba(0,0,0,.46) !important;
+  }
+
+  .navlinks-simple.show,
+  .navlinks-simple.open {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: .45rem !important;
+  }
+
+  .navlinks-simple a,
+  .navlinks-simple .nav-submit,
+  .navlinks-simple .nav-auth-mobile {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .navlinks-simple .nav-auth-mobile {
+    display: inline-flex !important;
+  }
+}
