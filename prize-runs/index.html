@@ -491,135 +491,204 @@
 @media(max-width:720px){ .run-depth-row{align-items:flex-start;flex-direction:column;} }
 
 
-/* Prize Runs v7 cinematic 3D-style route + balanced rewards */
+/* Prize Runs v8 faux-3D Trackmania-style route + balanced rewards */
 .track-stage {
-  min-height: 430px !important;
+  min-height: 500px !important;
   padding: 1rem !important;
-  perspective: 850px !important;
+  overflow: hidden !important;
+  perspective: 1100px !important;
   background:
-    radial-gradient(circle at 50% 0%, rgba(104,240,255,.14), transparent 36%),
-    radial-gradient(circle at 82% 22%, rgba(245,217,138,.06), transparent 30%),
-    linear-gradient(180deg, rgba(8,12,22,.96), rgba(4,6,11,.98)) !important;
+    radial-gradient(circle at 50% 4%, rgba(104,240,255,.16), transparent 34%),
+    radial-gradient(circle at 78% 24%, rgba(245,217,138,.07), transparent 30%),
+    linear-gradient(180deg, rgba(8,13,24,.98), rgba(3,5,10,.98)) !important;
 }
 .track-stage::before {
-  inset: 0 !important;
-  opacity: .55 !important;
+  content:"";
+  position:absolute;
+  inset:0 !important;
+  opacity:.72 !important;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.05), transparent 36%),
-    repeating-linear-gradient(90deg, rgba(104,240,255,.08) 0 1px, transparent 1px 58px),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 42px) !important;
+    linear-gradient(180deg, rgba(255,255,255,.045), transparent 30%),
+    repeating-linear-gradient(90deg, rgba(104,240,255,.055) 0 1px, transparent 1px 70px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 46px) !important;
   transform: none !important;
+  pointer-events:none;
 }
 .track-stage::after {
   content:"";
   position:absolute;
-  left:8%;
-  right:8%;
-  bottom:18px;
-  height:180px;
-  border-radius:28px 28px 16px 16px;
-  background:
-    linear-gradient(90deg, transparent 0 47%, rgba(255,255,255,.14) 48% 52%, transparent 53% 100%),
-    linear-gradient(180deg, rgba(104,240,255,.18), rgba(255,255,255,.02));
-  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
-  transform: rotateX(56deg);
-  transform-origin: bottom center;
-  box-shadow: 0 0 50px rgba(104,240,255,.10), inset 0 0 0 1px rgba(255,255,255,.08);
-  pointer-events:none;
+  left:6%;
+  right:6%;
+  bottom:-42px;
+  height:390px;
   z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, transparent 0 46%, rgba(255,255,255,.13) 48% 52%, transparent 54% 100%),
+    repeating-linear-gradient(180deg, transparent 0 34px, rgba(255,255,255,.08) 35px 42px, transparent 43px 78px),
+    linear-gradient(90deg, rgba(104,240,255,.28), rgba(255,255,255,.035) 18%, rgba(255,255,255,.02) 50%, rgba(245,217,138,.22)),
+    linear-gradient(180deg, rgba(104,240,255,.12), rgba(255,255,255,.035));
+  clip-path: polygon(42% 0, 58% 0, 96% 100%, 4% 100%);
+  transform: rotateX(64deg) translateY(28px);
+  transform-origin: bottom center;
+  border-radius: 28px 28px 10px 10px;
+  box-shadow:
+    0 -30px 80px rgba(104,240,255,.08),
+    inset 0 0 0 1px rgba(255,255,255,.08),
+    inset 0 0 60px rgba(104,240,255,.08);
 }
 .route-wrap {
   position: relative !important;
   z-index: 3 !important;
-  height: 280px !important;
+  height: 360px !important;
   margin: .5rem 0 0 !important;
   overflow: visible !important;
+  transform-style: preserve-3d !important;
+}
+.route-wrap::before {
+  content:"";
+  position:absolute;
+  left:50%;
+  top:24px;
+  width:220px;
+  height:230px;
+  transform: translateX(-50%) rotateX(64deg);
+  transform-origin: bottom center;
+  background: radial-gradient(ellipse at center, rgba(104,240,255,.16), transparent 64%);
+  filter: blur(2px);
+  opacity:.6;
+  pointer-events:none;
 }
 .route-line {
-  left: 9% !important;
-  right: 9% !important;
-  top: 156px !important;
-  height: 3px !important;
-  background: linear-gradient(90deg, rgba(104,240,255,.16), rgba(255,255,255,.22), rgba(245,217,138,.16)) !important;
-  transform: skewY(-7deg) !important;
-  opacity: .78 !important;
+  left:50% !important;
+  top:58px !important;
+  bottom:66px !important;
+  right:auto !important;
+  width:4px !important;
+  height:auto !important;
+  border-radius:999px !important;
+  background: linear-gradient(180deg, rgba(245,217,138,.18), rgba(255,255,255,.20), rgba(104,240,255,.18)) !important;
+  transform: translateX(-50%) perspective(700px) rotateX(54deg) !important;
+  transform-origin: bottom center !important;
+  opacity:.72 !important;
+  box-shadow: 0 0 24px rgba(104,240,255,.08) !important;
 }
 .route-progress {
-  top: 156px !important;
-  left: 9% !important;
-  height: 3px !important;
-  max-width: 82% !important;
-  background: linear-gradient(90deg, rgba(104,240,255,.88), rgba(245,217,138,.75)) !important;
-  transform: skewY(-7deg) !important;
+  left:50% !important;
+  bottom:66px !important;
+  top:auto !important;
+  width:5px !important;
+  max-width:none !important;
+  height:0% !important;
+  border-radius:999px !important;
+  background: linear-gradient(0deg, rgba(104,240,255,.95), rgba(245,217,138,.78)) !important;
+  transform: translateX(-50%) perspective(700px) rotateX(54deg) !important;
+  transform-origin: bottom center !important;
+  box-shadow: 0 0 28px rgba(104,240,255,.28), 0 0 46px rgba(245,217,138,.10) !important;
 }
 .route-point {
-  width: 74px !important;
-  top: 144px !important;
-  font-size: .68rem !important;
-  text-shadow: 0 8px 18px rgba(0,0,0,.6) !important;
+  left:50% !important;
+  width:86px !important;
+  font-size:.68rem !important;
+  text-shadow: 0 8px 18px rgba(0,0,0,.75) !important;
+  transform: translateX(-50%) !important;
 }
 .route-point::before {
   content:"";
-  width: 34px;
-  height: 44px;
-  border-radius: 999px 999px 10px 10px;
-  border: 2px solid rgba(255,255,255,.18);
+  width: 54px;
+  height: 70px;
+  border-radius: 999px 999px 12px 12px;
+  border: 3px solid rgba(104,240,255,.66);
   border-bottom: 0;
-  background: linear-gradient(180deg, rgba(104,240,255,.10), transparent);
-  box-shadow: 0 0 18px rgba(104,240,255,.08);
+  background: linear-gradient(180deg, rgba(104,240,255,.14), rgba(104,240,255,.035) 58%, transparent);
+  box-shadow: 0 0 22px rgba(104,240,255,.18), inset 0 0 18px rgba(104,240,255,.06);
+  transform-origin: bottom center;
 }
 .route-dot {
   position:absolute;
-  top: 34px;
+  top: 53px;
   width: 12px !important;
   height: 12px !important;
+  box-shadow: 0 0 20px rgba(104,240,255,.40) !important;
 }
-.route-point[data-slot="cp1"] { top: 126px !important; }
-.route-point[data-slot="cp2"] { top: 108px !important; }
-.route-point[data-slot="cp3"] { top: 90px !important; }
-.route-point[data-slot="finish"] { top: 70px !important; }
+.route-point:not([data-slot]) { top: 248px !important; }
+.route-point:not([data-slot])::before { transform: scale(1.22); }
+.route-point[data-slot="cp1"] { top: 204px !important; }
+.route-point[data-slot="cp1"]::before { transform: scale(1.08); }
+.route-point[data-slot="cp2"] { top: 156px !important; }
+.route-point[data-slot="cp2"]::before { transform: scale(.94); opacity:.94; }
+.route-point[data-slot="cp3"] { top: 108px !important; }
+.route-point[data-slot="cp3"]::before { transform: scale(.80); opacity:.88; }
+.route-point[data-slot="finish"] { top: 52px !important; }
+.route-point[data-slot="finish"]::before { transform: scale(.68); opacity:.84; border-color: rgba(245,217,138,.74); }
+.route-point span {
+  display:block;
+  margin-top:.25rem;
+  letter-spacing:.02em;
+}
 .route-point.hit::before {
-  border-color: rgba(104,240,255,.74);
-  box-shadow: 0 0 24px rgba(104,240,255,.22), inset 0 0 22px rgba(104,240,255,.08);
+  border-color: rgba(104,240,255,.95);
+  box-shadow: 0 0 30px rgba(104,240,255,.36), inset 0 0 22px rgba(104,240,255,.12);
+}
+.route-point[data-slot="finish"].hit::before {
+  border-color: rgba(245,217,138,.96);
+  box-shadow: 0 0 34px rgba(245,217,138,.34), inset 0 0 22px rgba(245,217,138,.10);
 }
 .route-car {
-  top: 154px !important;
-  left: 7%;
-  width: 64px !important;
-  height: 42px !important;
-  border-radius: 18px 22px 14px 14px !important;
-  background: linear-gradient(180deg, rgba(104,240,255,.16), rgba(255,255,255,.055)) !important;
-  transform: translateX(-50%) scale(1) !important;
-  transition: left .9s cubic-bezier(.19,1,.22,1), top .9s cubic-bezier(.19,1,.22,1), transform .25s ease !important;
+  top: 290px !important;
+  left: 50% !important;
+  width: 82px !important;
+  height: 50px !important;
+  border-radius: 22px 26px 16px 16px !important;
+  background: linear-gradient(180deg, rgba(104,240,255,.20), rgba(255,255,255,.060)) !important;
+  transform: translateX(-50%) scale(1.12) !important;
+  transition:
+    left .95s cubic-bezier(.19,1,.22,1),
+    top .95s cubic-bezier(.19,1,.22,1),
+    transform .95s cubic-bezier(.19,1,.22,1),
+    filter .25s ease !important;
+  box-shadow: 0 18px 40px rgba(0,0,0,.28), 0 0 26px rgba(104,240,255,.16) !important;
 }
 .route-car::after {
   content:"";
   position:absolute;
-  left:-28px;
-  width:36px;
-  height:3px;
+  left:50%;
+  top:100%;
+  width:8px;
+  height:54px;
   border-radius:999px;
-  background: linear-gradient(90deg, transparent, rgba(104,240,255,.72));
-  opacity:.75;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(104,240,255,.68), transparent);
+  opacity:.0;
+  transition: opacity .18s ease;
 }
-.route-car.going { transform: translateX(-50%) translateY(-5px) scale(1.05) rotate(-3deg) !important; }
-.route-car-icon { transform: scaleX(-1) !important; }
+.route-car.going::after { opacity:.9; }
+.route-car.going {
+  filter: drop-shadow(0 0 20px rgba(104,240,255,.26));
+}
+.route-car-icon {
+  display:block !important;
+  transform: scaleX(-1) !important;
+  font-size:1.35rem;
+}
+.route-car.car-depth-0 { transform: translateX(-50%) scale(1.16) !important; }
+.route-car.car-depth-1 { transform: translateX(-50%) scale(1.00) !important; }
+.route-car.car-depth-2 { transform: translateX(-50%) scale(.84) !important; }
+.route-car.car-depth-3 { transform: translateX(-50%) scale(.70) !important; }
+.route-car.car-depth-4 { transform: translateX(-50%) scale(.58) !important; }
 .reward-card.reward-kind-parts {
   border-color: rgba(245,217,138,.16) !important;
   background: linear-gradient(180deg, rgba(245,217,138,.045), rgba(255,255,255,.022)) !important;
 }
-.reward-card.reward-kind-bonus {
-  border-color: rgba(104,240,255,.18) !important;
-}
-.reward-card.reward-kind-finish {
-  border-color: rgba(255,255,255,.16) !important;
-}
+.reward-card.reward-kind-bonus { border-color: rgba(104,240,255,.18) !important; }
+.reward-card.reward-kind-finish { border-color: rgba(255,255,255,.16) !important; }
 @media (max-width: 720px) {
-  .track-stage { min-height: 380px !important; }
-  .route-wrap { height: 235px !important; }
-  .route-point { width: 58px !important; font-size: .58rem !important; }
-  .route-car { width: 54px !important; height: 38px !important; }
+  .track-stage { min-height: 430px !important; }
+  .route-wrap { height: 310px !important; }
+  .route-point { width: 64px !important; font-size: .58rem !important; }
+  .route-car { width: 60px !important; height: 42px !important; }
 }
+
 
 </style>
 </head>
@@ -963,10 +1032,11 @@
         countdownEl.classList.remove("show");
         countdownEl.textContent = "3";
       }
-      $("routeProgress").style.width = "0%";
-      $("routeCar").style.left = "7%";
-      $("routeCar").style.top = "154px";
-      $("routeCar").classList.remove("going");
+      $("routeProgress").style.height = "0%";
+      $("routeProgress").style.width = "5px";
+      $("routeCar").style.left = "50%";
+      $("routeCar").style.top = "290px";
+      $("routeCar").className = "route-car car-depth-0";
       if (!$("routeCar").querySelector(".route-car-icon")) {
         $("routeCar").innerHTML = '<span class="route-car-icon">🏎️</span>';
       }
@@ -1125,19 +1195,19 @@
       $("routeCar").innerHTML = `<span class="route-car-icon">${escapeHtml(CAR_BY_THEME[theme] || "🏎️")}</span>`;
       await showCountdown();
       const positions = {
-        cp1: { left: 28, top: 136, progress: 22 },
-        cp2: { left: 50, top: 116, progress: 44 },
-        cp3: { left: 72, top: 96, progress: 66 },
-        finish: { left: 93, top: 76, progress: 86 }
+        cp1: { left: 50, top: 238, progress: 22, depth: 1 },
+        cp2: { left: 50, top: 188, progress: 44, depth: 2 },
+        cp3: { left: 50, top: 138, progress: 66, depth: 3 },
+        finish: { left: 50, top: 84, progress: 88, depth: 4 }
       };
       for (const slot of ["cp1", "cp2", "cp3", "finish"]) {
         const pos = positions[slot];
-        $("routeCar").classList.add("going");
+        $("routeCar").className = `route-car going car-depth-${pos.depth || 0}`;
         $("routeCar").style.left = `${pos.left}%`;
         $("routeCar").style.top = `${pos.top}px`;
-        $("routeProgress").style.width = `${pos.progress}%`;
-        await sleep(900);
-        $("routeCar").classList.remove("going");
+        $("routeProgress").style.height = `${pos.progress}%`;
+        await sleep(950);
+        $("routeCar").className = `route-car car-depth-${pos.depth || 0}`;
         const point = document.querySelector(`.route-point[data-slot="${slot}"]`);
         if (point) point.classList.add("hit");
         const reward = rewards.find((r) => r.slot === slot);
