@@ -490,6 +490,137 @@
 .history-meta .rare-tag { color:#f5d98a; font-weight:950; }
 @media(max-width:720px){ .run-depth-row{align-items:flex-start;flex-direction:column;} }
 
+
+/* Prize Runs v7 cinematic 3D-style route + balanced rewards */
+.track-stage {
+  min-height: 430px !important;
+  padding: 1rem !important;
+  perspective: 850px !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(104,240,255,.14), transparent 36%),
+    radial-gradient(circle at 82% 22%, rgba(245,217,138,.06), transparent 30%),
+    linear-gradient(180deg, rgba(8,12,22,.96), rgba(4,6,11,.98)) !important;
+}
+.track-stage::before {
+  inset: 0 !important;
+  opacity: .55 !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 36%),
+    repeating-linear-gradient(90deg, rgba(104,240,255,.08) 0 1px, transparent 1px 58px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 42px) !important;
+  transform: none !important;
+}
+.track-stage::after {
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  bottom:18px;
+  height:180px;
+  border-radius:28px 28px 16px 16px;
+  background:
+    linear-gradient(90deg, transparent 0 47%, rgba(255,255,255,.14) 48% 52%, transparent 53% 100%),
+    linear-gradient(180deg, rgba(104,240,255,.18), rgba(255,255,255,.02));
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+  transform: rotateX(56deg);
+  transform-origin: bottom center;
+  box-shadow: 0 0 50px rgba(104,240,255,.10), inset 0 0 0 1px rgba(255,255,255,.08);
+  pointer-events:none;
+  z-index:1;
+}
+.route-wrap {
+  position: relative !important;
+  z-index: 3 !important;
+  height: 280px !important;
+  margin: .5rem 0 0 !important;
+  overflow: visible !important;
+}
+.route-line {
+  left: 9% !important;
+  right: 9% !important;
+  top: 156px !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, rgba(104,240,255,.16), rgba(255,255,255,.22), rgba(245,217,138,.16)) !important;
+  transform: skewY(-7deg) !important;
+  opacity: .78 !important;
+}
+.route-progress {
+  top: 156px !important;
+  left: 9% !important;
+  height: 3px !important;
+  max-width: 82% !important;
+  background: linear-gradient(90deg, rgba(104,240,255,.88), rgba(245,217,138,.75)) !important;
+  transform: skewY(-7deg) !important;
+}
+.route-point {
+  width: 74px !important;
+  top: 144px !important;
+  font-size: .68rem !important;
+  text-shadow: 0 8px 18px rgba(0,0,0,.6) !important;
+}
+.route-point::before {
+  content:"";
+  width: 34px;
+  height: 44px;
+  border-radius: 999px 999px 10px 10px;
+  border: 2px solid rgba(255,255,255,.18);
+  border-bottom: 0;
+  background: linear-gradient(180deg, rgba(104,240,255,.10), transparent);
+  box-shadow: 0 0 18px rgba(104,240,255,.08);
+}
+.route-dot {
+  position:absolute;
+  top: 34px;
+  width: 12px !important;
+  height: 12px !important;
+}
+.route-point[data-slot="cp1"] { top: 126px !important; }
+.route-point[data-slot="cp2"] { top: 108px !important; }
+.route-point[data-slot="cp3"] { top: 90px !important; }
+.route-point[data-slot="finish"] { top: 70px !important; }
+.route-point.hit::before {
+  border-color: rgba(104,240,255,.74);
+  box-shadow: 0 0 24px rgba(104,240,255,.22), inset 0 0 22px rgba(104,240,255,.08);
+}
+.route-car {
+  top: 154px !important;
+  left: 7%;
+  width: 64px !important;
+  height: 42px !important;
+  border-radius: 18px 22px 14px 14px !important;
+  background: linear-gradient(180deg, rgba(104,240,255,.16), rgba(255,255,255,.055)) !important;
+  transform: translateX(-50%) scale(1) !important;
+  transition: left .9s cubic-bezier(.19,1,.22,1), top .9s cubic-bezier(.19,1,.22,1), transform .25s ease !important;
+}
+.route-car::after {
+  content:"";
+  position:absolute;
+  left:-28px;
+  width:36px;
+  height:3px;
+  border-radius:999px;
+  background: linear-gradient(90deg, transparent, rgba(104,240,255,.72));
+  opacity:.75;
+}
+.route-car.going { transform: translateX(-50%) translateY(-5px) scale(1.05) rotate(-3deg) !important; }
+.route-car-icon { transform: scaleX(-1) !important; }
+.reward-card.reward-kind-parts {
+  border-color: rgba(245,217,138,.16) !important;
+  background: linear-gradient(180deg, rgba(245,217,138,.045), rgba(255,255,255,.022)) !important;
+}
+.reward-card.reward-kind-bonus {
+  border-color: rgba(104,240,255,.18) !important;
+}
+.reward-card.reward-kind-finish {
+  border-color: rgba(255,255,255,.16) !important;
+}
+@media (max-width: 720px) {
+  .track-stage { min-height: 380px !important; }
+  .route-wrap { height: 235px !important; }
+  .route-point { width: 58px !important; font-size: .58rem !important; }
+  .route-car { width: 54px !important; height: 38px !important; }
+}
+
 </style>
 </head>
 <body class="bg-track-curves">
@@ -559,8 +690,8 @@
     <section class="container prize-shell">
       <div class="prize-hero">
         <span class="prize-kicker">Daily Prize Runs</span>
-        <h1 class="prize-title">Start a run. Hit checkpoints. Unlock rewards.</h1>
-        <p class="prize-subtitle">Prize Runs are daily Trackmania-style reward runs. Each checkpoint reveals a Paddock item you can collect and later equip from your Account page.</p>
+        <h1 class="prize-title">Launch the run. Clear checkpoints. Claim the finish reward.</h1>
+        <p class="prize-subtitle">Prize Runs are daily Trackmania-style reward routes. Checkpoints now award Paddock Parts or bonus chances, while the Finish line gives the guaranteed cosmetic reward.</p>
       </div>
 
       <div id="lockedWrap" class="prize-card locked-card hidden">
@@ -584,7 +715,7 @@
           <div class="prize-card-head">
             <div>
               <strong>Daily Run</strong>
-              <span>One free run per day. Extra tickets are used after your daily run is already claimed.</span>
+              <span>One free run per day. Checkpoints give parts and bonus chances; the Finish line gives the main reward.</span>
             </div>
           </div>
           <div class="prize-card-body">
@@ -598,11 +729,11 @@
 
             <div class="run-depth-panel">
               <div class="run-depth-row">
-                <span><strong>Collection depth:</strong> duplicates now become Paddock Parts and help upgrade item levels.</span>
+                <span><strong>Run rewards:</strong> CP1 and CP3 give Paddock Parts, CP2 can hit a bonus drop, and Finish gives the guaranteed reward.</span>
                 <span id="bestStreakValue" class="parts-chip">Best streak: 0</span>
               </div>
               <div class="run-depth-row">
-                <span>Champion/Iconic pulls can create automatic shoutbox announcements.</span>
+                <span>Duplicates still convert into Paddock Parts, and Champion/Iconic finish pulls can create shoutbox announcements.</span>
                 <span id="partsHint" class="parts-chip">Parts: 0</span>
               </div>
             </div>
@@ -610,7 +741,7 @@
             <div class="run-control-panel">
               <div class="run-control-copy">
                 <strong>Ready to start?</strong>
-                Click the button to call Supabase, roll your rewards, then reveal them across the route.
+                Click the button to launch the cinematic route, hit checkpoint gates, and reveal your Finish reward.
               </div>
               <div class="run-control-actions">
                 <button id="startRunBtn" class="btn primary" type="button">Start Prize Run</button>
@@ -644,7 +775,7 @@
           <div class="prize-card-head">
             <div>
               <strong>Reward Reveal</strong>
-              <span>Rewards are saved to your Paddock automatically after the run starts.</span>
+              <span>Checkpoint bonuses and the Finish reward are saved automatically after the run starts.</span>
             </div>
           </div>
           <div class="prize-card-body">
@@ -663,7 +794,7 @@
           <div class="prize-card-head">
             <div>
               <strong>Recent Prize Runs</strong>
-              <span>Your latest runs and unlocked rewards.</span>
+              <span>Your latest runs, checkpoint bonuses, and finish rewards.</span>
             </div>
           </div>
           <div class="prize-card-body">
@@ -811,6 +942,14 @@
       try { return new Date(value).toLocaleString(); } catch { return ""; }
     }
 
+    function rewardHistoryLabel(r) {
+      if (r?.kind === "parts" || r?.category === "parts") {
+        return `⚙️ +${Number(r.parts_awarded || 0).toLocaleString()} Parts`;
+      }
+      if (r?.kind === "no_bonus") return "🎲 Bonus missed";
+      return `${r?.icon || "🎁"} ${r?.name || "Reward"}`;
+    }
+
     function setMsg(text, type = "") {
       const el = $("runMessage");
       if (!el) return;
@@ -826,19 +965,28 @@
       }
       $("routeProgress").style.width = "0%";
       $("routeCar").style.left = "7%";
+      $("routeCar").style.top = "154px";
       $("routeCar").classList.remove("going");
       if (!$("routeCar").querySelector(".route-car-icon")) {
         $("routeCar").innerHTML = '<span class="route-car-icon">🏎️</span>';
       }
       document.querySelectorAll(".route-point").forEach((p) => p.classList.remove("hit"));
+      const startPoint = document.querySelector(".route-point:not([data-slot])");
+      if (startPoint) startPoint.classList.add("hit");
       const shareBox = $("shareResultBox");
       if (shareBox) shareBox.classList.remove("show");
+      const placeholders = {
+        cp1: ["Paddock Parts", "Checkpoint 1 gives a small parts payout."],
+        cp2: ["Bonus Chance", "Checkpoint 2 can hit a bonus item or parts."],
+        cp3: ["Paddock Parts", "Checkpoint 3 gives a bigger parts payout."],
+        finish: ["Finish Reward", "The Finish line gives the guaranteed cosmetic reward."]
+      };
       $("rewardGrid").innerHTML = ["cp1", "cp2", "cp3", "finish"].map((slot) => `
         <article class="reward-card" id="reward-${slot}">
           <div class="reward-slot">${SLOT_LABELS[slot]}</div>
-          <div class="reward-name">Waiting for reward…</div>
-          <div class="reward-desc">Start a run to reveal this checkpoint.</div>
-          <span class="tier-chip tier-standard">Locked</span>
+          <div class="reward-name">${placeholders[slot][0]}</div>
+          <div class="reward-desc">${placeholders[slot][1]}</div>
+          <span class="tier-chip tier-standard">Waiting</span>
         </article>
       `).join("");
     }
@@ -858,7 +1006,13 @@
       if ($("bestStreakValue")) $("bestStreakValue").textContent = `Best streak: ${best.toLocaleString()}`;
       if ($("partsHint")) $("partsHint").textContent = `Parts: ${parts.toLocaleString()}`;
       $("startRunBtn").disabled = !canRun || isRunning;
-      $("startRunBtn").textContent = freeUsed ? "Use Extra Ticket" : "Start Prize Run";
+      if (!canRun && freeUsed && tickets <= 0) {
+        $("startRunBtn").textContent = "Come Back Tomorrow";
+      } else if (freeUsed && tickets > 0) {
+        $("startRunBtn").textContent = "Use Extra Ticket";
+      } else {
+        $("startRunBtn").textContent = "Start Daily Run";
+      }
     }
 
     async function loadPrizeStatus() {
@@ -892,7 +1046,7 @@
         }
         box.innerHTML = rows.map((row) => {
           const rewards = Array.isArray(row.rewards) ? row.rewards : [];
-          const names = rewards.map((r) => `${r.icon || "🎁"} ${r.name || "Reward"}`).join(" • ");
+          const names = rewards.map((r) => rewardHistoryLabel(r)).join(" • ");
           return `
             <article class="history-item">
               <div class="history-top">
@@ -926,8 +1080,32 @@
       const slot = reward?.slot || "cp1";
       const card = $(`reward-${slot}`);
       if (!card) return;
+      const kind = reward?.kind || (reward?.category === "parts" ? "parts" : "item");
       const parts = Number(reward.parts_awarded || 0);
       const duplicate = reward.was_duplicate ? ` <span style="color:rgba(255,255,255,.65)">Duplicate copy</span>` : "";
+
+      if (kind === "parts") {
+        card.innerHTML = `
+          <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • Parts</div>
+          <div class="reward-name">⚙️ +${parts.toLocaleString()} Paddock Parts</div>
+          <div class="reward-desc">Checkpoint cleared. Parts were added to your Paddock balance.</div>
+          <span class="tier-chip tier-clean">Checkpoint Bonus</span>
+        `;
+        card.classList.add("revealed", "reward-kind-parts");
+        return;
+      }
+
+      if (kind === "no_bonus") {
+        card.innerHTML = `
+          <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • Bonus Chance</div>
+          <div class="reward-name">🎲 No bonus item</div>
+          <div class="reward-desc">You still cleared the checkpoint. The Finish reward is guaranteed.</div>
+          <span class="tier-chip tier-standard">Checkpoint Clear</span>
+        `;
+        card.classList.add("revealed");
+        return;
+      }
+
       card.innerHTML = `
         <div class="reward-slot">${escapeHtml(SLOT_LABELS[slot] || slot)} • ${escapeHtml(reward.category || "reward")}</div>
         <div class="reward-name">${escapeHtml(reward.icon || "🎁")} ${escapeHtml(reward.name || "Reward")}</div>
@@ -935,7 +1113,7 @@
         ${parts > 0 ? `<div class="reward-parts">⚙️ +${parts.toLocaleString()} Paddock Parts</div>` : ""}
         <span class="tier-chip tier-${escapeHtml(reward.tier || "standard")}">${escapeHtml(prettyTier(reward.tier))}</span>
       `;
-      card.classList.add("revealed");
+      card.classList.add("revealed", slot === "finish" ? "reward-kind-finish" : "reward-kind-bonus");
       if (reward.was_duplicate) card.classList.add("duplicate-reward");
     }
 
@@ -946,19 +1124,25 @@
       resetTrack();
       $("routeCar").innerHTML = `<span class="route-car-icon">${escapeHtml(CAR_BY_THEME[theme] || "🏎️")}</span>`;
       await showCountdown();
-      const positions = { cp1: 28, cp2: 50, cp3: 72, finish: 93 };
-      const progress = { cp1: 21, cp2: 43, cp3: 65, finish: 86 };
+      const positions = {
+        cp1: { left: 28, top: 136, progress: 22 },
+        cp2: { left: 50, top: 116, progress: 44 },
+        cp3: { left: 72, top: 96, progress: 66 },
+        finish: { left: 93, top: 76, progress: 86 }
+      };
       for (const slot of ["cp1", "cp2", "cp3", "finish"]) {
+        const pos = positions[slot];
         $("routeCar").classList.add("going");
-        $("routeCar").style.left = `${positions[slot]}%`;
-        $("routeProgress").style.width = `${progress[slot]}%`;
-        await sleep(850);
+        $("routeCar").style.left = `${pos.left}%`;
+        $("routeCar").style.top = `${pos.top}px`;
+        $("routeProgress").style.width = `${pos.progress}%`;
+        await sleep(900);
         $("routeCar").classList.remove("going");
         const point = document.querySelector(`.route-point[data-slot="${slot}"]`);
         if (point) point.classList.add("hit");
         const reward = rewards.find((r) => r.slot === slot);
         if (reward) revealReward(reward);
-        await sleep(slot === "finish" ? 650 : 520);
+        await sleep(slot === "finish" ? 760 : 560);
       }
     }
 
@@ -969,6 +1153,12 @@
         `Theme: ${prettyTheme(result?.theme)}`,
         "",
         ...rewards.map((r) => {
+          if (r.kind === "parts" || r.category === "parts") {
+            return `${SLOT_LABELS[r.slot] || r.slot}: ⚙️ +${Number(r.parts_awarded || 0).toLocaleString()} Paddock Parts`;
+          }
+          if (r.kind === "no_bonus") {
+            return `${SLOT_LABELS[r.slot] || r.slot}: 🎲 No bonus item`;
+          }
           const dupe = r.was_duplicate ? ` duplicate (+${Number(r.parts_awarded || 0)} parts)` : "";
           return `${SLOT_LABELS[r.slot] || r.slot}: ${r.icon || "🎁"} ${r.name || "Reward"} [${prettyTier(r.tier)}]${dupe}`;
         }),
@@ -998,7 +1188,7 @@
         await animateRun(data);
         lastRunResult = data;
         showShareResult(data);
-        setMsg("Prize Run complete. Rewards saved to your Paddock.", "success");
+        setMsg("Prize Run complete. Parts and reward saved to your Paddock.", "success");
         await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
       } catch (err) {
         console.warn("Prize Run failed:", err);
