@@ -597,13 +597,23 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     const clock = new THREE.Clock();
 
     function resize() {
-      const rect = mount.getBoundingClientRect();
-      const width = Math.max(1, rect.width);
-      const height = Math.max(1, rect.height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 1.25 : 1.75));
+      // The account/auth wrapper can be hidden when this script first boots.
+      // If the canvas is sized while hidden, WebGL renders at 1x1 until a resize
+      // event happens. DevTools opening triggers that resize, which is why the
+      // scene appeared only after pressing F12. Use the visible parent as a
+      // fallback and retry after layout settles.
+      const mountRect = mount.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      const width = Math.max(320, Math.floor(mountRect.width || stageRect.width || mount.clientWidth || stage.clientWidth || 640));
+      const height = Math.max(320, Math.floor(mountRect.height || stageRect.height || mount.clientHeight || stage.clientHeight || 440));
+
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 1.15 : 1.6));
       renderer.setSize(width, height, false);
+      renderer.domElement.style.width = "100%";
+      renderer.domElement.style.height = "100%";
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
     }
 
     function setCarAt(vec, yaw = Math.PI) {
@@ -692,6 +702,20 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     }
 
     window.addEventListener("resize", resize, { passive: true });
+
+    if ("ResizeObserver" in window) {
+      const observer = new ResizeObserver(() => resize());
+      observer.observe(stage);
+      observer.observe(mount);
+    }
+
+    // Extra layout passes for GitHub Pages/mobile/browser cache weirdness.
+    // This prevents the blank canvas until DevTools/resize issue.
+    requestAnimationFrame(resize);
+    setTimeout(resize, 80);
+    setTimeout(resize, 250);
+    setTimeout(resize, 700);
+
     document.addEventListener("visibilitychange", () => {
       if (document.hidden && rafId) {
         cancelAnimationFrame(rafId);
@@ -706,7 +730,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     rafId = requestAnimationFrame(render);
 
     console.info("Prize Runs 3D scene ready");
-    return { ready: true, reset, driveTo };
+    return { ready: true, reset, driveTo, resize };
   }
 
   function setupNav() {
@@ -909,6 +933,10 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
       if ($("lockedWrap")) $("lockedWrap").classList.add("hidden");
       if ($("authedWrap")) $("authedWrap").classList.remove("hidden");
+      if (threeRun?.resize) {
+        requestAnimationFrame(() => threeRun.resize());
+        setTimeout(() => threeRun.resize(), 120);
+      }
       await Promise.all([loadPrizeStatus(), loadRecentHistory()]);
     } catch (err) {
       console.warn("Prize page failed:", err);
