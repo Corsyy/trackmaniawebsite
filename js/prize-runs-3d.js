@@ -517,6 +517,27 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       scene.add(edge);
     }
 
+    // Trackmania-inspired stadium side blocks and glowing lane panels.
+    const barrierMat = new THREE.MeshStandardMaterial({ color: 0x0d1422, roughness: 0.5, metalness: 0.35, emissive: 0x020712, emissiveIntensity: 0.35 });
+    const barrierTrimMat = new THREE.MeshBasicMaterial({ color: 0x53a6ff, transparent: true, opacity: 0.58 });
+    for (const x of [-4.35, 4.35]) {
+      const barrier = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.45, 38), barrierMat);
+      barrier.position.set(x, 0.27, -4);
+      scene.add(barrier);
+      const trim = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.055, 38), barrierTrimMat);
+      trim.position.set(x * 0.985, 0.56, -4);
+      scene.add(trim);
+    }
+
+    const panelMat = new THREE.MeshBasicMaterial({ color: 0x68f0ff, transparent: true, opacity: 0.18 });
+    for (let z = 10.8; z > -18.5; z -= 5.6) {
+      for (const x of [-2.25, 2.25]) {
+        const panel = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.025, 0.9), panelMat);
+        panel.position.set(x, 0.095, z);
+        scene.add(panel);
+      }
+    }
+
     const gatePositions = {
       start: { x: 0, z: 11.5, label: "START", color: 0x68f0ff },
       cp1: { x: -0.85, z: 4.6, label: "CP1", color: 0x68f0ff },
@@ -529,24 +550,59 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     function createGate(slot, data) {
       const group = new THREE.Group();
       const color = data.color;
-      const gateMat = makeMat(0x172033, color, 0.42, 0.35);
-      const glowMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.38 });
+      const isFinish = slot === "finish";
+      const darkMat = new THREE.MeshStandardMaterial({
+        color: isFinish ? 0x2a220d : 0x102034,
+        emissive: color,
+        emissiveIntensity: isFinish ? 0.46 : 0.38,
+        roughness: 0.42,
+        metalness: 0.44,
+      });
+      const brightMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: isFinish ? 0.78 : 0.62 });
+      const glassMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: isFinish ? 0.16 : 0.13, side: THREE.DoubleSide });
 
-      const left = new THREE.Mesh(new THREE.BoxGeometry(0.24, 2.25, 0.24), gateMat);
-      const right = new THREE.Mesh(new THREE.BoxGeometry(0.24, 2.25, 0.24), gateMat);
-      const top = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.22, 0.28), gateMat);
-      left.position.set(-2.45, 1.12, 0);
-      right.position.set(2.45, 1.12, 0);
-      top.position.set(0, 2.28, 0);
-      group.add(left, right, top);
+      // A wider Trackmania-style checkpoint gate with side posts, glowing top rail,
+      // and a translucent hit plane, instead of a small flat doorway.
+      const postGeo = new THREE.BoxGeometry(0.28, 2.65, 0.34);
+      const left = new THREE.Mesh(postGeo, darkMat);
+      const right = new THREE.Mesh(postGeo, darkMat);
+      left.position.set(-2.7, 1.32, 0);
+      right.position.set(2.7, 1.32, 0);
+      group.add(left, right);
 
-      const glow = new THREE.Mesh(new THREE.BoxGeometry(4.25, 0.055, 0.055), glowMat);
-      glow.position.set(0, 2.48, 0);
-      group.add(glow);
+      const footGeo = new THREE.BoxGeometry(0.82, 0.2, 0.75);
+      const leftFoot = new THREE.Mesh(footGeo, darkMat);
+      const rightFoot = new THREE.Mesh(footGeo, darkMat);
+      leftFoot.position.set(-2.7, 0.1, 0);
+      rightFoot.position.set(2.7, 0.1, 0);
+      group.add(leftFoot, rightFoot);
 
-      const sprite = createTextSprite(data.label, slot === "finish" ? "#f5d98a" : "#dffbff");
-      sprite.position.set(0, 3.15, 0);
+      const top = new THREE.Mesh(new THREE.BoxGeometry(5.85, 0.28, 0.4), darkMat);
+      top.position.set(0, 2.68, 0);
+      group.add(top);
+
+      const neonTop = new THREE.Mesh(new THREE.BoxGeometry(5.35, 0.07, 0.08), brightMat);
+      neonTop.position.set(0, 2.9, -0.03);
+      group.add(neonTop);
+
+      const hitPlane = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 1.85), glassMat);
+      hitPlane.position.set(0, 1.42, 0.02);
+      group.add(hitPlane);
+
+      const ringGeo = new THREE.TorusGeometry(2.25, 0.035, 8, 72, Math.PI);
+      const arch = new THREE.Mesh(ringGeo, brightMat);
+      arch.rotation.z = Math.PI;
+      arch.scale.y = 0.54;
+      arch.position.set(0, 1.78, -0.04);
+      group.add(arch);
+
+      const sprite = createTextSprite(data.label, isFinish ? "#fff3a8" : "#dffbff");
+      sprite.position.set(0, 3.45, 0);
       group.add(sprite);
+
+      const localLight = new THREE.PointLight(color, isFinish ? 1.2 : 0.9, 6);
+      localLight.position.set(0, 2.4, 0.3);
+      group.add(localLight);
 
       group.position.set(data.x, 0, data.z);
       scene.add(group);
@@ -558,29 +614,76 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     });
 
     const car = new THREE.Group();
-    const bodyMat = makeMat(0x1b75ff, 0x073d6d, 0.38, 0.5);
-    const trimMat = makeMat(0xeaf0ff, 0x111111, 0.4, 0.35);
-    const tireMat = makeMat(0x05070c, 0x000000, 0.7, 0.15);
-    const body = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.38, 2.2), bodyMat);
-    body.position.y = 0.42;
-    car.add(body);
-    const nose = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.24, 0.72), bodyMat);
-    nose.position.set(0, 0.35, -1.23);
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x126cff, emissive: 0x06275f, emissiveIntensity: 0.42, roughness: 0.34, metalness: 0.55 });
+    const bodyDarkMat = new THREE.MeshStandardMaterial({ color: 0x071121, emissive: 0x02060c, emissiveIntensity: 0.2, roughness: 0.58, metalness: 0.38 });
+    const trimMat = new THREE.MeshStandardMaterial({ color: 0xeaf0ff, emissive: 0x111927, emissiveIntensity: 0.24, roughness: 0.34, metalness: 0.45 });
+    const glassCarMat = new THREE.MeshStandardMaterial({ color: 0x8ddcff, emissive: 0x143b5a, emissiveIntensity: 0.55, roughness: 0.18, metalness: 0.18, transparent: true, opacity: 0.88 });
+    const tireMat = new THREE.MeshStandardMaterial({ color: 0x03050a, roughness: 0.74, metalness: 0.18 });
+    const rimMat = new THREE.MeshStandardMaterial({ color: 0xbfc9d8, roughness: 0.4, metalness: 0.62 });
+    const glowBlueMat = new THREE.MeshBasicMaterial({ color: 0x68f0ff, transparent: true, opacity: 0.85 });
+
+    // Low-poly Trackmania-inspired stadium car. No external model files are used,
+    // so it stays fast on mobile and cannot fail from missing assets.
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.36, 0.34, 2.35), bodyMat);
+    chassis.position.set(0, 0.42, 0.05);
+    car.add(chassis);
+
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.22, 1.05), bodyMat);
+    nose.position.set(0, 0.38, -1.35);
     car.add(nose);
-    const cockpit = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.34, 0.72), trimMat);
-    cockpit.position.set(0, 0.78, 0.08);
+
+    const frontSplitter = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.08, 0.28), bodyDarkMat);
+    frontSplitter.position.set(0, 0.26, -1.92);
+    car.add(frontSplitter);
+
+    const cockpit = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.42, 0.78), glassCarMat);
+    cockpit.position.set(0, 0.78, -0.05);
     car.add(cockpit);
-    const wing = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.12, 0.26), trimMat);
-    wing.position.set(0, 0.75, 1.15);
-    car.add(wing);
-    for (const x of [-0.72, 0.72]) {
-      for (const z of [-0.72, 0.78]) {
-        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.18, 18), tireMat);
+
+    const roofStripe = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 2.18), trimMat);
+    roofStripe.position.set(0, 0.62, -0.22);
+    car.add(roofStripe);
+
+    const rearDeck = new THREE.Mesh(new THREE.BoxGeometry(1.42, 0.22, 0.76), bodyMat);
+    rearDeck.position.set(0, 0.5, 1.13);
+    car.add(rearDeck);
+
+    const rearWing = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.1, 0.34), trimMat);
+    rearWing.position.set(0, 0.9, 1.47);
+    car.add(rearWing);
+    const wingLeft = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.22), trimMat);
+    const wingRight = wingLeft.clone();
+    wingLeft.position.set(-0.82, 0.68, 1.39);
+    wingRight.position.set(0.82, 0.68, 1.39);
+    car.add(wingLeft, wingRight);
+
+    const leftSidepod = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.25, 1.28), bodyDarkMat);
+    const rightSidepod = leftSidepod.clone();
+    leftSidepod.position.set(-0.86, 0.38, 0.15);
+    rightSidepod.position.set(0.86, 0.38, 0.15);
+    car.add(leftSidepod, rightSidepod);
+
+    const headGlow = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.035, 0.055), glowBlueMat);
+    headGlow.position.set(0, 0.43, -1.92);
+    car.add(headGlow);
+
+    const wheels = [];
+    for (const x of [-0.82, 0.82]) {
+      for (const z of [-0.86, 0.88]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.27, 0.22, 28), tireMat);
         wheel.rotation.z = Math.PI / 2;
-        wheel.position.set(x, 0.24, z);
+        wheel.position.set(x, 0.28, z);
         car.add(wheel);
+        wheels.push(wheel);
+
+        const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.235, 20), rimMat);
+        rim.rotation.z = Math.PI / 2;
+        rim.position.copy(wheel.position);
+        car.add(rim);
       }
     }
+    car.userData.wheels = wheels;
+    car.scale.set(1.08, 1.08, 1.08);
     scene.add(car);
 
     const path = {
@@ -616,14 +719,16 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       renderer.render(scene, camera);
     }
 
-    function setCarAt(vec, yaw = Math.PI) {
+    function setCarAt(vec, yaw = 0) {
+      // The car model points down the local -Z axis, which is also the route direction.
+      // A yaw of 0 means the nose faces forward toward the finish.
       car.position.set(vec.x, 0.18, vec.z);
       car.rotation.y = yaw;
     }
 
     function reset() {
       currentSlot = "start";
-      setCarAt(path.start, Math.PI);
+      setCarAt(path.start, 0);
       Object.entries(gates).forEach(([slot, group]) => {
         group.scale.set(1, 1, 1);
         group.traverse((obj) => {
@@ -669,7 +774,9 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
           const nextT = Math.min(1, t + 0.02);
           const nx = from.x + (to.x - from.x) * nextT;
           const nz = from.z + (to.z - from.z) * nextT;
-          const yaw = Math.atan2(nx - x, nz - z) + Math.PI;
+          const dx = nx - x;
+          const dz = nz - z;
+          const yaw = Math.atan2(-dx, -dz);
           setCarAt(new THREE.Vector3(x, 0, z), yaw);
 
           targetCamera.set(x * 0.55, 6.2, z + 10.5);
@@ -693,6 +800,11 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         gate.position.y = Math.sin(elapsed * 1.6 + index) * 0.025;
       });
       car.position.y = 0.18 + Math.sin(elapsed * 9) * 0.018;
+      if (car.userData.wheels) {
+        car.userData.wheels.forEach((wheel) => {
+          wheel.rotation.x -= 0.18;
+        });
+      }
 
       camera.position.lerp(targetCamera, 0.045);
       camera.lookAt(car.position.x * 0.35, 0.55, car.position.z - 5.5);
@@ -729,7 +841,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     reset();
     rafId = requestAnimationFrame(render);
 
-    console.info("Prize Runs 3D scene ready");
+    console.info("Prize Runs 3D scene ready - v15 stadium car");
     return { ready: true, reset, driveTo, resize };
   }
 
