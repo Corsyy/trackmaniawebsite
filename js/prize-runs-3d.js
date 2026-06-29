@@ -1,3 +1,5 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
 (function () {
   "use strict";
 
@@ -443,7 +445,7 @@
   function createThreeRun() {
     const mount = $("threeMount");
     const stage = $("trackStage");
-    if (!mount || !stage || !window.THREE || !hasWebGL()) {
+    if (!mount || !stage || !hasWebGL()) {
       if (stage) stage.classList.add("no-webgl");
       return { ready: false, reset() {}, driveTo: async () => {} };
     }
