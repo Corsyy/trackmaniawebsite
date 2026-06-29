@@ -13,7 +13,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
   const STADIUM_CAR_TARGET_WIDTH = 2.72;
   const STADIUM_CAR_TARGET_LENGTH = 4.48;
   const STADIUM_CAR_BASE_Y = 0.04;
-  const STADIUM_CAR_YAW_OFFSET = 0;
+  const STADIUM_CAR_YAW_OFFSET = Math.PI;
 
   const SLOT_LABELS = {
     cp1: "Checkpoint 1",
@@ -993,20 +993,69 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     }
 
     function applyLoadedCarQuality(model) {
+      const colorConfig = {
+        body: 0x8d9494,
+        bodyAccent: 0x687070,
+        tires: 0x050608,
+        wheels: 0x1b1f22,
+        glass: 0x182329,
+        details: 0x14191d,
+      };
+
       model.traverse((obj) => {
         if (!obj.isMesh) return;
         obj.frustumCulled = true;
         obj.castShadow = false;
         obj.receiveShadow = false;
-        if (obj.material) {
-          const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
-          materials.forEach((mat) => {
-            mat.depthWrite = true;
-            mat.needsUpdate = true;
-            if ("roughness" in mat && typeof mat.roughness === "number") mat.roughness = Math.max(mat.roughness, 0.34);
-            if ("metalness" in mat && typeof mat.metalness === "number") mat.metalness = Math.min(Math.max(mat.metalness, 0.18), 0.82);
-          });
-        }
+
+        if (!obj.material) return;
+        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        materials.forEach((mat) => {
+          if (!mat) return;
+
+          const matName = String(mat.name || "").toLowerCase();
+          const objName = String(obj.name || "").toLowerCase();
+          const label = `${matName} ${objName}`;
+
+          mat.depthWrite = true;
+
+          // The original GLB imports very bright/white because several materials include
+          // emissive texture data. Kill that glow so the model reads like a clean car,
+          // not a blown-out white object inside the dark Prize Runs scene.
+          if (mat.emissive?.setHex) mat.emissive.setHex(0x000000);
+          if ("emissiveIntensity" in mat) mat.emissiveIntensity = 0;
+
+          if (label.includes("skin")) {
+            // Main Stadium body paint: neutral grey/silver.
+            if (mat.color?.setHex) mat.color.setHex(colorConfig.body);
+            if ("metalness" in mat) mat.metalness = 0.22;
+            if ("roughness" in mat) mat.roughness = 0.42;
+            if ("clearcoat" in mat) mat.clearcoat = 0.7;
+            if ("clearcoatRoughness" in mat) mat.clearcoatRoughness = 0.18;
+          } else if (label.includes("wheel")) {
+            // Tires/rims: darker so they stop looking white in-game.
+            if (mat.color?.setHex) mat.color.setHex(label.includes("tire") ? colorConfig.tires : colorConfig.wheels);
+            if ("metalness" in mat) mat.metalness = 0.18;
+            if ("roughness" in mat) mat.roughness = 0.78;
+          } else if (label.includes("glass")) {
+            // Cockpit glass: dark smoked glass.
+            if (mat.color?.setHex) mat.color.setHex(colorConfig.glass);
+            mat.transparent = true;
+            mat.opacity = 0.72;
+            if ("metalness" in mat) mat.metalness = 0.02;
+            if ("roughness" in mat) mat.roughness = 0.2;
+          } else if (label.includes("detail")) {
+            // Intakes, suspension, rear panel, trims.
+            if (mat.color?.setHex) mat.color.setHex(colorConfig.details);
+            if ("metalness" in mat) mat.metalness = 0.32;
+            if ("roughness" in mat) mat.roughness = 0.55;
+          } else {
+            if ("roughness" in mat && typeof mat.roughness === "number") mat.roughness = Math.max(mat.roughness, 0.38);
+            if ("metalness" in mat && typeof mat.metalness === "number") mat.metalness = Math.min(Math.max(mat.metalness, 0.12), 0.72);
+          }
+
+          mat.needsUpdate = true;
+        });
       });
     }
 
