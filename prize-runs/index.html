@@ -546,7 +546,7 @@
       .theme-pill { max-width: 100%; white-space: normal; }
     }
 
-    /* v13: keep the real Three.js canvas visible and hide the flat route when WebGL is ready */
+    /* 3D canvas layer */
     .track-stage.three-ready .three-stage {
       z-index: 4;
       opacity: 1;
@@ -587,7 +587,7 @@
       display: none;
     }
 
-    /* v14: keep 3D mount sized before/after auth wrapper becomes visible */
+    /* Keep 3D mount sized before/after auth wrapper becomes visible */
     #threeMount {
       display: block;
       width: 100%;
@@ -811,6 +811,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="/js/prize-runs-3d.js?v=15"></script>
+  <script type="module" src="/js/prize-runs-3d.js?v=17"></script>
 </body>
 </html>
