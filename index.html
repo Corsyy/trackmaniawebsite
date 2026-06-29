@@ -1,608 +1,452 @@
 <!DOCTYPE html>
+
 <html lang="en">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Trackmania Events — Community Event Hub</title>
-  <meta name="description"
-    content="Find Trackmania community events, submit races, follow Weekly Shorts and TOTD stats, recent records, highlights, and community updates in one place." />
-  <meta name="theme-color" content="#0a0f1a" />
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://trackmaniawebsite.onrender.com; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; frame-src https://player.twitch.tv; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; upgrade-insecure-requests;" />
-  <meta property="og:title" content="Trackmania Events — Community Event Hub" />
-  <meta property="og:description" content="Upcoming events, event submissions, Weekly Shorts/TOTD stats, recent WRs, highlights, and community updates for Trackmania." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://trackmaniaevents.com/" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <script id="event-jsonld" type="application/ld+json">{}</script>
-  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
-  <link rel="apple-touch-icon" href="/logo.png">
-  <link rel="shortcut icon" href="/logo.png">
-  <link rel="stylesheet" href="/css/styles.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Trackmania Events — Community Event Hub</title>
+<meta content="Find Trackmania community events, submit races, follow Weekly Shorts and TOTD stats, recent records, highlights, and community updates in one place." name="description"/>
+<meta content="#0a0f1a" name="theme-color"/>
+<meta content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://trackmaniawebsite.onrender.com; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; frame-src https://player.twitch.tv; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; upgrade-insecure-requests;" http-equiv="Content-Security-Policy"/>
+<meta content="Trackmania Events — Community Event Hub" property="og:title"/>
+<meta content="Upcoming events, event submissions, Weekly Shorts/TOTD stats, recent WRs, highlights, and community updates for Trackmania." property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="https://trackmaniaevents.com/" property="og:url"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<script id="event-jsonld" type="application/ld+json">{}</script>
+<link href="/logo.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/logo.png" rel="apple-touch-icon"/>
+<link href="/logo.png" rel="shortcut icon"/>
+<link href="/css/styles.css" rel="stylesheet"/>
 </head>
-
 <body class="bg-track-curves">
-  <header>
-    <div class="container nav">
-      <a class="brand" href="/" aria-label="Trackmania Events Home">
-        <span class="brand-badge" aria-hidden="true">🎮</span>
-        <span>Trackmania Events</span>
-      </a>
-
-      <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">☰</button>
-
-      <nav id="primary-nav" class="navlinks navlinks-clean" aria-label="Primary">
-        <div class="nav-group">
-          <button class="nav-drop-btn" type="button" aria-haspopup="true">Events <span>▾</span></button>
-          <div class="nav-drop-menu">
-            <a href="/">Home</a>
-            <a href="/kacky">Kacky Finishes</a>
-            <a href="/totd">Track of the Day</a>
-          </div>
-        </div>
-
-        <div class="nav-group">
-          <button class="nav-drop-btn" type="button" aria-haspopup="true">Stats <span>▾</span></button>
-          <div class="nav-drop-menu">
-            <a href="/wrleaderboard">WR Leaderboard</a>
-            <a href="/weekly-shorts-stats">Weekly Shorts Stats</a>
-          </div>
-        </div>
-
-        <div class="nav-group">
-          <button class="nav-drop-btn" type="button" aria-haspopup="true">Community <span>▾</span></button>
-          <div class="nav-drop-menu">
-            <a href="/highlights">Community Highlights</a>
-            <a href="/prize-runs">Prize Runs</a>
-            <a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noopener noreferrer">Discord</a>
-            <a href="#contact">Contact</a>
-          </div>
-        </div>
-
-        <a class="nav-support-link" href="/support">Support</a>
-        <button class="nav-submit submit-event-open" type="button">Submit Event</button>
-        <button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button>
-      </nav>
-
-      <div class="cta" id="authArea">
-        <div class="auth-user-dropdown">
-          <button id="authUserBtn" class="btn auth-user-btn" type="button">
-            <span id="authUserLabel">Login / Register</span>
-            <span class="auth-caret">▾</span>
-          </button>
-
-          <div id="authUserMenu" class="auth-user-menu">
-            <div class="auth-user-info">
-              <strong id="authMenuUsername">Guest</strong>
-              <span id="authMenuEmail"></span>
-            </div>
-
-            <button id="authMenuAccountBtn" type="button">Account</button>
-            <button id="authMenuLogoutBtn" type="button">Logout</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <section class="hero" id="home">
-    <div class="container hero-grid">
-      <div class="hero-top">
-        <span class="hero-kicker" id="hero-chip">Community Event Hub</span>
-
-        <h1 class="h1">The community event hub for Trackmania.</h1>
-
-        <p class="lead">
-          Find upcoming community races, submit your own events, follow Weekly Shorts and TOTD stats,
-          and keep up with recent records and highlights in one place.
-        </p>
-
-        <div class="hero-actions" aria-label="Primary actions">
-          <a class="btn primary" href="#schedule">Browse Events</a>
-          <a class="btn" href="/weekly-shorts-stats">Weekly Shorts Stats</a>
-        </div>
-
-        <div class="hero-intent-row" aria-label="Site focus">
-          <span class="intent-chip">🏁 Event discovery</span>
-          <span class="intent-chip">📅 Organizer submissions</span>
-          <span class="intent-chip">📊 Weekly Shorts / TOTD</span>
-          <span class="intent-chip">💬 Community updates</span>
-        </div>
-
-        <p class="homepage-intro-note">
+<header>
+<div class="container nav">
+<a aria-label="Trackmania Events Home" class="brand" href="/">
+<span aria-hidden="true" class="brand-badge">🎮</span>
+<span>Trackmania Events</span>
+</a>
+<button aria-controls="primary-nav" aria-expanded="false" class="nav-toggle" id="navToggle">☰</button>
+<nav aria-label="Primary" class="navlinks navlinks-simple" id="primary-nav"><a href="#schedule">Events</a><a href="/weekly-shorts-stats">Weekly Shorts</a><a href="/totd">Track of the Day</a><a href="/wrleaderboard">WR Leaderboard</a><a href="/highlights">Highlights</a><a href="/prize-runs">Prize Runs</a><a class="nav-support-link" href="/support">Support</a><button class="btn submit-event-open nav-submit" type="button">Submit Event</button><button class="btn auth-open nav-auth-mobile" type="button">Login / Register</button></nav>
+<div class="cta" id="authArea">
+<div class="auth-user-dropdown">
+<button class="btn auth-user-btn" id="authUserBtn" type="button">
+<span id="authUserLabel">Login / Register</span>
+<span class="auth-caret">▾</span>
+</button>
+<div class="auth-user-menu" id="authUserMenu">
+<div class="auth-user-info">
+<strong id="authMenuUsername">Guest</strong>
+<span id="authMenuEmail"></span>
+</div>
+<button id="authMenuAccountBtn" type="button">Account</button>
+<button id="authMenuLogoutBtn" type="button">Logout</button>
+</div>
+</div>
+</div>
+</div>
+</header>
+<section class="hero" id="home">
+<div class="container hero-grid">
+<div class="hero-top">
+<span class="hero-kicker" id="hero-chip">Community Event Hub</span>
+<h1 class="h1">The community event hub for Trackmania.</h1>
+<p class="lead">Find upcoming races, submit community events, follow Weekly Shorts and TOTD stats, and keep up with recent records and highlights in one place.</p>
+<div aria-label="Primary actions" class="hero-actions"><a class="btn primary" href="#schedule">Browse Events</a><a class="btn" href="/weekly-shorts-stats">Weekly Shorts Stats</a><a class="btn" href="/prize-runs">Prize Runs</a></div>
+<div aria-label="Site focus" class="hero-intent-row">
+<span class="intent-chip">🏁 Event discovery</span>
+<span class="intent-chip">📅 Organizer submissions</span>
+<span class="intent-chip">📊 Weekly Shorts / TOTD</span>
+<span class="intent-chip">💬 Community updates</span>
+</div>
+<p class="homepage-intro-note">
           Built to help players see what is happening and give event hosts another place to get their races seen.
         </p>
+<div class="hero-event-card" id="hero-event-card">
+<div class="hero-event-label">Featured Event</div>
+<h3 id="hero-event-title">Loading event…</h3>
+<div class="hero-event-grid">
+<div>
+<span>Date</span>
+<strong id="hero-event-date">Loading…</strong>
+</div>
+<div>
+<span>Location</span>
+<strong id="hero-event-location">Online</strong>
+</div>
+</div>
+<p id="hero-event-desc">Finding the next Trackmania event.</p>
+<div class="hero-event-actions">
+<a class="hero-website-btn" href="#schedule" id="hero-event-website-link">Event website</a>
+<a class="hero-discord-btn" href="#schedule" id="hero-event-discord-link">Discord</a>
+</div>
+</div>
+</div>
+<div class="hero-row">
+<div>
+<div aria-live="polite" class="card" id="countdown-card">
+<div class="card-header">
+<strong id="countdown-title">Next event countdown</strong>
+</div>
+<div class="card-body">
+<div class="countdown" id="countdown">
+<div class="timebox"><strong id="d">0</strong><span>Days</span></div>
+<div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
+<div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
+<div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
+</div>
+<div class="calendar-container" id="miniCalendar">
+<div class="cal-header">
+<button id="cal-prev" type="button">←</button>
+<div id="cal-title"></div>
+<button id="cal-next" type="button">→</button>
+</div>
+<table id="cal-grid"></table>
+</div>
+</div>
+</div>
+</div>
+<div class="live" id="live">
+<div class="card reveal">
+<div class="card-header"><strong>Live on Twitch</strong></div>
+<div class="card-body">
+<div id="twitch-embed"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-        <div class="hero-event-card" id="hero-event-card">
-          <div class="hero-event-label">Featured Event</div>
-          <h3 id="hero-event-title">Loading event…</h3>
-
-          <div class="hero-event-grid">
-            <div>
-              <span>Date</span>
-              <strong id="hero-event-date">Loading…</strong>
-            </div>
-
-            <div>
-              <span>Location</span>
-              <strong id="hero-event-location">Online</strong>
-            </div>
-          </div>
-
-          <p id="hero-event-desc">Finding the next Trackmania event.</p>
-          <div class="hero-event-actions">
-            <a id="hero-event-website-link" class="hero-website-btn" href="#schedule">Event website</a>
-            <a id="hero-event-discord-link" class="hero-discord-btn" href="#schedule">Discord</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-row">
-        <div>
-          <div class="card" id="countdown-card" aria-live="polite">
-            <div class="card-header">
-              <strong id="countdown-title">Next event countdown</strong>
-            </div>
-
-            <div class="card-body">
-              <div class="countdown" id="countdown">
-                <div class="timebox"><strong id="d">0</strong><span>Days</span></div>
-                <div class="timebox"><strong id="h">0</strong><span>Hours</span></div>
-                <div class="timebox"><strong id="m">0</strong><span>Minutes</span></div>
-                <div class="timebox"><strong id="s">0</strong><span>Seconds</span></div>
-              </div>
-
-              <div id="miniCalendar" class="calendar-container">
-                <div class="cal-header">
-                  <button id="cal-prev" type="button">←</button>
-                  <div id="cal-title"></div>
-                  <button id="cal-next" type="button">→</button>
-                </div>
-                <table id="cal-grid"></table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="live" class="live">
-          <div class="card reveal">
-            <div class="card-header"><strong>Live on Twitch</strong></div>
-            <div class="card-body">
-              <div id="twitch-embed"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="hub-purpose" class="hub-section" aria-label="What Trackmania Events is for">
-    <div class="container">
-      <div class="hub-panel reveal">
-        <div class="hub-panel-head">
-          <div>
-            <div class="hub-eyebrow">Built for players and event hosts</div>
-            <h2>Find races faster. Give community events a place to be seen.</h2>
-            <p>
-              Trackmania Events is focused on event discovery first, with stats and community features around it.
-            </p>
-          </div>
-          <button class="btn submit-event-open" type="button">Submit Your Event</button>
-        </div>
-
-        <div class="hub-feature-grid">
-          <div class="hub-feature">
-            <strong>Upcoming events</strong>
-            <span>Browse main events, weekly races, fun community cups, and live events from one homepage.</span>
-            <a href="#schedule">View events →</a>
-          </div>
-          <div class="hub-feature">
-            <strong>Organizer submissions</strong>
-            <span>Registered users can submit events for review instead of relying on one person to find everything manually.</span>
-            <a href="#" class="submit-event-open">Submit event →</a>
-          </div>
-          <div class="hub-feature">
-            <strong>Weekly Shorts & TOTD</strong>
-            <span>Follow dedicated Trackmania stats pages without losing the community/event focus of the site.</span>
-            <a href="/weekly-shorts-stats">Open stats →</a>
-          </div>
-          <div class="hub-feature">
-            <strong>Community extras</strong>
-            <span>Highlights, shoutbox updates, profiles, badges, and Prize Runs give registered users more reason to come back.</span>
-            <a href="/prize-runs">Try Prize Runs →</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="schedule" class="section">
-    <div class="container">
-      <h2 class="title">Upcoming Main Events</h2>
-      <p class="section-intro">The main event board is the heart of the site. These are the races and community competitions players should be able to find quickly.</p>
-      <div class="grid" id="main-events-grid">
-        <article class="event">
-          <div class="meta">Loading schedule…</div>
-        </article>
-      </div>
-
-      <h3 class="title" style="margin-top:2rem;font-size:1.8rem">Weekly & Community Events</h3>
-      <p class="section-intro">Recurring cups, casual races, community nights, and smaller events that deserve more visibility.</p>
-      <div class="grid" id="weekly-events-grid">
-        <article class="event">
-          <div class="meta">Loading schedule…</div>
-        </article>
-      </div>
-    </div>
-  </section>
-  <section id="live-events" class="section">
-    <div class="container">
-      <h2 class="title">Live Now</h2>
-      <p class="section-intro">Events currently happening or highlighted as live by the site.</p>
-      <div class="grid" id="live-events-grid"></div>
-    </div>
-  </section>
-
-  <section id="shoutbox-section" class="section" aria-label="Community shoutbox">
-    <div class="container">
-      <div class="card shoutbox-card reveal">
-        <div class="card-header shoutbox-top">
-          <div>
-            <strong>Community Shoutbox</strong>
-            <div class="shoutbox-sub">Chat with signed-in users and see automatic event/system notices.</div>
-          </div>
-          <div class="shoutbox-header-actions">
-            <div class="online-users-wrap">
-              <button id="onlineUsersBtn" class="chip online-users-btn" type="button">
+<section class="section" id="schedule">
+<div class="container">
+<h2 class="title">Upcoming Main Events</h2>
+<p class="section-intro">The main event board is the heart of the site. These are the races and community competitions players should be able to find quickly.</p>
+<div class="grid" id="main-events-grid">
+<article class="event">
+<div class="meta">Loading schedule…</div>
+</article>
+</div>
+<h3 class="title" style="margin-top:2rem;font-size:1.8rem">Weekly &amp; Community Events</h3>
+<p class="section-intro">Recurring cups, casual races, community nights, and smaller events that deserve more visibility.</p>
+<div class="grid" id="weekly-events-grid">
+<article class="event">
+<div class="meta">Loading schedule…</div>
+</article>
+</div>
+</div>
+</section>
+<section class="section" id="live-events">
+<div class="container">
+<h2 class="title">Live Now</h2>
+<p class="section-intro">Events currently happening or highlighted as live by the site.</p>
+<div class="grid" id="live-events-grid"></div>
+</div>
+</section>
+<section aria-label="Community shoutbox" class="section" id="shoutbox-section">
+<div class="container">
+<div class="card shoutbox-card reveal">
+<div class="card-header shoutbox-top">
+<div>
+<strong>Community Shoutbox</strong>
+<div class="shoutbox-sub">Chat with signed-in users and see automatic event/system notices.</div>
+</div>
+<div class="shoutbox-header-actions">
+<div class="online-users-wrap">
+<button class="chip online-users-btn" id="onlineUsersBtn" type="button">
                 👥 <span id="onlineUsersChip">0 online</span>
-              </button>
-
-              <div id="onlineUsersMenu" class="online-users-menu">
-                <div class="online-users-title">Online Users</div>
-                <div id="onlineUsersList" class="online-users-list">
-                  <div class="online-user-empty">No users online</div>
-                </div>
-              </div>
-            </div>
-
-            <span class="chip" id="shoutboxAuthState">Guest</span>
-          </div>
-        </div>
-        <div class="card-body">
-          <div id="shoutboxEventTicker" class="shout-event-ticker"></div>
-          <div id="shoutboxMessages" aria-live="polite">
-            <div class="meta">Loading shoutbox…</div>
-          </div>
-          <div id="shoutTyping" class="shout-typing"></div>
-          <div class="shout-form">
-            <div class="shout-input-row">
-              <input id="shoutInput" class="input" type="text" maxlength="300" placeholder="Type a shout..."
-                autocomplete="off" />
-
-              <button id="emojiBtn" class="btn" type="button">😊</button>
-              <button id="sendShout" class="btn send-btn" type="button">Send</button>
-            </div>
-          </div>
-
-          <div id="emojiPanel" class="emoji-panel">
-            <button type="button" data-emoji="🔥">🔥</button>
-            <button type="button" data-emoji="😂">😂</button>
-            <button type="button" data-emoji="💀">💀</button>
-            <button type="button" data-emoji="🏁">🏁</button>
-            <button type="button" data-emoji="🏆">🏆</button>
-            <button type="button" data-emoji="🚨">🚨</button>
-            <button type="button" data-emoji="👀">👀</button>
-            <button type="button" data-emoji="✅">✅</button>
-            <button type="button" data-emoji="❌">❌</button>
-            <button type="button" data-emoji="❤️">❤️</button>
-          </div>
-          <div id="shoutStatus" aria-live="polite"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="support-preview" class="section support-preview-section">
-    <div class="container">
-      <div class="support-preview-card reveal">
-        <div class="support-preview-text">
-          <span class="support-preview-kicker">Community supported</span>
-          <h2>Enjoying Trackmania Events?</h2>
-          <p>
+</button>
+<div class="online-users-menu" id="onlineUsersMenu">
+<div class="online-users-title">Online Users</div>
+<div class="online-users-list" id="onlineUsersList">
+<div class="online-user-empty">No users online</div>
+</div>
+</div>
+</div>
+<span class="chip" id="shoutboxAuthState">Guest</span>
+</div>
+</div>
+<div class="card-body">
+<div class="shout-event-ticker" id="shoutboxEventTicker"></div>
+<div aria-live="polite" id="shoutboxMessages">
+<div class="meta">Loading shoutbox…</div>
+</div>
+<div class="shout-typing" id="shoutTyping"></div>
+<div class="shout-form">
+<div class="shout-input-row">
+<input autocomplete="off" class="input" id="shoutInput" maxlength="300" placeholder="Type a shout..." type="text"/>
+<button class="btn" id="emojiBtn" type="button">😊</button>
+<button class="btn send-btn" id="sendShout" type="button">Send</button>
+</div>
+</div>
+<div class="emoji-panel" id="emojiPanel">
+<button data-emoji="🔥" type="button">🔥</button>
+<button data-emoji="😂" type="button">😂</button>
+<button data-emoji="💀" type="button">💀</button>
+<button data-emoji="🏁" type="button">🏁</button>
+<button data-emoji="🏆" type="button">🏆</button>
+<button data-emoji="🚨" type="button">🚨</button>
+<button data-emoji="👀" type="button">👀</button>
+<button data-emoji="✅" type="button">✅</button>
+<button data-emoji="❌" type="button">❌</button>
+<button data-emoji="❤️" type="button">❤️</button>
+</div>
+<div aria-live="polite" id="shoutStatus"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="section support-preview-section" id="support-preview">
+<div class="container">
+<div class="support-preview-card reveal">
+<div class="support-preview-text">
+<span class="support-preview-kicker">Community supported</span>
+<h2>Enjoying Trackmania Events?</h2>
+<p>
             Trackmania Events is free to use. Optional support helps with hosting,
             tools, data updates, and future site features.
           </p>
-          <p class="support-preview-muted">
+<p class="support-preview-muted">
             No pressure — using the site, sharing it, and submitting events already helps a ton.
           </p>
-        </div>
-
-        <a class="support-preview-btn" href="/support">Support the Site</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="about" class="section">
-    <div class="container">
-      <h2 class="title">About</h2>
-      <div class="card reveal">
-        <div class="card-body">
-          <div class="about-copy">
-            <p>
+</div>
+<a class="support-preview-btn" href="/support">Support the Site</a>
+</div>
+</div>
+</section>
+<section class="section" id="about">
+<div class="container">
+<h2 class="title">About</h2>
+<div class="card reveal">
+<div class="card-body">
+<div class="about-copy">
+<p>
               Trackmania Events is a community-run hub built around one simple goal: make it easier to see what is
               happening in the Trackmania scene.
             </p>
-            <p>
+<p>
               The main focus is events. Players should be able to find upcoming races, and organizers should have a
               straightforward place to submit what they are hosting. Stats, recent records, highlights, shoutbox updates,
               badges, and Prize Runs are supporting features that make the site feel active between events.
             </p>
-            <p>
+<p>
               The site is still growing, so feedback from players and event hosts is always welcome.
             </p>
-          </div>
-          <div class="keyfacts" style="margin-top:1rem">
-            <a class="btn" href="https://twitch.tv/Ryvennox" target="_blank" rel="noreferrer">Follow on Twitch</a>
-            <a class="btn" href="#contact">Business / Collabs</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact" class="section">
-    <div class="container">
-      <h2 class="title">Contact</h2>
-      <div class="grid" style="grid-template-columns:2fr 1fr">
-        <form action="https://formspree.io/f/xjkazybj" method="POST" class="card form reveal" id="contact-form">
-          <div class="card-body">
-            <div class="twocol">
-              <div class="field">
-                <label for="name">Name</label>
-                <input class="input" id="name" name="name" type="text" placeholder="Your name" required />
-              </div>
-              <div class="field">
-                <label for="email">Email</label>
-                <input class="input" id="email" name="_replyto" type="email" placeholder="name@example.com" required />
-              </div>
-            </div>
-            <div class="field" style="margin-top:.8rem">
-              <label for="message">Message</label>
-              <textarea class="textarea" id="message" name="message" rows="5" placeholder="How can we help?"
-                required></textarea>
-            </div>
-            <div style="margin-top:1rem;display:flex;gap:.6rem;align-items:center">
-              <button class="btn primary" type="submit">Send</button>
-              <span id="formStatus" style="font-size:0.9rem;" aria-live="polite"></span>
-            </div>
-          </div>
-        </form>
-        <aside class="card reveal">
-          <div class="card-body">
-            <strong>Discord</strong>
-            <div class="meta"><a href="https://discord.gg/hmC97kXAwF" target="_blank" rel="noreferrer">You can join the
+</div>
+<div class="keyfacts" style="margin-top:1rem"><span class="pill">🏁 Upcoming events</span><span class="pill">📊 Weekly Shorts / TOTD</span><span class="pill">🏆 Recent WRs</span><span class="pill">💬 Highlights &amp; shoutbox</span></div>
+</div>
+</div>
+</div>
+</section>
+<section class="section" id="contact">
+<div class="container">
+<h2 class="title">Contact</h2>
+<div class="grid" style="grid-template-columns:2fr 1fr">
+<form action="https://formspree.io/f/xjkazybj" class="card form reveal" id="contact-form" method="POST">
+<div class="card-body">
+<div class="twocol">
+<div class="field">
+<label for="name">Name</label>
+<input class="input" id="name" name="name" placeholder="Your name" required="" type="text"/>
+</div>
+<div class="field">
+<label for="email">Email</label>
+<input class="input" id="email" name="_replyto" placeholder="name@example.com" required="" type="email"/>
+</div>
+</div>
+<div class="field" style="margin-top:.8rem">
+<label for="message">Message</label>
+<textarea class="textarea" id="message" name="message" placeholder="How can we help?" required="" rows="5"></textarea>
+</div>
+<div style="margin-top:1rem;display:flex;gap:.6rem;align-items:center">
+<button class="btn primary" type="submit">Send</button>
+<span aria-live="polite" id="formStatus" style="font-size:0.9rem;"></span>
+</div>
+</div>
+</form>
+<aside class="card reveal">
+<div class="card-body">
+<strong>Discord</strong>
+<div class="meta"><a href="https://discord.gg/hmC97kXAwF" rel="noreferrer" target="_blank">You can join the
                 discord server or fill out the contact form if you have any questions related to adding your events to
                 the website!</a></div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </section>
-
-  <button id="toTop" aria-label="Back to top"><span>Top</span></button>
-
-  <footer>
-    <div class="container"
-      style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
-      <div>© <span id="year"></span> Trackmania Events</div>
-      <div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a> • <a href="/support">Support</a> • <a
-          href="#contact">Contact</a></div>
-    </div>
-  </footer>
-
-  <div id="authModal" role="dialog" aria-modal="true" aria-label="Account login and registration">
-    <div class="auth-dialog">
-      <div class="auth-head">
-        <div>
-          <strong id="authTitle">Account</strong>
-          <span id="authSubtitle">Login or create an account to use the shoutbox.</span>
-        </div>
-        <button class="auth-close" id="authClose" type="button" aria-label="Close account window">×</button>
-      </div>
-
-      <div class="auth-body">
-        <div class="auth-tabs">
-          <button class="auth-tab active" type="button" data-auth-tab="login">Login</button>
-          <button class="auth-tab" type="button" data-auth-tab="register">Register</button>
-        </div>
-
-        <div class="auth-panel active" id="authLoginPanel">
-          <input id="authLoginEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
-          <input id="authLoginPassword" class="input" type="password" placeholder="Password"
-            autocomplete="current-password" />
-          <button id="authLoginBtn" class="btn primary" type="button">Login</button>
-          <button id="authForgotBtn" class="auth-link-btn" type="button">Forgot password?</button>
-        </div>
-
-        <div class="auth-panel" id="authRegisterPanel">
-          <input id="authRegisterUsername" class="input" type="text" maxlength="24" placeholder="Username"
-            autocomplete="username" />
-          <input id="authRegisterEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
-          <input id="authRegisterPassword" class="input" type="password" placeholder="Password"
-            autocomplete="new-password" />
-          <button id="authRegisterBtn" class="btn primary" type="button">Create Account</button>
-          <div class="help">Check your spam/junk folder if the verification email does not arrive within a minute.</div>
-        </div>
-
-        <div class="auth-panel" id="authForgotPanel">
-          <input id="authResetEmail" class="input" type="email" placeholder="Email" autocomplete="email" />
-          <button id="authResetBtn" class="btn primary" type="button">Send Password Reset</button>
-          <button id="authBackLoginBtn" class="auth-link-btn" type="button">Back to login</button>
-        </div>
-
-        <div class="auth-message" id="authMessage" aria-live="polite"></div>
-        <div class="auth-row" style="margin-top:.85rem">
-          <button id="authLogoutBtn" class="btn" type="button" style="display:none">Logout</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="submitEventModal" class="submit-event-panel" role="dialog" aria-modal="true"
-    aria-label="Submit a Trackmania event">
-    <div class="submit-event-dialog">
-      <div class="submit-event-head">
-        <div>
-          <strong>Submit Event</strong>
-          <span>Submit your Trackmania event for review. Events are saved as pending until an admin approves
+</div>
+</aside>
+</div>
+</div>
+</section>
+<button aria-label="Back to top" id="toTop"><span>Top</span></button>
+<footer>
+<div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+<div>© <span id="year"></span> Trackmania Events</div>
+<div><a href="/privacy">Privacy</a> • <a href="/terms">Terms</a> • <a href="/support">Support</a> • <a href="#contact">Contact</a></div>
+</div>
+</footer>
+<div aria-label="Account login and registration" aria-modal="true" id="authModal" role="dialog">
+<div class="auth-dialog">
+<div class="auth-head">
+<div>
+<strong id="authTitle">Account</strong>
+<span id="authSubtitle">Login or create an account to use the shoutbox.</span>
+</div>
+<button aria-label="Close account window" class="auth-close" id="authClose" type="button">×</button>
+</div>
+<div class="auth-body">
+<div class="auth-tabs">
+<button class="auth-tab active" data-auth-tab="login" type="button">Login</button>
+<button class="auth-tab" data-auth-tab="register" type="button">Register</button>
+</div>
+<div class="auth-panel active" id="authLoginPanel">
+<input autocomplete="email" class="input" id="authLoginEmail" placeholder="Email" type="email"/>
+<input autocomplete="current-password" class="input" id="authLoginPassword" placeholder="Password" type="password"/>
+<button class="btn primary" id="authLoginBtn" type="button">Login</button>
+<button class="auth-link-btn" id="authForgotBtn" type="button">Forgot password?</button>
+</div>
+<div class="auth-panel" id="authRegisterPanel">
+<input autocomplete="username" class="input" id="authRegisterUsername" maxlength="24" placeholder="Username" type="text"/>
+<input autocomplete="email" class="input" id="authRegisterEmail" placeholder="Email" type="email"/>
+<input autocomplete="new-password" class="input" id="authRegisterPassword" placeholder="Password" type="password"/>
+<button class="btn primary" id="authRegisterBtn" type="button">Create Account</button>
+<div class="help">Check your spam/junk folder if the verification email does not arrive within a minute.</div>
+</div>
+<div class="auth-panel" id="authForgotPanel">
+<input autocomplete="email" class="input" id="authResetEmail" placeholder="Email" type="email"/>
+<button class="btn primary" id="authResetBtn" type="button">Send Password Reset</button>
+<button class="auth-link-btn" id="authBackLoginBtn" type="button">Back to login</button>
+</div>
+<div aria-live="polite" class="auth-message" id="authMessage"></div>
+<div class="auth-row" style="margin-top:.85rem">
+<button class="btn" id="authLogoutBtn" style="display:none" type="button">Logout</button>
+</div>
+</div>
+</div>
+</div>
+<div aria-label="Submit a Trackmania event" aria-modal="true" class="submit-event-panel" id="submitEventModal" role="dialog">
+<div class="submit-event-dialog">
+<div class="submit-event-head">
+<div>
+<strong>Submit Event</strong>
+<span>Submit your Trackmania event for review. Events are saved as pending until an admin approves
             them.</span>
-        </div>
-        <button id="submitEventClose" class="submit-event-close" type="button"
-          aria-label="Close submit event window">×</button>
-      </div>
-
-      <div class="submit-event-body">
-        <form id="submitEventForm">
-          <div class="submit-event-grid">
-            <div class="field">
-              <label for="submitEventTitle">Event title</label>
-              <input id="submitEventTitle" class="input" type="text" maxlength="90" placeholder="Example: Weekly Cup"
-                required />
-            </div>
-
-            <div class="field">
-              <label for="submitEventType">Event type</label>
-              <select id="submitEventType" class="input" required>
-                <option value="weekly">Weekly Event</option>
-                <option value="fun">Fun Event</option>
-                <option value="cup">Cup</option>
-                <option value="tournament">Tournament</option>
-                <option value="campaign">Campaign</option>
-                <option value="kacky">Kacky</option>
-                <option value="other">Other</option>
-              </select>
-              <div class="submit-event-help">Public submissions cannot choose Main. Admins choose Main or Weekly during
+</div>
+<button aria-label="Close submit event window" class="submit-event-close" id="submitEventClose" type="button">×</button>
+</div>
+<div class="submit-event-body">
+<form id="submitEventForm">
+<div class="submit-event-grid">
+<div class="field">
+<label for="submitEventTitle">Event title</label>
+<input class="input" id="submitEventTitle" maxlength="90" placeholder="Example: Weekly Cup" required="" type="text"/>
+</div>
+<div class="field">
+<label for="submitEventType">Event type</label>
+<select class="input" id="submitEventType" required="">
+<option value="weekly">Weekly Event</option>
+<option value="fun">Fun Event</option>
+<option value="cup">Cup</option>
+<option value="tournament">Tournament</option>
+<option value="campaign">Campaign</option>
+<option value="kacky">Kacky</option>
+<option value="other">Other</option>
+</select>
+<div class="submit-event-help">Public submissions cannot choose Main. Admins choose Main or Weekly during
                 review.</div>
-            </div>
-
-            <div class="field">
-              <label for="submitEventTimezone">Event timezone</label>
-              <select id="submitEventTimezone" class="input" required>
-                <option value="America/New_York">Eastern Time — America/New_York</option>
-                <option value="America/Chicago">Central Time — America/Chicago</option>
-                <option value="America/Denver">Mountain Time — America/Denver</option>
-                <option value="America/Los_Angeles">Pacific Time — America/Los_Angeles</option>
-                <option value="Europe/London">UK — Europe/London</option>
-                <option value="Europe/Paris">Central Europe — Europe/Paris</option>
-                <option value="Europe/Berlin">Germany — Europe/Berlin</option>
-                <option value="Australia/Sydney">Australia Eastern — Australia/Sydney</option>
-                <option value="Australia/Perth">Australia Western — Australia/Perth</option>
-                <option value="Asia/Tokyo">Japan — Asia/Tokyo</option>
-                <option value="UTC">UTC</option>
-              </select>
-              <div class="submit-event-help">Times are entered in this timezone. Visitors will see the correct converted
+</div>
+<div class="field">
+<label for="submitEventTimezone">Event timezone</label>
+<select class="input" id="submitEventTimezone" required="">
+<option value="America/New_York">Eastern Time — America/New_York</option>
+<option value="America/Chicago">Central Time — America/Chicago</option>
+<option value="America/Denver">Mountain Time — America/Denver</option>
+<option value="America/Los_Angeles">Pacific Time — America/Los_Angeles</option>
+<option value="Europe/London">UK — Europe/London</option>
+<option value="Europe/Paris">Central Europe — Europe/Paris</option>
+<option value="Europe/Berlin">Germany — Europe/Berlin</option>
+<option value="Australia/Sydney">Australia Eastern — Australia/Sydney</option>
+<option value="Australia/Perth">Australia Western — Australia/Perth</option>
+<option value="Asia/Tokyo">Japan — Asia/Tokyo</option>
+<option value="UTC">UTC</option>
+</select>
+<div class="submit-event-help">Times are entered in this timezone. Visitors will see the correct converted
                 time locally.</div>
-            </div>
-
-            <div class="field">
-              <label for="submitEventTag">Card tag</label>
-              <input id="submitEventTag" class="input" type="text" maxlength="24" placeholder="Cup, Race, Tournament..."
-                required />
-            </div>
-
-            <div class="field">
-              <label for="submitEventLocation">Location</label>
-              <input id="submitEventLocation" class="input" type="text" maxlength="80" placeholder="Online"
-                value="Online" />
-            </div>
-
-            <div class="field">
-              <label for="submitEventStartDate">Start date</label>
-              <input id="submitEventStartDate" class="input" type="date" required />
-            </div>
-
-            <div class="field">
-              <label for="submitEventStartTime">Start time</label>
-              <input id="submitEventStartTime" class="input" type="text" inputmode="numeric" maxlength="5"
-                placeholder="14:00" required />
-              <div class="submit-event-time-hint">Use 24-hour time, example: 14:00</div>
-            </div>
-
-            <div class="field">
-              <label for="submitEventEndDate">End date</label>
-              <input id="submitEventEndDate" class="input" type="date" required />
-            </div>
-
-            <div class="field">
-              <label for="submitEventEndTime">End time</label>
-              <input id="submitEventEndTime" class="input" type="text" inputmode="numeric" maxlength="5"
-                placeholder="16:00" required />
-              <div class="submit-event-time-hint">Use 24-hour time, example: 16:00</div>
-            </div>
-
-            <div class="field">
-              <label for="submitEventHasSplits">Does this event have multiple splits?</label>
-              <select id="submitEventHasSplits" class="input">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
-
-            <div class="field" id="submitEventSplitCountWrap" style="display:none">
-              <label for="submitEventSplitCount">How many splits?</label>
-              <select id="submitEventSplitCount" class="input">
-                <option value="2">2 splits</option>
-                <option value="3">3 splits</option>
-                <option value="4">4 splits</option>
-                <option value="5">5 splits</option>
-                <option value="6">6 splits</option>
-              </select>
-            </div>
-
-            <div id="submitEventSplitBox" class="submit-event-split-box">
-              <div class="submit-event-split-title">Split dates and times</div>
-              <div class="submit-event-help">Each split uses the event timezone selected above.</div>
-              <div id="submitEventSplitFields"></div>
-            </div>
-
-            <div class="field submit-event-full">
-              <label for="submitEventDiscordUrl">Discord / registration link</label>
-              <input id="submitEventDiscordUrl" class="input" type="url" maxlength="300"
-                placeholder="https://discord.gg/..." />
-              <div class="submit-event-help">Use this for Discord invites, registration pages, or where players should
+</div>
+<div class="field">
+<label for="submitEventTag">Card tag</label>
+<input class="input" id="submitEventTag" maxlength="24" placeholder="Cup, Race, Tournament..." required="" type="text"/>
+</div>
+<div class="field">
+<label for="submitEventLocation">Location</label>
+<input class="input" id="submitEventLocation" maxlength="80" placeholder="Online" type="text" value="Online"/>
+</div>
+<div class="field">
+<label for="submitEventStartDate">Start date</label>
+<input class="input" id="submitEventStartDate" required="" type="date"/>
+</div>
+<div class="field">
+<label for="submitEventStartTime">Start time</label>
+<input class="input" id="submitEventStartTime" inputmode="numeric" maxlength="5" placeholder="14:00" required="" type="text"/>
+<div class="submit-event-time-hint">Use 24-hour time, example: 14:00</div>
+</div>
+<div class="field">
+<label for="submitEventEndDate">End date</label>
+<input class="input" id="submitEventEndDate" required="" type="date"/>
+</div>
+<div class="field">
+<label for="submitEventEndTime">End time</label>
+<input class="input" id="submitEventEndTime" inputmode="numeric" maxlength="5" placeholder="16:00" required="" type="text"/>
+<div class="submit-event-time-hint">Use 24-hour time, example: 16:00</div>
+</div>
+<div class="field">
+<label for="submitEventHasSplits">Does this event have multiple splits?</label>
+<select class="input" id="submitEventHasSplits">
+<option value="no">No</option>
+<option value="yes">Yes</option>
+</select>
+</div>
+<div class="field" id="submitEventSplitCountWrap" style="display:none">
+<label for="submitEventSplitCount">How many splits?</label>
+<select class="input" id="submitEventSplitCount">
+<option value="2">2 splits</option>
+<option value="3">3 splits</option>
+<option value="4">4 splits</option>
+<option value="5">5 splits</option>
+<option value="6">6 splits</option>
+</select>
+</div>
+<div class="submit-event-split-box" id="submitEventSplitBox">
+<div class="submit-event-split-title">Split dates and times</div>
+<div class="submit-event-help">Each split uses the event timezone selected above.</div>
+<div id="submitEventSplitFields"></div>
+</div>
+<div class="field submit-event-full">
+<label for="submitEventDiscordUrl">Discord / registration link</label>
+<input class="input" id="submitEventDiscordUrl" maxlength="300" placeholder="https://discord.gg/..." type="url"/>
+<div class="submit-event-help">Use this for Discord invites, registration pages, or where players should
                 join/sign up.</div>
-            </div>
-
-            <div class="field submit-event-full">
-              <label for="submitEventWebsiteUrl">Official website link</label>
-              <input id="submitEventWebsiteUrl" class="input" type="url" maxlength="300"
-                placeholder="https://example.com" />
-              <div class="submit-event-help">Optional. This is used for the hero “Visit event website” button when
+</div>
+<div class="field submit-event-full">
+<label for="submitEventWebsiteUrl">Official website link</label>
+<input class="input" id="submitEventWebsiteUrl" maxlength="300" placeholder="https://example.com" type="url"/>
+<div class="submit-event-help">Optional. This is used for the hero “Visit event website” button when
                 provided.</div>
-            </div>
-
-            <div class="field submit-event-full">
-              <label for="submitEventDescription">Description</label>
-              <textarea id="submitEventDescription" class="textarea" rows="4" maxlength="700"
-                placeholder="Tell people what the event is, where to register, prize pool, format, etc."
-                required></textarea>
-            </div>
-          </div>
-
-          <div class="submit-event-actions">
-            <button id="submitEventSend" class="btn primary" type="submit">Submit for Review</button>
-            <button id="submitEventCancel" class="btn" type="button">Cancel</button>
-            <span id="submitEventStatus" class="submit-event-status" aria-live="polite"></span>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div id="reactionPickerMenu" class="reaction-picker-menu"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
+</div>
+<div class="field submit-event-full">
+<label for="submitEventDescription">Description</label>
+<textarea class="textarea" id="submitEventDescription" maxlength="700" placeholder="Tell people what the event is, where to register, prize pool, format, etc." required="" rows="4"></textarea>
+</div>
+</div>
+<div class="submit-event-actions">
+<button class="btn primary" id="submitEventSend" type="submit">Submit for Review</button>
+<button class="btn" id="submitEventCancel" type="button">Cancel</button>
+<span aria-live="polite" class="submit-event-status" id="submitEventStatus"></span>
+</div>
+</form>
+</div>
+</div>
+</div>
+<div class="reaction-picker-menu" id="reactionPickerMenu"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
     const TTV_CHANNEL = "Ryvennox";
 
     const SUPABASE_URL = "https://kpypacgyudnqysgxaqcs.supabase.co";
@@ -1831,7 +1675,7 @@
       normalizeEventCardHeights();
     });
   </script>
-  <script>
+<script>
 
     (function () {
       const btn = document.getElementById("navToggle");
@@ -1868,7 +1712,7 @@
       });
     })();
   </script>
-  <script>
+<script>
 
     const authModal = document.getElementById("authModal");
     const authMessage = document.getElementById("authMessage");
@@ -4171,8 +4015,7 @@
     loginEmail?.addEventListener("keydown", handleLoginEnter);
     loginPassword?.addEventListener("keydown", handleLoginEnter);
   </script>
-
-  <script>
+<script>
     (function () {
       const authUserBtn = document.getElementById("authUserBtn");
       const authUserMenu = document.getElementById("authUserMenu");
@@ -4291,7 +4134,5 @@
       setTimeout(() => updateDropdownUser().catch(console.warn), 800);
     })();
   </script>
-
 </body>
-
 </html>
