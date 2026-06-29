@@ -742,62 +742,69 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     function makeCarModel() {
       const carGroup = new THREE.Group();
 
-      // Cleaner Stadium-inspired car:
-      // no front wing, no random side cages, no oversized stacked boxes.
+      // Stadium 2020-inspired car rebuilt for v21:
+      // longer silver body, smooth tapered nose, open wheels, compact canopy,
+      // rear black panel with 888 blocks, and no toy-like wing/cage clutter.
       // The model points down local -Z; rear is +Z.
-      const paint = new THREE.MeshStandardMaterial({
-        color: 0x1767d6,
-        emissive: 0x020812,
-        emissiveIntensity: 0.04,
-        roughness: 0.38,
-        metalness: 0.5
-      });
-      const paintLight = new THREE.MeshStandardMaterial({
-        color: 0x3f9bff,
-        emissive: 0x031327,
-        emissiveIntensity: 0.06,
+      const shell = new THREE.MeshStandardMaterial({
+        color: 0xaeb7b6,
+        emissive: 0x050709,
+        emissiveIntensity: 0.035,
         roughness: 0.34,
-        metalness: 0.46
+        metalness: 0.62
       });
-      const bodyGrey = new THREE.MeshStandardMaterial({
-        color: 0x9ca7ad,
-        roughness: 0.32,
-        metalness: 0.56
+      const shellLight = new THREE.MeshStandardMaterial({
+        color: 0xc5cfce,
+        emissive: 0x07090b,
+        emissiveIntensity: 0.03,
+        roughness: 0.30,
+        metalness: 0.66
       });
-      const dark = new THREE.MeshStandardMaterial({
-        color: 0x05070b,
-        roughness: 0.72,
-        metalness: 0.22
+      const shellDark = new THREE.MeshStandardMaterial({
+        color: 0x707b7b,
+        roughness: 0.38,
+        metalness: 0.58
       });
       const carbon = new THREE.MeshStandardMaterial({
-        color: 0x0b1118,
-        roughness: 0.66,
-        metalness: 0.34
+        color: 0x070a0e,
+        roughness: 0.68,
+        metalness: 0.30
+      });
+      const dark = new THREE.MeshStandardMaterial({
+        color: 0x030407,
+        roughness: 0.74,
+        metalness: 0.18
       });
       const rubber = new THREE.MeshStandardMaterial({
-        color: 0x020305,
-        roughness: 0.9,
-        metalness: 0.03
+        color: 0x050505,
+        roughness: 0.91,
+        metalness: 0.02
+      });
+      const tireSide = new THREE.MeshStandardMaterial({
+        color: 0x111315,
+        roughness: 0.84,
+        metalness: 0.04
       });
       const rim = new THREE.MeshStandardMaterial({
-        color: 0xc4ccd2,
-        roughness: 0.26,
-        metalness: 0.82
+        color: 0xaeb7b8,
+        roughness: 0.24,
+        metalness: 0.86
       });
       const glass = new THREE.MeshPhysicalMaterial({
-        color: 0x8fdcf7,
-        emissive: 0x06192a,
+        color: 0x0c161b,
+        emissive: 0x010508,
         emissiveIntensity: 0.08,
-        roughness: 0.04,
-        metalness: 0.02,
+        roughness: 0.08,
+        metalness: 0.04,
         transparent: true,
-        opacity: 0.72,
-        clearcoat: 0.95,
-        clearcoatRoughness: 0.08
+        opacity: 0.86,
+        clearcoat: 0.9,
+        clearcoatRoughness: 0.12
       });
-      const redLight = new THREE.MeshBasicMaterial({ color: 0xff2e55, transparent: true, opacity: 0.92 });
-      const whiteLight = new THREE.MeshBasicMaterial({ color: 0xf2fbff, transparent: true, opacity: 0.92 });
-      const cyanLine = new THREE.MeshBasicMaterial({ color: 0x80f0ff, transparent: true, opacity: 0.72 });
+      const whiteLight = new THREE.MeshBasicMaterial({ color: 0xeef7f8, transparent: true, opacity: 0.92 });
+      const redLight = new THREE.MeshBasicMaterial({ color: 0xff344b, transparent: true, opacity: 0.88 });
+      const amber = new THREE.MeshBasicMaterial({ color: 0xf7c64e, transparent: true, opacity: 0.82 });
+      const blueAccent = new THREE.MeshBasicMaterial({ color: 0x4aa9ff, transparent: true, opacity: 0.62 });
 
       const add = (mesh, x, y, z, rx = 0, ry = 0, rz = 0) => {
         mesh.position.set(x, y, z);
@@ -812,137 +819,176 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         return add(m, x, y, z, rx, ry, rz);
       };
 
-      // Undertray: thin black floor visible below the blue body.
-      make(new THREE.BoxGeometry(1.55, 0.07, 3.35), carbon, 0, 0.20, 0.03);
+      function makeTaperedWedge(frontWidth, rearWidth, length, frontHeight, rearHeight) {
+        const fw = frontWidth / 2;
+        const rw = rearWidth / 2;
+        const l = length / 2;
+        const verts = new Float32Array([
+          -fw, 0, -l,    fw, 0, -l,    rw, 0, l,   -rw, 0, l,
+          -fw, frontHeight, -l,    fw, frontHeight, -l,    rw, rearHeight, l,   -rw, rearHeight, l,
+        ]);
+        const idx = [
+          0, 1, 2, 0, 2, 3,
+          4, 7, 6, 4, 6, 5,
+          0, 4, 5, 0, 5, 1,
+          1, 5, 6, 1, 6, 2,
+          2, 6, 7, 2, 7, 3,
+          3, 7, 4, 3, 4, 0,
+        ];
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+        geo.setIndex(idx);
+        geo.computeVertexNormals();
+        return geo;
+      }
 
-      // Main low tub. Rounded, wide, and smooth instead of a brick.
-      const mainTub = makeRoundedBox(1.08, 0.34, 2.18, 0.26, paint, 5);
-      mainTub.scale.set(1.02, 0.76, 1.0);
-      add(mainTub, 0, 0.43, 0.06);
+      function makeRodBetween(a, b, radius, material) {
+        const start = new THREE.Vector3(a[0], a[1], a[2]);
+        const end = new THREE.Vector3(b[0], b[1], b[2]);
+        const mid = start.clone().add(end).multiplyScalar(0.5);
+        const direction = end.clone().sub(start);
+        const len = direction.length();
+        const rod = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len, 10), material);
+        rod.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+        rod.position.copy(mid);
+        carGroup.add(rod);
+        return rod;
+      }
 
-      // Rear shoulders: gives the Stadium car that broad rear haunch look.
-      const rearDeck = makeRoundedBox(1.34, 0.30, 0.98, 0.24, paint, 5);
-      rearDeck.scale.set(1.02, 0.72, 1);
-      add(rearDeck, 0, 0.44, 0.91);
+      // Thin undertray/floor.
+      make(new THREE.BoxGeometry(1.12, 0.07, 3.55), carbon, 0, 0.19, 0.04);
+      make(new THREE.BoxGeometry(0.92, 0.05, 3.95), dark, 0, 0.16, -0.02);
 
-      // Long smooth nose/hood tapering toward the front. No front wing.
-      const hood = new THREE.Mesh(makeWedgeGeometry(0.82, 0.30, 1.62, 0.05, 0.28), paintLight);
-      hood.rotation.x = -0.015;
-      add(hood, 0, 0.34, -1.02);
+      // Main single-seat body: long, low, and tapered like the reference.
+      const mainBody = new THREE.Mesh(makeTaperedWedge(0.50, 1.28, 3.28, 0.18, 0.38), shell);
+      add(mainBody, 0, 0.30, 0.00);
 
-      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.02, 28), paintLight);
-      nose.rotation.x = -Math.PI / 2;
-      nose.scale.set(0.86, 1.0, 0.30);
-      add(nose, 0, 0.35, -1.72);
+      // Smooth rear haunches/shoulders around the cockpit.
+      const rearDeck = makeRoundedBox(1.20, 0.25, 1.10, 0.21, shell, 5);
+      rearDeck.scale.set(1.04, 0.72, 1.0);
+      add(rearDeck, 0, 0.44, 0.74);
 
-      // Subtle center crease like the real car's sculpted hood.
-      const crease = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.026, 2.46), bodyGrey);
-      crease.rotation.x = -0.025;
-      add(crease, 0, 0.58, -0.40);
-
-      // Smooth cockpit/canopy, not a tall bubble.
-      const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.43, 36, 16, 0, Math.PI * 2, 0, Math.PI / 2), glass);
-      canopy.scale.set(0.60, 0.52, 1.02);
-      add(canopy, 0, 0.69, -0.05);
-
-      const canopyBase = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.025, 8, 40), dark);
-      canopyBase.rotation.x = Math.PI / 2;
-      canopyBase.scale.set(0.66, 0.40, 1);
-      add(canopyBase, 0, 0.665, -0.05);
-
-      // Low roof intake/slot.
-      make(new THREE.BoxGeometry(0.34, 0.035, 0.18), dark, 0, 0.84, 0.41, 1, 1, 1, -0.05, 0, 0);
-
-      // Side intakes integrated into the body, not random side objects.
       for (const side of [-1, 1]) {
-        const shoulder = makeRoundedBox(0.28, 0.22, 1.38, 0.14, paint, 4);
-        shoulder.scale.set(0.82, 0.70, 1);
-        add(shoulder, side * 0.66, 0.38, 0.20);
+        const sidePod = new THREE.Mesh(makeTaperedWedge(0.18, 0.34, 1.36, 0.08, 0.20), shellDark);
+        sidePod.rotation.z = side * -0.035;
+        add(sidePod, side * 0.51, 0.35, 0.28);
 
-        const intake = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.13, 0.52), dark);
-        intake.rotation.y = side * -0.10;
-        add(intake, side * 0.78, 0.42, -0.18);
+        const intake = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.12, 0.42), dark);
+        intake.rotation.y = side * -0.08;
+        add(intake, side * 0.68, 0.42, -0.14);
 
-        const lowerSkirt = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.06, 2.08), carbon);
-        add(lowerSkirt, side * 0.78, 0.25, 0.14);
-
-        // Small cyan accent line similar to trim/LED detail, kept subtle.
-        const trimLine = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.018, 0.88), cyanLine);
-        add(trimLine, side * 0.80, 0.53, -0.32);
+        const lowerSkirt = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.055, 1.88), carbon);
+        add(lowerSkirt, side * 0.70, 0.235, 0.18);
       }
 
-      // Front black grille/air intake with simple light details.
-      const frontPanel = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.14, 0.052), dark);
-      add(frontPanel, 0, 0.39, -2.18);
-      for (const x of [-0.24, 0, 0.24]) {
-        make(new THREE.BoxGeometry(0.12, 0.035, 0.055), whiteLight, x, 0.415, -2.212);
-      }
-      make(new THREE.BoxGeometry(0.22, 0.025, 0.055), cyanLine, -0.43, 0.445, -2.21);
-      make(new THREE.BoxGeometry(0.22, 0.025, 0.055), cyanLine, 0.43, 0.445, -2.21);
+      // Pointed front nose blended into the tub. No vertical spike/wing.
+      const nose = new THREE.Mesh(makeTaperedWedge(0.18, 0.58, 1.66, 0.055, 0.20), shellLight);
+      add(nose, 0, 0.37, -1.34, -0.018, 0, 0);
+      make(new THREE.BoxGeometry(0.035, 0.018, 1.72), shellDark, 0, 0.565, -0.88, 1, 1, 1, -0.018, 0, 0);
 
-      // Rear black panel and "888" style blocks, visible from the route camera.
-      const rearPanel = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.22, 0.06), dark);
-      add(rearPanel, 0, 0.43, 1.82);
+      // Cockpit opening and low canopy.
+      const cockpitCutout = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.038, 0.70), dark);
+      cockpitCutout.rotation.x = -0.045;
+      add(cockpitCutout, 0, 0.64, -0.12);
+
+      const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.37, 36, 14, 0, Math.PI * 2, 0, Math.PI / 2), glass);
+      canopy.scale.set(0.56, 0.30, 0.82);
+      add(canopy, 0, 0.67, -0.12);
+
+      const cockpitRim = new THREE.Mesh(new THREE.TorusGeometry(0.30, 0.018, 8, 42), dark);
+      cockpitRim.rotation.x = Math.PI / 2;
+      cockpitRim.scale.set(0.76, 0.40, 1);
+      add(cockpitRim, 0, 0.645, -0.12);
+
+      // Small driver/seat hints inside the canopy.
+      make(new THREE.BoxGeometry(0.18, 0.09, 0.20), carbon, 0, 0.58, -0.01, 1, 1, 1, -0.14, 0, 0);
+      make(new THREE.BoxGeometry(0.10, 0.018, 0.19), amber, -0.08, 0.61, -0.08, 1, 1, 1, 0, -0.38, 0);
+      make(new THREE.BoxGeometry(0.10, 0.018, 0.19), amber, 0.08, 0.61, -0.08, 1, 1, 1, 0, 0.38, 0);
+
+      // Front black grille and tiny headlights.
+      const frontPanel = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.10, 0.055), dark);
+      add(frontPanel, 0, 0.38, -1.98);
+      make(new THREE.BoxGeometry(0.12, 0.026, 0.06), whiteLight, -0.17, 0.405, -2.014);
+      make(new THREE.BoxGeometry(0.12, 0.026, 0.06), whiteLight, 0.17, 0.405, -2.014);
+
+      // Rear black number panel with 888-style blocks.
+      const rearPanel = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.27, 0.065), dark);
+      add(rearPanel, 0, 0.43, 1.76);
       for (const x of [-0.22, 0, 0.22]) {
-        make(new THREE.BoxGeometry(0.095, 0.105, 0.065), whiteLight, x, 0.46, 1.858);
+        make(new THREE.BoxGeometry(0.105, 0.125, 0.07), whiteLight, x, 0.455, 1.80);
       }
-      make(new THREE.BoxGeometry(0.26, 0.035, 0.065), redLight, -0.42, 0.29, 1.86);
-      make(new THREE.BoxGeometry(0.26, 0.035, 0.065), redLight, 0.42, 0.29, 1.86);
+      make(new THREE.BoxGeometry(0.23, 0.036, 0.07), redLight, -0.41, 0.285, 1.80);
+      make(new THREE.BoxGeometry(0.23, 0.036, 0.07), redLight, 0.41, 0.285, 1.80);
 
-      // Rear diffuser, small and integrated.
-      const diffuser = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.10, 0.32), carbon);
-      diffuser.rotation.x = -0.16;
-      add(diffuser, 0, 0.24, 1.66);
+      // Compact rear diffuser, not a wing.
+      const diffuser = new THREE.Mesh(new THREE.BoxGeometry(1.06, 0.10, 0.38), carbon);
+      diffuser.rotation.x = -0.18;
+      add(diffuser, 0, 0.245, 1.55);
 
-      // Wheels: larger, cleaner, open-wheel layout like Stadium.
+      // Open wheels: larger, farther out, less toy-like.
       const wheels = [];
-      for (const x of [-1.08, 1.08]) {
-        for (const z of [-1.05, 1.04]) {
-          const wheelGroup = new THREE.Group();
+      const wheelData = [
+        [-1.03, 0.36, -1.23], [1.03, 0.36, -1.23],
+        [-1.08, 0.36, 1.05], [1.08, 0.36, 1.05],
+      ];
+      for (const [x, y, z] of wheelData) {
+        const wheelGroup = new THREE.Group();
 
-          const tireMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.39, 0.39, 0.30, 56), rubber);
-          tireMesh.rotation.z = Math.PI / 2;
-          wheelGroup.add(tireMesh);
+        const tireMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.39, 0.39, 0.32, 56), rubber);
+        tireMesh.rotation.z = Math.PI / 2;
+        wheelGroup.add(tireMesh);
 
-          const rimOuter = new THREE.Mesh(new THREE.CylinderGeometry(0.245, 0.245, 0.312, 48), rim);
-          rimOuter.rotation.z = Math.PI / 2;
-          wheelGroup.add(rimOuter);
+        const sidewallA = new THREE.Mesh(new THREE.CylinderGeometry(0.315, 0.315, 0.326, 48), tireSide);
+        sidewallA.rotation.z = Math.PI / 2;
+        sidewallA.position.x = x < 0 ? -0.012 : 0.012;
+        wheelGroup.add(sidewallA);
 
-          const rimInner = new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.135, 0.318, 40), dark);
-          rimInner.rotation.z = Math.PI / 2;
-          wheelGroup.add(rimInner);
+        const rimOuter = new THREE.Mesh(new THREE.CylinderGeometry(0.215, 0.215, 0.336, 48), rim);
+        rimOuter.rotation.z = Math.PI / 2;
+        wheelGroup.add(rimOuter);
 
-          const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.326, 32), bodyGrey);
-          hub.rotation.z = Math.PI / 2;
-          wheelGroup.add(hub);
+        const rimInner = new THREE.Mesh(new THREE.CylinderGeometry(0.112, 0.112, 0.342, 40), dark);
+        rimInner.rotation.z = Math.PI / 2;
+        wheelGroup.add(rimInner);
 
-          const ring = new THREE.Mesh(new THREE.TorusGeometry(0.255, 0.012, 8, 48), cyanLine);
-          ring.rotation.y = Math.PI / 2;
-          wheelGroup.add(ring);
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.35, 28), shellDark);
+        hub.rotation.z = Math.PI / 2;
+        wheelGroup.add(hub);
 
-          for (let i = 0; i < 8; i++) {
-            const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.035, 0.19), rim);
-            spoke.rotation.z = Math.PI / 2;
-            spoke.rotation.y = (Math.PI / 4) * i;
-            wheelGroup.add(spoke);
-          }
-
-          wheelGroup.position.set(x, 0.35, z);
-          carGroup.add(wheelGroup);
-          wheels.push(wheelGroup);
+        for (let i = 0; i < 7; i++) {
+          const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.030, 0.17), rim);
+          spoke.rotation.z = Math.PI / 2;
+          spoke.rotation.y = (Math.PI * 2 / 7) * i;
+          wheelGroup.add(spoke);
         }
+
+        // Slight tire flattening makes the wheels feel heavier.
+        wheelGroup.scale.set(1.0, 1.06, 0.96);
+        wheelGroup.position.set(x, y, z);
+        carGroup.add(wheelGroup);
+        wheels.push(wheelGroup);
       }
 
-      // Suspension arms, thin and tucked. Avoids the spider/wing look from earlier.
-      const suspensionMat = new THREE.MeshStandardMaterial({ color: 0x111820, roughness: 0.55, metalness: 0.58 });
-      for (const z of [-1.05, 1.04]) {
-        make(new THREE.BoxGeometry(1.42, 0.028, 0.042), suspensionMat, 0, 0.36, z);
-        make(new THREE.BoxGeometry(1.18, 0.025, 0.035), suspensionMat, 0, 0.48, z - 0.05, 1, 1, 1, 0, 0, 0.06);
-        make(new THREE.BoxGeometry(1.18, 0.025, 0.035), suspensionMat, 0, 0.48, z + 0.05, 1, 1, 1, 0, 0, -0.06);
+      // Suspension arms: clean A-arm layout, not random side cages.
+      const suspension = new THREE.MeshStandardMaterial({ color: 0x1a2024, roughness: 0.54, metalness: 0.64 });
+      for (const side of [-1, 1]) {
+        // front A-arms
+        makeRodBetween([side * 0.30, 0.35, -1.08], [side * 0.88, 0.39, -1.36], 0.022, suspension);
+        makeRodBetween([side * 0.26, 0.47, -1.00], [side * 0.88, 0.46, -1.14], 0.018, suspension);
+        makeRodBetween([side * 0.38, 0.35, -1.41], [side * 0.88, 0.39, -1.23], 0.020, suspension);
+
+        // rear A-arms
+        makeRodBetween([side * 0.40, 0.35, 0.82], [side * 0.93, 0.39, 1.20], 0.022, suspension);
+        makeRodBetween([side * 0.38, 0.47, 0.92], [side * 0.93, 0.46, 0.98], 0.018, suspension);
+        makeRodBetween([side * 0.48, 0.35, 1.28], [side * 0.93, 0.39, 1.05], 0.020, suspension);
       }
+
+      // Subtle blue strips preserve the site theme without making the car neon.
+      make(new THREE.BoxGeometry(0.045, 0.018, 1.10), blueAccent, 0, 0.60, -1.10, 1, 1, 1, -0.018, 0, 0);
+      make(new THREE.BoxGeometry(0.28, 0.018, 0.055), blueAccent, 0, 0.60, 0.66);
 
       carGroup.userData.wheels = wheels;
-      carGroup.scale.set(1.0, 1.0, 1.0);
+      carGroup.scale.set(1.08, 1.02, 1.08);
       return carGroup;
     }
 
@@ -1104,7 +1150,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     reset();
     rafId = requestAnimationFrame(render);
 
-    console.info("Prize Runs 3D scene ready - v16 clean route");
+    console.info("Prize Runs 3D scene ready - v21 stadium car reference pass");
     return { ready: true, reset, driveTo, resize };
   }
 
