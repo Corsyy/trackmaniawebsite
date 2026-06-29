@@ -3537,3 +3537,238 @@ footer {
     width: 100%;
   }
 }
+
+/* ============================================================
+   Homepage v11 rescue cleanup
+   Fixes separated CSS/header styling, removes accidental native
+   button look, and keeps only the intentional Submit Event CTA.
+   ============================================================ */
+header .nav {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
+  gap: .85rem !important;
+}
+
+.navlinks.navlinks-clean {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .72rem !important;
+  min-width: 0 !important;
+}
+
+.nav-group {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.nav-drop-btn {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .35rem !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 .35rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: rgba(234,240,255,.76) !important;
+  font-family: inherit !important;
+  font-size: .90rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+}
+
+.nav-drop-btn:hover,
+.nav-group:hover .nav-drop-btn,
+.nav-group:focus-within .nav-drop-btn {
+  color: #fff !important;
+  background: transparent !important;
+}
+
+.nav-drop-btn span {
+  font-size: .72rem !important;
+  color: rgba(234,240,255,.42) !important;
+}
+
+.nav-drop-menu {
+  position: absolute !important;
+  top: calc(100% + 10px) !important;
+  left: 0 !important;
+  right: auto !important;
+  z-index: 1000 !important;
+  display: none !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: .25rem !important;
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: 290px !important;
+  padding: .55rem !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(180deg, rgba(18,24,38,.98), rgba(9,14,25,.98)) !important;
+  box-shadow: 0 22px 60px rgba(0,0,0,.46) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  white-space: nowrap !important;
+}
+
+.nav-group:hover .nav-drop-menu,
+.nav-group:focus-within .nav-drop-menu,
+.nav-group.open .nav-drop-menu,
+.nav-drop-menu:hover {
+  display: flex !important;
+}
+
+.nav-drop-menu a {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: .72rem .78rem !important;
+  border-radius: 12px !important;
+  color: rgba(234,240,255,.72) !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.nav-drop-menu a:hover,
+.nav-drop-menu a:focus {
+  color: #fff !important;
+  background: rgba(255,255,255,.06) !important;
+}
+
+.nav-support-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 40px !important;
+  padding: .58rem 1rem !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(104,240,255,.42) !important;
+  background: rgba(104,240,255,.095) !important;
+  color: #f7fbff !important;
+  font-weight: 950 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.nav-submit {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 40px !important;
+  padding: .58rem .95rem !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  background: rgba(255,255,255,.045) !important;
+  color: rgba(234,240,255,.92) !important;
+  font-family: inherit !important;
+  font-size: .88rem !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.nav-submit:hover,
+.nav-submit:focus {
+  border-color: rgba(255,255,255,.2) !important;
+  background: rgba(255,255,255,.075) !important;
+  color: #fff !important;
+}
+
+.auth-open.nav-auth-mobile {
+  display: none !important;
+}
+
+.hero-actions .submit-event-open {
+  display: none !important;
+}
+
+@media (min-width: 901px) {
+  .nav-group::after {
+    content: "";
+    position: absolute;
+    left: -12px;
+    right: -12px;
+    top: 100%;
+    height: 16px;
+    background: transparent;
+    pointer-events: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  header .nav {
+    grid-template-columns: auto auto 1fr !important;
+  }
+
+  .navlinks.navlinks-clean {
+    display: none !important;
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    justify-content: stretch !important;
+    align-items: stretch !important;
+    gap: .55rem !important;
+    padding-top: .7rem !important;
+  }
+
+  .navlinks.navlinks-clean.show,
+  .navlinks.navlinks-clean.open {
+    display: grid !important;
+  }
+
+  .nav-group {
+    display: grid !important;
+    width: 100% !important;
+  }
+
+  .nav-drop-btn {
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding: .75rem .85rem !important;
+    border: 1px solid rgba(255,255,255,.08) !important;
+    border-radius: 14px !important;
+    background: rgba(255,255,255,.035) !important;
+  }
+
+  .nav-drop-menu {
+    position: static !important;
+    display: grid !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-top: .35rem !important;
+    box-shadow: none !important;
+  }
+
+  .nav-support-link,
+  .nav-submit,
+  .auth-open.nav-auth-mobile {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .auth-open.nav-auth-mobile {
+    display: inline-flex !important;
+  }
+}
+
+/* This section was removed from the homepage in v11 because the nav already covers these links. */
+#showcase {
+  display: none !important;
+}
