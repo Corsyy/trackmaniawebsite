@@ -445,6 +445,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
   function createThreeRun() {
     const mount = $("threeMount");
     const stage = $("trackStage");
+    if (stage) stage.classList.add("three-loading");
     if (!mount || !stage || !hasWebGL()) {
       if (stage) stage.classList.add("no-webgl");
       return { ready: false, reset() {}, driveTo: async () => {} };
@@ -455,13 +456,18 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     } catch (err) {
       console.warn("WebGL renderer failed:", err);
+      stage.classList.remove("three-loading");
+      stage.classList.remove("three-loading");
       stage.classList.add("no-webgl");
       return { ready: false, reset() {}, driveTo: async () => {} };
     }
 
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    mount.innerHTML = "";
     mount.appendChild(renderer.domElement);
+    stage.classList.remove("three-loading");
+    stage.classList.add("three-ready");
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x05070c, 12, 52);
@@ -484,7 +490,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     goldLight.position.set(2, 3, -14);
     scene.add(goldLight);
 
-    const roadMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.68, metalness: 0.18 });
+    const roadMat = new THREE.MeshStandardMaterial({ color: 0x1a2638, roughness: 0.58, metalness: 0.22, emissive: 0x071b25, emissiveIntensity: 0.45 });
     const road = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 38, 1, 1), roadMat);
     road.rotation.x = -Math.PI / 2;
     road.position.set(0, 0, -4);
@@ -497,14 +503,14 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       scene.add(shoulder);
     }
 
-    const lineMat = new THREE.MeshBasicMaterial({ color: 0x68f0ff, transparent: true, opacity: 0.42 });
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0x68f0ff, transparent: true, opacity: 0.82 });
     for (let z = 13; z > -22; z -= 3.4) {
       const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.035, 1.2), lineMat);
       stripe.position.set(0, 0.075, z);
       scene.add(stripe);
     }
 
-    const edgeBlue = new THREE.MeshBasicMaterial({ color: 0x68f0ff, transparent: true, opacity: 0.58 });
+    const edgeBlue = new THREE.MeshBasicMaterial({ color: 0x68f0ff, transparent: true, opacity: 0.88 });
     for (const x of [-3.85, 3.85]) {
       const edge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 38), edgeBlue);
       edge.position.set(x, 0.08, -4);
@@ -699,6 +705,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     reset();
     rafId = requestAnimationFrame(render);
 
+    console.info("Prize Runs 3D scene ready");
     return { ready: true, reset, driveTo };
   }
 
