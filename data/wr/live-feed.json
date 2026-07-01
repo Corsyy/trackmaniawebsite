@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T00:06:29.032Z",
+  "generatedAt": "2026-07-01T04:51:17.495Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|7ptJQ5g8embqYPhSP_0lP9bTkad|f73c41d6-36df-462f-a70c-d610675a370e|7371dfbe-0eec-4fcb-8490-b32471a22e0e|16129|16128|2026-07-01T04:51:17.495Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-01T04:51:17.495Z",
+      "at": "2026-07-01T04:51:17.495Z",
+      "mapUid": "7ptJQ5g8embqYPhSP_0lP9bTkad",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "f73c41d6-36df-462f-a70c-d610675a370e",
+      "oldHolder": "tnt.hc",
+      "oldTimeMs": 16129,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:16.129",
+      "oldScoreKey": "16129",
+      "newHolderAccountId": "7371dfbe-0eec-4fcb-8490-b32471a22e0e",
+      "newHolder": "Nuzzle.-",
+      "newTimeMs": 16128,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:16.128",
+      "newScoreKey": "16128",
+      "text": "Nuzzle.- overtook tnt.hc on Unknown map with 00:00:16.128."
+    },
     {
       "id": "wr_changed|BfchlDqKC0bwiVpDU6x7in1zKG6|d9835d12-3ff6-49f5-901d-c572ee058414|c04d5345-34ca-49e6-a839-98416bf0aada|20461|20291|2026-07-01T00:06:29.032Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:15.926",
       "newScoreKey": "15926",
       "text": "BUXKSK_ overtook NotAnEthanTM on Unknown map with 00:00:15.926."
-    },
-    {
-      "id": "wr_changed|RSSJY5meG7393u5oXzoo6djgWpc|8c8086fe-997b-4990-b82c-9ee3e0f90f78|c34c6c53-aa80-4b64-9495-aecc8d5729fd|11481|11465|2026-06-22T21:33:48.699Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-22T21:33:48.699Z",
-      "at": "2026-06-22T21:33:48.699Z",
-      "mapUid": "RSSJY5meG7393u5oXzoo6djgWpc",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "8c8086fe-997b-4990-b82c-9ee3e0f90f78",
-      "oldHolder": "Nikl9696",
-      "oldTimeMs": 11481,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:11.481",
-      "oldScoreKey": "11481",
-      "newHolderAccountId": "c34c6c53-aa80-4b64-9495-aecc8d5729fd",
-      "newHolder": "OriginalCJM",
-      "newTimeMs": 11465,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:11.465",
-      "newScoreKey": "11465",
-      "text": "OriginalCJM overtook Nikl9696 on Unknown map with 00:00:11.465."
     }
   ]
 }
