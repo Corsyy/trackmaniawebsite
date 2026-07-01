@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-01T16:26:54.220Z",
+  "generatedAt": "2026-07-01T18:25:31.540Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 4,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|SUiGVC8zVC6jEKpk9U0XcidANH|aa4e375f-d23e-4915-8d53-8b3307e06764|36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a|43637|43627|2026-07-01T18:25:31.540Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-01T18:25:31.540Z",
+      "at": "2026-07-01T18:25:31.540Z",
+      "mapUid": "SUiGVC8zVC6jEKpk9U0XcidANH",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "aa4e375f-d23e-4915-8d53-8b3307e06764",
+      "oldHolder": "racehansTM",
+      "oldTimeMs": 43637,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:43.637",
+      "oldScoreKey": "43637",
+      "newHolderAccountId": "36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a",
+      "newHolder": "zodiark.",
+      "newTimeMs": 43627,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:43.627",
+      "newScoreKey": "43627",
+      "text": "zodiark. overtook racehansTM on Unknown map with 00:00:43.627."
+    },
     {
       "id": "wr_changed|kEUOPQLJmXPFXeQ78T02zE5ST7d|f32a9011-770d-4f48-bd0c-f9cb081d3924|0605073d-04d1-40ea-8791-ec556483e16b|31872|31815|2026-07-01T16:26:54.220Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:05.364",
       "newScoreKey": "5364",
       "text": "poruzu4 overtook HerricaneEly on Unknown map with 00:00:05.364."
-    },
-    {
-      "id": "wr_changed|fJElYu7iRnDAsOruV20yuQFxNU2|a091e92d-426f-440e-a3d8-7b2c5278e812|d569b3f3-6cf9-4879-86d1-05243d152314|9861|9144|2026-06-23T00:18:59.154Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-23T00:18:59.154Z",
-      "at": "2026-06-23T00:18:59.154Z",
-      "mapUid": "fJElYu7iRnDAsOruV20yuQFxNU2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "a091e92d-426f-440e-a3d8-7b2c5278e812",
-      "oldHolder": "Panda.ly",
-      "oldTimeMs": 9861,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.861",
-      "oldScoreKey": "9861",
-      "newHolderAccountId": "d569b3f3-6cf9-4879-86d1-05243d152314",
-      "newHolder": "Stone-tm",
-      "newTimeMs": 9144,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.144",
-      "newScoreKey": "9144",
-      "text": "Stone-tm overtook Panda.ly on Unknown map with 00:00:09.144."
     }
   ]
 }
