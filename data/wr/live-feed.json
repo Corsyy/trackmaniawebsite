@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-03T18:04:30.350Z",
+  "generatedAt": "2026-07-03T19:45:45.029Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|4Q9EMMC3wnnGzeeym8uq_XBeQn7|d28a55af-b66d-4401-9466-2f9877890a54|d4e88731-a617-4d90-9e1c-2c3f796bce84|8337|8287|2026-07-03T19:45:45.029Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-03T19:45:45.029Z",
+      "at": "2026-07-03T19:45:45.029Z",
+      "mapUid": "4Q9EMMC3wnnGzeeym8uq_XBeQn7",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
+      "oldHolder": "MazsTM",
+      "oldTimeMs": 8337,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.337",
+      "oldScoreKey": "8337",
+      "newHolderAccountId": "d4e88731-a617-4d90-9e1c-2c3f796bce84",
+      "newHolder": "buffharold",
+      "newTimeMs": 8287,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.287",
+      "newScoreKey": "8287",
+      "text": "buffharold overtook MazsTM on Unknown map with 00:00:08.287."
+    },
     {
       "id": "wr_changed|ZGbRxMen860hhvhAa_yHllz5242|8cfe5e6e-f8aa-4e78-82ea-03746716f457|05e7e7c7-1bed-48f1-8d7a-b53244290532|4927|4900|2026-07-03T18:04:30.350Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:58.866",
       "newScoreKey": "118866",
       "text": "Aquariummm overtook Purrl471 on Unknown map with 00:01:58.866."
-    },
-    {
-      "id": "wr_changed|kf6bG3cRu_Ncp7fENx8hOc18fNd|ee763e0b-90a4-4707-825a-a0c62b308726|2343ca67-a77c-47c8-83bd-74f99c6f0a37|24735|24708|2026-06-25T22:06:17.825Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-25T22:06:17.825Z",
-      "at": "2026-06-25T22:06:17.825Z",
-      "mapUid": "kf6bG3cRu_Ncp7fENx8hOc18fNd",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "official",
-      "oldHolderAccountId": "ee763e0b-90a4-4707-825a-a0c62b308726",
-      "oldHolder": "LordQuacked",
-      "oldTimeMs": 24735,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:24.735",
-      "oldScoreKey": "24735",
-      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
-      "newHolder": "hobbi.",
-      "newTimeMs": 24708,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:24.708",
-      "newScoreKey": "24708",
-      "text": "hobbi. overtook LordQuacked on Unknown map with 00:00:24.708."
     }
   ]
 }
