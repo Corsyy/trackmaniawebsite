@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-03T16:47:36.307Z",
+  "generatedAt": "2026-07-03T18:04:30.350Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|ZGbRxMen860hhvhAa_yHllz5242|8cfe5e6e-f8aa-4e78-82ea-03746716f457|05e7e7c7-1bed-48f1-8d7a-b53244290532|4927|4900|2026-07-03T18:04:30.350Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-03T18:04:30.350Z",
+      "at": "2026-07-03T18:04:30.350Z",
+      "mapUid": "ZGbRxMen860hhvhAa_yHllz5242",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8cfe5e6e-f8aa-4e78-82ea-03746716f457",
+      "oldHolder": "eyezero",
+      "oldTimeMs": 4927,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:04.927",
+      "oldScoreKey": "4927",
+      "newHolderAccountId": "05e7e7c7-1bed-48f1-8d7a-b53244290532",
+      "newHolder": "N1trium",
+      "newTimeMs": 4900,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:04.900",
+      "newScoreKey": "4900",
+      "text": "N1trium overtook eyezero on Unknown map with 00:00:04.900."
+    },
     {
       "id": "wr_changed|xGHONmz2nSzUTDHD8JqUEpdqC8g|3a96e825-e60d-4cef-97a4-deda1f05666c|55a3499e-bd43-46ba-b2ac-a9b4ab8006cd|8319|8209|2026-07-03T15:18:00.088Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:24.708",
       "newScoreKey": "24708",
       "text": "hobbi. overtook LordQuacked on Unknown map with 00:00:24.708."
-    },
-    {
-      "id": "wr_changed|XOHDLPbgM6_BkRCoeGOdjOdKKS6|efb1ceca-bfe1-4b53-8e7a-be13b84bc533|ee99ebb0-b4a6-4bb4-84e8-6f8654cd60d3|4700|7557|2026-06-25T08:42:18.744Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-25T08:42:18.744Z",
-      "at": "2026-06-25T08:42:18.744Z",
-      "mapUid": "XOHDLPbgM6_BkRCoeGOdjOdKKS6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "efb1ceca-bfe1-4b53-8e7a-be13b84bc533",
-      "oldHolder": "erhofft-Euro",
-      "oldTimeMs": 4700,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:04.700",
-      "oldScoreKey": "4700",
-      "newHolderAccountId": "ee99ebb0-b4a6-4bb4-84e8-6f8654cd60d3",
-      "newHolder": "MRMNKY.",
-      "newTimeMs": 7557,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.557",
-      "newScoreKey": "7557",
-      "text": "MRMNKY. overtook erhofft-Euro on Unknown map with 00:00:07.557."
     }
   ]
 }
