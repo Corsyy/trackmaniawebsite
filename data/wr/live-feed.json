@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-04T22:00:11.324Z",
+  "generatedAt": "2026-07-04T23:00:11.501Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|xd4vsxBl6IK5sUcEnasPgP7_4Wl|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|a6a6f19e-46ac-4f3a-8181-a61d9ad5e85e|9411|9410|2026-07-04T23:00:11.501Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-04T23:00:11.501Z",
+      "at": "2026-07-04T23:00:11.501Z",
+      "mapUid": "xd4vsxBl6IK5sUcEnasPgP7_4Wl",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
+      "oldHolder": "ShcrTM",
+      "oldTimeMs": 9411,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.411",
+      "oldScoreKey": "9411",
+      "newHolderAccountId": "a6a6f19e-46ac-4f3a-8181-a61d9ad5e85e",
+      "newHolder": "Lopshi",
+      "newTimeMs": 9410,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.410",
+      "newScoreKey": "9410",
+      "text": "Lopshi overtook ShcrTM on Unknown map with 00:00:09.410."
+    },
     {
       "id": "wr_changed|lmiCGAfrHgYOC2ov8tmrln6jngf|416dbd30-da2a-49d7-8dab-dda22bc5b828|7893daf4-345c-4b13-835b-382f6484247a|36198|35588|2026-07-04T18:44:16.638Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:11.301",
       "newScoreKey": "11301",
       "text": "Danyy912 overtook puchmu on Unknown map with 00:00:11.301."
-    },
-    {
-      "id": "self_improve|GOL0DzUHx3eLvuRrltMU3X3ZxL|11e56e9f-d89e-484e-b3d9-5e04de40c33d|11e56e9f-d89e-484e-b3d9-5e04de40c33d|12343|12267|2026-06-26T01:54:36.972Z",
-      "type": "self_improve",
-      "detectedAt": "2026-06-26T01:54:36.972Z",
-      "at": "2026-06-26T01:54:36.972Z",
-      "mapUid": "GOL0DzUHx3eLvuRrltMU3X3ZxL",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
-      "oldHolder": "Vatsug44",
-      "oldTimeMs": 12343,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.343",
-      "oldScoreKey": "12343",
-      "newHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
-      "newHolder": "Vatsug44",
-      "newTimeMs": 12267,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.267",
-      "newScoreKey": "12267",
-      "text": "Vatsug44 improved their WR on Unknown map from 00:00:12.343 to 00:00:12.267."
     }
   ]
 }
