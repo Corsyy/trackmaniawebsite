@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-04T14:18:35.723Z",
+  "generatedAt": "2026-07-04T15:35:03.870Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|1rwAkLrbqhN47zCsVvJJFJimlcf|bc54abd0-2c26-4026-84e1-b734a5b219c1|6d3f964f-ef2b-410f-b969-37b08f86f4d4|17405|17328|2026-07-04T15:35:03.870Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-04T15:35:03.870Z",
+      "at": "2026-07-04T15:35:03.870Z",
+      "mapUid": "1rwAkLrbqhN47zCsVvJJFJimlcf",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "bc54abd0-2c26-4026-84e1-b734a5b219c1",
+      "oldHolder": "Stellar.TM",
+      "oldTimeMs": 17405,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:17.405",
+      "oldScoreKey": "17405",
+      "newHolderAccountId": "6d3f964f-ef2b-410f-b969-37b08f86f4d4",
+      "newHolder": "Korniee",
+      "newTimeMs": 17328,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:17.328",
+      "newScoreKey": "17328",
+      "text": "Korniee overtook Stellar.TM on Unknown map with 00:00:17.328."
+    },
     {
       "id": "wr_changed|zKDaMk4TXmTRJXJrjy0hniJWQwi|fbf70e81-96d5-4162-b59b-1b196f882d2c|5c207a55-bc55-4b68-b89e-d222c1cfc019|8183|8167|2026-07-04T14:18:35.723Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:11.310",
       "newScoreKey": "11310",
       "text": "Danyy912 overtook Vatsug44 on Unknown map with 00:00:11.310."
-    },
-    {
-      "id": "wr_changed|Dp8A3LmCp0aB4HKAIrG1odRkqQh|fd10ebf7-40b1-44db-8318-b1010ec6fb81|3a96e825-e60d-4cef-97a4-deda1f05666c|8866|8670|2026-06-26T01:54:36.972Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T01:54:36.972Z",
-      "at": "2026-06-26T01:54:36.972Z",
-      "mapUid": "Dp8A3LmCp0aB4HKAIrG1odRkqQh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "fd10ebf7-40b1-44db-8318-b1010ec6fb81",
-      "oldHolder": "SimekOne",
-      "oldTimeMs": 8866,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.866",
-      "oldScoreKey": "8866",
-      "newHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "newHolder": "Danyy912",
-      "newTimeMs": 8670,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.670",
-      "newScoreKey": "8670",
-      "text": "Danyy912 overtook SimekOne on Unknown map with 00:00:08.670."
     }
   ]
 }
