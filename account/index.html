@@ -1802,6 +1802,144 @@ header .auth-user-menu button:hover {
       .public-profile-facts { grid-template-columns: 1fr; }
     }
 
+
+    /* Account/public profile no-glow cleanup v17 */
+    .account-hero,
+    .account-card,
+    .account-profile-card,
+    .public-profile-card,
+    .profile-preview-card,
+    .stat-box,
+    .collection-progress-panel,
+    .theme-set-panel,
+    .paddock-showcase-panel,
+    .parts-info-panel,
+    .paddock-shop-panel,
+    .collection-box,
+    .public-collection-panel {
+      box-shadow: none !important;
+      filter: none !important;
+    }
+
+    .account-profile-card,
+    .public-profile-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.040), rgba(255,255,255,.020)) !important;
+    }
+
+    .profile-preview-card,
+    .profile-preview-card.frame-theme-stadium,
+    .profile-preview-card.frame-theme-snow,
+    .profile-preview-card.frame-theme-rally,
+    .profile-preview-card.frame-theme-desert,
+    .profile-preview-card.frame-theme-night,
+    .profile-preview-card.frame-theme-wr,
+    .profile-preview-card.frame-theme-champion,
+    .profile-preview-card.frame-theme-kacky,
+    .profile-preview-card.frame-theme-support,
+    .profile-preview-card.frame-theme-community {
+      background: rgba(255,255,255,.026) !important;
+      box-shadow: none !important;
+    }
+
+    .profile-preview-card::before,
+    .account-profile-card::before,
+    .public-profile-card::before {
+      box-shadow: none !important;
+      filter: none !important;
+      opacity: .28 !important;
+    }
+
+    .profile-preview-card.frame-tier-champion,
+    .profile-preview-card.frame-tier-iconic {
+      box-shadow: none !important;
+    }
+
+    .public-collection-panel {
+      display: grid;
+      gap: .75rem;
+      margin-top: .95rem;
+      padding: .95rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.065);
+      background: rgba(255,255,255,.024);
+    }
+
+    .public-collection-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: .8rem;
+    }
+
+    .public-collection-head strong {
+      display: block;
+      color: var(--account-text);
+    }
+
+    .public-collection-head span {
+      display: block;
+      margin-top: .18rem;
+      color: var(--account-muted);
+      font-size: .85rem;
+      line-height: 1.35;
+    }
+
+    .public-collection-rows {
+      display: grid;
+      gap: .55rem;
+    }
+
+    .public-collection-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr) 70px;
+      align-items: center;
+      gap: .7rem;
+      color: var(--account-soft);
+      font-size: .86rem;
+    }
+
+    .public-collection-label {
+      font-weight: 900;
+      color: var(--account-text);
+    }
+
+    .public-collection-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.055);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.045);
+    }
+
+    .public-collection-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: rgba(235,240,250,.72);
+    }
+
+    .public-collection-count {
+      text-align: right;
+      color: var(--account-muted);
+      font-weight: 850;
+    }
+
+    .public-collection-muted {
+      color: var(--account-muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 720px) {
+      .public-collection-row {
+        grid-template-columns: 1fr;
+        gap: .35rem;
+      }
+
+      .public-collection-count {
+        text-align: left;
+      }
+    }
+
 </style>
 </head>
 
@@ -1930,8 +2068,23 @@ header .auth-user-menu button:hover {
                   <div class="public-profile-facts">
                     <div class="stat-box"><span>Visible Badges</span><strong id="publicVisibleBadgeCount">0</strong></div>
                     <div class="stat-box"><span>Equipped Style</span><strong id="publicEquippedCount">0</strong></div>
+                    <div class="stat-box"><span>Collection</span><strong id="publicCollectionTotal">0</strong></div>
+                    <div class="stat-box"><span>Completion</span><strong id="publicCollectionPct">0%</strong></div>
                     <div class="stat-box"><span>Weekly Wins</span><strong id="publicWeeklyWins">0</strong></div>
                     <div class="stat-box"><span>Total WRs</span><strong id="publicTotalWrs">0</strong></div>
+                  </div>
+
+                  <div id="publicCollectionPanel" class="public-collection-panel">
+                    <div class="public-collection-head">
+                      <div>
+                        <strong>Prize Run Collection Progress</strong>
+                        <span>Public progress from unlocked Prize Run rewards.</span>
+                      </div>
+                      <span id="publicCollectionCompletion" class="parts-balance">0 / 0</span>
+                    </div>
+                    <div id="publicCollectionRows" class="public-collection-rows">
+                      <div class="public-collection-muted">Loading public collection progress…</div>
+                    </div>
                   </div>
 
                   <div style="height:.9rem"></div>
@@ -3758,6 +3911,92 @@ header .auth-user-menu button:hover {
       if ($("publicProfilePreview")) $("publicProfilePreview").innerHTML = cardHtml;
     }
 
+
+    async function loadPublicCollectionProgress(userId) {
+      if (!userId) return { totalOwned: 0, totalPool: 0, categories: {}, available: false };
+
+      try {
+        const [inventoryRes, poolRes] = await Promise.all([
+          tmeSupabase
+            .from("user_prize_inventory")
+            .select("id,item:prize_items(id,category)")
+            .eq("user_id", userId),
+          tmeSupabase
+            .from("prize_items")
+            .select("id,category")
+            .eq("is_active", true),
+        ]);
+
+        if (inventoryRes.error) throw inventoryRes.error;
+        if (poolRes.error) throw poolRes.error;
+
+        const inventory = Array.isArray(inventoryRes.data) ? inventoryRes.data : [];
+        const pool = Array.isArray(poolRes.data) ? poolRes.data : [];
+
+        const poolCounts = {};
+        for (const item of pool) {
+          const cat = item?.category || "item";
+          poolCounts[cat] = (poolCounts[cat] || 0) + 1;
+        }
+
+        const ownedCounts = {};
+        for (const row of inventory) {
+          const item = getInventoryItem(row);
+          const cat = item?.category || "item";
+          ownedCounts[cat] = (ownedCounts[cat] || 0) + 1;
+        }
+
+        return {
+          totalOwned: inventory.length,
+          totalPool: pool.length,
+          categories: { poolCounts, ownedCounts },
+          available: true,
+        };
+      } catch (err) {
+        console.warn("Could not load public collection progress:", err);
+        return { totalOwned: 0, totalPool: 0, categories: {}, available: false };
+      }
+    }
+
+    function renderPublicCollectionProgress(progress) {
+      const totalOwned = Number(progress?.totalOwned || 0);
+      const totalPool = Number(progress?.totalPool || 0);
+      const pct = totalPool ? Math.round((totalOwned / totalPool) * 100) : 0;
+
+      if ($("publicCollectionTotal")) $("publicCollectionTotal").textContent = totalOwned.toLocaleString();
+      if ($("publicCollectionPct")) $("publicCollectionPct").textContent = `${pct}%`;
+      if ($("publicCollectionCompletion")) $("publicCollectionCompletion").textContent = totalPool ? `${totalOwned.toLocaleString()} / ${totalPool.toLocaleString()} • ${pct}%` : "Unavailable";
+
+      const rowsEl = $("publicCollectionRows");
+      if (!rowsEl) return;
+
+      if (!progress?.available) {
+        rowsEl.innerHTML = `<div class="public-collection-muted">Collection progress is not public for this profile yet.</div>`;
+        return;
+      }
+
+      const poolCounts = progress.categories?.poolCounts || {};
+      const ownedCounts = progress.categories?.ownedCounts || {};
+      const order = ["flair", "title", "frame", "sticker", "nameplate", "paddock", "seasonal"];
+
+      const rows = order.map((cat) => {
+        const max = Number(poolCounts[cat] || 0);
+        if (!max) return "";
+        const got = Number(ownedCounts[cat] || 0);
+        const rowPct = Math.min(100, Math.round((got / max) * 100));
+        return `
+          <div class="public-collection-row">
+            <div class="public-collection-label">${escapeHtml(prettyCategory(cat))}</div>
+            <div class="public-collection-track"><div class="public-collection-fill" style="width:${rowPct}%"></div></div>
+            <div class="public-collection-count">${got}/${max}</div>
+          </div>
+        `;
+      }).filter(Boolean).join("");
+
+      rowsEl.innerHTML = rows || `<div class="public-collection-muted">No collection categories available yet.</div>`;
+    }
+
+
     async function renderPublicStats(profile) {
       const accountId = profile?.trackmania_account_id || "";
       if (!accountId) {
@@ -3838,6 +4077,8 @@ header .auth-user-menu button:hover {
         $("publicCosmeticSummary").textContent = cosmeticNames.length ? cosmeticNames.join(" · ") : "No public cosmetics equipped";
 
         renderPublicProfilePreview(profile, badges, loadout);
+        const publicCollectionProgress = await loadPublicCollectionProgress(profile.id);
+        renderPublicCollectionProgress(publicCollectionProgress);
         await renderPublicStats(profile);
       } catch (err) {
         console.warn("Public profile failed:", err);
