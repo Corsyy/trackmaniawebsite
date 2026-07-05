@@ -3112,8 +3112,21 @@
 
 
 
-    function getPublicAccountUrl(userId) {
-      const safeId = normalizeUuidList([userId])[0] || "";
+    function cleanPublicProfileName(value) {
+      return String(value || "")
+        .trim()
+        .replace(/^@+/, "")
+        .replace(/[^a-zA-Z0-9_.-]/g, "")
+        .slice(0, 24);
+    }
+
+    function getPublicAccountUrl(msg) {
+      const username = cleanPublicProfileName(msg?.username || "");
+      if (username && username.toUpperCase() !== "SYSTEM") {
+        return `/account?name=${encodeURIComponent(username)}`;
+      }
+
+      const safeId = normalizeUuidList([msg?.user_id])[0] || "";
       return safeId ? `/account?user=${encodeURIComponent(safeId)}` : "/account";
     }
 
@@ -3125,12 +3138,8 @@
         return `<span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span>`;
       }
 
-      const safeId = normalizeUuidList([msg.user_id])[0] || "";
-      if (!safeId) {
-        return `<span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span>`;
-      }
-
-      return `<a class="shout-name-link" href="${getPublicAccountUrl(safeId)}" title="View ${escapeHtml(displayName)}'s profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
+      const href = getPublicAccountUrl(msg);
+      return `<a class="shout-name-link" href="${escapeHtml(href)}" title="View ${escapeHtml(displayName)}'s profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
     }
 
 
