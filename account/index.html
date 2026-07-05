@@ -1740,6 +1740,68 @@ header .auth-user-menu button:hover {
   .paddock-shop-head { flex-direction:column; }
 }
 
+
+    /* Public profile mode */
+    .account-public { display: none; }
+    .account-public.show { display: block; }
+
+    .public-profile-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .public-profile-card {
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.085);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(104,240,255,.08), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.022));
+      box-shadow: 0 18px 42px rgba(0,0,0,.28);
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    .public-profile-top {
+      display: flex;
+      align-items: center;
+      gap: .85rem;
+      padding-bottom: .9rem;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .public-profile-facts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .75rem;
+    }
+
+    .public-profile-note {
+      color: var(--account-muted);
+      line-height: 1.55;
+    }
+
+    .public-safe-pill {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      gap: .35rem;
+      margin-top: .75rem;
+      padding: .34rem .62rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.035);
+      color: rgba(235,240,250,.76);
+      font-size: .78rem;
+      font-weight: 900;
+    }
+
+    @media (max-width: 900px) {
+      .public-profile-grid { grid-template-columns: 1fr; }
+      .public-profile-facts { grid-template-columns: 1fr; }
+    }
+
 </style>
 </head>
 
@@ -1830,6 +1892,77 @@ header .auth-user-menu button:hover {
           <div class="account-actions">
             <a class="btn primary" href="/">Go to homepage</a>
           </div>
+        </div>
+      </div>
+
+      <div id="accountPublic" class="account-public">
+        <div class="public-profile-grid">
+          <aside class="public-profile-card">
+            <div class="public-profile-top">
+              <span class="account-avatar" aria-hidden="true">🏁</span>
+              <div>
+                <span class="account-mini-label">Public Profile</span>
+                <strong id="publicProfileUsername">Loading…</strong>
+                <small id="publicProfileTrackmania">Loading public profile…</small>
+              </div>
+            </div>
+
+            <div id="publicProfilePreview" class="account-profile-preview">
+              <div class="empty-state">Loading public profile preview…</div>
+            </div>
+
+            <div class="public-safe-pill">🔒 Only public-selected info is shown here.</div>
+          </aside>
+
+          <section class="account-workspace">
+            <article class="account-card">
+              <div class="account-card-head">
+                <div>
+                  <strong>Profile Summary</strong>
+                  <span>Selected badges, equipped profile style, and public Trackmania stats.</span>
+                </div>
+              </div>
+
+              <div class="account-card-body">
+                <div id="publicProfileError" class="empty-state" style="display:none"></div>
+
+                <div id="publicProfileContent">
+                  <div class="public-profile-facts">
+                    <div class="stat-box"><span>Visible Badges</span><strong id="publicVisibleBadgeCount">0</strong></div>
+                    <div class="stat-box"><span>Equipped Style</span><strong id="publicEquippedCount">0</strong></div>
+                    <div class="stat-box"><span>Weekly Wins</span><strong id="publicWeeklyWins">0</strong></div>
+                    <div class="stat-box"><span>Total WRs</span><strong id="publicTotalWrs">0</strong></div>
+                  </div>
+
+                  <div style="height:.9rem"></div>
+
+                  <div class="account-info-list">
+                    <div class="account-info-row">
+                      <span>Username</span>
+                      <strong id="publicUsernameMirror">Loading…</strong>
+                    </div>
+                    <div class="account-info-row">
+                      <span>Trackmania</span>
+                      <strong id="publicTmSummary">Not linked</strong>
+                    </div>
+                    <div class="account-info-row">
+                      <span>Badges</span>
+                      <strong id="publicBadgeSummary">No visible badges selected</strong>
+                    </div>
+                    <div class="account-info-row">
+                      <span>Cosmetics</span>
+                      <strong id="publicCosmeticSummary">No public cosmetics equipped</strong>
+                    </div>
+                  </div>
+
+                  <p class="public-profile-note" style="margin-top:1rem">
+                    This public view intentionally hides private account details like email, tickets, Paddock Parts, inventory,
+                    submissions, settings, and admin controls.
+                  </p>
+                </div>
+              </div>
+            </article>
+          </section>
         </div>
       </div>
 
@@ -3396,6 +3529,325 @@ header .auth-user-menu button:hover {
       });
     }
 
+
+    function getPublicProfileRequest() {
+      const params = new URLSearchParams(window.location.search);
+      const rawName = cleanText(params.get("name") || "", 32);
+      const rawUser = cleanText(params.get("user") || "", 80);
+
+      const name = rawName
+        .replace(/^@+/, "")
+        .replace(/[^a-zA-Z0-9_.-]/g, "")
+        .slice(0, 24);
+
+      const userId = isLikelyAccountId(rawUser) ? rawUser : "";
+
+      if (!name && !userId) return null;
+      return { name, userId };
+    }
+
+    async function findPublicProfile(request) {
+      if (!request) return null;
+
+      const selectFields = "id,username,trackmania_account_id,trackmania_display_name,supporter_status,show_supporter_badge";
+
+      if (request.userId) {
+        const { data, error } = await tmeSupabase
+          .from("profiles")
+          .select(selectFields)
+          .eq("id", request.userId)
+          .maybeSingle();
+
+        if (error) throw error;
+        return data || null;
+      }
+
+      const { data, error } = await tmeSupabase
+        .from("profiles")
+        .select(selectFields)
+        .ilike("username", request.name)
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data || null;
+    }
+
+    async function loadPublicVisiblePrefsForUser(userId) {
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_public_visible_badges", {
+          user_ids_input: [userId],
+        });
+        if (error) throw error;
+
+        const out = {};
+        for (const row of data || []) {
+          if (!row.badge_key) continue;
+          out[row.badge_key] = {
+            is_visible: row.is_visible !== false,
+            display_order: Number(row.display_order || 0),
+          };
+        }
+        return out;
+      } catch (err) {
+        console.warn("Could not load public visible badges:", err);
+        return {};
+      }
+    }
+
+    async function loadPublicContributionFlagsForUser(userId) {
+      try {
+        const { data, error } = await tmeSupabase.rpc("get_public_contribution_badges", {
+          user_ids_input: [userId],
+        });
+        if (error) throw error;
+
+        const row = Array.isArray(data) ? data[0] : null;
+        return {
+          event_organizer: Boolean(row?.event_organizer),
+          highlight_contributor: Boolean(row?.highlight_contributor),
+        };
+      } catch (err) {
+        console.warn("Could not load public contribution badges:", err);
+        return { event_organizer: false, highlight_contributor: false };
+      }
+    }
+
+    async function loadPublicRoleForUser(userId) {
+      try {
+        const { data, error } = await tmeSupabase
+          .from("shoutbox_roles")
+          .select("role")
+          .eq("user_id", userId)
+          .maybeSingle();
+        if (error) throw error;
+        return String(data?.role || "user").toLowerCase();
+      } catch {
+        return "user";
+      }
+    }
+
+    async function loadPublicPrizeLoadoutForUser(userId) {
+      async function callLoadouts(params) {
+        const { data, error } = await tmeSupabase.rpc("get_public_prize_loadouts", params);
+        if (error) throw error;
+        return Array.isArray(data) ? data : [];
+      }
+
+      try {
+        let rows = [];
+        try {
+          rows = await callLoadouts({ p_user_ids: [userId] });
+        } catch {
+          rows = await callLoadouts({ user_ids_input: [userId] });
+        }
+
+        const row = rows[0] || null;
+        if (!row) return {};
+
+        function item(prefix, fallbackIcon, category) {
+          const hasItem = Boolean(row[`${prefix}_item_key`] || row[`${prefix}_name`]);
+          if (!hasItem) return null;
+          return {
+            key: category,
+            item_key: row[`${prefix}_item_key`] || "",
+            name: row[`${prefix}_name`] || "Item",
+            icon: row[`${prefix}_icon`] || fallbackIcon,
+            tier: row[`${prefix}_tier`] || "",
+            theme: row[`${prefix}_theme`] || "",
+            category,
+          };
+        }
+
+        return {
+          flair: item("flair", "💬", "flair"),
+          title: item("title", "🏷️", "title"),
+          frame: item("frame", "🖼️", "frame"),
+          nameplate: item("nameplate", "🔷", "nameplate"),
+          stickers: [
+            item("sticker_1", "✨", "sticker"),
+            item("sticker_2", "✨", "sticker"),
+            item("sticker_3", "✨", "sticker"),
+          ].filter(Boolean),
+        };
+      } catch (err) {
+        console.warn("Could not load public prize loadout:", err);
+        return {};
+      }
+    }
+
+    async function calculatePublicVerifiedBadges(profile, visiblePrefs, contributionFlags, role) {
+      const earned = {};
+      const accountId = profile?.trackmania_account_id || "";
+
+      if (role === "admin") earned.admin = true;
+
+      if (String(profile?.supporter_status || "").toLowerCase() === "supporter" && profile?.show_supporter_badge !== false) {
+        earned.supporter = true;
+      }
+
+      if (contributionFlags.event_organizer) earned.event_organizer = true;
+      if (contributionFlags.highlight_contributor) earned.highlight_contributor = true;
+
+      if (accountId) {
+        try {
+          const data = await loadStatsData(accountId);
+          const players = Array.isArray(data.weeklyAggregate?.players) ? data.weeklyAggregate.players : [];
+          const weekly = findPlayerByAccountId(players, accountId);
+          const wins = Number(weekly?.wins || 0);
+          const maxWins = players.reduce((max, player) => Math.max(max, Number(player?.wins || 0)), 0);
+          if (wins > 0) earned.weekly_winner = true;
+          if (wins > 0 && wins === maxWins) earned.weekly_champion = true;
+        } catch (err) {
+          console.warn("Could not calculate public weekly badges:", err);
+        }
+      }
+
+      return BADGE_ORDER
+        .filter((key) => earned[key] && visiblePrefs[key]?.is_visible === true)
+        .sort((a, b) => Number(visiblePrefs[a]?.display_order || 0) - Number(visiblePrefs[b]?.display_order || 0));
+    }
+
+    function publicPreviewChip(item, labelPrefix = "") {
+      if (!item) return "";
+      const theme = cleanCssToken(item.theme || "general");
+      const tier = cleanCssToken(item.tier || "standard");
+      return `<span class="preview-cosmetic-chip theme-${escapeHtml(theme)} tier-${escapeHtml(tier)}" title="${escapeHtml(prettyTier(item.tier))}${item.theme ? ` · ${escapeHtml(prettyTheme(item.theme))}` : ""}">${escapeHtml(item.icon || "✨")} ${labelPrefix ? `${escapeHtml(labelPrefix)}: ` : ""}${escapeHtml(item.name || item.label || "Item")}</span>`;
+    }
+
+    function renderPublicProfilePreview(profile, badges, loadout) {
+      const username = profile?.username || "Player";
+      const flair = loadout.flair || null;
+      const title = loadout.title || null;
+      const frame = loadout.frame || null;
+      const nameplate = loadout.nameplate || null;
+      const stickers = Array.isArray(loadout.stickers) ? loadout.stickers : [];
+
+      const allStyleItems = [flair, title, frame, nameplate, ...stickers].filter(Boolean);
+      const dominant = getDominantLoadoutTheme(allStyleItems);
+      const setBonusHtml = dominant && dominant.count >= 3
+        ? `<div class="theme-set-panel"><div class="theme-chip-row"><span class="theme-chip theme-${escapeHtml(dominant.theme)}">${escapeHtml(prettyTheme(dominant.theme))} Set ${Number(dominant.count)}/6</span><strong>Theme style active</strong></div></div>`
+        : "";
+
+      const badgeText = badges.map(getBadgeText);
+      const equippedChips = [
+        publicPreviewChip(flair, "Flair"),
+        publicPreviewChip(title, "Title"),
+        publicPreviewChip(frame, "Frame"),
+        publicPreviewChip(nameplate, "Nameplate"),
+      ].filter(Boolean).join("");
+
+      const stickerHtml = stickers.length
+        ? `<div class="preview-stickers">${stickers.map((item) => `
+            <span class="preview-sticker-chip theme-${escapeHtml(cleanCssToken(item.theme || "general"))}" title="${escapeHtml(item.name || "Sticker")}">
+              ${escapeHtml(item.icon || "✨")} ${escapeHtml(item.name || "Sticker")}
+            </span>
+          `).join("")}</div>`
+        : `<div class="preview-meta">Stickers: None equipped publicly</div>`;
+
+      const cardHtml = `
+        <strong>Public Preview:</strong>
+        <div class="profile-preview-card ${escapeHtml(previewFrameClasses(frame))}">
+          <div class="preview-nameplate ${escapeHtml(previewNameplateClasses(nameplate))}">${escapeHtml(username)}</div>
+          <div class="preview-meta">${badgeText.length ? escapeHtml(badgeText.join(" · ")) : "No visible badges selected"}</div>
+          <div class="cosmetic-preview-row">${equippedChips || `<span class="preview-cosmetic-chip">No public cosmetics equipped</span>`}</div>
+          ${stickerHtml}
+          ${setBonusHtml}
+        </div>`;
+
+      if ($("publicProfilePreview")) $("publicProfilePreview").innerHTML = cardHtml;
+    }
+
+    async function renderPublicStats(profile) {
+      const accountId = profile?.trackmania_account_id || "";
+      if (!accountId) {
+        if ($("publicWeeklyWins")) $("publicWeeklyWins").textContent = "0";
+        if ($("publicTotalWrs")) $("publicTotalWrs").textContent = "0";
+        return;
+      }
+
+      try {
+        const data = await loadStatsData(accountId);
+        const weekly = findPlayerByAccountId(data.weeklyAggregate.players, accountId);
+        const wrPlayerListRecord = findPlayerByAccountId(data.wrPlayers.players, accountId);
+        const wrTotal = getWrTotal(data.wrPlayerFile, wrPlayerListRecord);
+
+        if ($("publicWeeklyWins")) $("publicWeeklyWins").textContent = Number(weekly?.wins || 0).toLocaleString();
+        if ($("publicTotalWrs")) $("publicTotalWrs").textContent = Number(wrTotal || 0).toLocaleString();
+      } catch (err) {
+        console.warn("Could not load public stats:", err);
+      }
+    }
+
+    async function bootPublicProfile(request) {
+      $("accountLocked").classList.remove("show");
+      $("accountAuthed").classList.remove("show");
+      $("accountPublic").classList.add("show");
+
+      const titleEl = document.querySelector(".account-title");
+      const subtitleEl = document.querySelector(".account-subtitle");
+      const kickerEl = document.querySelector(".account-kicker");
+      if (kickerEl) kickerEl.textContent = "Public Profile";
+      if (titleEl) titleEl.textContent = "Trackmania Events public profile";
+      if (subtitleEl) subtitleEl.textContent = "Viewing selected public badges, equipped profile style, and public Trackmania stats.";
+
+      try {
+        const profile = await findPublicProfile(request);
+        if (!profile?.id) {
+          $("publicProfileContent").style.display = "none";
+          $("publicProfileError").style.display = "";
+          $("publicProfileError").textContent = "Could not find that public profile.";
+          $("publicProfileUsername").textContent = request.name || "Unknown profile";
+          $("publicProfileTrackmania").textContent = "Profile not found";
+          return;
+        }
+
+        const [visiblePrefs, contributionFlags, role, loadout] = await Promise.all([
+          loadPublicVisiblePrefsForUser(profile.id),
+          loadPublicContributionFlagsForUser(profile.id),
+          loadPublicRoleForUser(profile.id),
+          loadPublicPrizeLoadoutForUser(profile.id),
+        ]);
+
+        const badges = await calculatePublicVerifiedBadges(profile, visiblePrefs, contributionFlags, role);
+        const username = profile.username || request.name || "Player";
+        const tmName = profile.trackmania_display_name || "";
+        const tmId = profile.trackmania_account_id || "";
+        const tmSummary = tmName || tmId || "Not linked publicly";
+        const cosmeticCount = [loadout.flair, loadout.title, loadout.frame, loadout.nameplate, ...(loadout.stickers || [])].filter(Boolean).length;
+
+        document.title = `${username} — Trackmania Events`;
+        if (titleEl) titleEl.textContent = `${username}'s public profile`;
+
+        $("publicProfileUsername").textContent = username;
+        $("publicProfileTrackmania").textContent = tmSummary;
+        $("publicUsernameMirror").textContent = username;
+        $("publicTmSummary").textContent = tmSummary;
+        $("publicVisibleBadgeCount").textContent = badges.length.toLocaleString();
+        $("publicEquippedCount").textContent = cosmeticCount.toLocaleString();
+        $("publicBadgeSummary").textContent = badges.length ? badges.map(getBadgeText).join(" · ") : "No visible badges selected";
+
+        const cosmeticNames = [
+          loadout.flair?.name ? `Flair: ${loadout.flair.name}` : "",
+          loadout.title?.name ? `Title: ${loadout.title.name}` : "",
+          loadout.frame?.name ? `Frame: ${loadout.frame.name}` : "",
+          loadout.nameplate?.name ? `Nameplate: ${loadout.nameplate.name}` : "",
+          ...(loadout.stickers || []).map((s, i) => `Sticker ${i + 1}: ${s.name}`),
+        ].filter(Boolean);
+
+        $("publicCosmeticSummary").textContent = cosmeticNames.length ? cosmeticNames.join(" · ") : "No public cosmetics equipped";
+
+        renderPublicProfilePreview(profile, badges, loadout);
+        await renderPublicStats(profile);
+      } catch (err) {
+        console.warn("Public profile failed:", err);
+        $("publicProfileContent").style.display = "none";
+        $("publicProfileError").style.display = "";
+        $("publicProfileError").textContent = err.message || "Could not load this public profile.";
+      }
+    }
+
+
     async function bootAccountPage() {
       $("year").textContent = new Date().getFullYear();
       initAccountTabs();
@@ -3412,13 +3864,20 @@ header .auth-user-menu button:hover {
         window.addEventListener("scroll", () => { toTop.classList.toggle("show", window.scrollY > 500); }, { passive: true });
         toTop.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
       }
-      $("savePrefsBtn").addEventListener("click", savePreferences);
+
+      const publicRequest = getPublicProfileRequest();
+      if (publicRequest) {
+        await bootPublicProfile(publicRequest);
+        return;
+      }
+
+      if ($("savePrefsBtn")) $("savePrefsBtn").addEventListener("click", savePreferences);
       if ($("saveBadgesBtn")) $("saveBadgesBtn").addEventListener("click", saveVisibleBadges);
       if ($("saveLoadoutBtn")) $("saveLoadoutBtn").addEventListener("click", savePrizeLoadout);
-      $("saveTmBtn").addEventListener("click", saveTrackmaniaAccount);
-      $("clearTmBtn").addEventListener("click", clearTrackmaniaAccount);
-      $("resetPasswordBtn").addEventListener("click", sendPasswordReset);
-      $("logoutBtn").addEventListener("click", logout);
+      if ($("saveTmBtn")) $("saveTmBtn").addEventListener("click", saveTrackmaniaAccount);
+      if ($("clearTmBtn")) $("clearTmBtn").addEventListener("click", clearTrackmaniaAccount);
+      if ($("resetPasswordBtn")) $("resetPasswordBtn").addEventListener("click", sendPasswordReset);
+      if ($("logoutBtn")) $("logoutBtn").addEventListener("click", logout);
 
       try {
         const { data } = await tmeSupabase.auth.getSession();
