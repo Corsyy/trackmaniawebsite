@@ -453,6 +453,33 @@
 </div>
 </div>
 <div class="reaction-picker-menu" id="reactionPickerMenu"></div>
+<div class="shout-profile-popover" id="shoutProfilePopover" aria-hidden="true">
+<div class="shout-profile-card" id="shoutProfileCard" role="dialog" aria-label="Shoutbox mini profile">
+<button class="shout-profile-close" id="shoutProfileClose" type="button" aria-label="Close mini profile">×</button>
+<div class="shout-profile-top">
+<div class="shout-profile-avatar" aria-hidden="true">🏁</div>
+<div class="shout-profile-main">
+<div class="shout-profile-kicker">Mini Profile</div>
+<strong id="shoutProfileName">Loading…</strong>
+<span id="shoutProfileTm">Loading profile…</span>
+</div>
+</div>
+<div class="shout-profile-preview" id="shoutProfilePreview">
+<div class="shout-profile-empty">Loading public style…</div>
+</div>
+<div class="shout-profile-grid">
+<div><span>Role</span><strong id="shoutProfileRole">User</strong></div>
+<div><span>Badges</span><strong id="shoutProfileBadgeCount">0</strong></div>
+<div><span>Weekly Wins</span><strong id="shoutProfileWeeklyWins">0</strong></div>
+<div><span>Total WRs</span><strong id="shoutProfileTotalWrs">0</strong></div>
+</div>
+<div class="shout-profile-mini-list" id="shoutProfileSummary"></div>
+<div class="shout-profile-actions">
+<a class="btn primary" id="shoutProfileFullLink" href="/account">View Full Profile</a>
+<button class="btn" id="shoutProfileCloseBtn" type="button">Close</button>
+</div>
+</div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const TTV_CHANNEL = "Ryvennox";
@@ -480,6 +507,7 @@
     const shoutBadgeProfilesByUserId = {};
     const shoutBadgesByUserId = {};
     const shoutCosmeticsByUserId = {};
+    const shoutMiniProfilesByUserId = {};
     let weeklyBadgeStatePromise = null;
     const supabaseConfigured =
       typeof window.supabase !== "undefined" &&
@@ -3007,6 +3035,15 @@
         if (contributions.highlightUsers.has(userId)) earnedBadges.push({ badge_key: "highlight_contributor", key: "highlight", icon: "🎬", label: "Highlight Contributor", default_order: 60 });
 
         shoutBadgesByUserId[userId] = filterVisibleEarnedBadges(userId, earnedBadges, visiblePrefsByUser);
+        shoutMiniProfilesByUserId[userId] = {
+          user_id: userId,
+          role,
+          profile,
+          weeklyWins,
+          totalWrs: 0,
+          badges: shoutBadgesByUserId[userId] || [],
+          loadout: shoutCosmeticsByUserId[userId] || {},
+        };
       }
     }
 
@@ -3138,11 +3175,181 @@
         return `<span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span>`;
       }
 
+      const safeId = normalizeUuidList([msg.user_id])[0] || "";
       const href = getPublicAccountUrl(msg);
-      return `<a class="shout-name-link" href="${escapeHtml(href)}" title="View ${escapeHtml(displayName)}'s profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
+      return `<button class="shout-name-link" type="button" data-shout-profile-user="${escapeHtml(safeId)}" data-shout-profile-name="${escapeHtml(displayName)}" data-shout-profile-href="${escapeHtml(href)}" title="View ${escapeHtml(displayName)}'s mini profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></button>`;
     }
 
 
+
+
+    function getShoutMiniProfileUrlFromName(username, userId = "") {
+      const cleanName = cleanPublicProfileName(username || "");
+      if (cleanName && cleanName.toUpperCase() !== "SYSTEM") return `/account?name=${encodeURIComponent(cleanName)}`;
+      const safeId = normalizeUuidList([userId])[0] || "";
+      return safeId ? `/account?user=${encodeURIComponent(safeId)}` : "/account";
+    }
+
+    function profileStatLookupByAccountId(accountId) {
+      if (!accountId) return Promise.resolve({ weeklyWins: 0, totalWrs: 0 });
+      return Promise.all([
+        fetch("/data/weekly-shorts/aggregate.json?cb=" + Date.now(), { cache: "no-store" }).then((r) => r.ok ? r.json() : { players: [] }).catch(() => ({ players: [] })),
+        fetch("/data/wr/players.json?cb=" + Date.now(), { cache: "no-store" }).then((r) => r.ok ? r.json() : { players: [] }).catch(() => ({ players: [] })),
+      ]).then(([weekly, wr]) => {
+        const weeklyRow = (Array.isArray(weekly?.players) ? weekly.players : []).find((p) => p?.accountId === accountId);
+        const wrRow = (Array.isArray(wr?.players) ? wr.players : []).find((p) => p?.accountId === accountId);
+        return {
+          weeklyWins: Number(weeklyRow?.wins || 0),
+          totalWrs: Number(wrRow?.wrs ?? wrRow?.wrCount ?? wrRow?.totalWRs ?? 0),
+        };
+      }).catch(() => ({ weeklyWins: 0, totalWrs: 0 }));
+    }
+
+    function miniProfileBadgeText(badges) {
+      const arr = Array.isArray(badges) ? badges : [];
+      if (!arr.length) return "No visible badges selected";
+      return arr.map((badge) => `${badge.icon || ""} ${badge.label || "Badge"}`.trim()).join(" · ");
+    }
+
+    function miniProfileCosmeticText(loadout) {
+      const parts = [];
+      if (loadout?.flair?.label) parts.push(`Flair: ${loadout.flair.icon || ""} ${loadout.flair.label}`.trim());
+      if (loadout?.title?.label) parts.push(`Title: ${loadout.title.icon || ""} ${loadout.title.label}`.trim());
+      if (loadout?.nameplate?.label) parts.push(`Nameplate: ${loadout.nameplate.icon || ""} ${loadout.nameplate.label}`.trim());
+      if (loadout?.frame?.label) parts.push(`Frame: ${loadout.frame.icon || ""} ${loadout.frame.label}`.trim());
+      const stickers = Array.isArray(loadout?.stickers) ? loadout.stickers : [];
+      stickers.slice(0, 3).forEach((item, index) => {
+        parts.push(`Sticker ${index + 1}: ${item.icon || "✨"} ${item.label || "Sticker"}`);
+      });
+      return parts.length ? parts.join(" · ") : "No public cosmetics equipped";
+    }
+
+    function miniProfileFrameClasses(loadout) {
+      const frame = loadout?.frame;
+      if (!frame) return "";
+      return [
+        `frame-tier-${cleanCssToken(frame.tier)}`,
+        `frame-theme-${cleanCssToken(frame.theme)}`,
+        `frame-item-${cleanCssToken(frame.item_key)}`,
+      ].join(" ");
+    }
+
+    function miniProfileNameplateClasses(loadout) {
+      const nameplate = loadout?.nameplate;
+      if (!nameplate) return "";
+      return [
+        "has-nameplate",
+        `nameplate-tier-${cleanCssToken(nameplate.tier)}`,
+        `nameplate-theme-${cleanCssToken(nameplate.theme)}`,
+        `nameplate-item-${cleanCssToken(nameplate.item_key)}`,
+      ].join(" ");
+    }
+
+    function renderMiniProfilePreview(username, badges, loadout) {
+      const visibleBadges = miniProfileBadgeText(badges);
+      const cosmetics = [loadout?.flair, loadout?.title].filter(Boolean);
+      const stickers = Array.isArray(loadout?.stickers) ? loadout.stickers.slice(0, 3) : [];
+      const frameClasses = miniProfileFrameClasses(loadout);
+      const nameplateClasses = miniProfileNameplateClasses(loadout);
+      const stickerHtml = stickers.length
+        ? `<span class="mini-profile-stickers">${stickers.map((item) => `<span title="${escapeHtml(item.label || "Sticker")}">${escapeHtml(item.icon || "✨")}</span>`).join("")}</span>`
+        : "";
+
+      return `
+        <div class="mini-profile-preview-card ${escapeHtml(frameClasses)}">
+          <div class="mini-profile-identity">
+            <span class="mini-profile-name ${escapeHtml(nameplateClasses)}">${escapeHtml(username || "Player")}</span>
+            <span class="mini-profile-badges">${escapeHtml(visibleBadges)}</span>
+            ${cosmetics.length ? `<span class="mini-profile-cosmetics">${cosmetics.map((item) => `${item.icon || ""} ${item.label || "Item"}`.trim()).map(escapeHtml).join(" · ")}</span>` : ""}
+            ${stickerHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    async function openShoutMiniProfileFromButton(button) {
+      const popover = document.getElementById("shoutProfilePopover");
+      const card = document.getElementById("shoutProfileCard");
+      if (!popover || !card || !button) return;
+
+      const userId = button.dataset.shoutProfileUser || "";
+      const username = button.dataset.shoutProfileName || "Player";
+      const href = button.dataset.shoutProfileHref || getShoutMiniProfileUrlFromName(username, userId);
+
+      const profileData = shoutMiniProfilesByUserId[userId] || {};
+      const role = profileData.role || shoutRolesByUserId[userId] || "user";
+      const profile = profileData.profile || shoutBadgeProfilesByUserId[userId] || {};
+      const badges = profileData.badges || shoutBadgesByUserId[userId] || [];
+      const loadout = profileData.loadout || shoutCosmeticsByUserId[userId] || {};
+      const tmAccountId = profile.trackmania_account_id || "";
+      const tmText = tmAccountId ? "Trackmania account linked" : "No public Trackmania link";
+
+      document.getElementById("shoutProfileName").textContent = username;
+      document.getElementById("shoutProfileTm").textContent = tmText;
+      document.getElementById("shoutProfileRole").textContent = role === "admin" ? "Admin" : role === "mod" ? "Moderator" : "User";
+      document.getElementById("shoutProfileBadgeCount").textContent = Number(badges.length || 0).toLocaleString();
+      document.getElementById("shoutProfileWeeklyWins").textContent = Number(profileData.weeklyWins || 0).toLocaleString();
+      document.getElementById("shoutProfileTotalWrs").textContent = Number(profileData.totalWrs || 0).toLocaleString();
+      document.getElementById("shoutProfilePreview").innerHTML = renderMiniProfilePreview(username, badges, loadout);
+      document.getElementById("shoutProfileSummary").innerHTML = `
+        <div><span>Visible Badges</span><strong>${escapeHtml(miniProfileBadgeText(badges))}</strong></div>
+        <div><span>Public Style</span><strong>${escapeHtml(miniProfileCosmeticText(loadout))}</strong></div>
+      `;
+      const fullLink = document.getElementById("shoutProfileFullLink");
+      if (fullLink) fullLink.href = href;
+
+      popover.classList.add("show");
+      popover.setAttribute("aria-hidden", "false");
+
+      const rect = button.getBoundingClientRect();
+      const pad = 12;
+      const cardWidth = Math.min(360, window.innerWidth - pad * 2);
+      card.style.width = `${cardWidth}px`;
+
+      let left = rect.left;
+      let top = rect.bottom + 10;
+
+      if (left + cardWidth > window.innerWidth - pad) left = window.innerWidth - cardWidth - pad;
+      if (left < pad) left = pad;
+
+      requestAnimationFrame(() => {
+        const cardRect = card.getBoundingClientRect();
+        if (top + cardRect.height > window.innerHeight - pad) {
+          top = Math.max(pad, rect.top - cardRect.height - 10);
+        }
+        card.style.left = `${left}px`;
+        card.style.top = `${top}px`;
+      });
+
+      if (tmAccountId && !profileData.statsLoaded) {
+        const stats = await profileStatLookupByAccountId(tmAccountId);
+        profileData.weeklyWins = stats.weeklyWins;
+        profileData.totalWrs = stats.totalWrs;
+        profileData.statsLoaded = true;
+        shoutMiniProfilesByUserId[userId] = profileData;
+        document.getElementById("shoutProfileWeeklyWins").textContent = Number(stats.weeklyWins || 0).toLocaleString();
+        document.getElementById("shoutProfileTotalWrs").textContent = Number(stats.totalWrs || 0).toLocaleString();
+      }
+    }
+
+    function closeShoutMiniProfile() {
+      const popover = document.getElementById("shoutProfilePopover");
+      if (!popover) return;
+      popover.classList.remove("show");
+      popover.setAttribute("aria-hidden", "true");
+    }
+
+    document.getElementById("shoutProfileClose")?.addEventListener("click", closeShoutMiniProfile);
+    document.getElementById("shoutProfileCloseBtn")?.addEventListener("click", closeShoutMiniProfile);
+    document.addEventListener("click", (event) => {
+      const popover = document.getElementById("shoutProfilePopover");
+      if (!popover?.classList.contains("show")) return;
+      if (event.target.closest("#shoutProfileCard") || event.target.closest("[data-shout-profile-user]")) return;
+      closeShoutMiniProfile();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeShoutMiniProfile();
+    });
 
     function getShoutRole(msg) {
       return shoutRolesByUserId[msg?.user_id] || "user";
@@ -3337,6 +3544,14 @@
     }
     if (shoutboxMessages) {
       shoutboxMessages.onclick = async (event) => {
+        const profileBtn = event.target.closest("[data-shout-profile-user]");
+        if (profileBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          await openShoutMiniProfileFromButton(profileBtn);
+          return;
+        }
+
         const deleteBtn = event.target.closest("[data-delete-shout]");
         if (deleteBtn) {
           await deleteShoutMessage(deleteBtn.dataset.deleteShout);
