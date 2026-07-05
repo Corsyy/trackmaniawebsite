@@ -3088,7 +3088,7 @@
     function renderShoutBadges(userId) {
       const verifiedBadges = shoutBadgesByUserId[userId] || [];
       const loadout = shoutCosmeticsByUserId[userId] || {};
-      const cosmetics = [loadout.flair, loadout.title].filter(Boolean).slice(0, 2);
+      const cosmetics = [loadout.title].filter(Boolean).slice(0, 1);
       const badges = [
         ...verifiedBadges.map((badge) => ({ ...badge, isCosmetic: false })),
         ...cosmetics.map((item) => ({
@@ -3149,14 +3149,30 @@
     }
 
     function getShoutNameplateClasses(userId) {
-      const nameplate = shoutCosmeticsByUserId[userId]?.nameplate;
-      if (!nameplate) return "";
-      return [
-        "has-nameplate",
-        `nameplate-tier-${cleanCssToken(nameplate.tier)}`,
-        `nameplate-theme-${cleanCssToken(nameplate.theme)}`,
-        `nameplate-item-${cleanCssToken(nameplate.item_key)}`,
-      ].join(" ");
+      const loadout = shoutCosmeticsByUserId[userId] || {};
+      const nameplate = loadout.nameplate;
+      const flair = loadout.flair;
+      const classes = [];
+
+      if (nameplate) {
+        classes.push(
+          "has-nameplate",
+          `nameplate-tier-${cleanCssToken(nameplate.tier)}`,
+          `nameplate-theme-${cleanCssToken(nameplate.theme)}`,
+          `nameplate-item-${cleanCssToken(nameplate.item_key)}`
+        );
+      }
+
+      if (flair) {
+        classes.push(
+          "has-flair",
+          `flair-tier-${cleanCssToken(flair.tier)}`,
+          `flair-theme-${cleanCssToken(flair.theme)}`,
+          `flair-item-${cleanCssToken(flair.item_key)}`
+        );
+      }
+
+      return classes.join(" ");
     }
 
 
@@ -3267,7 +3283,7 @@
 
     function miniProfileCosmeticText(loadout) {
       const parts = [];
-      if (loadout?.flair?.label) parts.push(`Flair: ${loadout.flair.icon || ""} ${loadout.flair.label}`.trim());
+      if (loadout?.flair?.label) parts.push(`Name color: ${loadout.flair.icon || ""} ${loadout.flair.label}`.trim());
       if (loadout?.title?.label) parts.push(`Title: ${loadout.title.icon || ""} ${loadout.title.label}`.trim());
       if (loadout?.nameplate?.label) parts.push(`Nameplate: ${loadout.nameplate.icon || ""} ${loadout.nameplate.label}`.trim());
       if (loadout?.frame?.label) parts.push(`Frame: ${loadout.frame.icon || ""} ${loadout.frame.label}`.trim());
@@ -3301,10 +3317,11 @@
 
     function renderMiniProfilePreview(username, badges, loadout) {
       const visibleBadges = miniProfileBadgeText(badges);
-      const cosmetics = [loadout?.flair, loadout?.title].filter(Boolean);
+      const cosmetics = [loadout?.title].filter(Boolean);
+      const flair = loadout?.flair || null;
       const stickers = Array.isArray(loadout?.stickers) ? loadout.stickers.slice(0, 3) : [];
       const frameClasses = miniProfileFrameClasses(loadout);
-      const nameplateClasses = miniProfileNameplateClasses(loadout);
+      const nameplateClasses = [miniProfileNameplateClasses(loadout), flair ? `has-flair flair-tier-${cleanCssToken(flair.tier)} flair-theme-${cleanCssToken(flair.theme)} flair-item-${cleanCssToken(flair.item_key)}` : ""].filter(Boolean).join(" ");
       const stickerHtml = stickers.length
         ? `<span class="mini-profile-stickers">${stickers.map((item) => `<span title="${escapeHtml(item.label || "Sticker")}">${escapeHtml(item.icon || "✨")}</span>`).join("")}</span>`
         : "";
