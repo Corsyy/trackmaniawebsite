@@ -3312,6 +3312,25 @@
       return popover;
     }
 
+
+    function bindShoutMiniProfileCloseButtons() {
+      document.querySelectorAll("#shoutProfileClose, #shoutProfileCloseBtn").forEach((btn) => {
+        if (btn.dataset.profileCloseBound === "1") return;
+        btn.dataset.profileCloseBound = "1";
+        btn.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          closeShoutMiniProfile();
+        }, true);
+        btn.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+        }, true);
+      });
+    }
+
     function getShoutMiniProfileUrlFromName(username, userId = "") {
       const cleanName = cleanPublicProfileName(username || "");
       if (cleanName && cleanName.toUpperCase() !== "SYSTEM") return `/account?name=${encodeURIComponent(cleanName)}`;
@@ -3402,6 +3421,7 @@
 
     async function openShoutMiniProfileFromButton(button) {
       const popover = ensureShoutMiniProfileDom();
+      bindShoutMiniProfileCloseButtons();
       const card = document.getElementById("shoutProfileCard");
       if (!popover || !card || !button) return;
 
@@ -3416,6 +3436,11 @@
       const loadout = profileData.loadout || shoutCosmeticsByUserId[userId] || {};
       const tmAccountId = profile.trackmania_account_id || "";
       const tmText = tmAccountId ? "Trackmania account linked" : "Not linked publicly";
+
+      const frameVars = cosmeticColorFromItem(loadout.frame, loadout.frame?.theme || "default");
+      card.style.setProperty("--profile-accent", frameVars.color);
+      card.style.setProperty("--profile-accent-soft", frameVars.softer);
+      card.style.setProperty("--profile-accent-glow", frameVars.soft);
 
       document.getElementById("shoutProfileName").textContent = username;
       document.getElementById("shoutProfileTm").textContent = tmText;
@@ -3517,6 +3542,12 @@
     document.addEventListener("click", (event) => {
       const popover = document.getElementById("shoutProfilePopover");
       if (!popover?.classList.contains("show")) return;
+      if (event.target.closest("#shoutProfileClose, #shoutProfileCloseBtn")) {
+        event.preventDefault();
+        event.stopPropagation();
+        closeShoutMiniProfile();
+        return;
+      }
       if (event.target.closest("#shoutProfileCard") || event.target.closest("[data-shout-profile-user], .shout-name-link")) return;
       closeShoutMiniProfile();
     });
