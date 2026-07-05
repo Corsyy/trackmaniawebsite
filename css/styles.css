@@ -3414,3 +3414,115 @@ footer {
   }
 }
 
+/* Shoutbox profile links + badge baseline alignment fix v15 */
+.shout-identity {
+  align-items: center !important;
+  align-content: center !important;
+  gap: .20rem .30rem !important;
+  line-height: 1 !important;
+}
+
+.shout-name-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  vertical-align: middle !important;
+}
+
+.shout-name-link:hover .shout-name,
+.shout-name-link:focus-visible .shout-name {
+  color: #fff !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+}
+
+.shout-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+  vertical-align: middle !important;
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+}
+
+.shout-name.has-nameplate {
+  min-height: 20px !important;
+  height: 20px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 20px !important;
+}
+
+.shout-badge-line {
+  display: inline-flex !important;
+  align-items: center !important;
+  align-content: center !important;
+  flex-wrap: wrap !important;
+  gap: .16rem .28rem !important;
+  min-height: 20px !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+}
+
+.shout-badge-label,
+.shout-badge-label.cosmetic {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .18rem !important;
+  min-height: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  vertical-align: middle !important;
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+}
+
+.shout-badge-label.cosmetic {
+  padding-left: .04rem !important;
+  padding-right: .04rem !important;
+}
+
+.shout-badge-label > span,
+.shout-badge-label.cosmetic > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+.shout-stickers {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .16rem !important;
+  min-height: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+  vertical-align: middle !important;
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+}
+
+.shout-stickers span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+}
+
