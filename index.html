@@ -3143,15 +3143,61 @@
     }
 
 
+    function nameplateColorFromItem(item) {
+      if (!item) return null;
+
+      const key = cleanCssToken(item.item_key || item.key || item.name || item.label || "nameplate");
+      const theme = cleanCssToken(item.theme || "general");
+
+      const themePalettes = {
+        stadium: ["#4fdcff", "#53a6ff", "#7cf7ff"],
+        snow: ["#f3fdff", "#b8e7ff", "#d7f6ff"],
+        rally: ["#7ee39c", "#b6e07a", "#c49a5d"],
+        desert: ["#ffc46f", "#ff9a57", "#ffd37e"],
+        night: ["#9aa7ff", "#c48cff", "#7d8cff"],
+        weekly: ["#53a6ff", "#68f0ff", "#8ec6ff"],
+        totd: ["#76f5e6", "#53d6ff", "#b6fff6"],
+        wr: ["#ff6975", "#ff9e6e", "#f5d98a"],
+        champion: ["#f5d98a", "#ffe98a", "#fff0b8"],
+        support: ["#68f0ff", "#7fb1ff", "#bff9ff"],
+        kacky: ["#c88cff", "#ffcf63", "#e3b0ff"],
+        community: ["#7be7d3", "#68f0ff", "#a8ffe9"],
+        general: ["#ff8bd2", "#9aa7ff", "#68f0ff", "#7ee39c", "#ffc46f", "#f5d98a"],
+        default: ["#ff8bd2", "#9aa7ff", "#68f0ff", "#7ee39c", "#ffc46f", "#f5d98a"],
+      };
+
+      const palette = themePalettes[theme] || themePalettes.general;
+
+      let hash = 0;
+      for (let i = 0; i < key.length; i++) hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
+      const color = palette[Math.abs(hash) % palette.length];
+
+      function hexToRgb(hex) {
+        const clean = String(hex || "#ffffff").replace("#", "");
+        return {
+          r: parseInt(clean.slice(0, 2), 16),
+          g: parseInt(clean.slice(2, 4), 16),
+          b: parseInt(clean.slice(4, 6), 16),
+        };
+      }
+
+      const rgb = hexToRgb(color);
+      return {
+        color,
+        soft: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, .48)`,
+        softer: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, .13)`,
+      };
+    }
+
     function nameCosmeticVarsStyle(nameplate, flair) {
-      const name = nameplate ? cosmeticColorFromItem(nameplate, nameplate.theme || "default") : null;
+      const name = nameplate ? nameplateColorFromItem(nameplate) : null;
       const line = flair ? cosmeticColorFromItem(flair, flair.theme || "default") : null;
 
       const nameColor = name?.color || "#f8fbff";
       const nameSoft = name?.soft || "rgba(255,255,255,.22)";
       const lineColor = line?.color || nameColor;
       const lineSoft = line?.soft || nameSoft;
-      const lineBg = line?.softer || "rgba(255,255,255,.08)";
+      const lineBg = line?.softer || name?.softer || "rgba(255,255,255,.08)";
 
       return `--nameplate-color:${nameColor};--nameplate-soft:${nameSoft};--flair-line-color:${lineColor};--flair-line-soft:${lineSoft};--flair-bg:${lineBg};`;
     }
