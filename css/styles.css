@@ -4209,10 +4209,12 @@ footer {
   background: var(--flair-bg, rgba(255,255,255,.036)) !important;
 }
 
+/* hide flair chip text, but keep flair as name color */
 .preview-cosmetic-chip.cosmetic-kind-flair {
   display: none !important;
 }
 
+/* Small layout cleanup inside profile cards */
 .profile-preview-card .cosmetic-preview-row {
   display: flex !important;
   align-items: center !important;
@@ -4222,5 +4224,104 @@ footer {
 
 .profile-preview-card .preview-stickers {
   margin-top: .1rem !important;
+}
+
+/* v23 exact profile cosmetic behavior */
+/* 1) Frame cosmetics DO NOT color the shoutbox message card at all. */
+.shout-msg,
+.shout-msg.has-frame,
+.shout-msg.theme-set-active,
+.shout-msg[class*="frame-theme-"],
+.shout-msg[class*="frame-tier-"],
+.shout-msg[class*="set-theme-"] {
+  border-left-color: rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.018) !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.shout-msg.has-frame::before,
+.shout-msg.has-frame::after,
+.shout-msg.theme-set-active::before,
+.shout-msg.theme-set-active::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* 2) Frame cosmetics color the whole profile preview, public profile preview, and mini profile popup. */
+.profile-preview-card,
+.mini-profile-preview-card,
+.shout-profile-card {
+  border: 2px solid var(--profile-accent, rgba(255,255,255,.18)) !important;
+  border-left-width: 2px !important;
+  background:
+    linear-gradient(135deg, var(--profile-accent-soft, rgba(255,255,255,.035)), rgba(255,255,255,.020) 48%, rgba(0,0,0,.12)) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--profile-accent, #ffffff) 22%, transparent),
+    0 0 18px color-mix(in srgb, var(--profile-accent, #ffffff) 22%, transparent) !important;
+}
+
+/* The outer mini profile card gets the frame color all the way around. */
+.shout-profile-card {
+  border-color: var(--profile-accent, rgba(255,255,255,.18)) !important;
+}
+
+/* 3) Flair cosmetics change the username color only. */
+.shout-name[class*="flair-"],
+.shout-name.has-flair,
+.shout-name-link .shout-name[class*="flair-"],
+.preview-nameplate[class*="flair-"],
+.preview-nameplate.has-flair,
+.mini-profile-name[class*="flair-"],
+.mini-profile-name.has-flair {
+  color: var(--flair-color, #f8fbff) !important;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--flair-color, #ffffff) 22%, transparent) !important;
+}
+
+.shout-name[class*="flair-"].has-nameplate::after,
+.preview-nameplate[class*="flair-"]::after,
+.preview-nameplate.has-flair::after,
+.mini-profile-name[class*="flair-"]::after,
+.mini-profile-name.has-flair::after {
+  background: linear-gradient(90deg, var(--flair-color, #ffffff), rgba(255,255,255,.18)) !important;
+}
+
+/* 4) Flair should not print as a separate cosmetic pill. */
+.preview-cosmetic-chip.cosmetic-kind-flair,
+.mini-profile-cosmetics .mini-flair-name {
+  display: none !important;
+}
+
+/* 5) Keep title/frame/nameplate/stickers as display labels, but use item colors. */
+.preview-cosmetic-chip.cosmetic-kind-title,
+.preview-cosmetic-chip.cosmetic-kind-frame,
+.preview-cosmetic-chip.cosmetic-kind-nameplate,
+.preview-sticker-chip,
+.mini-profile-cosmetics,
+.mini-profile-stickers {
+  border-color: var(--flair-soft, rgba(255,255,255,.10)) !important;
+  background: var(--flair-bg, rgba(255,255,255,.036)) !important;
+  box-shadow: none !important;
+}
+
+/* Mini profile close must always be clickable. */
+#shoutProfileClose,
+#shoutProfileCloseBtn {
+  pointer-events: auto !important;
+  z-index: 2147483647 !important;
+  position: relative !important;
+}
+
+.shout-profile-close {
+  position: absolute !important;
+  top: .65rem !important;
+  right: .65rem !important;
+}
+
+/* Ensure name link is clickable but does not make the message box colorful. */
+.shout-name-link {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 5 !important;
 }
 
