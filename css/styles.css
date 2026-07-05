@@ -4155,3 +4155,72 @@ footer {
   .public-collection-count { text-align:left !important; }
 }
 
+/* Profile cosmetic border + individual color pass v22 */
+/* Shoutbox should not get frame glow/border coloring anymore. Name color still works. */
+.shout-msg.has-frame,
+.shout-msg.has-frame.frame-theme-stadium,
+.shout-msg.has-frame.frame-theme-snow,
+.shout-msg.has-frame.frame-theme-rally,
+.shout-msg.has-frame.frame-theme-desert,
+.shout-msg.has-frame.frame-theme-night,
+.shout-msg.has-frame.frame-theme-weekly,
+.shout-msg.has-frame.frame-theme-totd,
+.shout-msg.has-frame.frame-theme-wr,
+.shout-msg.has-frame.frame-theme-champion,
+.shout-msg.has-frame.frame-theme-support,
+.shout-msg.has-frame.frame-theme-kacky,
+.shout-msg.has-frame.frame-theme-community {
+  border-left-color: rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.018) !important;
+  box-shadow: none !important;
+}
+
+/* Full profile cards get color all the way around */
+.profile-preview-card,
+.mini-profile-preview-card {
+  border: 2px solid var(--profile-accent, rgba(255,255,255,.18)) !important;
+  border-left-width: 2px !important;
+  background: linear-gradient(135deg, var(--profile-accent-soft, rgba(255,255,255,.030)), rgba(255,255,255,.020) 48%, rgba(0,0,0,.12)) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--profile-accent, #ffffff) 25%, transparent),
+    0 0 18px color-mix(in srgb, var(--profile-accent, #ffffff) 20%, transparent) !important;
+}
+
+/* Item-specific cosmetic colors */
+.preview-nameplate[class*="flair-"],
+.mini-profile-name[class*="flair-"],
+.shout-name[class*="flair-"] {
+  color: var(--flair-color, #f8fbff) !important;
+}
+
+.preview-nameplate[class*="flair-"]::after,
+.mini-profile-name[class*="flair-"]::after,
+.shout-name[class*="flair-"].has-nameplate::after {
+  background: linear-gradient(90deg, var(--flair-color, #ffffff), rgba(255,255,255,.18)) !important;
+}
+
+.preview-cosmetic-chip.cosmetic-kind-title,
+.preview-cosmetic-chip.cosmetic-kind-frame,
+.preview-cosmetic-chip.cosmetic-kind-nameplate,
+.preview-sticker-chip,
+.mini-profile-cosmetics,
+.mini-profile-stickers {
+  border-color: var(--flair-soft, rgba(255,255,255,.10)) !important;
+  background: var(--flair-bg, rgba(255,255,255,.036)) !important;
+}
+
+.preview-cosmetic-chip.cosmetic-kind-flair {
+  display: none !important;
+}
+
+.profile-preview-card .cosmetic-preview-row {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: .38rem !important;
+}
+
+.profile-preview-card .preview-stickers {
+  margin-top: .1rem !important;
+}
+
