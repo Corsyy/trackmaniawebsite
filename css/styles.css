@@ -4405,3 +4405,30 @@ footer {
   box-shadow: none !important;
 }
 
+/* v26 non-white nameplate color fix */
+.shout-name.has-nameplate,
+.preview-nameplate,
+.mini-profile-name.has-nameplate {
+  color: var(--nameplate-color, #f8fbff) !important;
+}
+
+.shout-name.has-nameplate::after,
+.preview-nameplate::after,
+.mini-profile-name.has-nameplate::after {
+  background: linear-gradient(90deg, var(--flair-line-color, #ffffff), rgba(255,255,255,.18)) !important;
+}
+
+.shout-name.has-flair:not([class*="nameplate-theme-"]),
+.preview-nameplate.has-flair:not([class*="nameplate-theme-"]),
+.mini-profile-name.has-flair:not([class*="nameplate-theme-"]) {
+  color: #f8fbff !important;
+  text-shadow: none !important;
+}
+
+/* When a nameplate is equipped, never let old nameplate-theme CSS force it back to white. */
+.shout-name[class*="nameplate-"],
+.preview-nameplate[class*="nameplate-"],
+.mini-profile-name[class*="nameplate-"] {
+  color: var(--nameplate-color, #f8fbff) !important;
+}
+
