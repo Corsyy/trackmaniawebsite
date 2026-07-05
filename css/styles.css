@@ -3895,8 +3895,6 @@ footer {
     width: auto !important;
   }
 }
-
-/* Shoutbox v19 mobile click target */
 .shout-name-link {
   min-height: 24px !important;
   touch-action: manipulation !important;
@@ -3904,5 +3902,15 @@ footer {
 
 .shout-name-link .shout-name {
   pointer-events: none !important;
+}
+
+.shout-name-link,
+.shout-name-link * {
+  pointer-events: auto !important;
+}
+
+.shout-name-link {
+  position: relative !important;
+  z-index: 5 !important;
 }
 
