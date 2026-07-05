@@ -3085,6 +3085,63 @@
       return bestTheme ? { theme: bestTheme, count: bestCount } : null;
     }
 
+
+    function cosmeticColorFromItem(item, fallbackTheme = "") {
+      const key = cleanCssToken(item?.item_key || item?.key || item?.name || fallbackTheme || "default");
+      const theme = cleanCssToken(item?.theme || fallbackTheme || "default");
+      const palettes = {
+        stadium: ["#68f0ff", "#53a6ff"],
+        snow: ["#e7fbff", "#9fdcff"],
+        rally: ["#7ee39c", "#b28a52"],
+        desert: ["#ffc46f", "#ff8f4d"],
+        night: ["#9aa7ff", "#6f78ff"],
+        weekly: ["#53a6ff", "#68f0ff"],
+        totd: ["#76f5e6", "#53a6ff"],
+        wr: ["#ff6975", "#f5d98a"],
+        champion: ["#f5d98a", "#fff0b8"],
+        support: ["#68f0ff", "#6ea8ff"],
+        kacky: ["#c88cff", "#ffcf63"],
+        community: ["#7be7d3", "#68f0ff"],
+        general: ["#eaf0ff", "#aeb7c7"],
+        default: ["#eaf0ff", "#aeb7c7"],
+      };
+      const base = palettes[theme] || palettes.default;
+
+      let hash = 0;
+      for (let i = 0; i < key.length; i++) hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
+
+      function hexToRgb(hex) {
+        const clean = String(hex || "#ffffff").replace("#", "");
+        return {
+          r: parseInt(clean.slice(0, 2), 16),
+          g: parseInt(clean.slice(2, 4), 16),
+          b: parseInt(clean.slice(4, 6), 16),
+        };
+      }
+
+      function rgbToHex(r, g, b) {
+        return "#" + [r, g, b].map((n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0")).join("");
+      }
+
+      const a = hexToRgb(base[0]);
+      const b = hexToRgb(base[1]);
+      const mix = 0.28 + ((Math.abs(hash) % 45) / 100);
+      const color = rgbToHex(a.r * (1 - mix) + b.r * mix, a.g * (1 - mix) + b.g * mix, a.b * (1 - mix) + b.b * mix);
+      const soft = `rgba(${hexToRgb(color).r}, ${hexToRgb(color).g}, ${hexToRgb(color).b}, .42)`;
+      const softer = `rgba(${hexToRgb(color).r}, ${hexToRgb(color).g}, ${hexToRgb(color).b}, .12)`;
+
+      return { color, soft, softer };
+    }
+
+    function cosmeticVarsStyle(item, kind = "flair") {
+      if (!item) return "";
+      const c = cosmeticColorFromItem(item, item.theme || "default");
+      if (kind === "frame") {
+        return `--profile-accent:${c.color};--profile-accent-soft:${c.softer};--profile-accent-glow:${c.soft};`;
+      }
+      return `--flair-color:${c.color};--flair-soft:${c.soft};--flair-bg:${c.softer};`;
+    }
+
     function renderShoutBadges(userId) {
       const verifiedBadges = shoutBadgesByUserId[userId] || [];
       const loadout = shoutCosmeticsByUserId[userId] || {};
@@ -3205,8 +3262,10 @@
 
       const safeId = normalizeUuidList([msg.user_id])[0] || "";
       const href = getPublicAccountUrl(msg);
+      const flair = shoutCosmeticsByUserId[msg.user_id]?.flair || null;
+      const flairStyle = cosmeticVarsStyle(flair, "flair");
 
-      return `<a class="shout-name-link" href="${escapeHtml(href)}" data-shout-profile-user="${escapeHtml(safeId)}" data-shout-profile-name="${escapeHtml(displayName)}" data-shout-profile-href="${escapeHtml(href)}" onclick="event.preventDefault(); event.stopPropagation(); if (window.__openShoutMiniProfileFromElement) window.__openShoutMiniProfileFromElement(this); return false;" title="View ${escapeHtml(displayName)}'s mini profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
+      return `<a class="shout-name-link" href="${escapeHtml(href)}" data-shout-profile-user="${escapeHtml(safeId)}" data-shout-profile-name="${escapeHtml(displayName)}" data-shout-profile-href="${escapeHtml(href)}" onclick="event.preventDefault(); event.stopPropagation(); if (window.__openShoutMiniProfileFromElement) window.__openShoutMiniProfileFromElement(this); return false;" title="View ${escapeHtml(displayName)}'s mini profile"><span class="${escapeHtml(classes)}" style="${escapeHtml(flairStyle)}">${escapeHtml(displayName)}</span></a>`;
     }
 
 
@@ -3326,10 +3385,13 @@
         ? `<span class="mini-profile-stickers">${stickers.map((item) => `<span title="${escapeHtml(item.label || "Sticker")}">${escapeHtml(item.icon || "✨")}</span>`).join("")}</span>`
         : "";
 
+      const frameStyle = cosmeticVarsStyle(loadout?.frame, "frame");
+      const flairStyle = cosmeticVarsStyle(loadout?.flair, "flair");
+
       return `
-        <div class="mini-profile-preview-card ${escapeHtml(frameClasses)}">
+        <div class="mini-profile-preview-card ${escapeHtml(frameClasses)}" style="${escapeHtml(frameStyle)}">
           <div class="mini-profile-identity">
-            <span class="mini-profile-name ${escapeHtml(nameplateClasses)}">${escapeHtml(username || "Player")}</span>
+            <span class="mini-profile-name ${escapeHtml(nameplateClasses)}" style="${escapeHtml(flairStyle)}">${escapeHtml(username || "Player")}</span>
             <span class="mini-profile-badges">${escapeHtml(visibleBadges)}</span>
             ${cosmetics.length ? `<span class="mini-profile-cosmetics">${cosmetics.map((item) => `${item.icon || ""} ${item.label || "Item"}`.trim()).map(escapeHtml).join(" · ")}</span>` : ""}
             ${stickerHtml}
@@ -3410,6 +3472,25 @@
       popover.classList.remove("show");
       popover.setAttribute("aria-hidden", "true");
     }
+
+
+    document.addEventListener("click", (event) => {
+      if (event.target.closest?.("#shoutProfileClose, #shoutProfileCloseBtn")) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        closeShoutMiniProfile();
+      }
+    }, true);
+
+    document.addEventListener("pointerdown", (event) => {
+      if (event.target.closest?.("#shoutProfileClose, #shoutProfileCloseBtn")) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        closeShoutMiniProfile();
+      }
+    }, true);
 
     document.addEventListener("click", async (event) => {
       const profileLink = event.target.closest?.("[data-shout-profile-user], .shout-name-link");
