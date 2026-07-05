@@ -3190,7 +3190,7 @@
       const safeId = normalizeUuidList([msg.user_id])[0] || "";
       const href = getPublicAccountUrl(msg);
 
-      return `<a class="shout-name-link" href="${escapeHtml(href)}" data-shout-profile-user="${escapeHtml(safeId)}" data-shout-profile-name="${escapeHtml(displayName)}" data-shout-profile-href="${escapeHtml(href)}" title="View ${escapeHtml(displayName)}'s mini profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
+      return `<a class="shout-name-link" href="${escapeHtml(href)}" data-shout-profile-user="${escapeHtml(safeId)}" data-shout-profile-name="${escapeHtml(displayName)}" data-shout-profile-href="${escapeHtml(href)}" onclick="event.preventDefault(); event.stopPropagation(); if (window.__openShoutMiniProfileFromElement) window.__openShoutMiniProfileFromElement(this); return false;" title="View ${escapeHtml(displayName)}'s mini profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
     }
 
 
@@ -3422,6 +3422,15 @@
       if (event.target.closest("#shoutProfileCard") || event.target.closest("[data-shout-profile-user], .shout-name-link")) return;
       closeShoutMiniProfile();
     });
+
+    document.addEventListener("pointerdown", (event) => {
+      const profileLink = event.target.closest?.("[data-shout-profile-user], .shout-name-link");
+      if (!profileLink || !shoutboxMessages || !shoutboxMessages.contains(profileLink)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      if (window.__openShoutMiniProfileFromElement) window.__openShoutMiniProfileFromElement(profileLink);
+    }, true);
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeShoutMiniProfile();
