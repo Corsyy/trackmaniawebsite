@@ -2984,14 +2984,26 @@
 
     function filterVisibleEarnedBadges(userId, earnedBadges, visiblePrefsByUser) {
       const prefs = visiblePrefsByUser?.[userId] || {};
-      const hasSavedPrefs = Object.keys(prefs).length > 0;
 
       return earnedBadges
         .map((badge) => {
           const pref = prefs[badge.badge_key];
+
+          /*
+            Public shoutbox rule:
+            - Admin can still show from the role lookup as a safe fallback.
+            - Everything else must have an explicit saved public visibility row.
+            This prevents logged-out/mobile views from falling back to every earned badge
+            like Event Organizer when get_public_visible_badges is missing/stale/blocked.
+          */
+          const visible =
+            badge.badge_key === "admin"
+              ? pref?.is_visible !== false
+              : pref?.is_visible === true;
+
           return {
             ...badge,
-            is_visible: hasSavedPrefs ? Boolean(pref?.is_visible) : pref?.is_visible !== false,
+            is_visible: visible,
             display_order: Number(pref?.display_order ?? badge.default_order ?? 0),
           };
         })
@@ -3177,11 +3189,53 @@
 
       const safeId = normalizeUuidList([msg.user_id])[0] || "";
       const href = getPublicAccountUrl(msg);
-      return `<button class="shout-name-link" type="button" data-shout-profile-user="${escapeHtml(safeId)}" data-shout-profile-name="${escapeHtml(displayName)}" data-shout-profile-href="${escapeHtml(href)}" title="View ${escapeHtml(displayName)}'s mini profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></button>`;
+
+      return `<a class="shout-name-link" href="${escapeHtml(href)}" data-shout-profile-user="${escapeHtml(safeId)}" data-shout-profile-name="${escapeHtml(displayName)}" data-shout-profile-href="${escapeHtml(href)}" title="View ${escapeHtml(displayName)}'s mini profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
     }
 
 
 
+
+    function ensureShoutMiniProfileDom() {
+      let popover = document.getElementById("shoutProfilePopover");
+      if (popover) return popover;
+
+      popover = document.createElement("div");
+      popover.className = "shout-profile-popover";
+      popover.id = "shoutProfilePopover";
+      popover.setAttribute("aria-hidden", "true");
+      popover.innerHTML = `
+        <div class="shout-profile-card" id="shoutProfileCard" role="dialog" aria-label="Shoutbox mini profile">
+          <button class="shout-profile-close" id="shoutProfileClose" type="button" aria-label="Close mini profile">×</button>
+          <div class="shout-profile-top">
+            <div class="shout-profile-avatar" aria-hidden="true">🏁</div>
+            <div class="shout-profile-main">
+              <div class="shout-profile-kicker">Mini Profile</div>
+              <strong id="shoutProfileName">Loading…</strong>
+              <span id="shoutProfileTm">Loading profile…</span>
+            </div>
+          </div>
+          <div class="shout-profile-preview" id="shoutProfilePreview">
+            <div class="shout-profile-empty">Loading public style…</div>
+          </div>
+          <div class="shout-profile-grid">
+            <div><span>Role</span><strong id="shoutProfileRole">User</strong></div>
+            <div><span>Badges</span><strong id="shoutProfileBadgeCount">0</strong></div>
+            <div><span>Weekly Wins</span><strong id="shoutProfileWeeklyWins">0</strong></div>
+            <div><span>Total WRs</span><strong id="shoutProfileTotalWrs">0</strong></div>
+          </div>
+          <div class="shout-profile-mini-list" id="shoutProfileSummary"></div>
+          <div class="shout-profile-actions">
+            <a class="btn primary" id="shoutProfileFullLink" href="/account">View Full Profile</a>
+            <button class="btn" id="shoutProfileCloseBtn" type="button">Close</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(popover);
+      document.getElementById("shoutProfileClose")?.addEventListener("click", closeShoutMiniProfile);
+      document.getElementById("shoutProfileCloseBtn")?.addEventListener("click", closeShoutMiniProfile);
+      return popover;
+    }
 
     function getShoutMiniProfileUrlFromName(username, userId = "") {
       const cleanName = cleanPublicProfileName(username || "");
@@ -3268,13 +3322,13 @@
     }
 
     async function openShoutMiniProfileFromButton(button) {
-      const popover = document.getElementById("shoutProfilePopover");
+      const popover = ensureShoutMiniProfileDom();
       const card = document.getElementById("shoutProfileCard");
       if (!popover || !card || !button) return;
 
       const userId = button.dataset.shoutProfileUser || "";
-      const username = button.dataset.shoutProfileName || "Player";
-      const href = button.dataset.shoutProfileHref || getShoutMiniProfileUrlFromName(username, userId);
+      const username = button.dataset.shoutProfileName || button.textContent?.trim() || "Player";
+      const href = button.dataset.shoutProfileHref || button.getAttribute("href") || getShoutMiniProfileUrlFromName(username, userId);
 
       const profileData = shoutMiniProfilesByUserId[userId] || {};
       const role = profileData.role || shoutRolesByUserId[userId] || "user";
@@ -3282,7 +3336,7 @@
       const badges = profileData.badges || shoutBadgesByUserId[userId] || [];
       const loadout = profileData.loadout || shoutCosmeticsByUserId[userId] || {};
       const tmAccountId = profile.trackmania_account_id || "";
-      const tmText = tmAccountId ? "Trackmania account linked" : "No public Trackmania link";
+      const tmText = tmAccountId ? "Trackmania account linked" : "Not linked publicly";
 
       document.getElementById("shoutProfileName").textContent = username;
       document.getElementById("shoutProfileTm").textContent = tmText;
@@ -3295,6 +3349,7 @@
         <div><span>Visible Badges</span><strong>${escapeHtml(miniProfileBadgeText(badges))}</strong></div>
         <div><span>Public Style</span><strong>${escapeHtml(miniProfileCosmeticText(loadout))}</strong></div>
       `;
+
       const fullLink = document.getElementById("shoutProfileFullLink");
       if (fullLink) fullLink.href = href;
 
@@ -3339,17 +3394,39 @@
       popover.setAttribute("aria-hidden", "true");
     }
 
-    document.getElementById("shoutProfileClose")?.addEventListener("click", closeShoutMiniProfile);
-    document.getElementById("shoutProfileCloseBtn")?.addEventListener("click", closeShoutMiniProfile);
+    document.addEventListener("click", async (event) => {
+      const profileLink = event.target.closest?.("[data-shout-profile-user], .shout-name-link");
+      if (!profileLink || !shoutboxMessages || !shoutboxMessages.contains(profileLink)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      await openShoutMiniProfileFromButton(profileLink);
+    }, true);
+
+    document.addEventListener("touchend", async (event) => {
+      const profileLink = event.target.closest?.("[data-shout-profile-user], .shout-name-link");
+      if (!profileLink || !shoutboxMessages || !shoutboxMessages.contains(profileLink)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      await openShoutMiniProfileFromButton(profileLink);
+    }, { capture: true, passive: false });
+
     document.addEventListener("click", (event) => {
       const popover = document.getElementById("shoutProfilePopover");
       if (!popover?.classList.contains("show")) return;
-      if (event.target.closest("#shoutProfileCard") || event.target.closest("[data-shout-profile-user]")) return;
+      if (event.target.closest("#shoutProfileCard") || event.target.closest("[data-shout-profile-user], .shout-name-link")) return;
       closeShoutMiniProfile();
     });
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeShoutMiniProfile();
     });
+
 
     function getShoutRole(msg) {
       return shoutRolesByUserId[msg?.user_id] || "user";
@@ -3544,7 +3621,7 @@
     }
     if (shoutboxMessages) {
       shoutboxMessages.onclick = async (event) => {
-        const profileBtn = event.target.closest("[data-shout-profile-user]");
+        const profileBtn = event.target.closest("[data-shout-profile-user], .shout-name-link");
         if (profileBtn) {
           event.preventDefault();
           event.stopPropagation();
