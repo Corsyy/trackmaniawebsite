@@ -3896,3 +3896,13 @@ footer {
   }
 }
 
+/* Shoutbox v19 mobile click target */
+.shout-name-link {
+  min-height: 24px !important;
+  touch-action: manipulation !important;
+}
+
+.shout-name-link .shout-name {
+  pointer-events: none !important;
+}
+
