@@ -4325,3 +4325,83 @@ footer {
   z-index: 5 !important;
 }
 
+/* v24 mini profile close button position fix */
+.shout-profile-card {
+  position: fixed !important;
+}
+
+#shoutProfileClose,
+.shout-profile-close {
+  position: absolute !important;
+  top: .75rem !important;
+  right: .75rem !important;
+  left: auto !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 11px !important;
+  z-index: 2147483647 !important;
+  transform: none !important;
+}
+
+.shout-profile-top {
+  padding-right: 2.75rem !important;
+}
+
+/* v25 cosmetic role swap:
+   - Flair controls underline beneath the username.
+   - Nameplate controls username color.
+   - Frame controls profile/mini/public card border only.
+*/
+.shout-name[class*="flair-"],
+.shout-name.has-flair,
+.shout-name-link .shout-name[class*="flair-"],
+.preview-nameplate[class*="flair-"],
+.preview-nameplate.has-flair,
+.mini-profile-name[class*="flair-"],
+.mini-profile-name.has-flair,
+.shout-name[class*="nameplate-"],
+.preview-nameplate[class*="nameplate-"],
+.mini-profile-name[class*="nameplate-"] {
+  color: var(--nameplate-color, #f8fbff) !important;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--nameplate-color, #ffffff) 20%, transparent) !important;
+}
+
+.shout-name.has-nameplate::after,
+.preview-nameplate::after,
+.mini-profile-name.has-nameplate::after,
+.shout-name[class*="flair-"].has-nameplate::after,
+.preview-nameplate[class*="flair-"]::after,
+.preview-nameplate.has-flair::after,
+.mini-profile-name[class*="flair-"]::after,
+.mini-profile-name.has-flair::after {
+  background: linear-gradient(90deg, var(--flair-line-color, #ffffff), rgba(255,255,255,.18)) !important;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--flair-line-color, #ffffff) 24%, transparent) !important;
+}
+
+/* If no nameplate is equipped, keep normal text color but still allow flair underline. */
+.shout-name.has-flair:not([class*="nameplate-theme-"]),
+.preview-nameplate.has-flair:not([class*="nameplate-theme-"]),
+.mini-profile-name.has-flair:not([class*="nameplate-theme-"]) {
+  color: #f8fbff !important;
+  text-shadow: none !important;
+}
+
+/* Account text copy fix for the changed meaning. */
+.account-field label[for="loadoutFlair"] + select + .help::after {
+  content: "";
+}
+
+.shout-msg.has-frame,
+.shout-msg[class*="frame-theme-"] {
+  border-left-color: rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.018) !important;
+  box-shadow: none !important;
+}
+
