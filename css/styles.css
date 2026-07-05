@@ -3325,3 +3325,92 @@ footer {
   color: rgba(234,240,255,.72);
   line-height: 1.65;
 }
+
+/* v14 shoutbox profile links + selected badge alignment fix */
+.shout-meta,
+.shout-identity {
+  align-items: center !important;
+}
+
+.shout-identity {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: .26rem .42rem !important;
+  line-height: 1.2 !important;
+}
+
+.shout-name-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+.shout-name-link:hover .shout-name,
+.shout-name-link:focus-visible .shout-name {
+  color: #fff !important;
+  border-color: rgba(104,240,255,.30) !important;
+  background: rgba(104,240,255,.075) !important;
+}
+
+.shout-name-link:focus-visible {
+  outline: none !important;
+}
+
+.shout-name,
+.shout-badge-line,
+.shout-badge-label,
+.shout-stickers,
+.shout-stickers > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+.shout-badge-line {
+  flex-wrap: wrap !important;
+  gap: .20rem .34rem !important;
+  transform: none !important;
+  margin-top: 0 !important;
+}
+
+.shout-badge-label {
+  gap: .18rem !important;
+  transform: none !important;
+  position: relative !important;
+  top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.shout-badge-label > span[aria-hidden="true"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
+  transform: translateY(.5px) !important;
+}
+
+.shout-stickers {
+  transform: none !important;
+  position: relative !important;
+  top: 0 !important;
+  margin-top: 0 !important;
+}
+
+@media (max-width: 560px) {
+  .shout-identity {
+    gap: .24rem .34rem !important;
+  }
+
+  .shout-name-link,
+  .shout-name,
+  .shout-badge-line,
+  .shout-badge-label,
+  .shout-stickers {
+    line-height: 1 !important;
+  }
+}
+
