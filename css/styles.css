@@ -3526,3 +3526,119 @@ footer {
   line-height: 20px !important;
 }
 
+/* Shoutbox badge alignment hard reset v16 */
+.shout-meta {
+  align-items: flex-start !important;
+}
+
+.shout-identity {
+  display: flex !important;
+  align-items: center !important;
+  align-content: center !important;
+  flex-wrap: wrap !important;
+  gap: .18rem .34rem !important;
+  min-height: 22px !important;
+  line-height: 22px !important;
+}
+
+.shout-name-link,
+.shout-name,
+.shout-badge-line,
+.shout-badge-label,
+.shout-badge-label.cosmetic,
+.shout-stickers,
+.shout-stickers span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  position: static !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 22px !important;
+  min-height: 22px !important;
+  height: 22px !important;
+}
+
+.shout-name {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.shout-name.has-nameplate {
+  padding: 0 .08rem !important;
+  line-height: 22px !important;
+  min-height: 22px !important;
+  height: 22px !important;
+}
+
+.shout-name.has-nameplate::after {
+  bottom: 2px !important;
+}
+
+.shout-badge-line {
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: .18rem .34rem !important;
+}
+
+.shout-badge-label,
+.shout-badge-label.cosmetic {
+  gap: .18rem !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  white-space: nowrap !important;
+}
+
+.shout-badge-label::before,
+.shout-badge-label.cosmetic::before {
+  content: none !important;
+  display: none !important;
+}
+
+.shout-badge-label > span,
+.shout-badge-label.cosmetic > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 22px !important;
+  min-height: 22px !important;
+  height: 22px !important;
+  transform: none !important;
+}
+
+.shout-stickers {
+  gap: .16rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.shout-text {
+  margin-top: .20rem !important;
+}
+
+@media (max-width: 560px) {
+  .shout-identity {
+    gap: .18rem .30rem !important;
+    line-height: 22px !important;
+  }
+
+  .shout-name-link,
+  .shout-name,
+  .shout-badge-line,
+  .shout-badge-label,
+  .shout-badge-label.cosmetic,
+  .shout-stickers,
+  .shout-stickers span {
+    line-height: 22px !important;
+    min-height: 22px !important;
+    height: 22px !important;
+  }
+}
+
