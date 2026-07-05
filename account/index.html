@@ -2180,6 +2180,79 @@ header .auth-user-menu button:hover {
   .public-collection-count { text-align:left !important; }
 }
 
+
+
+/* Profile cosmetic border + individual color pass v22 */
+/* Shoutbox should not get frame glow/border coloring anymore. Name color still works. */
+.shout-msg.has-frame,
+.shout-msg.has-frame.frame-theme-stadium,
+.shout-msg.has-frame.frame-theme-snow,
+.shout-msg.has-frame.frame-theme-rally,
+.shout-msg.has-frame.frame-theme-desert,
+.shout-msg.has-frame.frame-theme-night,
+.shout-msg.has-frame.frame-theme-weekly,
+.shout-msg.has-frame.frame-theme-totd,
+.shout-msg.has-frame.frame-theme-wr,
+.shout-msg.has-frame.frame-theme-champion,
+.shout-msg.has-frame.frame-theme-support,
+.shout-msg.has-frame.frame-theme-kacky,
+.shout-msg.has-frame.frame-theme-community {
+  border-left-color: rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.018) !important;
+  box-shadow: none !important;
+}
+
+/* Full profile cards get color all the way around */
+.profile-preview-card,
+.mini-profile-preview-card {
+  border: 2px solid var(--profile-accent, rgba(255,255,255,.18)) !important;
+  border-left-width: 2px !important;
+  background: linear-gradient(135deg, var(--profile-accent-soft, rgba(255,255,255,.030)), rgba(255,255,255,.020) 48%, rgba(0,0,0,.12)) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--profile-accent, #ffffff) 25%, transparent),
+    0 0 18px color-mix(in srgb, var(--profile-accent, #ffffff) 20%, transparent) !important;
+}
+
+/* Item-specific cosmetic colors */
+.preview-nameplate[class*="flair-"],
+.mini-profile-name[class*="flair-"],
+.shout-name[class*="flair-"] {
+  color: var(--flair-color, #f8fbff) !important;
+}
+
+.preview-nameplate[class*="flair-"]::after,
+.mini-profile-name[class*="flair-"]::after,
+.shout-name[class*="flair-"].has-nameplate::after {
+  background: linear-gradient(90deg, var(--flair-color, #ffffff), rgba(255,255,255,.18)) !important;
+}
+
+.preview-cosmetic-chip.cosmetic-kind-title,
+.preview-cosmetic-chip.cosmetic-kind-frame,
+.preview-cosmetic-chip.cosmetic-kind-nameplate,
+.preview-sticker-chip,
+.mini-profile-cosmetics,
+.mini-profile-stickers {
+  border-color: var(--flair-soft, rgba(255,255,255,.10)) !important;
+  background: var(--flair-bg, rgba(255,255,255,.036)) !important;
+}
+
+/* hide flair chip text, but keep flair as name color */
+.preview-cosmetic-chip.cosmetic-kind-flair {
+  display: none !important;
+}
+
+/* Small layout cleanup inside profile cards */
+.profile-preview-card .cosmetic-preview-row {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: .38rem !important;
+}
+
+.profile-preview-card .preview-stickers {
+  margin-top: .1rem !important;
+}
+
 </style>
 </head>
 
@@ -3756,11 +3829,70 @@ header .auth-user-menu button:hover {
       return bestTheme ? { theme: bestTheme, count: bestCount } : null;
     }
 
+
+    function cosmeticColorFromItem(item, fallbackTheme = "") {
+      const key = cleanCssToken(item?.item_key || item?.key || item?.name || fallbackTheme || "default");
+      const theme = cleanCssToken(item?.theme || fallbackTheme || "default");
+      const palettes = {
+        stadium: ["#68f0ff", "#53a6ff"],
+        snow: ["#e7fbff", "#9fdcff"],
+        rally: ["#7ee39c", "#b28a52"],
+        desert: ["#ffc46f", "#ff8f4d"],
+        night: ["#9aa7ff", "#6f78ff"],
+        weekly: ["#53a6ff", "#68f0ff"],
+        totd: ["#76f5e6", "#53a6ff"],
+        wr: ["#ff6975", "#f5d98a"],
+        champion: ["#f5d98a", "#fff0b8"],
+        support: ["#68f0ff", "#6ea8ff"],
+        kacky: ["#c88cff", "#ffcf63"],
+        community: ["#7be7d3", "#68f0ff"],
+        general: ["#eaf0ff", "#aeb7c7"],
+        default: ["#eaf0ff", "#aeb7c7"],
+      };
+      const base = palettes[theme] || palettes.default;
+
+      let hash = 0;
+      for (let i = 0; i < key.length; i++) hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
+
+      function hexToRgb(hex) {
+        const clean = String(hex || "#ffffff").replace("#", "");
+        return {
+          r: parseInt(clean.slice(0, 2), 16),
+          g: parseInt(clean.slice(2, 4), 16),
+          b: parseInt(clean.slice(4, 6), 16),
+        };
+      }
+
+      function rgbToHex(r, g, b) {
+        return "#" + [r, g, b].map((n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0")).join("");
+      }
+
+      const a = hexToRgb(base[0]);
+      const b = hexToRgb(base[1]);
+      const mix = 0.28 + ((Math.abs(hash) % 45) / 100);
+      const color = rgbToHex(a.r * (1 - mix) + b.r * mix, a.g * (1 - mix) + b.g * mix, a.b * (1 - mix) + b.b * mix);
+      const soft = `rgba(${hexToRgb(color).r}, ${hexToRgb(color).g}, ${hexToRgb(color).b}, .42)`;
+      const softer = `rgba(${hexToRgb(color).r}, ${hexToRgb(color).g}, ${hexToRgb(color).b}, .12)`;
+
+      return { color, soft, softer };
+    }
+
+    function cosmeticVarsStyle(item, kind = "flair") {
+      if (!item) return "";
+      const c = cosmeticColorFromItem(item, item.theme || "default");
+      if (kind === "frame") {
+        return `--profile-accent:${c.color};--profile-accent-soft:${c.softer};--profile-accent-glow:${c.soft};`;
+      }
+      return `--flair-color:${c.color};--flair-soft:${c.soft};--flair-bg:${c.softer};`;
+    }
+
     function previewChip(item, labelPrefix = "") {
       if (!item) return "";
       const theme = cleanCssToken(item.theme || "general");
       const tier = cleanCssToken(item.tier || "standard");
-      return `<span class="preview-cosmetic-chip cosmetic-kind-${escapeHtml(cleanCssToken(item.category || labelPrefix || "item"))} theme-${escapeHtml(theme)} tier-${escapeHtml(tier)}" title="${escapeHtml(prettyTier(item.tier))}${item.theme ? ` · ${escapeHtml(prettyTheme(item.theme))}` : ""}">${escapeHtml(item.icon || "✨")} ${labelPrefix ? `${escapeHtml(labelPrefix)}: ` : ""}${escapeHtml(item.name || "Item")}</span>`;
+      const kind = cleanCssToken(item.category || labelPrefix || "item");
+      const itemStyle = kind === "frame" ? cosmeticVarsStyle(item, "frame") : cosmeticVarsStyle(item, "flair");
+      return `<span class="preview-cosmetic-chip cosmetic-kind-${escapeHtml(kind)} theme-${escapeHtml(theme)} tier-${escapeHtml(tier)}" style="${escapeHtml(itemStyle)}" title="${escapeHtml(prettyTier(item.tier))}${item.theme ? ` · ${escapeHtml(prettyTheme(item.theme))}` : ""}">${escapeHtml(item.icon || "✨")} ${labelPrefix ? `${escapeHtml(labelPrefix)}: ` : ""}${escapeHtml(item.name || "Item")}</span>`;
     }
 
     function updatePaddockPreview() {
@@ -3808,8 +3940,8 @@ header .auth-user-menu button:hover {
       if ($("profilePreview")) {
         $("profilePreview").innerHTML = `
           <strong>Profile Preview:</strong>
-          <div class="profile-preview-card ${escapeHtml(previewFrameClasses(frame))}">
-            <div class="preview-nameplate ${escapeHtml([previewNameplateClasses(nameplate), previewFlairClasses(flair)].filter(Boolean).join(" "))}">${escapeHtml(username)}</div>
+          <div class="profile-preview-card ${escapeHtml(previewFrameClasses(frame))}" style="${escapeHtml(cosmeticVarsStyle(frame, "frame"))}">
+            <div class="preview-nameplate ${escapeHtml([previewNameplateClasses(nameplate), previewFlairClasses(flair)].filter(Boolean).join(" "))}" style="${escapeHtml(cosmeticVarsStyle(flair, "flair"))}">${escapeHtml(username)}</div>
             <div class="preview-meta">${visibleBadges.length ? escapeHtml(visibleBadges.join(" · ")) : "No visible badges selected"}</div>
             <div class="cosmetic-preview-row">${equippedChips || `<span class="preview-cosmetic-chip">No cosmetics equipped</span>`}</div>
             ${stickerHtml}
@@ -4145,8 +4277,8 @@ header .auth-user-menu button:hover {
 
       const cardHtml = `
         <strong>Public Preview:</strong>
-        <div class="profile-preview-card ${escapeHtml(previewFrameClasses(frame))}">
-          <div class="preview-nameplate ${escapeHtml([previewNameplateClasses(nameplate), previewFlairClasses(flair)].filter(Boolean).join(" "))}">${escapeHtml(username)}</div>
+        <div class="profile-preview-card ${escapeHtml(previewFrameClasses(frame))}" style="${escapeHtml(cosmeticVarsStyle(frame, "frame"))}">
+          <div class="preview-nameplate ${escapeHtml([previewNameplateClasses(nameplate), previewFlairClasses(flair)].filter(Boolean).join(" "))}" style="${escapeHtml(cosmeticVarsStyle(flair, "flair"))}">${escapeHtml(username)}</div>
           <div class="preview-meta">${badgeText.length ? escapeHtml(badgeText.join(" · ")) : "No visible badges selected"}</div>
           <div class="cosmetic-preview-row">${equippedChips || `<span class="preview-cosmetic-chip">No public cosmetics equipped</span>`}</div>
           ${stickerHtml}
