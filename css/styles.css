@@ -3642,7 +3642,7 @@ footer {
   }
 }
 
-/* Shoutbox mini profile popover v17 */
+/* Shoutbox mini profile reliable popup v18 */
 .shout-name-link {
   appearance: none !important;
   -webkit-appearance: none !important;
@@ -3652,33 +3652,41 @@ footer {
   margin: 0 !important;
   font: inherit !important;
   cursor: pointer !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  pointer-events: auto !important;
+}
+
+.shout-name-link:hover .shout-name,
+.shout-name-link:focus-visible .shout-name {
+  color: #fff !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
 }
 
 .shout-profile-popover {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  display: none;
-  pointer-events: none;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  display: none !important;
+  pointer-events: none !important;
 }
 
 .shout-profile-popover.show {
-  display: block;
+  display: block !important;
 }
 
 .shout-profile-card {
-  position: fixed;
+  position: fixed !important;
   top: 90px;
   left: 16px;
   width: min(360px, calc(100vw - 24px));
   max-height: min(680px, calc(100vh - 24px));
   overflow: auto;
-  pointer-events: auto;
+  pointer-events: auto !important;
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,.10);
-  background:
-    radial-gradient(circle at 18% 0%, rgba(104,240,255,.10), transparent 34%),
-    linear-gradient(180deg, rgba(14,18,28,.98), rgba(8,11,18,.98));
+  background: linear-gradient(180deg, rgba(14,18,28,.98), rgba(8,11,18,.98));
   box-shadow: 0 22px 70px rgba(0,0,0,.52);
   backdrop-filter: blur(18px) saturate(110%);
   -webkit-backdrop-filter: blur(18px) saturate(110%);
