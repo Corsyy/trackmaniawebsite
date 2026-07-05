@@ -2956,12 +2956,17 @@
 
     function filterVisibleEarnedBadges(userId, earnedBadges, visiblePrefsByUser) {
       const prefs = visiblePrefsByUser?.[userId] || {};
+      const hasSavedPrefs = Object.keys(prefs).length > 0;
+
       return earnedBadges
-        .map((badge) => ({
-          ...badge,
-          is_visible: prefs[badge.badge_key]?.is_visible !== false,
-          display_order: Number(prefs[badge.badge_key]?.display_order ?? badge.default_order ?? 0),
-        }))
+        .map((badge) => {
+          const pref = prefs[badge.badge_key];
+          return {
+            ...badge,
+            is_visible: hasSavedPrefs ? Boolean(pref?.is_visible) : pref?.is_visible !== false,
+            display_order: Number(pref?.display_order ?? badge.default_order ?? 0),
+          };
+        })
         .filter((badge) => badge.is_visible)
         .sort(visibleBadgeSort)
         .slice(0, 2);
@@ -3107,6 +3112,29 @@
 
 
 
+    function getPublicAccountUrl(userId) {
+      const safeId = normalizeUuidList([userId])[0] || "";
+      return safeId ? `/account?user=${encodeURIComponent(safeId)}` : "/account";
+    }
+
+    function renderShoutNameLink(msg, isSystem, isLocal, roleClass = "", nameplateClasses = "") {
+      const displayName = isSystem ? "SYSTEM" : (msg?.username || "Someone");
+      const classes = ["shout-name", roleClass, nameplateClasses].filter(Boolean).join(" ");
+
+      if (isSystem || isLocal || !msg?.user_id) {
+        return `<span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span>`;
+      }
+
+      const safeId = normalizeUuidList([msg.user_id])[0] || "";
+      if (!safeId) {
+        return `<span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span>`;
+      }
+
+      return `<a class="shout-name-link" href="${getPublicAccountUrl(safeId)}" title="View ${escapeHtml(displayName)}'s profile"><span class="${escapeHtml(classes)}">${escapeHtml(displayName)}</span></a>`;
+    }
+
+
+
     function getShoutRole(msg) {
       return shoutRolesByUserId[msg?.user_id] || "user";
     }
@@ -3191,7 +3219,7 @@
         ${!shouldGroup ? `
           <div class="shout-meta">
             <div class="shout-identity">
-              <span class="shout-name ${roleClass} ${escapeHtml(nameplateClasses)}">${escapeHtml(isSystem ? "SYSTEM" : msg.username)}</span>
+              ${renderShoutNameLink(msg, isSystem, isLocal, roleClass, nameplateClasses)}
               ${!isSystem && !isLocal ? renderShoutBadges(msg.user_id) : ""}
               ${!isSystem && !isLocal ? renderShoutStickers(msg.user_id) : ""}
             </div>
