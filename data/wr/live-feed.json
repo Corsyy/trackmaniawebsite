@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-05T23:48:16.428Z",
+  "generatedAt": "2026-07-06T01:27:08.305Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|ME_f_VE2kImJcxdgm87T_mTVYVf|f69fba59-bc01-4769-a68a-76e25d5c1694|d569b3f3-6cf9-4879-86d1-05243d152314|8827|8685|2026-07-06T01:27:08.305Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-06T01:27:08.305Z",
+      "at": "2026-07-06T01:27:08.305Z",
+      "mapUid": "ME_f_VE2kImJcxdgm87T_mTVYVf",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "f69fba59-bc01-4769-a68a-76e25d5c1694",
+      "oldHolder": "PafiiC_MCLocke",
+      "oldTimeMs": 8827,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.827",
+      "oldScoreKey": "8827",
+      "newHolderAccountId": "d569b3f3-6cf9-4879-86d1-05243d152314",
+      "newHolder": "Stone-tm",
+      "newTimeMs": 8685,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.685",
+      "newScoreKey": "8685",
+      "text": "Stone-tm overtook PafiiC_MCLocke on Unknown map with 00:00:08.685."
+    },
     {
       "id": "wr_changed|1Z9m0PpNWUo7xZysqaEzN9Xzkxh|684f85e3-8588-4652-86d2-5ccd4f40c823|de8f4871-31b8-4db5-8f3d-add0bf2774e0|106013|105188|2026-07-05T20:42:42.702Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:31.944",
       "newScoreKey": "91944",
       "text": "SeOnLarppa overtook ZiggySig on Unknown map with 00:01:31.944."
-    },
-    {
-      "id": "wr_changed|uCck9e55nf3e5coEFO4iPx01hp9|5f7d4952-61a8-41d8-a22d-fcfe4b03f145|3a96e825-e60d-4cef-97a4-deda1f05666c|8034|7990|2026-06-26T01:54:36.972Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T01:54:36.972Z",
-      "at": "2026-06-26T01:54:36.972Z",
-      "mapUid": "uCck9e55nf3e5coEFO4iPx01hp9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "5f7d4952-61a8-41d8-a22d-fcfe4b03f145",
-      "oldHolder": "xeap-.-",
-      "oldTimeMs": 8034,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.034",
-      "oldScoreKey": "8034",
-      "newHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "newHolder": "Danyy912",
-      "newTimeMs": 7990,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.990",
-      "newScoreKey": "7990",
-      "text": "Danyy912 overtook xeap-.- on Unknown map with 00:00:07.990."
     }
   ]
 }
