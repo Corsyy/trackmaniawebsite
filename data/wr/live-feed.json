@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-06T10:19:37.780Z",
+  "generatedAt": "2026-07-06T14:04:09.745Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|BTpvtBLK4CxD6XDcje5LhoJoNhj|396713ba-f977-4ea3-82bc-10f718c9c99e|32cd11fa-c340-4ac9-a0cb-7e6859f5c37d|41296|41286|2026-07-06T14:04:09.745Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-06T14:04:09.745Z",
+      "at": "2026-07-06T14:04:09.745Z",
+      "mapUid": "BTpvtBLK4CxD6XDcje5LhoJoNhj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "396713ba-f977-4ea3-82bc-10f718c9c99e",
+      "oldHolder": "josh1248",
+      "oldTimeMs": 41296,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:41.296",
+      "oldScoreKey": "41296",
+      "newHolderAccountId": "32cd11fa-c340-4ac9-a0cb-7e6859f5c37d",
+      "newHolder": "Wombat.09",
+      "newTimeMs": 41286,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.286",
+      "newScoreKey": "41286",
+      "text": "Wombat.09 overtook josh1248 on Unknown map with 00:00:41.286."
+    },
     {
       "id": "wr_changed|ME_f_VE2kImJcxdgm87T_mTVYVf|f69fba59-bc01-4769-a68a-76e25d5c1694|d569b3f3-6cf9-4879-86d1-05243d152314|8827|8685|2026-07-06T01:27:08.305Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:45.296",
       "newScoreKey": "45296",
       "text": "sauuceytm overtook Purrl471 on Unknown map with 00:00:45.296."
-    },
-    {
-      "id": "wr_changed|Q75YnL3tWURvSwoHe7xhrQVHtY1|d9f2da45-c124-48a4-840e-966e3466b484|2c428304-cb79-40e5-be8a-c2ac4357a64c|92624|91944|2026-06-26T01:54:36.972Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T01:54:36.972Z",
-      "at": "2026-06-26T01:54:36.972Z",
-      "mapUid": "Q75YnL3tWURvSwoHe7xhrQVHtY1",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d9f2da45-c124-48a4-840e-966e3466b484",
-      "oldHolder": "ZiggySig",
-      "oldTimeMs": 92624,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:32.624",
-      "oldScoreKey": "92624",
-      "newHolderAccountId": "2c428304-cb79-40e5-be8a-c2ac4357a64c",
-      "newHolder": "SeOnLarppa",
-      "newTimeMs": 91944,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:31.944",
-      "newScoreKey": "91944",
-      "text": "SeOnLarppa overtook ZiggySig on Unknown map with 00:01:31.944."
     }
   ]
 }
