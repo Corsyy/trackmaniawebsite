@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-07T01:20:03.651Z",
+  "generatedAt": "2026-07-07T05:10:54.794Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|b6MutP6WWhIh3eW4MDWel2Cduu6|8cfe5e6e-f8aa-4e78-82ea-03746716f457|c11b87d6-b864-403c-ba3a-d644fc586901|11300|11283|2026-07-07T05:10:54.794Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-07T05:10:54.794Z",
+      "at": "2026-07-07T05:10:54.794Z",
+      "mapUid": "b6MutP6WWhIh3eW4MDWel2Cduu6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8cfe5e6e-f8aa-4e78-82ea-03746716f457",
+      "oldHolder": "eyezero",
+      "oldTimeMs": 11300,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:11.300",
+      "oldScoreKey": "11300",
+      "newHolderAccountId": "c11b87d6-b864-403c-ba3a-d644fc586901",
+      "newHolder": "puchmu",
+      "newTimeMs": 11283,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.283",
+      "newScoreKey": "11283",
+      "text": "puchmu overtook eyezero on Unknown map with 00:00:11.283."
+    },
     {
       "id": "wr_changed|dFs3HDl3HcZYsGemz_h3vPagwoh|8496b1d0-0825-4175-bcd3-aa54cd0ebe07|b235dcab-606c-4091-88bc-88c161ddb10c|22603|22568|2026-07-07T01:20:03.651Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:38.144",
       "newScoreKey": "38144",
       "text": "Larstm overtook DIST4NT on Unknown map with 00:00:38.144."
-    },
-    {
-      "id": "wr_changed|7yA2un3AqF4Qd0dyd6qFKivcZT5|0183cce6-060d-4278-89d5-c97c5442431d|21161743-d01c-429f-a50d-8214149df07d|34238|34160|2026-06-26T06:10:52.981Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T06:10:52.981Z",
-      "at": "2026-06-26T06:10:52.981Z",
-      "mapUid": "7yA2un3AqF4Qd0dyd6qFKivcZT5",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "0183cce6-060d-4278-89d5-c97c5442431d",
-      "oldHolder": "fwo.riolu",
-      "oldTimeMs": 34238,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:34.238",
-      "oldScoreKey": "34238",
-      "newHolderAccountId": "21161743-d01c-429f-a50d-8214149df07d",
-      "newHolder": "Ryx_1",
-      "newTimeMs": 34160,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:34.160",
-      "newScoreKey": "34160",
-      "text": "Ryx_1 overtook fwo.riolu on Unknown map with 00:00:34.160."
     }
   ]
 }
