@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-07T16:13:22.488Z",
+  "generatedAt": "2026-07-07T18:20:44.214Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 3,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|_GkbOKP2m3axRmtaqOrtMSLsy0h|47d0be8b-33db-4ca5-af50-3ac62c42a72f|40dd7366-7a92-4b35-b423-49de19856b2b|1910294|1892648|2026-07-07T18:20:44.214Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-07T18:20:44.214Z",
+      "at": "2026-07-07T18:20:44.214Z",
+      "mapUid": "_GkbOKP2m3axRmtaqOrtMSLsy0h",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "47d0be8b-33db-4ca5-af50-3ac62c42a72f",
+      "oldHolder": "Suudo_W",
+      "oldTimeMs": 1910294,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:31:50.294",
+      "oldScoreKey": "1910294",
+      "newHolderAccountId": "40dd7366-7a92-4b35-b423-49de19856b2b",
+      "newHolder": "Borindal",
+      "newTimeMs": 1892648,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:31:32.648",
+      "newScoreKey": "1892648",
+      "text": "Borindal overtook Suudo_W on Unknown map with 00:31:32.648."
+    },
     {
       "id": "wr_changed|7_0QanCAWNXZhPeWj6wtQbmEnSk|66b78c2a-1481-40d7-b8cd-a318dee16c00|3a5beaac-438c-4b0b-9995-e7fd2cf58a00|8526|8508|2026-07-07T16:13:22.488Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:33.082",
       "newScoreKey": "93082",
       "text": "Fudgemania overtook HNK-MP5K on Unknown map with 00:01:33.082."
-    },
-    {
-      "id": "wr_changed|SRx6BXJTTCVWlrgAiYgmIgawVH1|4a4aae09-8665-434d-b005-1967190a1005|f31d310b-3cfe-418f-b3dc-85cdd1ab6823|9091|9038|2026-06-26T06:10:52.981Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T06:10:52.981Z",
-      "at": "2026-06-26T06:10:52.981Z",
-      "mapUid": "SRx6BXJTTCVWlrgAiYgmIgawVH1",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "4a4aae09-8665-434d-b005-1967190a1005",
-      "oldHolder": "Zwanuss",
-      "oldTimeMs": 9091,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.091",
-      "oldScoreKey": "9091",
-      "newHolderAccountId": "f31d310b-3cfe-418f-b3dc-85cdd1ab6823",
-      "newHolder": "Zarrro",
-      "newTimeMs": 9038,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.038",
-      "newScoreKey": "9038",
-      "text": "Zarrro overtook Zwanuss on Unknown map with 00:00:09.038."
     }
   ]
 }
