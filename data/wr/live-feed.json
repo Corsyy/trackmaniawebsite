@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T18:20:44.214Z",
+  "generatedAt": "2026-07-07T20:18:54.909Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|dN2ly4Qtdm4Hxp1C1FYFXkTx0f2|c42884e8-d6d9-4778-beb8-f1e7b9b8bbb5|296a77c2-1c19-4236-9a3e-28c8c01e6312|20480|20248|2026-07-07T20:18:54.909Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-07T20:18:54.909Z",
+      "at": "2026-07-07T20:18:54.909Z",
+      "mapUid": "dN2ly4Qtdm4Hxp1C1FYFXkTx0f2",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c42884e8-d6d9-4778-beb8-f1e7b9b8bbb5",
+      "oldHolder": "WilmBabberich",
+      "oldTimeMs": 20480,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:20.480",
+      "oldScoreKey": "20480",
+      "newHolderAccountId": "296a77c2-1c19-4236-9a3e-28c8c01e6312",
+      "newHolder": "luddekuddekofot",
+      "newTimeMs": 20248,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:20.248",
+      "newScoreKey": "20248",
+      "text": "luddekuddekofot overtook WilmBabberich on Unknown map with 00:00:20.248."
+    },
     {
       "id": "wr_changed|_GkbOKP2m3axRmtaqOrtMSLsy0h|47d0be8b-33db-4ca5-af50-3ac62c42a72f|40dd7366-7a92-4b35-b423-49de19856b2b|1910294|1892648|2026-07-07T18:20:44.214Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:06.284",
       "newScoreKey": "66284",
       "text": "Larstm overtook seepya on Unknown map with 00:01:06.284."
-    },
-    {
-      "id": "wr_changed|M7e_xNM0OcXH0aMk3ANNeCi3WR0|593690eb-e7e6-4d78-82cb-a2ab870a4a60|5939c2ea-ee1d-435d-9458-3dc2534da2bf|94397|93082|2026-06-26T06:10:52.981Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T06:10:52.981Z",
-      "at": "2026-06-26T06:10:52.981Z",
-      "mapUid": "M7e_xNM0OcXH0aMk3ANNeCi3WR0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "593690eb-e7e6-4d78-82cb-a2ab870a4a60",
-      "oldHolder": "HNK-MP5K",
-      "oldTimeMs": 94397,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:34.397",
-      "oldScoreKey": "94397",
-      "newHolderAccountId": "5939c2ea-ee1d-435d-9458-3dc2534da2bf",
-      "newHolder": "Fudgemania",
-      "newTimeMs": 93082,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:33.082",
-      "newScoreKey": "93082",
-      "text": "Fudgemania overtook HNK-MP5K on Unknown map with 00:01:33.082."
     }
   ]
 }
