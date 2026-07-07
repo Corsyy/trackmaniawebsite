@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T18:41:16.134Z",
+  "generatedAt": "2026-07-07T20:35:45.813Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -10559,7 +10559,7 @@
       "player": "SID-TM",
       "wins": 0,
       "wrs": 1,
-      "top5": 10,
+      "top5": 11,
       "weeksWon": [],
       "wrWeeks": [
         {
@@ -10639,6 +10639,13 @@
           "rank": 5,
           "timeMs": 13991,
           "rawRank": 5
+        },
+        {
+          "week": 82,
+          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
+          "rank": 4,
+          "timeMs": null,
+          "rawRank": 4
         }
       ],
       "aliases": []
@@ -12858,39 +12865,6 @@
       "aliases": []
     },
     {
-      "accountId": "243a98a9-ff11-41e6-b09c-466a33a9655c",
-      "player": "xXStringShotXx",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 2,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 82,
-          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 21,
-          "mapUid": "0BfIkFWcqPIcAn_qSaMP2dBHYI9",
-          "rank": 3,
-          "timeMs": 18250,
-          "rawRank": 3
-        },
-        {
-          "week": 82,
-          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
-          "rank": 1,
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "fbfcce38-0201-49cc-b589-3d8fe3a39ace",
       "player": "banktm",
       "wins": 0,
@@ -13431,6 +13405,32 @@
           "mapUid": "gQ6A0AHG2bnBSWgobGTefolM5Gi",
           "rank": 1,
           "timeMs": 11449,
+          "rawRank": 1
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "485b3945-1c91-4397-876e-1b679bc94840",
+      "player": "Klipse.",
+      "wins": 0,
+      "wrs": 1,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [
+        {
+          "week": 82,
+          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "top5Weeks": [
+        {
+          "week": 82,
+          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
+          "rank": 1,
+          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -14330,9 +14330,9 @@
         {
           "week": 82,
           "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
-          "rank": 2,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -15292,9 +15292,9 @@
         {
           "week": 82,
           "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
-          "rank": 3,
+          "rank": 5,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -18081,32 +18081,6 @@
       "aliases": []
     },
     {
-      "accountId": "0090912b-a515-4cf7-a734-f25279853108",
-      "player": "useinaimbot",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 2,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 39,
-          "mapUid": "JuJxxgjjZpnqBBi5ZiMJoDJ86dd",
-          "rank": 2,
-          "timeMs": 12665,
-          "rawRank": 2
-        },
-        {
-          "week": 82,
-          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "c44a4039-483a-4b85-b4db-7b4b5a900ce2",
       "player": "vaysee",
       "wins": 0,
@@ -18206,6 +18180,32 @@
           "rank": 3,
           "timeMs": 13498,
           "rawRank": 3
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "243a98a9-ff11-41e6-b09c-466a33a9655c",
+      "player": "xXStringShotXx",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 2,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 21,
+          "mapUid": "0BfIkFWcqPIcAn_qSaMP2dBHYI9",
+          "rank": 3,
+          "timeMs": 18250,
+          "rawRank": 3
+        },
+        {
+          "week": 82,
+          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
         }
       ],
       "aliases": []
@@ -21089,25 +21089,6 @@
       "aliases": []
     },
     {
-      "accountId": "2dd5d840-db94-4223-9bff-2690be4ee40a",
-      "player": "Keduska",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 82,
-          "mapUid": "ydm3pfa8kQe0uWevA7cApj31Cam",
-          "rank": 4,
-          "timeMs": null,
-          "rawRank": 4
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "ab233794-0574-430b-936d-128271fbda94",
       "player": "Keeevart",
       "wins": 0,
@@ -23706,6 +23687,25 @@
           "rank": 4,
           "timeMs": 20976,
           "rawRank": 4
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "0090912b-a515-4cf7-a734-f25279853108",
+      "player": "useinaimbot",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 39,
+          "mapUid": "JuJxxgjjZpnqBBi5ZiMJoDJ86dd",
+          "rank": 2,
+          "timeMs": 12665,
+          "rawRank": 2
         }
       ],
       "aliases": []
