@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-08T17:01:13.167Z",
+  "generatedAt": "2026-07-08T18:22:41.077Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|GA65jcOn5kpvpP4TklyrchLcjp2|d569b3f3-6cf9-4879-86d1-05243d152314|a091e92d-426f-440e-a3d8-7b2c5278e812|9164|9104|2026-07-08T18:22:41.077Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-08T18:22:41.077Z",
+      "at": "2026-07-08T18:22:41.077Z",
+      "mapUid": "GA65jcOn5kpvpP4TklyrchLcjp2",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d569b3f3-6cf9-4879-86d1-05243d152314",
+      "oldHolder": "Stone-tm",
+      "oldTimeMs": 9164,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.164",
+      "oldScoreKey": "9164",
+      "newHolderAccountId": "a091e92d-426f-440e-a3d8-7b2c5278e812",
+      "newHolder": "Panda.ly",
+      "newTimeMs": 9104,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.104",
+      "newScoreKey": "9104",
+      "text": "Panda.ly overtook Stone-tm on Unknown map with 00:00:09.104."
+    },
     {
       "id": "wr_changed|gQGoPN2HcLTyrlYTRoT4aXf7hW5|7f80b573-fff1-4de9-8cd5-ee7e5749ce15|55a3499e-bd43-46ba-b2ac-a9b4ab8006cd|8605|8597|2026-07-08T17:01:13.167Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:23.120",
       "newScoreKey": "23120",
       "text": "Ethanol143 overtook Kismate357 on Unknown map with 00:00:23.120."
-    },
-    {
-      "id": "wr_changed|kYXmqoCy0jpZOUFk96xPdms8BY2|58da2197-affe-4137-a415-40bd2e524908|0d514e6f-5a95-41d7-9dc2-3684cfeff330|10998|10996|2026-06-26T16:52:54.082Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T16:52:54.082Z",
-      "at": "2026-06-26T16:52:54.082Z",
-      "mapUid": "kYXmqoCy0jpZOUFk96xPdms8BY2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "58da2197-affe-4137-a415-40bd2e524908",
-      "oldHolder": "TwinsNaA",
-      "oldTimeMs": 10998,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.998",
-      "oldScoreKey": "10998",
-      "newHolderAccountId": "0d514e6f-5a95-41d7-9dc2-3684cfeff330",
-      "newHolder": "Lunarius.tm",
-      "newTimeMs": 10996,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.996",
-      "newScoreKey": "10996",
-      "text": "Lunarius.tm overtook TwinsNaA on Unknown map with 00:00:10.996."
     }
   ]
 }
