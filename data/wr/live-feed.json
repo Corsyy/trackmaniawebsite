@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-08T04:35:40.552Z",
+  "generatedAt": "2026-07-08T07:17:43.563Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|J3RyKSumRDcpqxza1y8PzvRitLl|16ee3d8e-ee78-4e77-b787-48f2247f96c3|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|23128|23126|2026-07-08T07:17:43.563Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-08T07:17:43.563Z",
+      "at": "2026-07-08T07:17:43.563Z",
+      "mapUid": "J3RyKSumRDcpqxza1y8PzvRitLl",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "16ee3d8e-ee78-4e77-b787-48f2247f96c3",
+      "oldHolder": "DarkBringer94",
+      "oldTimeMs": 23128,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:23.128",
+      "oldScoreKey": "23128",
+      "newHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
+      "newHolder": "ShcrTM",
+      "newTimeMs": 23126,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:23.126",
+      "newScoreKey": "23126",
+      "text": "ShcrTM overtook DarkBringer94 on Unknown map with 00:00:23.126."
+    },
     {
       "id": "wr_changed|9rh98PIQkpAmdFZIl5lPQo5wJ0f|bf154307-85ef-4402-915d-415dc57cffc0|b31d3e25-21df-400e-89bb-6d70e305042b|49697|49680|2026-07-08T01:14:07.141Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.213",
       "newScoreKey": "12213",
       "text": "FiggeTM overtook Ssnake01 on Unknown map with 00:00:12.213."
-    },
-    {
-      "id": "self_improve|CMu5RfjcE7vr13fd7gWb89Cyofj|7117a39a-b103-4c88-bd15-00e12cf07b7d|7117a39a-b103-4c88-bd15-00e12cf07b7d|24162|24148|2026-06-26T06:10:52.981Z",
-      "type": "self_improve",
-      "detectedAt": "2026-06-26T06:10:52.981Z",
-      "at": "2026-06-26T06:10:52.981Z",
-      "mapUid": "CMu5RfjcE7vr13fd7gWb89Cyofj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7117a39a-b103-4c88-bd15-00e12cf07b7d",
-      "oldHolder": "Flohex",
-      "oldTimeMs": 24162,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:24.162",
-      "oldScoreKey": "24162",
-      "newHolderAccountId": "7117a39a-b103-4c88-bd15-00e12cf07b7d",
-      "newHolder": "Flohex",
-      "newTimeMs": 24148,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:24.148",
-      "newScoreKey": "24148",
-      "text": "Flohex improved their WR on Unknown map from 00:00:24.162 to 00:00:24.148."
     }
   ]
 }
