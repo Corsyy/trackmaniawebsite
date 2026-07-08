@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-07T23:40:43.339Z",
+  "generatedAt": "2026-07-08T01:14:07.141Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|9rh98PIQkpAmdFZIl5lPQo5wJ0f|bf154307-85ef-4402-915d-415dc57cffc0|b31d3e25-21df-400e-89bb-6d70e305042b|49697|49680|2026-07-08T01:14:07.141Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-08T01:14:07.141Z",
+      "at": "2026-07-08T01:14:07.141Z",
+      "mapUid": "9rh98PIQkpAmdFZIl5lPQo5wJ0f",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "bf154307-85ef-4402-915d-415dc57cffc0",
+      "oldHolder": "Cocow_",
+      "oldTimeMs": 49697,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:49.697",
+      "oldScoreKey": "49697",
+      "newHolderAccountId": "b31d3e25-21df-400e-89bb-6d70e305042b",
+      "newHolder": "Mysto..",
+      "newTimeMs": 49680,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:49.680",
+      "newScoreKey": "49680",
+      "text": "Mysto.. overtook Cocow_ on Unknown map with 00:00:49.680."
+    },
     {
       "id": "wr_changed|dN2ly4Qtdm4Hxp1C1FYFXkTx0f2|c42884e8-d6d9-4778-beb8-f1e7b9b8bbb5|296a77c2-1c19-4236-9a3e-28c8c01e6312|20480|20248|2026-07-07T20:18:54.909Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:24.148",
       "newScoreKey": "24148",
       "text": "Flohex improved their WR on Unknown map from 00:00:24.162 to 00:00:24.148."
-    },
-    {
-      "id": "wr_changed|dsjb5kN_bfPp2qDWArvCtZdF5Db|8e3857d4-8a50-4af0-a7ee-7659108d917b|e3ff2309-bc24-414a-b9f1-81954236c34b|66388|66284|2026-06-26T06:10:52.981Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T06:10:52.981Z",
-      "at": "2026-06-26T06:10:52.981Z",
-      "mapUid": "dsjb5kN_bfPp2qDWArvCtZdF5Db",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "8e3857d4-8a50-4af0-a7ee-7659108d917b",
-      "oldHolder": "seepya",
-      "oldTimeMs": 66388,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:06.388",
-      "oldScoreKey": "66388",
-      "newHolderAccountId": "e3ff2309-bc24-414a-b9f1-81954236c34b",
-      "newHolder": "Larstm",
-      "newTimeMs": 66284,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:06.284",
-      "newScoreKey": "66284",
-      "text": "Larstm overtook seepya on Unknown map with 00:01:06.284."
     }
   ]
 }
