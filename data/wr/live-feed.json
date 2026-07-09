@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-09T16:31:33.064Z",
+  "generatedAt": "2026-07-09T18:32:23.508Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|tveQkkOUzpglOJKMjcXdbddb_Jc|7f80b573-fff1-4de9-8cd5-ee7e5749ce15|390e3e65-c4e1-426e-9621-273a816eb5de|10646|10601|2026-07-09T18:32:23.508Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-09T18:32:23.508Z",
+      "at": "2026-07-09T18:32:23.508Z",
+      "mapUid": "tveQkkOUzpglOJKMjcXdbddb_Jc",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "7f80b573-fff1-4de9-8cd5-ee7e5749ce15",
+      "oldHolder": "Gossfire89",
+      "oldTimeMs": 10646,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.646",
+      "oldScoreKey": "10646",
+      "newHolderAccountId": "390e3e65-c4e1-426e-9621-273a816eb5de",
+      "newHolder": "NitiN..",
+      "newTimeMs": 10601,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.601",
+      "newScoreKey": "10601",
+      "text": "NitiN.. overtook Gossfire89 on Unknown map with 00:00:10.601."
+    },
     {
       "id": "wr_changed|52fvYHNfKLwgFuGM0shouYbuY4c|3fb6b9c7-77f2-434f-b821-af9f246e5ad8|517bba44-37b2-4594-b4ac-07d2510469b7|8255|8124|2026-07-08T23:32:42.436Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:20.633",
       "newScoreKey": "20633",
       "text": "TimeBreaker1 overtook laurids. on Unknown map with 00:00:20.633."
-    },
-    {
-      "id": "wr_changed|7QolgF_CvujpyIMdqXyFevJz764|98f37702-18bb-4b45-84e5-58fda2974ceb|7a566e6e-61bb-48b9-a393-4472d9ce60ae|48007|47219|2026-06-26T22:54:41.971Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-26T22:54:41.971Z",
-      "at": "2026-06-26T22:54:41.971Z",
-      "mapUid": "7QolgF_CvujpyIMdqXyFevJz764",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "98f37702-18bb-4b45-84e5-58fda2974ceb",
-      "oldHolder": "Angex_RJ",
-      "oldTimeMs": 48007,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:48.007",
-      "oldScoreKey": "48007",
-      "newHolderAccountId": "7a566e6e-61bb-48b9-a393-4472d9ce60ae",
-      "newHolder": "brumebleue",
-      "newTimeMs": 47219,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:47.219",
-      "newScoreKey": "47219",
-      "text": "brumebleue overtook Angex_RJ on Unknown map with 00:00:47.219."
     }
   ]
 }
