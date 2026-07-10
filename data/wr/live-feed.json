@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-10T18:01:16.445Z",
+  "generatedAt": "2026-07-10T19:46:50.641Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|gJg3oy9BLoD8aTd_HrYY3k880D3|36ab4cde-1217-4dfb-b377-348e19fbc124|99687578-136e-4e7f-91dd-7433f6b63a6c|8313|8297|2026-07-10T19:46:50.641Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-10T19:46:50.641Z",
+      "at": "2026-07-10T19:46:50.641Z",
+      "mapUid": "gJg3oy9BLoD8aTd_HrYY3k880D3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "36ab4cde-1217-4dfb-b377-348e19fbc124",
+      "oldHolder": "Meeeap",
+      "oldTimeMs": 8313,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.313",
+      "oldScoreKey": "8313",
+      "newHolderAccountId": "99687578-136e-4e7f-91dd-7433f6b63a6c",
+      "newHolder": "PlainCreature24",
+      "newTimeMs": 8297,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.297",
+      "newScoreKey": "8297",
+      "text": "PlainCreature24 overtook Meeeap on Unknown map with 00:00:08.297."
+    },
     {
       "id": "self_improve|rWW4kdqMLrSxwOVPWbUhD8_0ZOl|38d0a926-e075-4d8e-84b8-b35569abc51b|38d0a926-e075-4d8e-84b8-b35569abc51b|7997|7500|2026-07-10T16:09:42.477Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.829",
       "newScoreKey": "10829",
       "text": "Boyslowi overtook pacioxtm on Unknown map with 00:00:10.829."
-    },
-    {
-      "id": "wr_changed|z9_MyG1EMVSj9plhjk1SREOXKDi|7e13b604-785b-4531-b152-85798c309730|ed14ac85-1252-4cc7-8efd-49cd72938f9d|63681|54448|2026-06-27T14:18:42.477Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-27T14:18:42.477Z",
-      "at": "2026-06-27T14:18:42.477Z",
-      "mapUid": "z9_MyG1EMVSj9plhjk1SREOXKDi",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7e13b604-785b-4531-b152-85798c309730",
-      "oldHolder": "Purrl471",
-      "oldTimeMs": 63681,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:03.681",
-      "oldScoreKey": "63681",
-      "newHolderAccountId": "ed14ac85-1252-4cc7-8efd-49cd72938f9d",
-      "newHolder": "Jxliano",
-      "newTimeMs": 54448,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:54.448",
-      "newScoreKey": "54448",
-      "text": "Jxliano overtook Purrl471 on Unknown map with 00:00:54.448."
     }
   ]
 }
