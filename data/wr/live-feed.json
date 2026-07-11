@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-10T23:13:20.513Z",
+  "generatedAt": "2026-07-11T03:42:55.915Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|hAGZNuNqrjReWeoDxQXs5zFVzff|61cf89e9-849a-49be-be26-749ae09bb8cb|bf5f13a3-3be5-457b-88fa-2b4fee777fd6|57425|57372|2026-07-11T03:42:55.915Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-11T03:42:55.915Z",
+      "at": "2026-07-11T03:42:55.915Z",
+      "mapUid": "hAGZNuNqrjReWeoDxQXs5zFVzff",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "61cf89e9-849a-49be-be26-749ae09bb8cb",
+      "oldHolder": "Legu18",
+      "oldTimeMs": 57425,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:57.425",
+      "oldScoreKey": "57425",
+      "newHolderAccountId": "bf5f13a3-3be5-457b-88fa-2b4fee777fd6",
+      "newHolder": "vrinho.",
+      "newTimeMs": 57372,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:57.372",
+      "newScoreKey": "57372",
+      "text": "vrinho. overtook Legu18 on Unknown map with 00:00:57.372."
+    },
     {
       "id": "wr_changed|gJg3oy9BLoD8aTd_HrYY3k880D3|36ab4cde-1217-4dfb-b377-348e19fbc124|99687578-136e-4e7f-91dd-7433f6b63a6c|8313|8297|2026-07-10T19:46:50.641Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:02:17.494",
       "newScoreKey": "137494",
       "text": "Layne_UwU overtook POINTEEEE on Unknown map with 00:02:17.494."
-    },
-    {
-      "id": "wr_changed|gdFyHJmbLm9D1j2JCcWT0J9hCdj|bc3dd2a4-17af-498a-aaf3-426cd0bfa4ac|fc1c4371-3e1a-4272-bc03-1105fe6c2a26|10834|10829|2026-06-27T14:18:42.477Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-27T14:18:42.477Z",
-      "at": "2026-06-27T14:18:42.477Z",
-      "mapUid": "gdFyHJmbLm9D1j2JCcWT0J9hCdj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "bc3dd2a4-17af-498a-aaf3-426cd0bfa4ac",
-      "oldHolder": "pacioxtm",
-      "oldTimeMs": 10834,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.834",
-      "oldScoreKey": "10834",
-      "newHolderAccountId": "fc1c4371-3e1a-4272-bc03-1105fe6c2a26",
-      "newHolder": "Boyslowi",
-      "newTimeMs": 10829,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.829",
-      "newScoreKey": "10829",
-      "text": "Boyslowi overtook pacioxtm on Unknown map with 00:00:10.829."
     }
   ]
 }
