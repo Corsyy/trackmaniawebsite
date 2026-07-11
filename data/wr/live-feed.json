@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-11T10:47:45.167Z",
+  "generatedAt": "2026-07-11T11:39:39.585Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|lqw0_TW1ykxQgXRBeL6awQChGai|2e34c3cb-9548-4815-aee3-c68518a1fd88|07d288a1-dffa-49d1-9c72-adcbc79a76ba|55427|55408|2026-07-11T11:39:39.585Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-11T11:39:39.585Z",
+      "at": "2026-07-11T11:39:39.585Z",
+      "mapUid": "lqw0_TW1ykxQgXRBeL6awQChGai",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "2e34c3cb-9548-4815-aee3-c68518a1fd88",
+      "oldHolder": "Nixotica",
+      "oldTimeMs": 55427,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:55.427",
+      "oldScoreKey": "55427",
+      "newHolderAccountId": "07d288a1-dffa-49d1-9c72-adcbc79a76ba",
+      "newHolder": "EULAsAreUnfair",
+      "newTimeMs": 55408,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:55.408",
+      "newScoreKey": "55408",
+      "text": "EULAsAreUnfair overtook Nixotica on Unknown map with 00:00:55.408."
+    },
     {
       "id": "wr_changed|IYMRsan1NG9f_Zd5oWZFeMM0UK7|55a3499e-bd43-46ba-b2ac-a9b4ab8006cd|d77b72a6-dcc0-4e43-b1cc-47c11a9581ad|11313|11281|2026-07-11T10:47:45.167Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:05.644",
       "newScoreKey": "65644",
       "text": "Layne_UwU overtook Larstm on Unknown map with 00:01:05.644."
-    },
-    {
-      "id": "self_improve|S_j4sVka0COWMEJwKBrsRvKnTtf|d0a811b4-5611-4948-8865-03c9d252bcf4|d0a811b4-5611-4948-8865-03c9d252bcf4|20903|20798|2026-06-27T15:41:25.210Z",
-      "type": "self_improve",
-      "detectedAt": "2026-06-27T15:41:25.210Z",
-      "at": "2026-06-27T15:41:25.210Z",
-      "mapUid": "S_j4sVka0COWMEJwKBrsRvKnTtf",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d0a811b4-5611-4948-8865-03c9d252bcf4",
-      "oldHolder": "Richie1308",
-      "oldTimeMs": 20903,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:20.903",
-      "oldScoreKey": "20903",
-      "newHolderAccountId": "d0a811b4-5611-4948-8865-03c9d252bcf4",
-      "newHolder": "Richie1308",
-      "newTimeMs": 20798,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:20.798",
-      "newScoreKey": "20798",
-      "text": "Richie1308 improved their WR on Unknown map from 00:00:20.903 to 00:00:20.798."
     }
   ]
 }
