@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-11T14:14:36.248Z",
+  "generatedAt": "2026-07-11T15:27:19.805Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 4,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|UGvZvnX6WmL0reKm6NJ1GGW46na|377eb164-9e96-42c0-8338-38a344d08334|65f17733-bc2d-4e35-9893-a77c49acc16f|19170|17226|2026-07-11T15:27:19.805Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-11T15:27:19.805Z",
+      "at": "2026-07-11T15:27:19.805Z",
+      "mapUid": "UGvZvnX6WmL0reKm6NJ1GGW46na",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "377eb164-9e96-42c0-8338-38a344d08334",
+      "oldHolder": "NinjaStar152753",
+      "oldTimeMs": 19170,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:19.170",
+      "oldScoreKey": "19170",
+      "newHolderAccountId": "65f17733-bc2d-4e35-9893-a77c49acc16f",
+      "newHolder": "AtomikTM",
+      "newTimeMs": 17226,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:17.226",
+      "newScoreKey": "17226",
+      "text": "AtomikTM overtook NinjaStar152753 on Unknown map with 00:00:17.226."
+    },
     {
       "id": "wr_changed|GA65jcOn5kpvpP4TklyrchLcjp2|a091e92d-426f-440e-a3d8-7b2c5278e812|d569b3f3-6cf9-4879-86d1-05243d152314|9104|9096|2026-07-11T14:14:36.248Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:22.761",
       "newScoreKey": "22761",
       "text": "Falx_TM overtook Makrellen... on Unknown map with 00:00:22.761."
-    },
-    {
-      "id": "wr_changed|nJotOCOiTdrBRgZRggPNByFOJEi|41d5fd91-a880-46d6-ad24-58d34524774b|d52768b5-1e2c-495f-9df5-16494ddcf053|15786|15626|2026-06-27T20:07:54.919Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-27T20:07:54.919Z",
-      "at": "2026-06-27T20:07:54.919Z",
-      "mapUid": "nJotOCOiTdrBRgZRggPNByFOJEi",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "41d5fd91-a880-46d6-ad24-58d34524774b",
-      "oldHolder": "JuntaoTM",
-      "oldTimeMs": 15786,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:15.786",
-      "oldScoreKey": "15786",
-      "newHolderAccountId": "d52768b5-1e2c-495f-9df5-16494ddcf053",
-      "newHolder": "Uptempo_Miko",
-      "newTimeMs": 15626,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:15.626",
-      "newScoreKey": "15626",
-      "text": "Uptempo_Miko overtook JuntaoTM on Unknown map with 00:00:15.626."
     }
   ]
 }
