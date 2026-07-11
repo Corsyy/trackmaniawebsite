@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-11T06:03:55.845Z",
+  "generatedAt": "2026-07-11T08:13:43.395Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|ZUs6ZCm_kWrWbm_09FRfNv1wzK6|0d514e6f-5a95-41d7-9dc2-3684cfeff330|732155f1-66c8-465b-8346-840b0bbbcfea|20957|20885|2026-07-11T08:13:43.395Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-11T08:13:43.395Z",
+      "at": "2026-07-11T08:13:43.395Z",
+      "mapUid": "ZUs6ZCm_kWrWbm_09FRfNv1wzK6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "0d514e6f-5a95-41d7-9dc2-3684cfeff330",
+      "oldHolder": "Lunarius.tm",
+      "oldTimeMs": 20957,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:20.957",
+      "oldScoreKey": "20957",
+      "newHolderAccountId": "732155f1-66c8-465b-8346-840b0bbbcfea",
+      "newHolder": "healplease",
+      "newTimeMs": 20885,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:20.885",
+      "newScoreKey": "20885",
+      "text": "healplease overtook Lunarius.tm on Unknown map with 00:00:20.885."
+    },
     {
       "id": "wr_changed|hAGZNuNqrjReWeoDxQXs5zFVzff|61cf89e9-849a-49be-be26-749ae09bb8cb|bf5f13a3-3be5-457b-88fa-2b4fee777fd6|57425|57372|2026-07-11T03:42:55.915Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:16.451",
       "newScoreKey": "76451",
       "text": "Ryx_1 overtook fwo.riolu on Unknown map with 00:01:16.451."
-    },
-    {
-      "id": "wr_changed|PRbegq60H5SdJB7S0U5KWwEqj51|d546849e-8663-46f9-9664-2e39e22a1cab|1cf07c37-3ffd-4873-a46f-7a2563524f6d|151890|137494|2026-06-27T15:41:25.210Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-27T15:41:25.210Z",
-      "at": "2026-06-27T15:41:25.210Z",
-      "mapUid": "PRbegq60H5SdJB7S0U5KWwEqj51",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d546849e-8663-46f9-9664-2e39e22a1cab",
-      "oldHolder": "POINTEEEE",
-      "oldTimeMs": 151890,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:02:31.890",
-      "oldScoreKey": "151890",
-      "newHolderAccountId": "1cf07c37-3ffd-4873-a46f-7a2563524f6d",
-      "newHolder": "Layne_UwU",
-      "newTimeMs": 137494,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:02:17.494",
-      "newScoreKey": "137494",
-      "text": "Layne_UwU overtook POINTEEEE on Unknown map with 00:02:17.494."
     }
   ]
 }
