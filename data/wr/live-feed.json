@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-11T16:26:07.419Z",
+  "generatedAt": "2026-07-11T17:29:52.177Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|9z7vYx8baw7qHrLQZZwiPqaklQ4|7c399a69-9e44-41ad-81dc-3815391938de|b6677538-cef2-4033-a680-5ba34cf83511|7827|7824|2026-07-11T17:29:52.177Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-11T17:29:52.177Z",
+      "at": "2026-07-11T17:29:52.177Z",
+      "mapUid": "9z7vYx8baw7qHrLQZZwiPqaklQ4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "7c399a69-9e44-41ad-81dc-3815391938de",
+      "oldHolder": "N125-XAZEC",
+      "oldTimeMs": 7827,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:07.827",
+      "oldScoreKey": "7827",
+      "newHolderAccountId": "b6677538-cef2-4033-a680-5ba34cf83511",
+      "newHolder": "deadchimp2000",
+      "newTimeMs": 7824,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:07.824",
+      "newScoreKey": "7824",
+      "text": "deadchimp2000 overtook N125-XAZEC on Unknown map with 00:00:07.824."
+    },
     {
       "id": "wr_changed|BiPb0EN7DuwvC7ZcBoBAK8_b5Nk|16825d1e-975c-45e7-8df2-b5e1d34a5bd1|05e7e7c7-1bed-48f1-8d7a-b53244290532|39488|39436|2026-07-11T16:26:07.419Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.511",
       "newScoreKey": "9511",
       "text": "PeterGrippinTM overtook Jayotik on Unknown map with 00:00:09.511."
-    },
-    {
-      "id": "wr_changed|c6pjURcr1PXrkM40Albi0Xeopu6|e2f42d3d-873f-4706-bf37-636a6296c7f0|47deaeb4-6a90-46cf-9b2b-f986c282076f|19764|19669|2026-06-27T20:07:54.919Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-27T20:07:54.919Z",
-      "at": "2026-06-27T20:07:54.919Z",
-      "mapUid": "c6pjURcr1PXrkM40Albi0Xeopu6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "e2f42d3d-873f-4706-bf37-636a6296c7f0",
-      "oldHolder": "NLFearAtPeace",
-      "oldTimeMs": 19764,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:19.764",
-      "oldScoreKey": "19764",
-      "newHolderAccountId": "47deaeb4-6a90-46cf-9b2b-f986c282076f",
-      "newHolder": "LeinAdmiral",
-      "newTimeMs": 19669,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:19.669",
-      "newScoreKey": "19669",
-      "text": "LeinAdmiral overtook NLFearAtPeace on Unknown map with 00:00:19.669."
     }
   ]
 }
