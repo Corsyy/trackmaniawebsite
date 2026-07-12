@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-12T15:29:35.449Z",
+  "generatedAt": "2026-07-12T16:30:25.278Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|A5B0BB8eczuJib4BC12cJwsnJme|23346f43-788f-48a5-b4f4-1efb085efcc7|75a4cad0-7824-483d-a6fa-789b8e69a150|46274|46234|2026-07-12T16:30:25.278Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-12T16:30:25.278Z",
+      "at": "2026-07-12T16:30:25.278Z",
+      "mapUid": "A5B0BB8eczuJib4BC12cJwsnJme",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "23346f43-788f-48a5-b4f4-1efb085efcc7",
+      "oldHolder": "Eggy-.-",
+      "oldTimeMs": 46274,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:46.274",
+      "oldScoreKey": "46274",
+      "newHolderAccountId": "75a4cad0-7824-483d-a6fa-789b8e69a150",
+      "newHolder": "Dionysos.TM.",
+      "newTimeMs": 46234,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:46.234",
+      "newScoreKey": "46234",
+      "text": "Dionysos.TM. overtook Eggy-.- on Unknown map with 00:00:46.234."
+    },
     {
       "id": "self_improve|ShXo6QotIWLkTQMfG7InILRSjKi|01981816-c06e-4d88-8682-bf24610df643|01981816-c06e-4d88-8682-bf24610df643|39655|39618|2026-07-12T12:43:04.117Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:43.837",
       "newScoreKey": "43837",
       "text": "Hokkanuilu overtook scheepsjongen on Unknown map with 00:00:43.837."
-    },
-    {
-      "id": "wr_changed|Y4ZeU_dRzThgTPP0kRNNC4wk3Fl|9f932e81-277c-4cb5-9c97-dd9b2d7b4d3d|4749ff87-438d-4d1e-9608-ad57a6db8163|9695|9602|2026-06-28T21:12:22.094Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-28T21:12:22.094Z",
-      "at": "2026-06-28T21:12:22.094Z",
-      "mapUid": "Y4ZeU_dRzThgTPP0kRNNC4wk3Fl",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "9f932e81-277c-4cb5-9c97-dd9b2d7b4d3d",
-      "oldHolder": "Baxalut",
-      "oldTimeMs": 9695,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.695",
-      "oldScoreKey": "9695",
-      "newHolderAccountId": "4749ff87-438d-4d1e-9608-ad57a6db8163",
-      "newHolder": "Kepppo",
-      "newTimeMs": 9602,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.602",
-      "newScoreKey": "9602",
-      "text": "Kepppo overtook Baxalut on Unknown map with 00:00:09.602."
     }
   ]
 }
