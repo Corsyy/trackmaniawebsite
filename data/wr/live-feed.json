@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-13T12:39:14.172Z",
+  "generatedAt": "2026-07-13T15:37:34.664Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|CS3chcWpKylFZFT3PJ7hnJLNbAh|54565860-6f3d-47d3-b84b-e146372b1069|d77b72a6-dcc0-4e43-b1cc-47c11a9581ad|8555|8548|2026-07-13T15:37:34.664Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-13T15:37:34.664Z",
+      "at": "2026-07-13T15:37:34.664Z",
+      "mapUid": "CS3chcWpKylFZFT3PJ7hnJLNbAh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "54565860-6f3d-47d3-b84b-e146372b1069",
+      "oldHolder": "leoleodeodeo",
+      "oldTimeMs": 8555,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.555",
+      "oldScoreKey": "8555",
+      "newHolderAccountId": "d77b72a6-dcc0-4e43-b1cc-47c11a9581ad",
+      "newHolder": "Vulpecia",
+      "newTimeMs": 8548,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.548",
+      "newScoreKey": "8548",
+      "text": "Vulpecia overtook leoleodeodeo on Unknown map with 00:00:08.548."
+    },
     {
       "id": "wr_changed|yGzSsIZ4aGEdxJMP3YdfHxZAhG3|8cfe5e6e-f8aa-4e78-82ea-03746716f457|b5bce78b-0cfd-4b38-8cdb-45ad13e9213e|8562|8458|2026-07-13T12:39:14.172Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:39.958",
       "newScoreKey": "39958",
       "text": "Miguelinio overtook Overtlion on Unknown map with 00:00:39.958."
-    },
-    {
-      "id": "wr_changed|yUxNoeHM07t6G5DMpTHkBJ_Ywe9|a7ee32e5-8066-4291-a785-9aa40a9ca6a4|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|29964|29942|2026-06-29T23:29:19.830Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-29T23:29:19.830Z",
-      "at": "2026-06-29T23:29:19.830Z",
-      "mapUid": "yUxNoeHM07t6G5DMpTHkBJ_Ywe9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "official",
-      "oldHolderAccountId": "a7ee32e5-8066-4291-a785-9aa40a9ca6a4",
-      "oldHolder": "WashedNowa",
-      "oldTimeMs": 29964,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:29.964",
-      "oldScoreKey": "29964",
-      "newHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
-      "newHolder": "ShcrTM",
-      "newTimeMs": 29942,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:29.942",
-      "newScoreKey": "29942",
-      "text": "ShcrTM overtook WashedNowa on Unknown map with 00:00:29.942."
     }
   ]
 }
