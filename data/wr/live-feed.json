@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-13T06:41:42.779Z",
+  "generatedAt": "2026-07-13T10:02:22.913Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|URJxaJ4sUD1g1v6ND3x3Q5QEGcd|adec5cca-6a3d-4016-91ee-380e83dcf2f4|11e56e9f-d89e-484e-b3d9-5e04de40c33d|6698|6695|2026-07-13T10:02:22.913Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-13T10:02:22.913Z",
+      "at": "2026-07-13T10:02:22.913Z",
+      "mapUid": "URJxaJ4sUD1g1v6ND3x3Q5QEGcd",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "adec5cca-6a3d-4016-91ee-380e83dcf2f4",
+      "oldHolder": "GRX_Ranger",
+      "oldTimeMs": 6698,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:06.698",
+      "oldScoreKey": "6698",
+      "newHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
+      "newHolder": "Vatsug44",
+      "newTimeMs": 6695,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:06.695",
+      "newScoreKey": "6695",
+      "text": "Vatsug44 overtook GRX_Ranger on Unknown map with 00:00:06.695."
+    },
     {
       "id": "wr_changed|O3uLq_V9ETxwyEcRjN8fsNWsMof|aa8d29a3-c6b2-4bfc-82f4-f53d784513f1|0ee3ef77-4d10-4926-9e73-82cc8755e15c|9741|9135|2026-07-13T06:41:42.779Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:16.702",
       "newScoreKey": "16702",
       "text": "S7_Siroze overtook Zypher.TM on Unknown map with 00:00:16.702."
-    },
-    {
-      "id": "wr_changed|B8ichuCM2osvqmdCzLlKbtjCbs2|416dbd30-da2a-49d7-8dab-dda22bc5b828|2c58a171-6a36-4129-9bb4-5abe9b980c81|31984|31428|2026-06-29T11:32:21.501Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-29T11:32:21.501Z",
-      "at": "2026-06-29T11:32:21.501Z",
-      "mapUid": "B8ichuCM2osvqmdCzLlKbtjCbs2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "416dbd30-da2a-49d7-8dab-dda22bc5b828",
-      "oldHolder": "RidgeRacerNinja",
-      "oldTimeMs": 31984,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:31.984",
-      "oldScoreKey": "31984",
-      "newHolderAccountId": "2c58a171-6a36-4129-9bb4-5abe9b980c81",
-      "newHolder": "WoodItBeOk",
-      "newTimeMs": 31428,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:31.428",
-      "newScoreKey": "31428",
-      "text": "WoodItBeOk overtook RidgeRacerNinja on Unknown map with 00:00:31.428."
     }
   ]
 }
