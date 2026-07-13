@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-13T10:02:22.913Z",
+  "generatedAt": "2026-07-13T12:39:14.172Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|yGzSsIZ4aGEdxJMP3YdfHxZAhG3|8cfe5e6e-f8aa-4e78-82ea-03746716f457|b5bce78b-0cfd-4b38-8cdb-45ad13e9213e|8562|8458|2026-07-13T12:39:14.172Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-13T12:39:14.172Z",
+      "at": "2026-07-13T12:39:14.172Z",
+      "mapUid": "yGzSsIZ4aGEdxJMP3YdfHxZAhG3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8cfe5e6e-f8aa-4e78-82ea-03746716f457",
+      "oldHolder": "eyezero",
+      "oldTimeMs": 8562,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.562",
+      "oldScoreKey": "8562",
+      "newHolderAccountId": "b5bce78b-0cfd-4b38-8cdb-45ad13e9213e",
+      "newHolder": "Zaitsev_1337",
+      "newTimeMs": 8458,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.458",
+      "newScoreKey": "8458",
+      "text": "Zaitsev_1337 overtook eyezero on Unknown map with 00:00:08.458."
+    },
     {
       "id": "wr_changed|URJxaJ4sUD1g1v6ND3x3Q5QEGcd|adec5cca-6a3d-4016-91ee-380e83dcf2f4|11e56e9f-d89e-484e-b3d9-5e04de40c33d|6698|6695|2026-07-13T10:02:22.913Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:29.942",
       "newScoreKey": "29942",
       "text": "ShcrTM overtook WashedNowa on Unknown map with 00:00:29.942."
-    },
-    {
-      "id": "wr_changed|DGMbFKLbRM34yRrnz8gTQccVgHi|4a983dc3-a938-4564-8a1c-8be20779f069|1c17a5db-accf-457e-a7ce-c3cd86defbc1|16785|16702|2026-06-29T11:32:21.501Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-29T11:32:21.501Z",
-      "at": "2026-06-29T11:32:21.501Z",
-      "mapUid": "DGMbFKLbRM34yRrnz8gTQccVgHi",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "4a983dc3-a938-4564-8a1c-8be20779f069",
-      "oldHolder": "Zypher.TM",
-      "oldTimeMs": 16785,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:16.785",
-      "oldScoreKey": "16785",
-      "newHolderAccountId": "1c17a5db-accf-457e-a7ce-c3cd86defbc1",
-      "newHolder": "S7_Siroze",
-      "newTimeMs": 16702,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:16.702",
-      "newScoreKey": "16702",
-      "text": "S7_Siroze overtook Zypher.TM on Unknown map with 00:00:16.702."
     }
   ]
 }
