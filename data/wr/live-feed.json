@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-13T17:46:00.447Z",
+  "generatedAt": "2026-07-13T19:07:07.168Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|b3RVUzwQAZbu65ElrcIEXCbhLRm|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|11e56e9f-d89e-484e-b3d9-5e04de40c33d|20830|20790|2026-07-13T19:07:07.168Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-13T19:07:07.168Z",
+      "at": "2026-07-13T19:07:07.168Z",
+      "mapUid": "b3RVUzwQAZbu65ElrcIEXCbhLRm",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0",
+      "oldHolder": "BartAker05",
+      "oldTimeMs": 20830,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:20.830",
+      "oldScoreKey": "20830",
+      "newHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
+      "newHolder": "Vatsug44",
+      "newTimeMs": 20790,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:20.790",
+      "newScoreKey": "20790",
+      "text": "Vatsug44 overtook BartAker05 on Unknown map with 00:00:20.790."
+    },
     {
       "id": "wr_changed|dBWJFLZzIAtd5nOKqsKsusb6MB6|dea0f888-f14a-4685-85ba-102b019cb862|697e0c28-cd1d-4b4f-9f99-19e76d8b170b|9795|9794|2026-07-13T17:46:00.447Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:22.431",
       "newScoreKey": "22431",
       "text": "inarmyfor1year overtook KarjeN on Unknown map with 00:00:22.431."
-    },
-    {
-      "id": "wr_changed|8LULS7CTXvmUWxn2ENLLYeiS0k9|e51492b5-a51f-4f3b-994b-b728faf83366|d569b3f3-6cf9-4879-86d1-05243d152314|8968|8941|2026-06-30T01:30:45.365Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T01:30:45.365Z",
-      "at": "2026-06-30T01:30:45.365Z",
-      "mapUid": "8LULS7CTXvmUWxn2ENLLYeiS0k9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "e51492b5-a51f-4f3b-994b-b728faf83366",
-      "oldHolder": "Reverse_TM",
-      "oldTimeMs": 8968,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.968",
-      "oldScoreKey": "8968",
-      "newHolderAccountId": "d569b3f3-6cf9-4879-86d1-05243d152314",
-      "newHolder": "Stone-tm",
-      "newTimeMs": 8941,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.941",
-      "newScoreKey": "8941",
-      "text": "Stone-tm overtook Reverse_TM on Unknown map with 00:00:08.941."
     }
   ]
 }
