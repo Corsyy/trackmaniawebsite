@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-14T17:53:20.050Z",
+  "generatedAt": "2026-07-14T19:03:21.387Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 4,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|ShXo6QotIWLkTQMfG7InILRSjKi|01981816-c06e-4d88-8682-bf24610df643|01981816-c06e-4d88-8682-bf24610df643|39618|39478|2026-07-14T19:03:21.387Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-14T19:03:21.387Z",
+      "at": "2026-07-14T19:03:21.387Z",
+      "mapUid": "ShXo6QotIWLkTQMfG7InILRSjKi",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "01981816-c06e-4d88-8682-bf24610df643",
+      "oldHolder": "MattT_tm",
+      "oldTimeMs": 39618,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:39.618",
+      "oldScoreKey": "39618",
+      "newHolderAccountId": "01981816-c06e-4d88-8682-bf24610df643",
+      "newHolder": "MattT_tm",
+      "newTimeMs": 39478,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:39.478",
+      "newScoreKey": "39478",
+      "text": "MattT_tm improved their WR on Unknown map from 00:00:39.618 to 00:00:39.478."
+    },
     {
       "id": "wr_changed|7duNGAqIz1KMIKXvrHfza9qBxjh|22b520e4-3efb-4c9f-8f25-b973ec107fa6|8b76d467-a579-48a4-b1e4-37a75ee9a6ab|21230|21212|2026-07-14T17:53:20.050Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:15.464",
       "newScoreKey": "15464",
       "text": "Yerkling overtook awi.uwu on Unknown map with 00:00:15.464."
-    },
-    {
-      "id": "wr_changed|QVnnodOXNuMTCL8KTfR1zHikA6k|817a6e2a-e076-47f5-bb65-43c64cda8802|8fcd03c0-b92e-47c3-9f40-566cdf26cf16|48805|48785|2026-06-30T05:47:30.440Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T05:47:30.440Z",
-      "at": "2026-06-30T05:47:30.440Z",
-      "mapUid": "QVnnodOXNuMTCL8KTfR1zHikA6k",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "817a6e2a-e076-47f5-bb65-43c64cda8802",
-      "oldHolder": "Corvus128",
-      "oldTimeMs": 48805,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:48.805",
-      "oldScoreKey": "48805",
-      "newHolderAccountId": "8fcd03c0-b92e-47c3-9f40-566cdf26cf16",
-      "newHolder": "aurawrara",
-      "newTimeMs": 48785,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:48.785",
-      "newScoreKey": "48785",
-      "text": "aurawrara overtook Corvus128 on Unknown map with 00:00:48.785."
     }
   ]
 }
