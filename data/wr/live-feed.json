@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-15T18:35:58.729Z",
+  "generatedAt": "2026-07-15T19:57:43.755Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|MYYE2iwWC94woQntRmwAPK7jY0j|2c58a171-6a36-4129-9bb4-5abe9b980c81|4a983dc3-a938-4564-8a1c-8be20779f069|54405|54042|2026-07-15T19:57:43.755Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-15T19:57:43.755Z",
+      "at": "2026-07-15T19:57:43.755Z",
+      "mapUid": "MYYE2iwWC94woQntRmwAPK7jY0j",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "2c58a171-6a36-4129-9bb4-5abe9b980c81",
+      "oldHolder": "WoodItBeOk",
+      "oldTimeMs": 54405,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:54.405",
+      "oldScoreKey": "54405",
+      "newHolderAccountId": "4a983dc3-a938-4564-8a1c-8be20779f069",
+      "newHolder": "Zypher.TM",
+      "newTimeMs": 54042,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:54.042",
+      "newScoreKey": "54042",
+      "text": "Zypher.TM overtook WoodItBeOk on Unknown map with 00:00:54.042."
+    },
     {
       "id": "wr_changed|jzIN542QcUl588OOrRTFJ0yrpX9|65da0f1a-b864-4eac-a865-dd3c995b4f0c|7328c79d-d79a-4782-a9b2-967deaeadb72|9565|9027|2026-07-15T14:17:01.173Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:33.072",
       "newScoreKey": "33072",
       "text": "wata33cz overtook Plague_TM on Unknown map with 00:00:33.072."
-    },
-    {
-      "id": "wr_changed|b3kj6jpXEkoyUC884pEUavdjEI3|71a490be-d5aa-46f1-9019-9893fb7be156|7fc7bc9c-67b2-4003-b1a3-29006486f71e|11358|11328|2026-06-30T08:48:25.292Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T08:48:25.292Z",
-      "at": "2026-06-30T08:48:25.292Z",
-      "mapUid": "b3kj6jpXEkoyUC884pEUavdjEI3",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "71a490be-d5aa-46f1-9019-9893fb7be156",
-      "oldHolder": "x.3viE.x",
-      "oldTimeMs": 11358,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:11.358",
-      "oldScoreKey": "11358",
-      "newHolderAccountId": "7fc7bc9c-67b2-4003-b1a3-29006486f71e",
-      "newHolder": "ailiei.",
-      "newTimeMs": 11328,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:11.328",
-      "newScoreKey": "11328",
-      "text": "ailiei. overtook x.3viE.x on Unknown map with 00:00:11.328."
     }
   ]
 }
