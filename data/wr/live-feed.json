@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-15T12:21:47.945Z",
+  "generatedAt": "2026-07-15T14:17:01.173Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|jzIN542QcUl588OOrRTFJ0yrpX9|65da0f1a-b864-4eac-a865-dd3c995b4f0c|7328c79d-d79a-4782-a9b2-967deaeadb72|9565|9027|2026-07-15T14:17:01.173Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-15T14:17:01.173Z",
+      "at": "2026-07-15T14:17:01.173Z",
+      "mapUid": "jzIN542QcUl588OOrRTFJ0yrpX9",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "65da0f1a-b864-4eac-a865-dd3c995b4f0c",
+      "oldHolder": "Seanchen137",
+      "oldTimeMs": 9565,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.565",
+      "oldScoreKey": "9565",
+      "newHolderAccountId": "7328c79d-d79a-4782-a9b2-967deaeadb72",
+      "newHolder": "rbaxTM",
+      "newTimeMs": 9027,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.027",
+      "newScoreKey": "9027",
+      "text": "rbaxTM overtook Seanchen137 on Unknown map with 00:00:09.027."
+    },
     {
       "id": "wr_changed|epjVd9eoucFUWRCuqXLOGW0_oN0|fb678553-f730-442a-a035-dfc50f4a5b7b|da4642f9-6acf-43fe-88b6-b120ff1308ba|33523|33501|2026-07-15T11:00:34.775Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:11.328",
       "newScoreKey": "11328",
       "text": "ailiei. overtook x.3viE.x on Unknown map with 00:00:11.328."
-    },
-    {
-      "id": "wr_changed|l4r_8k1EHp81YbW7_QnSKBzHM24|ce4e9f2b-315e-4c64-8421-34c27edd1f75|3e609ea5-2ab7-410d-9050-d828eac57131|36027|35750|2026-06-30T08:48:25.292Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T08:48:25.292Z",
-      "at": "2026-06-30T08:48:25.292Z",
-      "mapUid": "l4r_8k1EHp81YbW7_QnSKBzHM24",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "ce4e9f2b-315e-4c64-8421-34c27edd1f75",
-      "oldHolder": "Plague_TM",
-      "oldTimeMs": 36027,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:36.027",
-      "oldScoreKey": "36027",
-      "newHolderAccountId": "3e609ea5-2ab7-410d-9050-d828eac57131",
-      "newHolder": "wata33cz",
-      "newTimeMs": 35750,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:35.750",
-      "newScoreKey": "35750",
-      "text": "wata33cz overtook Plague_TM on Unknown map with 00:00:35.750."
     }
   ]
 }
