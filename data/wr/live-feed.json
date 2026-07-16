@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-16T06:07:11.566Z",
+  "generatedAt": "2026-07-16T08:32:11.162Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 6,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|7Zn4yERrcyqJUB40zr053qEr8E9|ba5a5908-ce5b-4aa4-b84c-7b6eb9b959a0|11e56e9f-d89e-484e-b3d9-5e04de40c33d|32309|32294|2026-07-16T08:32:11.162Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-16T08:32:11.162Z",
+      "at": "2026-07-16T08:32:11.162Z",
+      "mapUid": "7Zn4yERrcyqJUB40zr053qEr8E9",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "ba5a5908-ce5b-4aa4-b84c-7b6eb9b959a0",
+      "oldHolder": "Patriam",
+      "oldTimeMs": 32309,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:32.309",
+      "oldScoreKey": "32309",
+      "newHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
+      "newHolder": "Vatsug44",
+      "newTimeMs": 32294,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:32.294",
+      "newScoreKey": "32294",
+      "text": "Vatsug44 overtook Patriam on Unknown map with 00:00:32.294."
+    },
     {
       "id": "wr_changed|xjyM13WRkWIXddpbQm3Wx4b2y1i|9b84751c-22d0-4c74-aed7-6a31c9365742|a537e543-26ff-4208-ba9f-a77f748c26b5|13298|13293|2026-07-16T06:07:11.566Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:16.112",
       "newScoreKey": "16112",
       "text": "ailiei. overtook Tengu2022 on Unknown map with 00:00:16.112."
-    },
-    {
-      "id": "wr_changed|4zGnz93lJ1yUrfbyqQic9Bwvk2c|17c514d7-0816-4a87-a4b4-80b6104629a9|81ad6bff-137c-4006-80d9-038702eb9beb|15799|14987|2026-06-30T13:30:48.901Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T13:30:48.901Z",
-      "at": "2026-06-30T13:30:48.901Z",
-      "mapUid": "4zGnz93lJ1yUrfbyqQic9Bwvk2c",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "17c514d7-0816-4a87-a4b4-80b6104629a9",
-      "oldHolder": "Flopper_TM",
-      "oldTimeMs": 15799,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:15.799",
-      "oldScoreKey": "15799",
-      "newHolderAccountId": "81ad6bff-137c-4006-80d9-038702eb9beb",
-      "newHolder": "uelen.",
-      "newTimeMs": 14987,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:14.987",
-      "newScoreKey": "14987",
-      "text": "uelen. overtook Flopper_TM on Unknown map with 00:00:14.987."
     }
   ]
 }
