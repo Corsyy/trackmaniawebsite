@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-16T17:04:18.537Z",
+  "generatedAt": "2026-07-16T18:18:43.831Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|We3dEN_W6PYuEnYY90G8ZBBjXLh|dba55c7e-d5cd-40c0-a5e7-8e793fd295eb|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|60082|60078|2026-07-16T18:18:43.831Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-16T18:18:43.831Z",
+      "at": "2026-07-16T18:18:43.831Z",
+      "mapUid": "We3dEN_W6PYuEnYY90G8ZBBjXLh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "dba55c7e-d5cd-40c0-a5e7-8e793fd295eb",
+      "oldHolder": "Gwenn.",
+      "oldTimeMs": 60082,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:01:00.082",
+      "oldScoreKey": "60082",
+      "newHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
+      "newHolder": "ShcrTM",
+      "newTimeMs": 60078,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:01:00.078",
+      "newScoreKey": "60078",
+      "text": "ShcrTM overtook Gwenn. on Unknown map with 00:01:00.078."
+    },
     {
       "id": "self_improve|Mh7eoeVIlpNQ5_5PC95aaAjHq59|d620091b-876b-4af4-8f98-ed3625d234e9|d620091b-876b-4af4-8f98-ed3625d234e9|43620|43590|2026-07-16T12:12:00.291Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:32.424",
       "newScoreKey": "32424",
       "text": "LeinAdmiral improved their WR on Unknown map from 00:00:32.522 to 00:00:32.424."
-    },
-    {
-      "id": "wr_changed|NzJF8pmjYKvCITJS8_1jlBfnMM2|226872e2-69eb-48be-8921-540dec7c5d50|a3df3c7f-8ed1-4aeb-9f2d-24fe28cabdcf|26200|26076|2026-06-30T13:30:48.901Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T13:30:48.901Z",
-      "at": "2026-06-30T13:30:48.901Z",
-      "mapUid": "NzJF8pmjYKvCITJS8_1jlBfnMM2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "226872e2-69eb-48be-8921-540dec7c5d50",
-      "oldHolder": "jakoblgn",
-      "oldTimeMs": 26200,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:26.200",
-      "oldScoreKey": "26200",
-      "newHolderAccountId": "a3df3c7f-8ed1-4aeb-9f2d-24fe28cabdcf",
-      "newHolder": "Pawel-TM",
-      "newTimeMs": 26076,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:26.076",
-      "newScoreKey": "26076",
-      "text": "Pawel-TM overtook jakoblgn on Unknown map with 00:00:26.076."
     }
   ]
 }
