@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-16T10:47:09.567Z",
+  "generatedAt": "2026-07-16T12:12:00.291Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|Mh7eoeVIlpNQ5_5PC95aaAjHq59|d620091b-876b-4af4-8f98-ed3625d234e9|d620091b-876b-4af4-8f98-ed3625d234e9|43620|43590|2026-07-16T12:12:00.291Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-16T12:12:00.291Z",
+      "at": "2026-07-16T12:12:00.291Z",
+      "mapUid": "Mh7eoeVIlpNQ5_5PC95aaAjHq59",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "oldHolder": "C50.94975-6.947",
+      "oldTimeMs": 43620,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:43.620",
+      "oldScoreKey": "43620",
+      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "newHolder": "C50.94975-6.947",
+      "newTimeMs": 43590,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:43.590",
+      "newScoreKey": "43590",
+      "text": "C50.94975-6.947 improved their WR on Unknown map from 00:00:43.620 to 00:00:43.590."
+    },
     {
       "id": "wr_changed|7Zn4yERrcyqJUB40zr053qEr8E9|ba5a5908-ce5b-4aa4-b84c-7b6eb9b959a0|11e56e9f-d89e-484e-b3d9-5e04de40c33d|32309|32294|2026-07-16T08:32:11.162Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:26.076",
       "newScoreKey": "26076",
       "text": "Pawel-TM overtook jakoblgn on Unknown map with 00:00:26.076."
-    },
-    {
-      "id": "wr_changed|yRohXQc7GDcJi2eYiRUsA4Os9Fd|9f431f7e-f72b-437f-b0d2-31991eec22da|7fc7bc9c-67b2-4003-b1a3-29006486f71e|17335|16112|2026-06-30T13:30:48.901Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T13:30:48.901Z",
-      "at": "2026-06-30T13:30:48.901Z",
-      "mapUid": "yRohXQc7GDcJi2eYiRUsA4Os9Fd",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "9f431f7e-f72b-437f-b0d2-31991eec22da",
-      "oldHolder": "Tengu2022",
-      "oldTimeMs": 17335,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:17.335",
-      "oldScoreKey": "17335",
-      "newHolderAccountId": "7fc7bc9c-67b2-4003-b1a3-29006486f71e",
-      "newHolder": "ailiei.",
-      "newTimeMs": 16112,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:16.112",
-      "newScoreKey": "16112",
-      "text": "ailiei. overtook Tengu2022 on Unknown map with 00:00:16.112."
     }
   ]
 }
