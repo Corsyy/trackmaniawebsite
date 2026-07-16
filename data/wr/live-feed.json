@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-16T20:38:53.893Z",
+  "generatedAt": "2026-07-16T21:49:26.045Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|foFn6MI6jiICC55XPFtjNHXHya2|efc0d5f5-9d09-4944-ab0b-b0660d01bd76|11e56e9f-d89e-484e-b3d9-5e04de40c33d|10483|10480|2026-07-16T21:49:26.045Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-16T21:49:26.045Z",
+      "at": "2026-07-16T21:49:26.045Z",
+      "mapUid": "foFn6MI6jiICC55XPFtjNHXHya2",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "efc0d5f5-9d09-4944-ab0b-b0660d01bd76",
+      "oldHolder": "Kardeth",
+      "oldTimeMs": 10483,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.483",
+      "oldScoreKey": "10483",
+      "newHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
+      "newHolder": "Vatsug44",
+      "newTimeMs": 10480,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.480",
+      "newScoreKey": "10480",
+      "text": "Vatsug44 overtook Kardeth on Unknown map with 00:00:10.480."
+    },
     {
       "id": "wr_changed|H8PV5yjckjnL_oMemJca3D_0AWb|d9835d12-3ff6-49f5-901d-c572ee058414|11e56e9f-d89e-484e-b3d9-5e04de40c33d|9187|9178|2026-07-16T20:38:53.893Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:03.997",
       "newScoreKey": "3997",
       "text": "JoloJipf overtook AlexRcsc on Unknown map with 00:00:03.997."
-    },
-    {
-      "id": "wr_changed|ouHoeA7Cfkiv_Fq6RcxP2_SZoY2|1a38fbc0-d6e6-41bf-a78e-1e15a04a236e|58da2197-affe-4137-a415-40bd2e524908|27156|12285|2026-06-30T16:07:52.652Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T16:07:52.652Z",
-      "at": "2026-06-30T16:07:52.652Z",
-      "mapUid": "ouHoeA7Cfkiv_Fq6RcxP2_SZoY2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "1a38fbc0-d6e6-41bf-a78e-1e15a04a236e",
-      "oldHolder": "Cydrosil",
-      "oldTimeMs": 27156,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:27.156",
-      "oldScoreKey": "27156",
-      "newHolderAccountId": "58da2197-affe-4137-a415-40bd2e524908",
-      "newHolder": "TwinsNaA",
-      "newTimeMs": 12285,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.285",
-      "newScoreKey": "12285",
-      "text": "TwinsNaA overtook Cydrosil on Unknown map with 00:00:12.285."
     }
   ]
 }
