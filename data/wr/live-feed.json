@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-17T01:16:14.184Z",
+  "generatedAt": "2026-07-17T04:30:33.874Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|jawVpwzd8Gyo8TBWqCKsnD0_UJh|005d4ee0-b88f-4b28-a342-0ae2a2f36dca|ff68ddb0-b0c7-4195-87e5-e4569b67f8b3|10128|10046|2026-07-17T04:30:33.874Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-17T04:30:33.874Z",
+      "at": "2026-07-17T04:30:33.874Z",
+      "mapUid": "jawVpwzd8Gyo8TBWqCKsnD0_UJh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "005d4ee0-b88f-4b28-a342-0ae2a2f36dca",
+      "oldHolder": "inki..",
+      "oldTimeMs": 10128,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.128",
+      "oldScoreKey": "10128",
+      "newHolderAccountId": "ff68ddb0-b0c7-4195-87e5-e4569b67f8b3",
+      "newHolder": "Elmoo",
+      "newTimeMs": 10046,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.046",
+      "newScoreKey": "10046",
+      "text": "Elmoo overtook inki.. on Unknown map with 00:00:10.046."
+    },
     {
       "id": "wr_changed|foFn6MI6jiICC55XPFtjNHXHya2|efc0d5f5-9d09-4944-ab0b-b0660d01bd76|11e56e9f-d89e-484e-b3d9-5e04de40c33d|10483|10480|2026-07-16T21:49:26.045Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:47.027",
       "newScoreKey": "47027",
       "text": "cigarette5000 overtook ShadyBanana on Unknown map with 00:00:47.027."
-    },
-    {
-      "id": "wr_changed|aI2gRt_JfzwTfGKyOV4R8Fw2_M2|e09e0215-9526-4cbe-b7ca-6d1b5bbd02f7|0a0c30e0-4f8e-40a1-811a-005fe3e1e224|4134|3997|2026-06-30T16:07:52.652Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T16:07:52.652Z",
-      "at": "2026-06-30T16:07:52.652Z",
-      "mapUid": "aI2gRt_JfzwTfGKyOV4R8Fw2_M2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "e09e0215-9526-4cbe-b7ca-6d1b5bbd02f7",
-      "oldHolder": "AlexRcsc",
-      "oldTimeMs": 4134,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:04.134",
-      "oldScoreKey": "4134",
-      "newHolderAccountId": "0a0c30e0-4f8e-40a1-811a-005fe3e1e224",
-      "newHolder": "JoloJipf",
-      "newTimeMs": 3997,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:03.997",
-      "newScoreKey": "3997",
-      "text": "JoloJipf overtook AlexRcsc on Unknown map with 00:00:03.997."
     }
   ]
 }
