@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-17T06:41:45.804Z",
+  "generatedAt": "2026-07-17T09:01:26.343Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|qHU4dAEZaWwb7Nu2n8lZ_2c9vD3|f338668e-5d57-4395-93ac-ef514f2fb898|f338668e-5d57-4395-93ac-ef514f2fb898|42187|42150|2026-07-17T09:01:26.343Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-17T09:01:26.343Z",
+      "at": "2026-07-17T09:01:26.343Z",
+      "mapUid": "qHU4dAEZaWwb7Nu2n8lZ_2c9vD3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "f338668e-5d57-4395-93ac-ef514f2fb898",
+      "oldHolder": "ultimatehippie",
+      "oldTimeMs": 42187,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.187",
+      "oldScoreKey": "42187",
+      "newHolderAccountId": "f338668e-5d57-4395-93ac-ef514f2fb898",
+      "newHolder": "ultimatehippie",
+      "newTimeMs": 42150,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:42.150",
+      "newScoreKey": "42150",
+      "text": "ultimatehippie improved their WR on Unknown map from 00:00:42.187 to 00:00:42.150."
+    },
     {
       "id": "wr_changed|jawVpwzd8Gyo8TBWqCKsnD0_UJh|005d4ee0-b88f-4b28-a342-0ae2a2f36dca|ff68ddb0-b0c7-4195-87e5-e4569b67f8b3|10128|10046|2026-07-17T04:30:33.874Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.212",
       "newScoreKey": "10212",
       "text": "Lunarius.tm overtook JuntaoTM on Unknown map with 00:00:10.212."
-    },
-    {
-      "id": "wr_changed|QlHRcI6zdbfl645j2dzzRRIGHef|974aa34c-25c6-4244-a14c-4eb04ad25660|9a0ff6af-063b-4114-98e7-92c794baee3e|47152|47027|2026-06-30T18:09:07.979Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T18:09:07.979Z",
-      "at": "2026-06-30T18:09:07.979Z",
-      "mapUid": "QlHRcI6zdbfl645j2dzzRRIGHef",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "974aa34c-25c6-4244-a14c-4eb04ad25660",
-      "oldHolder": "ShadyBanana",
-      "oldTimeMs": 47152,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:47.152",
-      "oldScoreKey": "47152",
-      "newHolderAccountId": "9a0ff6af-063b-4114-98e7-92c794baee3e",
-      "newHolder": "cigarette5000",
-      "newTimeMs": 47027,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:47.027",
-      "newScoreKey": "47027",
-      "text": "cigarette5000 overtook ShadyBanana on Unknown map with 00:00:47.027."
     }
   ]
 }
