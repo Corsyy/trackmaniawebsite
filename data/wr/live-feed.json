@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-18T09:46:20.854Z",
+  "generatedAt": "2026-07-18T10:52:15.660Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|wv2Q3wAMrfKTt68Y4Gt_QRJQY0n|403a098f-8390-4f46-9b06-36577d559b7d|403a098f-8390-4f46-9b06-36577d559b7d|27854|27066|2026-07-18T10:52:15.660Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-18T10:52:15.660Z",
+      "at": "2026-07-18T10:52:15.660Z",
+      "mapUid": "wv2Q3wAMrfKTt68Y4Gt_QRJQY0n",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "403a098f-8390-4f46-9b06-36577d559b7d",
+      "oldHolder": "hp09",
+      "oldTimeMs": 27854,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:27.854",
+      "oldScoreKey": "27854",
+      "newHolderAccountId": "403a098f-8390-4f46-9b06-36577d559b7d",
+      "newHolder": "hp09",
+      "newTimeMs": 27066,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:27.066",
+      "newScoreKey": "27066",
+      "text": "hp09 improved their WR on Unknown map from 00:00:27.854 to 00:00:27.066."
+    },
     {
       "id": "wr_changed|dFs3HDl3HcZYsGemz_h3vPagwoh|b235dcab-606c-4091-88bc-88c161ddb10c|a7a0ff29-88c6-4dfb-b2dc-d2d1ff77597f|22568|22446|2026-07-18T04:12:54.297Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:14.689",
       "newScoreKey": "14689",
       "text": "andrenator5000 overtook BUXKSK_ on Unknown map with 00:00:14.689."
-    },
-    {
-      "id": "wr_changed|12QTR1eqb0bMGiVcLpi5lmiH5n4|41d5fd91-a880-46d6-ad24-58d34524774b|be9992af-2533-47d4-bdc8-1c2ef5b491d9|8665|8640|2026-06-30T20:16:15.310Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-06-30T20:16:15.310Z",
-      "at": "2026-06-30T20:16:15.310Z",
-      "mapUid": "12QTR1eqb0bMGiVcLpi5lmiH5n4",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "41d5fd91-a880-46d6-ad24-58d34524774b",
-      "oldHolder": "JuntaoTM",
-      "oldTimeMs": 8665,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.665",
-      "oldScoreKey": "8665",
-      "newHolderAccountId": "be9992af-2533-47d4-bdc8-1c2ef5b491d9",
-      "newHolder": "Jakhias_Edwards",
-      "newTimeMs": 8640,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.640",
-      "newScoreKey": "8640",
-      "text": "Jakhias_Edwards overtook JuntaoTM on Unknown map with 00:00:08.640."
     }
   ]
 }
