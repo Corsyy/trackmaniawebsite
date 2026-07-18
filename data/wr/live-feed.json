@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-18T15:15:44.692Z",
+  "generatedAt": "2026-07-18T16:14:53.974Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|Mh7eoeVIlpNQ5_5PC95aaAjHq59|d620091b-876b-4af4-8f98-ed3625d234e9|d620091b-876b-4af4-8f98-ed3625d234e9|43590|43585|2026-07-18T16:14:53.974Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-18T16:14:53.974Z",
+      "at": "2026-07-18T16:14:53.974Z",
+      "mapUid": "Mh7eoeVIlpNQ5_5PC95aaAjHq59",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "oldHolder": "C50.94975-6.947",
+      "oldTimeMs": 43590,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:43.590",
+      "oldScoreKey": "43590",
+      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "newHolder": "C50.94975-6.947",
+      "newTimeMs": 43585,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:43.585",
+      "newScoreKey": "43585",
+      "text": "C50.94975-6.947 improved their WR on Unknown map from 00:00:43.590 to 00:00:43.585."
+    },
     {
       "id": "wr_changed|HMKGPhijpjdiPI8OTIoJQSioO89|2c78f985-1ca6-48f6-8070-f8b2370271a7|bd0aefa2-f0fd-4abe-95e4-033b4c623196|221165|219652|2026-07-18T14:12:11.067Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:21.616",
       "newScoreKey": "21616",
       "text": "Kovalc improved their WR on Unknown map from 00:00:21.633 to 00:00:21.616."
-    },
-    {
-      "id": "wr_changed|7ptJQ5g8embqYPhSP_0lP9bTkad|f73c41d6-36df-462f-a70c-d610675a370e|7371dfbe-0eec-4fcb-8490-b32471a22e0e|16129|16128|2026-07-01T04:51:17.495Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-01T04:51:17.495Z",
-      "at": "2026-07-01T04:51:17.495Z",
-      "mapUid": "7ptJQ5g8embqYPhSP_0lP9bTkad",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f73c41d6-36df-462f-a70c-d610675a370e",
-      "oldHolder": "tnt.hc",
-      "oldTimeMs": 16129,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:16.129",
-      "oldScoreKey": "16129",
-      "newHolderAccountId": "7371dfbe-0eec-4fcb-8490-b32471a22e0e",
-      "newHolder": "Nuzzle.-",
-      "newTimeMs": 16128,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:16.128",
-      "newScoreKey": "16128",
-      "text": "Nuzzle.- overtook tnt.hc on Unknown map with 00:00:16.128."
     }
   ]
 }
