@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-19T19:58:47.031Z",
+  "generatedAt": "2026-07-19T20:57:48.878Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|gJjAIuJG03OF50bqBbZNE0B3ms0|0d514e6f-5a95-41d7-9dc2-3684cfeff330|5dec78af-980c-4806-b72b-5ada41c158e1|23148|23005|2026-07-19T20:57:48.878Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-19T20:57:48.878Z",
+      "at": "2026-07-19T20:57:48.878Z",
+      "mapUid": "gJjAIuJG03OF50bqBbZNE0B3ms0",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "0d514e6f-5a95-41d7-9dc2-3684cfeff330",
+      "oldHolder": "Lunarius.tm",
+      "oldTimeMs": 23148,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:23.148",
+      "oldScoreKey": "23148",
+      "newHolderAccountId": "5dec78af-980c-4806-b72b-5ada41c158e1",
+      "newHolder": "macro.tm",
+      "newTimeMs": 23005,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:23.005",
+      "newScoreKey": "23005",
+      "text": "macro.tm overtook Lunarius.tm on Unknown map with 00:00:23.005."
+    },
     {
       "id": "wr_changed|ME_f_VE2kImJcxdgm87T_mTVYVf|d569b3f3-6cf9-4879-86d1-05243d152314|43e08c40-14fa-4f0d-ae1f-59a91bfadcc5|8685|8603|2026-07-19T12:41:46.669Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:11.280",
       "newScoreKey": "11280",
       "text": "Boasyyy overtook Danyy912 on Unknown map with 00:00:11.280."
-    },
-    {
-      "id": "wr_changed|Dp8A3LmCp0aB4HKAIrG1odRkqQh|7f80b573-fff1-4de9-8cd5-ee7e5749ce15|d207f651-e68e-41f9-b8de-58f3e503c5b5|8490|8351|2026-07-01T20:24:52.454Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-01T20:24:52.454Z",
-      "at": "2026-07-01T20:24:52.454Z",
-      "mapUid": "Dp8A3LmCp0aB4HKAIrG1odRkqQh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7f80b573-fff1-4de9-8cd5-ee7e5749ce15",
-      "oldHolder": "Gossfire89",
-      "oldTimeMs": 8490,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.490",
-      "oldScoreKey": "8490",
-      "newHolderAccountId": "d207f651-e68e-41f9-b8de-58f3e503c5b5",
-      "newHolder": "dcdsx",
-      "newTimeMs": 8351,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.351",
-      "newScoreKey": "8351",
-      "text": "dcdsx overtook Gossfire89 on Unknown map with 00:00:08.351."
     }
   ]
 }
