@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-19T07:17:55.316Z",
+  "generatedAt": "2026-07-19T09:22:30.498Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|MLieVzA8WgfU3yXAyCoRBTcJJci|4eb4b758-5bea-465c-9526-8520c697588e|d63054a0-f977-4f1b-9dcb-644ef5ed735d|12067|11925|2026-07-19T09:22:30.498Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-19T09:22:30.498Z",
+      "at": "2026-07-19T09:22:30.498Z",
+      "mapUid": "MLieVzA8WgfU3yXAyCoRBTcJJci",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "4eb4b758-5bea-465c-9526-8520c697588e",
+      "oldHolder": "junipurr666",
+      "oldTimeMs": 12067,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:12.067",
+      "oldScoreKey": "12067",
+      "newHolderAccountId": "d63054a0-f977-4f1b-9dcb-644ef5ed735d",
+      "newHolder": "k477R",
+      "newTimeMs": 11925,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.925",
+      "newScoreKey": "11925",
+      "text": "k477R overtook junipurr666 on Unknown map with 00:00:11.925."
+    },
     {
       "id": "wr_changed|NaE2nHdfD4MyBsCa6oBFiV7xCfa|d28a55af-b66d-4401-9466-2f9877890a54|d4e88731-a617-4d90-9e1c-2c3f796bce84|6694|6654|2026-07-19T04:36:41.098Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.913",
       "newScoreKey": "10913",
       "text": "Nightroast overtook Analog-.- on Unknown map with 00:00:10.913."
-    },
-    {
-      "id": "wr_changed|SUiGVC8zVC6jEKpk9U0XcidANH|aa4e375f-d23e-4915-8d53-8b3307e06764|36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a|43637|43627|2026-07-01T18:25:31.540Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-01T18:25:31.540Z",
-      "at": "2026-07-01T18:25:31.540Z",
-      "mapUid": "SUiGVC8zVC6jEKpk9U0XcidANH",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "official",
-      "oldHolderAccountId": "aa4e375f-d23e-4915-8d53-8b3307e06764",
-      "oldHolder": "racehansTM",
-      "oldTimeMs": 43637,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:43.637",
-      "oldScoreKey": "43637",
-      "newHolderAccountId": "36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a",
-      "newHolder": "zodiark.",
-      "newTimeMs": 43627,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:43.627",
-      "newScoreKey": "43627",
-      "text": "zodiark. overtook racehansTM on Unknown map with 00:00:43.627."
     }
   ]
 }
