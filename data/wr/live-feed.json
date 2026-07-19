@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19T09:22:30.498Z",
+  "generatedAt": "2026-07-19T10:49:56.335Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|iWd8XL1Jr_ofCPIhEQBf3aOQMm6|d28a55af-b66d-4401-9466-2f9877890a54|30e6dc3a-38be-4e24-841e-57205b7d5012|5233|5232|2026-07-19T10:49:56.335Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-19T10:49:56.335Z",
+      "at": "2026-07-19T10:49:56.335Z",
+      "mapUid": "iWd8XL1Jr_ofCPIhEQBf3aOQMm6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
+      "oldHolder": "MazsTM",
+      "oldTimeMs": 5233,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:05.233",
+      "oldScoreKey": "5233",
+      "newHolderAccountId": "30e6dc3a-38be-4e24-841e-57205b7d5012",
+      "newHolder": "OZY-.-",
+      "newTimeMs": 5232,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:05.232",
+      "newScoreKey": "5232",
+      "text": "OZY-.- overtook MazsTM on Unknown map with 00:00:05.232."
+    },
     {
       "id": "wr_changed|MLieVzA8WgfU3yXAyCoRBTcJJci|4eb4b758-5bea-465c-9526-8520c697588e|d63054a0-f977-4f1b-9dcb-644ef5ed735d|12067|11925|2026-07-19T09:22:30.498Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.585",
       "newScoreKey": "10585",
       "text": "Danyy912 overtook Vatsug44 on Unknown map with 00:00:10.585."
-    },
-    {
-      "id": "wr_changed|3IUiN2o2_CXoJpzya5xeyuWrpG6|2827299e-fc4f-4717-936b-1b01282859bb|114f00e8-12ca-41ee-81f2-5ef64dbfcac5|10923|10913|2026-07-01T20:24:52.454Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-01T20:24:52.454Z",
-      "at": "2026-07-01T20:24:52.454Z",
-      "mapUid": "3IUiN2o2_CXoJpzya5xeyuWrpG6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "2827299e-fc4f-4717-936b-1b01282859bb",
-      "oldHolder": "Analog-.-",
-      "oldTimeMs": 10923,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.923",
-      "oldScoreKey": "10923",
-      "newHolderAccountId": "114f00e8-12ca-41ee-81f2-5ef64dbfcac5",
-      "newHolder": "Nightroast",
-      "newTimeMs": 10913,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.913",
-      "newScoreKey": "10913",
-      "text": "Nightroast overtook Analog-.- on Unknown map with 00:00:10.913."
     }
   ]
 }
