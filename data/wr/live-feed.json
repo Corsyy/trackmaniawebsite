@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-21T21:32:47.680Z",
+  "generatedAt": "2026-07-21T22:40:32.784Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|fhnI69XXpZOlNoSlpRBPZeJaZZ0|f9210878-80c5-4f88-b98e-faeef9a5c21a|f9210878-80c5-4f88-b98e-faeef9a5c21a|41582|41473|2026-07-21T22:40:32.784Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-21T22:40:32.784Z",
+      "at": "2026-07-21T22:40:32.784Z",
+      "mapUid": "fhnI69XXpZOlNoSlpRBPZeJaZZ0",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "f9210878-80c5-4f88-b98e-faeef9a5c21a",
+      "oldHolder": "Bio_Arcane",
+      "oldTimeMs": 41582,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:41.582",
+      "oldScoreKey": "41582",
+      "newHolderAccountId": "f9210878-80c5-4f88-b98e-faeef9a5c21a",
+      "newHolder": "Bio_Arcane",
+      "newTimeMs": 41473,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.473",
+      "newScoreKey": "41473",
+      "text": "Bio_Arcane improved their WR on Unknown map from 00:00:41.582 to 00:00:41.473."
+    },
     {
       "id": "wr_changed|NB31ldG2bRmnROfTcnt6TKo6IM5|ab2e1953-83da-467b-9ea1-caf350fa8cc4|bf5f13a3-3be5-457b-88fa-2b4fee777fd6|54072|53868|2026-07-21T21:32:47.680Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:24.401",
       "newScoreKey": "24401",
       "text": "ailiei. overtook BucketTm on Unknown map with 00:00:24.401."
-    },
-    {
-      "id": "wr_changed|FEY7xpv2Xi89uVzZhfxFqS4SWwe|7345239e-c200-4698-bc37-2bff1edc72c8|7fc7bc9c-67b2-4003-b1a3-29006486f71e|7702|7239|2026-07-04T16:44:24.044Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-04T16:44:24.044Z",
-      "at": "2026-07-04T16:44:24.044Z",
-      "mapUid": "FEY7xpv2Xi89uVzZhfxFqS4SWwe",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7345239e-c200-4698-bc37-2bff1edc72c8",
-      "oldHolder": "gohardware",
-      "oldTimeMs": 7702,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.702",
-      "oldScoreKey": "7702",
-      "newHolderAccountId": "7fc7bc9c-67b2-4003-b1a3-29006486f71e",
-      "newHolder": "ailiei.",
-      "newTimeMs": 7239,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.239",
-      "newScoreKey": "7239",
-      "text": "ailiei. overtook gohardware on Unknown map with 00:00:07.239."
     }
   ]
 }
