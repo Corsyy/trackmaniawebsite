@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-21T14:05:48.634Z",
+  "generatedAt": "2026-07-21T15:52:38.424Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|fTME4rUOfarTKpPNNQanrJC6F6f|8ff5b64e-1653-4595-a09f-f0b75cd8931a|b8466c27-6898-4956-a510-4c37c5ba4347|1450|8713|2026-07-21T15:52:38.424Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-21T15:52:38.424Z",
+      "at": "2026-07-21T15:52:38.424Z",
+      "mapUid": "fTME4rUOfarTKpPNNQanrJC6F6f",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8ff5b64e-1653-4595-a09f-f0b75cd8931a",
+      "oldHolder": "quezo888",
+      "oldTimeMs": 1450,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:01.450",
+      "oldScoreKey": "1450",
+      "newHolderAccountId": "b8466c27-6898-4956-a510-4c37c5ba4347",
+      "newHolder": "ZoMBiE4053",
+      "newTimeMs": 8713,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.713",
+      "newScoreKey": "8713",
+      "text": "ZoMBiE4053 overtook quezo888 on Unknown map with 00:00:08.713."
+    },
     {
       "id": "wr_changed|fCpO4I6_Yd8vyJT90x7TbpSyg3b|d9835d12-3ff6-49f5-901d-c572ee058414|c03bb461-2fbc-46b9-b490-65102bec7c61|9228|9221|2026-07-21T14:05:48.634Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.315",
       "newScoreKey": "6315",
       "text": "Flechetas overtook Tyhhh. on Unknown map with 00:00:06.315."
-    },
-    {
-      "id": "self_improve|iFx4MbpiwM7xOMKrI5TbfmZ6WXa|f7ac1b28-4ec2-442b-9cc8-9740e4bbeca8|f7ac1b28-4ec2-442b-9cc8-9740e4bbeca8|48530|47955|2026-07-04T12:44:08.571Z",
-      "type": "self_improve",
-      "detectedAt": "2026-07-04T12:44:08.571Z",
-      "at": "2026-07-04T12:44:08.571Z",
-      "mapUid": "iFx4MbpiwM7xOMKrI5TbfmZ6WXa",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f7ac1b28-4ec2-442b-9cc8-9740e4bbeca8",
-      "oldHolder": "Jules61",
-      "oldTimeMs": 48530,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:48.530",
-      "oldScoreKey": "48530",
-      "newHolderAccountId": "f7ac1b28-4ec2-442b-9cc8-9740e4bbeca8",
-      "newHolder": "Jules61",
-      "newTimeMs": 47955,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:47.955",
-      "newScoreKey": "47955",
-      "text": "Jules61 improved their WR on Unknown map from 00:00:48.530 to 00:00:47.955."
     }
   ]
 }
