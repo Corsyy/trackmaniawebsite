@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-21T17:05:18.389Z",
+  "generatedAt": "2026-07-21T18:39:28.172Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|MypZNRw9hzHgZQqS9kpwT6Vhqdc|d110d3dc-5dd3-4714-82ae-15633a0e78d3|10eeb2e7-50de-4aba-815e-dd50342e067a|13242|13234|2026-07-21T18:39:28.172Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-21T18:39:28.172Z",
+      "at": "2026-07-21T18:39:28.172Z",
+      "mapUid": "MypZNRw9hzHgZQqS9kpwT6Vhqdc",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d110d3dc-5dd3-4714-82ae-15633a0e78d3",
+      "oldHolder": "tuduttuduu",
+      "oldTimeMs": 13242,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.242",
+      "oldScoreKey": "13242",
+      "newHolderAccountId": "10eeb2e7-50de-4aba-815e-dd50342e067a",
+      "newHolder": "MattsSats",
+      "newTimeMs": 13234,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.234",
+      "newScoreKey": "13234",
+      "text": "MattsSats overtook tuduttuduu on Unknown map with 00:00:13.234."
+    },
     {
       "id": "wr_changed|fTME4rUOfarTKpPNNQanrJC6F6f|8ff5b64e-1653-4595-a09f-f0b75cd8931a|b8466c27-6898-4956-a510-4c37c5ba4347|1450|8713|2026-07-21T15:52:38.424Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.167",
       "newScoreKey": "8167",
       "text": "anToni_TM overtook SpeederBen on Unknown map with 00:00:08.167."
-    },
-    {
-      "id": "wr_changed|6aQTYDRdxmLL3O6CVWSgrSP0nGl|cbc3ec4d-658b-4df0-bb7a-b83216e08f01|cd32b288-a361-483a-9c48-68417eb83c74|6318|6315|2026-07-04T14:18:35.723Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-04T14:18:35.723Z",
-      "at": "2026-07-04T14:18:35.723Z",
-      "mapUid": "6aQTYDRdxmLL3O6CVWSgrSP0nGl",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "cbc3ec4d-658b-4df0-bb7a-b83216e08f01",
-      "oldHolder": "Tyhhh.",
-      "oldTimeMs": 6318,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:06.318",
-      "oldScoreKey": "6318",
-      "newHolderAccountId": "cd32b288-a361-483a-9c48-68417eb83c74",
-      "newHolder": "Flechetas",
-      "newTimeMs": 6315,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:06.315",
-      "newScoreKey": "6315",
-      "text": "Flechetas overtook Tyhhh. on Unknown map with 00:00:06.315."
     }
   ]
 }
