@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-22T22:47:17.175Z",
+  "generatedAt": "2026-07-22T23:47:16.546Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|qXxx4DXcswV3hEUtQc02yXoCGPg|8b747f40-22d7-4373-b8f9-679ffdfd5b56|34b5fb61-ca15-4b9a-b6e3-9cee8bccea3c|3630|9637|2026-07-22T23:47:16.546Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-22T23:47:16.546Z",
+      "at": "2026-07-22T23:47:16.546Z",
+      "mapUid": "qXxx4DXcswV3hEUtQc02yXoCGPg",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8b747f40-22d7-4373-b8f9-679ffdfd5b56",
+      "oldHolder": "AlfieTheWolfie",
+      "oldTimeMs": 3630,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:03.630",
+      "oldScoreKey": "3630",
+      "newHolderAccountId": "34b5fb61-ca15-4b9a-b6e3-9cee8bccea3c",
+      "newHolder": "AdamJC20",
+      "newTimeMs": 9637,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.637",
+      "newScoreKey": "9637",
+      "text": "AdamJC20 overtook AlfieTheWolfie on Unknown map with 00:00:09.637."
+    },
     {
       "id": "wr_changed|iwlK663IItEOnbe3quHrf_lQXK3|6cdffc9d-5773-4ffd-a1f4-5ebb4e3b048a|51a58d8b-6dda-408d-a945-70e89d2cdfdd|51198|51022|2026-07-22T22:47:17.175Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:22.568",
       "newScoreKey": "22568",
       "text": "jvstqanic overtook andrenator5000 on Unknown map with 00:00:22.568."
-    },
-    {
-      "id": "wr_changed|SZRHLvdOciCF1xYY0cbWq3VUO70|ffd1d59b-827d-406f-8b1f-ae4e5f41e7f1|05477e79-25fd-48c2-84c7-e1621aa46517|44293|43848|2026-07-07T01:20:03.651Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-07T01:20:03.651Z",
-      "at": "2026-07-07T01:20:03.651Z",
-      "mapUid": "SZRHLvdOciCF1xYY0cbWq3VUO70",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "ffd1d59b-827d-406f-8b1f-ae4e5f41e7f1",
-      "oldHolder": "tunksunham",
-      "oldTimeMs": 44293,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:44.293",
-      "oldScoreKey": "44293",
-      "newHolderAccountId": "05477e79-25fd-48c2-84c7-e1621aa46517",
-      "newHolder": "GranaDy.",
-      "newTimeMs": 43848,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:43.848",
-      "newScoreKey": "43848",
-      "text": "GranaDy. overtook tunksunham on Unknown map with 00:00:43.848."
     }
   ]
 }
