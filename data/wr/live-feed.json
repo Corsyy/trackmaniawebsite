@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-23T17:44:19.879Z",
+  "generatedAt": "2026-07-23T18:53:53.347Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|8xpjgEUiE_ELpg278fi8iWOWYNf|3898953a-980c-411a-8cd7-f38625773acd|3898953a-980c-411a-8cd7-f38625773acd|10244|10232|2026-07-23T18:53:53.347Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-23T18:53:53.347Z",
+      "at": "2026-07-23T18:53:53.347Z",
+      "mapUid": "8xpjgEUiE_ELpg278fi8iWOWYNf",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "3898953a-980c-411a-8cd7-f38625773acd",
+      "oldHolder": "Utopasoi",
+      "oldTimeMs": 10244,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.244",
+      "oldScoreKey": "10244",
+      "newHolderAccountId": "3898953a-980c-411a-8cd7-f38625773acd",
+      "newHolder": "Utopasoi",
+      "newTimeMs": 10232,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.232",
+      "newScoreKey": "10232",
+      "text": "Utopasoi improved their WR on Unknown map from 00:00:10.244 to 00:00:10.232."
+    },
     {
       "id": "wr_changed|s7NSPqr038sJsIMRx66HskVg119|e1adb543-8ffb-4352-9ef1-94c82b5f01de|3a96e825-e60d-4cef-97a4-deda1f05666c|11206|11185|2026-07-23T16:05:07.590Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.655",
       "newScoreKey": "10655",
       "text": "puchmu overtook Nalax_tm on Unknown map with 00:00:10.655."
-    },
-    {
-      "id": "wr_changed|J3RyKSumRDcpqxza1y8PzvRitLl|16ee3d8e-ee78-4e77-b787-48f2247f96c3|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|23128|23126|2026-07-08T07:17:43.563Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-08T07:17:43.563Z",
-      "at": "2026-07-08T07:17:43.563Z",
-      "mapUid": "J3RyKSumRDcpqxza1y8PzvRitLl",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "official",
-      "oldHolderAccountId": "16ee3d8e-ee78-4e77-b787-48f2247f96c3",
-      "oldHolder": "DarkBringer94",
-      "oldTimeMs": 23128,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:23.128",
-      "oldScoreKey": "23128",
-      "newHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
-      "newHolder": "ShcrTM",
-      "newTimeMs": 23126,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:23.126",
-      "newScoreKey": "23126",
-      "text": "ShcrTM overtook DarkBringer94 on Unknown map with 00:00:23.126."
     }
   ]
 }
