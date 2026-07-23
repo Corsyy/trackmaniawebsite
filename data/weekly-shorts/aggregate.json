@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-23T20:48:46.854Z",
+  "generatedAt": "2026-07-23T21:53:13.780Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -4079,7 +4079,7 @@
       "accountId": "083ff8a9-ff45-4cf9-b7cf-8fc601aa656e",
       "player": "Krazy_dudeCr00k",
       "wins": 1,
-      "wrs": 15,
+      "wrs": 16,
       "top5": 34,
       "weeksWon": [
         61
@@ -4173,6 +4173,12 @@
           "week": 83,
           "mapUid": "4wvSMutDyCU0zHDyqqI8GOPawii",
           "timeMs": 10963,
+          "rawRank": 1
+        },
+        {
+          "week": 84,
+          "mapUid": "AMirNcXSxWkZ6D_a41dqOiSqVSh",
+          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -4411,9 +4417,9 @@
         {
           "week": 84,
           "mapUid": "AMirNcXSxWkZ6D_a41dqOiSqVSh",
-          "rank": 3,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 1
         }
       ],
       "aliases": []
@@ -13598,32 +13604,6 @@
       "aliases": []
     },
     {
-      "accountId": "3f0b0305-50a5-4b7e-aebf-0602b7a3f84a",
-      "player": "CursedTEX",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 84,
-          "mapUid": "AMirNcXSxWkZ6D_a41dqOiSqVSh",
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 84,
-          "mapUid": "AMirNcXSxWkZ6D_a41dqOiSqVSh",
-          "rank": 1,
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "bb425f31-5e51-4f39-bab0-c85327ed949c",
       "player": "dexyytm",
       "wins": 0,
@@ -14884,9 +14864,9 @@
         {
           "week": 84,
           "mapUid": "AMirNcXSxWkZ6D_a41dqOiSqVSh",
-          "rank": 2,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -19820,6 +19800,25 @@
           "rank": 3,
           "timeMs": 12104,
           "rawRank": 3
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "3f0b0305-50a5-4b7e-aebf-0602b7a3f84a",
+      "player": "CursedTEX",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 84,
+          "mapUid": "AMirNcXSxWkZ6D_a41dqOiSqVSh",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
         }
       ],
       "aliases": []
