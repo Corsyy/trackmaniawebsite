@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-24T15:01:06.509Z",
+  "generatedAt": "2026-07-24T16:50:37.107Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|R5bZf5QUFjKSN767_xC1GT4yVka|5be4a170-f48d-4f80-9e19-334b0cadf472|da4642f9-6acf-43fe-88b6-b120ff1308ba|42492|42446|2026-07-24T16:50:37.107Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-24T16:50:37.107Z",
+      "at": "2026-07-24T16:50:37.107Z",
+      "mapUid": "R5bZf5QUFjKSN767_xC1GT4yVka",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "5be4a170-f48d-4f80-9e19-334b0cadf472",
+      "oldHolder": "Otaaaq",
+      "oldTimeMs": 42492,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.492",
+      "oldScoreKey": "42492",
+      "newHolderAccountId": "da4642f9-6acf-43fe-88b6-b120ff1308ba",
+      "newHolder": "Scrapie98",
+      "newTimeMs": 42446,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:42.446",
+      "newScoreKey": "42446",
+      "text": "Scrapie98 overtook Otaaaq on Unknown map with 00:00:42.446."
+    },
     {
       "id": "self_improve|_allkPCDNXTx2ech7txHuAvvpfd|d620091b-876b-4af4-8f98-ed3625d234e9|d620091b-876b-4af4-8f98-ed3625d234e9|41258|41243|2026-07-24T11:27:32.764Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:13.575",
       "newScoreKey": "13575",
       "text": "JumpThisDoodle overtook Mr.Snowdie on Unknown map with 00:00:13.575."
-    },
-    {
-      "id": "wr_changed|6cGmgVF9FDlMUps_4EvDPi5p92c|d84aa727-7402-4f82-94c3-97082ecc1676|a6bba306-12cc-4e9d-80bb-9951ca56f4b5|16848|16445|2026-07-08T15:32:34.391Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-08T15:32:34.391Z",
-      "at": "2026-07-08T15:32:34.391Z",
-      "mapUid": "6cGmgVF9FDlMUps_4EvDPi5p92c",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d84aa727-7402-4f82-94c3-97082ecc1676",
-      "oldHolder": "Xylodriver",
-      "oldTimeMs": 16848,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:16.848",
-      "oldScoreKey": "16848",
-      "newHolderAccountId": "a6bba306-12cc-4e9d-80bb-9951ca56f4b5",
-      "newHolder": "JumpThisDoodle",
-      "newTimeMs": 16445,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:16.445",
-      "newScoreKey": "16445",
-      "text": "JumpThisDoodle overtook Xylodriver on Unknown map with 00:00:16.445."
     }
   ]
 }
