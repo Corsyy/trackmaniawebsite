@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-24T09:42:01.859Z",
+  "generatedAt": "2026-07-24T11:27:32.764Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|_allkPCDNXTx2ech7txHuAvvpfd|d620091b-876b-4af4-8f98-ed3625d234e9|d620091b-876b-4af4-8f98-ed3625d234e9|41258|41243|2026-07-24T11:27:32.764Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-24T11:27:32.764Z",
+      "at": "2026-07-24T11:27:32.764Z",
+      "mapUid": "_allkPCDNXTx2ech7txHuAvvpfd",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "oldHolder": "C50.94975-6.947",
+      "oldTimeMs": 41258,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:41.258",
+      "oldScoreKey": "41258",
+      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "newHolder": "C50.94975-6.947",
+      "newTimeMs": 41243,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.243",
+      "newScoreKey": "41243",
+      "text": "C50.94975-6.947 improved their WR on Unknown map from 00:00:41.258 to 00:00:41.243."
+    },
     {
       "id": "wr_changed|5ltLFt88u2HrcZry3yZXIJxI5ge|90e8416c-b42c-49d9-8f59-c7510e54fc4d|a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12|11797|11763|2026-07-24T09:42:01.859Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:16.445",
       "newScoreKey": "16445",
       "text": "JumpThisDoodle overtook Xylodriver on Unknown map with 00:00:16.445."
-    },
-    {
-      "id": "wr_changed|RmokknXocC2qSJzHkOci8ZYdBG5|c11b87d6-b864-403c-ba3a-d644fc586901|517bba44-37b2-4594-b4ac-07d2510469b7|12807|12588|2026-07-08T15:32:34.391Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-08T15:32:34.391Z",
-      "at": "2026-07-08T15:32:34.391Z",
-      "mapUid": "RmokknXocC2qSJzHkOci8ZYdBG5",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c11b87d6-b864-403c-ba3a-d644fc586901",
-      "oldHolder": "puchmu",
-      "oldTimeMs": 12807,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.807",
-      "oldScoreKey": "12807",
-      "newHolderAccountId": "517bba44-37b2-4594-b4ac-07d2510469b7",
-      "newHolder": "Hemi-_---",
-      "newTimeMs": 12588,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.588",
-      "newScoreKey": "12588",
-      "text": "Hemi-_--- overtook puchmu on Unknown map with 00:00:12.588."
     }
   ]
 }
