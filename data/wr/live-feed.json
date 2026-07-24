@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-24T07:22:36.462Z",
+  "generatedAt": "2026-07-24T09:42:01.859Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 5,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|5ltLFt88u2HrcZry3yZXIJxI5ge|90e8416c-b42c-49d9-8f59-c7510e54fc4d|a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12|11797|11763|2026-07-24T09:42:01.859Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-24T09:42:01.859Z",
+      "at": "2026-07-24T09:42:01.859Z",
+      "mapUid": "5ltLFt88u2HrcZry3yZXIJxI5ge",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "90e8416c-b42c-49d9-8f59-c7510e54fc4d",
+      "oldHolder": "FEVER.MODE",
+      "oldTimeMs": 11797,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:11.797",
+      "oldScoreKey": "11797",
+      "newHolderAccountId": "a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12",
+      "newHolder": "tommy_tucker193",
+      "newTimeMs": 11763,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.763",
+      "newScoreKey": "11763",
+      "text": "tommy_tucker193 overtook FEVER.MODE on Unknown map with 00:00:11.763."
+    },
     {
       "id": "self_improve|NB31ldG2bRmnROfTcnt6TKo6IM5|bf5f13a3-3be5-457b-88fa-2b4fee777fd6|bf5f13a3-3be5-457b-88fa-2b4fee777fd6|53868|53795|2026-07-24T07:22:36.462Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.588",
       "newScoreKey": "12588",
       "text": "Hemi-_--- overtook puchmu on Unknown map with 00:00:12.588."
-    },
-    {
-      "id": "wr_changed|klxhdTN2scSsUubD4tpwNiaMaym|3a96e825-e60d-4cef-97a4-deda1f05666c|55a3499e-bd43-46ba-b2ac-a9b4ab8006cd|7915|7832|2026-07-08T13:10:30.051Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-08T13:10:30.051Z",
-      "at": "2026-07-08T13:10:30.051Z",
-      "mapUid": "klxhdTN2scSsUubD4tpwNiaMaym",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "oldHolder": "Danyy912",
-      "oldTimeMs": 7915,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.915",
-      "oldScoreKey": "7915",
-      "newHolderAccountId": "55a3499e-bd43-46ba-b2ac-a9b4ab8006cd",
-      "newHolder": "Rosarubra_tm",
-      "newTimeMs": 7832,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.832",
-      "newScoreKey": "7832",
-      "text": "Rosarubra_tm overtook Danyy912 on Unknown map with 00:00:07.832."
     }
   ]
 }
