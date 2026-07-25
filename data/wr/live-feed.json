@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-25T14:22:30.038Z",
+  "generatedAt": "2026-07-25T15:34:56.064Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|Qy345pWg821zDyIg3DvZdD54_yj|b52e0c98-387c-43eb-9acb-5c9b5e0f1286|e582f3c0-29a8-4391-aa7f-acd01ecf0496|39974|39965|2026-07-25T15:34:56.064Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-25T15:34:56.064Z",
+      "at": "2026-07-25T15:34:56.064Z",
+      "mapUid": "Qy345pWg821zDyIg3DvZdD54_yj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "b52e0c98-387c-43eb-9acb-5c9b5e0f1286",
+      "oldHolder": "RoaTM.",
+      "oldTimeMs": 39974,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:39.974",
+      "oldScoreKey": "39974",
+      "newHolderAccountId": "e582f3c0-29a8-4391-aa7f-acd01ecf0496",
+      "newHolder": "Alekzi...",
+      "newTimeMs": 39965,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:39.965",
+      "newScoreKey": "39965",
+      "text": "Alekzi... overtook RoaTM. on Unknown map with 00:00:39.965."
+    },
     {
       "id": "wr_changed|mYbZniyvEFF7gMKaVbo5bflczmh|70ea8df2-ddda-4a89-b2b0-301d764cef9d|2f81cdd9-dbf4-42a5-a1f9-a5dd7461b967|26091|25882|2026-07-25T12:48:41.557Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.593",
       "newScoreKey": "6593",
       "text": "k477R overtook blippesen_121 on Unknown map with 00:00:06.593."
-    },
-    {
-      "id": "wr_changed|PPXmy7S7V23lKGbqyvJaOOw3Hw1|c04d5345-34ca-49e6-a839-98416bf0aada|41d5fd91-a880-46d6-ad24-58d34524774b|11796|7558|2026-07-09T23:35:48.620Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-09T23:35:48.620Z",
-      "at": "2026-07-09T23:35:48.620Z",
-      "mapUid": "PPXmy7S7V23lKGbqyvJaOOw3Hw1",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c04d5345-34ca-49e6-a839-98416bf0aada",
-      "oldHolder": "Whatever8319",
-      "oldTimeMs": 11796,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:11.796",
-      "oldScoreKey": "11796",
-      "newHolderAccountId": "41d5fd91-a880-46d6-ad24-58d34524774b",
-      "newHolder": "JuntaoTM",
-      "newTimeMs": 7558,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.558",
-      "newScoreKey": "7558",
-      "text": "JuntaoTM overtook Whatever8319 on Unknown map with 00:00:07.558."
     }
   ]
 }
