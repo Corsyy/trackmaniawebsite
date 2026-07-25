@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-25T06:07:50.813Z",
+  "generatedAt": "2026-07-25T08:22:48.749Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|KYjQhJjQ92sQ4Msbi4GT2ndqlZa|652069fa-48df-4d58-b0c9-d686ef445103|c1e8bbec-8bb3-40b3-9b0e-52e3cb36015e|279026|277162|2026-07-25T08:22:48.749Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-25T08:22:48.749Z",
+      "at": "2026-07-25T08:22:48.749Z",
+      "mapUid": "KYjQhJjQ92sQ4Msbi4GT2ndqlZa",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "652069fa-48df-4d58-b0c9-d686ef445103",
+      "oldHolder": "KevinStrike_Tm",
+      "oldTimeMs": 279026,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:04:39.026",
+      "oldScoreKey": "279026",
+      "newHolderAccountId": "c1e8bbec-8bb3-40b3-9b0e-52e3cb36015e",
+      "newHolder": "SkandeaR",
+      "newTimeMs": 277162,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:04:37.162",
+      "newScoreKey": "277162",
+      "text": "SkandeaR overtook KevinStrike_Tm on Unknown map with 00:04:37.162."
+    },
     {
       "id": "wr_changed|WlnOudzutGcYlDuh7KsuNH8eL8b|d569b3f3-6cf9-4879-86d1-05243d152314|f321dfe4-b13e-4cb0-b052-8e08abdd188d|5499|5484|2026-07-25T06:07:50.813Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:19.949",
       "newScoreKey": "19949",
       "text": "jvstqanic overtook xXStringShotXx on Unknown map with 00:00:19.949."
-    },
-    {
-      "id": "wr_changed|CMu5RfjcE7vr13fd7gWb89Cyofj|7117a39a-b103-4c88-bd15-00e12cf07b7d|b0af1901-132a-4c14-899d-7ea1d764188e|24148|24142|2026-07-09T22:05:41.617Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-09T22:05:41.617Z",
-      "at": "2026-07-09T22:05:41.617Z",
-      "mapUid": "CMu5RfjcE7vr13fd7gWb89Cyofj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7117a39a-b103-4c88-bd15-00e12cf07b7d",
-      "oldHolder": "Flohex",
-      "oldTimeMs": 24148,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:24.148",
-      "oldScoreKey": "24148",
-      "newHolderAccountId": "b0af1901-132a-4c14-899d-7ea1d764188e",
-      "newHolder": "stunbot11",
-      "newTimeMs": 24142,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:24.142",
-      "newScoreKey": "24142",
-      "text": "stunbot11 overtook Flohex on Unknown map with 00:00:24.142."
     }
   ]
 }
