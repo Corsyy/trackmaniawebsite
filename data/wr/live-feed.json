@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-25T00:14:07.037Z",
+  "generatedAt": "2026-07-25T03:44:45.393Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 3,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|koAFDPjk7R9ZU3dtUapxGysluba|91baf12f-ad56-42d6-a15a-c829d0a22fce|6405c192-ca87-451d-933c-1c8d2647ae86|70438|68896|2026-07-25T03:44:45.393Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-25T03:44:45.393Z",
+      "at": "2026-07-25T03:44:45.393Z",
+      "mapUid": "koAFDPjk7R9ZU3dtUapxGysluba",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "91baf12f-ad56-42d6-a15a-c829d0a22fce",
+      "oldHolder": "NicoB_",
+      "oldTimeMs": 70438,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:01:10.438",
+      "oldScoreKey": "70438",
+      "newHolderAccountId": "6405c192-ca87-451d-933c-1c8d2647ae86",
+      "newHolder": "MustardF1",
+      "newTimeMs": 68896,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:01:08.896",
+      "newScoreKey": "68896",
+      "text": "MustardF1 overtook NicoB_ on Unknown map with 00:01:08.896."
+    },
     {
       "id": "wr_changed|PtqoIShPE3uQBLtfcgMtMqe4uvl|cc939d93-1266-42bb-85f5-40037a9a6d1d|8aa64de7-ebae-48bf-a2f9-80a2c5a0f58b|22906|22737|2026-07-25T00:14:07.037Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.522",
       "newScoreKey": "9522",
       "text": "Habbyyy overtook Evon- on Unknown map with 00:00:09.522."
-    },
-    {
-      "id": "wr_changed|PKNyeNSGL0wl9V1zFwHRsKpi1Oj|95ff4dc9-b06c-4aa5-ae7d-f58461c7d6f2|622bd5ef-d074-4f39-9708-87a6bf3950b4|12541|12533|2026-07-09T22:05:41.617Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-09T22:05:41.617Z",
-      "at": "2026-07-09T22:05:41.617Z",
-      "mapUid": "PKNyeNSGL0wl9V1zFwHRsKpi1Oj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "95ff4dc9-b06c-4aa5-ae7d-f58461c7d6f2",
-      "oldHolder": "Franswazig",
-      "oldTimeMs": 12541,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.541",
-      "oldScoreKey": "12541",
-      "newHolderAccountId": "622bd5ef-d074-4f39-9708-87a6bf3950b4",
-      "newHolder": "sun.._",
-      "newTimeMs": 12533,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.533",
-      "newScoreKey": "12533",
-      "text": "sun.._ overtook Franswazig on Unknown map with 00:00:12.533."
     }
   ]
 }
