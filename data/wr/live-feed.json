@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-25T17:45:00.609Z",
+  "generatedAt": "2026-07-25T18:43:45.164Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|C_dty5lFSnVAz9wr4vgBvm8POHh|445a6375-a8aa-4b56-b3b5-18d4bff53351|2343ca67-a77c-47c8-83bd-74f99c6f0a37|35327|35273|2026-07-25T18:43:45.164Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-25T18:43:45.164Z",
+      "at": "2026-07-25T18:43:45.164Z",
+      "mapUid": "C_dty5lFSnVAz9wr4vgBvm8POHh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "445a6375-a8aa-4b56-b3b5-18d4bff53351",
+      "oldHolder": "Raceta",
+      "oldTimeMs": 35327,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:35.327",
+      "oldScoreKey": "35327",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 35273,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:35.273",
+      "newScoreKey": "35273",
+      "text": "hobbi. overtook Raceta on Unknown map with 00:00:35.273."
+    },
     {
       "id": "wr_changed|Qy345pWg821zDyIg3DvZdD54_yj|b52e0c98-387c-43eb-9acb-5c9b5e0f1286|e582f3c0-29a8-4391-aa7f-acd01ecf0496|39974|39965|2026-07-25T15:34:56.064Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:15.279",
       "newScoreKey": "15279",
       "text": "thebiglizard overtook LeinAdmiral on Unknown map with 00:00:15.279."
-    },
-    {
-      "id": "wr_changed|KRJjcU5X7aVGnUFklle7nHIAJy5|f844f068-48f3-4b15-b904-d5dc47050123|d63054a0-f977-4f1b-9dcb-644ef5ed735d|6596|6593|2026-07-10T01:19:15.803Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-10T01:19:15.803Z",
-      "at": "2026-07-10T01:19:15.803Z",
-      "mapUid": "KRJjcU5X7aVGnUFklle7nHIAJy5",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f844f068-48f3-4b15-b904-d5dc47050123",
-      "oldHolder": "blippesen_121",
-      "oldTimeMs": 6596,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:06.596",
-      "oldScoreKey": "6596",
-      "newHolderAccountId": "d63054a0-f977-4f1b-9dcb-644ef5ed735d",
-      "newHolder": "k477R",
-      "newTimeMs": 6593,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:06.593",
-      "newScoreKey": "6593",
-      "text": "k477R overtook blippesen_121 on Unknown map with 00:00:06.593."
     }
   ]
 }
