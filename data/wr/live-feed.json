@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-26T20:41:19.406Z",
+  "generatedAt": "2026-07-26T21:44:14.747Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|ZeKbaoPTjRIkTAeL2KonbiiWjtb|cc81d885-8d42-4c7f-88c4-0cd55af5ea00|cc81d885-8d42-4c7f-88c4-0cd55af5ea00|9418|9402|2026-07-26T21:44:14.747Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-26T21:44:14.747Z",
+      "at": "2026-07-26T21:44:14.747Z",
+      "mapUid": "ZeKbaoPTjRIkTAeL2KonbiiWjtb",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "cc81d885-8d42-4c7f-88c4-0cd55af5ea00",
+      "oldHolder": "klmrs",
+      "oldTimeMs": 9418,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.418",
+      "oldScoreKey": "9418",
+      "newHolderAccountId": "cc81d885-8d42-4c7f-88c4-0cd55af5ea00",
+      "newHolder": "klmrs",
+      "newTimeMs": 9402,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.402",
+      "newScoreKey": "9402",
+      "text": "klmrs improved their WR on Unknown map from 00:00:09.418 to 00:00:09.402."
+    },
     {
       "id": "wr_changed|QVnnodOXNuMTCL8KTfR1zHikA6k|8fcd03c0-b92e-47c3-9f40-566cdf26cf16|a0aaf5c7-cdf2-4354-9042-ff71ea240215|48716|48566|2026-07-26T20:41:19.406Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:07.824",
       "newScoreKey": "7824",
       "text": "deadchimp2000 overtook N125-XAZEC on Unknown map with 00:00:07.824."
-    },
-    {
-      "id": "wr_changed|BiPb0EN7DuwvC7ZcBoBAK8_b5Nk|16825d1e-975c-45e7-8df2-b5e1d34a5bd1|05e7e7c7-1bed-48f1-8d7a-b53244290532|39488|39436|2026-07-11T16:26:07.419Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-11T16:26:07.419Z",
-      "at": "2026-07-11T16:26:07.419Z",
-      "mapUid": "BiPb0EN7DuwvC7ZcBoBAK8_b5Nk",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "16825d1e-975c-45e7-8df2-b5e1d34a5bd1",
-      "oldHolder": "TheBean06",
-      "oldTimeMs": 39488,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:39.488",
-      "oldScoreKey": "39488",
-      "newHolderAccountId": "05e7e7c7-1bed-48f1-8d7a-b53244290532",
-      "newHolder": "N1trium",
-      "newTimeMs": 39436,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:39.436",
-      "newScoreKey": "39436",
-      "text": "N1trium overtook TheBean06 on Unknown map with 00:00:39.436."
     }
   ]
 }
