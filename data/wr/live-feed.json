@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-26T14:54:12.989Z",
+  "generatedAt": "2026-07-26T16:06:13.977Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|5mO38j25OvNz074jBymjlO5jU4m|05f4cfb7-d190-4b00-8b1f-c07a352bd93b|8977a4a0-3458-4e00-a1f4-864e4d1d4dbe|40944|40938|2026-07-26T16:06:13.977Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-26T16:06:13.977Z",
+      "at": "2026-07-26T16:06:13.977Z",
+      "mapUid": "5mO38j25OvNz074jBymjlO5jU4m",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "05f4cfb7-d190-4b00-8b1f-c07a352bd93b",
+      "oldHolder": "LokoGz",
+      "oldTimeMs": 40944,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:40.944",
+      "oldScoreKey": "40944",
+      "newHolderAccountId": "8977a4a0-3458-4e00-a1f4-864e4d1d4dbe",
+      "newHolder": "ComplexStatics_",
+      "newTimeMs": 40938,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:40.938",
+      "newScoreKey": "40938",
+      "text": "ComplexStatics_ overtook LokoGz on Unknown map with 00:00:40.938."
+    },
     {
       "id": "wr_changed|s4jNXDvjO22JHEzgA5g29AqvPnh|652069fa-48df-4d58-b0c9-d686ef445103|c1e8bbec-8bb3-40b3-9b0e-52e3cb36015e|208296|207713|2026-07-26T13:40:38.748Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:19.644",
       "newScoreKey": "19644",
       "text": "thebiglizard overtook LeinAdmiral on Unknown map with 00:00:19.644."
-    },
-    {
-      "id": "wr_changed|k4RLd0nzOkEiukKCKyP4XuMP8l7|b4a2a877-47a3-4a1e-8ab3-eeb28f45637d|75a4cad0-7824-483d-a6fa-789b8e69a150|55786|55570|2026-07-11T14:14:36.248Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-11T14:14:36.248Z",
-      "at": "2026-07-11T14:14:36.248Z",
-      "mapUid": "k4RLd0nzOkEiukKCKyP4XuMP8l7",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "b4a2a877-47a3-4a1e-8ab3-eeb28f45637d",
-      "oldHolder": "nOvATM_",
-      "oldTimeMs": 55786,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:55.786",
-      "oldScoreKey": "55786",
-      "newHolderAccountId": "75a4cad0-7824-483d-a6fa-789b8e69a150",
-      "newHolder": "Dionysos.TM.",
-      "newTimeMs": 55570,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:55.570",
-      "newScoreKey": "55570",
-      "text": "Dionysos.TM. overtook nOvATM_ on Unknown map with 00:00:55.570."
     }
   ]
 }
