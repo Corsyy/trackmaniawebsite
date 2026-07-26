@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T03:56:56.841Z",
+  "generatedAt": "2026-07-26T06:41:37.350Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|HOmgqTQUTLxgPmcU2oXp8C13jMh|7fc7bc9c-67b2-4003-b1a3-29006486f71e|d66cf74e-3720-4490-ac79-a2b55b74e870|6531|6516|2026-07-26T06:41:37.350Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-26T06:41:37.350Z",
+      "at": "2026-07-26T06:41:37.350Z",
+      "mapUid": "HOmgqTQUTLxgPmcU2oXp8C13jMh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "7fc7bc9c-67b2-4003-b1a3-29006486f71e",
+      "oldHolder": "ailiei.",
+      "oldTimeMs": 6531,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:06.531",
+      "oldScoreKey": "6531",
+      "newHolderAccountId": "d66cf74e-3720-4490-ac79-a2b55b74e870",
+      "newHolder": "Xx8Bit-SWAYZY",
+      "newTimeMs": 6516,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:06.516",
+      "newScoreKey": "6516",
+      "text": "Xx8Bit-SWAYZY overtook ailiei. on Unknown map with 00:00:06.516."
+    },
     {
       "id": "wr_changed|wQywq1LHZCiKUUQP4jiHAQuTg9c|5a63000d-7288-4046-b0f3-8e86cbae92ea|8710c941-356d-487e-8232-35f8fc1f5bb4|19619|14195|2026-07-26T03:56:56.841Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:23.540",
       "newScoreKey": "23540",
       "text": "Dezii.. overtook Tarantu. on Unknown map with 00:00:23.540."
-    },
-    {
-      "id": "wr_changed|yEIUzYtTszjRDLhcFe87kP2rjI2|68b44a57-963c-4be0-961d-2ec385fcb703|73ed6c90-ca93-42bd-bd1f-746911ae8b87|84439|78478|2026-07-11T09:50:03.420Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-11T09:50:03.420Z",
-      "at": "2026-07-11T09:50:03.420Z",
-      "mapUid": "yEIUzYtTszjRDLhcFe87kP2rjI2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "68b44a57-963c-4be0-961d-2ec385fcb703",
-      "oldHolder": "Mr.Swe",
-      "oldTimeMs": 84439,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:24.439",
-      "oldScoreKey": "84439",
-      "newHolderAccountId": "73ed6c90-ca93-42bd-bd1f-746911ae8b87",
-      "newHolder": "TMHornet.",
-      "newTimeMs": 78478,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:18.478",
-      "newScoreKey": "78478",
-      "text": "TMHornet. overtook Mr.Swe on Unknown map with 00:01:18.478."
     }
   ]
 }
