@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-26T00:12:50.428Z",
+  "generatedAt": "2026-07-26T03:56:56.841Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|wQywq1LHZCiKUUQP4jiHAQuTg9c|5a63000d-7288-4046-b0f3-8e86cbae92ea|8710c941-356d-487e-8232-35f8fc1f5bb4|19619|14195|2026-07-26T03:56:56.841Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-26T03:56:56.841Z",
+      "at": "2026-07-26T03:56:56.841Z",
+      "mapUid": "wQywq1LHZCiKUUQP4jiHAQuTg9c",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "5a63000d-7288-4046-b0f3-8e86cbae92ea",
+      "oldHolder": "UndertakerTM",
+      "oldTimeMs": 19619,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:19.619",
+      "oldScoreKey": "19619",
+      "newHolderAccountId": "8710c941-356d-487e-8232-35f8fc1f5bb4",
+      "newHolder": "N4M3S_Tiptop",
+      "newTimeMs": 14195,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:14.195",
+      "newScoreKey": "14195",
+      "text": "N4M3S_Tiptop overtook UndertakerTM on Unknown map with 00:00:14.195."
+    },
     {
       "id": "wr_changed|_qLh5HJ7SIX9RoIObWCbsUrFk8m|3a96e825-e60d-4cef-97a4-deda1f05666c|46b93d10-9bb9-425f-a84c-c6c4895f8b94|9351|9285|2026-07-25T23:10:23.404Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:18.478",
       "newScoreKey": "78478",
       "text": "TMHornet. overtook Mr.Swe on Unknown map with 00:01:18.478."
-    },
-    {
-      "id": "wr_changed|Ipb5G3Unv0EPLPqyt7fAJ2mMdwc|b8c5c3a0-4cac-4eba-abd4-2f55afab04e2|c782ff80-0297-4b07-9d96-e75b6c2d8ca7|8825|8800|2026-07-11T09:50:03.420Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-11T09:50:03.420Z",
-      "at": "2026-07-11T09:50:03.420Z",
-      "mapUid": "Ipb5G3Unv0EPLPqyt7fAJ2mMdwc",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "b8c5c3a0-4cac-4eba-abd4-2f55afab04e2",
-      "oldHolder": "DanOnTheMoon.",
-      "oldTimeMs": 8825,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.825",
-      "oldScoreKey": "8825",
-      "newHolderAccountId": "c782ff80-0297-4b07-9d96-e75b6c2d8ca7",
-      "newHolder": "SnowyKeks",
-      "newTimeMs": 8800,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.800",
-      "newScoreKey": "8800",
-      "text": "SnowyKeks overtook DanOnTheMoon. on Unknown map with 00:00:08.800."
     }
   ]
 }
