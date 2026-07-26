@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T22:45:02.640Z",
+  "generatedAt": "2026-07-26T23:46:16.035Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|IGdEnETlysw97zGh6O0sVArJm78|61e24c6b-8410-4998-82fe-cacc36d3ce7e|c3309971-e4bd-4111-865b-77c79337786a|9229|9224|2026-07-26T23:46:16.035Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-26T23:46:16.035Z",
+      "at": "2026-07-26T23:46:16.035Z",
+      "mapUid": "IGdEnETlysw97zGh6O0sVArJm78",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "61e24c6b-8410-4998-82fe-cacc36d3ce7e",
+      "oldHolder": "Jortim",
+      "oldTimeMs": 9229,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.229",
+      "oldScoreKey": "9229",
+      "newHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
+      "newHolder": "Apoc_TM",
+      "newTimeMs": 9224,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.224",
+      "newScoreKey": "9224",
+      "text": "Apoc_TM overtook Jortim on Unknown map with 00:00:09.224."
+    },
     {
       "id": "self_improve|BYttErdh6HtSDolt_X2U3koAOni|a879dd6c-a096-4fdd-b8ec-6356e104bac1|a879dd6c-a096-4fdd-b8ec-6356e104bac1|23540|22937|2026-07-26T22:45:02.640Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:45.468",
       "newScoreKey": "45468",
       "text": "Pawel-TM overtook mihcai on Unknown map with 00:00:45.468."
-    },
-    {
-      "id": "wr_changed|WI8E2Nhr8sCLeqXStQAslcpY6Tm|87e13a2a-63ab-48cb-91d3-098d5dbb20d0|a3df3c7f-8ed1-4aeb-9f2d-24fe28cabdcf|25160|25100|2026-07-11T19:44:30.364Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-11T19:44:30.364Z",
-      "at": "2026-07-11T19:44:30.364Z",
-      "mapUid": "WI8E2Nhr8sCLeqXStQAslcpY6Tm",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "87e13a2a-63ab-48cb-91d3-098d5dbb20d0",
-      "oldHolder": "mihcai",
-      "oldTimeMs": 25160,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:25.160",
-      "oldScoreKey": "25160",
-      "newHolderAccountId": "a3df3c7f-8ed1-4aeb-9f2d-24fe28cabdcf",
-      "newHolder": "Pawel-TM",
-      "newTimeMs": 25100,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:25.100",
-      "newScoreKey": "25100",
-      "text": "Pawel-TM overtook mihcai on Unknown map with 00:00:25.100."
     }
   ]
 }
