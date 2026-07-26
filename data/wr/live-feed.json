@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-26T18:16:09.523Z",
+  "generatedAt": "2026-07-26T19:40:14.078Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|gLjlftQPuk5kBY2dpiabyAxXt2l|908ae383-a5d3-4bc5-ae16-ad1113d19317|2343ca67-a77c-47c8-83bd-74f99c6f0a37|29388|29380|2026-07-26T19:40:14.078Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-26T19:40:14.078Z",
+      "at": "2026-07-26T19:40:14.078Z",
+      "mapUid": "gLjlftQPuk5kBY2dpiabyAxXt2l",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "908ae383-a5d3-4bc5-ae16-ad1113d19317",
+      "oldHolder": "Redbolt_",
+      "oldTimeMs": 29388,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:29.388",
+      "oldScoreKey": "29388",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 29380,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:29.380",
+      "newScoreKey": "29380",
+      "text": "hobbi. overtook Redbolt_ on Unknown map with 00:00:29.380."
+    },
     {
       "id": "wr_changed|5mO38j25OvNz074jBymjlO5jU4m|05f4cfb7-d190-4b00-8b1f-c07a352bd93b|8977a4a0-3458-4e00-a1f4-864e4d1d4dbe|40944|40938|2026-07-26T16:06:13.977Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.096",
       "newScoreKey": "9096",
       "text": "Stone-tm overtook Panda.ly on Unknown map with 00:00:09.096."
-    },
-    {
-      "id": "wr_changed|c6pjURcr1PXrkM40Albi0Xeopu6|47deaeb4-6a90-46cf-9b2b-f986c282076f|69327e6d-93b9-4a9d-a25a-065ba5ff10ff|19669|19644|2026-07-11T14:14:36.248Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-11T14:14:36.248Z",
-      "at": "2026-07-11T14:14:36.248Z",
-      "mapUid": "c6pjURcr1PXrkM40Albi0Xeopu6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "47deaeb4-6a90-46cf-9b2b-f986c282076f",
-      "oldHolder": "LeinAdmiral",
-      "oldTimeMs": 19669,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:19.669",
-      "oldScoreKey": "19669",
-      "newHolderAccountId": "69327e6d-93b9-4a9d-a25a-065ba5ff10ff",
-      "newHolder": "thebiglizard",
-      "newTimeMs": 19644,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:19.644",
-      "newScoreKey": "19644",
-      "text": "thebiglizard overtook LeinAdmiral on Unknown map with 00:00:19.644."
     }
   ]
 }
