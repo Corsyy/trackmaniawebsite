@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T21:44:14.747Z",
+  "generatedAt": "2026-07-26T22:45:02.640Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|BYttErdh6HtSDolt_X2U3koAOni|a879dd6c-a096-4fdd-b8ec-6356e104bac1|a879dd6c-a096-4fdd-b8ec-6356e104bac1|23540|22937|2026-07-26T22:45:02.640Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-26T22:45:02.640Z",
+      "at": "2026-07-26T22:45:02.640Z",
+      "mapUid": "BYttErdh6HtSDolt_X2U3koAOni",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "a879dd6c-a096-4fdd-b8ec-6356e104bac1",
+      "oldHolder": "Dezii..",
+      "oldTimeMs": 23540,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:23.540",
+      "oldScoreKey": "23540",
+      "newHolderAccountId": "a879dd6c-a096-4fdd-b8ec-6356e104bac1",
+      "newHolder": "Dezii..",
+      "newTimeMs": 22937,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:22.937",
+      "newScoreKey": "22937",
+      "text": "Dezii.. improved their WR on Unknown map from 00:00:23.540 to 00:00:22.937."
+    },
     {
       "id": "self_improve|ZeKbaoPTjRIkTAeL2KonbiiWjtb|cc81d885-8d42-4c7f-88c4-0cd55af5ea00|cc81d885-8d42-4c7f-88c4-0cd55af5ea00|9418|9402|2026-07-26T21:44:14.747Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:25.100",
       "newScoreKey": "25100",
       "text": "Pawel-TM overtook mihcai on Unknown map with 00:00:25.100."
-    },
-    {
-      "id": "wr_changed|9z7vYx8baw7qHrLQZZwiPqaklQ4|7c399a69-9e44-41ad-81dc-3815391938de|b6677538-cef2-4033-a680-5ba34cf83511|7827|7824|2026-07-11T17:29:52.177Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-11T17:29:52.177Z",
-      "at": "2026-07-11T17:29:52.177Z",
-      "mapUid": "9z7vYx8baw7qHrLQZZwiPqaklQ4",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7c399a69-9e44-41ad-81dc-3815391938de",
-      "oldHolder": "N125-XAZEC",
-      "oldTimeMs": 7827,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.827",
-      "oldScoreKey": "7827",
-      "newHolderAccountId": "b6677538-cef2-4033-a680-5ba34cf83511",
-      "newHolder": "deadchimp2000",
-      "newTimeMs": 7824,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.824",
-      "newScoreKey": "7824",
-      "text": "deadchimp2000 overtook N125-XAZEC on Unknown map with 00:00:07.824."
     }
   ]
 }
