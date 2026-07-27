@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-27T17:02:46.665Z",
+  "generatedAt": "2026-07-27T18:42:46.201Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 5,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|Fhje4g0_T1hFVTprhZUj162PLih|87e13a2a-63ab-48cb-91d3-098d5dbb20d0|2b250090-3a26-42de-9fbc-df094755ab30|50709|50563|2026-07-27T18:42:46.201Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-27T18:42:46.201Z",
+      "at": "2026-07-27T18:42:46.201Z",
+      "mapUid": "Fhje4g0_T1hFVTprhZUj162PLih",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "87e13a2a-63ab-48cb-91d3-098d5dbb20d0",
+      "oldHolder": "mihcai",
+      "oldTimeMs": 50709,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:50.709",
+      "oldScoreKey": "50709",
+      "newHolderAccountId": "2b250090-3a26-42de-9fbc-df094755ab30",
+      "newHolder": "Grabbe-_-",
+      "newTimeMs": 50563,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:50.563",
+      "newScoreKey": "50563",
+      "text": "Grabbe-_- overtook mihcai on Unknown map with 00:00:50.563."
+    },
     {
       "id": "wr_changed|tpI4cfZjCGb8Dmo6j4mmVjLOfOm|c0859fc8-2dfb-4b33-9a03-80f765a3edf4|e582f3c0-29a8-4391-aa7f-acd01ecf0496|27562|27460|2026-07-27T17:02:46.665Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.717",
       "newScoreKey": "9717",
       "text": "Panda.ly overtook Danyy912 on Unknown map with 00:00:09.717."
-    },
-    {
-      "id": "wr_changed|48YR_yaToprpWTPvLMo60qicUP6|d9835d12-3ff6-49f5-901d-c572ee058414|a091e92d-426f-440e-a3d8-7b2c5278e812|9228|9186|2026-07-12T07:20:57.996Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-12T07:20:57.996Z",
-      "at": "2026-07-12T07:20:57.996Z",
-      "mapUid": "48YR_yaToprpWTPvLMo60qicUP6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d9835d12-3ff6-49f5-901d-c572ee058414",
-      "oldHolder": "Boasyyy",
-      "oldTimeMs": 9228,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.228",
-      "oldScoreKey": "9228",
-      "newHolderAccountId": "a091e92d-426f-440e-a3d8-7b2c5278e812",
-      "newHolder": "Panda.ly",
-      "newTimeMs": 9186,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.186",
-      "newScoreKey": "9186",
-      "text": "Panda.ly overtook Boasyyy on Unknown map with 00:00:09.186."
     }
   ]
 }
