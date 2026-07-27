@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-27T12:01:15.836Z",
+  "generatedAt": "2026-07-27T14:56:09.330Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|esqYdwMCMNxozvMiovZDYzZfii3|b8466c27-6898-4956-a510-4c37c5ba4347|d28a55af-b66d-4401-9466-2f9877890a54|9583|9581|2026-07-27T14:56:09.330Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-27T14:56:09.330Z",
+      "at": "2026-07-27T14:56:09.330Z",
+      "mapUid": "esqYdwMCMNxozvMiovZDYzZfii3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "b8466c27-6898-4956-a510-4c37c5ba4347",
+      "oldHolder": "ZoMBiE4053",
+      "oldTimeMs": 9583,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.583",
+      "oldScoreKey": "9583",
+      "newHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
+      "newHolder": "MazsTM",
+      "newTimeMs": 9581,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.581",
+      "newScoreKey": "9581",
+      "text": "MazsTM overtook ZoMBiE4053 on Unknown map with 00:00:09.581."
+    },
     {
       "id": "wr_changed|VJAQH4Qw6akJmg6NLqabDAisk3|d28a55af-b66d-4401-9466-2f9877890a54|9ebc76de-0d25-403b-97e4-cf75c327b3fc|9373|9364|2026-07-27T08:42:11.822Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:04.580",
       "newScoreKey": "4580",
       "text": "Panda.ly overtook dcdsx on Unknown map with 00:00:04.580."
-    },
-    {
-      "id": "wr_changed|JaNMxZKWGOiZsB9ouSbGgo1iCee|d766c9bb-a686-4deb-a71f-3604bd0e3a54|a091e92d-426f-440e-a3d8-7b2c5278e812|9565|9508|2026-07-12T04:44:17.577Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-12T04:44:17.577Z",
-      "at": "2026-07-12T04:44:17.577Z",
-      "mapUid": "JaNMxZKWGOiZsB9ouSbGgo1iCee",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d766c9bb-a686-4deb-a71f-3604bd0e3a54",
-      "oldHolder": "BENCHODU",
-      "oldTimeMs": 9565,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.565",
-      "oldScoreKey": "9565",
-      "newHolderAccountId": "a091e92d-426f-440e-a3d8-7b2c5278e812",
-      "newHolder": "Panda.ly",
-      "newTimeMs": 9508,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.508",
-      "newScoreKey": "9508",
-      "text": "Panda.ly overtook BENCHODU on Unknown map with 00:00:09.508."
     }
   ]
 }
