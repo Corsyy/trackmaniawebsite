@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-28T22:46:25.323Z",
+  "generatedAt": "2026-07-28T23:45:47.607Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|Mh7eoeVIlpNQ5_5PC95aaAjHq59|d620091b-876b-4af4-8f98-ed3625d234e9|d620091b-876b-4af4-8f98-ed3625d234e9|43585|43537|2026-07-28T23:45:47.607Z",
+      "type": "self_improve",
+      "detectedAt": "2026-07-28T23:45:47.607Z",
+      "at": "2026-07-28T23:45:47.607Z",
+      "mapUid": "Mh7eoeVIlpNQ5_5PC95aaAjHq59",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "oldHolder": "C50.94975-6.947",
+      "oldTimeMs": 43585,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:43.585",
+      "oldScoreKey": "43585",
+      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "newHolder": "C50.94975-6.947",
+      "newTimeMs": 43537,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:43.537",
+      "newScoreKey": "43537",
+      "text": "C50.94975-6.947 improved their WR on Unknown map from 00:00:43.585 to 00:00:43.537."
+    },
     {
       "id": "wr_changed|AWYOwQzeerjwBRDCaSFCZi2zaIm|d569b3f3-6cf9-4879-86d1-05243d152314|a091e92d-426f-440e-a3d8-7b2c5278e812|9758|9751|2026-07-28T21:51:25.441Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:19.105",
       "newScoreKey": "19105",
       "text": "KewoTM overtook Farigeri on Unknown map with 00:00:19.105."
-    },
-    {
-      "id": "wr_changed|sJz3u63hyl1Lsdb36iAJ1Glfo4e|55a3499e-bd43-46ba-b2ac-a9b4ab8006cd|d77b72a6-dcc0-4e43-b1cc-47c11a9581ad|9286|9224|2026-07-14T13:57:11.227Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-14T13:57:11.227Z",
-      "at": "2026-07-14T13:57:11.227Z",
-      "mapUid": "sJz3u63hyl1Lsdb36iAJ1Glfo4e",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "55a3499e-bd43-46ba-b2ac-a9b4ab8006cd",
-      "oldHolder": "Rosarubra_tm",
-      "oldTimeMs": 9286,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.286",
-      "oldScoreKey": "9286",
-      "newHolderAccountId": "d77b72a6-dcc0-4e43-b1cc-47c11a9581ad",
-      "newHolder": "Vulpecia",
-      "newTimeMs": 9224,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.224",
-      "newScoreKey": "9224",
-      "text": "Vulpecia overtook Rosarubra_tm on Unknown map with 00:00:09.224."
     }
   ]
 }
