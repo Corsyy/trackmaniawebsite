@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-28T04:27:37.164Z",
+  "generatedAt": "2026-07-28T07:15:03.402Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 3,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|8IBGetCvdLy7Rlvvt1npHntJ_0g|214ca321-f5ca-47e7-a993-f9a624dc2614|0093eef8-ab9f-4c44-ae58-604da2be7620|12088|11892|2026-07-28T07:15:03.402Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-28T07:15:03.402Z",
+      "at": "2026-07-28T07:15:03.402Z",
+      "mapUid": "8IBGetCvdLy7Rlvvt1npHntJ_0g",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "214ca321-f5ca-47e7-a993-f9a624dc2614",
+      "oldHolder": "FiggeTM",
+      "oldTimeMs": 12088,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:12.088",
+      "oldScoreKey": "12088",
+      "newHolderAccountId": "0093eef8-ab9f-4c44-ae58-604da2be7620",
+      "newHolder": "l3wieee",
+      "newTimeMs": 11892,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.892",
+      "newScoreKey": "11892",
+      "text": "l3wieee overtook FiggeTM on Unknown map with 00:00:11.892."
+    },
     {
       "id": "wr_changed|vTpIcu8byBbLZ0EibybU48HHUq5|d10cdccd-31e7-491f-9504-d72ee3a70de6|e562f9f6-4625-4f42-809a-93c918ed23ec|29624|29544|2026-07-28T04:27:37.164Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:46.234",
       "newScoreKey": "46234",
       "text": "Dionysos.TM. overtook Eggy-.- on Unknown map with 00:00:46.234."
-    },
-    {
-      "id": "self_improve|ShXo6QotIWLkTQMfG7InILRSjKi|01981816-c06e-4d88-8682-bf24610df643|01981816-c06e-4d88-8682-bf24610df643|39655|39618|2026-07-12T12:43:04.117Z",
-      "type": "self_improve",
-      "detectedAt": "2026-07-12T12:43:04.117Z",
-      "at": "2026-07-12T12:43:04.117Z",
-      "mapUid": "ShXo6QotIWLkTQMfG7InILRSjKi",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "01981816-c06e-4d88-8682-bf24610df643",
-      "oldHolder": "MattT_tm",
-      "oldTimeMs": 39655,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:39.655",
-      "oldScoreKey": "39655",
-      "newHolderAccountId": "01981816-c06e-4d88-8682-bf24610df643",
-      "newHolder": "MattT_tm",
-      "newTimeMs": 39618,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:39.618",
-      "newScoreKey": "39618",
-      "text": "MattT_tm improved their WR on Unknown map from 00:00:39.655 to 00:00:39.618."
     }
   ]
 }
