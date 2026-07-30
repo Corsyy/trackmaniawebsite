@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-29T23:15:26.368Z",
+  "generatedAt": "2026-07-30T00:15:42.671Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|esqYdwMCMNxozvMiovZDYzZfii3|d28a55af-b66d-4401-9466-2f9877890a54|b8466c27-6898-4956-a510-4c37c5ba4347|9580|9572|2026-07-30T00:15:42.671Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-30T00:15:42.671Z",
+      "at": "2026-07-30T00:15:42.671Z",
+      "mapUid": "esqYdwMCMNxozvMiovZDYzZfii3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
+      "oldHolder": "MazsTM",
+      "oldTimeMs": 9580,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.580",
+      "oldScoreKey": "9580",
+      "newHolderAccountId": "b8466c27-6898-4956-a510-4c37c5ba4347",
+      "newHolder": "ZoMBiE4053",
+      "newTimeMs": 9572,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.572",
+      "newScoreKey": "9572",
+      "text": "ZoMBiE4053 overtook MazsTM on Unknown map with 00:00:09.572."
+    },
     {
       "id": "wr_changed|dYsHgzsZjTWYYNc8lK345kZk7m6|d28a55af-b66d-4401-9466-2f9877890a54|d63054a0-f977-4f1b-9dcb-644ef5ed735d|8741|8736|2026-07-29T23:15:26.368Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:20.933",
       "newScoreKey": "80933",
       "text": "Leandersoltveit overtook Squirbo on Unknown map with 00:01:20.933."
-    },
-    {
-      "id": "wr_changed|xXw4aJ7dm5S1PhbLMlevf4NRrw|950de14c-9e65-4089-bdc7-0cf8efbd4965|64b724a5-f1d6-4d93-8074-9d65a1a8d9b2|92086|91464|2026-07-16T06:07:11.566Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-16T06:07:11.566Z",
-      "at": "2026-07-16T06:07:11.566Z",
-      "mapUid": "xXw4aJ7dm5S1PhbLMlevf4NRrw",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "950de14c-9e65-4089-bdc7-0cf8efbd4965",
-      "oldHolder": "Squirbo",
-      "oldTimeMs": 92086,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:32.086",
-      "oldScoreKey": "92086",
-      "newHolderAccountId": "64b724a5-f1d6-4d93-8074-9d65a1a8d9b2",
-      "newHolder": "Leandersoltveit",
-      "newTimeMs": 91464,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:31.464",
-      "newScoreKey": "91464",
-      "text": "Leandersoltveit overtook Squirbo on Unknown map with 00:01:31.464."
     }
   ]
 }
