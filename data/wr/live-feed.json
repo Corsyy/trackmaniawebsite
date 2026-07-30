@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-30T06:14:20.614Z",
+  "generatedAt": "2026-07-30T09:08:38.477Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|TU6cxKQhU2SwXNV2MYZjquLJXBa|5aaa3dae-82ba-4383-a599-36efb71d8068|e413e842-4db1-4858-8926-1b663b27ba8f|42255|42122|2026-07-30T09:08:38.477Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-30T09:08:38.477Z",
+      "at": "2026-07-30T09:08:38.477Z",
+      "mapUid": "TU6cxKQhU2SwXNV2MYZjquLJXBa",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "5aaa3dae-82ba-4383-a599-36efb71d8068",
+      "oldHolder": "r3.windows",
+      "oldTimeMs": 42255,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.255",
+      "oldScoreKey": "42255",
+      "newHolderAccountId": "e413e842-4db1-4858-8926-1b663b27ba8f",
+      "newHolder": "r3.rist",
+      "newTimeMs": 42122,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:42.122",
+      "newScoreKey": "42122",
+      "text": "r3.rist overtook r3.windows on Unknown map with 00:00:42.122."
+    },
     {
       "id": "wr_changed|5ltLFt88u2HrcZry3yZXIJxI5ge|a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12|403a098f-8390-4f46-9b06-36577d559b7d|11763|11591|2026-07-30T06:14:20.614Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:32.294",
       "newScoreKey": "32294",
       "text": "Vatsug44 overtook Patriam on Unknown map with 00:00:32.294."
-    },
-    {
-      "id": "wr_changed|xjyM13WRkWIXddpbQm3Wx4b2y1i|9b84751c-22d0-4c74-aed7-6a31c9365742|a537e543-26ff-4208-ba9f-a77f748c26b5|13298|13293|2026-07-16T06:07:11.566Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-16T06:07:11.566Z",
-      "at": "2026-07-16T06:07:11.566Z",
-      "mapUid": "xjyM13WRkWIXddpbQm3Wx4b2y1i",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "9b84751c-22d0-4c74-aed7-6a31c9365742",
-      "oldHolder": "TOUR.TM",
-      "oldTimeMs": 13298,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:13.298",
-      "oldScoreKey": "13298",
-      "newHolderAccountId": "a537e543-26ff-4208-ba9f-a77f748c26b5",
-      "newHolder": "lqpzz",
-      "newTimeMs": 13293,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:13.293",
-      "newScoreKey": "13293",
-      "text": "lqpzz overtook TOUR.TM on Unknown map with 00:00:13.293."
     }
   ]
 }
