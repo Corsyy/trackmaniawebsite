@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-30T03:37:59.473Z",
+  "generatedAt": "2026-07-30T06:14:20.614Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|5ltLFt88u2HrcZry3yZXIJxI5ge|a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12|403a098f-8390-4f46-9b06-36577d559b7d|11763|11591|2026-07-30T06:14:20.614Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-30T06:14:20.614Z",
+      "at": "2026-07-30T06:14:20.614Z",
+      "mapUid": "5ltLFt88u2HrcZry3yZXIJxI5ge",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12",
+      "oldHolder": "tommy_tucker193",
+      "oldTimeMs": 11763,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:11.763",
+      "oldScoreKey": "11763",
+      "newHolderAccountId": "403a098f-8390-4f46-9b06-36577d559b7d",
+      "newHolder": "hp09",
+      "newTimeMs": 11591,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.591",
+      "newScoreKey": "11591",
+      "text": "hp09 overtook tommy_tucker193 on Unknown map with 00:00:11.591."
+    },
     {
       "id": "wr_changed|AWYOwQzeerjwBRDCaSFCZi2zaIm|a091e92d-426f-440e-a3d8-7b2c5278e812|d569b3f3-6cf9-4879-86d1-05243d152314|9751|9748|2026-07-30T03:37:59.473Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:13.293",
       "newScoreKey": "13293",
       "text": "lqpzz overtook TOUR.TM on Unknown map with 00:00:13.293."
-    },
-    {
-      "id": "wr_changed|ETYi3MGC9AND3aLCWp9SJfVr9X3|f532aae0-7dd0-4004-8ab8-43c7145c5473|541bcc4b-0c4f-43d5-aab3-8c90d1279290|14285|14265|2026-07-16T06:07:11.566Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-16T06:07:11.566Z",
-      "at": "2026-07-16T06:07:11.566Z",
-      "mapUid": "ETYi3MGC9AND3aLCWp9SJfVr9X3",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f532aae0-7dd0-4004-8ab8-43c7145c5473",
-      "oldHolder": "Danifill",
-      "oldTimeMs": 14285,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:14.285",
-      "oldScoreKey": "14285",
-      "newHolderAccountId": "541bcc4b-0c4f-43d5-aab3-8c90d1279290",
-      "newHolder": "MagorTM",
-      "newTimeMs": 14265,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:14.265",
-      "newScoreKey": "14265",
-      "text": "MagorTM overtook Danifill on Unknown map with 00:00:14.265."
     }
   ]
 }
