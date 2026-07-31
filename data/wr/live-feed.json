@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-31T19:53:34.196Z",
+  "generatedAt": "2026-07-31T20:54:50.351Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|ScaYbRsZTY7_Vn274jEMG9hUtL2|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|2343ca67-a77c-47c8-83bd-74f99c6f0a37|33665|33631|2026-07-31T20:54:50.351Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-31T20:54:50.351Z",
+      "at": "2026-07-31T20:54:50.351Z",
+      "mapUid": "ScaYbRsZTY7_Vn274jEMG9hUtL2",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
+      "oldHolder": "ShcrTM",
+      "oldTimeMs": 33665,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:33.665",
+      "oldScoreKey": "33665",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 33631,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:33.631",
+      "newScoreKey": "33631",
+      "text": "hobbi. overtook ShcrTM on Unknown map with 00:00:33.631."
+    },
     {
       "id": "wr_changed|A_KS_19tfM8dkSSXF5p9CB2HWx4|12643ba7-db5c-40ad-b32f-a2d76463297a|cdd1c302-a87d-4048-bf79-1573e7ba5da1|41645|41586|2026-07-31T16:49:11.784Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.926",
       "newScoreKey": "12926",
       "text": "Boasyyy overtook puchmu on Unknown map with 00:00:12.926."
-    },
-    {
-      "id": "wr_changed|429TS93bBqZJJ8rTvcWyrwOj4J9|2ba3c60e-ee59-42b0-9d9f-f098086b14cb|a3853b49-4aab-4c46-8776-c5a8c1e3f635|9088|9075|2026-07-19T21:58:56.557Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-19T21:58:56.557Z",
-      "at": "2026-07-19T21:58:56.557Z",
-      "mapUid": "429TS93bBqZJJ8rTvcWyrwOj4J9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "2ba3c60e-ee59-42b0-9d9f-f098086b14cb",
-      "oldHolder": "Undead813",
-      "oldTimeMs": 9088,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.088",
-      "oldScoreKey": "9088",
-      "newHolderAccountId": "a3853b49-4aab-4c46-8776-c5a8c1e3f635",
-      "newHolder": "Abu_Massaker",
-      "newTimeMs": 9075,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.075",
-      "newScoreKey": "9075",
-      "text": "Abu_Massaker overtook Undead813 on Unknown map with 00:00:09.075."
     }
   ]
 }
