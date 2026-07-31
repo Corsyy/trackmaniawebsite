@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-31T20:54:50.351Z",
+  "generatedAt": "2026-07-31T22:10:03.722Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|T5815lg7ladHiNv1hsg0TwIpzIj|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|2343ca67-a77c-47c8-83bd-74f99c6f0a37|18171|18166|2026-07-31T22:10:03.722Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-31T22:10:03.722Z",
+      "at": "2026-07-31T22:10:03.722Z",
+      "mapUid": "T5815lg7ladHiNv1hsg0TwIpzIj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
+      "oldHolder": "ShcrTM",
+      "oldTimeMs": 18171,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:18.171",
+      "oldScoreKey": "18171",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 18166,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:18.166",
+      "newScoreKey": "18166",
+      "text": "hobbi. overtook ShcrTM on Unknown map with 00:00:18.166."
+    },
     {
       "id": "wr_changed|ScaYbRsZTY7_Vn274jEMG9hUtL2|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|2343ca67-a77c-47c8-83bd-74f99c6f0a37|33665|33631|2026-07-31T20:54:50.351Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.180",
       "newScoreKey": "10180",
       "text": "Boasyyy overtook Deli.-. on Unknown map with 00:00:10.180."
-    },
-    {
-      "id": "wr_changed|fauVrhlnTUCKDUE5tf7whR8r7ig|c11b87d6-b864-403c-ba3a-d644fc586901|d9835d12-3ff6-49f5-901d-c572ee058414|12980|12926|2026-07-19T21:58:56.557Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-19T21:58:56.557Z",
-      "at": "2026-07-19T21:58:56.557Z",
-      "mapUid": "fauVrhlnTUCKDUE5tf7whR8r7ig",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c11b87d6-b864-403c-ba3a-d644fc586901",
-      "oldHolder": "puchmu",
-      "oldTimeMs": 12980,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.980",
-      "oldScoreKey": "12980",
-      "newHolderAccountId": "d9835d12-3ff6-49f5-901d-c572ee058414",
-      "newHolder": "Boasyyy",
-      "newTimeMs": 12926,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.926",
-      "newScoreKey": "12926",
-      "text": "Boasyyy overtook puchmu on Unknown map with 00:00:12.926."
     }
   ]
 }
