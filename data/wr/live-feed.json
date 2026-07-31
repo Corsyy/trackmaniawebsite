@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-07-31T14:58:15.734Z",
+  "generatedAt": "2026-07-31T16:49:11.784Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|A_KS_19tfM8dkSSXF5p9CB2HWx4|12643ba7-db5c-40ad-b32f-a2d76463297a|cdd1c302-a87d-4048-bf79-1573e7ba5da1|41645|41586|2026-07-31T16:49:11.784Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-07-31T16:49:11.784Z",
+      "at": "2026-07-31T16:49:11.784Z",
+      "mapUid": "A_KS_19tfM8dkSSXF5p9CB2HWx4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "12643ba7-db5c-40ad-b32f-a2d76463297a",
+      "oldHolder": "r3.zimzalabim",
+      "oldTimeMs": 41645,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:41.645",
+      "oldScoreKey": "41645",
+      "newHolderAccountId": "cdd1c302-a87d-4048-bf79-1573e7ba5da1",
+      "newHolder": "Macrobloxoblox",
+      "newTimeMs": 41586,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.586",
+      "newScoreKey": "41586",
+      "text": "Macrobloxoblox overtook r3.zimzalabim on Unknown map with 00:00:41.586."
+    },
     {
       "id": "wr_changed|OMzWIp1AFvAz95WcBdWA5UkejK6|b8466c27-6898-4956-a510-4c37c5ba4347|f8968be2-68e1-45e9-b752-3d3e7941339e|9677|9676|2026-07-31T14:58:15.734Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.075",
       "newScoreKey": "9075",
       "text": "Abu_Massaker overtook Undead813 on Unknown map with 00:00:09.075."
-    },
-    {
-      "id": "wr_changed|gJjAIuJG03OF50bqBbZNE0B3ms0|0d514e6f-5a95-41d7-9dc2-3684cfeff330|5dec78af-980c-4806-b72b-5ada41c158e1|23148|23005|2026-07-19T20:57:48.878Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-19T20:57:48.878Z",
-      "at": "2026-07-19T20:57:48.878Z",
-      "mapUid": "gJjAIuJG03OF50bqBbZNE0B3ms0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "0d514e6f-5a95-41d7-9dc2-3684cfeff330",
-      "oldHolder": "Lunarius.tm",
-      "oldTimeMs": 23148,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:23.148",
-      "oldScoreKey": "23148",
-      "newHolderAccountId": "5dec78af-980c-4806-b72b-5ada41c158e1",
-      "newHolder": "macro.tm",
-      "newTimeMs": 23005,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:23.005",
-      "newScoreKey": "23005",
-      "text": "macro.tm overtook Lunarius.tm on Unknown map with 00:00:23.005."
     }
   ]
 }
