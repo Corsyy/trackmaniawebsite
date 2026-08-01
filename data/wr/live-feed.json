@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T08:58:00.459Z",
+  "generatedAt": "2026-08-01T10:44:09.760Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|ba1iCE4OyqTkNOe99YwpXpSKYrc|d940b5fa-89d1-47a4-9c64-d2364f1867a6|d2409764-c018-4bab-ab3b-bb89ed411257|4870|4860|2026-08-01T10:44:09.760Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-01T10:44:09.760Z",
+      "at": "2026-08-01T10:44:09.760Z",
+      "mapUid": "ba1iCE4OyqTkNOe99YwpXpSKYrc",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d940b5fa-89d1-47a4-9c64-d2364f1867a6",
+      "oldHolder": "Darkwing...O_o",
+      "oldTimeMs": 4870,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:04.870",
+      "oldScoreKey": "4870",
+      "newHolderAccountId": "d2409764-c018-4bab-ab3b-bb89ed411257",
+      "newHolder": "jantronix1",
+      "newTimeMs": 4860,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:04.860",
+      "newScoreKey": "4860",
+      "text": "jantronix1 overtook Darkwing...O_o on Unknown map with 00:00:04.860."
+    },
     {
       "id": "wr_changed|y_R_oCEGYKfW8_UMlrTfsEVV4Vh|54565860-6f3d-47d3-b84b-e146372b1069|3c530018-af61-4c4a-81ee-c2f9e1e9f996|9886|9882|2026-08-01T08:58:00.459Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:40.651",
       "newScoreKey": "40651",
       "text": "iTsTactiicz overtook ioReaper on Unknown map with 00:00:40.651."
-    },
-    {
-      "id": "wr_changed|TngIv14fUHcdpBwO9gRovdJgPP6|c7e326cb-a54e-4bee-9caf-92c2a25b0797|05e7e7c7-1bed-48f1-8d7a-b53244290532|46278|46203|2026-07-20T03:55:54.086Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-20T03:55:54.086Z",
-      "at": "2026-07-20T03:55:54.086Z",
-      "mapUid": "TngIv14fUHcdpBwO9gRovdJgPP6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c7e326cb-a54e-4bee-9caf-92c2a25b0797",
-      "oldHolder": "Tescoja",
-      "oldTimeMs": 46278,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:46.278",
-      "oldScoreKey": "46278",
-      "newHolderAccountId": "05e7e7c7-1bed-48f1-8d7a-b53244290532",
-      "newHolder": "N1trium",
-      "newTimeMs": 46203,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:46.203",
-      "newScoreKey": "46203",
-      "text": "N1trium overtook Tescoja on Unknown map with 00:00:46.203."
     }
   ]
 }
