@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-02T22:08:51.706Z",
+  "generatedAt": "2026-08-02T23:09:23.188Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|ar1YeCxCQ8osUUmwyAprVyRc4Wb|36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a|40d4abc0-f10b-4093-8244-bda72eaea955|55398|53973|2026-08-02T23:09:23.188Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-02T23:09:23.188Z",
+      "at": "2026-08-02T23:09:23.188Z",
+      "mapUid": "ar1YeCxCQ8osUUmwyAprVyRc4Wb",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a",
+      "oldHolder": "zodiark.",
+      "oldTimeMs": 55398,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:55.398",
+      "oldScoreKey": "55398",
+      "newHolderAccountId": "40d4abc0-f10b-4093-8244-bda72eaea955",
+      "newHolder": "arppa.",
+      "newTimeMs": 53973,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:53.973",
+      "newScoreKey": "53973",
+      "text": "arppa. overtook zodiark. on Unknown map with 00:00:53.973."
+    },
     {
       "id": "wr_changed|TU6cxKQhU2SwXNV2MYZjquLJXBa|e413e842-4db1-4858-8926-1b663b27ba8f|5aaa3dae-82ba-4383-a599-36efb71d8068|42122|42120|2026-08-02T18:45:44.493Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.575",
       "newScoreKey": "6575",
       "text": "Vatsug44 overtook KetchupDisliker on Unknown map with 00:00:06.575."
-    },
-    {
-      "id": "wr_changed|QIXMYfduePsIrfHB_cibRdRNGt0|3a96e825-e60d-4cef-97a4-deda1f05666c|11e56e9f-d89e-484e-b3d9-5e04de40c33d|9065|9029|2026-07-21T07:24:54.922Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-21T07:24:54.922Z",
-      "at": "2026-07-21T07:24:54.922Z",
-      "mapUid": "QIXMYfduePsIrfHB_cibRdRNGt0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "oldHolder": "Danyy912",
-      "oldTimeMs": 9065,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.065",
-      "oldScoreKey": "9065",
-      "newHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
-      "newHolder": "Vatsug44",
-      "newTimeMs": 9029,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.029",
-      "newScoreKey": "9029",
-      "text": "Vatsug44 overtook Danyy912 on Unknown map with 00:00:09.029."
     }
   ]
 }
