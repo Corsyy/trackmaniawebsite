@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T12:45:26.408Z",
+  "generatedAt": "2026-08-02T14:18:57.618Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|uS55zwnKxKNFRgJoBUn3WQROaR0|c36462b6-90ed-4a60-91f0-ddedeaacac61|dcde8b0e-a2aa-435a-b361-91da8b714447|13836|13830|2026-08-02T14:18:57.618Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-02T14:18:57.618Z",
+      "at": "2026-08-02T14:18:57.618Z",
+      "mapUid": "uS55zwnKxKNFRgJoBUn3WQROaR0",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c36462b6-90ed-4a60-91f0-ddedeaacac61",
+      "oldHolder": "rat--.",
+      "oldTimeMs": 13836,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.836",
+      "oldScoreKey": "13836",
+      "newHolderAccountId": "dcde8b0e-a2aa-435a-b361-91da8b714447",
+      "newHolder": "Alfie_2706",
+      "newTimeMs": 13830,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.830",
+      "newScoreKey": "13830",
+      "text": "Alfie_2706 overtook rat--. on Unknown map with 00:00:13.830."
+    },
     {
       "id": "wr_changed|MhP0SPVqkHoug9m7myo8ncYX1Mk|7c9be520-7287-49fd-afd1-6e2421d6a55c|41d5fd91-a880-46d6-ad24-58d34524774b|12171|12166|2026-08-02T12:45:26.408Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.228",
       "newScoreKey": "9228",
       "text": "Vatsug44 overtook Gossfire89 on Unknown map with 00:00:09.228."
-    },
-    {
-      "id": "wr_changed|QX_7KZftlamwN8LSPvzOSUtf7kf|0c857beb-fd95-4449-a669-21fb310cacae|da4642f9-6acf-43fe-88b6-b120ff1308ba|37826|37728|2026-07-20T22:28:57.922Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-20T22:28:57.922Z",
-      "at": "2026-07-20T22:28:57.922Z",
-      "mapUid": "QX_7KZftlamwN8LSPvzOSUtf7kf",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "totd",
-      "oldHolderAccountId": "0c857beb-fd95-4449-a669-21fb310cacae",
-      "oldHolder": "CarlJr.",
-      "oldTimeMs": 37826,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:37.826",
-      "oldScoreKey": "37826",
-      "newHolderAccountId": "da4642f9-6acf-43fe-88b6-b120ff1308ba",
-      "newHolder": "Scrapie98",
-      "newTimeMs": 37728,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:37.728",
-      "newScoreKey": "37728",
-      "text": "Scrapie98 overtook CarlJr. on Unknown map with 00:00:37.728."
     }
   ]
 }
