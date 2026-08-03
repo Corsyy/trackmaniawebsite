@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-03T07:33:29.949Z",
+  "generatedAt": "2026-08-03T11:01:10.289Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 4,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|AcOnHcyuIkMdCYd3H5EE_2UgD58|d9835d12-3ff6-49f5-901d-c572ee058414|c3309971-e4bd-4111-865b-77c79337786a|10070|10068|2026-08-03T11:01:10.289Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-03T11:01:10.289Z",
+      "at": "2026-08-03T11:01:10.289Z",
+      "mapUid": "AcOnHcyuIkMdCYd3H5EE_2UgD58",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d9835d12-3ff6-49f5-901d-c572ee058414",
+      "oldHolder": "Boasyyy",
+      "oldTimeMs": 10070,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.070",
+      "oldScoreKey": "10070",
+      "newHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
+      "newHolder": "Apoc_TM",
+      "newTimeMs": 10068,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.068",
+      "newScoreKey": "10068",
+      "text": "Apoc_TM overtook Boasyyy on Unknown map with 00:00:10.068."
+    },
     {
       "id": "wr_changed|5Cug9zeybzr8sM6lU53K88MoUai|79d49e8f-5126-474a-9648-34e72ebbe255|c3309971-e4bd-4111-865b-77c79337786a|9560|9545|2026-08-03T07:33:29.949Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:15.520",
       "newScoreKey": "15520",
       "text": "Vatsug44 overtook dcdsx on Unknown map with 00:00:15.520."
-    },
-    {
-      "id": "wr_changed|idAplAev0P7r1TqT2HV_XSSHuSk|f8968be2-68e1-45e9-b752-3d3e7941339e|cbd70092-6bc8-4195-9dd1-a0d534a497e5|9586|9580|2026-07-21T10:01:01.230Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-21T10:01:01.230Z",
-      "at": "2026-07-21T10:01:01.230Z",
-      "mapUid": "idAplAev0P7r1TqT2HV_XSSHuSk",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f8968be2-68e1-45e9-b752-3d3e7941339e",
-      "oldHolder": "Blavok",
-      "oldTimeMs": 9586,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.586",
-      "oldScoreKey": "9586",
-      "newHolderAccountId": "cbd70092-6bc8-4195-9dd1-a0d534a497e5",
-      "newHolder": "TunaFish-",
-      "newTimeMs": 9580,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.580",
-      "newScoreKey": "9580",
-      "text": "TunaFish- overtook Blavok on Unknown map with 00:00:09.580."
     }
   ]
 }
