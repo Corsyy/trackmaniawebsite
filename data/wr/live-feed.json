@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-04T01:10:40.004Z",
+  "generatedAt": "2026-08-04T04:30:13.373Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|p5xL9t6n7l1xh1z_b85WU4AkoL6|d620091b-876b-4af4-8f98-ed3625d234e9|6c51c127-a155-4d8b-8172-4508e5aec8e4|44581|44530|2026-08-04T04:30:13.373Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-04T04:30:13.373Z",
+      "at": "2026-08-04T04:30:13.373Z",
+      "mapUid": "p5xL9t6n7l1xh1z_b85WU4AkoL6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "oldHolder": "C50.94975-6.947",
+      "oldTimeMs": 44581,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:44.581",
+      "oldScoreKey": "44581",
+      "newHolderAccountId": "6c51c127-a155-4d8b-8172-4508e5aec8e4",
+      "newHolder": "atrick.",
+      "newTimeMs": 44530,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:44.530",
+      "newScoreKey": "44530",
+      "text": "atrick. overtook C50.94975-6.947 on Unknown map with 00:00:44.530."
+    },
     {
       "id": "wr_changed|DYbBV7FgZ_FPCZ7YoteTxHpIdJj|e7bb55be-c0ea-44de-9af8-8a2c3c6c90a1|46ea451c-7b20-4906-a215-9eee410d0d6c|14648|14626|2026-08-03T22:17:03.801Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:19.382",
       "newScoreKey": "19382",
       "text": "NinjaStar152753 overtook shark.___ on Unknown map with 00:00:19.382."
-    },
-    {
-      "id": "wr_changed|Oh7BqFKMwgzGjAn5sUGaZMxuNPm|fc0526d3-e4ab-47b0-985e-0ce972653098|3c2593e7-30e9-4f3d-8532-ffe4eaad206f|19790|19780|2026-07-22T15:51:16.379Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-22T15:51:16.379Z",
-      "at": "2026-07-22T15:51:16.379Z",
-      "mapUid": "Oh7BqFKMwgzGjAn5sUGaZMxuNPm",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "fc0526d3-e4ab-47b0-985e-0ce972653098",
-      "oldHolder": "Zbuster",
-      "oldTimeMs": 19790,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:19.790",
-      "oldScoreKey": "19790",
-      "newHolderAccountId": "3c2593e7-30e9-4f3d-8532-ffe4eaad206f",
-      "newHolder": "Tim888881",
-      "newTimeMs": 19780,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:19.780",
-      "newScoreKey": "19780",
-      "text": "Tim888881 overtook Zbuster on Unknown map with 00:00:19.780."
     }
   ]
 }
