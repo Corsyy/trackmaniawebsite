@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-04T16:43:55.746Z",
+  "generatedAt": "2026-08-04T18:20:34.832Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 3,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|sJz3u63hyl1Lsdb36iAJ1Glfo4e|c3309971-e4bd-4111-865b-77c79337786a|d77b72a6-dcc0-4e43-b1cc-47c11a9581ad|9191|9143|2026-08-04T18:20:34.832Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-04T18:20:34.832Z",
+      "at": "2026-08-04T18:20:34.832Z",
+      "mapUid": "sJz3u63hyl1Lsdb36iAJ1Glfo4e",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
+      "oldHolder": "Apoc_TM",
+      "oldTimeMs": 9191,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.191",
+      "oldScoreKey": "9191",
+      "newHolderAccountId": "d77b72a6-dcc0-4e43-b1cc-47c11a9581ad",
+      "newHolder": "Vulpecia",
+      "newTimeMs": 9143,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.143",
+      "newScoreKey": "9143",
+      "text": "Vulpecia overtook Apoc_TM on Unknown map with 00:00:09.143."
+    },
     {
       "id": "wr_changed|ItSByHC5cOlqLcTAfow9TT0dYCf|bedb6960-48ca-4416-bfc9-ddfa5616c560|da2b3afe-7610-4d1a-a45c-1430dfbacf86|5851|5825|2026-08-04T16:43:55.746Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.524",
       "newScoreKey": "12524",
       "text": "Utopasoi overtook Boasyyy on Unknown map with 00:00:12.524."
-    },
-    {
-      "id": "wr_changed|xGHONmz2nSzUTDHD8JqUEpdqC8g|55a3499e-bd43-46ba-b2ac-a9b4ab8006cd|941fd1bb-9120-40af-b2d7-f967e69297ee|8209|8174|2026-07-22T17:03:49.005Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-22T17:03:49.005Z",
-      "at": "2026-07-22T17:03:49.005Z",
-      "mapUid": "xGHONmz2nSzUTDHD8JqUEpdqC8g",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "55a3499e-bd43-46ba-b2ac-a9b4ab8006cd",
-      "oldHolder": "Rosarubra_tm",
-      "oldTimeMs": 8209,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.209",
-      "oldScoreKey": "8209",
-      "newHolderAccountId": "941fd1bb-9120-40af-b2d7-f967e69297ee",
-      "newHolder": "POG_MO_THOIN_",
-      "newTimeMs": 8174,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.174",
-      "newScoreKey": "8174",
-      "text": "POG_MO_THOIN_ overtook Rosarubra_tm on Unknown map with 00:00:08.174."
     }
   ]
 }
