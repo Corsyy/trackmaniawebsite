@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T12:06:58.785Z",
+  "generatedAt": "2026-08-05T14:30:43.810Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|3JdxvBUgeZkdUy0_U98v8BLU2s6|0716708a-93d5-4a30-9b2d-0f9dea7d05f0|f348a39e-be47-4090-b813-b34090adabcc|48338|48330|2026-08-05T14:30:43.810Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-05T14:30:43.810Z",
+      "at": "2026-08-05T14:30:43.810Z",
+      "mapUid": "3JdxvBUgeZkdUy0_U98v8BLU2s6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "0716708a-93d5-4a30-9b2d-0f9dea7d05f0",
+      "oldHolder": "abcol1",
+      "oldTimeMs": 48338,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:48.338",
+      "oldScoreKey": "48338",
+      "newHolderAccountId": "f348a39e-be47-4090-b813-b34090adabcc",
+      "newHolder": "ChooDawn",
+      "newTimeMs": 48330,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:48.330",
+      "newScoreKey": "48330",
+      "text": "ChooDawn overtook abcol1 on Unknown map with 00:00:48.330."
+    },
     {
       "id": "wr_changed|eYORKHSYEymMMJXtR54Wdsrmdwh|87e13a2a-63ab-48cb-91d3-098d5dbb20d0|0ae25773-c225-49a2-80fb-adb8d5fdce78|39631|39603|2026-08-05T12:06:58.785Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.494",
       "newScoreKey": "12494",
       "text": "Fluffy.Toasty overtook BLBensko on Unknown map with 00:00:12.494."
-    },
-    {
-      "id": "wr_changed|_u1Cv5xDLDiCzkeDUzOHRS60W61|d9835d12-3ff6-49f5-901d-c572ee058414|3898953a-980c-411a-8cd7-f38625773acd|16562|16289|2026-07-22T20:50:54.065Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-22T20:50:54.065Z",
-      "at": "2026-07-22T20:50:54.065Z",
-      "mapUid": "_u1Cv5xDLDiCzkeDUzOHRS60W61",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d9835d12-3ff6-49f5-901d-c572ee058414",
-      "oldHolder": "Boasyyy",
-      "oldTimeMs": 16562,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:16.562",
-      "oldScoreKey": "16562",
-      "newHolderAccountId": "3898953a-980c-411a-8cd7-f38625773acd",
-      "newHolder": "Utopasoi",
-      "newTimeMs": 16289,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:16.289",
-      "newScoreKey": "16289",
-      "text": "Utopasoi overtook Boasyyy on Unknown map with 00:00:16.289."
     }
   ]
 }
