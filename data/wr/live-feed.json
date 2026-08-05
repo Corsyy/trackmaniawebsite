@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-05T19:43:14.887Z",
+  "generatedAt": "2026-08-05T20:49:14.479Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|NuDWGXtTQOkbRNI5cQZLJDsyazm|aa4e375f-d23e-4915-8d53-8b3307e06764|2343ca67-a77c-47c8-83bd-74f99c6f0a37|37618|37604|2026-08-05T20:49:14.479Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-05T20:49:14.479Z",
+      "at": "2026-08-05T20:49:14.479Z",
+      "mapUid": "NuDWGXtTQOkbRNI5cQZLJDsyazm",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "aa4e375f-d23e-4915-8d53-8b3307e06764",
+      "oldHolder": "racehansTM",
+      "oldTimeMs": 37618,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:37.618",
+      "oldScoreKey": "37618",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 37604,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:37.604",
+      "newScoreKey": "37604",
+      "text": "hobbi. overtook racehansTM on Unknown map with 00:00:37.604."
+    },
     {
       "id": "wr_changed|3JdxvBUgeZkdUy0_U98v8BLU2s6|0716708a-93d5-4a30-9b2d-0f9dea7d05f0|f348a39e-be47-4090-b813-b34090adabcc|48338|48330|2026-08-05T14:30:43.810Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:51.022",
       "newScoreKey": "51022",
       "text": "Itz.Iced overtook Roquett on Unknown map with 00:00:51.022."
-    },
-    {
-      "id": "wr_changed|lRCX4FA6TV_CpbSwQcadUVbI42l|9be915e6-adef-45c7-b7ac-fe4b8fb5d7f5|ff1abcf8-ac9c-459a-9852-12caff49da72|12548|12494|2026-07-22T21:54:32.144Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-22T21:54:32.144Z",
-      "at": "2026-07-22T21:54:32.144Z",
-      "mapUid": "lRCX4FA6TV_CpbSwQcadUVbI42l",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "9be915e6-adef-45c7-b7ac-fe4b8fb5d7f5",
-      "oldHolder": "BLBensko",
-      "oldTimeMs": 12548,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.548",
-      "oldScoreKey": "12548",
-      "newHolderAccountId": "ff1abcf8-ac9c-459a-9852-12caff49da72",
-      "newHolder": "Fluffy.Toasty",
-      "newTimeMs": 12494,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.494",
-      "newScoreKey": "12494",
-      "text": "Fluffy.Toasty overtook BLBensko on Unknown map with 00:00:12.494."
     }
   ]
 }
