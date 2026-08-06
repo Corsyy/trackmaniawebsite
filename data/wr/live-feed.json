@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-06T13:24:42.409Z",
+  "generatedAt": "2026-08-06T15:42:52.070Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 8,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|durbnLdc1xW_1cG7dFdoScRt2Sh|6d5323d0-d6ff-4a6a-af3c-42c11740f9d0|a3712fe0-51ef-4fee-b90c-a470121d6752|8425|8414|2026-08-06T15:42:52.070Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-06T15:42:52.070Z",
+      "at": "2026-08-06T15:42:52.070Z",
+      "mapUid": "durbnLdc1xW_1cG7dFdoScRt2Sh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "6d5323d0-d6ff-4a6a-af3c-42c11740f9d0",
+      "oldHolder": "WantedTM",
+      "oldTimeMs": 8425,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.425",
+      "oldScoreKey": "8425",
+      "newHolderAccountId": "a3712fe0-51ef-4fee-b90c-a470121d6752",
+      "newHolder": "daku..",
+      "newTimeMs": 8414,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.414",
+      "newScoreKey": "8414",
+      "text": "daku.. overtook WantedTM on Unknown map with 00:00:08.414."
+    },
     {
       "id": "wr_changed|J4QsYQEm2knVep9JjfZF_CKFCTh|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|3898953a-980c-411a-8cd7-f38625773acd|12745|12735|2026-08-06T13:24:42.409Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:20.383",
       "newScoreKey": "20383",
       "text": "tommy_tucker193 overtook joo.naah on Unknown map with 00:00:20.383."
-    },
-    {
-      "id": "wr_changed|KTJabUTReP0c8272qqzJxMJkSFb|a00b5e82-a3f5-4c02-9388-a7d565f0985e|1022e6c9-0e99-49f6-81d1-a115d63392cd|4081|4008|2026-07-24T07:22:36.462Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-24T07:22:36.462Z",
-      "at": "2026-07-24T07:22:36.462Z",
-      "mapUid": "KTJabUTReP0c8272qqzJxMJkSFb",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "a00b5e82-a3f5-4c02-9388-a7d565f0985e",
-      "oldHolder": "molyy",
-      "oldTimeMs": 4081,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:04.081",
-      "oldScoreKey": "4081",
-      "newHolderAccountId": "1022e6c9-0e99-49f6-81d1-a115d63392cd",
-      "newHolder": "DanekCZZ",
-      "newTimeMs": 4008,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:04.008",
-      "newScoreKey": "4008",
-      "text": "DanekCZZ overtook molyy on Unknown map with 00:00:04.008."
     }
   ]
 }
