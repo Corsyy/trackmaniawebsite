@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T08:15:33.606Z",
+  "generatedAt": "2026-08-06T11:16:16.579Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -5033,7 +5033,7 @@
       "player": "Exosum_",
       "wins": 1,
       "wrs": 8,
-      "top5": 18,
+      "top5": 19,
       "weeksWon": [
         86
       ],
@@ -5210,6 +5210,13 @@
         {
           "week": 86,
           "mapUid": "vniKL3NF0pmNuglVrYjrZFxfn89",
+          "rank": 3,
+          "timeMs": null,
+          "rawRank": 3
+        },
+        {
+          "week": 86,
+          "mapUid": "NEc21pBrstqqJfKl6GXksSYN_Ga",
           "rank": 3,
           "timeMs": null,
           "rawRank": 3
@@ -15633,9 +15640,9 @@
         {
           "week": 86,
           "mapUid": "NEc21pBrstqqJfKl6GXksSYN_Ga",
-          "rank": 3,
+          "rank": 4,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 4
         }
       ],
       "aliases": []
@@ -16959,9 +16966,9 @@
         {
           "week": 86,
           "mapUid": "NEc21pBrstqqJfKl6GXksSYN_Ga",
-          "rank": 4,
+          "rank": 5,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -17659,32 +17666,6 @@
           "mapUid": "4ZsZo6pMOiXr_W_UFUg_Y30Vxre",
           "rank": 5,
           "timeMs": 11260,
-          "rawRank": 5
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "8405c4ba-d815-46c5-9916-b9cee03083c8",
-      "player": "Bronx_Tm",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 2,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 54,
-          "mapUid": "a7OWKbvmO3OWLXhXo5v22yzena",
-          "rank": 4,
-          "timeMs": 16318,
-          "rawRank": 4
-        },
-        {
-          "week": 86,
-          "mapUid": "NEc21pBrstqqJfKl6GXksSYN_Ga",
-          "rank": 5,
-          "timeMs": null,
           "rawRank": 5
         }
       ],
@@ -19867,6 +19848,25 @@
           "mapUid": "6l_KRfn6Q6BKllRCAXMnjMO3Hd1",
           "rank": 4,
           "timeMs": 15995,
+          "rawRank": 4
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "8405c4ba-d815-46c5-9916-b9cee03083c8",
+      "player": "Bronx_Tm",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 54,
+          "mapUid": "a7OWKbvmO3OWLXhXo5v22yzena",
+          "rank": 4,
+          "timeMs": 16318,
           "rawRank": 4
         }
       ],
