@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-07T16:24:59.628Z",
+  "generatedAt": "2026-08-07T17:22:24.446Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|QJjWTlNUF_iRh3DTI2wt7w9MQA3|8817f987-26d8-4024-b9e4-bfabc9a6181c|8817f987-26d8-4024-b9e4-bfabc9a6181c|13560|13520|2026-08-07T17:22:24.446Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-07T17:22:24.446Z",
+      "at": "2026-08-07T17:22:24.446Z",
+      "mapUid": "QJjWTlNUF_iRh3DTI2wt7w9MQA3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8817f987-26d8-4024-b9e4-bfabc9a6181c",
+      "oldHolder": "Rals8",
+      "oldTimeMs": 13560,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.560",
+      "oldScoreKey": "13560",
+      "newHolderAccountId": "8817f987-26d8-4024-b9e4-bfabc9a6181c",
+      "newHolder": "Rals8",
+      "newTimeMs": 13520,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.520",
+      "newScoreKey": "13520",
+      "text": "Rals8 improved their WR on Unknown map from 00:00:13.560 to 00:00:13.520."
+    },
     {
       "id": "wr_changed|drmUFfEY40H2QtXIea3nopxoxG8|3a96e825-e60d-4cef-97a4-deda1f05666c|390e3e65-c4e1-426e-9621-273a816eb5de|10192|10178|2026-08-07T15:27:20.214Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.555",
       "newScoreKey": "8555",
       "text": "Utopasoi overtook YoloBagwan on Unknown map with 00:00:08.555."
-    },
-    {
-      "id": "wr_changed|BV5BjKnUJFGleOvQ1aiwncoQOh0|06f82f24-f945-4fdd-aea2-8fd031616861|a90404b4-7217-4f78-8891-135da2b442b2|28881|28598|2026-07-24T21:54:49.974Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-24T21:54:49.974Z",
-      "at": "2026-07-24T21:54:49.974Z",
-      "mapUid": "BV5BjKnUJFGleOvQ1aiwncoQOh0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "06f82f24-f945-4fdd-aea2-8fd031616861",
-      "oldHolder": "TiToch22",
-      "oldTimeMs": 28881,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:28.881",
-      "oldScoreKey": "28881",
-      "newHolderAccountId": "a90404b4-7217-4f78-8891-135da2b442b2",
-      "newHolder": "Ice-TM",
-      "newTimeMs": 28598,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:28.598",
-      "newScoreKey": "28598",
-      "text": "Ice-TM overtook TiToch22 on Unknown map with 00:00:28.598."
     }
   ]
 }
