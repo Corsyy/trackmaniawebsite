@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-07T11:55:34.630Z",
+  "generatedAt": "2026-08-07T13:15:27.619Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|egsJYROXRQwA4ZulXVL8GopX2aa|dc84c61a-4da6-46d9-813e-423d30a06ab1|27af4475-0ba8-44cc-8757-42ba3341d882|87053|86876|2026-08-07T13:15:27.619Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-07T13:15:27.619Z",
+      "at": "2026-08-07T13:15:27.619Z",
+      "mapUid": "egsJYROXRQwA4ZulXVL8GopX2aa",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "dc84c61a-4da6-46d9-813e-423d30a06ab1",
+      "oldHolder": "Norsu.",
+      "oldTimeMs": 87053,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:01:27.053",
+      "oldScoreKey": "87053",
+      "newHolderAccountId": "27af4475-0ba8-44cc-8757-42ba3341d882",
+      "newHolder": "lewii.",
+      "newTimeMs": 86876,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:01:26.876",
+      "newScoreKey": "86876",
+      "text": "lewii. overtook Norsu. on Unknown map with 00:01:26.876."
+    },
     {
       "id": "wr_changed|TU6cxKQhU2SwXNV2MYZjquLJXBa|5aaa3dae-82ba-4383-a599-36efb71d8068|e413e842-4db1-4858-8926-1b663b27ba8f|42120|42101|2026-08-07T06:44:49.377Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.635",
       "newScoreKey": "10635",
       "text": "Apoc_TM overtook Danyy912 on Unknown map with 00:00:10.635."
-    },
-    {
-      "id": "wr_changed|GE7EWq6mVWCIQvngX7qanctZySe|d207f651-e68e-41f9-b8de-58f3e503c5b5|c3309971-e4bd-4111-865b-77c79337786a|10263|10262|2026-07-24T19:45:03.381Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-24T19:45:03.381Z",
-      "at": "2026-07-24T19:45:03.381Z",
-      "mapUid": "GE7EWq6mVWCIQvngX7qanctZySe",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d207f651-e68e-41f9-b8de-58f3e503c5b5",
-      "oldHolder": "dcdsx",
-      "oldTimeMs": 10263,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.263",
-      "oldScoreKey": "10263",
-      "newHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
-      "newHolder": "Apoc_TM",
-      "newTimeMs": 10262,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.262",
-      "newScoreKey": "10262",
-      "text": "Apoc_TM overtook dcdsx on Unknown map with 00:00:10.262."
     }
   ]
 }
