@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-07T05:25:49.541Z",
+  "generatedAt": "2026-08-07T06:44:49.377Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|TU6cxKQhU2SwXNV2MYZjquLJXBa|5aaa3dae-82ba-4383-a599-36efb71d8068|e413e842-4db1-4858-8926-1b663b27ba8f|42120|42101|2026-08-07T06:44:49.377Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-07T06:44:49.377Z",
+      "at": "2026-08-07T06:44:49.377Z",
+      "mapUid": "TU6cxKQhU2SwXNV2MYZjquLJXBa",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "5aaa3dae-82ba-4383-a599-36efb71d8068",
+      "oldHolder": "r3.windows",
+      "oldTimeMs": 42120,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.120",
+      "oldScoreKey": "42120",
+      "newHolderAccountId": "e413e842-4db1-4858-8926-1b663b27ba8f",
+      "newHolder": "r3.rist",
+      "newTimeMs": 42101,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:42.101",
+      "newScoreKey": "42101",
+      "text": "r3.rist overtook r3.windows on Unknown map with 00:00:42.101."
+    },
     {
       "id": "wr_changed|MlI7aB8eTdPkp91nw1JKKVAqrKk|14df9d02-9786-408d-b7cc-2d072ed4c2d4|46ea451c-7b20-4906-a215-9eee410d0d6c|18599|18589|2026-08-07T05:25:49.541Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.262",
       "newScoreKey": "10262",
       "text": "Apoc_TM overtook dcdsx on Unknown map with 00:00:10.262."
-    },
-    {
-      "id": "wr_changed|R5bZf5QUFjKSN767_xC1GT4yVka|5be4a170-f48d-4f80-9e19-334b0cadf472|da4642f9-6acf-43fe-88b6-b120ff1308ba|42492|42446|2026-07-24T16:50:37.107Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-24T16:50:37.107Z",
-      "at": "2026-07-24T16:50:37.107Z",
-      "mapUid": "R5bZf5QUFjKSN767_xC1GT4yVka",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "totd",
-      "oldHolderAccountId": "5be4a170-f48d-4f80-9e19-334b0cadf472",
-      "oldHolder": "Otaaaq",
-      "oldTimeMs": 42492,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:42.492",
-      "oldScoreKey": "42492",
-      "newHolderAccountId": "da4642f9-6acf-43fe-88b6-b120ff1308ba",
-      "newHolder": "Scrapie98",
-      "newTimeMs": 42446,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:42.446",
-      "newScoreKey": "42446",
-      "text": "Scrapie98 overtook Otaaaq on Unknown map with 00:00:42.446."
     }
   ]
 }
