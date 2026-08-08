@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-08T19:04:12.475Z",
+  "generatedAt": "2026-08-08T19:43:29.502Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|YIxIY164qiWZrW8MxPqlQ3RvPIm|c3309971-e4bd-4111-865b-77c79337786a|e9345be4-1f4a-45fc-8032-e9be8a4286d5|10378|10366|2026-08-08T19:43:29.502Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T19:43:29.502Z",
+      "at": "2026-08-08T19:43:29.502Z",
+      "mapUid": "YIxIY164qiWZrW8MxPqlQ3RvPIm",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
+      "oldHolder": "Apoc_TM",
+      "oldTimeMs": 10378,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.378",
+      "oldScoreKey": "10378",
+      "newHolderAccountId": "e9345be4-1f4a-45fc-8032-e9be8a4286d5",
+      "newHolder": "JanTM-",
+      "newTimeMs": 10366,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.366",
+      "newScoreKey": "10366",
+      "text": "JanTM- overtook Apoc_TM on Unknown map with 00:00:10.366."
+    },
     {
       "id": "wr_changed|URJxaJ4sUD1g1v6ND3x3Q5QEGcd|549e4ccf-45bd-4e0f-898b-185d0ee5d878|a091e92d-426f-440e-a3d8-7b2c5278e812|6598|6582|2026-08-08T19:04:12.475Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.285",
       "newScoreKey": "9285",
       "text": "Trackmaniac.TM overtook Danyy912 on Unknown map with 00:00:09.285."
-    },
-    {
-      "id": "wr_changed|BM9GQkQLCweSJCnCqF8U9WRrl5j|d8a6ff89-10b7-4db5-9d8f-485c171cdb35|ba182417-82ff-4819-aab2-6535575db0c8|26101|25818|2026-07-25T23:10:23.404Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-25T23:10:23.404Z",
-      "at": "2026-07-25T23:10:23.404Z",
-      "mapUid": "BM9GQkQLCweSJCnCqF8U9WRrl5j",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d8a6ff89-10b7-4db5-9d8f-485c171cdb35",
-      "oldHolder": "drupoy",
-      "oldTimeMs": 26101,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:26.101",
-      "oldScoreKey": "26101",
-      "newHolderAccountId": "ba182417-82ff-4819-aab2-6535575db0c8",
-      "newHolder": "geo.wj",
-      "newTimeMs": 25818,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:25.818",
-      "newScoreKey": "25818",
-      "text": "geo.wj overtook drupoy on Unknown map with 00:00:25.818."
     }
   ]
 }
