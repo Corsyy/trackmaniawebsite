@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T21:16:03.689Z",
+  "generatedAt": "2026-08-08T21:50:49.325Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|UluFI9ttrEjCUHNeDYuqc6Q1Yg4|9a357bbc-4e3d-4a24-8ee8-635627ce215b|ca84b3ff-6663-4c53-a00a-0e265e80c798|40832|40243|2026-08-08T21:50:49.325Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T21:50:49.325Z",
+      "at": "2026-08-08T21:50:49.325Z",
+      "mapUid": "UluFI9ttrEjCUHNeDYuqc6Q1Yg4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "9a357bbc-4e3d-4a24-8ee8-635627ce215b",
+      "oldHolder": "hangenTM",
+      "oldTimeMs": 40832,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:40.832",
+      "oldScoreKey": "40832",
+      "newHolderAccountId": "ca84b3ff-6663-4c53-a00a-0e265e80c798",
+      "newHolder": "KKDU_Torbenli",
+      "newTimeMs": 40243,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:40.243",
+      "newScoreKey": "40243",
+      "text": "KKDU_Torbenli overtook hangenTM on Unknown map with 00:00:40.243."
+    },
     {
       "id": "wr_changed|HOmgqTQUTLxgPmcU2oXp8C13jMh|abd7d1f7-3d64-4663-97a7-31dc147c4001|a091e92d-426f-440e-a3d8-7b2c5278e812|6498|6481|2026-08-08T21:16:03.689Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:13.287",
       "newScoreKey": "13287",
       "text": "k477R overtook lqpzz on Unknown map with 00:00:13.287."
-    },
-    {
-      "id": "wr_changed|v1i4twaCUOFGsJm1htZvjf4Yo8k|79d26d53-aaa1-4765-9cc0-18afa6efd50f|3229ee93-adb0-4950-8ea6-ba64f396e49f|12757|12741|2026-07-26T10:52:53.337Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-26T10:52:53.337Z",
-      "at": "2026-07-26T10:52:53.337Z",
-      "mapUid": "v1i4twaCUOFGsJm1htZvjf4Yo8k",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "79d26d53-aaa1-4765-9cc0-18afa6efd50f",
-      "oldHolder": "Glirdo",
-      "oldTimeMs": 12757,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.757",
-      "oldScoreKey": "12757",
-      "newHolderAccountId": "3229ee93-adb0-4950-8ea6-ba64f396e49f",
-      "newHolder": "Jakeinator2424",
-      "newTimeMs": 12741,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.741",
-      "newScoreKey": "12741",
-      "text": "Jakeinator2424 overtook Glirdo on Unknown map with 00:00:12.741."
     }
   ]
 }
