@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T16:57:16.656Z",
+  "generatedAt": "2026-08-08T17:35:35.644Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|yquyPz7OYBwTqEomfnZMVohIFdh|c3309971-e4bd-4111-865b-77c79337786a|e9345be4-1f4a-45fc-8032-e9be8a4286d5|10556|10553|2026-08-08T17:35:35.644Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T17:35:35.644Z",
+      "at": "2026-08-08T17:35:35.644Z",
+      "mapUid": "yquyPz7OYBwTqEomfnZMVohIFdh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
+      "oldHolder": "Apoc_TM",
+      "oldTimeMs": 10556,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.556",
+      "oldScoreKey": "10556",
+      "newHolderAccountId": "e9345be4-1f4a-45fc-8032-e9be8a4286d5",
+      "newHolder": "JanTM-",
+      "newTimeMs": 10553,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.553",
+      "newScoreKey": "10553",
+      "text": "JanTM- overtook Apoc_TM on Unknown map with 00:00:10.553."
+    },
     {
       "id": "wr_changed|Pc6LHnHQfyrDd4hNCQQR6rTTlAm|fb678553-f730-442a-a035-dfc50f4a5b7b|2343ca67-a77c-47c8-83bd-74f99c6f0a37|43858|43831|2026-08-08T16:57:16.656Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:22.342",
       "newScoreKey": "22342",
       "text": "Deeko.. overtook OnTheCamm on Unknown map with 00:00:22.342."
-    },
-    {
-      "id": "wr_changed|g5gxE8y1Frq_oUhWN2qc6EUuDLg|c0859fc8-2dfb-4b33-9a03-80f765a3edf4|9700daa9-554b-46c1-a370-baf0293c8495|14751|14748|2026-07-25T20:01:56.627Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-25T20:01:56.627Z",
-      "at": "2026-07-25T20:01:56.627Z",
-      "mapUid": "g5gxE8y1Frq_oUhWN2qc6EUuDLg",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c0859fc8-2dfb-4b33-9a03-80f765a3edf4",
-      "oldHolder": "LucaSniperTrick",
-      "oldTimeMs": 14751,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:14.751",
-      "oldScoreKey": "14751",
-      "newHolderAccountId": "9700daa9-554b-46c1-a370-baf0293c8495",
-      "newHolder": "xeandor",
-      "newTimeMs": 14748,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:14.748",
-      "newScoreKey": "14748",
-      "text": "xeandor overtook LucaSniperTrick on Unknown map with 00:00:14.748."
     }
   ]
 }
