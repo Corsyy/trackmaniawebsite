@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T20:49:23.146Z",
+  "generatedAt": "2026-08-08T21:16:03.689Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|HOmgqTQUTLxgPmcU2oXp8C13jMh|abd7d1f7-3d64-4663-97a7-31dc147c4001|a091e92d-426f-440e-a3d8-7b2c5278e812|6498|6481|2026-08-08T21:16:03.689Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T21:16:03.689Z",
+      "at": "2026-08-08T21:16:03.689Z",
+      "mapUid": "HOmgqTQUTLxgPmcU2oXp8C13jMh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "abd7d1f7-3d64-4663-97a7-31dc147c4001",
+      "oldHolder": "Skyheart_",
+      "oldTimeMs": 6498,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:06.498",
+      "oldScoreKey": "6498",
+      "newHolderAccountId": "a091e92d-426f-440e-a3d8-7b2c5278e812",
+      "newHolder": "Panda.ly",
+      "newTimeMs": 6481,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:06.481",
+      "newScoreKey": "6481",
+      "text": "Panda.ly overtook Skyheart_ on Unknown map with 00:00:06.481."
+    },
     {
       "id": "wr_changed|fJQi8zaNOxtxhAJGQPH10RYUUKe|54565860-6f3d-47d3-b84b-e146372b1069|ca7b3167-46a5-4124-a689-d8307eff9f88|7968|7834|2026-08-08T20:49:23.146Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.741",
       "newScoreKey": "12741",
       "text": "Jakeinator2424 overtook Glirdo on Unknown map with 00:00:12.741."
-    },
-    {
-      "id": "wr_changed|HOmgqTQUTLxgPmcU2oXp8C13jMh|7fc7bc9c-67b2-4003-b1a3-29006486f71e|d66cf74e-3720-4490-ac79-a2b55b74e870|6531|6516|2026-07-26T06:41:37.350Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-26T06:41:37.350Z",
-      "at": "2026-07-26T06:41:37.350Z",
-      "mapUid": "HOmgqTQUTLxgPmcU2oXp8C13jMh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7fc7bc9c-67b2-4003-b1a3-29006486f71e",
-      "oldHolder": "ailiei.",
-      "oldTimeMs": 6531,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:06.531",
-      "oldScoreKey": "6531",
-      "newHolderAccountId": "d66cf74e-3720-4490-ac79-a2b55b74e870",
-      "newHolder": "Xx8Bit-SWAYZY",
-      "newTimeMs": 6516,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:06.516",
-      "newScoreKey": "6516",
-      "text": "Xx8Bit-SWAYZY overtook ailiei. on Unknown map with 00:00:06.516."
     }
   ]
 }
