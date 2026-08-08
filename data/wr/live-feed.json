@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-08T16:15:59.818Z",
+  "generatedAt": "2026-08-08T16:57:16.656Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|Pc6LHnHQfyrDd4hNCQQR6rTTlAm|fb678553-f730-442a-a035-dfc50f4a5b7b|2343ca67-a77c-47c8-83bd-74f99c6f0a37|43858|43831|2026-08-08T16:57:16.656Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T16:57:16.656Z",
+      "at": "2026-08-08T16:57:16.656Z",
+      "mapUid": "Pc6LHnHQfyrDd4hNCQQR6rTTlAm",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "fb678553-f730-442a-a035-dfc50f4a5b7b",
+      "oldHolder": "mime-",
+      "oldTimeMs": 43858,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:43.858",
+      "oldScoreKey": "43858",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 43831,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:43.831",
+      "newScoreKey": "43831",
+      "text": "hobbi. overtook mime- on Unknown map with 00:00:43.831."
+    },
     {
       "id": "wr_changed|bLox3TMKtxSHlqpnufmCD08cQal|c248ea54-9119-4bde-b8b1-b8f716d361a0|17914018-b9f0-4965-8a2d-dd0b734374e5|7281|7237|2026-08-08T12:17:27.002Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:14.748",
       "newScoreKey": "14748",
       "text": "xeandor overtook LucaSniperTrick on Unknown map with 00:00:14.748."
-    },
-    {
-      "id": "wr_changed|5bT35Xvpk29bugSizCgchmnyiFi|3a96e825-e60d-4cef-97a4-deda1f05666c|5b97f735-0096-4610-8af8-6698b50225fa|9576|9550|2026-07-25T20:01:56.627Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-25T20:01:56.627Z",
-      "at": "2026-07-25T20:01:56.627Z",
-      "mapUid": "5bT35Xvpk29bugSizCgchmnyiFi",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "oldHolder": "Danyy912",
-      "oldTimeMs": 9576,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.576",
-      "oldScoreKey": "9576",
-      "newHolderAccountId": "5b97f735-0096-4610-8af8-6698b50225fa",
-      "newHolder": "oooogaming",
-      "newTimeMs": 9550,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.550",
-      "newScoreKey": "9550",
-      "text": "oooogaming overtook Danyy912 on Unknown map with 00:00:09.550."
     }
   ]
 }
