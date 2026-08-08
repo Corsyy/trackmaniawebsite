@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-08T11:15:18.953Z",
+  "generatedAt": "2026-08-08T11:48:51.027Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|bH8zoW8RtHYNfyD0q6Ul06Gx6s6|dc2c5812-6df9-4fc9-a9d8-e5b80d2bff4e|8ee65bbf-0bcf-4c8f-a1ab-26f83ec7fc5e|27274|25876|2026-08-08T11:48:51.027Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T11:48:51.027Z",
+      "at": "2026-08-08T11:48:51.027Z",
+      "mapUid": "bH8zoW8RtHYNfyD0q6Ul06Gx6s6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "dc2c5812-6df9-4fc9-a9d8-e5b80d2bff4e",
+      "oldHolder": "PengiTM",
+      "oldTimeMs": 27274,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:27.274",
+      "oldScoreKey": "27274",
+      "newHolderAccountId": "8ee65bbf-0bcf-4c8f-a1ab-26f83ec7fc5e",
+      "newHolder": "Serphal",
+      "newTimeMs": 25876,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:25.876",
+      "newScoreKey": "25876",
+      "text": "Serphal overtook PengiTM on Unknown map with 00:00:25.876."
+    },
     {
       "id": "wr_changed|sBWT1yfnXgzluUBNGHvKlA0MA92|a07c4353-1c41-4174-9027-bbb9c17c5591|f0bce595-9a1c-4ffd-92f7-7e2734969553|8533|8447|2026-08-08T10:43:23.765Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:35.273",
       "newScoreKey": "35273",
       "text": "hobbi. overtook Raceta on Unknown map with 00:00:35.273."
-    },
-    {
-      "id": "wr_changed|Qy345pWg821zDyIg3DvZdD54_yj|b52e0c98-387c-43eb-9acb-5c9b5e0f1286|e582f3c0-29a8-4391-aa7f-acd01ecf0496|39974|39965|2026-07-25T15:34:56.064Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-25T15:34:56.064Z",
-      "at": "2026-07-25T15:34:56.064Z",
-      "mapUid": "Qy345pWg821zDyIg3DvZdD54_yj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "totd",
-      "oldHolderAccountId": "b52e0c98-387c-43eb-9acb-5c9b5e0f1286",
-      "oldHolder": "RoaTM.",
-      "oldTimeMs": 39974,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:39.974",
-      "oldScoreKey": "39974",
-      "newHolderAccountId": "e582f3c0-29a8-4391-aa7f-acd01ecf0496",
-      "newHolder": "Alekzi...",
-      "newTimeMs": 39965,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:39.965",
-      "newScoreKey": "39965",
-      "text": "Alekzi... overtook RoaTM. on Unknown map with 00:00:39.965."
     }
   ]
 }
