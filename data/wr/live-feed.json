@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T20:12:59.888Z",
+  "generatedAt": "2026-08-08T20:49:23.146Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|fJQi8zaNOxtxhAJGQPH10RYUUKe|54565860-6f3d-47d3-b84b-e146372b1069|ca7b3167-46a5-4124-a689-d8307eff9f88|7968|7834|2026-08-08T20:49:23.146Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T20:49:23.146Z",
+      "at": "2026-08-08T20:49:23.146Z",
+      "mapUid": "fJQi8zaNOxtxhAJGQPH10RYUUKe",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "54565860-6f3d-47d3-b84b-e146372b1069",
+      "oldHolder": "leoleodeodeo",
+      "oldTimeMs": 7968,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:07.968",
+      "oldScoreKey": "7968",
+      "newHolderAccountId": "ca7b3167-46a5-4124-a689-d8307eff9f88",
+      "newHolder": "Jetaplex.",
+      "newTimeMs": 7834,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:07.834",
+      "newScoreKey": "7834",
+      "text": "Jetaplex. overtook leoleodeodeo on Unknown map with 00:00:07.834."
+    },
     {
       "id": "wr_changed|mtuRwLl_0XexhCNKZnIJP2rJuMg|c3309971-e4bd-4111-865b-77c79337786a|e9345be4-1f4a-45fc-8032-e9be8a4286d5|9915|9912|2026-08-08T20:12:59.888Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.516",
       "newScoreKey": "6516",
       "text": "Xx8Bit-SWAYZY overtook ailiei. on Unknown map with 00:00:06.516."
-    },
-    {
-      "id": "wr_changed|wQywq1LHZCiKUUQP4jiHAQuTg9c|5a63000d-7288-4046-b0f3-8e86cbae92ea|8710c941-356d-487e-8232-35f8fc1f5bb4|19619|14195|2026-07-26T03:56:56.841Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-26T03:56:56.841Z",
-      "at": "2026-07-26T03:56:56.841Z",
-      "mapUid": "wQywq1LHZCiKUUQP4jiHAQuTg9c",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "5a63000d-7288-4046-b0f3-8e86cbae92ea",
-      "oldHolder": "UndertakerTM",
-      "oldTimeMs": 19619,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:19.619",
-      "oldScoreKey": "19619",
-      "newHolderAccountId": "8710c941-356d-487e-8232-35f8fc1f5bb4",
-      "newHolder": "N4M3S_Tiptop",
-      "newTimeMs": 14195,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:14.195",
-      "newScoreKey": "14195",
-      "text": "N4M3S_Tiptop overtook UndertakerTM on Unknown map with 00:00:14.195."
     }
   ]
 }
