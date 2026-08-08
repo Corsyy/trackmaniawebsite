@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T10:01:36.238Z",
+  "generatedAt": "2026-08-08T10:43:23.765Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|sBWT1yfnXgzluUBNGHvKlA0MA92|a07c4353-1c41-4174-9027-bbb9c17c5591|f0bce595-9a1c-4ffd-92f7-7e2734969553|8533|8447|2026-08-08T10:43:23.765Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T10:43:23.765Z",
+      "at": "2026-08-08T10:43:23.765Z",
+      "mapUid": "sBWT1yfnXgzluUBNGHvKlA0MA92",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "a07c4353-1c41-4174-9027-bbb9c17c5591",
+      "oldHolder": "B3NJ4M1N__",
+      "oldTimeMs": 8533,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.533",
+      "oldScoreKey": "8533",
+      "newHolderAccountId": "f0bce595-9a1c-4ffd-92f7-7e2734969553",
+      "newHolder": "Akubne",
+      "newTimeMs": 8447,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.447",
+      "newScoreKey": "8447",
+      "text": "Akubne overtook B3NJ4M1N__ on Unknown map with 00:00:08.447."
+    },
     {
       "id": "wr_changed|BZ2YpVxaCpeq6fzSCxQbUnD_v09|72d15cc6-d75b-4312-8441-ee3bc33780ba|7893daf4-345c-4b13-835b-382f6484247a|17546|17442|2026-08-08T10:01:36.238Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:39.965",
       "newScoreKey": "39965",
       "text": "Alekzi... overtook RoaTM. on Unknown map with 00:00:39.965."
-    },
-    {
-      "id": "wr_changed|mYbZniyvEFF7gMKaVbo5bflczmh|70ea8df2-ddda-4a89-b2b0-301d764cef9d|2f81cdd9-dbf4-42a5-a1f9-a5dd7461b967|26091|25882|2026-07-25T12:48:41.557Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-25T12:48:41.557Z",
-      "at": "2026-07-25T12:48:41.557Z",
-      "mapUid": "mYbZniyvEFF7gMKaVbo5bflczmh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "70ea8df2-ddda-4a89-b2b0-301d764cef9d",
-      "oldHolder": "MathIsFun_",
-      "oldTimeMs": 26091,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:26.091",
-      "oldScoreKey": "26091",
-      "newHolderAccountId": "2f81cdd9-dbf4-42a5-a1f9-a5dd7461b967",
-      "newHolder": "Chonke_Squirrel",
-      "newTimeMs": 25882,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:25.882",
-      "newScoreKey": "25882",
-      "text": "Chonke_Squirrel overtook MathIsFun_ on Unknown map with 00:00:25.882."
     }
   ]
 }
