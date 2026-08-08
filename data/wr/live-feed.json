@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-08T09:23:34.400Z",
+  "generatedAt": "2026-08-08T10:01:36.238Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|BZ2YpVxaCpeq6fzSCxQbUnD_v09|72d15cc6-d75b-4312-8441-ee3bc33780ba|7893daf4-345c-4b13-835b-382f6484247a|17546|17442|2026-08-08T10:01:36.238Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-08T10:01:36.238Z",
+      "at": "2026-08-08T10:01:36.238Z",
+      "mapUid": "BZ2YpVxaCpeq6fzSCxQbUnD_v09",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "72d15cc6-d75b-4312-8441-ee3bc33780ba",
+      "oldHolder": "karmv.",
+      "oldTimeMs": 17546,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:17.546",
+      "oldScoreKey": "17546",
+      "newHolderAccountId": "7893daf4-345c-4b13-835b-382f6484247a",
+      "newHolder": "jujumasterr",
+      "newTimeMs": 17442,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:17.442",
+      "newScoreKey": "17442",
+      "text": "jujumasterr overtook karmv. on Unknown map with 00:00:17.442."
+    },
     {
       "id": "wr_changed|MnlG2BWm608aUzuE9rNYVqITGdf|6927ad82-770d-434b-92ef-5e385f870ce5|34336add-5019-4f76-849e-c937311435d6|8910|8877|2026-08-08T07:01:21.278Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:25.882",
       "newScoreKey": "25882",
       "text": "Chonke_Squirrel overtook MathIsFun_ on Unknown map with 00:00:25.882."
-    },
-    {
-      "id": "wr_changed|woGaHHgM3H7JQMFJkENeaqiCyge|89ded608-258c-4ae9-8b11-91b8abcde69a|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|22232|22164|2026-07-25T11:32:13.161Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-25T11:32:13.161Z",
-      "at": "2026-07-25T11:32:13.161Z",
-      "mapUid": "woGaHHgM3H7JQMFJkENeaqiCyge",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "89ded608-258c-4ae9-8b11-91b8abcde69a",
-      "oldHolder": "SW.Alfie",
-      "oldTimeMs": 22232,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:22.232",
-      "oldScoreKey": "22232",
-      "newHolderAccountId": "7b6a993a-e7f5-4e4b-bc32-edaaaa209725",
-      "newHolder": "eepySokrat",
-      "newTimeMs": 22164,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:22.164",
-      "newScoreKey": "22164",
-      "text": "eepySokrat overtook SW.Alfie on Unknown map with 00:00:22.164."
     }
   ]
 }
