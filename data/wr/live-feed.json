@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-09T19:07:26.286Z",
+  "generatedAt": "2026-08-09T19:47:28.997Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|OG7vygJDh_5G9uWI55dm5m6KUAa|d207f651-e68e-41f9-b8de-58f3e503c5b5|8f58e7ae-bfad-4759-9bad-445b5fa0315a|9166|9165|2026-08-09T19:47:28.997Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-09T19:47:28.997Z",
+      "at": "2026-08-09T19:47:28.997Z",
+      "mapUid": "OG7vygJDh_5G9uWI55dm5m6KUAa",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d207f651-e68e-41f9-b8de-58f3e503c5b5",
+      "oldHolder": "dcdsx",
+      "oldTimeMs": 9166,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.166",
+      "oldScoreKey": "9166",
+      "newHolderAccountId": "8f58e7ae-bfad-4759-9bad-445b5fa0315a",
+      "newHolder": "NekrossTM",
+      "newTimeMs": 9165,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.165",
+      "newScoreKey": "9165",
+      "text": "NekrossTM overtook dcdsx on Unknown map with 00:00:09.165."
+    },
     {
       "id": "wr_changed|va6bYAtFYNGUxay5CxqpWKoq5ac|c3309971-e4bd-4111-865b-77c79337786a|8f58e7ae-bfad-4759-9bad-445b5fa0315a|9264|9245|2026-08-09T18:18:23.644Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:25.489",
       "newScoreKey": "25489",
       "text": "dongr. overtook Tekky.. on Unknown map with 00:00:25.489."
-    },
-    {
-      "id": "wr_changed|2v0PfUwAk4ZERY_UuN4aQwKK9nl|a198e640-779a-47c0-97b5-9d38a351e7fa|7c9be520-7287-49fd-afd1-6e2421d6a55c|26319|26049|2026-07-27T08:42:11.822Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-27T08:42:11.822Z",
-      "at": "2026-07-27T08:42:11.822Z",
-      "mapUid": "2v0PfUwAk4ZERY_UuN4aQwKK9nl",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "a198e640-779a-47c0-97b5-9d38a351e7fa",
-      "oldHolder": "Tekky..",
-      "oldTimeMs": 26319,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:26.319",
-      "oldScoreKey": "26319",
-      "newHolderAccountId": "7c9be520-7287-49fd-afd1-6e2421d6a55c",
-      "newHolder": "dongr.",
-      "newTimeMs": 26049,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:26.049",
-      "newScoreKey": "26049",
-      "text": "dongr. overtook Tekky.. on Unknown map with 00:00:26.049."
     }
   ]
 }
