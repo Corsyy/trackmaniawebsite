@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-09T04:11:07.571Z",
+  "generatedAt": "2026-08-09T05:18:14.453Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|4f8s1XbBQ1u6vLi5oRWTuYsjCW8|2016f67a-0814-42ed-bea8-2e75da48840d|ecdb2228-bea6-4206-a061-635e8df4ee4c|57098|57038|2026-08-09T05:18:14.453Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-09T05:18:14.453Z",
+      "at": "2026-08-09T05:18:14.453Z",
+      "mapUid": "4f8s1XbBQ1u6vLi5oRWTuYsjCW8",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "2016f67a-0814-42ed-bea8-2e75da48840d",
+      "oldHolder": "Ikewolf",
+      "oldTimeMs": 57098,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:57.098",
+      "oldScoreKey": "57098",
+      "newHolderAccountId": "ecdb2228-bea6-4206-a061-635e8df4ee4c",
+      "newHolder": "Siyei27",
+      "newTimeMs": 57038,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:57.038",
+      "newScoreKey": "57038",
+      "text": "Siyei27 overtook Ikewolf on Unknown map with 00:00:57.038."
+    },
     {
       "id": "wr_changed|UluFI9ttrEjCUHNeDYuqc6Q1Yg4|9a357bbc-4e3d-4a24-8ee8-635627ce215b|ca84b3ff-6663-4c53-a00a-0e265e80c798|40832|40243|2026-08-08T21:50:49.325Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.677",
       "newScoreKey": "9677",
       "text": "ZoMBiE4053 overtook Blavok on Unknown map with 00:00:09.677."
-    },
-    {
-      "id": "wr_changed|xjyM13WRkWIXddpbQm3Wx4b2y1i|a537e543-26ff-4208-ba9f-a77f748c26b5|d63054a0-f977-4f1b-9dcb-644ef5ed735d|13293|13287|2026-07-26T10:52:53.337Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-26T10:52:53.337Z",
-      "at": "2026-07-26T10:52:53.337Z",
-      "mapUid": "xjyM13WRkWIXddpbQm3Wx4b2y1i",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "a537e543-26ff-4208-ba9f-a77f748c26b5",
-      "oldHolder": "lqpzz",
-      "oldTimeMs": 13293,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:13.293",
-      "oldScoreKey": "13293",
-      "newHolderAccountId": "d63054a0-f977-4f1b-9dcb-644ef5ed735d",
-      "newHolder": "k477R",
-      "newTimeMs": 13287,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:13.287",
-      "newScoreKey": "13287",
-      "text": "k477R overtook lqpzz on Unknown map with 00:00:13.287."
     }
   ]
 }
