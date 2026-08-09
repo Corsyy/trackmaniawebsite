@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-09T22:54:22.085Z",
+  "generatedAt": "2026-08-09T23:36:19.145Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|_lJk6t0x9enNuvVBuD_sMPS0Dr9|421f5292-f81f-4e46-a896-3569b2bfd5c5|788d6532-0871-4f6d-b8be-21e04d81b256|5721|5704|2026-08-09T23:36:19.145Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-09T23:36:19.145Z",
+      "at": "2026-08-09T23:36:19.145Z",
+      "mapUid": "_lJk6t0x9enNuvVBuD_sMPS0Dr9",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "421f5292-f81f-4e46-a896-3569b2bfd5c5",
+      "oldHolder": "Miami560.",
+      "oldTimeMs": 5721,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:05.721",
+      "oldScoreKey": "5721",
+      "newHolderAccountId": "788d6532-0871-4f6d-b8be-21e04d81b256",
+      "newHolder": "rozuu..",
+      "newTimeMs": 5704,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:05.704",
+      "newScoreKey": "5704",
+      "text": "rozuu.. overtook Miami560. on Unknown map with 00:00:05.704."
+    },
     {
       "id": "wr_changed|HXVoosOAysUqFx1SSiOUQ4avbR9|c4608ed9-681a-41ce-823f-e355d6c6f743|fb18383a-1179-42ac-b84a-6bdbf3b4fc7f|16027|15672|2026-08-09T22:13:56.463Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:22.257",
       "newScoreKey": "22257",
       "text": "Alekzi... overtook LucaSniperTrick on Unknown map with 00:00:22.257."
-    },
-    {
-      "id": "wr_changed|34Luubx7kffImy83clt4Ax8H3de|c0859fc8-2dfb-4b33-9a03-80f765a3edf4|e582f3c0-29a8-4391-aa7f-acd01ecf0496|15721|15714|2026-07-27T17:02:46.665Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-27T17:02:46.665Z",
-      "at": "2026-07-27T17:02:46.665Z",
-      "mapUid": "34Luubx7kffImy83clt4Ax8H3de",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c0859fc8-2dfb-4b33-9a03-80f765a3edf4",
-      "oldHolder": "LucaSniperTrick",
-      "oldTimeMs": 15721,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:15.721",
-      "oldScoreKey": "15721",
-      "newHolderAccountId": "e582f3c0-29a8-4391-aa7f-acd01ecf0496",
-      "newHolder": "Alekzi...",
-      "newTimeMs": 15714,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:15.714",
-      "newScoreKey": "15714",
-      "text": "Alekzi... overtook LucaSniperTrick on Unknown map with 00:00:15.714."
     }
   ]
 }
