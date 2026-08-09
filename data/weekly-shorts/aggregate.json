@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-09T13:45:14.693Z",
+  "generatedAt": "2026-08-09T14:30:55.173Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -525,7 +525,7 @@
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
       "player": "in-.-",
       "wins": 6,
-      "wrs": 24,
+      "wrs": 23,
       "top5": 45,
       "weeksWon": [
         44,
@@ -671,12 +671,6 @@
         {
           "week": 86,
           "mapUid": "vniKL3NF0pmNuglVrYjrZFxfn89",
-          "timeMs": null,
-          "rawRank": 1
-        },
-        {
-          "week": 86,
-          "mapUid": "plMRVF2y59S8WNuWZ1yRW5F0H75",
           "timeMs": null,
           "rawRank": 1
         }
@@ -993,9 +987,9 @@
         {
           "week": 86,
           "mapUid": "plMRVF2y59S8WNuWZ1yRW5F0H75",
-          "rank": 1,
+          "rank": 2,
           "timeMs": null,
-          "rawRank": 1
+          "rawRank": 2
         }
       ],
       "aliases": []
@@ -12897,6 +12891,46 @@
       "aliases": []
     },
     {
+      "accountId": "5e7bc5fd-6c74-4a78-aad6-58ccb7b21f11",
+      "player": "chunkatuff",
+      "wins": 0,
+      "wrs": 1,
+      "top5": 3,
+      "weeksWon": [],
+      "wrWeeks": [
+        {
+          "week": 86,
+          "mapUid": "plMRVF2y59S8WNuWZ1yRW5F0H75",
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "top5Weeks": [
+        {
+          "week": 6,
+          "mapUid": "ndbc7cCFDK7PocDCJu_T5YThVo",
+          "rank": 4,
+          "timeMs": 29417,
+          "rawRank": 4
+        },
+        {
+          "week": 9,
+          "mapUid": "S2i9AiVTNSmuUwl8hGwA9Hb815",
+          "rank": 4,
+          "timeMs": 19223,
+          "rawRank": 4
+        },
+        {
+          "week": 86,
+          "mapUid": "plMRVF2y59S8WNuWZ1yRW5F0H75",
+          "rank": 1,
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
+      "aliases": []
+    },
+    {
       "accountId": "f532aae0-7dd0-4004-8ab8-43c7145c5473",
       "player": "Danifill",
       "wins": 0,
@@ -16822,39 +16856,6 @@
           "rank": 4,
           "timeMs": 11220,
           "rawRank": 4
-        }
-      ],
-      "aliases": []
-    },
-    {
-      "accountId": "5e7bc5fd-6c74-4a78-aad6-58ccb7b21f11",
-      "player": "chunkatuff",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 3,
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 6,
-          "mapUid": "ndbc7cCFDK7PocDCJu_T5YThVo",
-          "rank": 4,
-          "timeMs": 29417,
-          "rawRank": 4
-        },
-        {
-          "week": 9,
-          "mapUid": "S2i9AiVTNSmuUwl8hGwA9Hb815",
-          "rank": 4,
-          "timeMs": 19223,
-          "rawRank": 4
-        },
-        {
-          "week": 86,
-          "mapUid": "plMRVF2y59S8WNuWZ1yRW5F0H75",
-          "rank": 2,
-          "timeMs": null,
-          "rawRank": 2
         }
       ],
       "aliases": []
