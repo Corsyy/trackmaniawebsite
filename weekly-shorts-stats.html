@@ -1430,6 +1430,63 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
       return r.json();
     }
 
+
+    function goatPlayerKeyFromRow(row){
+      const id =
+        row?.accountId ||
+        row?.account_id ||
+        row?.playerId ||
+        row?.player_id ||
+        row?.userId ||
+        row?.user_id ||
+        "";
+      if (id) return `id:${String(id).toLowerCase()}`;
+
+      const name = row?.player || row?.name || row?.displayName || "";
+      return name ? `name:${String(name).trim().toLowerCase()}` : "";
+    }
+
+    async function hydrateGoatWeekWinsFromWeeks(goatAgg, goatWeeks){
+      const players = Array.isArray(goatAgg?.players) ? goatAgg.players : [];
+      const weeks = Array.isArray(goatWeeks) ? goatWeeks : [];
+      if (!players.length || !weeks.length) return goatAgg;
+
+      const winsByKey = new Map();
+
+      await Promise.all(weeks.map(async (weekMeta) => {
+        const weekNum = weekMeta?.week ?? weekMeta?.number ?? weekMeta;
+        if (weekNum == null) return;
+
+        try {
+          const weekJson = await fetchJson(PATHS.goatWeekFile(weekNum));
+          const entries = Array.isArray(weekJson?.entries) ? weekJson.entries : [];
+          const winners = entries.filter((entry) => Number(entry?.rank ?? entry?.position ?? entry?.place) === 1);
+
+          for (const winner of winners) {
+            const key = goatPlayerKeyFromRow(winner);
+            if (!key) continue;
+            winsByKey.set(key, (winsByKey.get(key) || 0) + 1);
+          }
+        } catch (err) {
+          console.warn("Could not hydrate GOAT wins from week file:", weekNum, err);
+        }
+      }));
+
+      if (!winsByKey.size) return goatAgg;
+
+      for (const player of players) {
+        const key = goatPlayerKeyFromRow(player);
+        const computedWins = winsByKey.get(key);
+        if (computedWins != null) {
+          player.weekWins = computedWins;
+        } else {
+          player.weekWins = Number(player.weekWins ?? player.wins ?? 0);
+        }
+      }
+
+      return goatAgg;
+    }
+
     function pickLeader(players, key){
       let best = null;
       for (const p of players){
@@ -1475,7 +1532,7 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
       const byNumDesc = (k) => (a,b) => (b[k]??0) - (a[k]??0) || (a.player||"").localeCompare(b.player||"");
 
       if (sortBy === "points") return arr.sort(byNumDesc("goatPoints"));
-      if (sortBy === "wins") return arr.sort(byNumDesc("weekWins"));
+      if (sortBy === "wins") return arr.sort((a,b) => Number(b.weekWins ?? b.wins ?? 0) - Number(a.weekWins ?? a.wins ?? 0) || (a.player||"").localeCompare(b.player||""));
       if (sortBy === "wrs") return arr.sort(byNumDesc("wrs"));
       return arr.sort((a,b) => (a.player||"").localeCompare(b.player||""));
     }
@@ -1612,7 +1669,7 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
           <td class="player-cell" data-label="Player"><b>${p.player || "—"}</b></td>
           <td class="right" data-label="Points">${fmtScore(p.goatPoints ?? 0)}</td>
           <td class="tier-col" data-label="Tier">${renderTierBadge(tierMeta)}</td>
-          <td class="right" data-label="Wins">${p.weekWins ?? 0}</td>
+          <td class="right" data-label="Wins">${Number(p.weekWins ?? p.wins ?? 0).toLocaleString()}</td>
           <td class="right" data-label="WRs">${p.wrs ?? 0}</td>
           <td class="right" data-label="2nd">${p.secondPlaces ?? 0}</td>
           <td class="right" data-label="3rd">${p.thirdPlaces ?? 0}</td>
@@ -1751,6 +1808,8 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 
       liveWeeksIndex = weeksIndex.weeks || [];
       goatWeeksIndex = goatWeeksIndexData.weeks || [];
+
+      await hydrateGoatWeekWinsFromWeeks(goatAgg, goatWeeksIndex);
 
       renderKpis(agg, liveWeeksIndex.length);
 
