@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-09T20:56:56.305Z",
+  "generatedAt": "2026-08-09T21:38:22.990Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|fIgDYamvaFw_gKMbEvw49JS0Wy5|c6872cac-f5b3-4296-a52f-596d17879d57|3108cb99-0463-4c95-b1a5-a96e5a2a9e14|31357|31215|2026-08-09T21:38:22.990Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-09T21:38:22.990Z",
+      "at": "2026-08-09T21:38:22.990Z",
+      "mapUid": "fIgDYamvaFw_gKMbEvw49JS0Wy5",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c6872cac-f5b3-4296-a52f-596d17879d57",
+      "oldHolder": "Azaza909",
+      "oldTimeMs": 31357,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:31.357",
+      "oldScoreKey": "31357",
+      "newHolderAccountId": "3108cb99-0463-4c95-b1a5-a96e5a2a9e14",
+      "newHolder": "Krievouss",
+      "newTimeMs": 31215,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:31.215",
+      "newScoreKey": "31215",
+      "text": "Krievouss overtook Azaza909 on Unknown map with 00:00:31.215."
+    },
     {
       "id": "wr_changed|Zi2UbCy7kdxvYa3a82vyWyC64Uk|392c689c-e54f-41c9-9e26-7e68bc41633c|4fe15603-ea1e-438e-b0ec-3be320917fe7|30154|29901|2026-08-09T20:56:56.305Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:26.568",
       "newScoreKey": "26568",
       "text": "Alekzi... overtook LucaSniperTrick on Unknown map with 00:00:26.568."
-    },
-    {
-      "id": "wr_changed|esqYdwMCMNxozvMiovZDYzZfii3|b8466c27-6898-4956-a510-4c37c5ba4347|d28a55af-b66d-4401-9466-2f9877890a54|9583|9581|2026-07-27T14:56:09.330Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-27T14:56:09.330Z",
-      "at": "2026-07-27T14:56:09.330Z",
-      "mapUid": "esqYdwMCMNxozvMiovZDYzZfii3",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "b8466c27-6898-4956-a510-4c37c5ba4347",
-      "oldHolder": "ZoMBiE4053",
-      "oldTimeMs": 9583,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.583",
-      "oldScoreKey": "9583",
-      "newHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
-      "newHolder": "MazsTM",
-      "newTimeMs": 9581,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.581",
-      "newScoreKey": "9581",
-      "text": "MazsTM overtook ZoMBiE4053 on Unknown map with 00:00:09.581."
     }
   ]
 }
