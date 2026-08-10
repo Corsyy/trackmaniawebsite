@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-10T08:02:48.386Z",
+  "generatedAt": "2026-08-10T09:43:43.306Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|b9OPxDgnPnrTY1qUS73wX9aYVb8|aa4e375f-d23e-4915-8d53-8b3307e06764|2343ca67-a77c-47c8-83bd-74f99c6f0a37|23218|23208|2026-08-10T09:43:43.306Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-10T09:43:43.306Z",
+      "at": "2026-08-10T09:43:43.306Z",
+      "mapUid": "b9OPxDgnPnrTY1qUS73wX9aYVb8",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "aa4e375f-d23e-4915-8d53-8b3307e06764",
+      "oldHolder": "racehansTM",
+      "oldTimeMs": 23218,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:23.218",
+      "oldScoreKey": "23218",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 23208,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:23.208",
+      "newScoreKey": "23208",
+      "text": "hobbi. overtook racehansTM on Unknown map with 00:00:23.208."
+    },
     {
       "id": "wr_changed|p5xL9t6n7l1xh1z_b85WU4AkoL6|6c51c127-a155-4d8b-8172-4508e5aec8e4|d620091b-876b-4af4-8f98-ed3625d234e9|44530|44503|2026-08-10T03:02:23.020Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:32.160",
       "newScoreKey": "32160",
       "text": "Helldiver_Agent overtook Danger.Rae on Unknown map with 00:00:32.160."
-    },
-    {
-      "id": "wr_changed|tiXWDDL96ViFJtj4uYHAFeg7SRh|07366bee-9b15-42d8-bf7a-9ec1c17a2133|46b93d10-9bb9-425f-a84c-c6c4895f8b94|9423|9381|2026-07-28T10:00:29.479Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-28T10:00:29.479Z",
-      "at": "2026-07-28T10:00:29.479Z",
-      "mapUid": "tiXWDDL96ViFJtj4uYHAFeg7SRh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "07366bee-9b15-42d8-bf7a-9ec1c17a2133",
-      "oldHolder": "GeraldDuke",
-      "oldTimeMs": 9423,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.423",
-      "oldScoreKey": "9423",
-      "newHolderAccountId": "46b93d10-9bb9-425f-a84c-c6c4895f8b94",
-      "newHolder": "Trackmaniac.TM",
-      "newTimeMs": 9381,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.381",
-      "newScoreKey": "9381",
-      "text": "Trackmaniac.TM overtook GeraldDuke on Unknown map with 00:00:09.381."
     }
   ]
 }
