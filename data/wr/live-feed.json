@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-11T13:17:08.704Z",
+  "generatedAt": "2026-08-11T14:33:38.875Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|HX04fe19rwQdRMPc2ikovyWMU95|70ea8df2-ddda-4a89-b2b0-301d764cef9d|3d85370f-4a45-4e85-9fe3-6b9c3ef19a16|27352|26805|2026-08-11T14:33:38.875Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-11T14:33:38.875Z",
+      "at": "2026-08-11T14:33:38.875Z",
+      "mapUid": "HX04fe19rwQdRMPc2ikovyWMU95",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "70ea8df2-ddda-4a89-b2b0-301d764cef9d",
+      "oldHolder": "MathIsFun_",
+      "oldTimeMs": 27352,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:27.352",
+      "oldScoreKey": "27352",
+      "newHolderAccountId": "3d85370f-4a45-4e85-9fe3-6b9c3ef19a16",
+      "newHolder": "WildMagnus",
+      "newTimeMs": 26805,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:26.805",
+      "newScoreKey": "26805",
+      "text": "WildMagnus overtook MathIsFun_ on Unknown map with 00:00:26.805."
+    },
     {
       "id": "wr_changed|bSa_hx75S23SzbEw5QnRaVzjxkl|7735b375-7929-4b03-ab91-8c24bd6aeb87|0593f9e2-6332-416f-a97f-40328db13ae5|393420|388773|2026-08-11T11:04:16.306Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:31.135",
       "newScoreKey": "31135",
       "text": "Helldiver_Agent overtook Danger.Rae on Unknown map with 00:00:31.135."
-    },
-    {
-      "id": "self_improve|Mh7eoeVIlpNQ5_5PC95aaAjHq59|d620091b-876b-4af4-8f98-ed3625d234e9|d620091b-876b-4af4-8f98-ed3625d234e9|43585|43537|2026-07-28T23:45:47.607Z",
-      "type": "self_improve",
-      "detectedAt": "2026-07-28T23:45:47.607Z",
-      "at": "2026-07-28T23:45:47.607Z",
-      "mapUid": "Mh7eoeVIlpNQ5_5PC95aaAjHq59",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "totd",
-      "oldHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
-      "oldHolder": "C50.94975-6.947",
-      "oldTimeMs": 43585,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:43.585",
-      "oldScoreKey": "43585",
-      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
-      "newHolder": "C50.94975-6.947",
-      "newTimeMs": 43537,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:43.537",
-      "newScoreKey": "43537",
-      "text": "C50.94975-6.947 improved their WR on Unknown map from 00:00:43.585 to 00:00:43.537."
     }
   ]
 }
