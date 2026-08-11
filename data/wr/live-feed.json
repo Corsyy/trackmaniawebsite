@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-11T21:25:00.959Z",
+  "generatedAt": "2026-08-11T22:11:23.533Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|lEuOxHj_dYJOsMJ0W6qsktn7_n4|3898953a-980c-411a-8cd7-f38625773acd|8f58e7ae-bfad-4759-9bad-445b5fa0315a|8555|8542|2026-08-11T22:11:23.533Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-11T22:11:23.533Z",
+      "at": "2026-08-11T22:11:23.533Z",
+      "mapUid": "lEuOxHj_dYJOsMJ0W6qsktn7_n4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "3898953a-980c-411a-8cd7-f38625773acd",
+      "oldHolder": "Utopasoi",
+      "oldTimeMs": 8555,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.555",
+      "oldScoreKey": "8555",
+      "newHolderAccountId": "8f58e7ae-bfad-4759-9bad-445b5fa0315a",
+      "newHolder": "NekrossTM",
+      "newTimeMs": 8542,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.542",
+      "newScoreKey": "8542",
+      "text": "NekrossTM overtook Utopasoi on Unknown map with 00:00:08.542."
+    },
     {
       "id": "wr_changed|8gEWXowUFJVQgluE1DjDeTZJmK8|fc611694-a12b-46b2-b2bb-29a2938969d8|5c9f57d9-2b40-4560-8a6f-3140905a9e4e|13551|13522|2026-08-11T20:29:55.432Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:45.428",
       "newScoreKey": "45428",
       "text": "Helldiver_Agent overtook Danger.Rae on Unknown map with 00:00:45.428."
-    },
-    {
-      "id": "wr_changed|VXxVIzDpBA_wa7VwAWlCzKadEVl|f3577c31-9549-4c74-8af0-d456f057b7bb|a66eaf5d-ddcd-4ca9-b8be-2109d164d0ce|38994|38708|2026-07-29T12:26:41.747Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-29T12:26:41.747Z",
-      "at": "2026-07-29T12:26:41.747Z",
-      "mapUid": "VXxVIzDpBA_wa7VwAWlCzKadEVl",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f3577c31-9549-4c74-8af0-d456f057b7bb",
-      "oldHolder": "beho421",
-      "oldTimeMs": 38994,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:38.994",
-      "oldScoreKey": "38994",
-      "newHolderAccountId": "a66eaf5d-ddcd-4ca9-b8be-2109d164d0ce",
-      "newHolder": "Helldiver_Agent",
-      "newTimeMs": 38708,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:38.708",
-      "newScoreKey": "38708",
-      "text": "Helldiver_Agent overtook beho421 on Unknown map with 00:00:38.708."
     }
   ]
 }
