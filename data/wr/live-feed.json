@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-11T02:55:56.041Z",
+  "generatedAt": "2026-08-11T04:24:10.539Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 6,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|E1X668U1adHolQy_QWKZ2EJ3ELe|47d0be8b-33db-4ca5-af50-3ac62c42a72f|e9345be4-1f4a-45fc-8032-e9be8a4286d5|371858|370304|2026-08-11T04:24:10.539Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-11T04:24:10.539Z",
+      "at": "2026-08-11T04:24:10.539Z",
+      "mapUid": "E1X668U1adHolQy_QWKZ2EJ3ELe",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "47d0be8b-33db-4ca5-af50-3ac62c42a72f",
+      "oldHolder": "Suudo_W",
+      "oldTimeMs": 371858,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:06:11.858",
+      "oldScoreKey": "371858",
+      "newHolderAccountId": "e9345be4-1f4a-45fc-8032-e9be8a4286d5",
+      "newHolder": "JanTM-",
+      "newTimeMs": 370304,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:06:10.304",
+      "newScoreKey": "370304",
+      "text": "JanTM- overtook Suudo_W on Unknown map with 00:06:10.304."
+    },
     {
       "id": "wr_changed|npQgdq2L0X6usrVeyoCRaNmfZGi|3a96e825-e60d-4cef-97a4-deda1f05666c|8f58e7ae-bfad-4759-9bad-445b5fa0315a|9464|9463|2026-08-11T02:55:56.041Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:31.810",
       "newScoreKey": "91810",
       "text": "Imperator635 overtook notIMPRESS3D on Unknown map with 00:01:31.810."
-    },
-    {
-      "id": "wr_changed|yOMpuQv7ZEBozfKiqfvVFgucfs|04da993f-f4db-410e-92d8-669e7f3ba544|9b793bbe-6ba8-4ade-b712-fa7e64c0e6e4|12268|11978|2026-07-28T19:07:20.900Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-28T19:07:20.900Z",
-      "at": "2026-07-28T19:07:20.900Z",
-      "mapUid": "yOMpuQv7ZEBozfKiqfvVFgucfs",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "04da993f-f4db-410e-92d8-669e7f3ba544",
-      "oldHolder": "Section--",
-      "oldTimeMs": 12268,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.268",
-      "oldScoreKey": "12268",
-      "newHolderAccountId": "9b793bbe-6ba8-4ade-b712-fa7e64c0e6e4",
-      "newHolder": "GatitoTM",
-      "newTimeMs": 11978,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:11.978",
-      "newScoreKey": "11978",
-      "text": "GatitoTM overtook Section-- on Unknown map with 00:00:11.978."
     }
   ]
 }
