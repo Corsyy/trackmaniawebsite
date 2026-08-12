@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-12T09:30:58.790Z",
+  "generatedAt": "2026-08-12T10:45:58.819Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|yJEuKElVuSuHdJIQxgRrZG31eii|87e13a2a-63ab-48cb-91d3-098d5dbb20d0|c673bbb7-5ff1-4059-be62-78afe0bee5a8|48516|48497|2026-08-12T10:45:58.819Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-12T10:45:58.819Z",
+      "at": "2026-08-12T10:45:58.819Z",
+      "mapUid": "yJEuKElVuSuHdJIQxgRrZG31eii",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "87e13a2a-63ab-48cb-91d3-098d5dbb20d0",
+      "oldHolder": "mihcai",
+      "oldTimeMs": 48516,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:48.516",
+      "oldScoreKey": "48516",
+      "newHolderAccountId": "c673bbb7-5ff1-4059-be62-78afe0bee5a8",
+      "newHolder": "ollyca10",
+      "newTimeMs": 48497,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:48.497",
+      "newScoreKey": "48497",
+      "text": "ollyca10 overtook mihcai on Unknown map with 00:00:48.497."
+    },
     {
       "id": "wr_changed|8wBCrzABQ9hczSHIuHll9OnyHZd|f54ee117-074f-43ac-9b49-2130446ac8d1|5b640430-adef-445d-89b4-e23f3eb198b8|52747|52602|2026-08-12T03:29:33.539Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.672",
       "newScoreKey": "6672",
       "text": "BartAker05 overtook Vatsug44 on Unknown map with 00:00:06.672."
-    },
-    {
-      "id": "wr_changed|btAUJH9mkoeipWQcifyVApILP0g|64634b30-3b33-4399-b130-642e6415902b|a66eaf5d-ddcd-4ca9-b8be-2109d164d0ce|96477|96070|2026-07-29T16:12:59.166Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-29T16:12:59.166Z",
-      "at": "2026-07-29T16:12:59.166Z",
-      "mapUid": "btAUJH9mkoeipWQcifyVApILP0g",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "64634b30-3b33-4399-b130-642e6415902b",
-      "oldHolder": "Henri97_",
-      "oldTimeMs": 96477,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:36.477",
-      "oldScoreKey": "96477",
-      "newHolderAccountId": "a66eaf5d-ddcd-4ca9-b8be-2109d164d0ce",
-      "newHolder": "Helldiver_Agent",
-      "newTimeMs": 96070,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:36.070",
-      "newScoreKey": "96070",
-      "text": "Helldiver_Agent overtook Henri97_ on Unknown map with 00:01:36.070."
     }
   ]
 }
