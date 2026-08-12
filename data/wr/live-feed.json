@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-12T19:18:28.049Z",
+  "generatedAt": "2026-08-12T20:07:31.724Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 3,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|I5bFhxhxtDNkFRE3nYG4gdzi9Ym|3a96e825-e60d-4cef-97a4-deda1f05666c|702b0631-3c06-45dd-9be3-8322da84d2cf|10650|10633|2026-08-12T20:07:31.724Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-12T20:07:31.724Z",
+      "at": "2026-08-12T20:07:31.724Z",
+      "mapUid": "I5bFhxhxtDNkFRE3nYG4gdzi9Ym",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
+      "oldHolder": "Danyy912",
+      "oldTimeMs": 10650,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.650",
+      "oldScoreKey": "10650",
+      "newHolderAccountId": "702b0631-3c06-45dd-9be3-8322da84d2cf",
+      "newHolder": "DishBrain",
+      "newTimeMs": 10633,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.633",
+      "newScoreKey": "10633",
+      "text": "DishBrain overtook Danyy912 on Unknown map with 00:00:10.633."
+    },
     {
       "id": "wr_changed|WSa6Du7HN2INCNGETYZczXCdOci|7f80b573-fff1-4de9-8cd5-ee7e5749ce15|702b0631-3c06-45dd-9be3-8322da84d2cf|11274|11270|2026-08-12T19:18:28.049Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:57.178",
       "newScoreKey": "117178",
       "text": "Helldiver_Agent overtook sstistrup on Unknown map with 00:01:57.178."
-    },
-    {
-      "id": "wr_changed|wYW7xAuorD2TLJLUmMbXJjfDKha|5a1b3368-d3cb-4a13-93e8-ff9800d7df2f|a66eaf5d-ddcd-4ca9-b8be-2109d164d0ce|76455|76025|2026-07-29T18:44:26.410Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-29T18:44:26.410Z",
-      "at": "2026-07-29T18:44:26.410Z",
-      "mapUid": "wYW7xAuorD2TLJLUmMbXJjfDKha",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "5a1b3368-d3cb-4a13-93e8-ff9800d7df2f",
-      "oldHolder": "Danger.Rae",
-      "oldTimeMs": 76455,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:16.455",
-      "oldScoreKey": "76455",
-      "newHolderAccountId": "a66eaf5d-ddcd-4ca9-b8be-2109d164d0ce",
-      "newHolder": "Helldiver_Agent",
-      "newTimeMs": 76025,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:16.025",
-      "newScoreKey": "76025",
-      "text": "Helldiver_Agent overtook Danger.Rae on Unknown map with 00:01:16.025."
     }
   ]
 }
