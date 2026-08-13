@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-13T13:36:20.208Z",
+  "generatedAt": "2026-08-13T14:48:07.864Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|bDhDOEQdf6vPKGnXPuFoLYMhbZd|05477e79-25fd-48c2-84c7-e1621aa46517|38510958-c5c5-4fe0-806f-2fecf1d4677a|19879|19724|2026-08-13T14:48:07.864Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-13T14:48:07.864Z",
+      "at": "2026-08-13T14:48:07.864Z",
+      "mapUid": "bDhDOEQdf6vPKGnXPuFoLYMhbZd",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "05477e79-25fd-48c2-84c7-e1621aa46517",
+      "oldHolder": "GranaDy.",
+      "oldTimeMs": 19879,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:19.879",
+      "oldScoreKey": "19879",
+      "newHolderAccountId": "38510958-c5c5-4fe0-806f-2fecf1d4677a",
+      "newHolder": "Vray_Z",
+      "newTimeMs": 19724,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:19.724",
+      "newScoreKey": "19724",
+      "text": "Vray_Z overtook GranaDy. on Unknown map with 00:00:19.724."
+    },
     {
       "id": "wr_changed|qTyT1tKnRKZvRDIve_ItnR54aZ3|7fd38b8a-3d48-4eb7-b7fe-b473fe8e6b87|2343ca67-a77c-47c8-83bd-74f99c6f0a37|36110|36082|2026-08-13T13:36:20.208Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.572",
       "newScoreKey": "9572",
       "text": "ZoMBiE4053 overtook MazsTM on Unknown map with 00:00:09.572."
-    },
-    {
-      "id": "wr_changed|dYsHgzsZjTWYYNc8lK345kZk7m6|d28a55af-b66d-4401-9466-2f9877890a54|d63054a0-f977-4f1b-9dcb-644ef5ed735d|8741|8736|2026-07-29T23:15:26.368Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-29T23:15:26.368Z",
-      "at": "2026-07-29T23:15:26.368Z",
-      "mapUid": "dYsHgzsZjTWYYNc8lK345kZk7m6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
-      "oldHolder": "MazsTM",
-      "oldTimeMs": 8741,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.741",
-      "oldScoreKey": "8741",
-      "newHolderAccountId": "d63054a0-f977-4f1b-9dcb-644ef5ed735d",
-      "newHolder": "k477R",
-      "newTimeMs": 8736,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.736",
-      "newScoreKey": "8736",
-      "text": "k477R overtook MazsTM on Unknown map with 00:00:08.736."
     }
   ]
 }
