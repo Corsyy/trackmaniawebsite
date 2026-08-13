@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-13T21:13:54.969Z",
+  "generatedAt": "2026-08-13T22:05:05.615Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|_AihuKp6lP8TAs_dfTSLa3RLd45|e3dfa7a6-35c5-41ba-85cf-da78b5274210|296a77c2-1c19-4236-9a3e-28c8c01e6312|10048|10034|2026-08-13T22:05:05.615Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-13T22:05:05.615Z",
+      "at": "2026-08-13T22:05:05.615Z",
+      "mapUid": "_AihuKp6lP8TAs_dfTSLa3RLd45",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "e3dfa7a6-35c5-41ba-85cf-da78b5274210",
+      "oldHolder": "Francesco.tm",
+      "oldTimeMs": 10048,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.048",
+      "oldScoreKey": "10048",
+      "newHolderAccountId": "296a77c2-1c19-4236-9a3e-28c8c01e6312",
+      "newHolder": "luddekuddekofot",
+      "newTimeMs": 10034,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.034",
+      "newScoreKey": "10034",
+      "text": "luddekuddekofot overtook Francesco.tm on Unknown map with 00:00:10.034."
+    },
     {
       "id": "wr_changed|t6PbtBjEtyA1GJwG_l6Zkm2GXR9|15bf0469-bb6c-4225-9382-08a94b2c9715|b235dcab-606c-4091-88bc-88c161ddb10c|2855|2838|2026-08-13T20:25:05.766Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:01:38.574",
       "newScoreKey": "98574",
       "text": "Helldiver_Agent overtook Heav.3Y on Unknown map with 00:01:38.574."
-    },
-    {
-      "id": "wr_changed|rfPVO5hsc0mEMcvT1G1jGpzAZ7a|027f9a06-7faf-449e-8ffb-f9d00978fed3|81ad6bff-137c-4006-80d9-038702eb9beb|8202|8195|2026-07-30T18:20:48.745Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-30T18:20:48.745Z",
-      "at": "2026-07-30T18:20:48.745Z",
-      "mapUid": "rfPVO5hsc0mEMcvT1G1jGpzAZ7a",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "027f9a06-7faf-449e-8ffb-f9d00978fed3",
-      "oldHolder": "HeXeRMaN",
-      "oldTimeMs": 8202,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.202",
-      "oldScoreKey": "8202",
-      "newHolderAccountId": "81ad6bff-137c-4006-80d9-038702eb9beb",
-      "newHolder": "uelen.",
-      "newTimeMs": 8195,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.195",
-      "newScoreKey": "8195",
-      "text": "uelen. overtook HeXeRMaN on Unknown map with 00:00:08.195."
     }
   ]
 }
