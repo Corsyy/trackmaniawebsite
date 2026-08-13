@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-13T12:00:11.239Z",
+  "generatedAt": "2026-08-13T13:36:20.208Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|qTyT1tKnRKZvRDIve_ItnR54aZ3|7fd38b8a-3d48-4eb7-b7fe-b473fe8e6b87|2343ca67-a77c-47c8-83bd-74f99c6f0a37|36110|36082|2026-08-13T13:36:20.208Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-13T13:36:20.208Z",
+      "at": "2026-08-13T13:36:20.208Z",
+      "mapUid": "qTyT1tKnRKZvRDIve_ItnR54aZ3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "7fd38b8a-3d48-4eb7-b7fe-b473fe8e6b87",
+      "oldHolder": "pusztitopako",
+      "oldTimeMs": 36110,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:36.110",
+      "oldScoreKey": "36110",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 36082,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:36.082",
+      "newScoreKey": "36082",
+      "text": "hobbi. overtook pusztitopako on Unknown map with 00:00:36.082."
+    },
     {
       "id": "wr_changed|tYlag8ZOaZMytgam_m27AidJfD|96f484bb-6830-4d20-b283-0d503c366bd8|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|14144|14142|2026-08-13T07:50:39.450Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.736",
       "newScoreKey": "8736",
       "text": "k477R overtook MazsTM on Unknown map with 00:00:08.736."
-    },
-    {
-      "id": "wr_changed|VJAQH4Qw6akJmg6NLqabDAisk3|9ebc76de-0d25-403b-97e4-cf75c327b3fc|6d5b7cf7-fab8-4c28-a0f8-bda014f67ac0|9364|9339|2026-07-29T21:11:46.954Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-29T21:11:46.954Z",
-      "at": "2026-07-29T21:11:46.954Z",
-      "mapUid": "VJAQH4Qw6akJmg6NLqabDAisk3",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "9ebc76de-0d25-403b-97e4-cf75c327b3fc",
-      "oldHolder": "Flawlessly.",
-      "oldTimeMs": 9364,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.364",
-      "oldScoreKey": "9364",
-      "newHolderAccountId": "6d5b7cf7-fab8-4c28-a0f8-bda014f67ac0",
-      "newHolder": "zen_753",
-      "newTimeMs": 9339,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.339",
-      "newScoreKey": "9339",
-      "text": "zen_753 overtook Flawlessly. on Unknown map with 00:00:09.339."
     }
   ]
 }
