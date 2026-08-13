@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-13T18:41:51.988Z",
+  "generatedAt": "2026-08-13T19:47:44.222Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|FDVlyelCl1kbE6eb4vnHKuZrgtj|9d0f6c95-c1ed-4eb7-a1b4-215b38db55a4|6feda512-784e-4aba-b3bb-7c2009aacbeb|10350|10304|2026-08-13T19:47:44.222Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-13T19:47:44.222Z",
+      "at": "2026-08-13T19:47:44.222Z",
+      "mapUid": "FDVlyelCl1kbE6eb4vnHKuZrgtj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "9d0f6c95-c1ed-4eb7-a1b4-215b38db55a4",
+      "oldHolder": "The_O_Man_147",
+      "oldTimeMs": 10350,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.350",
+      "oldScoreKey": "10350",
+      "newHolderAccountId": "6feda512-784e-4aba-b3bb-7c2009aacbeb",
+      "newHolder": "Dan_The_Manz",
+      "newTimeMs": 10304,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.304",
+      "newScoreKey": "10304",
+      "text": "Dan_The_Manz overtook The_O_Man_147 on Unknown map with 00:00:10.304."
+    },
     {
       "id": "self_improve|dSTJTTBnu0ErM80b2pSrgI_yFpj|1d70147e-c41c-42e2-9d68-3f445e4d5c73|1d70147e-c41c-42e2-9d68-3f445e4d5c73|7591|7570|2026-08-13T17:45:55.166Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:15.801",
       "newScoreKey": "15801",
       "text": "Yerkling overtook dmuctm on Unknown map with 00:00:15.801."
-    },
-    {
-      "id": "wr_changed|k_5O3PVAH9a9kWbb6_EZ4wiyUNb|64a9dbf9-22b4-4143-a3d4-ffbae7a6ebfa|7893daf4-345c-4b13-835b-382f6484247a|23425|23382|2026-07-30T18:20:48.745Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-30T18:20:48.745Z",
-      "at": "2026-07-30T18:20:48.745Z",
-      "mapUid": "k_5O3PVAH9a9kWbb6_EZ4wiyUNb",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "64a9dbf9-22b4-4143-a3d4-ffbae7a6ebfa",
-      "oldHolder": "LyRooZ.",
-      "oldTimeMs": 23425,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:23.425",
-      "oldScoreKey": "23425",
-      "newHolderAccountId": "7893daf4-345c-4b13-835b-382f6484247a",
-      "newHolder": "jujumasterr",
-      "newTimeMs": 23382,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:23.382",
-      "newScoreKey": "23382",
-      "text": "jujumasterr overtook LyRooZ. on Unknown map with 00:00:23.382."
     }
   ]
 }
