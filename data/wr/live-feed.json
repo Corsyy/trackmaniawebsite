@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-13T16:40:44.179Z",
+  "generatedAt": "2026-08-13T17:45:55.166Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|dSTJTTBnu0ErM80b2pSrgI_yFpj|1d70147e-c41c-42e2-9d68-3f445e4d5c73|1d70147e-c41c-42e2-9d68-3f445e4d5c73|7591|7570|2026-08-13T17:45:55.166Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-13T17:45:55.166Z",
+      "at": "2026-08-13T17:45:55.166Z",
+      "mapUid": "dSTJTTBnu0ErM80b2pSrgI_yFpj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "1d70147e-c41c-42e2-9d68-3f445e4d5c73",
+      "oldHolder": "MO_7TM",
+      "oldTimeMs": 7591,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:07.591",
+      "oldScoreKey": "7591",
+      "newHolderAccountId": "1d70147e-c41c-42e2-9d68-3f445e4d5c73",
+      "newHolder": "MO_7TM",
+      "newTimeMs": 7570,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:07.570",
+      "newScoreKey": "7570",
+      "text": "MO_7TM improved their WR on Unknown map from 00:00:07.591 to 00:00:07.570."
+    },
     {
       "id": "wr_changed|5f9D7I8IC2forHmunlfs7XAQPT|4972f131-14fc-4dc4-a9f6-28711492fce2|34692f5e-372a-43ff-a0ba-a33be41fdec9|12517|12506|2026-08-13T16:40:44.179Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:23.382",
       "newScoreKey": "23382",
       "text": "jujumasterr overtook LyRooZ. on Unknown map with 00:00:23.382."
-    },
-    {
-      "id": "wr_changed|TU6cxKQhU2SwXNV2MYZjquLJXBa|5aaa3dae-82ba-4383-a599-36efb71d8068|e413e842-4db1-4858-8926-1b663b27ba8f|42255|42122|2026-07-30T09:08:38.477Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-30T09:08:38.477Z",
-      "at": "2026-07-30T09:08:38.477Z",
-      "mapUid": "TU6cxKQhU2SwXNV2MYZjquLJXBa",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "totd",
-      "oldHolderAccountId": "5aaa3dae-82ba-4383-a599-36efb71d8068",
-      "oldHolder": "r3.windows",
-      "oldTimeMs": 42255,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:42.255",
-      "oldScoreKey": "42255",
-      "newHolderAccountId": "e413e842-4db1-4858-8926-1b663b27ba8f",
-      "newHolder": "r3.rist",
-      "newTimeMs": 42122,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:42.122",
-      "newScoreKey": "42122",
-      "text": "r3.rist overtook r3.windows on Unknown map with 00:00:42.122."
     }
   ]
 }
