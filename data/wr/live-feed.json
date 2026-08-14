@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-14T11:21:16.803Z",
+  "generatedAt": "2026-08-14T12:02:52.290Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 3,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|dFFJbozLaBKCDPSMTrYXQ4dV3j2|74683fca-a196-4eed-89da-4b103843a7ff|59537d40-2963-47a9-aed7-9bcfa83ee97e|7671|7638|2026-08-14T12:02:52.290Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-14T12:02:52.290Z",
+      "at": "2026-08-14T12:02:52.290Z",
+      "mapUid": "dFFJbozLaBKCDPSMTrYXQ4dV3j2",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "74683fca-a196-4eed-89da-4b103843a7ff",
+      "oldHolder": "Deli.-.",
+      "oldTimeMs": 7671,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:07.671",
+      "oldScoreKey": "7671",
+      "newHolderAccountId": "59537d40-2963-47a9-aed7-9bcfa83ee97e",
+      "newHolder": "WalkTheEons",
+      "newTimeMs": 7638,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:07.638",
+      "newScoreKey": "7638",
+      "text": "WalkTheEons overtook Deli.-. on Unknown map with 00:00:07.638."
+    },
     {
       "id": "wr_changed|2XsOE6FomZRm13iqcc3fIGwvP27|6927ad82-770d-434b-92ef-5e385f870ce5|cbcbfe26-ec26-4a5f-9a35-45b7c1110ee5|9360|9357|2026-08-14T11:21:16.803Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.916",
       "newScoreKey": "8916",
       "text": "Stone-tm improved their WR on Unknown map from 00:00:08.928 to 00:00:08.916."
-    },
-    {
-      "id": "wr_changed|aEVFAE72a5oMXztxQThdaiSILze|fc4ece2c-0133-43cd-a468-69a72b67701b|d28a55af-b66d-4401-9466-2f9877890a54|9015|9008|2026-07-30T23:46:10.370Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-30T23:46:10.370Z",
-      "at": "2026-07-30T23:46:10.370Z",
-      "mapUid": "aEVFAE72a5oMXztxQThdaiSILze",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "fc4ece2c-0133-43cd-a468-69a72b67701b",
-      "oldHolder": "Noah1788",
-      "oldTimeMs": 9015,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.015",
-      "oldScoreKey": "9015",
-      "newHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
-      "newHolder": "MazsTM",
-      "newTimeMs": 9008,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.008",
-      "newScoreKey": "9008",
-      "text": "MazsTM overtook Noah1788 on Unknown map with 00:00:09.008."
     }
   ]
 }
