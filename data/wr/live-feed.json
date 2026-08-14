@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-14T14:42:50.505Z",
+  "generatedAt": "2026-08-14T15:37:54.529Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|o1goztsMucwN7_x8HHdaJvjQ7G4|cbd70092-6bc8-4195-9dd1-a0d534a497e5|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|8321|8261|2026-08-14T15:37:54.529Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-14T15:37:54.529Z",
+      "at": "2026-08-14T15:37:54.529Z",
+      "mapUid": "o1goztsMucwN7_x8HHdaJvjQ7G4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "cbd70092-6bc8-4195-9dd1-a0d534a497e5",
+      "oldHolder": "TunaFish-",
+      "oldTimeMs": 8321,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.321",
+      "oldScoreKey": "8321",
+      "newHolderAccountId": "7b6a993a-e7f5-4e4b-bc32-edaaaa209725",
+      "newHolder": "eepySokrat",
+      "newTimeMs": 8261,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.261",
+      "newScoreKey": "8261",
+      "text": "eepySokrat overtook TunaFish- on Unknown map with 00:00:08.261."
+    },
     {
       "id": "wr_changed|dFFJbozLaBKCDPSMTrYXQ4dV3j2|74683fca-a196-4eed-89da-4b103843a7ff|59537d40-2963-47a9-aed7-9bcfa83ee97e|7671|7638|2026-08-14T12:02:52.290Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:02.875",
       "newScoreKey": "2875",
       "text": "roy4lf3mb0y overtook VIGO_otero7 on Unknown map with 00:00:02.875."
-    },
-    {
-      "id": "self_improve|GA65jcOn5kpvpP4TklyrchLcjp2|d569b3f3-6cf9-4879-86d1-05243d152314|d569b3f3-6cf9-4879-86d1-05243d152314|8928|8916|2026-07-31T01:18:34.771Z",
-      "type": "self_improve",
-      "detectedAt": "2026-07-31T01:18:34.771Z",
-      "at": "2026-07-31T01:18:34.771Z",
-      "mapUid": "GA65jcOn5kpvpP4TklyrchLcjp2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d569b3f3-6cf9-4879-86d1-05243d152314",
-      "oldHolder": "Stone-tm",
-      "oldTimeMs": 8928,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.928",
-      "oldScoreKey": "8928",
-      "newHolderAccountId": "d569b3f3-6cf9-4879-86d1-05243d152314",
-      "newHolder": "Stone-tm",
-      "newTimeMs": 8916,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.916",
-      "newScoreKey": "8916",
-      "text": "Stone-tm improved their WR on Unknown map from 00:00:08.928 to 00:00:08.916."
     }
   ]
 }
