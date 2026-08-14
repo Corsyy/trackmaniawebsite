@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-13T23:51:45.823Z",
+  "generatedAt": "2026-08-14T00:46:56.723Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|tl261xRT7XjS4igEPS0jCOF7Grb|1785f9a8-1d7a-4546-9e7b-d20e5e7ab1d9|083ff8a9-ff45-4cf9-b7cf-8fc601aa656e|19408|19376|2026-08-14T00:46:56.723Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-14T00:46:56.723Z",
+      "at": "2026-08-14T00:46:56.723Z",
+      "mapUid": "tl261xRT7XjS4igEPS0jCOF7Grb",
+      "mapId": null,
+      "mapName": "Weekly Shorts Week 6 Map 3",
+      "sourceType": "weekly_shorts",
+      "oldHolderAccountId": "1785f9a8-1d7a-4546-9e7b-d20e5e7ab1d9",
+      "oldHolder": "r1nt3.",
+      "oldTimeMs": 19408,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:19.408",
+      "oldScoreKey": "19408",
+      "newHolderAccountId": "083ff8a9-ff45-4cf9-b7cf-8fc601aa656e",
+      "newHolder": "Krazy_dudeCr00k",
+      "newTimeMs": 19376,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:19.376",
+      "newScoreKey": "19376",
+      "text": "Krazy_dudeCr00k overtook r1nt3. on Weekly Shorts Week 6 Map 3 with 00:00:19.376."
+    },
     {
       "id": "wr_changed|OJ6H_MIwPkDYxgJOdKep5cZMJjc|07366bee-9b15-42d8-bf7a-9ec1c17a2133|e5349d94-6fac-43d8-b051-22966fe16fcf|7898|7880|2026-08-13T23:51:45.823Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.492",
       "newScoreKey": "9492",
       "text": "Rany_59460 overtook Franswazig on Unknown map with 00:00:09.492."
-    },
-    {
-      "id": "wr_changed|saq3LhSICJqyUR4C0tdFjEA6Pb8|ac184146-1889-4c1d-a418-f1421e80c5dd|0432bea8-9bd9-4780-811c-b48631b5e9a5|52871|51893|2026-07-30T19:58:00.421Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-30T19:58:00.421Z",
-      "at": "2026-07-30T19:58:00.421Z",
-      "mapUid": "saq3LhSICJqyUR4C0tdFjEA6Pb8",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "ac184146-1889-4c1d-a418-f1421e80c5dd",
-      "oldHolder": "SM.Lemonade",
-      "oldTimeMs": 52871,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:52.871",
-      "oldScoreKey": "52871",
-      "newHolderAccountId": "0432bea8-9bd9-4780-811c-b48631b5e9a5",
-      "newHolder": "Airekishh",
-      "newTimeMs": 51893,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:51.893",
-      "newScoreKey": "51893",
-      "text": "Airekishh overtook SM.Lemonade on Unknown map with 00:00:51.893."
     }
   ]
 }
