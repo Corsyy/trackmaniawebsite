@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-14T20:50:29.919Z",
+  "generatedAt": "2026-08-14T21:12:34.675Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|3J8_XXZ110piBlTEdvyxlgcDwSc|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|d620091b-876b-4af4-8f98-ed3625d234e9|41327|41265|2026-08-14T21:12:34.675Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-14T21:12:34.675Z",
+      "at": "2026-08-14T21:12:34.675Z",
+      "mapUid": "3J8_XXZ110piBlTEdvyxlgcDwSc",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "a6ae76c9-9030-4a7b-b533-cacfd6e85cb2",
+      "oldHolder": "ShcrTM",
+      "oldTimeMs": 41327,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:41.327",
+      "oldScoreKey": "41327",
+      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "newHolder": "C50.94975-6.947",
+      "newTimeMs": 41265,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.265",
+      "newScoreKey": "41265",
+      "text": "C50.94975-6.947 overtook ShcrTM on Unknown map with 00:00:41.265."
+    },
     {
       "id": "wr_changed|OJ6H_MIwPkDYxgJOdKep5cZMJjc|e5349d94-6fac-43d8-b051-22966fe16fcf|07366bee-9b15-42d8-bf7a-9ec1c17a2133|7880|7878|2026-08-14T20:17:50.258Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.206",
       "newScoreKey": "8206",
       "text": "pozorrrr overtook EmailTM. on Unknown map with 00:00:08.206."
-    },
-    {
-      "id": "wr_changed|7_0QanCAWNXZhPeWj6wtQbmEnSk|3a5beaac-438c-4b0b-9995-e7fd2cf58a00|4539f2ae-2813-4044-9616-b2508a3a86a8|8508|8506|2026-07-31T07:40:33.093Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-31T07:40:33.093Z",
-      "at": "2026-07-31T07:40:33.093Z",
-      "mapUid": "7_0QanCAWNXZhPeWj6wtQbmEnSk",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "3a5beaac-438c-4b0b-9995-e7fd2cf58a00",
-      "oldHolder": "Squire0930",
-      "oldTimeMs": 8508,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.508",
-      "oldScoreKey": "8508",
-      "newHolderAccountId": "4539f2ae-2813-4044-9616-b2508a3a86a8",
-      "newHolder": "TurtledTM",
-      "newTimeMs": 8506,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.506",
-      "newScoreKey": "8506",
-      "text": "TurtledTM overtook Squire0930 on Unknown map with 00:00:08.506."
     }
   ]
 }
