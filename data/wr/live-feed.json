@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-14T16:36:20.268Z",
+  "generatedAt": "2026-08-14T17:41:42.798Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|JNPmeyxCiWF4u9uU29MV48Mvkta|5ff1e057-b2f5-44d7-b805-aef1f117773f|d514353e-8980-41c6-9325-111728f8e5e2|9143|9117|2026-08-14T17:41:42.798Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-14T17:41:42.798Z",
+      "at": "2026-08-14T17:41:42.798Z",
+      "mapUid": "JNPmeyxCiWF4u9uU29MV48Mvkta",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "5ff1e057-b2f5-44d7-b805-aef1f117773f",
+      "oldHolder": "fala-tm",
+      "oldTimeMs": 9143,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.143",
+      "oldScoreKey": "9143",
+      "newHolderAccountId": "d514353e-8980-41c6-9325-111728f8e5e2",
+      "newHolder": "JULSEMANN",
+      "newTimeMs": 9117,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.117",
+      "newScoreKey": "9117",
+      "text": "JULSEMANN overtook fala-tm on Unknown map with 00:00:09.117."
+    },
     {
       "id": "wr_changed|o1goztsMucwN7_x8HHdaJvjQ7G4|cbd70092-6bc8-4195-9dd1-a0d534a497e5|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|8321|8261|2026-08-14T15:37:54.529Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.908",
       "newScoreKey": "9908",
       "text": "NoodleWave overtook Vatsug44 on Unknown map with 00:00:09.908."
-    },
-    {
-      "id": "wr_changed|t6PbtBjEtyA1GJwG_l6Zkm2GXR9|8487fcfa-9acb-4180-b9ea-9b47c7790a57|30356c88-05de-48f8-bbad-1af452d89838|2883|2875|2026-07-31T04:48:24.454Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-07-31T04:48:24.454Z",
-      "at": "2026-07-31T04:48:24.454Z",
-      "mapUid": "t6PbtBjEtyA1GJwG_l6Zkm2GXR9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "8487fcfa-9acb-4180-b9ea-9b47c7790a57",
-      "oldHolder": "VIGO_otero7",
-      "oldTimeMs": 2883,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:02.883",
-      "oldScoreKey": "2883",
-      "newHolderAccountId": "30356c88-05de-48f8-bbad-1af452d89838",
-      "newHolder": "roy4lf3mb0y",
-      "newTimeMs": 2875,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:02.875",
-      "newScoreKey": "2875",
-      "text": "roy4lf3mb0y overtook VIGO_otero7 on Unknown map with 00:00:02.875."
     }
   ]
 }
