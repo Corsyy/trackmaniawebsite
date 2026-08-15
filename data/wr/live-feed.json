@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-15T12:01:54.997Z",
+  "generatedAt": "2026-08-15T12:54:08.978Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|qHU4dAEZaWwb7Nu2n8lZ_2c9vD3|f338668e-5d57-4395-93ac-ef514f2fb898|05e7e7c7-1bed-48f1-8d7a-b53244290532|42023|41948|2026-08-15T12:54:08.978Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-15T12:54:08.978Z",
+      "at": "2026-08-15T12:54:08.978Z",
+      "mapUid": "qHU4dAEZaWwb7Nu2n8lZ_2c9vD3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "f338668e-5d57-4395-93ac-ef514f2fb898",
+      "oldHolder": "ultimatehippie",
+      "oldTimeMs": 42023,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.023",
+      "oldScoreKey": "42023",
+      "newHolderAccountId": "05e7e7c7-1bed-48f1-8d7a-b53244290532",
+      "newHolder": "N1trium",
+      "newTimeMs": 41948,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.948",
+      "newScoreKey": "41948",
+      "text": "N1trium overtook ultimatehippie on Unknown map with 00:00:41.948."
+    },
     {
       "id": "wr_changed|4v6sClUUo4VTFZrgWwppKdJiT0g|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|8817f987-26d8-4024-b9e4-bfabc9a6181c|15192|15156|2026-08-15T11:30:01.401Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:13.167",
       "newScoreKey": "13167",
       "text": "btx0 overtook MattsSats on Unknown map with 00:00:13.167."
-    },
-    {
-      "id": "wr_changed|q18N67PVgpnKVl6EuETy2l8n_R1|235bfc17-23b0-4344-9090-d3096aa33e1e|d616e64f-dc5d-4b42-96ff-e9e03a8243a5|4748|4655|2026-08-01T12:44:43.035Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-01T12:44:43.035Z",
-      "at": "2026-08-01T12:44:43.035Z",
-      "mapUid": "q18N67PVgpnKVl6EuETy2l8n_R1",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "235bfc17-23b0-4344-9090-d3096aa33e1e",
-      "oldHolder": "Zenkaidk",
-      "oldTimeMs": 4748,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:04.748",
-      "oldScoreKey": "4748",
-      "newHolderAccountId": "d616e64f-dc5d-4b42-96ff-e9e03a8243a5",
-      "newHolder": "Ctemort",
-      "newTimeMs": 4655,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:04.655",
-      "newScoreKey": "4655",
-      "text": "Ctemort overtook Zenkaidk on Unknown map with 00:00:04.655."
     }
   ]
 }
