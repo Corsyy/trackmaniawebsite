@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-15T22:31:21.471Z",
+  "generatedAt": "2026-08-15T23:02:27.058Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|rH8j2clTme0B9RR1lgT3j2JMvXe|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|8817f987-26d8-4024-b9e4-bfabc9a6181c|13498|13496|2026-08-15T23:02:27.058Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-15T23:02:27.058Z",
+      "at": "2026-08-15T23:02:27.058Z",
+      "mapUid": "rH8j2clTme0B9RR1lgT3j2JMvXe",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "7b6a993a-e7f5-4e4b-bc32-edaaaa209725",
+      "oldHolder": "eepySokrat",
+      "oldTimeMs": 13498,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.498",
+      "oldScoreKey": "13498",
+      "newHolderAccountId": "8817f987-26d8-4024-b9e4-bfabc9a6181c",
+      "newHolder": "Rals8",
+      "newTimeMs": 13496,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.496",
+      "newScoreKey": "13496",
+      "text": "Rals8 overtook eepySokrat on Unknown map with 00:00:13.496."
+    },
     {
       "id": "wr_changed|lXtMUQozTSV5i_08UXhnTb4F0Wg|bd3f04a8-17a0-433e-a828-b4ca1f346a60|74b306dd-f875-4730-a7b8-31879efb7748|35674|35642|2026-08-15T21:48:52.933Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.705",
       "newScoreKey": "9705",
       "text": "buffharold overtook Zwanuss on Unknown map with 00:00:09.705."
-    },
-    {
-      "id": "wr_changed|O3uLq_V9ETxwyEcRjN8fsNWsMof|0ee3ef77-4d10-4926-9e73-82cc8755e15c|09b20146-d4fa-494d-b870-c5d1aa968efd|9135|9018|2026-08-02T00:11:10.430Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T00:11:10.430Z",
-      "at": "2026-08-02T00:11:10.430Z",
-      "mapUid": "O3uLq_V9ETxwyEcRjN8fsNWsMof",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "0ee3ef77-4d10-4926-9e73-82cc8755e15c",
-      "oldHolder": "Stiffapotamus-",
-      "oldTimeMs": 9135,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.135",
-      "oldScoreKey": "9135",
-      "newHolderAccountId": "09b20146-d4fa-494d-b870-c5d1aa968efd",
-      "newHolder": "teddyturn",
-      "newTimeMs": 9018,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.018",
-      "newScoreKey": "9018",
-      "text": "teddyturn overtook Stiffapotamus- on Unknown map with 00:00:09.018."
     }
   ]
 }
