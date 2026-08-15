@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T12:54:08.978Z",
+  "generatedAt": "2026-08-15T13:34:35.070Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|0TEANFppKWeGQ3obHwWLOC1w2Gf|c0859fc8-2dfb-4b33-9a03-80f765a3edf4|e1adb543-8ffb-4352-9ef1-94c82b5f01de|13506|13451|2026-08-15T13:34:35.070Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-15T13:34:35.070Z",
+      "at": "2026-08-15T13:34:35.070Z",
+      "mapUid": "0TEANFppKWeGQ3obHwWLOC1w2Gf",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c0859fc8-2dfb-4b33-9a03-80f765a3edf4",
+      "oldHolder": "LucaSniperTrick",
+      "oldTimeMs": 13506,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.506",
+      "oldScoreKey": "13506",
+      "newHolderAccountId": "e1adb543-8ffb-4352-9ef1-94c82b5f01de",
+      "newHolder": "MubiTe",
+      "newTimeMs": 13451,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.451",
+      "newScoreKey": "13451",
+      "text": "MubiTe overtook LucaSniperTrick on Unknown map with 00:00:13.451."
+    },
     {
       "id": "wr_changed|qHU4dAEZaWwb7Nu2n8lZ_2c9vD3|f338668e-5d57-4395-93ac-ef514f2fb898|05e7e7c7-1bed-48f1-8d7a-b53244290532|42023|41948|2026-08-15T12:54:08.978Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:13.805",
       "newScoreKey": "13805",
       "text": "Tv_king overtook Geen_Kaas on Unknown map with 00:00:13.805."
-    },
-    {
-      "id": "wr_changed|MypZNRw9hzHgZQqS9kpwT6Vhqdc|10eeb2e7-50de-4aba-815e-dd50342e067a|4692df9e-b670-4b3f-9efa-8ddca580822c|13234|13167|2026-08-01T12:44:43.035Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-01T12:44:43.035Z",
-      "at": "2026-08-01T12:44:43.035Z",
-      "mapUid": "MypZNRw9hzHgZQqS9kpwT6Vhqdc",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "10eeb2e7-50de-4aba-815e-dd50342e067a",
-      "oldHolder": "MattsSats",
-      "oldTimeMs": 13234,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:13.234",
-      "oldScoreKey": "13234",
-      "newHolderAccountId": "4692df9e-b670-4b3f-9efa-8ddca580822c",
-      "newHolder": "btx0",
-      "newTimeMs": 13167,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:13.167",
-      "newScoreKey": "13167",
-      "text": "btx0 overtook MattsSats on Unknown map with 00:00:13.167."
     }
   ]
 }
