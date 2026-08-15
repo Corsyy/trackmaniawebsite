@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-15T07:02:28.789Z",
+  "generatedAt": "2026-08-15T07:37:54.220Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|g7l2eO_x9z4HWGGYj8dVBCDSTEg|b09527f2-b61d-4d9a-8cdc-73484590f81f|e5b339e6-f1d3-4759-af91-f0c3409477a1|34913|34361|2026-08-15T07:37:54.220Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-15T07:37:54.220Z",
+      "at": "2026-08-15T07:37:54.220Z",
+      "mapUid": "g7l2eO_x9z4HWGGYj8dVBCDSTEg",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "b09527f2-b61d-4d9a-8cdc-73484590f81f",
+      "oldHolder": "Insanity.TM",
+      "oldTimeMs": 34913,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:34.913",
+      "oldScoreKey": "34913",
+      "newHolderAccountId": "e5b339e6-f1d3-4759-af91-f0c3409477a1",
+      "newHolder": "Kattz95",
+      "newTimeMs": 34361,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:34.361",
+      "newScoreKey": "34361",
+      "text": "Kattz95 overtook Insanity.TM on Unknown map with 00:00:34.361."
+    },
     {
       "id": "self_improve|ipbupvLCXmUFEbMPlf9k1J9ZTnc|07366bee-9b15-42d8-bf7a-9ec1c17a2133|07366bee-9b15-42d8-bf7a-9ec1c17a2133|9647|9524|2026-08-15T06:14:16.908Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.201",
       "newScoreKey": "8201",
       "text": "NitiN.. overtook pozorrrr on Unknown map with 00:00:08.201."
-    },
-    {
-      "id": "wr_changed|ISltszkEB5CmNM57bbd6hVhoASe|c36462b6-90ed-4a60-91f0-ddedeaacac61|49a8e565-ed0e-460c-91b8-ac299fde25ae|10588|10547|2026-08-01T12:44:43.035Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-01T12:44:43.035Z",
-      "at": "2026-08-01T12:44:43.035Z",
-      "mapUid": "ISltszkEB5CmNM57bbd6hVhoASe",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c36462b6-90ed-4a60-91f0-ddedeaacac61",
-      "oldHolder": "rat--.",
-      "oldTimeMs": 10588,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.588",
-      "oldScoreKey": "10588",
-      "newHolderAccountId": "49a8e565-ed0e-460c-91b8-ac299fde25ae",
-      "newHolder": "NotAnEthanTM",
-      "newTimeMs": 10547,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.547",
-      "newScoreKey": "10547",
-      "text": "NotAnEthanTM overtook rat--. on Unknown map with 00:00:10.547."
     }
   ]
 }
