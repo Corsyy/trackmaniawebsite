@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-15T16:35:00.689Z",
+  "generatedAt": "2026-08-15T17:07:27.342Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|bmYHDGeNzSZVEQu39ZBOfhAbhE5|8f08302a-f670-463b-9f71-fbfacffb8bd1|22c46287-5af3-4808-b85a-2637c2d6dcf3|42518|20355|2026-08-15T17:07:27.342Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-15T17:07:27.342Z",
+      "at": "2026-08-15T17:07:27.342Z",
+      "mapUid": "bmYHDGeNzSZVEQu39ZBOfhAbhE5",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "8f08302a-f670-463b-9f71-fbfacffb8bd1",
+      "oldHolder": "AR_Down",
+      "oldTimeMs": 42518,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.518",
+      "oldScoreKey": "42518",
+      "newHolderAccountId": "22c46287-5af3-4808-b85a-2637c2d6dcf3",
+      "newHolder": "Yiptuss",
+      "newTimeMs": 20355,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:20.355",
+      "newScoreKey": "20355",
+      "text": "Yiptuss overtook AR_Down on Unknown map with 00:00:20.355."
+    },
     {
       "id": "wr_changed|0TEANFppKWeGQ3obHwWLOC1w2Gf|c0859fc8-2dfb-4b33-9a03-80f765a3edf4|e1adb543-8ffb-4352-9ef1-94c82b5f01de|13506|13451|2026-08-15T13:34:35.070Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:07.065",
       "newScoreKey": "7065",
       "text": "carlknutsen overtook curious-pepe on Unknown map with 00:00:07.065."
-    },
-    {
-      "id": "wr_changed|fmw4zp5zoeoJlsTurVGY91_gMR5|aa6fb7ae-ba71-4642-8d7c-99ed0db114eb|cd81f22a-c92f-48b9-8aa3-72f904c62b66|14023|13805|2026-08-01T14:17:25.058Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-01T14:17:25.058Z",
-      "at": "2026-08-01T14:17:25.058Z",
-      "mapUid": "fmw4zp5zoeoJlsTurVGY91_gMR5",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "aa6fb7ae-ba71-4642-8d7c-99ed0db114eb",
-      "oldHolder": "Geen_Kaas",
-      "oldTimeMs": 14023,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:14.023",
-      "oldScoreKey": "14023",
-      "newHolderAccountId": "cd81f22a-c92f-48b9-8aa3-72f904c62b66",
-      "newHolder": "Tv_king",
-      "newTimeMs": 13805,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:13.805",
-      "newScoreKey": "13805",
-      "text": "Tv_king overtook Geen_Kaas on Unknown map with 00:00:13.805."
     }
   ]
 }
