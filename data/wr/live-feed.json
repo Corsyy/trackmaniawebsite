@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-16T19:10:24.365Z",
+  "generatedAt": "2026-08-16T19:32:45.668Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|pMNfvKeZTGxVQLfY4C3ZXbKKlW4|dadbaf28-e7b5-429b-bf37-8c8c1419fcf4|aab01cd1-cae7-41ef-8183-03a1102e11da|46701|46688|2026-08-16T19:32:45.668Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-16T19:32:45.668Z",
+      "at": "2026-08-16T19:32:45.668Z",
+      "mapUid": "pMNfvKeZTGxVQLfY4C3ZXbKKlW4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "dadbaf28-e7b5-429b-bf37-8c8c1419fcf4",
+      "oldHolder": "That_Ski_Freak",
+      "oldTimeMs": 46701,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:46.701",
+      "oldScoreKey": "46701",
+      "newHolderAccountId": "aab01cd1-cae7-41ef-8183-03a1102e11da",
+      "newHolder": "ObibobPrime",
+      "newTimeMs": 46688,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:46.688",
+      "newScoreKey": "46688",
+      "text": "ObibobPrime overtook That_Ski_Freak on Unknown map with 00:00:46.688."
+    },
     {
       "id": "wr_changed|2xlSvX2DycnFYRuDIf_3GVqnrv2|384a9c68-d4aa-47f6-b6b1-5c567f96c826|4fe15603-ea1e-438e-b0ec-3be320917fe7|24935|24898|2026-08-16T17:32:33.434Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:40.219",
       "newScoreKey": "40219",
       "text": "Ghole4903 overtook Jules61 on Unknown map with 00:00:40.219."
-    },
-    {
-      "id": "wr_changed|ny8nPYt2mrW6H7OgT0lTTgo7dJ9|2e05816f-3b06-4362-baf6-32470e2fd848|46ea451c-7b20-4906-a215-9eee410d0d6c|12105|12104|2026-08-02T15:32:17.380Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T15:32:17.380Z",
-      "at": "2026-08-02T15:32:17.380Z",
-      "mapUid": "ny8nPYt2mrW6H7OgT0lTTgo7dJ9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "2e05816f-3b06-4362-baf6-32470e2fd848",
-      "oldHolder": "SunshineT.T",
-      "oldTimeMs": 12105,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.105",
-      "oldScoreKey": "12105",
-      "newHolderAccountId": "46ea451c-7b20-4906-a215-9eee410d0d6c",
-      "newHolder": "joo.naah",
-      "newTimeMs": 12104,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.104",
-      "newScoreKey": "12104",
-      "text": "joo.naah overtook SunshineT.T on Unknown map with 00:00:12.104."
     }
   ]
 }
