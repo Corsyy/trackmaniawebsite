@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-16T20:00:11.616Z",
+  "generatedAt": "2026-08-16T20:32:14.779Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|P508nXcOqZo4Br9zt_UaudERswh|ecdb2228-bea6-4206-a061-635e8df4ee4c|2343ca67-a77c-47c8-83bd-74f99c6f0a37|36847|36825|2026-08-16T20:32:14.779Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-16T20:32:14.779Z",
+      "at": "2026-08-16T20:32:14.779Z",
+      "mapUid": "P508nXcOqZo4Br9zt_UaudERswh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "ecdb2228-bea6-4206-a061-635e8df4ee4c",
+      "oldHolder": "Siyei27",
+      "oldTimeMs": 36847,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:36.847",
+      "oldScoreKey": "36847",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 36825,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:36.825",
+      "newScoreKey": "36825",
+      "text": "hobbi. overtook Siyei27 on Unknown map with 00:00:36.825."
+    },
     {
       "id": "wr_changed|pMNfvKeZTGxVQLfY4C3ZXbKKlW4|dadbaf28-e7b5-429b-bf37-8c8c1419fcf4|aab01cd1-cae7-41ef-8183-03a1102e11da|46701|46688|2026-08-16T19:32:45.668Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:14.840",
       "newScoreKey": "14840",
       "text": "joo.naah overtook Verezz on Unknown map with 00:00:14.840."
-    },
-    {
-      "id": "wr_changed|iJFemlGwMb_9BWwqOPKaPiTH8S6|f7ac1b28-4ec2-442b-9cc8-9740e4bbeca8|7ee4f169-5406-4108-ab63-bdad59ac945e|40221|40219|2026-08-02T15:32:17.380Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T15:32:17.380Z",
-      "at": "2026-08-02T15:32:17.380Z",
-      "mapUid": "iJFemlGwMb_9BWwqOPKaPiTH8S6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f7ac1b28-4ec2-442b-9cc8-9740e4bbeca8",
-      "oldHolder": "Jules61",
-      "oldTimeMs": 40221,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:40.221",
-      "oldScoreKey": "40221",
-      "newHolderAccountId": "7ee4f169-5406-4108-ab63-bdad59ac945e",
-      "newHolder": "Ghole4903",
-      "newTimeMs": 40219,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:40.219",
-      "newScoreKey": "40219",
-      "text": "Ghole4903 overtook Jules61 on Unknown map with 00:00:40.219."
     }
   ]
 }
