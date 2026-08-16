@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-16T07:05:00.676Z",
+  "generatedAt": "2026-08-16T07:43:58.786Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|Il9sUSAVVeVXmwsvj1aRF1dnsG3|4a41e0f8-ce6e-4790-bf68-da4857e466b3|767cf5a1-d82b-43cd-9526-b9909162ecc2|9501|9490|2026-08-16T07:43:58.786Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-16T07:43:58.786Z",
+      "at": "2026-08-16T07:43:58.786Z",
+      "mapUid": "Il9sUSAVVeVXmwsvj1aRF1dnsG3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "4a41e0f8-ce6e-4790-bf68-da4857e466b3",
+      "oldHolder": "Yezevich",
+      "oldTimeMs": 9501,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.501",
+      "oldScoreKey": "9501",
+      "newHolderAccountId": "767cf5a1-d82b-43cd-9526-b9909162ecc2",
+      "newHolder": "TAORYU76",
+      "newTimeMs": 9490,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.490",
+      "newScoreKey": "9490",
+      "text": "TAORYU76 overtook Yezevich on Unknown map with 00:00:09.490."
+    },
     {
       "id": "wr_changed|L2XXA26_SBEEFVwVG9lbjVShoyh|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|3c6abb28-2223-4f7d-b994-0655a8755b5b|10603|10522|2026-08-16T07:05:00.676Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.166",
       "newScoreKey": "12166",
       "text": "JuntaoTM overtook dongr. on Unknown map with 00:00:12.166."
-    },
-    {
-      "id": "wr_changed|J81p1zY3bspdNdJT80BI3fnf1r8|7b16a22c-8525-4f9a-b00b-e711a7ee7f02|3c530018-af61-4c4a-81ee-c2f9e1e9f996|29608|29604|2026-08-02T11:40:04.045Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T11:40:04.045Z",
-      "at": "2026-08-02T11:40:04.045Z",
-      "mapUid": "J81p1zY3bspdNdJT80BI3fnf1r8",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7b16a22c-8525-4f9a-b00b-e711a7ee7f02",
-      "oldHolder": "Segonho",
-      "oldTimeMs": 29608,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:29.608",
-      "oldScoreKey": "29608",
-      "newHolderAccountId": "3c530018-af61-4c4a-81ee-c2f9e1e9f996",
-      "newHolder": "Bartje101",
-      "newTimeMs": 29604,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:29.604",
-      "newScoreKey": "29604",
-      "text": "Bartje101 overtook Segonho on Unknown map with 00:00:29.604."
     }
   ]
 }
