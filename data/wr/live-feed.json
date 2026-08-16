@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-16T06:15:29.540Z",
+  "generatedAt": "2026-08-16T07:05:00.676Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|L2XXA26_SBEEFVwVG9lbjVShoyh|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|3c6abb28-2223-4f7d-b994-0655a8755b5b|10603|10522|2026-08-16T07:05:00.676Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-16T07:05:00.676Z",
+      "at": "2026-08-16T07:05:00.676Z",
+      "mapUid": "L2XXA26_SBEEFVwVG9lbjVShoyh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0",
+      "oldHolder": "BartAker05",
+      "oldTimeMs": 10603,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.603",
+      "oldScoreKey": "10603",
+      "newHolderAccountId": "3c6abb28-2223-4f7d-b994-0655a8755b5b",
+      "newHolder": "hijbird",
+      "newTimeMs": 10522,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.522",
+      "newScoreKey": "10522",
+      "text": "hijbird overtook BartAker05 on Unknown map with 00:00:10.522."
+    },
     {
       "id": "wr_changed|uBhpsZ_c_2gO9WXPHyuc1Rli1j4|9a80968a-145d-4a56-a886-59e4ed5ba990|456a93c8-1f49-4771-b7cd-28cee0787f4f|45761|45734|2026-08-16T06:15:29.540Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:29.604",
       "newScoreKey": "29604",
       "text": "Bartje101 overtook Segonho on Unknown map with 00:00:29.604."
-    },
-    {
-      "id": "wr_changed|dSTJTTBnu0ErM80b2pSrgI_yFpj|cf2f45df-0199-4080-a59d-fc7684cccf79|d4a539c9-7706-4df8-961a-7c591a026d4b|7984|7828|2026-08-02T08:43:33.696Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T08:43:33.696Z",
-      "at": "2026-08-02T08:43:33.696Z",
-      "mapUid": "dSTJTTBnu0ErM80b2pSrgI_yFpj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "cf2f45df-0199-4080-a59d-fc7684cccf79",
-      "oldHolder": "Mr_cool1987",
-      "oldTimeMs": 7984,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.984",
-      "oldScoreKey": "7984",
-      "newHolderAccountId": "d4a539c9-7706-4df8-961a-7c591a026d4b",
-      "newHolder": "benumismaxumis",
-      "newTimeMs": 7828,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.828",
-      "newScoreKey": "7828",
-      "text": "benumismaxumis overtook Mr_cool1987 on Unknown map with 00:00:07.828."
     }
   ]
 }
