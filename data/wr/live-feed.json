@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-16T12:55:46.321Z",
+  "generatedAt": "2026-08-16T13:35:42.254Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|qNWitb_T1dOOx1QW1105QmKFZMj|8cfe5e6e-f8aa-4e78-82ea-03746716f457|5eab40e9-c78d-4c29-829d-b12fe6b571d9|16705|16685|2026-08-16T13:35:42.254Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-16T13:35:42.254Z",
+      "at": "2026-08-16T13:35:42.254Z",
+      "mapUid": "qNWitb_T1dOOx1QW1105QmKFZMj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8cfe5e6e-f8aa-4e78-82ea-03746716f457",
+      "oldHolder": "eyezero",
+      "oldTimeMs": 16705,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:16.705",
+      "oldScoreKey": "16705",
+      "newHolderAccountId": "5eab40e9-c78d-4c29-829d-b12fe6b571d9",
+      "newHolder": "FrankTheHamster",
+      "newTimeMs": 16685,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:16.685",
+      "newScoreKey": "16685",
+      "text": "FrankTheHamster overtook eyezero on Unknown map with 00:00:16.685."
+    },
     {
       "id": "wr_changed|Il9sUSAVVeVXmwsvj1aRF1dnsG3|4a41e0f8-ce6e-4790-bf68-da4857e466b3|767cf5a1-d82b-43cd-9526-b9909162ecc2|9501|9490|2026-08-16T07:43:58.786Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:13.830",
       "newScoreKey": "13830",
       "text": "Alfie_2706 overtook rat--. on Unknown map with 00:00:13.830."
-    },
-    {
-      "id": "wr_changed|MhP0SPVqkHoug9m7myo8ncYX1Mk|7c9be520-7287-49fd-afd1-6e2421d6a55c|41d5fd91-a880-46d6-ad24-58d34524774b|12171|12166|2026-08-02T12:45:26.408Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T12:45:26.408Z",
-      "at": "2026-08-02T12:45:26.408Z",
-      "mapUid": "MhP0SPVqkHoug9m7myo8ncYX1Mk",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "7c9be520-7287-49fd-afd1-6e2421d6a55c",
-      "oldHolder": "dongr.",
-      "oldTimeMs": 12171,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.171",
-      "oldScoreKey": "12171",
-      "newHolderAccountId": "41d5fd91-a880-46d6-ad24-58d34524774b",
-      "newHolder": "JuntaoTM",
-      "newTimeMs": 12166,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.166",
-      "newScoreKey": "12166",
-      "text": "JuntaoTM overtook dongr. on Unknown map with 00:00:12.166."
     }
   ]
 }
