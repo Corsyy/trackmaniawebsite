@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-16T05:32:56.866Z",
+  "generatedAt": "2026-08-16T06:15:29.540Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|uBhpsZ_c_2gO9WXPHyuc1Rli1j4|9a80968a-145d-4a56-a886-59e4ed5ba990|456a93c8-1f49-4771-b7cd-28cee0787f4f|45761|45734|2026-08-16T06:15:29.540Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-16T06:15:29.540Z",
+      "at": "2026-08-16T06:15:29.540Z",
+      "mapUid": "uBhpsZ_c_2gO9WXPHyuc1Rli1j4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "9a80968a-145d-4a56-a886-59e4ed5ba990",
+      "oldHolder": "Baymax1991",
+      "oldTimeMs": 45761,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:45.761",
+      "oldScoreKey": "45761",
+      "newHolderAccountId": "456a93c8-1f49-4771-b7cd-28cee0787f4f",
+      "newHolder": "Nateag.TM",
+      "newTimeMs": 45734,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:45.734",
+      "newScoreKey": "45734",
+      "text": "Nateag.TM overtook Baymax1991 on Unknown map with 00:00:45.734."
+    },
     {
       "id": "wr_changed|Q9bjuiAoBZYZBaktNtrQk2ibAda|2a13aa7d-992d-4a7c-a3c5-d29b08b7f8cb|2343ca67-a77c-47c8-83bd-74f99c6f0a37|29322|29305|2026-08-16T02:51:01.842Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:07.828",
       "newScoreKey": "7828",
       "text": "benumismaxumis overtook Mr_cool1987 on Unknown map with 00:00:07.828."
-    },
-    {
-      "id": "wr_changed|SRx6BXJTTCVWlrgAiYgmIgawVH1|f31d310b-3cfe-418f-b3dc-85cdd1ab6823|d4e88731-a617-4d90-9e1c-2c3f796bce84|9038|8948|2026-08-02T00:11:10.430Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T00:11:10.430Z",
-      "at": "2026-08-02T00:11:10.430Z",
-      "mapUid": "SRx6BXJTTCVWlrgAiYgmIgawVH1",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f31d310b-3cfe-418f-b3dc-85cdd1ab6823",
-      "oldHolder": "Zarrro",
-      "oldTimeMs": 9038,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.038",
-      "oldScoreKey": "9038",
-      "newHolderAccountId": "d4e88731-a617-4d90-9e1c-2c3f796bce84",
-      "newHolder": "buffharold",
-      "newTimeMs": 8948,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.948",
-      "newScoreKey": "8948",
-      "text": "buffharold overtook Zarrro on Unknown map with 00:00:08.948."
     }
   ]
 }
