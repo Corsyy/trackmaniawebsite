@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-16T17:06:59.123Z",
+  "generatedAt": "2026-08-16T17:32:33.434Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|2xlSvX2DycnFYRuDIf_3GVqnrv2|384a9c68-d4aa-47f6-b6b1-5c567f96c826|4fe15603-ea1e-438e-b0ec-3be320917fe7|24935|24898|2026-08-16T17:32:33.434Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-16T17:32:33.434Z",
+      "at": "2026-08-16T17:32:33.434Z",
+      "mapUid": "2xlSvX2DycnFYRuDIf_3GVqnrv2",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "384a9c68-d4aa-47f6-b6b1-5c567f96c826",
+      "oldHolder": "spider-doge96",
+      "oldTimeMs": 24935,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:24.935",
+      "oldScoreKey": "24935",
+      "newHolderAccountId": "4fe15603-ea1e-438e-b0ec-3be320917fe7",
+      "newHolder": "FlameCasterTM",
+      "newTimeMs": 24898,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:24.898",
+      "newScoreKey": "24898",
+      "text": "FlameCasterTM overtook spider-doge96 on Unknown map with 00:00:24.898."
+    },
     {
       "id": "wr_changed|qNWitb_T1dOOx1QW1105QmKFZMj|8cfe5e6e-f8aa-4e78-82ea-03746716f457|5eab40e9-c78d-4c29-829d-b12fe6b571d9|16705|16685|2026-08-16T13:35:42.254Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.104",
       "newScoreKey": "12104",
       "text": "joo.naah overtook SunshineT.T on Unknown map with 00:00:12.104."
-    },
-    {
-      "id": "wr_changed|uS55zwnKxKNFRgJoBUn3WQROaR0|c36462b6-90ed-4a60-91f0-ddedeaacac61|dcde8b0e-a2aa-435a-b361-91da8b714447|13836|13830|2026-08-02T14:18:57.618Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T14:18:57.618Z",
-      "at": "2026-08-02T14:18:57.618Z",
-      "mapUid": "uS55zwnKxKNFRgJoBUn3WQROaR0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c36462b6-90ed-4a60-91f0-ddedeaacac61",
-      "oldHolder": "rat--.",
-      "oldTimeMs": 13836,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:13.836",
-      "oldScoreKey": "13836",
-      "newHolderAccountId": "dcde8b0e-a2aa-435a-b361-91da8b714447",
-      "newHolder": "Alfie_2706",
-      "newTimeMs": 13830,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:13.830",
-      "newScoreKey": "13830",
-      "text": "Alfie_2706 overtook rat--. on Unknown map with 00:00:13.830."
     }
   ]
 }
