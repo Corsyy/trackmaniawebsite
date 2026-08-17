@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-17T07:30:00.361Z",
+  "generatedAt": "2026-08-17T08:09:30.423Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|AA3bkM5yRfWmYm8gPf3Kldi_sQ9|d7d7489f-e926-4ffc-a3bf-df27b0efd4ce|e4ce4863-539c-46f2-9686-979bfa0019c4|9492|9476|2026-08-17T08:09:30.423Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-17T08:09:30.423Z",
+      "at": "2026-08-17T08:09:30.423Z",
+      "mapUid": "AA3bkM5yRfWmYm8gPf3Kldi_sQ9",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d7d7489f-e926-4ffc-a3bf-df27b0efd4ce",
+      "oldHolder": "Rany_59460",
+      "oldTimeMs": 9492,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.492",
+      "oldScoreKey": "9492",
+      "newHolderAccountId": "e4ce4863-539c-46f2-9686-979bfa0019c4",
+      "newHolder": "xXNollie",
+      "newTimeMs": 9476,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.476",
+      "newScoreKey": "9476",
+      "text": "xXNollie overtook Rany_59460 on Unknown map with 00:00:09.476."
+    },
     {
       "id": "wr_changed|zklKgLWRqrHwKsMSa7vAXqGcbTl|b4a98503-2047-4de7-ad48-f4a03f5157a3|74e2be2f-0f21-4659-992a-feb7b1219b7e|43538|43492|2026-08-17T04:27:52.054Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:20.572",
       "newScoreKey": "20572",
       "text": "Gaxaxa overtook Jonathan052 on Unknown map with 00:00:20.572."
-    },
-    {
-      "id": "wr_changed|yquyPz7OYBwTqEomfnZMVohIFdh|d207f651-e68e-41f9-b8de-58f3e503c5b5|c3309971-e4bd-4111-865b-77c79337786a|10584|10556|2026-08-03T00:11:14.245Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-03T00:11:14.245Z",
-      "at": "2026-08-03T00:11:14.245Z",
-      "mapUid": "yquyPz7OYBwTqEomfnZMVohIFdh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d207f651-e68e-41f9-b8de-58f3e503c5b5",
-      "oldHolder": "dcdsx",
-      "oldTimeMs": 10584,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.584",
-      "oldScoreKey": "10584",
-      "newHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
-      "newHolder": "Apoc_TM",
-      "newTimeMs": 10556,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.556",
-      "newScoreKey": "10556",
-      "text": "Apoc_TM overtook dcdsx on Unknown map with 00:00:10.556."
     }
   ]
 }
