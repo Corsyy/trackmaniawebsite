@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-17T19:36:21.686Z",
+  "generatedAt": "2026-08-17T20:10:36.089Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|dAXppvSupVF0L_hNgSA0OSqo6Mj|416dbd30-da2a-49d7-8dab-dda22bc5b828|a6a8ae3c-1ef8-4451-934f-8cea02e3fbc3|45275|45144|2026-08-17T20:10:36.089Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-17T20:10:36.089Z",
+      "at": "2026-08-17T20:10:36.089Z",
+      "mapUid": "dAXppvSupVF0L_hNgSA0OSqo6Mj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "416dbd30-da2a-49d7-8dab-dda22bc5b828",
+      "oldHolder": "RidgeRacerNinja",
+      "oldTimeMs": 45275,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:45.275",
+      "oldScoreKey": "45275",
+      "newHolderAccountId": "a6a8ae3c-1ef8-4451-934f-8cea02e3fbc3",
+      "newHolder": "Teffztm",
+      "newTimeMs": 45144,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:45.144",
+      "newScoreKey": "45144",
+      "text": "Teffztm overtook RidgeRacerNinja on Unknown map with 00:00:45.144."
+    },
     {
       "id": "wr_changed|PvDR0MM5mhvyDN4bYEzFYMpkI9c|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|e582f3c0-29a8-4391-aa7f-acd01ecf0496|11220|11212|2026-08-17T19:36:21.686Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:12.625",
       "newScoreKey": "12625",
       "text": "Boasyyy overtook GuyParix. on Unknown map with 00:00:12.625."
-    },
-    {
-      "id": "wr_changed|4jO5qu5lpXZz6XGt_1sZ4ZcAXga|3a96e825-e60d-4cef-97a4-deda1f05666c|8dcb2785-2c27-4877-a583-8be231e9b2d8|10110|10106|2026-08-03T13:46:18.402Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-03T13:46:18.402Z",
-      "at": "2026-08-03T13:46:18.402Z",
-      "mapUid": "4jO5qu5lpXZz6XGt_1sZ4ZcAXga",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "oldHolder": "Danyy912",
-      "oldTimeMs": 10110,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.110",
-      "oldScoreKey": "10110",
-      "newHolderAccountId": "8dcb2785-2c27-4877-a583-8be231e9b2d8",
-      "newHolder": "Aerial__milo",
-      "newTimeMs": 10106,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.106",
-      "newScoreKey": "10106",
-      "text": "Aerial__milo overtook Danyy912 on Unknown map with 00:00:10.106."
     }
   ]
 }
