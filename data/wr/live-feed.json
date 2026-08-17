@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-17T01:49:36.212Z",
+  "generatedAt": "2026-08-17T02:48:53.074Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|rH8j2clTme0B9RR1lgT3j2JMvXe|8817f987-26d8-4024-b9e4-bfabc9a6181c|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|13496|13493|2026-08-17T02:48:53.074Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-17T02:48:53.074Z",
+      "at": "2026-08-17T02:48:53.074Z",
+      "mapUid": "rH8j2clTme0B9RR1lgT3j2JMvXe",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8817f987-26d8-4024-b9e4-bfabc9a6181c",
+      "oldHolder": "Rals8",
+      "oldTimeMs": 13496,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.496",
+      "oldScoreKey": "13496",
+      "newHolderAccountId": "7b6a993a-e7f5-4e4b-bc32-edaaaa209725",
+      "newHolder": "eepySokrat",
+      "newTimeMs": 13493,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.493",
+      "newScoreKey": "13493",
+      "text": "eepySokrat overtook Rals8 on Unknown map with 00:00:13.493."
+    },
     {
       "id": "self_improve|2xlSvX2DycnFYRuDIf_3GVqnrv2|4fe15603-ea1e-438e-b0ec-3be320917fe7|4fe15603-ea1e-438e-b0ec-3be320917fe7|24898|24664|2026-08-17T00:00:39.682Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:42.120",
       "newScoreKey": "42120",
       "text": "r3.windows overtook r3.rist on Unknown map with 00:00:42.120."
-    },
-    {
-      "id": "wr_changed|c3in2wdGgUKdLF4ppfdLCOiHE07|81ad6bff-137c-4006-80d9-038702eb9beb|9e04b395-b20d-40bc-9866-a462e75112ff|14446|14254|2026-08-02T17:47:12.779Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T17:47:12.779Z",
-      "at": "2026-08-02T17:47:12.779Z",
-      "mapUid": "c3in2wdGgUKdLF4ppfdLCOiHE07",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "81ad6bff-137c-4006-80d9-038702eb9beb",
-      "oldHolder": "uelen.",
-      "oldTimeMs": 14446,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:14.446",
-      "oldScoreKey": "14446",
-      "newHolderAccountId": "9e04b395-b20d-40bc-9866-a462e75112ff",
-      "newHolder": "Massinho69",
-      "newTimeMs": 14254,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:14.254",
-      "newScoreKey": "14254",
-      "text": "Massinho69 overtook uelen. on Unknown map with 00:00:14.254."
     }
   ]
 }
