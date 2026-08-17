@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-16T23:48:42.470Z",
+  "generatedAt": "2026-08-17T00:00:39.682Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|2xlSvX2DycnFYRuDIf_3GVqnrv2|4fe15603-ea1e-438e-b0ec-3be320917fe7|4fe15603-ea1e-438e-b0ec-3be320917fe7|24898|24664|2026-08-17T00:00:39.682Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-17T00:00:39.682Z",
+      "at": "2026-08-17T00:00:39.682Z",
+      "mapUid": "2xlSvX2DycnFYRuDIf_3GVqnrv2",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "4fe15603-ea1e-438e-b0ec-3be320917fe7",
+      "oldHolder": "FlameCasterTM",
+      "oldTimeMs": 24898,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:24.898",
+      "oldScoreKey": "24898",
+      "newHolderAccountId": "4fe15603-ea1e-438e-b0ec-3be320917fe7",
+      "newHolder": "FlameCasterTM",
+      "newTimeMs": 24664,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:24.664",
+      "newScoreKey": "24664",
+      "text": "FlameCasterTM improved their WR on Unknown map from 00:00:24.898 to 00:00:24.664."
+    },
     {
       "id": "wr_changed|P508nXcOqZo4Br9zt_UaudERswh|ecdb2228-bea6-4206-a061-635e8df4ee4c|2343ca67-a77c-47c8-83bd-74f99c6f0a37|36847|36825|2026-08-16T20:32:14.779Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:14.254",
       "newScoreKey": "14254",
       "text": "Massinho69 overtook uelen. on Unknown map with 00:00:14.254."
-    },
-    {
-      "id": "wr_changed|uV1vxUnEm6jOPuGGQj2Ebth1Se0|edf486f4-ae0c-4fe3-b4c3-e9135a3156ab|46ea451c-7b20-4906-a215-9eee410d0d6c|14843|14840|2026-08-02T15:32:17.380Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-02T15:32:17.380Z",
-      "at": "2026-08-02T15:32:17.380Z",
-      "mapUid": "uV1vxUnEm6jOPuGGQj2Ebth1Se0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "edf486f4-ae0c-4fe3-b4c3-e9135a3156ab",
-      "oldHolder": "Verezz",
-      "oldTimeMs": 14843,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:14.843",
-      "oldScoreKey": "14843",
-      "newHolderAccountId": "46ea451c-7b20-4906-a215-9eee410d0d6c",
-      "newHolder": "joo.naah",
-      "newTimeMs": 14840,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:14.840",
-      "newScoreKey": "14840",
-      "text": "joo.naah overtook Verezz on Unknown map with 00:00:14.840."
     }
   ]
 }
