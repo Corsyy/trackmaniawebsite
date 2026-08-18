@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T02:44:12.680Z",
+  "generatedAt": "2026-08-18T03:32:29.676Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|jinGgRzZYjTGSSfcol0EHLTn3Q6|92673374-6b6b-4ce8-b9e1-74c0477f851e|b6a00102-210e-4116-9555-96de05289add|20572|18675|2026-08-18T03:32:29.676Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-18T03:32:29.676Z",
+      "at": "2026-08-18T03:32:29.676Z",
+      "mapUid": "jinGgRzZYjTGSSfcol0EHLTn3Q6",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "92673374-6b6b-4ce8-b9e1-74c0477f851e",
+      "oldHolder": "Gaxaxa",
+      "oldTimeMs": 20572,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:20.572",
+      "oldScoreKey": "20572",
+      "newHolderAccountId": "b6a00102-210e-4116-9555-96de05289add",
+      "newHolder": "Shortaaay",
+      "newTimeMs": 18675,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:18.675",
+      "newScoreKey": "18675",
+      "text": "Shortaaay overtook Gaxaxa on Unknown map with 00:00:18.675."
+    },
     {
       "id": "wr_changed|KPchfL0cxDuCv3jbFgnmj9VHK66|a6ae76c9-9030-4a7b-b533-cacfd6e85cb2|ee763e0b-90a4-4707-825a-a0c62b308726|33423|33408|2026-08-18T02:44:12.680Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.915",
       "newScoreKey": "9915",
       "text": "Apoc_TM overtook inoBaDe on Unknown map with 00:00:09.915."
-    },
-    {
-      "id": "wr_changed|Buc9GsQFCkVc4HEhtfLFXFsa_G0|8799ceae-713a-4365-b1cb-55e3539f4e67|7e13b604-785b-4531-b152-85798c309730|80541|67894|2026-08-03T16:11:20.934Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-03T16:11:20.934Z",
-      "at": "2026-08-03T16:11:20.934Z",
-      "mapUid": "Buc9GsQFCkVc4HEhtfLFXFsa_G0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "8799ceae-713a-4365-b1cb-55e3539f4e67",
-      "oldHolder": "TBZWNL",
-      "oldTimeMs": 80541,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:01:20.541",
-      "oldScoreKey": "80541",
-      "newHolderAccountId": "7e13b604-785b-4531-b152-85798c309730",
-      "newHolder": "Purrl471",
-      "newTimeMs": 67894,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:07.894",
-      "newScoreKey": "67894",
-      "text": "Purrl471 overtook TBZWNL on Unknown map with 00:01:07.894."
     }
   ]
 }
