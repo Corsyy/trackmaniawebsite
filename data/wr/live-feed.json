@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-18T12:16:01.468Z",
+  "generatedAt": "2026-08-18T13:13:39.093Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|gKMuDXvv7MM_RNS2rvjhL711Ae3|a5af97bc-d185-404f-a7d1-5c4e48d05db6|2343ca67-a77c-47c8-83bd-74f99c6f0a37|27324|27257|2026-08-18T13:13:39.093Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-18T13:13:39.093Z",
+      "at": "2026-08-18T13:13:39.093Z",
+      "mapUid": "gKMuDXvv7MM_RNS2rvjhL711Ae3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "a5af97bc-d185-404f-a7d1-5c4e48d05db6",
+      "oldHolder": "RotakeR.",
+      "oldTimeMs": 27324,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:27.324",
+      "oldScoreKey": "27324",
+      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
+      "newHolder": "hobbi.",
+      "newTimeMs": 27257,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:27.257",
+      "newScoreKey": "27257",
+      "text": "hobbi. overtook RotakeR. on Unknown map with 00:00:27.257."
+    },
     {
       "id": "wr_changed|cUknUbjg_cijYFcviYydETlD4J|5b5e358d-b53a-4a69-9253-23fc6dc98e68|d620091b-876b-4af4-8f98-ed3625d234e9|42947|42884|2026-08-18T11:11:44.257Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.377",
       "newScoreKey": "9377",
       "text": "Boasyyy overtook GuyParix. on Unknown map with 00:00:09.377."
-    },
-    {
-      "id": "wr_changed|gpTFbz0K049rFJbYrHDdpJiwVQc|8cfe5e6e-f8aa-4e78-82ea-03746716f457|8dcb2785-2c27-4877-a583-8be231e9b2d8|7370|7297|2026-08-03T18:04:41.461Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-03T18:04:41.461Z",
-      "at": "2026-08-03T18:04:41.461Z",
-      "mapUid": "gpTFbz0K049rFJbYrHDdpJiwVQc",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "8cfe5e6e-f8aa-4e78-82ea-03746716f457",
-      "oldHolder": "eyezero",
-      "oldTimeMs": 7370,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.370",
-      "oldScoreKey": "7370",
-      "newHolderAccountId": "8dcb2785-2c27-4877-a583-8be231e9b2d8",
-      "newHolder": "Aerial__milo",
-      "newTimeMs": 7297,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.297",
-      "newScoreKey": "7297",
-      "text": "Aerial__milo overtook eyezero on Unknown map with 00:00:07.297."
     }
   ]
 }
