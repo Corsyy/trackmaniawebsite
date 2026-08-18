@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-18T17:19:15.562Z",
+  "generatedAt": "2026-08-18T17:48:55.540Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|J8U6fyATmNyPJqovhwZt5BjypJd|52f40bee-ef2e-44b9-baf0-067f39dbc45a|35d26215-176f-466d-9786-a06abcca2d7b|14535|14408|2026-08-18T17:48:55.540Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-18T17:48:55.540Z",
+      "at": "2026-08-18T17:48:55.540Z",
+      "mapUid": "J8U6fyATmNyPJqovhwZt5BjypJd",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "52f40bee-ef2e-44b9-baf0-067f39dbc45a",
+      "oldHolder": "Ryluchs",
+      "oldTimeMs": 14535,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:14.535",
+      "oldScoreKey": "14535",
+      "newHolderAccountId": "35d26215-176f-466d-9786-a06abcca2d7b",
+      "newHolder": "NoTeamM_",
+      "newTimeMs": 14408,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:14.408",
+      "newScoreKey": "14408",
+      "text": "NoTeamM_ overtook Ryluchs on Unknown map with 00:00:14.408."
+    },
     {
       "id": "wr_changed|gKMuDXvv7MM_RNS2rvjhL711Ae3|a5af97bc-d185-404f-a7d1-5c4e48d05db6|2343ca67-a77c-47c8-83bd-74f99c6f0a37|27324|27257|2026-08-18T13:13:39.093Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:11.282",
       "newScoreKey": "11282",
       "text": "Boasyyy overtook kakuu. on Unknown map with 00:00:11.282."
-    },
-    {
-      "id": "wr_changed|Bf8Pg49jFaJDBDPqY2YIK4eSbW7|9d759f13-a6bc-40d0-9992-202be3aaff01|d9835d12-3ff6-49f5-901d-c572ee058414|9379|9377|2026-08-03T18:04:41.461Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-03T18:04:41.461Z",
-      "at": "2026-08-03T18:04:41.461Z",
-      "mapUid": "Bf8Pg49jFaJDBDPqY2YIK4eSbW7",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "9d759f13-a6bc-40d0-9992-202be3aaff01",
-      "oldHolder": "GuyParix.",
-      "oldTimeMs": 9379,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.379",
-      "oldScoreKey": "9379",
-      "newHolderAccountId": "d9835d12-3ff6-49f5-901d-c572ee058414",
-      "newHolder": "Boasyyy",
-      "newTimeMs": 9377,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.377",
-      "newScoreKey": "9377",
-      "text": "Boasyyy overtook GuyParix. on Unknown map with 00:00:09.377."
     }
   ]
 }
