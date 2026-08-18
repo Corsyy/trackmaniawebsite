@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-18T10:48:18.451Z",
+  "generatedAt": "2026-08-18T11:11:44.257Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|cUknUbjg_cijYFcviYydETlD4J|5b5e358d-b53a-4a69-9253-23fc6dc98e68|d620091b-876b-4af4-8f98-ed3625d234e9|42947|42884|2026-08-18T11:11:44.257Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-18T11:11:44.257Z",
+      "at": "2026-08-18T11:11:44.257Z",
+      "mapUid": "cUknUbjg_cijYFcviYydETlD4J",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "totd",
+      "oldHolderAccountId": "5b5e358d-b53a-4a69-9253-23fc6dc98e68",
+      "oldHolder": "CatziiTM",
+      "oldTimeMs": 42947,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.947",
+      "oldScoreKey": "42947",
+      "newHolderAccountId": "d620091b-876b-4af4-8f98-ed3625d234e9",
+      "newHolder": "C50.94975-6.947",
+      "newTimeMs": 42884,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:42.884",
+      "newScoreKey": "42884",
+      "text": "C50.94975-6.947 overtook CatziiTM on Unknown map with 00:00:42.884."
+    },
     {
       "id": "wr_changed|uv3sTRaQiNXSlL2V9rvE35pRsx9|716d855f-eb71-4bfa-843a-ff962c1bb734|a074c18f-0f1e-4fa1-aff3-87f92a555e7c|8169|8159|2026-08-18T06:18:04.807Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:07.297",
       "newScoreKey": "7297",
       "text": "Aerial__milo overtook eyezero on Unknown map with 00:00:07.297."
-    },
-    {
-      "id": "wr_changed|8hg1bWaoTkcpoOPaagVmuMZkCU3|aed062f7-33c8-468d-ba53-94fdce92988e|7e13b604-785b-4531-b152-85798c309730|149459|99512|2026-08-03T18:04:41.461Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-03T18:04:41.461Z",
-      "at": "2026-08-03T18:04:41.461Z",
-      "mapUid": "8hg1bWaoTkcpoOPaagVmuMZkCU3",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "aed062f7-33c8-468d-ba53-94fdce92988e",
-      "oldHolder": "BAYT_TSR",
-      "oldTimeMs": 149459,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:02:29.459",
-      "oldScoreKey": "149459",
-      "newHolderAccountId": "7e13b604-785b-4531-b152-85798c309730",
-      "newHolder": "Purrl471",
-      "newTimeMs": 99512,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:01:39.512",
-      "newScoreKey": "99512",
-      "text": "Purrl471 overtook BAYT_TSR on Unknown map with 00:01:39.512."
     }
   ]
 }
