@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T23:10:09.318Z",
+  "generatedAt": "2026-08-19T23:35:30.481Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|u_YrYBJAHOm48ppSiWs0vHMduqb|e1adb543-8ffb-4352-9ef1-94c82b5f01de|61e24c6b-8410-4998-82fe-cacc36d3ce7e|14429|14254|2026-08-19T23:35:30.481Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-19T23:35:30.481Z",
+      "at": "2026-08-19T23:35:30.481Z",
+      "mapUid": "u_YrYBJAHOm48ppSiWs0vHMduqb",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "e1adb543-8ffb-4352-9ef1-94c82b5f01de",
+      "oldHolder": "MubiTe",
+      "oldTimeMs": 14429,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:14.429",
+      "oldScoreKey": "14429",
+      "newHolderAccountId": "61e24c6b-8410-4998-82fe-cacc36d3ce7e",
+      "newHolder": "Jortim",
+      "newTimeMs": 14254,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:14.254",
+      "newScoreKey": "14254",
+      "text": "Jortim overtook MubiTe on Unknown map with 00:00:14.254."
+    },
     {
       "id": "wr_changed|29IkopTbAGk1Qc8jX_A76iQPxU|aed062f7-33c8-468d-ba53-94fdce92988e|263d4e6f-5809-4f9c-9f59-c56eaa5bd96a|140553|96234|2026-08-19T23:10:09.318Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.628",
       "newScoreKey": "6628",
       "text": "Trackmaniac.TM overtook Danyy912 on Unknown map with 00:00:06.628."
-    },
-    {
-      "id": "wr_changed|gY7ta66ptI0H3foKk_xSsuRtShj|50725b12-3247-40f4-b9b3-3d89f33d4443|46b93d10-9bb9-425f-a84c-c6c4895f8b94|7864|7847|2026-08-05T22:00:58.227Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-05T22:00:58.227Z",
-      "at": "2026-08-05T22:00:58.227Z",
-      "mapUid": "gY7ta66ptI0H3foKk_xSsuRtShj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "50725b12-3247-40f4-b9b3-3d89f33d4443",
-      "oldHolder": "Lomiig",
-      "oldTimeMs": 7864,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.864",
-      "oldScoreKey": "7864",
-      "newHolderAccountId": "46b93d10-9bb9-425f-a84c-c6c4895f8b94",
-      "newHolder": "Trackmaniac.TM",
-      "newTimeMs": 7847,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.847",
-      "newScoreKey": "7847",
-      "text": "Trackmaniac.TM overtook Lomiig on Unknown map with 00:00:07.847."
     }
   ]
 }
