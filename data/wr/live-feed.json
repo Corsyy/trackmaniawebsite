@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-19T01:48:24.660Z",
+  "generatedAt": "2026-08-19T02:45:31.571Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|3Y2uo3S5oBflHHv9ZrnuFTRpCsa|716d855f-eb71-4bfa-843a-ff962c1bb734|a074c18f-0f1e-4fa1-aff3-87f92a555e7c|29443|29349|2026-08-19T02:45:31.571Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-19T02:45:31.571Z",
+      "at": "2026-08-19T02:45:31.571Z",
+      "mapUid": "3Y2uo3S5oBflHHv9ZrnuFTRpCsa",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "716d855f-eb71-4bfa-843a-ff962c1bb734",
+      "oldHolder": "rattarme23",
+      "oldTimeMs": 29443,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:29.443",
+      "oldScoreKey": "29443",
+      "newHolderAccountId": "a074c18f-0f1e-4fa1-aff3-87f92a555e7c",
+      "newHolder": "Eevelzi",
+      "newTimeMs": 29349,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:29.349",
+      "newScoreKey": "29349",
+      "text": "Eevelzi overtook rattarme23 on Unknown map with 00:00:29.349."
+    },
     {
       "id": "wr_changed|zHkLNpadCwg6m8iJhpmiZ2IBppd|f0946767-89ed-4a51-b0fe-922469de318f|2343ca67-a77c-47c8-83bd-74f99c6f0a37|23413|23393|2026-08-18T22:34:47.567Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:17.418",
       "newScoreKey": "17418",
       "text": "Boasyyy overtook GuyParix. on Unknown map with 00:00:17.418."
-    },
-    {
-      "id": "wr_changed|9oTALMQyRDP1L4pshF4jrsHRpR9|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|d9835d12-3ff6-49f5-901d-c572ee058414|7654|7421|2026-08-03T19:55:32.712Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-03T19:55:32.712Z",
-      "at": "2026-08-03T19:55:32.712Z",
-      "mapUid": "9oTALMQyRDP1L4pshF4jrsHRpR9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0",
-      "oldHolder": "BartAker05",
-      "oldTimeMs": 7654,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.654",
-      "oldScoreKey": "7654",
-      "newHolderAccountId": "d9835d12-3ff6-49f5-901d-c572ee058414",
-      "newHolder": "Boasyyy",
-      "newTimeMs": 7421,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.421",
-      "newScoreKey": "7421",
-      "text": "Boasyyy overtook BartAker05 on Unknown map with 00:00:07.421."
     }
   ]
 }
