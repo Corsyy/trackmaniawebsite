@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-19T19:52:58.108Z",
+  "generatedAt": "2026-08-19T20:15:25.888Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|YabBQ9oDUsTfs8NwvzVjUECVcR4|07ff9d3a-849e-496e-aca9-6ac41ed23e75|07ff9d3a-849e-496e-aca9-6ac41ed23e75|42003|41960|2026-08-19T20:15:25.888Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-19T20:15:25.888Z",
+      "at": "2026-08-19T20:15:25.888Z",
+      "mapUid": "YabBQ9oDUsTfs8NwvzVjUECVcR4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "07ff9d3a-849e-496e-aca9-6ac41ed23e75",
+      "oldHolder": "MEDICINE9268",
+      "oldTimeMs": 42003,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.003",
+      "oldScoreKey": "42003",
+      "newHolderAccountId": "07ff9d3a-849e-496e-aca9-6ac41ed23e75",
+      "newHolder": "MEDICINE9268",
+      "newTimeMs": 41960,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:41.960",
+      "newScoreKey": "41960",
+      "text": "MEDICINE9268 improved their WR on Unknown map from 00:00:42.003 to 00:00:41.960."
+    },
     {
       "id": "wr_changed|kEfUqsODXbu3LQFND2mijqTi9w8|b373d4c9-46ed-434e-8e08-0343b20f0a05|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|13508|13432|2026-08-19T17:45:52.154Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:37.604",
       "newScoreKey": "37604",
       "text": "hobbi. overtook racehansTM on Unknown map with 00:00:37.604."
-    },
-    {
-      "id": "wr_changed|3JdxvBUgeZkdUy0_U98v8BLU2s6|0716708a-93d5-4a30-9b2d-0f9dea7d05f0|f348a39e-be47-4090-b813-b34090adabcc|48338|48330|2026-08-05T14:30:43.810Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-05T14:30:43.810Z",
-      "at": "2026-08-05T14:30:43.810Z",
-      "mapUid": "3JdxvBUgeZkdUy0_U98v8BLU2s6",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "totd",
-      "oldHolderAccountId": "0716708a-93d5-4a30-9b2d-0f9dea7d05f0",
-      "oldHolder": "abcol1",
-      "oldTimeMs": 48338,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:48.338",
-      "oldScoreKey": "48338",
-      "newHolderAccountId": "f348a39e-be47-4090-b813-b34090adabcc",
-      "newHolder": "ChooDawn",
-      "newTimeMs": 48330,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:48.330",
-      "newScoreKey": "48330",
-      "text": "ChooDawn overtook abcol1 on Unknown map with 00:00:48.330."
     }
   ]
 }
