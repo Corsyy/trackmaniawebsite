@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-19T22:40:00.135Z",
+  "generatedAt": "2026-08-19T23:10:09.318Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|29IkopTbAGk1Qc8jX_A76iQPxU|aed062f7-33c8-468d-ba53-94fdce92988e|263d4e6f-5809-4f9c-9f59-c56eaa5bd96a|140553|96234|2026-08-19T23:10:09.318Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-19T23:10:09.318Z",
+      "at": "2026-08-19T23:10:09.318Z",
+      "mapUid": "29IkopTbAGk1Qc8jX_A76iQPxU",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "aed062f7-33c8-468d-ba53-94fdce92988e",
+      "oldHolder": "BAYT_TSR",
+      "oldTimeMs": 140553,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:02:20.553",
+      "oldScoreKey": "140553",
+      "newHolderAccountId": "263d4e6f-5809-4f9c-9f59-c56eaa5bd96a",
+      "newHolder": "GeometryCrafter",
+      "newTimeMs": 96234,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:01:36.234",
+      "newScoreKey": "96234",
+      "text": "GeometryCrafter overtook BAYT_TSR on Unknown map with 00:01:36.234."
+    },
     {
       "id": "self_improve|YabBQ9oDUsTfs8NwvzVjUECVcR4|07ff9d3a-849e-496e-aca9-6ac41ed23e75|07ff9d3a-849e-496e-aca9-6ac41ed23e75|42003|41960|2026-08-19T20:15:25.888Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:07.847",
       "newScoreKey": "7847",
       "text": "Trackmaniac.TM overtook Lomiig on Unknown map with 00:00:07.847."
-    },
-    {
-      "id": "wr_changed|NuDWGXtTQOkbRNI5cQZLJDsyazm|aa4e375f-d23e-4915-8d53-8b3307e06764|2343ca67-a77c-47c8-83bd-74f99c6f0a37|37618|37604|2026-08-05T20:49:14.479Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-05T20:49:14.479Z",
-      "at": "2026-08-05T20:49:14.479Z",
-      "mapUid": "NuDWGXtTQOkbRNI5cQZLJDsyazm",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "official",
-      "oldHolderAccountId": "aa4e375f-d23e-4915-8d53-8b3307e06764",
-      "oldHolder": "racehansTM",
-      "oldTimeMs": 37618,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:37.618",
-      "oldScoreKey": "37618",
-      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
-      "newHolder": "hobbi.",
-      "newTimeMs": 37604,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:37.604",
-      "newScoreKey": "37604",
-      "text": "hobbi. overtook racehansTM on Unknown map with 00:00:37.604."
     }
   ]
 }
