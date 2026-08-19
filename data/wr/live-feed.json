@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-19T10:34:09.587Z",
+  "generatedAt": "2026-08-19T11:11:22.789Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|YabBQ9oDUsTfs8NwvzVjUECVcR4|c1d053c6-5e49-4fe8-8574-ecfa58267366|07ff9d3a-849e-496e-aca9-6ac41ed23e75|42021|42003|2026-08-19T11:11:22.789Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-19T11:11:22.789Z",
+      "at": "2026-08-19T11:11:22.789Z",
+      "mapUid": "YabBQ9oDUsTfs8NwvzVjUECVcR4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "c1d053c6-5e49-4fe8-8574-ecfa58267366",
+      "oldHolder": "Teuflum",
+      "oldTimeMs": 42021,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:42.021",
+      "oldScoreKey": "42021",
+      "newHolderAccountId": "07ff9d3a-849e-496e-aca9-6ac41ed23e75",
+      "newHolder": "MEDICINE9268",
+      "newTimeMs": 42003,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:42.003",
+      "newScoreKey": "42003",
+      "text": "MEDICINE9268 overtook Teuflum on Unknown map with 00:00:42.003."
+    },
     {
       "id": "wr_changed|VVyovovGPsNATlB0Acb0lR1rQ2h|04a64a68-7370-4f67-90b2-025e1006631a|d620091b-876b-4af4-8f98-ed3625d234e9|44278|44233|2026-08-19T09:18:45.767Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.614",
       "newScoreKey": "6614",
       "text": "MazsTM overtook Sweept on Unknown map with 00:00:06.614."
-    },
-    {
-      "id": "wr_changed|sJz3u63hyl1Lsdb36iAJ1Glfo4e|c3309971-e4bd-4111-865b-77c79337786a|d77b72a6-dcc0-4e43-b1cc-47c11a9581ad|9191|9143|2026-08-04T18:20:34.832Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-04T18:20:34.832Z",
-      "at": "2026-08-04T18:20:34.832Z",
-      "mapUid": "sJz3u63hyl1Lsdb36iAJ1Glfo4e",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c3309971-e4bd-4111-865b-77c79337786a",
-      "oldHolder": "Apoc_TM",
-      "oldTimeMs": 9191,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:09.191",
-      "oldScoreKey": "9191",
-      "newHolderAccountId": "d77b72a6-dcc0-4e43-b1cc-47c11a9581ad",
-      "newHolder": "Vulpecia",
-      "newTimeMs": 9143,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:09.143",
-      "newScoreKey": "9143",
-      "text": "Vulpecia overtook Apoc_TM on Unknown map with 00:00:09.143."
     }
   ]
 }
