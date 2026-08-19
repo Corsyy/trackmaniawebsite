@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-19T15:51:18.390Z",
+  "generatedAt": "2026-08-19T16:15:28.086Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|6XCNob6SZU8djhL6T20ztmjLrg3|4aff454c-3918-40e8-bf02-d49f3e95006a|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|10364|10106|2026-08-19T16:15:28.086Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-19T16:15:28.086Z",
+      "at": "2026-08-19T16:15:28.086Z",
+      "mapUid": "6XCNob6SZU8djhL6T20ztmjLrg3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "4aff454c-3918-40e8-bf02-d49f3e95006a",
+      "oldHolder": "Entomologiste",
+      "oldTimeMs": 10364,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.364",
+      "oldScoreKey": "10364",
+      "newHolderAccountId": "c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0",
+      "newHolder": "BartAker05",
+      "newTimeMs": 10106,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.106",
+      "newScoreKey": "10106",
+      "text": "BartAker05 overtook Entomologiste on Unknown map with 00:00:10.106."
+    },
     {
       "id": "wr_changed|FDVlyelCl1kbE6eb4vnHKuZrgtj|6feda512-784e-4aba-b3bb-7c2009aacbeb|7fc7bc9c-67b2-4003-b1a3-29006486f71e|10304|6848|2026-08-19T15:16:15.386Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:25.258",
       "newScoreKey": "25258",
       "text": "Pork_On_Wii overtook F2PEnjoyer on Unknown map with 00:00:25.258."
-    },
-    {
-      "id": "self_improve|Vp4LYG1eLesdkify5rYvnvrcEOm|81ad6bff-137c-4006-80d9-038702eb9beb|81ad6bff-137c-4006-80d9-038702eb9beb|6615|6613|2026-08-04T20:03:51.665Z",
-      "type": "self_improve",
-      "detectedAt": "2026-08-04T20:03:51.665Z",
-      "at": "2026-08-04T20:03:51.665Z",
-      "mapUid": "Vp4LYG1eLesdkify5rYvnvrcEOm",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "81ad6bff-137c-4006-80d9-038702eb9beb",
-      "oldHolder": "uelen.",
-      "oldTimeMs": 6615,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:06.615",
-      "oldScoreKey": "6615",
-      "newHolderAccountId": "81ad6bff-137c-4006-80d9-038702eb9beb",
-      "newHolder": "uelen.",
-      "newTimeMs": 6613,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:06.613",
-      "newScoreKey": "6613",
-      "text": "uelen. improved their WR on Unknown map from 00:00:06.615 to 00:00:06.613."
     }
   ]
 }
