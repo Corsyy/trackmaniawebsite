@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-20T13:16:48.558Z",
+  "generatedAt": "2026-08-20T14:04:54.921Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|_tVHNjvmdIkvooUAru7uPpOJtBc|126d2064-e4a3-4b3e-8f2d-06bc5d50d9db|d28a55af-b66d-4401-9466-2f9877890a54|9457|9440|2026-08-20T14:04:54.921Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-20T14:04:54.921Z",
+      "at": "2026-08-20T14:04:54.921Z",
+      "mapUid": "_tVHNjvmdIkvooUAru7uPpOJtBc",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "126d2064-e4a3-4b3e-8f2d-06bc5d50d9db",
+      "oldHolder": "SAiZ_TM",
+      "oldTimeMs": 9457,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:09.457",
+      "oldScoreKey": "9457",
+      "newHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
+      "newHolder": "MazsTM",
+      "newTimeMs": 9440,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:09.440",
+      "newScoreKey": "9440",
+      "text": "MazsTM overtook SAiZ_TM on Unknown map with 00:00:09.440."
+    },
     {
       "id": "wr_changed|lRCX4FA6TV_CpbSwQcadUVbI42l|ff1abcf8-ac9c-459a-9852-12caff49da72|39f65a51-6fc7-4fe2-be66-aab7607e8932|12494|12302|2026-08-20T12:17:25.572Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:23.812",
       "newScoreKey": "23812",
       "text": "Richie1308 improved their WR on Unknown map from 00:00:23.822 to 00:00:23.812."
-    },
-    {
-      "id": "self_improve|E95Yagkqw_lihL0Egveg4E4_fRf|b64877d2-1dc5-4de5-af44-dd677c38c251|b64877d2-1dc5-4de5-af44-dd677c38c251|11723|11300|2026-08-06T03:35:15.997Z",
-      "type": "self_improve",
-      "detectedAt": "2026-08-06T03:35:15.997Z",
-      "at": "2026-08-06T03:35:15.997Z",
-      "mapUid": "E95Yagkqw_lihL0Egveg4E4_fRf",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "b64877d2-1dc5-4de5-af44-dd677c38c251",
-      "oldHolder": "FauxBlue",
-      "oldTimeMs": 11723,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:11.723",
-      "oldScoreKey": "11723",
-      "newHolderAccountId": "b64877d2-1dc5-4de5-af44-dd677c38c251",
-      "newHolder": "FauxBlue",
-      "newTimeMs": 11300,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:11.300",
-      "newScoreKey": "11300",
-      "text": "FauxBlue improved their WR on Unknown map from 00:00:11.723 to 00:00:11.300."
     }
   ]
 }
