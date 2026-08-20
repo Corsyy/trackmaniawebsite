@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-20T11:44:00.112Z",
+  "generatedAt": "2026-08-20T12:17:25.572Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|lRCX4FA6TV_CpbSwQcadUVbI42l|ff1abcf8-ac9c-459a-9852-12caff49da72|39f65a51-6fc7-4fe2-be66-aab7607e8932|12494|12302|2026-08-20T12:17:25.572Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-20T12:17:25.572Z",
+      "at": "2026-08-20T12:17:25.572Z",
+      "mapUid": "lRCX4FA6TV_CpbSwQcadUVbI42l",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "ff1abcf8-ac9c-459a-9852-12caff49da72",
+      "oldHolder": "Fluffy.Toasty",
+      "oldTimeMs": 12494,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:12.494",
+      "oldScoreKey": "12494",
+      "newHolderAccountId": "39f65a51-6fc7-4fe2-be66-aab7607e8932",
+      "newHolder": "Qwiky",
+      "newTimeMs": 12302,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:12.302",
+      "newScoreKey": "12302",
+      "text": "Qwiky overtook Fluffy.Toasty on Unknown map with 00:00:12.302."
+    },
     {
       "id": "wr_changed|_9iEnGVu5yB5RGF7VmIQXcHYcJh|11e56e9f-d89e-484e-b3d9-5e04de40c33d|3c530018-af61-4c4a-81ee-c2f9e1e9f996|6884|6878|2026-08-20T09:19:53.413Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:11.300",
       "newScoreKey": "11300",
       "text": "FauxBlue improved their WR on Unknown map from 00:00:11.723 to 00:00:11.300."
-    },
-    {
-      "id": "wr_changed|URJxaJ4sUD1g1v6ND3x3Q5QEGcd|d28a55af-b66d-4401-9466-2f9877890a54|549e4ccf-45bd-4e0f-898b-185d0ee5d878|6614|6598|2026-08-06T03:35:15.997Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-06T03:35:15.997Z",
-      "at": "2026-08-06T03:35:15.997Z",
-      "mapUid": "URJxaJ4sUD1g1v6ND3x3Q5QEGcd",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d28a55af-b66d-4401-9466-2f9877890a54",
-      "oldHolder": "MazsTM",
-      "oldTimeMs": 6614,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:06.614",
-      "oldScoreKey": "6614",
-      "newHolderAccountId": "549e4ccf-45bd-4e0f-898b-185d0ee5d878",
-      "newHolder": "simsun9",
-      "newTimeMs": 6598,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:06.598",
-      "newScoreKey": "6598",
-      "text": "simsun9 overtook MazsTM on Unknown map with 00:00:06.598."
     }
   ]
 }
