@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-20T08:45:38.273Z",
+  "generatedAt": "2026-08-20T09:19:53.413Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|_9iEnGVu5yB5RGF7VmIQXcHYcJh|11e56e9f-d89e-484e-b3d9-5e04de40c33d|3c530018-af61-4c4a-81ee-c2f9e1e9f996|6884|6878|2026-08-20T09:19:53.413Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-20T09:19:53.413Z",
+      "at": "2026-08-20T09:19:53.413Z",
+      "mapUid": "_9iEnGVu5yB5RGF7VmIQXcHYcJh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "11e56e9f-d89e-484e-b3d9-5e04de40c33d",
+      "oldHolder": "Vatsug44",
+      "oldTimeMs": 6884,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:06.884",
+      "oldScoreKey": "6884",
+      "newHolderAccountId": "3c530018-af61-4c4a-81ee-c2f9e1e9f996",
+      "newHolder": "Bartje101",
+      "newTimeMs": 6878,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:06.878",
+      "newScoreKey": "6878",
+      "text": "Bartje101 overtook Vatsug44 on Unknown map with 00:00:06.878."
+    },
     {
       "id": "wr_changed|bxt32fTntw2LEFRNSw2VMsulkl9|3a96e825-e60d-4cef-97a4-deda1f05666c|702b0631-3c06-45dd-9be3-8322da84d2cf|9621|9580|2026-08-20T07:57:43.805Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.598",
       "newScoreKey": "6598",
       "text": "simsun9 overtook MazsTM on Unknown map with 00:00:06.598."
-    },
-    {
-      "id": "wr_changed|9vWpZ0BcR8EjQeFDLraaCmVO3u4|cb7bb189-b312-45d7-a17f-b186b3e8189f|c1348cbd-f69a-429a-a1cb-967ce72cd81e|18051|18021|2026-08-06T03:35:15.997Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-06T03:35:15.997Z",
-      "at": "2026-08-06T03:35:15.997Z",
-      "mapUid": "9vWpZ0BcR8EjQeFDLraaCmVO3u4",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "cb7bb189-b312-45d7-a17f-b186b3e8189f",
-      "oldHolder": "Gabinou.",
-      "oldTimeMs": 18051,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:18.051",
-      "oldScoreKey": "18051",
-      "newHolderAccountId": "c1348cbd-f69a-429a-a1cb-967ce72cd81e",
-      "newHolder": "fcardenas",
-      "newTimeMs": 18021,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:18.021",
-      "newScoreKey": "18021",
-      "text": "fcardenas overtook Gabinou. on Unknown map with 00:00:18.021."
     }
   ]
 }
