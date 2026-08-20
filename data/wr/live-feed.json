@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-20T19:44:21.598Z",
+  "generatedAt": "2026-08-20T20:12:57.619Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|BM9GQkQLCweSJCnCqF8U9WRrl5j|ba182417-82ff-4819-aab2-6535575db0c8|4ba5ee6f-b8ea-46a8-a080-be671e28c5e4|25818|25733|2026-08-20T20:12:57.619Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-20T20:12:57.619Z",
+      "at": "2026-08-20T20:12:57.619Z",
+      "mapUid": "BM9GQkQLCweSJCnCqF8U9WRrl5j",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "ba182417-82ff-4819-aab2-6535575db0c8",
+      "oldHolder": "geo.wj",
+      "oldTimeMs": 25818,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:25.818",
+      "oldScoreKey": "25818",
+      "newHolderAccountId": "4ba5ee6f-b8ea-46a8-a080-be671e28c5e4",
+      "newHolder": "DjangVo",
+      "newTimeMs": 25733,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:25.733",
+      "newScoreKey": "25733",
+      "text": "DjangVo overtook geo.wj on Unknown map with 00:00:25.733."
+    },
     {
       "id": "wr_changed|_tVHNjvmdIkvooUAru7uPpOJtBc|126d2064-e4a3-4b3e-8f2d-06bc5d50d9db|d28a55af-b66d-4401-9466-2f9877890a54|9457|9440|2026-08-20T14:04:54.921Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:13.560",
       "newScoreKey": "13560",
       "text": "Rals8 overtook eepySokrat on Unknown map with 00:00:13.560."
-    },
-    {
-      "id": "self_improve|n_ciydP8_Rzl_bSSsKvMkinEW9h|d0a811b4-5611-4948-8865-03c9d252bcf4|d0a811b4-5611-4948-8865-03c9d252bcf4|23822|23812|2026-08-06T03:35:15.997Z",
-      "type": "self_improve",
-      "detectedAt": "2026-08-06T03:35:15.997Z",
-      "at": "2026-08-06T03:35:15.997Z",
-      "mapUid": "n_ciydP8_Rzl_bSSsKvMkinEW9h",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "d0a811b4-5611-4948-8865-03c9d252bcf4",
-      "oldHolder": "Richie1308",
-      "oldTimeMs": 23822,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:23.822",
-      "oldScoreKey": "23822",
-      "newHolderAccountId": "d0a811b4-5611-4948-8865-03c9d252bcf4",
-      "newHolder": "Richie1308",
-      "newTimeMs": 23812,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:23.812",
-      "newScoreKey": "23812",
-      "text": "Richie1308 improved their WR on Unknown map from 00:00:23.822 to 00:00:23.812."
     }
   ]
 }
