@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-21T11:47:13.568Z",
+  "generatedAt": "2026-08-21T12:16:48.808Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 3,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|qjxgRLPruSEBRXt2VWccNWUYGpg|d9ed3f8e-5a11-4408-8d2d-7da999976c46|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|12282|11907|2026-08-21T12:16:48.808Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-21T12:16:48.808Z",
+      "at": "2026-08-21T12:16:48.808Z",
+      "mapUid": "qjxgRLPruSEBRXt2VWccNWUYGpg",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d9ed3f8e-5a11-4408-8d2d-7da999976c46",
+      "oldHolder": "craussor",
+      "oldTimeMs": 12282,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:12.282",
+      "oldScoreKey": "12282",
+      "newHolderAccountId": "c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0",
+      "newHolder": "BartAker05",
+      "newTimeMs": 11907,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.907",
+      "newScoreKey": "11907",
+      "text": "BartAker05 overtook craussor on Unknown map with 00:00:11.907."
+    },
     {
       "id": "wr_changed|Kpgw5rdzFGoimqZYmudgIUzO3T8|7f80b573-fff1-4de9-8cd5-ee7e5749ce15|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|11603|11592|2026-08-21T11:47:13.568Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.414",
       "newScoreKey": "8414",
       "text": "daku.. overtook WantedTM on Unknown map with 00:00:08.414."
-    },
-    {
-      "id": "wr_changed|J4QsYQEm2knVep9JjfZF_CKFCTh|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|3898953a-980c-411a-8cd7-f38625773acd|12745|12735|2026-08-06T13:24:42.409Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-06T13:24:42.409Z",
-      "at": "2026-08-06T13:24:42.409Z",
-      "mapUid": "J4QsYQEm2knVep9JjfZF_CKFCTh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0",
-      "oldHolder": "BartAker05",
-      "oldTimeMs": 12745,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.745",
-      "oldScoreKey": "12745",
-      "newHolderAccountId": "3898953a-980c-411a-8cd7-f38625773acd",
-      "newHolder": "Utopasoi",
-      "newTimeMs": 12735,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.735",
-      "newScoreKey": "12735",
-      "text": "Utopasoi overtook BartAker05 on Unknown map with 00:00:12.735."
     }
   ]
 }
