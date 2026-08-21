@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-21T19:02:37.667Z",
+  "generatedAt": "2026-08-21T19:32:40.234Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|2duqTTWF4Cm5FC9lbJNGZImP3t4|e0eed2fd-3eb5-4f41-990b-ae1b7c612d90|35d26215-176f-466d-9786-a06abcca2d7b|13473|13443|2026-08-21T19:32:40.234Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-21T19:32:40.234Z",
+      "at": "2026-08-21T19:32:40.234Z",
+      "mapUid": "2duqTTWF4Cm5FC9lbJNGZImP3t4",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "e0eed2fd-3eb5-4f41-990b-ae1b7c612d90",
+      "oldHolder": "bgood_",
+      "oldTimeMs": 13473,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.473",
+      "oldScoreKey": "13473",
+      "newHolderAccountId": "35d26215-176f-466d-9786-a06abcca2d7b",
+      "newHolder": "NoTeamM_",
+      "newTimeMs": 13443,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.443",
+      "newScoreKey": "13443",
+      "text": "NoTeamM_ overtook bgood_ on Unknown map with 00:00:13.443."
+    },
     {
       "id": "self_improve|EEXFdJbBbjaUKuxsPByQKd0dssk|5a63000d-7288-4046-b0f3-8e86cbae92ea|5a63000d-7288-4046-b0f3-8e86cbae92ea|10214|10212|2026-08-21T16:20:51.020Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:18.382",
       "newScoreKey": "18382",
       "text": "Rals8 overtook Crayoon. on Unknown map with 00:00:18.382."
-    },
-    {
-      "id": "wr_changed|OzbgAbo1QG2TZruYNW0vcBv_1ub|47deaeb4-6a90-46cf-9b2b-f986c282076f|e582f3c0-29a8-4391-aa7f-acd01ecf0496|52520|51944|2026-08-07T00:34:36.745Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-07T00:34:36.745Z",
-      "at": "2026-08-07T00:34:36.745Z",
-      "mapUid": "OzbgAbo1QG2TZruYNW0vcBv_1ub",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "47deaeb4-6a90-46cf-9b2b-f986c282076f",
-      "oldHolder": "LeinAdmiral",
-      "oldTimeMs": 52520,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:52.520",
-      "oldScoreKey": "52520",
-      "newHolderAccountId": "e582f3c0-29a8-4391-aa7f-acd01ecf0496",
-      "newHolder": "Alekzi...",
-      "newTimeMs": 51944,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:51.944",
-      "newScoreKey": "51944",
-      "text": "Alekzi... overtook LeinAdmiral on Unknown map with 00:00:51.944."
     }
   ]
 }
