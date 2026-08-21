@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-21T20:35:54.317Z",
+  "generatedAt": "2026-08-21T21:10:07.779Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|EvqKkKwl43X90HgZT1aCw3Qmsj1|9d759f13-a6bc-40d0-9992-202be3aaff01|2426a2b1-fb4f-4782-bc4f-f4c54fc44e6a|7060|7051|2026-08-21T21:10:07.779Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-21T21:10:07.779Z",
+      "at": "2026-08-21T21:10:07.779Z",
+      "mapUid": "EvqKkKwl43X90HgZT1aCw3Qmsj1",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "9d759f13-a6bc-40d0-9992-202be3aaff01",
+      "oldHolder": "GuyParix.",
+      "oldTimeMs": 7060,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:07.060",
+      "oldScoreKey": "7060",
+      "newHolderAccountId": "2426a2b1-fb4f-4782-bc4f-f4c54fc44e6a",
+      "newHolder": "GGbro2073",
+      "newTimeMs": 7051,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:07.051",
+      "newScoreKey": "7051",
+      "text": "GGbro2073 overtook GuyParix. on Unknown map with 00:00:07.051."
+    },
     {
       "id": "wr_changed|2duqTTWF4Cm5FC9lbJNGZImP3t4|e0eed2fd-3eb5-4f41-990b-ae1b7c612d90|35d26215-176f-466d-9786-a06abcca2d7b|13473|13443|2026-08-21T19:32:40.234Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.480",
       "newScoreKey": "6480",
       "text": "Gossfire89 overtook Erskii.. on Unknown map with 00:00:06.480."
-    },
-    {
-      "id": "wr_changed|LmKUQ_S4ASQsC2a8IueU3Uy0Pkk|74517ba9-4636-45ec-bbea-98ce8a25a15f|8817f987-26d8-4024-b9e4-bfabc9a6181c|18394|18382|2026-08-07T00:34:36.745Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-07T00:34:36.745Z",
-      "at": "2026-08-07T00:34:36.745Z",
-      "mapUid": "LmKUQ_S4ASQsC2a8IueU3Uy0Pkk",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "74517ba9-4636-45ec-bbea-98ce8a25a15f",
-      "oldHolder": "Crayoon.",
-      "oldTimeMs": 18394,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:18.394",
-      "oldScoreKey": "18394",
-      "newHolderAccountId": "8817f987-26d8-4024-b9e4-bfabc9a6181c",
-      "newHolder": "Rals8",
-      "newTimeMs": 18382,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:18.382",
-      "newScoreKey": "18382",
-      "text": "Rals8 overtook Crayoon. on Unknown map with 00:00:18.382."
     }
   ]
 }
