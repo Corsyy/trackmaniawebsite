@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-21T15:53:07.630Z",
+  "generatedAt": "2026-08-21T16:20:51.020Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|EEXFdJbBbjaUKuxsPByQKd0dssk|5a63000d-7288-4046-b0f3-8e86cbae92ea|5a63000d-7288-4046-b0f3-8e86cbae92ea|10214|10212|2026-08-21T16:20:51.020Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-21T16:20:51.020Z",
+      "at": "2026-08-21T16:20:51.020Z",
+      "mapUid": "EEXFdJbBbjaUKuxsPByQKd0dssk",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "5a63000d-7288-4046-b0f3-8e86cbae92ea",
+      "oldHolder": "UndertakerTM",
+      "oldTimeMs": 10214,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.214",
+      "oldScoreKey": "10214",
+      "newHolderAccountId": "5a63000d-7288-4046-b0f3-8e86cbae92ea",
+      "newHolder": "UndertakerTM",
+      "newTimeMs": 10212,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.212",
+      "newScoreKey": "10212",
+      "text": "UndertakerTM improved their WR on Unknown map from 00:00:10.214 to 00:00:10.212."
+    },
     {
       "id": "wr_changed|qjxgRLPruSEBRXt2VWccNWUYGpg|d9ed3f8e-5a11-4408-8d2d-7da999976c46|c9258ad3-1b9e-4443-9ea3-e2f7ee510dc0|12282|11907|2026-08-21T12:16:48.808Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:51.944",
       "newScoreKey": "51944",
       "text": "Alekzi... overtook LeinAdmiral on Unknown map with 00:00:51.944."
-    },
-    {
-      "id": "wr_changed|durbnLdc1xW_1cG7dFdoScRt2Sh|6d5323d0-d6ff-4a6a-af3c-42c11740f9d0|a3712fe0-51ef-4fee-b90c-a470121d6752|8425|8414|2026-08-06T15:42:52.070Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-06T15:42:52.070Z",
-      "at": "2026-08-06T15:42:52.070Z",
-      "mapUid": "durbnLdc1xW_1cG7dFdoScRt2Sh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "6d5323d0-d6ff-4a6a-af3c-42c11740f9d0",
-      "oldHolder": "WantedTM",
-      "oldTimeMs": 8425,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.425",
-      "oldScoreKey": "8425",
-      "newHolderAccountId": "a3712fe0-51ef-4fee-b90c-a470121d6752",
-      "newHolder": "daku..",
-      "newTimeMs": 8414,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.414",
-      "newScoreKey": "8414",
-      "text": "daku.. overtook WantedTM on Unknown map with 00:00:08.414."
     }
   ]
 }
