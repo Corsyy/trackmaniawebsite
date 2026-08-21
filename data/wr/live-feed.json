@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-21T07:48:47.922Z",
+  "generatedAt": "2026-08-21T08:21:48.512Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|QJjWTlNUF_iRh3DTI2wt7w9MQA3|8817f987-26d8-4024-b9e4-bfabc9a6181c|7b6a993a-e7f5-4e4b-bc32-edaaaa209725|13520|13508|2026-08-21T08:21:48.512Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-21T08:21:48.512Z",
+      "at": "2026-08-21T08:21:48.512Z",
+      "mapUid": "QJjWTlNUF_iRh3DTI2wt7w9MQA3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8817f987-26d8-4024-b9e4-bfabc9a6181c",
+      "oldHolder": "Rals8",
+      "oldTimeMs": 13520,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.520",
+      "oldScoreKey": "13520",
+      "newHolderAccountId": "7b6a993a-e7f5-4e4b-bc32-edaaaa209725",
+      "newHolder": "eepySokrat",
+      "newTimeMs": 13508,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.508",
+      "newScoreKey": "13508",
+      "text": "eepySokrat overtook Rals8 on Unknown map with 00:00:13.508."
+    },
     {
       "id": "wr_changed|_tVHNjvmdIkvooUAru7uPpOJtBc|d28a55af-b66d-4401-9466-2f9877890a54|a091e92d-426f-440e-a3d8-7b2c5278e812|9440|9433|2026-08-20T23:40:53.866Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:05.464",
       "newScoreKey": "5464",
       "text": "BradleyM834 overtook Generaldirty on Unknown map with 00:00:05.464."
-    },
-    {
-      "id": "wr_changed|HOmgqTQUTLxgPmcU2oXp8C13jMh|3a96e825-e60d-4cef-97a4-deda1f05666c|abd7d1f7-3d64-4663-97a7-31dc147c4001|6506|6498|2026-08-06T13:24:42.409Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-06T13:24:42.409Z",
-      "at": "2026-08-06T13:24:42.409Z",
-      "mapUid": "HOmgqTQUTLxgPmcU2oXp8C13jMh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "oldHolder": "Danyy912",
-      "oldTimeMs": 6506,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:06.506",
-      "oldScoreKey": "6506",
-      "newHolderAccountId": "abd7d1f7-3d64-4663-97a7-31dc147c4001",
-      "newHolder": "Skyheart_",
-      "newTimeMs": 6498,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:06.498",
-      "newScoreKey": "6498",
-      "text": "Skyheart_ overtook Danyy912 on Unknown map with 00:00:06.498."
     }
   ]
 }
