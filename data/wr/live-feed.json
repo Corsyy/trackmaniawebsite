@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-22T08:12:46.318Z",
+  "generatedAt": "2026-08-22T08:48:35.160Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|8tzoh8vPcc0uvuLI5LO1o9zC1Ti|1eaea44d-a759-4094-8064-e68efbabb06a|70545452-6098-48cd-a37e-2a5f6a45f26f|8781|8537|2026-08-22T08:48:35.160Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-22T08:48:35.160Z",
+      "at": "2026-08-22T08:48:35.160Z",
+      "mapUid": "8tzoh8vPcc0uvuLI5LO1o9zC1Ti",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "1eaea44d-a759-4094-8064-e68efbabb06a",
+      "oldHolder": "Sem_B",
+      "oldTimeMs": 8781,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:08.781",
+      "oldScoreKey": "8781",
+      "newHolderAccountId": "70545452-6098-48cd-a37e-2a5f6a45f26f",
+      "newHolder": "Thyla_",
+      "newTimeMs": 8537,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:08.537",
+      "newScoreKey": "8537",
+      "text": "Thyla_ overtook Sem_B on Unknown map with 00:00:08.537."
+    },
     {
       "id": "wr_changed|rTU6w7cBAJpqos_XtvzbW5f0uxf|d52768b5-1e2c-495f-9df5-16494ddcf053|0b435391-abee-49ef-a997-c72a07428296|16715|16682|2026-08-22T07:05:15.732Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.501",
       "newScoreKey": "8501",
       "text": "NitiN.. overtook Danyy912 on Unknown map with 00:00:08.501."
-    },
-    {
-      "id": "wr_changed|PKNyeNSGL0wl9V1zFwHRsKpi1Oj|622bd5ef-d074-4f39-9708-87a6bf3950b4|c91c4269-2f1e-47b6-ab8b-3a794e94b0a3|12533|12484|2026-08-07T15:27:20.214Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-07T15:27:20.214Z",
-      "at": "2026-08-07T15:27:20.214Z",
-      "mapUid": "PKNyeNSGL0wl9V1zFwHRsKpi1Oj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "622bd5ef-d074-4f39-9708-87a6bf3950b4",
-      "oldHolder": "sun.._",
-      "oldTimeMs": 12533,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.533",
-      "oldScoreKey": "12533",
-      "newHolderAccountId": "c91c4269-2f1e-47b6-ab8b-3a794e94b0a3",
-      "newHolder": "OGDark_Knight",
-      "newTimeMs": 12484,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.484",
-      "newScoreKey": "12484",
-      "text": "OGDark_Knight overtook sun.._ on Unknown map with 00:00:12.484."
     }
   ]
 }
