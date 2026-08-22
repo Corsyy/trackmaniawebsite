@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-22T15:02:31.422Z",
+  "generatedAt": "2026-08-22T15:30:56.172Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|fR7FmfE6ZY4T93JfGr6TZm1bhUf|d9835d12-3ff6-49f5-901d-c572ee058414|11cee1aa-54ca-487a-8d6e-8df4d7cd6b9d|10778|10743|2026-08-22T15:30:56.172Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-22T15:30:56.172Z",
+      "at": "2026-08-22T15:30:56.172Z",
+      "mapUid": "fR7FmfE6ZY4T93JfGr6TZm1bhUf",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "d9835d12-3ff6-49f5-901d-c572ee058414",
+      "oldHolder": "Boasyyy",
+      "oldTimeMs": 10778,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:10.778",
+      "oldScoreKey": "10778",
+      "newHolderAccountId": "11cee1aa-54ca-487a-8d6e-8df4d7cd6b9d",
+      "newHolder": "Nijbond",
+      "newTimeMs": 10743,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:10.743",
+      "newScoreKey": "10743",
+      "text": "Nijbond overtook Boasyyy on Unknown map with 00:00:10.743."
+    },
     {
       "id": "wr_changed|VZfPU5tv4QgLLdf68S8iMPFdp6l|d49d8035-e682-4c3d-90a4-fa605a12dff4|263d4e6f-5809-4f9c-9f59-c56eaa5bd96a|67938|67626|2026-08-22T15:02:31.422Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.350",
       "newScoreKey": "10350",
       "text": "The_O_Man_147 overtook Odenirl on Unknown map with 00:00:10.350."
-    },
-    {
-      "id": "wr_changed|Vg5iKn_KOZvM_BIqDyzyrsGFZs0|06217ba6-e57e-43de-98a4-d00cea72c60d|3c6abb28-2223-4f7d-b994-0655a8755b5b|12714|12598|2026-08-07T19:13:16.212Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-07T19:13:16.212Z",
-      "at": "2026-08-07T19:13:16.212Z",
-      "mapUid": "Vg5iKn_KOZvM_BIqDyzyrsGFZs0",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "06217ba6-e57e-43de-98a4-d00cea72c60d",
-      "oldHolder": "Tram15.",
-      "oldTimeMs": 12714,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:12.714",
-      "oldScoreKey": "12714",
-      "newHolderAccountId": "3c6abb28-2223-4f7d-b994-0655a8755b5b",
-      "newHolder": "hijbird",
-      "newTimeMs": 12598,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:12.598",
-      "newScoreKey": "12598",
-      "text": "hijbird overtook Tram15. on Unknown map with 00:00:12.598."
     }
   ]
 }
