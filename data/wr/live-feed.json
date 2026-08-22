@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-22T15:30:56.172Z",
+  "generatedAt": "2026-08-22T16:01:23.994Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|gaDvh2Jcyb0SdSM59pmatJC2o7h|32f4df25-a801-496e-89f0-8dc84ba4c294|d63e6a0d-5478-4426-b044-1cd66a1be341|12608|12514|2026-08-22T16:01:23.994Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-22T16:01:23.994Z",
+      "at": "2026-08-22T16:01:23.994Z",
+      "mapUid": "gaDvh2Jcyb0SdSM59pmatJC2o7h",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "32f4df25-a801-496e-89f0-8dc84ba4c294",
+      "oldHolder": "Speedyman083",
+      "oldTimeMs": 12608,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:12.608",
+      "oldScoreKey": "12608",
+      "newHolderAccountId": "d63e6a0d-5478-4426-b044-1cd66a1be341",
+      "newHolder": "kawaiilolo",
+      "newTimeMs": 12514,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:12.514",
+      "newScoreKey": "12514",
+      "text": "kawaiilolo overtook Speedyman083 on Unknown map with 00:00:12.514."
+    },
     {
       "id": "wr_changed|fR7FmfE6ZY4T93JfGr6TZm1bhUf|d9835d12-3ff6-49f5-901d-c572ee058414|11cee1aa-54ca-487a-8d6e-8df4d7cd6b9d|10778|10743|2026-08-22T15:30:56.172Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:18.282",
       "newScoreKey": "18282",
       "text": "Zeemuis overtook JNSNTM- on Unknown map with 00:00:18.282."
-    },
-    {
-      "id": "wr_changed|FDVlyelCl1kbE6eb4vnHKuZrgtj|236a9b89-c5a6-4f05-b1da-efb18dc9b08a|9d0f6c95-c1ed-4eb7-a1b4-215b38db55a4|10362|10350|2026-08-07T19:13:16.212Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-07T19:13:16.212Z",
-      "at": "2026-08-07T19:13:16.212Z",
-      "mapUid": "FDVlyelCl1kbE6eb4vnHKuZrgtj",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "236a9b89-c5a6-4f05-b1da-efb18dc9b08a",
-      "oldHolder": "Odenirl",
-      "oldTimeMs": 10362,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:10.362",
-      "oldScoreKey": "10362",
-      "newHolderAccountId": "9d0f6c95-c1ed-4eb7-a1b4-215b38db55a4",
-      "newHolder": "The_O_Man_147",
-      "newTimeMs": 10350,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:10.350",
-      "newScoreKey": "10350",
-      "text": "The_O_Man_147 overtook Odenirl on Unknown map with 00:00:10.350."
     }
   ]
 }
