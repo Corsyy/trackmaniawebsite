@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-22T12:01:53.219Z",
+  "generatedAt": "2026-08-22T12:55:22.681Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|hJk9DncnBmB97LFC6Mna5vMnyg3|f8d276a2-ef88-4819-9da1-08117d1b096a|4532db4f-086b-4557-9281-a4c9350f3eb5|30763|30747|2026-08-22T12:55:22.681Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-22T12:55:22.681Z",
+      "at": "2026-08-22T12:55:22.681Z",
+      "mapUid": "hJk9DncnBmB97LFC6Mna5vMnyg3",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "f8d276a2-ef88-4819-9da1-08117d1b096a",
+      "oldHolder": "PlinkTM",
+      "oldTimeMs": 30763,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:30.763",
+      "oldScoreKey": "30763",
+      "newHolderAccountId": "4532db4f-086b-4557-9281-a4c9350f3eb5",
+      "newHolder": "SharpTM_",
+      "newTimeMs": 30747,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:30.747",
+      "newScoreKey": "30747",
+      "text": "SharpTM_ overtook PlinkTM on Unknown map with 00:00:30.747."
+    },
     {
       "id": "wr_changed|8tzoh8vPcc0uvuLI5LO1o9zC1Ti|1eaea44d-a759-4094-8064-e68efbabb06a|70545452-6098-48cd-a37e-2a5f6a45f26f|8781|8537|2026-08-22T08:48:35.160Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.178",
       "newScoreKey": "10178",
       "text": "NitiN.. overtook Danyy912 on Unknown map with 00:00:10.178."
-    },
-    {
-      "id": "wr_changed|QHVlJe_YeuDvmfwVnFQQO4YCu57|3a96e825-e60d-4cef-97a4-deda1f05666c|390e3e65-c4e1-426e-9621-273a816eb5de|8579|8501|2026-08-07T15:27:20.214Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-07T15:27:20.214Z",
-      "at": "2026-08-07T15:27:20.214Z",
-      "mapUid": "QHVlJe_YeuDvmfwVnFQQO4YCu57",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "3a96e825-e60d-4cef-97a4-deda1f05666c",
-      "oldHolder": "Danyy912",
-      "oldTimeMs": 8579,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.579",
-      "oldScoreKey": "8579",
-      "newHolderAccountId": "390e3e65-c4e1-426e-9621-273a816eb5de",
-      "newHolder": "NitiN..",
-      "newTimeMs": 8501,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.501",
-      "newScoreKey": "8501",
-      "text": "NitiN.. overtook Danyy912 on Unknown map with 00:00:08.501."
     }
   ]
 }
