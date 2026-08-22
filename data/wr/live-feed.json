@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-22T16:34:44.437Z",
+  "generatedAt": "2026-08-22T17:05:51.546Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|_6q48FdAaNckGM4Oy5nkx15kbwh|477102b5-1c5f-4436-91e7-18bdacc5ad9d|4a4aae09-8665-434d-b005-1967190a1005|13454|13439|2026-08-22T17:05:51.546Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-22T17:05:51.546Z",
+      "at": "2026-08-22T17:05:51.546Z",
+      "mapUid": "_6q48FdAaNckGM4Oy5nkx15kbwh",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "477102b5-1c5f-4436-91e7-18bdacc5ad9d",
+      "oldHolder": "FABIXANDER",
+      "oldTimeMs": 13454,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:13.454",
+      "oldScoreKey": "13454",
+      "newHolderAccountId": "4a4aae09-8665-434d-b005-1967190a1005",
+      "newHolder": "Zwanuss",
+      "newTimeMs": 13439,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:13.439",
+      "newScoreKey": "13439",
+      "text": "Zwanuss overtook FABIXANDER on Unknown map with 00:00:13.439."
+    },
     {
       "id": "wr_changed|gaDvh2Jcyb0SdSM59pmatJC2o7h|32f4df25-a801-496e-89f0-8dc84ba4c294|d63e6a0d-5478-4426-b044-1cd66a1be341|12608|12514|2026-08-22T16:01:23.994Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:42.023",
       "newScoreKey": "42023",
       "text": "ultimatehippie improved their WR on Unknown map from 00:00:42.150 to 00:00:42.023."
-    },
-    {
-      "id": "wr_changed|KJo0b5502_4TQmw74GOjgwpT1A5|27bd7b49-5e3f-48a2-a9e2-a69bb7ef5ddf|c1fbedb5-292e-4440-8946-a48023090b4c|18472|18282|2026-08-07T19:13:16.212Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-07T19:13:16.212Z",
-      "at": "2026-08-07T19:13:16.212Z",
-      "mapUid": "KJo0b5502_4TQmw74GOjgwpT1A5",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "27bd7b49-5e3f-48a2-a9e2-a69bb7ef5ddf",
-      "oldHolder": "JNSNTM-",
-      "oldTimeMs": 18472,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:18.472",
-      "oldScoreKey": "18472",
-      "newHolderAccountId": "c1fbedb5-292e-4440-8946-a48023090b4c",
-      "newHolder": "Zeemuis",
-      "newTimeMs": 18282,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:18.282",
-      "newScoreKey": "18282",
-      "text": "Zeemuis overtook JNSNTM- on Unknown map with 00:00:18.282."
     }
   ]
 }
