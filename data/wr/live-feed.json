@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-22T20:01:23.349Z",
+  "generatedAt": "2026-08-22T20:33:37.914Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|WmZ03TdjLsXufgnr4c2zeHFarjj|36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a|f37b945d-1340-4f74-879e-7f6c4bb86e54|22292|22285|2026-08-22T20:33:37.914Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-22T20:33:37.914Z",
+      "at": "2026-08-22T20:33:37.914Z",
+      "mapUid": "WmZ03TdjLsXufgnr4c2zeHFarjj",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a",
+      "oldHolder": "zodiark.",
+      "oldTimeMs": 22292,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:22.292",
+      "oldScoreKey": "22292",
+      "newHolderAccountId": "f37b945d-1340-4f74-879e-7f6c4bb86e54",
+      "newHolder": "Rowa-",
+      "newTimeMs": 22285,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:22.285",
+      "newScoreKey": "22285",
+      "text": "Rowa- overtook zodiark. on Unknown map with 00:00:22.285."
+    },
     {
       "id": "wr_changed|_6q48FdAaNckGM4Oy5nkx15kbwh|477102b5-1c5f-4436-91e7-18bdacc5ad9d|4a4aae09-8665-434d-b005-1967190a1005|13454|13439|2026-08-22T17:05:51.546Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:17.037",
       "newScoreKey": "17037",
       "text": "Mell0w1222 overtook Maxieling. on Unknown map with 00:00:17.037."
-    },
-    {
-      "id": "self_improve|qHU4dAEZaWwb7Nu2n8lZ_2c9vD3|f338668e-5d57-4395-93ac-ef514f2fb898|f338668e-5d57-4395-93ac-ef514f2fb898|42150|42023|2026-08-07T20:51:46.738Z",
-      "type": "self_improve",
-      "detectedAt": "2026-08-07T20:51:46.738Z",
-      "at": "2026-08-07T20:51:46.738Z",
-      "mapUid": "qHU4dAEZaWwb7Nu2n8lZ_2c9vD3",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "f338668e-5d57-4395-93ac-ef514f2fb898",
-      "oldHolder": "ultimatehippie",
-      "oldTimeMs": 42150,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:42.150",
-      "oldScoreKey": "42150",
-      "newHolderAccountId": "f338668e-5d57-4395-93ac-ef514f2fb898",
-      "newHolder": "ultimatehippie",
-      "newTimeMs": 42023,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:42.023",
-      "newScoreKey": "42023",
-      "text": "ultimatehippie improved their WR on Unknown map from 00:00:42.150 to 00:00:42.023."
     }
   ]
 }
