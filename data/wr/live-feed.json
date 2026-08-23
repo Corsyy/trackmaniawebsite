@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-23T06:17:24.785Z",
+  "generatedAt": "2026-08-23T07:07:04.037Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|OpUNMYeOqouJ6LcOIZXTvHBJPE|c5023724-774f-4faa-a2ae-1427e5313aa5|2fd1f664-85e4-4429-89ca-d49e4d2083a1|27586|27562|2026-08-23T07:07:04.037Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-23T07:07:04.037Z",
+      "at": "2026-08-23T07:07:04.037Z",
+      "mapUid": "OpUNMYeOqouJ6LcOIZXTvHBJPE",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "official",
+      "oldHolderAccountId": "c5023724-774f-4faa-a2ae-1427e5313aa5",
+      "oldHolder": "WinkyFace-",
+      "oldTimeMs": 27586,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:27.586",
+      "oldScoreKey": "27586",
+      "newHolderAccountId": "2fd1f664-85e4-4429-89ca-d49e4d2083a1",
+      "newHolder": "Kelven.",
+      "newTimeMs": 27562,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:27.562",
+      "newScoreKey": "27562",
+      "text": "Kelven. overtook WinkyFace- on Unknown map with 00:00:27.562."
+    },
     {
       "id": "wr_changed|AOhXVMPs8MfPurPaK7JOLwydwA2|8cfe5e6e-f8aa-4e78-82ea-03746716f457|dbae1198-f8ec-455e-ad68-1b419a7c2249|15297|15291|2026-08-22T23:30:15.663Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.877",
       "newScoreKey": "8877",
       "text": "GJJameson overtook SneakyS14 on Unknown map with 00:00:08.877."
-    },
-    {
-      "id": "wr_changed|XK0uTDKrrPNKTwWT7T4_gkRF7Sa|2343ca67-a77c-47c8-83bd-74f99c6f0a37|715d87d3-9ffe-4fb1-9813-b3c95978b093|47639|47488|2026-08-08T05:05:04.810Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-08T05:05:04.810Z",
-      "at": "2026-08-08T05:05:04.810Z",
-      "mapUid": "XK0uTDKrrPNKTwWT7T4_gkRF7Sa",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "official",
-      "oldHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
-      "oldHolder": "hobbi.",
-      "oldTimeMs": 47639,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:47.639",
-      "oldScoreKey": "47639",
-      "newHolderAccountId": "715d87d3-9ffe-4fb1-9813-b3c95978b093",
-      "newHolder": "DarrahTM",
-      "newTimeMs": 47488,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:47.488",
-      "newScoreKey": "47488",
-      "text": "DarrahTM overtook hobbi. on Unknown map with 00:00:47.488."
     }
   ]
 }
