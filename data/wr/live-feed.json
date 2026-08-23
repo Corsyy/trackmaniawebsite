@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-23T16:02:24.207Z",
+  "generatedAt": "2026-08-23T16:36:44.974Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 2,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|0Kj6n2XVJdkkwwoY438mgYjE878|f532aae0-7dd0-4004-8ab8-43c7145c5473|61e24c6b-8410-4998-82fe-cacc36d3ce7e|25618|25581|2026-08-23T16:36:44.974Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-23T16:36:44.974Z",
+      "at": "2026-08-23T16:36:44.974Z",
+      "mapUid": "0Kj6n2XVJdkkwwoY438mgYjE878",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "f532aae0-7dd0-4004-8ab8-43c7145c5473",
+      "oldHolder": "Danifill",
+      "oldTimeMs": 25618,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:25.618",
+      "oldScoreKey": "25618",
+      "newHolderAccountId": "61e24c6b-8410-4998-82fe-cacc36d3ce7e",
+      "newHolder": "Jortim",
+      "newTimeMs": 25581,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:25.581",
+      "newScoreKey": "25581",
+      "text": "Jortim overtook Danifill on Unknown map with 00:00:25.581."
+    },
     {
       "id": "wr_changed|8KXiu3qYLOaHbNC_SzCZKSv3J_5|2fd1f664-85e4-4429-89ca-d49e4d2083a1|ec95e215-f569-4af7-9368-2cca8ec10771|13585|13572|2026-08-23T16:02:24.207Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:10.553",
       "newScoreKey": "10553",
       "text": "JanTM- overtook Apoc_TM on Unknown map with 00:00:10.553."
-    },
-    {
-      "id": "wr_changed|Pc6LHnHQfyrDd4hNCQQR6rTTlAm|fb678553-f730-442a-a035-dfc50f4a5b7b|2343ca67-a77c-47c8-83bd-74f99c6f0a37|43858|43831|2026-08-08T16:57:16.656Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-08T16:57:16.656Z",
-      "at": "2026-08-08T16:57:16.656Z",
-      "mapUid": "Pc6LHnHQfyrDd4hNCQQR6rTTlAm",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "official",
-      "oldHolderAccountId": "fb678553-f730-442a-a035-dfc50f4a5b7b",
-      "oldHolder": "mime-",
-      "oldTimeMs": 43858,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:43.858",
-      "oldScoreKey": "43858",
-      "newHolderAccountId": "2343ca67-a77c-47c8-83bd-74f99c6f0a37",
-      "newHolder": "hobbi.",
-      "newTimeMs": 43831,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:43.831",
-      "newScoreKey": "43831",
-      "text": "hobbi. overtook mime- on Unknown map with 00:00:43.831."
     }
   ]
 }
