@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-23T08:49:47.926Z",
+  "generatedAt": "2026-08-23T09:13:50.996Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|i_9VZqe8ZQEPW8lBL_dpubZLTWd|a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12|d84aa727-7402-4f82-94c3-97082ecc1676|12355|12017|2026-08-23T09:13:50.996Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-23T09:13:50.996Z",
+      "at": "2026-08-23T09:13:50.996Z",
+      "mapUid": "i_9VZqe8ZQEPW8lBL_dpubZLTWd",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "a69e3e6f-166c-4f0b-a4a8-e066b5d8ee12",
+      "oldHolder": "tommy_tucker193",
+      "oldTimeMs": 12355,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:12.355",
+      "oldScoreKey": "12355",
+      "newHolderAccountId": "d84aa727-7402-4f82-94c3-97082ecc1676",
+      "newHolder": "Xylodriver",
+      "newTimeMs": 12017,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:12.017",
+      "newScoreKey": "12017",
+      "text": "Xylodriver overtook tommy_tucker193 on Unknown map with 00:00:12.017."
+    },
     {
       "id": "self_improve|sdC559M4SdGbfjgUi_O6cGA4n37|9dc4fa9e-59e7-450d-ba02-b8a72e4d177c|9dc4fa9e-59e7-450d-ba02-b8a72e4d177c|3961|3960|2026-08-23T07:46:02.579Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:08.447",
       "newScoreKey": "8447",
       "text": "Akubne overtook B3NJ4M1N__ on Unknown map with 00:00:08.447."
-    },
-    {
-      "id": "wr_changed|BZ2YpVxaCpeq6fzSCxQbUnD_v09|72d15cc6-d75b-4312-8441-ee3bc33780ba|7893daf4-345c-4b13-835b-382f6484247a|17546|17442|2026-08-08T10:01:36.238Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-08T10:01:36.238Z",
-      "at": "2026-08-08T10:01:36.238Z",
-      "mapUid": "BZ2YpVxaCpeq6fzSCxQbUnD_v09",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "72d15cc6-d75b-4312-8441-ee3bc33780ba",
-      "oldHolder": "karmv.",
-      "oldTimeMs": 17546,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:17.546",
-      "oldScoreKey": "17546",
-      "newHolderAccountId": "7893daf4-345c-4b13-835b-382f6484247a",
-      "newHolder": "jujumasterr",
-      "newTimeMs": 17442,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:17.442",
-      "newScoreKey": "17442",
-      "text": "jujumasterr overtook karmv. on Unknown map with 00:00:17.442."
     }
   ]
 }
