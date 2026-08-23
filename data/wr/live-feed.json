@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-23T18:41:56.609Z",
+  "generatedAt": "2026-08-23T19:11:34.511Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|rTU6w7cBAJpqos_XtvzbW5f0uxf|0b435391-abee-49ef-a997-c72a07428296|d52768b5-1e2c-495f-9df5-16494ddcf053|16682|16507|2026-08-23T19:11:34.511Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-23T19:11:34.511Z",
+      "at": "2026-08-23T19:11:34.511Z",
+      "mapUid": "rTU6w7cBAJpqos_XtvzbW5f0uxf",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "0b435391-abee-49ef-a997-c72a07428296",
+      "oldHolder": "VictorPro123YT",
+      "oldTimeMs": 16682,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:16.682",
+      "oldScoreKey": "16682",
+      "newHolderAccountId": "d52768b5-1e2c-495f-9df5-16494ddcf053",
+      "newHolder": "Uptempo_Miko",
+      "newTimeMs": 16507,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:16.507",
+      "newScoreKey": "16507",
+      "text": "Uptempo_Miko overtook VictorPro123YT on Unknown map with 00:00:16.507."
+    },
     {
       "id": "wr_changed|WCpSgNZfyempTecCa0IEOzOC9Gd|d4024037-c91b-43ca-96cc-b50f4de3f727|516a83ff-1c56-4553-bb42-c7c444aa69bf|10685|10610|2026-08-23T18:01:34.793Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:09.264",
       "newScoreKey": "9264",
       "text": "Apoc_TM improved their WR on Unknown map from 00:00:09.274 to 00:00:09.264."
-    },
-    {
-      "id": "wr_changed|mbL4HFhaw0k5GuWFFfj26ElkWe2|fc952562-8f06-4862-adcf-fc7460e2cf1c|e4fa39ef-7380-427e-80d8-86daef63cea3|36937|36688|2026-08-08T18:15:54.786Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-08T18:15:54.786Z",
-      "at": "2026-08-08T18:15:54.786Z",
-      "mapUid": "mbL4HFhaw0k5GuWFFfj26ElkWe2",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "fc952562-8f06-4862-adcf-fc7460e2cf1c",
-      "oldHolder": "Willovekill",
-      "oldTimeMs": 36937,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:36.937",
-      "oldScoreKey": "36937",
-      "newHolderAccountId": "e4fa39ef-7380-427e-80d8-86daef63cea3",
-      "newHolder": "gooshon1221",
-      "newTimeMs": 36688,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:36.688",
-      "newScoreKey": "36688",
-      "text": "gooshon1221 overtook Willovekill on Unknown map with 00:00:36.688."
     }
   ]
 }
