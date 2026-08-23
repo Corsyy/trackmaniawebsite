@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T07:07:04.037Z",
+  "generatedAt": "2026-08-23T07:46:02.579Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
@@ -7,6 +7,29 @@
   "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|sdC559M4SdGbfjgUi_O6cGA4n37|9dc4fa9e-59e7-450d-ba02-b8a72e4d177c|9dc4fa9e-59e7-450d-ba02-b8a72e4d177c|3961|3960|2026-08-23T07:46:02.579Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-23T07:46:02.579Z",
+      "at": "2026-08-23T07:46:02.579Z",
+      "mapUid": "sdC559M4SdGbfjgUi_O6cGA4n37",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "9dc4fa9e-59e7-450d-ba02-b8a72e4d177c",
+      "oldHolder": "MLGNate.",
+      "oldTimeMs": 3961,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:03.961",
+      "oldScoreKey": "3961",
+      "newHolderAccountId": "9dc4fa9e-59e7-450d-ba02-b8a72e4d177c",
+      "newHolder": "MLGNate.",
+      "newTimeMs": 3960,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:03.960",
+      "newScoreKey": "3960",
+      "text": "MLGNate. improved their WR on Unknown map from 00:00:03.961 to 00:00:03.960."
+    },
     {
       "id": "wr_changed|OpUNMYeOqouJ6LcOIZXTvHBJPE|c5023724-774f-4faa-a2ae-1427e5313aa5|2fd1f664-85e4-4429-89ca-d49e4d2083a1|27586|27562|2026-08-23T07:07:04.037Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:17.442",
       "newScoreKey": "17442",
       "text": "jujumasterr overtook karmv. on Unknown map with 00:00:17.442."
-    },
-    {
-      "id": "wr_changed|MnlG2BWm608aUzuE9rNYVqITGdf|6927ad82-770d-434b-92ef-5e385f870ce5|34336add-5019-4f76-849e-c937311435d6|8910|8877|2026-08-08T07:01:21.278Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-08T07:01:21.278Z",
-      "at": "2026-08-08T07:01:21.278Z",
-      "mapUid": "MnlG2BWm608aUzuE9rNYVqITGdf",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "6927ad82-770d-434b-92ef-5e385f870ce5",
-      "oldHolder": "SneakyS14",
-      "oldTimeMs": 8910,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:08.910",
-      "oldScoreKey": "8910",
-      "newHolderAccountId": "34336add-5019-4f76-849e-c937311435d6",
-      "newHolder": "GJJameson",
-      "newTimeMs": 8877,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:08.877",
-      "newScoreKey": "8877",
-      "text": "GJJameson overtook SneakyS14 on Unknown map with 00:00:08.877."
     }
   ]
 }
