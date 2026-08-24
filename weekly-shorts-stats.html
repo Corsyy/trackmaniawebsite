@@ -1431,61 +1431,6 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
     }
 
 
-    function goatPlayerKeyFromRow(row){
-      const id =
-        row?.accountId ||
-        row?.account_id ||
-        row?.playerId ||
-        row?.player_id ||
-        row?.userId ||
-        row?.user_id ||
-        "";
-      if (id) return `id:${String(id).toLowerCase()}`;
-
-      const name = row?.player || row?.name || row?.displayName || "";
-      return name ? `name:${String(name).trim().toLowerCase()}` : "";
-    }
-
-    async function hydrateGoatWeekWinsFromWeeks(goatAgg, goatWeeks){
-      const players = Array.isArray(goatAgg?.players) ? goatAgg.players : [];
-      const weeks = Array.isArray(goatWeeks) ? goatWeeks : [];
-      if (!players.length || !weeks.length) return goatAgg;
-
-      const winsByKey = new Map();
-
-      await Promise.all(weeks.map(async (weekMeta) => {
-        const weekNum = weekMeta?.week ?? weekMeta?.number ?? weekMeta;
-        if (weekNum == null) return;
-
-        try {
-          const weekJson = await fetchJson(PATHS.goatWeekFile(weekNum));
-          const entries = Array.isArray(weekJson?.entries) ? weekJson.entries : [];
-          const winners = entries.filter((entry) => Number(entry?.rank ?? entry?.position ?? entry?.place) === 1);
-
-          for (const winner of winners) {
-            const key = goatPlayerKeyFromRow(winner);
-            if (!key) continue;
-            winsByKey.set(key, (winsByKey.get(key) || 0) + 1);
-          }
-        } catch (err) {
-          console.warn("Could not hydrate GOAT wins from week file:", weekNum, err);
-        }
-      }));
-
-      if (!winsByKey.size) return goatAgg;
-
-      for (const player of players) {
-        const key = goatPlayerKeyFromRow(player);
-        const computedWins = winsByKey.get(key);
-        if (computedWins != null) {
-          player.weekWins = computedWins;
-        } else {
-          player.weekWins = Number(player.weekWins ?? player.wins ?? 0);
-        }
-      }
-
-      return goatAgg;
-    }
 
     function pickLeader(players, key){
       let best = null;
@@ -1808,8 +1753,6 @@ tbody tr:hover{background:rgba(255,255,255,.035)}
 
       liveWeeksIndex = weeksIndex.weeks || [];
       goatWeeksIndex = goatWeeksIndexData.weeks || [];
-
-      await hydrateGoatWeekWinsFromWeeks(goatAgg, goatWeeksIndex);
 
       renderKpis(agg, liveWeeksIndex.length);
 
