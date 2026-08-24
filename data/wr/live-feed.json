@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-24T03:44:07.218Z",
+  "generatedAt": "2026-08-24T04:31:48.482Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|AcerRS3jXWYONdIVzYxpyC9b8hc|ebc8cb5e-be23-43dd-adfe-4f53afcf5cf2|ebc8cb5e-be23-43dd-adfe-4f53afcf5cf2|7170|7166|2026-08-24T04:31:48.482Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-24T04:31:48.482Z",
+      "at": "2026-08-24T04:31:48.482Z",
+      "mapUid": "AcerRS3jXWYONdIVzYxpyC9b8hc",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "ebc8cb5e-be23-43dd-adfe-4f53afcf5cf2",
+      "oldHolder": "seaWind.",
+      "oldTimeMs": 7170,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:07.170",
+      "oldScoreKey": "7170",
+      "newHolderAccountId": "ebc8cb5e-be23-43dd-adfe-4f53afcf5cf2",
+      "newHolder": "seaWind.",
+      "newTimeMs": 7166,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:07.166",
+      "newScoreKey": "7166",
+      "text": "seaWind. improved their WR on Unknown map from 00:00:07.170 to 00:00:07.166."
+    },
     {
       "id": "wr_changed|F34KG6hQPgUBK9zs9iMl_IaC9Ob|f520329f-cbb7-45f4-83d3-9b8681a21c6c|863535b0-80e5-41f3-bcb3-20b7452c3376|19299|18286|2026-08-24T02:52:53.775Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:06.481",
       "newScoreKey": "6481",
       "text": "Panda.ly overtook Skyheart_ on Unknown map with 00:00:06.481."
-    },
-    {
-      "id": "wr_changed|fJQi8zaNOxtxhAJGQPH10RYUUKe|54565860-6f3d-47d3-b84b-e146372b1069|ca7b3167-46a5-4124-a689-d8307eff9f88|7968|7834|2026-08-08T20:49:23.146Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-08T20:49:23.146Z",
-      "at": "2026-08-08T20:49:23.146Z",
-      "mapUid": "fJQi8zaNOxtxhAJGQPH10RYUUKe",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "54565860-6f3d-47d3-b84b-e146372b1069",
-      "oldHolder": "leoleodeodeo",
-      "oldTimeMs": 7968,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:07.968",
-      "oldScoreKey": "7968",
-      "newHolderAccountId": "ca7b3167-46a5-4124-a689-d8307eff9f88",
-      "newHolder": "Jetaplex.",
-      "newTimeMs": 7834,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:07.834",
-      "newScoreKey": "7834",
-      "text": "Jetaplex. overtook leoleodeodeo on Unknown map with 00:00:07.834."
     }
   ]
 }
