@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-24T07:18:18.458Z",
+  "generatedAt": "2026-08-24T08:08:34.755Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "wr_changed|lRCX4FA6TV_CpbSwQcadUVbI42l|ff1abcf8-ac9c-459a-9852-12caff49da72|2a509ae2-5e2d-4ba5-a12a-8c8325214d3d|11779|11723|2026-08-24T08:08:34.755Z",
+      "type": "wr_changed",
+      "detectedAt": "2026-08-24T08:08:34.755Z",
+      "at": "2026-08-24T08:08:34.755Z",
+      "mapUid": "lRCX4FA6TV_CpbSwQcadUVbI42l",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "ff1abcf8-ac9c-459a-9852-12caff49da72",
+      "oldHolder": "Fluffy.Toasty",
+      "oldTimeMs": 11779,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:11.779",
+      "oldScoreKey": "11779",
+      "newHolderAccountId": "2a509ae2-5e2d-4ba5-a12a-8c8325214d3d",
+      "newHolder": "Toppish146",
+      "newTimeMs": 11723,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:11.723",
+      "newScoreKey": "11723",
+      "text": "Toppish146 overtook Fluffy.Toasty on Unknown map with 00:00:11.723."
+    },
     {
       "id": "self_improve|AcerRS3jXWYONdIVzYxpyC9b8hc|ebc8cb5e-be23-43dd-adfe-4f53afcf5cf2|ebc8cb5e-be23-43dd-adfe-4f53afcf5cf2|7170|7166|2026-08-24T04:31:48.482Z",
       "type": "self_improve",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:40.243",
       "newScoreKey": "40243",
       "text": "KKDU_Torbenli overtook hangenTM on Unknown map with 00:00:40.243."
-    },
-    {
-      "id": "wr_changed|HOmgqTQUTLxgPmcU2oXp8C13jMh|abd7d1f7-3d64-4663-97a7-31dc147c4001|a091e92d-426f-440e-a3d8-7b2c5278e812|6498|6481|2026-08-08T21:16:03.689Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-08T21:16:03.689Z",
-      "at": "2026-08-08T21:16:03.689Z",
-      "mapUid": "HOmgqTQUTLxgPmcU2oXp8C13jMh",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "abd7d1f7-3d64-4663-97a7-31dc147c4001",
-      "oldHolder": "Skyheart_",
-      "oldTimeMs": 6498,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:06.498",
-      "oldScoreKey": "6498",
-      "newHolderAccountId": "a091e92d-426f-440e-a3d8-7b2c5278e812",
-      "newHolder": "Panda.ly",
-      "newTimeMs": 6481,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:06.481",
-      "newScoreKey": "6481",
-      "text": "Panda.ly overtook Skyheart_ on Unknown map with 00:00:06.481."
     }
   ]
 }
