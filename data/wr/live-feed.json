@@ -1,12 +1,35 @@
 {
-  "generatedAt": "2026-08-24T16:18:33.546Z",
+  "generatedAt": "2026-08-24T17:00:03.521Z",
   "title": "Live WR Feed",
   "description": "Near-live tracker for the top 8,000 active maps. Full archive updates separately in the main WR build.",
   "hotMapLimit": 8000,
   "checkBatch": 500,
-  "changesThisRun": 0,
+  "changesThisRun": 1,
   "totalItems": 250,
   "items": [
+    {
+      "id": "self_improve|_uzWWEPNR1zkpY7VMxzOxVsk7u5|8b0afd40-e741-44c7-8fcb-553bd07b74da|8b0afd40-e741-44c7-8fcb-553bd07b74da|15259|15234|2026-08-24T17:00:03.521Z",
+      "type": "self_improve",
+      "detectedAt": "2026-08-24T17:00:03.521Z",
+      "at": "2026-08-24T17:00:03.521Z",
+      "mapUid": "_uzWWEPNR1zkpY7VMxzOxVsk7u5",
+      "mapId": null,
+      "mapName": "",
+      "sourceType": "club",
+      "oldHolderAccountId": "8b0afd40-e741-44c7-8fcb-553bd07b74da",
+      "oldHolder": "SnelleYannick24",
+      "oldTimeMs": 15259,
+      "oldScoreHidden": false,
+      "oldDisplayTime": "00:00:15.259",
+      "oldScoreKey": "15259",
+      "newHolderAccountId": "8b0afd40-e741-44c7-8fcb-553bd07b74da",
+      "newHolder": "SnelleYannick24",
+      "newTimeMs": 15234,
+      "newScoreHidden": false,
+      "newDisplayTime": "00:00:15.234",
+      "newScoreKey": "15234",
+      "text": "SnelleYannick24 improved their WR on Unknown map from 00:00:15.259 to 00:00:15.234."
+    },
     {
       "id": "wr_changed|RJNPRHNVPcdsPM4KUraFuLIZHq2|e387f7d8-afb0-4bf6-bb29-868d1a62de3b|90c4d8bc-fecb-43a2-8a8f-2c73b2e23be6|18888|18863|2026-08-24T09:58:14.255Z",
       "type": "wr_changed",
@@ -5733,29 +5756,6 @@
       "newDisplayTime": "00:00:32.178",
       "newScoreKey": "32178",
       "text": "Roquett overtook TmDisk on Unknown map with 00:00:32.178."
-    },
-    {
-      "id": "wr_changed|t6PbtBjEtyA1GJwG_l6Zkm2GXR9|c0d1c610-75d1-49e5-81cc-d6a700c633c5|15bf0469-bb6c-4225-9382-08a94b2c9715|2868|2855|2026-08-09T10:57:23.077Z",
-      "type": "wr_changed",
-      "detectedAt": "2026-08-09T10:57:23.077Z",
-      "at": "2026-08-09T10:57:23.077Z",
-      "mapUid": "t6PbtBjEtyA1GJwG_l6Zkm2GXR9",
-      "mapId": null,
-      "mapName": "",
-      "sourceType": "club",
-      "oldHolderAccountId": "c0d1c610-75d1-49e5-81cc-d6a700c633c5",
-      "oldHolder": "Just_Akiraa",
-      "oldTimeMs": 2868,
-      "oldScoreHidden": false,
-      "oldDisplayTime": "00:00:02.868",
-      "oldScoreKey": "2868",
-      "newHolderAccountId": "15bf0469-bb6c-4225-9382-08a94b2c9715",
-      "newHolder": "zuqqTM",
-      "newTimeMs": 2855,
-      "newScoreHidden": false,
-      "newDisplayTime": "00:00:02.855",
-      "newScoreKey": "2855",
-      "text": "zuqqTM overtook Just_Akiraa on Unknown map with 00:00:02.855."
     }
   ]
 }
