@@ -698,6 +698,187 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
   h1{white-space:normal}
 }
 
+/* Screenshot-matched static GitHub Pages dashboard. */
+:root{
+  --bg:#030712;
+  --page:#070d19;
+  --panel:#0c1422;
+  --line:rgba(142,167,207,.12);
+  --line2:rgba(142,167,207,.2);
+  --soft:#bac5d6;
+  --muted:#8190a6;
+  --blue:#347ff1;
+  --blue2:#67a4ff;
+  --gutter:clamp(22px,3.85vw,76px);
+  --gap:20px;
+  --rail:clamp(350px,27vw,445px);
+  --shadow:0 12px 40px rgba(0,0,0,.16);
+}
+body{
+  background:radial-gradient(ellipse at 55% 8%,rgba(35,91,182,.11),transparent 40%),linear-gradient(180deg,#030711 0%,#060c18 100%);
+}
+body::before{
+  opacity:.085;
+  background:repeating-linear-gradient(90deg,rgba(191,209,239,.13) 0 1px,transparent 1px 105px);
+}
+.header,.nav{height:76px}
+.header{background:rgba(3,7,15,.94)}
+.nav{width:calc(100% - 40px);grid-template-columns:minmax(285px,370px) minmax(350px,1fr) auto;gap:16px}
+.brand{gap:12px}
+.brand img{width:62px;height:44px}
+.brand-title strong{font-size:.91rem;letter-spacing:.04em}
+.brand-title small{font-size:.72rem;color:#9ba7b8}
+.navlinks{gap:31px}
+.navlinks a{height:76px;font-size:.86rem;color:#b6becc}
+.navlinks a.active{color:#83bbff}
+.navlinks a.active::after{left:12px;right:12px;height:2px;bottom:6px}
+.nav-actions{gap:12px}
+.searchbar{width:260px;height:41px;border-radius:8px;background:rgba(11,16,26,.76)}
+.searchbar input{font-size:.8rem}
+.discord-btn{width:40px;height:40px}
+.nav-rankings{min-height:40px;padding:0 17px;border-radius:5px;font-size:.78rem;white-space:nowrap}
+.main{padding:20px 0 28px}
+.top-grid{align-items:stretch}
+.top-main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-width:0}
+.hero{min-height:220px;border-bottom:0;background:linear-gradient(90deg,rgba(4,8,16,.97) 0%,rgba(5,12,24,.94) 37%,rgba(5,12,24,.64) 62%,rgba(5,12,24,.18) 100%),#071020}
+.hero::before{width:63%;background:linear-gradient(90deg,rgba(7,16,32,0),rgba(7,16,32,.38)),url('/img/weekly-shorts-hero-car.jpg') right center / cover no-repeat}
+.hero-copy{max-width:750px;padding:12px 0 16px}
+.eyebrow{font-size:clamp(1.35rem,1.65vw,1.85rem)}
+h1{margin:5px 0 12px;font-size:clamp(2.9rem,3.65vw,4.3rem);line-height:.98;letter-spacing:-.075em}
+h1 span{background:linear-gradient(90deg,#2167ea,#4088f0);-webkit-background-clip:text;background-clip:text}
+.hero-copy p{max-width:525px;font-size:.89rem;line-height:1.47}
+.hero-actions{margin-top:17px;gap:14px}
+.btn{min-height:39px;border-radius:5px;font-size:.83rem}
+.btn.primary{background:linear-gradient(115deg,#277fec,#2449c0)}
+.link-btn{font-size:.81rem}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:7px 0 0}
+.kpi{min-height:101px;padding:13px 15px;grid-template-columns:49px minmax(0,1fr);gap:11px;border-radius:10px;background:linear-gradient(180deg,rgba(15,23,37,.94),rgba(9,15,26,.95))}
+.kpi-icon{width:45px;height:45px;border-radius:0;background:transparent}
+.kpi-icon svg,.footer-icon svg{width:40px;height:40px;display:block;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8}
+.kpi small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.63rem;letter-spacing:0}
+.kpi strong{font-size:1.84rem;margin-top:4px}
+.kpi span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem;margin-top:3px}
+.card{border-radius:12px;background:linear-gradient(165deg,rgba(12,19,32,.97),rgba(7,12,21,.97))}
+.week-feature{height:100%;min-height:336px;padding:18px 20px 19px}
+.card-head{margin-bottom:14px}
+.card-head h2,.card-head h3{font-size:.78rem;letter-spacing:.045em}
+.live-pill{padding:4px 9px;border-radius:4px;color:#52dc8b;background:rgba(10,117,59,.36);font-size:.66rem}
+.week-art{min-height:165px;border-radius:8px}
+.week-chip{position:absolute;top:11px;right:12px;padding:6px 10px;border-radius:6px;background:rgba(19,28,44,.87);color:#d8e3f2;font-size:.76rem;font-weight:800}
+.week-meta{grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:13px}
+.week-date{display:flex;min-width:0;align-items:center;gap:8px}
+.week-date svg{width:19px;height:19px;flex:0 0 19px;fill:none;stroke:#aab7ca;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8}
+.week-meta span{margin-top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.76rem}
+.week-leader small{font-size:.58rem}
+.week-leader strong{max-width:136px;font-size:.72rem;margin-top:3px}
+.week-actions{grid-template-columns:1fr .85fr;gap:8px;margin-top:17px}
+.week-actions .status-pill,.week-actions .archive-link{min-height:38px;padding:0 9px;border-radius:5px;font-size:.72rem;white-space:nowrap}
+.week-actions .status-pill{background:rgba(35,85,201,.16);border-color:rgba(56,115,233,.42)}
+.archive-link{display:flex;justify-content:center;align-items:center;gap:7px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:#bac6d8;font-weight:800}
+.content{margin-top:14px;align-items:start}
+.board-head{min-height:55px;gap:10px;padding:11px 15px;border-bottom:0}
+.board-title{gap:7px;white-space:nowrap}
+.board-title>span{font-size:1.15rem;color:#d9e4f3}
+.board-title h2{font-size:.76rem}
+.controls{gap:8px;flex-wrap:nowrap}
+.tabs{gap:0;padding:2px;border-radius:6px;background:rgba(9,15,26,.78)}
+.tabs button{min-height:29px;padding:0 10px;border-radius:5px;font-size:.72rem}
+.tabs button.active{color:#80b0ff;background:rgba(42,93,187,.19);box-shadow:inset 0 0 0 1px rgba(57,111,211,.44)}
+.select,.input{height:34px;border-radius:5px;font-size:.73rem}
+.select{padding:0 26px 0 9px}
+.input{width:164px;padding:0 10px}
+.note{padding:7px 15px;font-size:.71rem}
+.overall-note{display:none}
+.table-wrap{padding:0 13px}
+table{min-width:755px}
+th,td{padding:7px 10px}
+th{font-size:.58rem;letter-spacing:0}
+td{font-size:.79rem}
+.rank{min-width:28px;height:22px;border-radius:4px;font-size:.73rem}
+.player{gap:8px}
+.weeks-cell{max-width:255px}
+.board-foot{min-height:51px;gap:8px;padding:9px 13px;font-size:.72rem}
+.mini-btn{min-height:30px;padding:0 9px;border-radius:5px;font-size:.7rem}
+.activity{min-height:315px;margin-top:0;padding:19px 20px 13px}
+.timeline{min-height:224px;padding-top:2px}
+.timeline::before{left:3px;top:13px;bottom:15px;width:1px;background:#435065;opacity:1}
+.logitem{grid-template-columns:1fr;gap:3px;padding:10px 0 11px 22px}
+.logitem::before{left:0;top:14px;width:7px;height:7px}
+.logitem:nth-child(4n+1)::before{background:var(--green)}
+.logitem:nth-child(4n+2)::before{background:var(--blue2)}
+.logitem:nth-child(4n+3)::before{background:var(--purple)}
+.logitem:nth-child(4n+4)::before{background:var(--orange)}
+.logwhen{order:2;font-size:.64rem}
+.logtext{font-size:.76rem;line-height:1.4}
+.activity-link{display:flex;min-height:37px;align-items:center;justify-content:center;gap:8px;margin-top:6px;border-top:1px solid var(--line);color:#69a6ff;font-size:.82rem;font-weight:800}
+.footer{min-height:76px;margin-top:17px;padding:13px 22px;border-radius:11px;background:rgba(10,17,29,.84)}
+.footer-brand{display:flex;align-items:center;gap:13px}
+.footer-emblem{display:grid;width:48px;height:48px;place-items:center;border:1px solid rgba(66,137,244,.65);border-radius:50%;color:#75afff;font-size:1.35rem}
+.footer strong{font-size:.9rem}
+.footer span{font-size:.76rem}
+.footer-stats{gap:24px}
+.footer-stat{display:flex;align-items:center;gap:8px;padding-left:20px;border-left:1px solid var(--line)}
+.footer-stat:first-child{padding-left:0;border-left:0}
+.footer-icon{color:#719bdf}
+.footer-icon svg{width:25px;height:25px}
+.footer-stat span{margin:0;font-size:.62rem;letter-spacing:.035em;text-transform:uppercase}
+.footer-stat b{display:block;font-size:1.07rem;line-height:1.05}
+.archive-section{margin-top:18px;scroll-margin-top:94px}
+.archive-section .week-table{min-width:0}
+.archive-section .table-wrap{padding-bottom:5px}
+@media (max-width:1450px){
+  :root{--gutter:32px;--rail:365px;--gap:16px}
+  .nav{grid-template-columns:310px minmax(320px,1fr) auto}
+  .navlinks{gap:20px}
+  .searchbar{width:205px}
+  .kpi{grid-template-columns:38px minmax(0,1fr);gap:8px;padding:11px 10px}
+  .kpi-icon,.kpi-icon svg{width:35px;height:35px}
+  .footer-stats{gap:15px}
+  .footer-stat{padding-left:14px}
+}
+@media (max-width:1160px){
+  :root{--gutter:22px;--rail:340px;--gap:14px}
+  .nav{grid-template-columns:1fr auto}
+  .navlinks{gap:20px}
+  .nav-actions{display:none}
+  .top-grid,.content{grid-template-columns:minmax(0,1fr) var(--rail)}
+  h1{white-space:normal;font-size:clamp(2.6rem,5.3vw,3.65rem)}
+  .hero::before{width:78%;opacity:.53}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .week-feature{min-height:100%}
+  .board-head{align-items:flex-start;flex-direction:column}
+  .controls{width:100%;flex-wrap:wrap}
+  .footer{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  :root{--gutter:13px;--gap:14px}
+  .header,.nav{height:72px;min-height:72px}
+  .nav{width:calc(100% - 26px);padding:0}
+  .navlinks{display:flex;gap:10px}
+  .navlinks a{height:72px;font-size:.72rem}
+  .navlinks a:nth-child(n+3){display:none}
+  .brand img{width:43px;height:36px}
+  .brand-title strong{font-size:.69rem}
+  .brand-title small{font-size:.57rem}
+  .main{width:calc(100% - 26px);margin:0 13px;padding-top:15px}
+  .top-grid,.content{grid-template-columns:1fr}
+  .hero{min-height:238px}
+  .hero-copy{padding:18px 0 22px}
+  .eyebrow{font-size:1.24rem}
+  h1{font-size:clamp(2.7rem,10vw,4rem)}
+  .hero-copy p{font-size:.82rem}
+  .kpis{gap:8px;margin-top:6px}
+  .kpi{min-height:88px}
+  .week-feature{min-height:auto}
+  .week-art{min-height:180px}
+  .activity{min-height:0}
+  .timeline{min-height:0}
+  .board-foot{flex-direction:row;flex-wrap:wrap;align-items:center}
+  .footer{display:grid;padding:15px}
+  .footer-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .footer-stat,.footer-stat:first-child{padding-left:0;border-left:0}
+}
+
 </style>
 </head>
 
@@ -714,14 +895,17 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
       </a>
 
       <nav class="navlinks" aria-label="Primary navigation">
-        <a class="active" href="#leaderboards">Stats</a>
-        <a href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer">Discord</a>
+        <a class="active" href="#home">Dashboard</a>
+        <a href="#leaderboards">Leaderboards</a>
+        <a href="#weekArchive">Weeks</a>
+        <a id="goatNav" href="#leaderboards">GOAT</a>
+        <a href="#changelog">Changelog</a>
       </nav>
 
       <div class="nav-actions">
         <label class="searchbar" aria-label="Search players">
           <span>⌕</span>
-          <input id="globalSearch" type="search" placeholder="Search players..." autocomplete="off" />
+          <input id="globalSearch" type="search" placeholder="Search players, weeks..." autocomplete="off" />
           <span class="kbd">/</span>
         </label>
         <a class="discord-btn" href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer" aria-label="Discord">
@@ -730,22 +914,32 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
             <path d="M189.5 20h-134C44.2 20 35 29.2 35 40.6v135.1c0 11.4 9.2 20.6 20.5 20.6h113.4l-5.3-18.5 12.8 11.9 12.1 11.2 21.5 19.1V40.6c0-11.4-9.2-20.6-20.5-20.6Zm-38.6 130.5s-3.6-4.3-6.6-8.1c13.1-3.7 18.1-11.9 18.1-11.9-4.1 2.7-8 4.6-11.5 5.9-5 2.1-9.8 3.5-14.5 4.3-9.6 1.8-18.4 1.3-26-.1-5.7-1.1-10.6-2.7-14.7-4.3-2.3-.9-4.8-2-7.3-3.4-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.8 8 17.5 11.8c-3 3.8-6.7 8.3-6.7 8.3-22.1-.7-30.5-15.2-30.5-15.2 0-32.2 14.4-58.3 14.4-58.3 14.4-10.8 28.1-10.5 28.1-10.5l1 1.2c-18 5.2-26.3 13.1-26.3 13.1s2.2-1.2 5.9-2.9c10.7-4.7 19.2-5.9 22.7-6.2.6-.1 1.1-.2 1.7-.2 6.1-.8 13-1 20.2-.2 9.5 1.1 19.7 3.9 30.1 9.6 0 0-7.9-7.5-24.9-12.7l1.4-1.6s13.7-.3 28.1 10.5c0 0 14.4 26.1 14.4 58.3 0 0-8.5 14.5-30.6 15.2Z"/>
           </svg>
         </a>
+        <a class="btn primary nav-rankings" href="#leaderboards">▥ &nbsp; View Rankings</a>
       </div>
     </div>
   </header>
 
   <main class="main" id="home">
     <section class="top-grid">
-      <div class="hero">
-        <div class="hero-copy">
-          <span class="eyebrow">The definitive archive for</span>
-          <h1>Trackmania <span>Weekly Shorts.</span></h1>
-          <p>Comprehensive statistics, historic leaderboards, and week-by-week archives for the Trackmania Weekly Shorts community.</p>
-          <div class="hero-actions">
-            <a class="btn primary" href="#leaderboards">Explore stats →</a>
-            <a class="link-btn" href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer">Join Discord</a>
+      <div class="top-main">
+        <div class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow">The definitive archive for</span>
+            <h1>Trackmania <span>Weekly Shorts.</span></h1>
+            <p>Comprehensive statistics, historic leaderboards, and week-by-week archives for the Trackmania Weekly Shorts community.</p>
+            <div class="hero-actions">
+              <a class="btn primary" href="#leaderboards">Explore Leaderboards &nbsp; →</a>
+              <a class="link-btn" href="#weekArchive">▦ &nbsp; Browse Weeks</a>
+            </div>
           </div>
         </div>
+
+        <section class="kpis" aria-label="Stats summary">
+          <article class="kpi wins"><div class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 5h14v12a7 7 0 0 1-14 0zM9 8H4v3a6 6 0 0 0 5 5m14-8h5v3a6 6 0 0 1-5 5M16 24v4m-6 0h12M16 9v9m-3-6h6"/></svg></div><div><small>Most Wins</small><strong id="kpiWinsVal">—</strong><span id="kpiWinsName">—</span></div></article>
+          <article class="kpi wrs"><div class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M18 3 5 18h9l-2 11 15-17H17z"/></svg></div><div><small>Most WRs</small><strong id="kpiWrsVal">—</strong><span id="kpiWrsName">—</span></div></article>
+          <article class="kpi top5"><div class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="m16 3 4 8 9 1.3-6.5 6.4 1.5 9.1-8-4.3-8 4.3L9.5 19 3 12.3 12 11z"/></svg></div><div><small>Most Top 5s</small><strong id="kpiTop5Val">—</strong><span id="kpiTop5Name">—</span></div></article>
+          <article class="kpi weeks"><div class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="22" rx="2"/><path d="M10 3v8m12-8v8M4 14h24m-18 5h3m5 0h3m-11 5h3m5 0h3"/></svg></div><div><small>Total Weeks</small><strong id="kpiWeekCount">—</strong><span>Archived</span></div></article>
+        </section>
       </div>
 
       <aside>
@@ -754,10 +948,10 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
             <h2>Current Week Archive</h2>
             <span class="live-pill">Live</span>
           </div>
-          <div class="week-art" aria-label="Featured Weekly Shorts archive visual"></div>
+          <div class="week-art" aria-label="Featured Weekly Shorts archive visual"><strong class="week-chip" id="weekChip">Week —</strong></div>
           <div class="week-meta">
-            <div>
-              <strong id="weekChip">Week —</strong>
+            <div class="week-date">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18m-13 4h3m3 0h3m-9 4h3"/></svg>
               <span id="weekEnded">—</span>
             </div>
             <div class="week-leader">
@@ -766,17 +960,11 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
             </div>
           </div>
           <div class="week-actions">
-            <span class="status-pill">Live week spotlight</span>
+            <a class="status-pill" href="#weekArchive">View Week Archive &nbsp; →</a>
+            <a class="archive-link" href="#weekArchive">▦ &nbsp; All Weeks</a>
           </div>
         </section>
       </aside>
-    </section>
-
-    <section class="kpis" aria-label="Stats summary">
-      <article class="kpi wins"><div class="kpi-icon">♕</div><div><small>Most Wins</small><strong id="kpiWinsVal">—</strong><span id="kpiWinsName">—</span></div></article>
-      <article class="kpi wrs"><div class="kpi-icon">ϟ</div><div><small>Most WRs</small><strong id="kpiWrsVal">—</strong><span id="kpiWrsName">—</span></div></article>
-      <article class="kpi top5"><div class="kpi-icon">☆</div><div><small>Most Top 5s</small><strong id="kpiTop5Val">—</strong><span id="kpiTop5Name">—</span></div></article>
-      <article class="kpi weeks"><div class="kpi-icon">▣</div><div><small>Total Weeks</small><strong id="kpiWeekCount">—</strong><span>Archived</span></div></article>
     </section>
 
     <section class="content">
@@ -806,7 +994,7 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
         </div>
 
         <div id="overallPanel">
-          <div class="note">Overall stats include live week data and post-week WR tracking where available.</div>
+          <div class="note overall-note">Overall stats include live week data and post-week WR tracking where available.</div>
           <div class="table-wrap">
             <table>
               <thead><tr><th style="width:72px">#</th><th>Player</th><th class="num">Wins</th><th class="num">WRs</th><th class="num">Top 5</th><th class="num">Top 5 %</th><th class="num">Weeks Won</th></tr></thead>
@@ -817,7 +1005,7 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
             <button id="prevPage" class="mini-btn">← Prev</button>
             <span id="pageInfo">Page 1 / 1</span>
             <button id="nextPage" class="mini-btn">Next →</button>
-            <select id="pageSize" class="select"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select>
+            <select id="pageSize" class="select" aria-label="Players per page"><option value="8" selected>8</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="200">200</option></select>
             <button id="clearSearch" class="mini-btn" type="button">Clear</button>
           </div>
         </div>
@@ -837,47 +1025,50 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
             <button id="prevGoatPage" class="mini-btn">← Prev</button>
             <span id="goatPageInfo">Page 1 / 1</span>
             <button id="nextGoatPage" class="mini-btn">Next →</button>
-            <select id="goatPageSize" class="select"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select>
+            <select id="goatPageSize" class="select" aria-label="GOAT players per page"><option value="8" selected>8</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="200">200</option></select>
             <button id="clearGoatSearch" class="mini-btn" type="button">Clear</button>
           </div>
         </div>
       </section>
 
       <aside>
-        <section class="card week-board">
-          <div class="board-head">
-            <div class="board-title"><span>▣</span><h2>Week Spotlight</h2></div>
-            <select id="weekSelect" class="select" aria-label="Select week"></select>
-          </div>
-          <div class="table-wrap">
-            <table class="week-table">
-              <thead><tr><th style="width:58px">#</th><th>Player</th><th class="num">Score</th></tr></thead>
-              <tbody id="weekBody"></tbody>
-            </table>
-          </div>
-        </section>
-
         <section class="card activity" id="changelog">
           <div class="card-head">
             <h3>Latest Activity</h3>
           </div>
           <div class="timeline" id="changelogList"><div class="logtext">Loading…</div></div>
+          <a class="activity-link" href="#changelog">View full changelog &nbsp; →</a>
         </section>
       </aside>
     </section>
 
     <footer class="footer">
-      <div>
-        <strong>Built for the community. Preserved for competition.</strong>
-        <span>A low-maintenance website for Weekly Shorts stats.</span>
+      <div class="footer-brand">
+        <span class="footer-emblem" aria-hidden="true">♜</span>
+        <div>
+          <strong>Built for the community. Preserved for competition.</strong>
+          <span>Accurate stats. Transparent history. For every run that counts.</span>
+        </div>
       </div>
       <div class="footer-stats">
-        <span><b id="footerWeeks">—</b> Weeks Archived</span>
-        <span><b id="footerWrs">—</b> Total WRs</span>
-        <span><b id="footerPlayers">—</b> Players</span>
-        <span><b>∞</b> Trackmania Passion</span>
+        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="22" rx="2"/><path d="M10 3v8m12-8v8M4 14h24m-18 5h3m5 0h3m-11 5h3"/></svg></span><span><b id="footerWeeks">—</b> Weeks Archived</span></div>
+        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M18 3 5 18h9l-2 11 15-17H17z"/></svg></span><span><b id="footerWrs">—</b> Total WRs</span></div>
+        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M11 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm11 0a4 4 0 1 0 0-8m-19 19v-3a8 8 0 0 1 16 0v3m3-9a7 7 0 0 1 7 7v2"/></svg></span><span><b id="footerPlayers">—</b> Players Tracked</span></div>
       </div>
     </footer>
+
+    <section class="card week-board archive-section" id="weekArchive">
+      <div class="board-head">
+        <div class="board-title"><span>▣</span><h2>Week Spotlight &amp; Archive</h2></div>
+        <select id="weekSelect" class="select" aria-label="Select week"></select>
+      </div>
+      <div class="table-wrap">
+        <table class="week-table">
+          <thead><tr><th style="width:72px">#</th><th>Player</th><th class="num">Score</th></tr></thead>
+          <tbody id="weekBody"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -922,7 +1113,17 @@ async function loadWeek(num){if(!num)return;renderWeek(await fetchJson(activeTab
 async function switchWeeks(){const n=populateWeeks(activeWeeks());if(n!=null)await loadWeek(n);}
 function setTab(tab){activeTab=tab;const overall=tab==="overall";$("tabOverall").classList.toggle("active",overall);$("tabGoat").classList.toggle("active",!overall);$("tabOverall").setAttribute("aria-selected",overall?"true":"false");$("tabGoat").setAttribute("aria-selected",!overall?"true":"false");$("overallPanel").classList.toggle("hidden",!overall);$("goatPanel").classList.toggle("hidden",overall);$("sortBy").classList.toggle("hidden",!overall);$("goatSortBy").classList.toggle("hidden",overall);$("playerSearch").classList.toggle("hidden",!overall);$("goatSearch").classList.toggle("hidden",overall);$("boardHeading").textContent=overall?"All-Time Leaderboard":"GOAT Leaderboard";switchWeeks().catch(console.error);}
 function bind(){const rerenderOverall=(reset=false)=>{if(reset)overallPage=1;renderOverall(appData.agg.players||[],$("sortBy").value,$("playerSearch").value);};const rerenderGoat=(reset=false)=>{if(reset)goatPage=1;renderGoat(appData.goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);};$("sortBy").addEventListener("change",()=>rerenderOverall(true));$("playerSearch").addEventListener("input",()=>rerenderOverall(true));$("clearSearch").addEventListener("click",()=>{$("playerSearch").value="";$("globalSearch").value="";rerenderOverall(true);});$("prevPage").addEventListener("click",()=>{overallPage--;rerenderOverall();});$("nextPage").addEventListener("click",()=>{overallPage++;rerenderOverall();});$("pageSize").addEventListener("change",()=>rerenderOverall(true));$("goatSortBy").addEventListener("change",()=>rerenderGoat(true));$("goatSearch").addEventListener("input",()=>rerenderGoat(true));$("clearGoatSearch").addEventListener("click",()=>{$("goatSearch").value="";$("globalSearch").value="";rerenderGoat(true);});$("prevGoatPage").addEventListener("click",()=>{goatPage--;rerenderGoat();});$("nextGoatPage").addEventListener("click",()=>{goatPage++;rerenderGoat();});$("goatPageSize").addEventListener("change",()=>rerenderGoat(true));$("tabOverall").addEventListener("click",()=>setTab("overall"));$("tabGoat").addEventListener("click",()=>setTab("goat"));$("weekSelect").addEventListener("change",e=>loadWeek(e.target.value));$("globalSearch").addEventListener("input",e=>{if(activeTab==="overall"){$("playerSearch").value=e.target.value;rerenderOverall(true);}else{$("goatSearch").value=e.target.value;rerenderGoat(true);}});}
-async function main(){bind();const [weeksIndex,goatWeeksIndexData,agg,goatAgg,changelog]=await Promise.all([fetchJson(PATHS.weeksIndex),fetchJson(PATHS.goatWeeksIndex).catch(()=>({weeks:[]})),fetchJson(PATHS.aggregate),fetchJson(PATHS.goatAggregate).catch(()=>({players:[]})),fetchJson(PATHS.changelog).catch(()=>({items:[]}))]);liveWeeksIndex=await expandWeeksIndex(weeksIndex.weeks||[],false);goatWeeksIndex=await expandWeeksIndex(goatWeeksIndexData.weeks||[],true);appData={agg,goatAgg,changelog};renderKpis(agg,liveWeeksIndex.length);renderOverall(agg.players||[],$("sortBy").value,$("playerSearch").value);renderGoat(goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);renderChangelog(changelog.items||[]);await switchWeeks();}
+function bindDashboardNavigation(){
+  $("goatNav").addEventListener("click",()=>setTab("goat"));
+  document.addEventListener("keydown",event=>{
+    const target=event.target;
+    if(event.key!=="/"||event.ctrlKey||event.metaKey||event.altKey||target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName||""))return;
+    event.preventDefault();
+    if(window.getComputedStyle($("globalSearch").closest(".nav-actions")).display!=="none")$("globalSearch").focus();
+    else $(activeTab==="goat"?"goatSearch":"playerSearch").focus();
+  });
+}
+async function main(){bind();bindDashboardNavigation();const [weeksIndex,goatWeeksIndexData,agg,goatAgg,changelog]=await Promise.all([fetchJson(PATHS.weeksIndex),fetchJson(PATHS.goatWeeksIndex).catch(()=>({weeks:[]})),fetchJson(PATHS.aggregate),fetchJson(PATHS.goatAggregate).catch(()=>({players:[]})),fetchJson(PATHS.changelog).catch(()=>({items:[]}))]);liveWeeksIndex=await expandWeeksIndex(weeksIndex.weeks||[],false);goatWeeksIndex=await expandWeeksIndex(goatWeeksIndexData.weeks||[],true);appData={agg,goatAgg,changelog};renderKpis(agg,liveWeeksIndex.length);renderOverall(agg.players||[],$("sortBy").value,$("playerSearch").value);renderGoat(goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);renderChangelog(changelog.items||[]);await switchWeeks();}
 main().catch(err=>{console.error(err);document.body.innerHTML=`<div style="max-width:900px;margin:40px auto;padding:16px;color:#e6ecff;font-family:system-ui"><h2>Weekly Shorts Hub</h2><p>Failed to load data. Check console and JSON paths.</p><pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12)">${esc(String(err))}</pre></div>`;});
 </script>
 </body>
