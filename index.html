@@ -157,9 +157,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
     url("/img/weekly-shorts-hero-banner.jpg") right center / auto 100% no-repeat,
     linear-gradient(90deg,#071020,#071020);
 }
-.hero-copy{position:relative;z-index:1;max-width:705px;padding:38px 0 32px}
+.hero-copy{position:relative;z-index:1;max-width:1080px;padding:38px 0 32px}
 .eyebrow{display:block;color:#aab6c8;font-size:1.62rem;line-height:1.08;font-weight:850;letter-spacing:-.035em}
-h1{margin:5px 0 15px;font-size:clamp(3rem,4.18vw,4.6rem);line-height:.96;letter-spacing:-.065em;font-weight:1000}
+h1{margin:5px 0 15px;font-size:clamp(3rem,4.18vw,4.6rem);line-height:.96;letter-spacing:-.065em;font-weight:1000;max-width:1040px}
 h1 span{color:transparent;background:linear-gradient(90deg,#2f7dff,#78afff);-webkit-background-clip:text;background-clip:text}
 .hero-copy p{max-width:610px;margin:0;color:var(--soft);font-size:1rem;line-height:1.55}
 .hero-actions{margin-top:25px;display:flex;align-items:center;flex-wrap:wrap;gap:14px}
@@ -273,7 +273,7 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
 .hidden{display:none!important}
 
 @media (max-width:1300px){
-  :root{--nav-wrap:min(1180px,calc(100vw - 36px));--wrap:min(1180px,calc(100vw - 36px))}
+  :root{--nav-wrap:calc(100vw - 36px);--wrap:calc(100vw - 36px)}
   .nav{grid-template-columns:auto auto}
   .navlinks,.nav-actions{display:none}
   .menu-btn{display:inline-flex;justify-self:end}
@@ -389,6 +389,54 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
   .content{grid-template-columns:minmax(0,1fr) 440px}
 }
 
+
+/* Final matching overrides: wide website, not centered app dashboard */
+@media (min-width: 1301px){
+  .nav{
+    width:calc(100vw - 40px) !important;
+    max-width:none !important;
+  }
+  .main{
+    width:calc(100vw - 128px) !important;
+    max-width:none !important;
+    margin-left:64px !important;
+    margin-right:64px !important;
+  }
+  .top-grid{
+    grid-template-columns:minmax(0, 1fr) 440px !important;
+    gap:22px !important;
+  }
+  .content{
+    grid-template-columns:minmax(0, 1fr) 440px !important;
+    gap:22px !important;
+  }
+  .hero-copy{
+    max-width:1100px !important;
+  }
+  .hero-copy h1,
+  h1{
+    max-width:1080px !important;
+  }
+}
+.compact-nav{
+  gap:30px !important;
+}
+.compact-nav a{
+  font-size:.95rem;
+}
+.nav{
+  grid-template-columns:370px 1fr auto !important;
+}
+.single-week-action{
+  grid-template-columns:1fr !important;
+}
+.single-week-action .panel-btn{
+  cursor:default;
+}
+.board-foot-center .view-full{
+  display:none !important;
+}
+
 </style>
 </head>
 
@@ -404,12 +452,9 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
         </span>
       </a>
 
-      <nav class="navlinks" aria-label="Primary navigation">
-        <a class="active" href="#home">Dashboard</a>
-        <a href="#leaderboards">Leaderboards</a>
-        <a href="#weeks">Weeks</a>
-        <a href="#goat">GOAT</a>
-        <a href="#changelog">Changelog</a>
+      <nav class="navlinks compact-nav" aria-label="Primary navigation">
+        <a class="active" href="#leaderboards">Stats</a>
+        <a href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer">Discord</a>
       </nav>
 
       <div class="nav-actions">
@@ -422,7 +467,6 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
   <path d="M104.4 103.9c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1.1-6.1-4.5-11.1-10.2-11.1Zm36.8 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1 0-6.1-4.5-11.1-10.2-11.1Z"/>
   <path d="M189.5 20h-134C44.2 20 35 29.2 35 40.6v135.1c0 11.4 9.2 20.6 20.5 20.6h113.4l-5.3-18.5 12.8 11.9 12.1 11.2 21.5 19.1V40.6c0-11.4-9.2-20.6-20.5-20.6Zm-38.6 130.5s-3.6-4.3-6.6-8.1c13.1-3.7 18.1-11.9 18.1-11.9-4.1 2.7-8 4.6-11.5 5.9-5 2.1-9.8 3.5-14.5 4.3-9.6 1.8-18.4 1.3-26-.1-5.7-1.1-10.6-2.7-14.7-4.3-2.3-.9-4.8-2-7.3-3.4-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.8 8 17.5 11.8c-3 3.8-6.7 8.3-6.7 8.3-22.1-.7-30.5-15.2-30.5-15.2 0-32.2 14.4-58.3 14.4-58.3 14.4-10.8 28.1-10.5 28.1-10.5l1 1.2c-18 5.2-26.3 13.1-26.3 13.1s2.2-1.2 5.9-2.9c10.7-4.7 19.2-5.9 22.7-6.2.6-.1 1.1-.2 1.7-.2 6.1-.8 13-1 20.2-.2 9.5 1.1 19.7 3.9 30.1 9.6 0 0-7.9-7.5-24.9-12.7l1.4-1.6s13.7-.3 28.1 10.5c0 0 14.4 26.1 14.4 58.3 0 0-8.5 14.5-30.6 15.2Z"/>
 </svg></a>
-        <a class="btn primary" href="#leaderboards">▮ View Rankings</a>
       </div>
 
       <button class="btn menu-btn" id="mobileMenu" type="button" aria-expanded="false">Menu</button>
@@ -437,8 +481,8 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
           <h1>Trackmania <span>Weekly Shorts.</span></h1>
           <p>Comprehensive statistics, historic leaderboards, and week-by-week archives for the Trackmania Weekly Shorts community.</p>
           <div class="hero-actions">
-            <a class="btn primary" href="#leaderboards">Explore Leaderboards →</a>
-            <a class="link-btn" href="#weeks">▣ Browse Weeks</a>
+            <a class="btn primary" href="#leaderboards">Explore stats →</a>
+            <a class="link-btn" href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer">Join Discord</a>
           </div>
         </div>
       </div>
@@ -460,9 +504,8 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
               <strong id="weekLeader">—</strong>
             </div>
           </div>
-          <div class="week-actions">
-            <a class="panel-btn active" href="#weeks">View Week Archive →</a>
-            <a class="panel-btn" href="#leaderboards">All Weeks</a>
+          <div class="week-actions single-week-action">
+            <span class="panel-btn active">Live week spotlight</span>
           </div>
         </section>
       </aside>
@@ -516,7 +559,6 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
             <button id="prevPage" class="mini-btn">← Prev</button>
             <span id="pageInfo">Page 1 / 1</span>
             <button id="nextPage" class="mini-btn">Next →</button>
-            <a class="view-full" href="#leaderboards">View full leaderboard →</a>
             <span class="per-page">Per page</span>
             <select id="pageSize" class="select"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select>
             <button id="clearSearch" class="mini-btn" type="button">Clear</button>
