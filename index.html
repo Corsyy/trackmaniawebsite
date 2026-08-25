@@ -71,7 +71,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   -webkit-backdrop-filter:blur(20px);
 }
 .nav{
-  width:var(--wrap);
+  width:var(--nav-wrap);
   height:76px;
   margin:0 auto;
   display:grid;
@@ -273,7 +273,7 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
 .hidden{display:none!important}
 
 @media (max-width:1300px){
-  :root{--wrap:min(1180px,calc(100vw - 36px))}
+  :root{--nav-wrap:min(1180px,calc(100vw - 36px));--wrap:min(1180px,calc(100vw - 36px))}
   .nav{grid-template-columns:auto auto}
   .navlinks,.nav-actions{display:none}
   .menu-btn{display:inline-flex;justify-self:end}
@@ -282,7 +282,7 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
   .top-grid,.content{grid-template-columns:1fr}
 }
 @media (max-width:760px){
-  :root{--wrap:calc(100vw - 22px)}
+  :root{--nav-wrap:calc(100vw - 22px);--wrap:calc(100vw - 22px)}
   .header,.nav{height:auto;min-height:72px}
   .nav{padding:12px 0}
   .hero{min-height:360px;background-size:auto 76%;background-position:right bottom}
@@ -366,6 +366,27 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
 @media (max-width:760px){
   .week-meta-clean{gap:12px}
   .week-leader{align-items:flex-start;text-align:left}
+}
+
+
+.board-foot-center{
+  justify-content:center;
+  color:var(--soft);
+  font-size:.9rem;
+}
+.view-full{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 22px;
+  color:#fff;
+  font-weight:950;
+}
+.per-page{color:var(--muted)}
+@media (min-width:1301px){
+  .main{padding-top:22px}
+  .top-grid{grid-template-columns:minmax(0,1fr) 440px}
+  .content{grid-template-columns:minmax(0,1fr) 440px}
 }
 
 </style>
@@ -491,14 +512,13 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
               <tbody id="overallBody"></tbody>
             </table>
           </div>
-          <div class="board-foot">
-            <div class="pager">
-              <button id="prevPage" class="mini-btn">← Prev</button>
-              <span id="pageInfo">Page 1 / 1</span>
-              <button id="nextPage" class="mini-btn">Next →</button>
-              <span>Per page</span>
-              <select id="pageSize" class="select"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select>
-            </div>
+          <div class="board-foot board-foot-center">
+            <button id="prevPage" class="mini-btn">← Prev</button>
+            <span id="pageInfo">Page 1 / 1</span>
+            <button id="nextPage" class="mini-btn">Next →</button>
+            <a class="view-full" href="#leaderboards">View full leaderboard →</a>
+            <span class="per-page">Per page</span>
+            <select id="pageSize" class="select"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select>
             <button id="clearSearch" class="mini-btn" type="button">Clear</button>
           </div>
         </div>
