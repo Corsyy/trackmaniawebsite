@@ -813,6 +813,24 @@ td{font-size:.79rem}
 .logwhen{order:2;font-size:.64rem}
 .logtext{font-size:.76rem;line-height:1.4}
 .activity-link{display:flex;min-height:37px;align-items:center;justify-content:center;gap:8px;margin-top:6px;border-top:1px solid var(--line);color:#69a6ff;font-size:.82rem;font-weight:800}
+.logitem.log-close::before{background:var(--green);box-shadow:0 0 14px rgba(50,234,134,.4)}
+.logitem.log-solid::before{background:var(--blue2);box-shadow:0 0 14px rgba(117,173,255,.48)}
+.logitem.log-major::before{background:var(--purple);box-shadow:0 0 14px rgba(168,108,255,.4)}
+.logitem.log-massive::before{background:var(--orange);box-shadow:0 0 14px rgba(255,123,27,.4)}
+.logitem.log-unknown::before{background:var(--muted);box-shadow:none}
+.logtype{display:inline-flex;align-items:center;margin:0 0 5px;padding:2px 6px;border:1px solid currentColor;border-radius:4px;font-size:.57rem;font-weight:850;letter-spacing:.055em;text-transform:uppercase}
+.logtype-close,.legend-close{color:var(--green)}
+.logtype-solid,.legend-solid{color:var(--blue2)}
+.logtype-major,.legend-major{color:var(--purple)}
+.logtype-massive,.legend-massive{color:var(--orange)}
+.logtype-unknown{color:var(--muted)}
+.logmessage{display:block}
+.activity-legend{display:flex;flex-wrap:wrap;gap:7px 11px;margin:1px 0 8px;font-size:.6rem;font-weight:750}
+.activity-legend span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.activity-legend span::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.activity-toggle{width:100%;padding:0;border:0;border-top:1px solid var(--line);background:transparent;cursor:pointer}
+.activity-toggle:hover{color:#a3c8ff}
+.timeline.is-expanded{max-height:620px;overflow-y:auto;padding-right:8px;scrollbar-color:rgba(117,173,255,.42) transparent}
 .footer{min-height:76px;margin-top:17px;padding:13px 22px;border-radius:11px;background:rgba(10,17,29,.84)}
 .footer-brand{display:flex;align-items:center;gap:13px}
 .footer-emblem{display:grid;width:48px;height:48px;place-items:center;border:1px solid rgba(66,137,244,.65);border-radius:50%;color:#75afff;font-size:1.35rem}
@@ -902,7 +920,7 @@ td{font-size:.79rem}
 .hero-copy{padding:33px 0 27px}
 .hero-copy p{max-width:565px}
 .top-grid{align-items:stretch}
-.top-main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-width:0}
+.top-main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-width:0;container-type:inline-size;container-name:weekly-dashboard}
 .kpis{margin:10px 0 0}
 .content{margin-top:15px}
 .content>aside{display:grid;gap:15px;align-content:start}
@@ -1020,6 +1038,38 @@ td{font-size:.79rem}
   .kpi small{font-size:.56rem}
   .kpi span{font-size:.7rem}
   .footer-stats{gap:10px}
+}
+
+/* The hero adapts to its own column, even when a sidebar narrows it on desktop. */
+@container weekly-dashboard (min-width:761px) and (max-width:1100px){
+  .hero::before{
+    width:100%;
+    opacity:.94;
+    background-image:linear-gradient(90deg,rgba(5,10,20,.88) 0%,rgba(5,10,20,.79) 47%,rgba(6,13,25,.42) 64%,rgba(7,16,32,.04) 81%),url('/img/weekly-shorts-hero-car.jpg?v=20260825-container');
+    background-repeat:no-repeat,no-repeat;
+    background-position:center,70% center;
+    background-size:100% 100%,auto 100%;
+  }
+  .hero-copy{max-width:62%;padding:32px 0 27px}
+  .eyebrow{font-size:clamp(1.05rem,2.25cqi,1.55rem)}
+  .hero-copy h1{font-size:clamp(1.85rem,4cqi,3rem);line-height:1;white-space:nowrap}
+  .hero-copy p{max-width:100%;font-size:clamp(.72rem,1.3cqi,.87rem)}
+}
+
+@container weekly-dashboard (max-width:760px){
+  .hero{min-height:290px}
+  .hero::before{
+    width:100%;
+    opacity:.96;
+    background-image:linear-gradient(180deg,rgba(5,10,20,.8) 0%,rgba(5,10,20,.57) 43%,rgba(5,10,20,.12) 75%,rgba(5,10,20,.04) 100%),url('/img/weekly-shorts-hero-car.jpg?v=20260825-container');
+    background-repeat:no-repeat,no-repeat;
+    background-position:center,66% bottom;
+    background-size:100% 100%,auto 48%;
+  }
+  .hero-copy{max-width:100%;padding:19px 0 130px}
+  .eyebrow{font-size:clamp(.98rem,4.2cqi,1.25rem)}
+  .hero-copy h1{margin:8px 0 10px;font-size:clamp(1.8rem,7cqi,2.75rem);line-height:1.02;white-space:normal}
+  .hero-copy p{max-width:100%;font-size:clamp(.69rem,2.7cqi,.82rem)}
 }
 
 </style>
@@ -1162,7 +1212,14 @@ td{font-size:.79rem}
           <div class="card-head">
             <h3>Latest Activity</h3>
           </div>
+          <div class="activity-legend" aria-label="World record improvement color guide">
+            <span class="legend-close">&lt;0.010s</span>
+            <span class="legend-solid">0.010–0.049s</span>
+            <span class="legend-major">0.050–0.099s</span>
+            <span class="legend-massive">0.100s+</span>
+          </div>
           <div class="timeline" id="changelogList"><div class="logtext">Loading…</div></div>
+          <button class="activity-link activity-toggle hidden" id="changelogToggle" type="button" aria-expanded="false">View all changelog →</button>
         </section>
       </aside>
     </section>
@@ -1227,7 +1284,7 @@ function rankClass(n){return n===1?"rank r1":n===2?"rank r2":n===3?"rank r3":"ra
 async function weekFileExists(weekNum, goat=false){try{const data=await fetchJson(goat?PATHS.goatWeekFile(weekNum):PATHS.weekFile(weekNum));return data&&typeof data==="object"?data:null;}catch{return null;}}
 async function expandWeeksIndex(baseWeeks, goat=false){const map=new Map();for(const item of baseWeeks||[]){const n=Number(item?.week??item);if(Number.isFinite(n)&&n>0)map.set(n,{...(typeof item==="object"?item:{}),week:n});}const known=[...map.keys()],maxKnown=known.length?Math.max(...known):0,probeStart=Math.max(1,maxKnown-1),probeEnd=Math.max(maxKnown+8,96),probes=[];for(let n=probeStart;n<=probeEnd;n++){if(!map.has(n))probes.push(n);}const found=await Promise.all(probes.map(async n=>{const data=await weekFileExists(n,goat);return data?{week:n,endedAt:data.endedAt||data.endAt||null}:null;}));for(const item of found){if(item)map.set(item.week,item);}return [...map.values()].sort((a,b)=>Number(a.week)-Number(b.week));}
 
-let overallPage=1,goatPage=1,activeTab="overall",liveWeeksIndex=[],goatWeeksIndex=[],appData={agg:{players:[]},goatAgg:{players:[]},changelog:{items:[]}};
+let overallPage=1,goatPage=1,activeTab="overall",changelogExpanded=false,liveWeeksIndex=[],goatWeeksIndex=[],appData={agg:{players:[]},goatAgg:{players:[]},changelog:{items:[]}};
 function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="7">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—",top5Pct=liveWeeksIndex.length?`${((Number(p.top5||0)/liveWeeksIndex.length)*100).toFixed(1)}%`:"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="player-dot" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num">${top5Pct}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
 function renderGoat(players,sortBy,term){const body=$("goatBody");body.innerHTML="";const list=getGoatList(players,sortBy,term),size=Number($("goatPageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));goatPage=Math.min(Math.max(1,goatPage),pages);const ranks=goatRankMap(players);$("goatPageInfo").textContent=`Page ${goatPage} / ${pages} · ${list.length} players`;$("prevGoatPage").disabled=goatPage<=1;$("nextGoatPage").disabled=goatPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="10">No players match.</td></tr>`;return;}const start=(goatPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=ranks.get(accountKey(p))||start+i+1,t=tierMeta(p,rank);const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="player-dot" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.goatPoints??0)}</td><td>${tierBadge(t)}</td><td class="num">${fmtScore(p.weekWins??p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.secondPlaces??0)}</td><td class="num">${fmtScore(p.thirdPlaces??0)}</td><td class="num">${fmtScore(p.fourthPlaces??0)}</td><td class="num">${fmtScore(p.fifthPlaces??0)}</td>`;body.appendChild(tr);});}
 function activeWeeks(){return activeTab==="goat"?goatWeeksIndex:liveWeeksIndex;}
@@ -1266,7 +1323,55 @@ function renderWeek(week){
     body.appendChild(row);
   });
 }
-function renderChangelog(items){const el=$("changelogList"),list=Array.isArray(items)?items:[];if(!list.length){el.innerHTML=`<div class="logtext">No post-week WR improvements detected yet.</div>`;return;}el.innerHTML="";[...list].sort((a,b)=>(Date.parse(b.ts||b.at||"")||0)-(Date.parse(a.ts||a.at||"")||0)).slice(0,5).forEach(it=>{const div=document.createElement("div");div.className="logitem";const text=it.text?esc(it.text):esc(JSON.stringify(it));div.innerHTML=`<div class="logwhen">${esc(fmtIso(it.ts||it.at||""))}</div><div class="logtext">${text}</div>`;el.appendChild(div);});}
+function changelogImprovement(item){
+  const text=String(item?.text??"");
+  const match=text.match(/\bby\s*([+-]?\d+(?:\.\d+)?)\s*(milliseconds?|msecs?|ms|seconds?|secs?|s)?\b/i);
+  if(match){
+    const value=Math.abs(Number(match[1]));
+    if(Number.isFinite(value))return /^m/i.test(match[2]||"")?value/1000:value;
+  }
+  for(const key of ["improvementSeconds","deltaSeconds","gainSeconds","timeSavedSeconds","improvement","delta","gain"]){
+    const value=Number(item?.[key]);
+    if(item?.[key]!=null&&Number.isFinite(value))return Math.abs(value);
+  }
+  for(const key of ["improvementMs","deltaMs","gainMs","timeSavedMs"]){
+    const value=Number(item?.[key]);
+    if(item?.[key]!=null&&Number.isFinite(value))return Math.abs(value)/1000;
+  }
+  return null;
+}
+function changelogCategory(item){
+  const seconds=changelogImprovement(item);
+  if(seconds==null)return{key:"unknown",label:"World Record"};
+  const label=`${seconds.toFixed(3)}s faster`;
+  if(seconds<0.01)return{key:"close",label};
+  if(seconds<0.05)return{key:"solid",label};
+  if(seconds<0.1)return{key:"major",label};
+  return{key:"massive",label};
+}
+function renderChangelog(items){
+  const el=$("changelogList"),toggle=$("changelogToggle"),list=Array.isArray(items)?items:[];
+  if(!list.length){
+    el.innerHTML=`<div class="logtext">No post-week WR improvements detected yet.</div>`;
+    el.classList.remove("is-expanded");
+    toggle.classList.add("hidden");
+    return;
+  }
+  const sorted=[...list].sort((a,b)=>(Date.parse(b.ts||b.at||"")||0)-(Date.parse(a.ts||a.at||"")||0));
+  const visible=changelogExpanded?sorted:sorted.slice(0,5);
+  el.innerHTML="";
+  el.classList.toggle("is-expanded",changelogExpanded&&sorted.length>5);
+  visible.forEach(item=>{
+    const category=changelogCategory(item),entry=document.createElement("div");
+    entry.className=`logitem log-${category.key}`;
+    const text=item.text?esc(item.text):esc(JSON.stringify(item));
+    entry.innerHTML=`<div class="logwhen">${esc(fmtIso(item.ts||item.at||""))}</div><div class="logtext"><span class="logtype logtype-${category.key}">${esc(category.label)}</span><span class="logmessage">${text}</span></div>`;
+    el.appendChild(entry);
+  });
+  toggle.classList.toggle("hidden",sorted.length<=5);
+  toggle.setAttribute("aria-expanded",String(changelogExpanded));
+  toggle.textContent=changelogExpanded?"Show latest activity ↑":`View all changelog (${sorted.length}) →`;
+}
 async function loadWeek(num){if(!num)return;renderWeek(await fetchJson(activeTab==="goat"?PATHS.goatWeekFile(num):PATHS.weekFile(num)));}
 async function switchWeeks(){const n=populateWeeks(activeWeeks());if(n!=null)await loadWeek(n);}
 async function loadCurrentWeek(){
@@ -1274,7 +1379,7 @@ async function loadCurrentWeek(){
   if(latest)renderFeaturedWeek(await fetchJson(PATHS.weekFile(latest.week)));
 }
 function setTab(tab){activeTab=tab;const overall=tab==="overall";$("tabOverall").classList.toggle("active",overall);$("tabGoat").classList.toggle("active",!overall);$("tabOverall").setAttribute("aria-selected",overall?"true":"false");$("tabGoat").setAttribute("aria-selected",!overall?"true":"false");$("overallPanel").classList.toggle("hidden",!overall);$("goatPanel").classList.toggle("hidden",overall);$("sortBy").classList.toggle("hidden",!overall);$("goatSortBy").classList.toggle("hidden",overall);$("playerSearch").classList.toggle("hidden",!overall);$("goatSearch").classList.toggle("hidden",overall);$("boardHeading").textContent=overall?"All-Time Leaderboard":"GOAT Leaderboard";switchWeeks().catch(console.error);}
-function bind(){const rerenderOverall=(reset=false)=>{if(reset)overallPage=1;renderOverall(appData.agg.players||[],$("sortBy").value,$("playerSearch").value);};const rerenderGoat=(reset=false)=>{if(reset)goatPage=1;renderGoat(appData.goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);};$("sortBy").addEventListener("change",()=>rerenderOverall(true));$("playerSearch").addEventListener("input",()=>rerenderOverall(true));$("clearSearch").addEventListener("click",()=>{$("playerSearch").value="";$("globalSearch").value="";rerenderOverall(true);});$("prevPage").addEventListener("click",()=>{overallPage--;rerenderOverall();});$("nextPage").addEventListener("click",()=>{overallPage++;rerenderOverall();});$("pageSize").addEventListener("change",()=>rerenderOverall(true));$("goatSortBy").addEventListener("change",()=>rerenderGoat(true));$("goatSearch").addEventListener("input",()=>rerenderGoat(true));$("clearGoatSearch").addEventListener("click",()=>{$("goatSearch").value="";$("globalSearch").value="";rerenderGoat(true);});$("prevGoatPage").addEventListener("click",()=>{goatPage--;rerenderGoat();});$("nextGoatPage").addEventListener("click",()=>{goatPage++;rerenderGoat();});$("goatPageSize").addEventListener("change",()=>rerenderGoat(true));$("tabOverall").addEventListener("click",()=>setTab("overall"));$("tabGoat").addEventListener("click",()=>setTab("goat"));$("weekSelect").addEventListener("change",e=>loadWeek(e.target.value));$("globalSearch").addEventListener("input",e=>{if(activeTab==="overall"){$("playerSearch").value=e.target.value;rerenderOverall(true);}else{$("goatSearch").value=e.target.value;rerenderGoat(true);}});}
+function bind(){const rerenderOverall=(reset=false)=>{if(reset)overallPage=1;renderOverall(appData.agg.players||[],$("sortBy").value,$("playerSearch").value);};const rerenderGoat=(reset=false)=>{if(reset)goatPage=1;renderGoat(appData.goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);};$("sortBy").addEventListener("change",()=>rerenderOverall(true));$("playerSearch").addEventListener("input",()=>rerenderOverall(true));$("clearSearch").addEventListener("click",()=>{$("playerSearch").value="";$("globalSearch").value="";rerenderOverall(true);});$("prevPage").addEventListener("click",()=>{overallPage--;rerenderOverall();});$("nextPage").addEventListener("click",()=>{overallPage++;rerenderOverall();});$("pageSize").addEventListener("change",()=>rerenderOverall(true));$("goatSortBy").addEventListener("change",()=>rerenderGoat(true));$("goatSearch").addEventListener("input",()=>rerenderGoat(true));$("clearGoatSearch").addEventListener("click",()=>{$("goatSearch").value="";$("globalSearch").value="";rerenderGoat(true);});$("prevGoatPage").addEventListener("click",()=>{goatPage--;rerenderGoat();});$("nextGoatPage").addEventListener("click",()=>{goatPage++;rerenderGoat();});$("goatPageSize").addEventListener("change",()=>rerenderGoat(true));$("tabOverall").addEventListener("click",()=>setTab("overall"));$("tabGoat").addEventListener("click",()=>setTab("goat"));$("weekSelect").addEventListener("change",e=>loadWeek(e.target.value));$("globalSearch").addEventListener("input",e=>{if(activeTab==="overall"){$("playerSearch").value=e.target.value;rerenderOverall(true);}else{$("goatSearch").value=e.target.value;rerenderGoat(true);}});$("changelogToggle").addEventListener("click",()=>{changelogExpanded=!changelogExpanded;renderChangelog(appData.changelog.items||[]);});}
 function bindDashboardNavigation(){
   document.addEventListener("keydown",event=>{
     const target=event.target;
