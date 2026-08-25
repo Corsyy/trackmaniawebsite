@@ -294,6 +294,80 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
   .input,.searchbar{width:100%}
   .footer-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 }
+
+.icon-btn svg{display:block;color:#cdd8e8}
+.icon-btn:hover svg{color:#fff}
+
+.week-meta-clean{
+  align-items:flex-start;
+}
+.week-meta-clean > div:first-child{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.week-meta-clean > div:first-child strong{
+  font-size:1.05rem;
+}
+.week-meta-clean > div:first-child span{
+  color:var(--soft);
+}
+.week-leader{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
+  text-align:right;
+}
+.week-leader span{
+  color:var(--muted);
+  font-size:.75rem;
+  font-weight:1000;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.week-leader strong{
+  color:#fff;
+  max-width:170px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.flag{
+  width:22px;
+  height:15px;
+  flex:0 0 22px;
+  display:inline-block;
+  overflow:hidden;
+  border-radius:3px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.18), 0 2px 6px rgba(0,0,0,.20);
+  background:#fff;
+}
+.flag-de{background:linear-gradient(#000 0 33.33%,#dd0000 33.33% 66.66%,#ffce00 66.66%)}
+.flag-fr{background:linear-gradient(90deg,#0055a4 0 33.33%,#fff 33.33% 66.66%,#ef4135 66.66%)}
+.flag-ca{background:linear-gradient(90deg,#d52b1e 0 25%,#fff 25% 75%,#d52b1e 75%)}
+.flag-gb{
+  background:
+    linear-gradient(90deg,transparent 0 42%,#fff 42% 58%,transparent 58%),
+    linear-gradient(transparent 0 38%,#fff 38% 62%,transparent 62%),
+    linear-gradient(90deg,transparent 0 45%,#c8102e 45% 55%,transparent 55%),
+    linear-gradient(transparent 0 43%,#c8102e 43% 57%,transparent 57%),
+    #012169;
+}
+.flag-nl{background:linear-gradient(#ae1c28 0 33.33%,#fff 33.33% 66.66%,#21468b 66.66%)}
+.flag-us{
+  background:
+    linear-gradient(#b22234 0 7.69%,#fff 7.69% 15.38%,#b22234 15.38% 23.07%,#fff 23.07% 30.76%,#b22234 30.76% 38.45%,#fff 38.45% 46.14%,#b22234 46.14% 53.83%,#fff 53.83% 61.52%,#b22234 61.52% 69.21%,#fff 69.21% 76.9%,#b22234 76.9% 84.59%,#fff 84.59% 92.28%,#b22234 92.28%),
+    linear-gradient(#3c3b6e,#3c3b6e);
+  background-size:100% 100%, 45% 53%;
+  background-repeat:no-repeat;
+}
+@media (max-width:760px){
+  .week-meta-clean{gap:12px}
+  .week-leader{align-items:flex-start;text-align:left}
+}
+
 </style>
 </head>
 
@@ -323,7 +397,10 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
           <input id="globalSearch" type="search" placeholder="Search players, weeks..." autocomplete="off" />
           <span class="kbd">/</span>
         </label>
-        <a class="icon-btn" href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer" aria-label="Discord">☼</a>
+        <a class="icon-btn" href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer" aria-label="Discord"><svg aria-hidden="true" viewBox="0 0 245 240" width="21" height="21" fill="currentColor">
+  <path d="M104.4 103.9c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1.1-6.1-4.5-11.1-10.2-11.1Zm36.8 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1 0-6.1-4.5-11.1-10.2-11.1Z"/>
+  <path d="M189.5 20h-134C44.2 20 35 29.2 35 40.6v135.1c0 11.4 9.2 20.6 20.5 20.6h113.4l-5.3-18.5 12.8 11.9 12.1 11.2 21.5 19.1V40.6c0-11.4-9.2-20.6-20.5-20.6Zm-38.6 130.5s-3.6-4.3-6.6-8.1c13.1-3.7 18.1-11.9 18.1-11.9-4.1 2.7-8 4.6-11.5 5.9-5 2.1-9.8 3.5-14.5 4.3-9.6 1.8-18.4 1.3-26-.1-5.7-1.1-10.6-2.7-14.7-4.3-2.3-.9-4.8-2-7.3-3.4-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.8 8 17.5 11.8c-3 3.8-6.7 8.3-6.7 8.3-22.1-.7-30.5-15.2-30.5-15.2 0-32.2 14.4-58.3 14.4-58.3 14.4-10.8 28.1-10.5 28.1-10.5l1 1.2c-18 5.2-26.3 13.1-26.3 13.1s2.2-1.2 5.9-2.9c10.7-4.7 19.2-5.9 22.7-6.2.6-.1 1.1-.2 1.7-.2 6.1-.8 13-1 20.2-.2 9.5 1.1 19.7 3.9 30.1 9.6 0 0-7.9-7.5-24.9-12.7l1.4-1.6s13.7-.3 28.1 10.5c0 0 14.4 26.1 14.4 58.3 0 0-8.5 14.5-30.6 15.2Z"/>
+</svg></a>
         <a class="btn primary" href="#leaderboards">▮ View Rankings</a>
       </div>
 
@@ -351,12 +428,16 @@ tbody tr:hover{background:rgba(47,125,255,.055)}
             <h2>Current Week Archive</h2>
             <span class="live-pill">Live</span>
           </div>
-          <div class="week-art">
-            <span class="week-number" id="weekChip">Week —</span>
-          </div>
-          <div class="week-meta">
-            <span id="weekEnded">—</span>
-            <strong id="heroWeeks">— weeks indexed</strong>
+          <div class="week-art" aria-label="Featured Weekly Shorts archive visual"></div>
+          <div class="week-meta week-meta-clean">
+            <div>
+              <strong id="weekChip">Week —</strong>
+              <span id="weekEnded">—</span>
+            </div>
+            <div class="week-leader">
+              <span>Current leader</span>
+              <strong id="weekLeader">—</strong>
+            </div>
           </div>
           <div class="week-actions">
             <a class="panel-btn active" href="#weeks">View Week Archive →</a>
@@ -501,7 +582,7 @@ function fmtScore(v){const n=Number(v); return Number.isFinite(n) ? n.toLocaleSt
 function fmtIso(iso){if(!iso)return"—";const d=new Date(iso);if(isNaN(d.getTime()))return iso;return d.toLocaleString(undefined,{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});}
 async function fetchJson(url){const sep=url.includes("?")?"&":"?";const r=await fetch(`${url}${sep}v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw new Error(`Failed ${r.status} ${url}`);return r.json();}
 function pickLeader(players,key){let best=null;for(const p of players||[]){const val=Number(p?.[key]??0),bval=Number(best?.[key]??0);if(!best||val>bval||(val===bval&&(p.player||"").toLowerCase()<(best.player||"").toLowerCase()))best=p;}return best;}
-function renderKpis(agg,weeksCount){const players=agg.players||[],w=pickLeader(players,"wins"),r=pickLeader(players,"wrs"),t=pickLeader(players,"top5"),totalWrs=players.reduce((sum,p)=>sum+Number(p.wrs||0),0);$("kpiWinsVal").textContent=w?fmtScore(w.wins):"—";$("kpiWinsName").textContent=w?.player||"—";$("kpiWrsVal").textContent=r?fmtScore(r.wrs):"—";$("kpiWrsName").textContent=r?.player||"—";$("kpiTop5Val").textContent=t?fmtScore(t.top5):"—";$("kpiTop5Name").textContent=t?.player||"—";$("kpiWeekCount").textContent=weeksCount?fmtScore(weeksCount):"—";$("heroWeeks").textContent=weeksCount?`${fmtScore(weeksCount)} weeks indexed`:"— weeks indexed";$("footerWeeks").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerPlayers").textContent=fmtScore(players.length);$("footerWrs").textContent=fmtScore(totalWrs);}
+function renderKpis(agg,weeksCount){const players=agg.players||[],w=pickLeader(players,"wins"),r=pickLeader(players,"wrs"),t=pickLeader(players,"top5"),totalWrs=players.reduce((sum,p)=>sum+Number(p.wrs||0),0);$("kpiWinsVal").textContent=w?fmtScore(w.wins):"—";$("kpiWinsName").textContent=w?.player||"—";$("kpiWrsVal").textContent=r?fmtScore(r.wrs):"—";$("kpiWrsName").textContent=r?.player||"—";$("kpiTop5Val").textContent=t?fmtScore(t.top5):"—";$("kpiTop5Name").textContent=t?.player||"—";$("kpiWeekCount").textContent=weeksCount?fmtScore(weeksCount):"—";if ($("heroWeeks")) $("heroWeeks").textContent=weeksCount?`${fmtScore(weeksCount)} weeks indexed`:"— weeks indexed";$("footerWeeks").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerPlayers").textContent=fmtScore(players.length);$("footerWrs").textContent=fmtScore(totalWrs);}
 function sortPlayers(players,sortBy){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="wins")return arr.sort(by("wins"));if(sortBy==="wrs")return arr.sort(by("wrs"));if(sortBy==="top5")return arr.sort(by("top5"));return arr.sort((a,b)=>(a.player||"").localeCompare(b.player||""));}
 function sortGoatPlayers(players,sortBy){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="points")return arr.sort(by("goatPoints"));if(sortBy==="wins")return arr.sort((a,b)=>Number(b.weekWins??b.wins??0)-Number(a.weekWins??a.wins??0)||(a.player||"").localeCompare(b.player||""));if(sortBy==="wrs")return arr.sort(by("wrs"));return arr.sort((a,b)=>(a.player||"").localeCompare(b.player||""));}
 function getOverallList(players,sortBy,term){term=(term||"").trim().toLowerCase();let list=sortPlayers(players,sortBy);return term?list.filter(p=>(p.player||"").toLowerCase().includes(term)):list;}
@@ -511,7 +592,7 @@ function goatRankMap(players){const ranked=[...(players||[])].sort((a,b)=>Number
 function tierMeta(p,rank){const pts=Number(p?.goatPoints??0);if(rank===1&&pts>0)return{key:"champion",label:"Champion"};if(pts>=750)return{key:"gold",label:"Gold Tier"};if(pts>=500)return{key:"silver",label:"Silver Tier"};if(pts>=250)return{key:"bronze",label:"Bronze Tier"};return{key:"unranked",label:"Unranked"};}
 function tierBadge(t){return `<span class="tier-badge tier-${esc(t.key)}">${esc(t.label)}</span>`;}
 function rankClass(n){return n===1?"rank r1":n===2?"rank r2":n===3?"rank r3":"rank";}
-function fakeFlag(i){return ["🇩🇪","🇫🇷","🇨🇦","🇬🇧","🇳🇱","🇺🇸"][i%6];}
+function flagClass(i){return ["flag-de","flag-fr","flag-ca","flag-gb","flag-nl","flag-us"][i%6];}
 
 async function weekFileExists(weekNum, goat=false){
   try {
@@ -553,11 +634,11 @@ async function expandWeeksIndex(baseWeeks, goat=false){
 }
 
 let overallPage=1,goatPage=1,activeTab="overall",liveWeeksIndex=[],goatWeeksIndex=[],appData={agg:{players:[]},goatAgg:{players:[]},changelog:{items:[]}};
-function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="7">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—",top5Pct=liveWeeksIndex.length?`${((Number(p.top5||0)/liveWeeksIndex.length)*100).toFixed(1)}%`:"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag">${fakeFlag(i)}</span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num">${top5Pct}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
-function renderGoat(players,sortBy,term){const body=$("goatBody");body.innerHTML="";const list=getGoatList(players,sortBy,term),size=Number($("goatPageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));goatPage=Math.min(Math.max(1,goatPage),pages);const ranks=goatRankMap(players);$("goatPageInfo").textContent=`Page ${goatPage} / ${pages} · ${list.length} players`;$("prevGoatPage").disabled=goatPage<=1;$("nextGoatPage").disabled=goatPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="10">No players match.</td></tr>`;return;}const start=(goatPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=ranks.get(accountKey(p))||start+i+1,t=tierMeta(p,rank);const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag">${fakeFlag(i)}</span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.goatPoints??0)}</td><td>${tierBadge(t)}</td><td class="num">${fmtScore(p.weekWins??p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.secondPlaces??0)}</td><td class="num">${fmtScore(p.thirdPlaces??0)}</td><td class="num">${fmtScore(p.fourthPlaces??0)}</td><td class="num">${fmtScore(p.fifthPlaces??0)}</td>`;body.appendChild(tr);});}
+function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="7">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—",top5Pct=liveWeeksIndex.length?`${((Number(p.top5||0)/liveWeeksIndex.length)*100).toFixed(1)}%`:"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag ${flagClass(i)}" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num">${top5Pct}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
+function renderGoat(players,sortBy,term){const body=$("goatBody");body.innerHTML="";const list=getGoatList(players,sortBy,term),size=Number($("goatPageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));goatPage=Math.min(Math.max(1,goatPage),pages);const ranks=goatRankMap(players);$("goatPageInfo").textContent=`Page ${goatPage} / ${pages} · ${list.length} players`;$("prevGoatPage").disabled=goatPage<=1;$("nextGoatPage").disabled=goatPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="10">No players match.</td></tr>`;return;}const start=(goatPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=ranks.get(accountKey(p))||start+i+1,t=tierMeta(p,rank);const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag ${flagClass(i)}" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.goatPoints??0)}</td><td>${tierBadge(t)}</td><td class="num">${fmtScore(p.weekWins??p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.secondPlaces??0)}</td><td class="num">${fmtScore(p.thirdPlaces??0)}</td><td class="num">${fmtScore(p.fourthPlaces??0)}</td><td class="num">${fmtScore(p.fifthPlaces??0)}</td>`;body.appendChild(tr);});}
 function activeWeeks(){return activeTab==="goat"?goatWeeksIndex:liveWeeksIndex;}
 function populateWeeks(weeks){const sel=$("weekSelect"),cur=sel.value;sel.innerHTML="";const sorted=[...(weeks||[])].sort((a,b)=>Number(b.week||0)-Number(a.week||0));for(const w of sorted){const opt=document.createElement("option");opt.value=String(w.week);opt.textContent=`Week ${w.week}`;sel.appendChild(opt);}if(cur&&sorted.some(w=>String(w.week)===String(cur))){sel.value=cur;return cur;}return sorted[0]?.week??null;}
-function renderWeek(w){const body=$("weekBody"),num=w?.week??"—";$("weekChip").textContent=`Week ${num}`;const endedMs=Date.parse(w?.endedAt||"");$("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs ? "Ends":"Ended"}: ${fmtIso(w?.endedAt)}`;body.innerHTML="";const entries=(w?.entries||[]).slice(0,10);if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}entries.forEach((e,i)=>{const rank=Number(e.rank??i+1),badge=rank===1?`<span class="win-tag">WIN</span>`:"";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player">${badge}${esc(e.player||"—")}</span></td><td class="num">${fmtScore(e.score)}</td>`;body.appendChild(tr);});}
+function renderWeek(w){const body=$("weekBody"),num=w?.week??"—";$("weekChip").textContent=`Week ${num}`;const endedMs=Date.parse(w?.endedAt||"");$("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs ? "Ends":"Ended"}: ${fmtIso(w?.endedAt)}`;body.innerHTML="";const entries=(w?.entries||[]).slice(0,10);const leader=entries[0];$("weekLeader").textContent=leader?`${leader.player || "—"} · ${fmtScore(leader.score)}`:"—";if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}entries.forEach((e,i)=>{const rank=Number(e.rank??i+1),badge=rank===1?`<span class="win-tag">WIN</span>`:"";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player">${badge}${esc(e.player||"—")}</span></td><td class="num">${fmtScore(e.score)}</td>`;body.appendChild(tr);});}
 function renderChangelog(items){const el=$("changelogList"),list=Array.isArray(items)?items:[];if(!list.length){el.innerHTML=`<div class="logtext">No post-week WR improvements detected yet.</div>`;return;}el.innerHTML="";[...list].sort((a,b)=>(Date.parse(b.ts||b.at||"")||0)-(Date.parse(a.ts||a.at||"")||0)).slice(0,5).forEach(it=>{const div=document.createElement("div");div.className="logitem";const text=it.text?esc(it.text):esc(JSON.stringify(it));div.innerHTML=`<div class="logwhen">${esc(fmtIso(it.ts||it.at||""))}</div><div class="logtext">${text}</div>`;el.appendChild(div);});}
 async function loadWeek(num){if(!num)return;renderWeek(await fetchJson(activeTab==="goat"?PATHS.goatWeekFile(num):PATHS.weekFile(num)));}
 async function switchWeeks(){const n=populateWeeks(activeWeeks());if(n!=null)await loadWeek(n);}
