@@ -8,34 +8,39 @@
 
 <style>
 :root{
-  --bg:#050913;
-  --bg2:#081121;
+  --bg:#050914;
+  --bg2:#071020;
   --panel:#0e1728;
-  --panel2:#111d31;
-  --line:rgba(178,202,255,.14);
-  --line2:rgba(178,202,255,.24);
-  --text:#f8fbff;
-  --soft:#c6d4e8;
-  --muted:#8797b0;
-  --blue:#2d7dff;
-  --blue2:#6ca8ff;
+  --panel2:#111c30;
+  --panel3:#0a1220;
+  --text:#f7fbff;
+  --soft:#c7d4e7;
+  --muted:#8393ab;
+  --line:rgba(177,201,255,.14);
+  --line2:rgba(177,201,255,.24);
+  --blue:#2876ff;
+  --blue2:#68a3ff;
+  --cyan:#68d7ff;
+  --green:#35e886;
+  --gold:#ffbc36;
   --orange:#ff6b1a;
-  --gold:#ffbd37;
-  --green:#38e887;
-  --purple:#a867ff;
-  --wrap:min(1660px,calc(100vw - 72px));
+  --purple:#ad6dff;
+  --wrap:min(1660px, calc(100vw - 72px));
+  --radius:18px;
   --shadow:0 24px 80px rgba(0,0,0,.42);
 }
+
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
   margin:0;
+  min-height:100%;
   color:var(--text);
   background:
-    radial-gradient(circle at 16% 7%,rgba(45,125,255,.22),transparent 30%),
-    radial-gradient(circle at 88% 24%,rgba(45,125,255,.14),transparent 34%),
-    linear-gradient(180deg,#040813,#07101f 45%,#050913);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    radial-gradient(circle at 9% 9%,rgba(40,118,255,.18),transparent 30%),
+    radial-gradient(circle at 88% 20%,rgba(40,118,255,.12),transparent 36%),
+    linear-gradient(180deg,#040814 0%,#07101f 46%,#050913 100%);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
@@ -44,11 +49,11 @@ body::before{
   position:fixed;
   inset:0;
   pointer-events:none;
-  opacity:.26;
+  opacity:.25;
   background:
-    linear-gradient(116deg,transparent 0 43%,rgba(45,125,255,.12) 43% 44.5%,transparent 44.5% 56%,rgba(255,107,26,.10) 56% 57.2%,transparent 57.2%),
+    linear-gradient(116deg,transparent 0 43%,rgba(40,118,255,.12) 43% 44.5%,transparent 44.5% 56%,rgba(255,107,26,.10) 56% 57.2%,transparent 57.2%),
     repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 92px);
-  mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.82) 58%,transparent 96%);
+  mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.84) 60%,transparent 98%);
 }
 a{color:inherit;text-decoration:none}
 button,input,select{font:inherit}
@@ -56,13 +61,13 @@ button{cursor:pointer}
 button:disabled{opacity:.45;cursor:not-allowed}
 .site{position:relative;z-index:1}
 
-/* Header */
+/* Top website nav */
 .header{
   position:sticky;
   top:0;
   z-index:50;
   border-bottom:1px solid var(--line);
-  background:rgba(4,8,18,.88);
+  background:rgba(4,8,18,.90);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
 }
@@ -76,7 +81,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
   gap:24px;
 }
 .brand{display:flex;align-items:center;gap:14px;min-width:0}
-.logo{position:relative;width:58px;height:50px;flex:0 0 auto}
+.logo{
+  position:relative;
+  width:58px;
+  height:50px;
+  flex:0 0 auto;
+  filter:drop-shadow(0 12px 22px rgba(40,118,255,.24));
+}
 .logo::before,.logo::after,.logo span{
   content:"";
   position:absolute;
@@ -125,7 +136,18 @@ button:disabled{opacity:.45;cursor:not-allowed}
 }
 .searchbox input{width:100%;border:0;outline:0;background:transparent;color:#fff}
 .searchbox input::placeholder{color:rgba(198,212,232,.52)}
-.kbd{min-width:30px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:rgba(255,255,255,.06);color:var(--muted);font-size:.76rem;font-weight:950}
+.kbd{
+  min-width:30px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:6px;
+  background:rgba(255,255,255,.06);
+  color:var(--muted);
+  font-size:.76rem;
+  font-weight:950;
+}
 .btn{
   min-height:44px;
   display:inline-flex;
@@ -138,7 +160,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
   color:#fff;
   background:rgba(255,255,255,.045);
   font-weight:950;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease;
 }
+.btn:hover{transform:translateY(-1px);border-color:rgba(177,201,255,.34)}
 .btn.primary{
   border:0;
   background:linear-gradient(135deg,#2d7dff,#1b63e5);
@@ -155,7 +179,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 }
 .menu-btn{display:none}
 
-/* Website homepage layout */
+/* Homepage */
 .main{width:var(--wrap);margin:0 auto;padding:26px 0 36px}
 .hero-grid{
   display:grid;
@@ -167,9 +191,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
   min-height:330px;
   position:relative;
   overflow:hidden;
+  border-radius:0;
   border-bottom:1px solid rgba(255,255,255,.06);
   background:
-    radial-gradient(circle at 60% 32%,rgba(45,125,255,.24),transparent 20%),
+    radial-gradient(circle at 60% 32%,rgba(40,118,255,.24),transparent 20%),
     linear-gradient(90deg,rgba(7,16,31,.98),rgba(7,16,31,.70) 44%,rgba(8,19,41,.97));
 }
 .hero::before{
@@ -179,7 +204,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   transform:skewX(-27deg);
   opacity:.92;
   background:
-    linear-gradient(90deg,transparent 0 12%,rgba(45,125,255,.10) 12% 27%,transparent 27% 43%,rgba(45,125,255,.58) 43% 47%,transparent 47% 54%,rgba(255,107,26,.78) 54% 59%,transparent 59%),
+    linear-gradient(90deg,transparent 0 12%,rgba(40,118,255,.10) 12% 27%,transparent 27% 43%,rgba(40,118,255,.58) 43% 47%,transparent 47% 54%,rgba(255,107,26,.78) 54% 59%,transparent 59%),
     repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 48px,transparent 48px 118px);
 }
 .hero::after{
@@ -198,7 +223,19 @@ button:disabled{opacity:.45;cursor:not-allowed}
   box-shadow:0 28px 72px rgba(0,0,0,.42);
 }
 .hero-copy{position:relative;z-index:2;max-width:720px;padding:42px 0 38px}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;color:#a9c7ff;background:rgba(45,125,255,.16);font-size:.78rem;font-weight:1000;letter-spacing:.07em;text-transform:uppercase}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 11px;
+  border-radius:999px;
+  color:#a9c7ff;
+  background:rgba(45,125,255,.16);
+  font-size:.78rem;
+  font-weight:1000;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
 .badge::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 15px rgba(45,125,255,.82)}
 h1{margin:18px 0 14px;font-size:clamp(3.05rem,4.35vw,5.15rem);line-height:.93;letter-spacing:-.06em;font-weight:1000}
 h1 span{color:transparent;background:linear-gradient(90deg,#2d7dff,#75adff);-webkit-background-clip:text;background-clip:text}
@@ -222,12 +259,34 @@ h1 span{color:transparent;background:linear-gradient(90deg,#2d7dff,#75adff);-web
   overflow:hidden;
   border-radius:14px;
   background:
-    radial-gradient(circle at 75% 20%,rgba(255,255,255,.50),transparent 9%),
-    linear-gradient(160deg,rgba(45,125,255,.62),rgba(37,183,222,.18) 45%,rgba(255,107,26,.35)),
+    radial-gradient(circle at 76% 23%,rgba(255,255,255,.54),transparent 10%),
+    radial-gradient(circle at 18% 68%,rgba(255,107,26,.34),transparent 22%),
+    linear-gradient(160deg,rgba(45,125,255,.70),rgba(37,183,222,.20) 46%,rgba(255,107,26,.36)),
     repeating-linear-gradient(110deg,rgba(255,255,255,.12) 0 26px,transparent 26px 66px);
 }
-.week-art::after{content:"";position:absolute;left:-5%;right:-5%;bottom:28px;height:34px;transform:skewX(-28deg);background:linear-gradient(90deg,#fff,#2d7dff,#ff6b1a);opacity:.78;border-radius:999px}
-.week-number{position:absolute;right:14px;top:14px;z-index:1;padding:7px 12px;border-radius:999px;background:rgba(8,15,27,.78);font-weight:1000;backdrop-filter:blur(10px)}
+.week-art::after{
+  content:"";
+  position:absolute;
+  left:-5%;
+  right:-5%;
+  bottom:28px;
+  height:34px;
+  transform:skewX(-28deg);
+  background:linear-gradient(90deg,#fff,#2d7dff,#ff6b1a);
+  opacity:.78;
+  border-radius:999px;
+}
+.week-number{
+  position:absolute;
+  right:14px;
+  top:14px;
+  z-index:1;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(8,15,27,.78);
+  font-weight:1000;
+  backdrop-filter:blur(10px);
+}
 .week-meta{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:16px;color:var(--soft)}
 .week-meta strong{color:#fff}
 .week-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
@@ -302,6 +361,7 @@ tbody tr:hover{background:rgba(45,125,255,.055)}
 .week-table th,.week-table td{padding:12px 18px}
 .win-tag{display:inline-flex;align-items:center;justify-content:center;min-height:21px;padding:3px 8px;border-radius:999px;background:linear-gradient(135deg,#fff087,#ffbd37);color:#171002;font-size:.68rem;font-weight:1000;margin-right:7px}
 .activity{padding:19px 21px 22px}
+.activity .card-head a{color:var(--blue2);font-weight:950;font-size:.84rem}
 .timeline{position:relative;padding-top:3px}
 .timeline::before{content:"";position:absolute;left:6px;top:16px;bottom:18px;width:2px;background:linear-gradient(180deg,var(--green),var(--blue),var(--purple),var(--orange));opacity:.7}
 .logitem{position:relative;display:grid;grid-template-columns:90px 1fr;gap:14px;padding:13px 0 15px 27px}
@@ -355,7 +415,7 @@ tbody tr:hover{background:rgba(45,125,255,.055)}
       </a>
 
       <nav class="navlinks" aria-label="Primary navigation">
-        <a class="active" href="#dashboard">Dashboard</a>
+        <a class="active" href="#home">Home</a>
         <a href="#leaderboards">Leaderboards</a>
         <a href="#weeks">Weeks</a>
         <a href="#goat">GOAT</a>
@@ -376,7 +436,7 @@ tbody tr:hover{background:rgba(45,125,255,.055)}
     </div>
   </header>
 
-  <main class="main" id="dashboard">
+  <main class="main" id="home">
     <section class="hero-grid">
       <div class="hero">
         <div class="hero-copy">
@@ -451,7 +511,7 @@ tbody tr:hover{background:rgba(45,125,255,.055)}
           <div class="note">Overall stats include live week data and post-week WR tracking where available.</div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th style="width:72px">#</th><th>Player</th><th class="num">Wins</th><th class="num">WRs</th><th class="num">Top 5</th><th class="num">Weeks Won</th></tr></thead>
+              <thead><tr><th style="width:72px">#</th><th>Player</th><th class="num">Wins</th><th class="num">WRs</th><th class="num">Top 5</th><th class="num">Top 5 %</th><th class="num">Weeks Won</th></tr></thead>
               <tbody id="overallBody"></tbody>
             </table>
           </div>
@@ -508,7 +568,7 @@ tbody tr:hover{background:rgba(45,125,255,.055)}
         <section class="card activity" id="changelog">
           <div class="card-head">
             <h3>Latest Activity</h3>
-            <a href="#changelog">View all changelog</a>
+            <a href="#changelog">View all changelog →</a>
           </div>
           <div class="timeline" id="changelogList"><div class="logtext">Loading…</div></div>
         </section>
@@ -522,6 +582,7 @@ tbody tr:hover{background:rgba(45,125,255,.055)}
       </div>
       <div class="footer-stats">
         <span><b id="footerWeeks">—</b> Weeks Archived</span>
+        <span><b id="footerWrs">—</b> Total WRs</span>
         <span><b id="footerPlayers">—</b> Players</span>
         <span><b>∞</b> Trackmania Passion</span>
       </div>
@@ -545,7 +606,7 @@ function fmtScore(v){const n=Number(v); return Number.isFinite(n) ? n.toLocaleSt
 function fmtIso(iso){if(!iso)return"—";const d=new Date(iso);if(isNaN(d.getTime()))return iso;return d.toLocaleString(undefined,{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});}
 async function fetchJson(url){const sep=url.includes("?")?"&":"?";const r=await fetch(`${url}${sep}v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw new Error(`Failed ${r.status} ${url}`);return r.json();}
 function pickLeader(players,key){let best=null;for(const p of players||[]){const val=Number(p?.[key]??0),bval=Number(best?.[key]??0);if(!best||val>bval||(val===bval&&(p.player||"").toLowerCase()<(best.player||"").toLowerCase()))best=p;}return best;}
-function renderKpis(agg,weeksCount){const players=agg.players||[],w=pickLeader(players,"wins"),r=pickLeader(players,"wrs"),t=pickLeader(players,"top5");$("kpiWinsVal").textContent=w?fmtScore(w.wins):"—";$("kpiWinsName").textContent=w?.player||"—";$("kpiWrsVal").textContent=r?fmtScore(r.wrs):"—";$("kpiWrsName").textContent=r?.player||"—";$("kpiTop5Val").textContent=t?fmtScore(t.top5):"—";$("kpiTop5Name").textContent=t?.player||"—";$("kpiWeekCount").textContent=weeksCount?fmtScore(weeksCount):"—";$("heroWeeks").textContent=weeksCount?`${fmtScore(weeksCount)} weeks indexed`:"— weeks indexed";$("footerWeeks").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerPlayers").textContent=fmtScore(players.length);}
+function renderKpis(agg,weeksCount){const players=agg.players||[],w=pickLeader(players,"wins"),r=pickLeader(players,"wrs"),t=pickLeader(players,"top5"),totalWrs=players.reduce((sum,p)=>sum+Number(p.wrs||0),0);$("kpiWinsVal").textContent=w?fmtScore(w.wins):"—";$("kpiWinsName").textContent=w?.player||"—";$("kpiWrsVal").textContent=r?fmtScore(r.wrs):"—";$("kpiWrsName").textContent=r?.player||"—";$("kpiTop5Val").textContent=t?fmtScore(t.top5):"—";$("kpiTop5Name").textContent=t?.player||"—";$("kpiWeekCount").textContent=weeksCount?fmtScore(weeksCount):"—";$("heroWeeks").textContent=weeksCount?`${fmtScore(weeksCount)} weeks indexed`:"— weeks indexed";$("footerWeeks").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerPlayers").textContent=fmtScore(players.length);$("footerWrs").textContent=fmtScore(totalWrs);}
 function sortPlayers(players,sortBy){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="wins")return arr.sort(by("wins"));if(sortBy==="wrs")return arr.sort(by("wrs"));if(sortBy==="top5")return arr.sort(by("top5"));return arr.sort((a,b)=>(a.player||"").localeCompare(b.player||""));}
 function sortGoatPlayers(players,sortBy){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="points")return arr.sort(by("goatPoints"));if(sortBy==="wins")return arr.sort((a,b)=>Number(b.weekWins??b.wins??0)-Number(a.weekWins??a.wins??0)||(a.player||"").localeCompare(b.player||""));if(sortBy==="wrs")return arr.sort(by("wrs"));return arr.sort((a,b)=>(a.player||"").localeCompare(b.player||""));}
 function getOverallList(players,sortBy,term){term=(term||"").trim().toLowerCase();let list=sortPlayers(players,sortBy);return term?list.filter(p=>(p.player||"").toLowerCase().includes(term)):list;}
@@ -557,7 +618,7 @@ function tierBadge(t){return `<span class="tier-badge tier-${esc(t.key)}">${esc(
 function rankClass(n){return n===1?"rank r1":n===2?"rank r2":n===3?"rank r3":"rank";}
 function fakeFlag(i){return ["🇩🇪","🇫🇷","🇨🇦","🇬🇧","🇳🇱","🇺🇸"][i%6];}
 let overallPage=1,goatPage=1,activeTab="overall",liveWeeksIndex=[],goatWeeksIndex=[],appData={agg:{players:[]},goatAgg:{players:[]},changelog:{items:[]}};
-function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="6">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag">${fakeFlag(i)}</span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
+function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="7">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—",top5Pct=liveWeeksIndex.length?`${((Number(p.top5||0)/liveWeeksIndex.length)*100).toFixed(1)}%`:"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag">${fakeFlag(i)}</span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num">${top5Pct}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
 function renderGoat(players,sortBy,term){const body=$("goatBody");body.innerHTML="";const list=getGoatList(players,sortBy,term),size=Number($("goatPageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));goatPage=Math.min(Math.max(1,goatPage),pages);const ranks=goatRankMap(players);$("goatPageInfo").textContent=`Page ${goatPage} / ${pages} · ${list.length} players`;$("prevGoatPage").disabled=goatPage<=1;$("nextGoatPage").disabled=goatPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="10">No players match.</td></tr>`;return;}const start=(goatPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=ranks.get(accountKey(p))||start+i+1,t=tierMeta(p,rank);const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag">${fakeFlag(i)}</span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.goatPoints??0)}</td><td>${tierBadge(t)}</td><td class="num">${fmtScore(p.weekWins??p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.secondPlaces??0)}</td><td class="num">${fmtScore(p.thirdPlaces??0)}</td><td class="num">${fmtScore(p.fourthPlaces??0)}</td><td class="num">${fmtScore(p.fifthPlaces??0)}</td>`;body.appendChild(tr);});}
 function activeWeeks(){return activeTab==="goat"?goatWeeksIndex:liveWeeksIndex;}
 function populateWeeks(weeks){const sel=$("weekSelect"),cur=sel.value;sel.innerHTML="";const sorted=[...(weeks||[])].sort((a,b)=>Number(b.week||0)-Number(a.week||0));for(const w of sorted){const opt=document.createElement("option");opt.value=String(w.week);opt.textContent=`Week ${w.week}`;sel.appendChild(opt);}if(cur&&sorted.some(w=>String(w.week)===String(cur))){sel.value=cur;return cur;}return sorted[0]?.week??null;}
