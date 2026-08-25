@@ -932,7 +932,15 @@ td{font-size:.79rem}
 @media (max-width:1160px){
   .nav{grid-template-columns:minmax(0,1fr) auto}
   .nav-actions{display:flex}
-  .hero::before{width:100%;opacity:.7}
+  .hero::before{
+    width:100%;
+    opacity:.88;
+    background-image:linear-gradient(90deg,rgba(5,10,20,.82) 0%,rgba(5,10,20,.72) 48%,rgba(6,13,25,.3) 66%,rgba(7,16,32,.03) 82%),url('/img/weekly-shorts-hero-car.jpg?v=20260825-responsive');
+    background-position:center,71% center;
+    background-size:100% 100%,auto 100%;
+  }
+  .hero-copy{max-width:62%}
+  .hero-copy h1{font-size:clamp(2.25rem,3.7vw,3.4rem);white-space:nowrap}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:760px){
@@ -943,6 +951,75 @@ td{font-size:.79rem}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:11px}
   .tier-note{align-items:flex-start}
   .tier-list{justify-content:flex-start}
+}
+
+/* Keep the same visual identity while fitting desktop, tablet, and phone widths. */
+.top-grid>*,.content>*,.board,.week-feature,.activity,.footer{min-width:0}
+.table-wrap{max-width:100%;-webkit-overflow-scrolling:touch}
+
+@media (max-width:1100px){
+  .top-grid,.content{grid-template-columns:minmax(0,1fr)}
+  .week-feature{height:auto}
+  .week-art{min-height:clamp(175px,25vw,260px)}
+  .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .board-head{gap:12px}
+  .controls{justify-content:flex-start}
+}
+
+@media (max-width:760px){
+  :root{--gutter:13px;--gap:13px}
+  .main{width:calc(100% - 26px);margin:0 13px;padding-top:14px}
+  .nav{width:calc(100% - 26px);gap:10px}
+  .brand{gap:9px}
+  .brand-title strong{font-size:clamp(.65rem,2.8vw,.8rem)}
+  .brand-title small{font-size:clamp(.52rem,2vw,.65rem)}
+  .discord-btn{width:38px;height:38px}
+
+  .hero{min-height:300px}
+  .hero::before{
+    width:100%;
+    opacity:.96;
+    background-image:linear-gradient(180deg,rgba(5,10,20,.78) 0%,rgba(5,10,20,.56) 42%,rgba(5,10,20,.13) 73%,rgba(5,10,20,.04) 100%),url('/img/weekly-shorts-hero-car.jpg?v=20260825-responsive');
+    background-repeat:no-repeat,no-repeat;
+    background-position:center,67% bottom;
+    background-size:100% 100%,auto 48%;
+  }
+  .hero-copy{max-width:100%;padding:19px 0 137px}
+  .eyebrow{font-size:clamp(.98rem,4.2vw,1.25rem)}
+  .hero-copy h1{
+    max-width:100%;
+    margin:8px 0 10px;
+    font-size:clamp(1.9rem,7.2vw,2.8rem);
+    line-height:1.02;
+    white-space:normal;
+  }
+  .hero-copy p{max-width:100%;font-size:clamp(.69rem,2.7vw,.82rem);line-height:1.43}
+
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+  .kpi{min-height:83px;padding:10px 9px}
+  .kpi strong{font-size:1.45rem}
+  .week-art{min-height:clamp(165px,48vw,235px)}
+  .week-meta{gap:10px}
+  .board-head{padding:12px}
+  .controls{gap:7px}
+  .controls .input{flex:1 1 170px;min-width:0}
+  .board-foot{gap:7px;padding:10px}
+  .tier-note{padding:10px 12px}
+  .tier-explanation{max-width:none}
+  .footer{gap:14px}
+  .footer-stats{width:100%}
+}
+
+@media (max-width:420px){
+  .hero{min-height:285px}
+  .hero-copy{padding-bottom:132px}
+  .hero-copy h1{font-size:clamp(1.75rem,7.4vw,2.1rem)}
+  .hero::before{background-position:center,64% bottom}
+  .kpi{grid-template-columns:30px minmax(0,1fr);gap:6px}
+  .kpi-icon,.kpi-icon svg{width:29px;height:29px}
+  .kpi small{font-size:.56rem}
+  .kpi span{font-size:.7rem}
+  .footer-stats{gap:10px}
 }
 
 </style>
