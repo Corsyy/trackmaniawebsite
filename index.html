@@ -879,6 +879,66 @@ td{font-size:.79rem}
   .footer-stat,.footer-stat:first-child{padding-left:0;border-left:0}
 }
 
+/* Streamlined one-page layout: wider hero artwork and no duplicate navigation. */
+.nav{grid-template-columns:minmax(0,1fr) auto}
+.nav-actions{display:flex}
+.hero{
+  min-height:230px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:linear-gradient(90deg,rgba(4,8,16,.96) 0%,rgba(5,12,24,.82) 31%,rgba(5,12,24,.43) 62%,rgba(5,12,24,.16) 100%),#071020;
+}
+.hero::before{
+  width:100%;
+  background:linear-gradient(90deg,rgba(4,8,16,.7) 0%,rgba(5,12,24,.42) 24%,rgba(7,16,32,.05) 57%,rgba(7,16,32,.22) 100%),url('/img/weekly-shorts-hero-car.jpg') center center / cover no-repeat;
+}
+.hero-copy{padding:33px 0 27px}
+.hero-copy p{max-width:565px}
+.top-grid{align-items:stretch}
+.top-main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-width:0}
+.kpis{margin:10px 0 0}
+.content{margin-top:15px}
+.content>aside{display:grid;gap:15px;align-content:start}
+.week-feature{height:100%;min-height:0}
+.week-chip{
+  top:0;
+  right:0;
+  min-width:105px;
+  min-height:43px;
+  display:grid;
+  place-items:center;
+  padding:9px 12px;
+  border-radius:0 8px 0 8px;
+  background:#121c2c;
+  box-shadow:-8px 0 12px rgba(18,28,44,.84);
+}
+.week-meta{margin-top:14px}
+.tier-note{align-items:flex-start;gap:10px;padding:11px 15px}
+.tier-explanation{max-width:300px;line-height:1.45}
+.tier-list{gap:6px}
+.tier-badge{min-height:25px;padding:4px 8px;font-size:.66rem;white-space:nowrap}
+.activity{min-height:0}
+.timeline{min-height:0}
+@media (max-width:1450px){
+  .nav{grid-template-columns:minmax(0,1fr) auto}
+}
+@media (max-width:1160px){
+  .nav{grid-template-columns:minmax(0,1fr) auto}
+  .nav-actions{display:flex}
+  .hero::before{width:100%;opacity:.7}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .nav-actions .searchbar{display:none}
+  .hero{min-height:240px;padding:0}
+  .hero::before{width:100%;opacity:.45}
+  .hero-copy{padding:38px 0 33px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:11px}
+  .tier-note{align-items:flex-start}
+  .tier-list{justify-content:flex-start}
+}
+
 </style>
 </head>
 
@@ -894,14 +954,6 @@ td{font-size:.79rem}
         </span>
       </a>
 
-      <nav class="navlinks" aria-label="Primary navigation">
-        <a class="active" href="#home">Dashboard</a>
-        <a href="#leaderboards">Leaderboards</a>
-        <a href="#weekArchive">Weeks</a>
-        <a id="goatNav" href="#leaderboards">GOAT</a>
-        <a href="#changelog">Changelog</a>
-      </nav>
-
       <div class="nav-actions">
         <label class="searchbar" aria-label="Search players">
           <span>⌕</span>
@@ -914,7 +966,6 @@ td{font-size:.79rem}
             <path d="M189.5 20h-134C44.2 20 35 29.2 35 40.6v135.1c0 11.4 9.2 20.6 20.5 20.6h113.4l-5.3-18.5 12.8 11.9 12.1 11.2 21.5 19.1V40.6c0-11.4-9.2-20.6-20.5-20.6Zm-38.6 130.5s-3.6-4.3-6.6-8.1c13.1-3.7 18.1-11.9 18.1-11.9-4.1 2.7-8 4.6-11.5 5.9-5 2.1-9.8 3.5-14.5 4.3-9.6 1.8-18.4 1.3-26-.1-5.7-1.1-10.6-2.7-14.7-4.3-2.3-.9-4.8-2-7.3-3.4-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.8 8 17.5 11.8c-3 3.8-6.7 8.3-6.7 8.3-22.1-.7-30.5-15.2-30.5-15.2 0-32.2 14.4-58.3 14.4-58.3 14.4-10.8 28.1-10.5 28.1-10.5l1 1.2c-18 5.2-26.3 13.1-26.3 13.1s2.2-1.2 5.9-2.9c10.7-4.7 19.2-5.9 22.7-6.2.6-.1 1.1-.2 1.7-.2 6.1-.8 13-1 20.2-.2 9.5 1.1 19.7 3.9 30.1 9.6 0 0-7.9-7.5-24.9-12.7l1.4-1.6s13.7-.3 28.1 10.5c0 0 14.4 26.1 14.4 58.3 0 0-8.5 14.5-30.6 15.2Z"/>
           </svg>
         </a>
-        <a class="btn primary nav-rankings" href="#leaderboards">▥ &nbsp; View Rankings</a>
       </div>
     </div>
   </header>
@@ -922,17 +973,13 @@ td{font-size:.79rem}
   <main class="main" id="home">
     <section class="top-grid">
       <div class="top-main">
-        <div class="hero">
+        <section class="hero" aria-label="Trackmania Weekly Shorts archive">
           <div class="hero-copy">
             <span class="eyebrow">The definitive archive for</span>
             <h1>Trackmania <span>Weekly Shorts.</span></h1>
             <p>Comprehensive statistics, historic leaderboards, and week-by-week archives for the Trackmania Weekly Shorts community.</p>
-            <div class="hero-actions">
-              <a class="btn primary" href="#leaderboards">Explore Leaderboards &nbsp; →</a>
-              <a class="link-btn" href="#weekArchive">▦ &nbsp; Browse Weeks</a>
-            </div>
           </div>
-        </div>
+        </section>
 
         <section class="kpis" aria-label="Stats summary">
           <article class="kpi wins"><div class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 5h14v12a7 7 0 0 1-14 0zM9 8H4v3a6 6 0 0 0 5 5m14-8h5v3a6 6 0 0 1-5 5M16 24v4m-6 0h12M16 9v9m-3-6h6"/></svg></div><div><small>Most Wins</small><strong id="kpiWinsVal">—</strong><span id="kpiWinsName">—</span></div></article>
@@ -958,10 +1005,6 @@ td{font-size:.79rem}
               <small>Current leader</small>
               <strong id="weekLeader">—</strong>
             </div>
-          </div>
-          <div class="week-actions">
-            <a class="status-pill" href="#weekArchive">View Week Archive &nbsp; →</a>
-            <a class="archive-link" href="#weekArchive">▦ &nbsp; All Weeks</a>
           </div>
         </section>
       </aside>
@@ -1012,8 +1055,8 @@ td{font-size:.79rem}
 
         <div id="goatPanel" class="hidden">
           <div class="note tier-note" id="goat">
-            <span>GOAT points only count frozen ended-week results. #1 overall is Champion.</span>
-            <span class="tier-list"><span class="tier-badge tier-champion">Champion</span><span class="tier-badge tier-gold">Gold</span><span class="tier-badge tier-silver">Silver</span><span class="tier-badge tier-bronze">Bronze</span></span>
+            <span class="tier-explanation">GOAT points only count frozen ended-week results. Champion is reserved for the #1 overall player.</span>
+            <span class="tier-list"><span class="tier-badge tier-bronze">Bronze 250+</span><span class="tier-badge tier-silver">Silver 500+</span><span class="tier-badge tier-gold">Gold 750+</span><span class="tier-badge tier-champion">Champion #1</span></span>
           </div>
           <div class="table-wrap">
             <table>
@@ -1037,7 +1080,6 @@ td{font-size:.79rem}
             <h3>Latest Activity</h3>
           </div>
           <div class="timeline" id="changelogList"><div class="logtext">Loading…</div></div>
-          <a class="activity-link" href="#changelog">View full changelog &nbsp; →</a>
         </section>
       </aside>
     </section>
@@ -1106,24 +1148,60 @@ let overallPage=1,goatPage=1,activeTab="overall",liveWeeksIndex=[],goatWeeksInde
 function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="7">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—",top5Pct=liveWeeksIndex.length?`${((Number(p.top5||0)/liveWeeksIndex.length)*100).toFixed(1)}%`:"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="player-dot" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num">${top5Pct}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
 function renderGoat(players,sortBy,term){const body=$("goatBody");body.innerHTML="";const list=getGoatList(players,sortBy,term),size=Number($("goatPageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));goatPage=Math.min(Math.max(1,goatPage),pages);const ranks=goatRankMap(players);$("goatPageInfo").textContent=`Page ${goatPage} / ${pages} · ${list.length} players`;$("prevGoatPage").disabled=goatPage<=1;$("nextGoatPage").disabled=goatPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="10">No players match.</td></tr>`;return;}const start=(goatPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=ranks.get(accountKey(p))||start+i+1,t=tierMeta(p,rank);const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="player-dot" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.goatPoints??0)}</td><td>${tierBadge(t)}</td><td class="num">${fmtScore(p.weekWins??p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.secondPlaces??0)}</td><td class="num">${fmtScore(p.thirdPlaces??0)}</td><td class="num">${fmtScore(p.fourthPlaces??0)}</td><td class="num">${fmtScore(p.fifthPlaces??0)}</td>`;body.appendChild(tr);});}
 function activeWeeks(){return activeTab==="goat"?goatWeeksIndex:liveWeeksIndex;}
-function populateWeeks(weeks){const sel=$("weekSelect"),cur=sel.value;sel.innerHTML="";const sorted=[...(weeks||[])].sort((a,b)=>Number(b.week||0)-Number(a.week||0));for(const w of sorted){const opt=document.createElement("option");opt.value=String(w.week);opt.textContent=`Week ${w.week}`;sel.appendChild(opt);}if(cur&&sorted.some(w=>String(w.week)===String(cur))){sel.value=cur;return cur;}return sorted[0]?.week??null;}
-function renderWeek(w){const body=$("weekBody"),num=w?.week??"—";$("weekChip").textContent=`Week ${num}`;const endedMs=Date.parse(w?.endedAt||"");$("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs?"Ends":"Ended"}: ${fmtIso(w?.endedAt)}`;body.innerHTML="";const entries=(w?.entries||[]).slice(0,10);const leader=entries[0];$("weekLeader").textContent=leader?`${leader.player||"—"} · ${fmtScore(leader.score)}`:"—";if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}entries.forEach((e,i)=>{const rank=Number(e.rank??i+1),badge=rank===1?`<span class="win-tag">WIN</span>`:"";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player">${badge}${esc(e.player||"—")}</span></td><td class="num">${fmtScore(e.score)}</td>`;body.appendChild(tr);});}
+function populateWeeks(weeks){
+  const sel=$("weekSelect");
+  const sorted=[...(weeks||[])].sort((a,b)=>Number(b.week||0)-Number(a.week||0));
+  sel.innerHTML="";
+  for(const week of sorted){
+    const option=document.createElement("option");
+    option.value=String(week.week);
+    option.textContent=`Week ${week.week}`;
+    sel.appendChild(option);
+  }
+  const latest=sorted[0]?.week??null;
+  if(latest!=null)sel.value=String(latest);
+  return latest;
+}
+function renderFeaturedWeek(week){
+  const number=week?.week??"—";
+  const endedMs=Date.parse(week?.endedAt||"");
+  const leader=(week?.entries||[])[0];
+  $("weekChip").textContent=`Week ${number}`;
+  $("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs?"Ends":"Ended"}: ${fmtIso(week?.endedAt)}`;
+  $("weekLeader").textContent=leader?`${leader.player||"—"} · ${fmtScore(leader.score)}`:"—";
+}
+function renderWeek(week){
+  const body=$("weekBody");
+  const entries=(week?.entries||[]).slice(0,10);
+  body.innerHTML="";
+  if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}
+  entries.forEach((entry,index)=>{
+    const rank=Number(entry.rank??index+1);
+    const badge=rank===1?`<span class="win-tag">WIN</span>`:"";
+    const row=document.createElement("tr");
+    row.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player">${badge}${esc(entry.player||"—")}</span></td><td class="num">${fmtScore(entry.score)}</td>`;
+    body.appendChild(row);
+  });
+}
 function renderChangelog(items){const el=$("changelogList"),list=Array.isArray(items)?items:[];if(!list.length){el.innerHTML=`<div class="logtext">No post-week WR improvements detected yet.</div>`;return;}el.innerHTML="";[...list].sort((a,b)=>(Date.parse(b.ts||b.at||"")||0)-(Date.parse(a.ts||a.at||"")||0)).slice(0,5).forEach(it=>{const div=document.createElement("div");div.className="logitem";const text=it.text?esc(it.text):esc(JSON.stringify(it));div.innerHTML=`<div class="logwhen">${esc(fmtIso(it.ts||it.at||""))}</div><div class="logtext">${text}</div>`;el.appendChild(div);});}
 async function loadWeek(num){if(!num)return;renderWeek(await fetchJson(activeTab==="goat"?PATHS.goatWeekFile(num):PATHS.weekFile(num)));}
 async function switchWeeks(){const n=populateWeeks(activeWeeks());if(n!=null)await loadWeek(n);}
+async function loadCurrentWeek(){
+  const latest=[...liveWeeksIndex].sort((a,b)=>Number(b.week||0)-Number(a.week||0))[0];
+  if(latest)renderFeaturedWeek(await fetchJson(PATHS.weekFile(latest.week)));
+}
 function setTab(tab){activeTab=tab;const overall=tab==="overall";$("tabOverall").classList.toggle("active",overall);$("tabGoat").classList.toggle("active",!overall);$("tabOverall").setAttribute("aria-selected",overall?"true":"false");$("tabGoat").setAttribute("aria-selected",!overall?"true":"false");$("overallPanel").classList.toggle("hidden",!overall);$("goatPanel").classList.toggle("hidden",overall);$("sortBy").classList.toggle("hidden",!overall);$("goatSortBy").classList.toggle("hidden",overall);$("playerSearch").classList.toggle("hidden",!overall);$("goatSearch").classList.toggle("hidden",overall);$("boardHeading").textContent=overall?"All-Time Leaderboard":"GOAT Leaderboard";switchWeeks().catch(console.error);}
 function bind(){const rerenderOverall=(reset=false)=>{if(reset)overallPage=1;renderOverall(appData.agg.players||[],$("sortBy").value,$("playerSearch").value);};const rerenderGoat=(reset=false)=>{if(reset)goatPage=1;renderGoat(appData.goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);};$("sortBy").addEventListener("change",()=>rerenderOverall(true));$("playerSearch").addEventListener("input",()=>rerenderOverall(true));$("clearSearch").addEventListener("click",()=>{$("playerSearch").value="";$("globalSearch").value="";rerenderOverall(true);});$("prevPage").addEventListener("click",()=>{overallPage--;rerenderOverall();});$("nextPage").addEventListener("click",()=>{overallPage++;rerenderOverall();});$("pageSize").addEventListener("change",()=>rerenderOverall(true));$("goatSortBy").addEventListener("change",()=>rerenderGoat(true));$("goatSearch").addEventListener("input",()=>rerenderGoat(true));$("clearGoatSearch").addEventListener("click",()=>{$("goatSearch").value="";$("globalSearch").value="";rerenderGoat(true);});$("prevGoatPage").addEventListener("click",()=>{goatPage--;rerenderGoat();});$("nextGoatPage").addEventListener("click",()=>{goatPage++;rerenderGoat();});$("goatPageSize").addEventListener("change",()=>rerenderGoat(true));$("tabOverall").addEventListener("click",()=>setTab("overall"));$("tabGoat").addEventListener("click",()=>setTab("goat"));$("weekSelect").addEventListener("change",e=>loadWeek(e.target.value));$("globalSearch").addEventListener("input",e=>{if(activeTab==="overall"){$("playerSearch").value=e.target.value;rerenderOverall(true);}else{$("goatSearch").value=e.target.value;rerenderGoat(true);}});}
 function bindDashboardNavigation(){
-  $("goatNav").addEventListener("click",()=>setTab("goat"));
   document.addEventListener("keydown",event=>{
     const target=event.target;
     if(event.key!=="/"||event.ctrlKey||event.metaKey||event.altKey||target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName||""))return;
     event.preventDefault();
-    if(window.getComputedStyle($("globalSearch").closest(".nav-actions")).display!=="none")$("globalSearch").focus();
+    if(window.getComputedStyle($("globalSearch").closest(".searchbar")).display!=="none")$("globalSearch").focus();
     else $(activeTab==="goat"?"goatSearch":"playerSearch").focus();
   });
 }
-async function main(){bind();bindDashboardNavigation();const [weeksIndex,goatWeeksIndexData,agg,goatAgg,changelog]=await Promise.all([fetchJson(PATHS.weeksIndex),fetchJson(PATHS.goatWeeksIndex).catch(()=>({weeks:[]})),fetchJson(PATHS.aggregate),fetchJson(PATHS.goatAggregate).catch(()=>({players:[]})),fetchJson(PATHS.changelog).catch(()=>({items:[]}))]);liveWeeksIndex=await expandWeeksIndex(weeksIndex.weeks||[],false);goatWeeksIndex=await expandWeeksIndex(goatWeeksIndexData.weeks||[],true);appData={agg,goatAgg,changelog};renderKpis(agg,liveWeeksIndex.length);renderOverall(agg.players||[],$("sortBy").value,$("playerSearch").value);renderGoat(goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);renderChangelog(changelog.items||[]);await switchWeeks();}
+async function main(){bind();bindDashboardNavigation();const [weeksIndex,goatWeeksIndexData,agg,goatAgg,changelog]=await Promise.all([fetchJson(PATHS.weeksIndex),fetchJson(PATHS.goatWeeksIndex).catch(()=>({weeks:[]})),fetchJson(PATHS.aggregate),fetchJson(PATHS.goatAggregate).catch(()=>({players:[]})),fetchJson(PATHS.changelog).catch(()=>({items:[]}))]);liveWeeksIndex=await expandWeeksIndex(weeksIndex.weeks||[],false);goatWeeksIndex=await expandWeeksIndex(goatWeeksIndexData.weeks||[],true);appData={agg,goatAgg,changelog};renderKpis(agg,liveWeeksIndex.length);renderOverall(agg.players||[],$("sortBy").value,$("playerSearch").value);renderGoat(goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);renderChangelog(changelog.items||[]);await Promise.all([switchWeeks(),loadCurrentWeek()]);}
 main().catch(err=>{console.error(err);document.body.innerHTML=`<div style="max-width:900px;margin:40px auto;padding:16px;color:#e6ecff;font-family:system-ui"><h2>Weekly Shorts Hub</h2><p>Failed to load data. Check console and JSON paths.</p><pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12)">${esc(String(err))}</pre></div>`;});
 </script>
 </body>
