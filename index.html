@@ -1,649 +1,593 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>Weekly Shorts Hub — Trackmania 2020 Stats</title>
-<meta content="Weekly Shorts Hub: Trackmania 2020 Weekly Shorts leaderboards, GOAT standings, weekly results, world records, and post-week WR improvement changelog." name="description"/>
-<style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weekly Shorts Hub — Trackmania Stats Archive</title>
+  <meta name="description" content="Weekly Shorts Hub: Trackmania 2020 Weekly Shorts standings, GOAT leaderboard, week archive, world records, Top 5s, and post-week WR changelog." />
+  <style>
+    :root {
+      --bg:#05070c;
+      --bg2:#081019;
+      --panel:#0d141d;
+      --panel2:#111b26;
+      --panel3:#07131c;
+      --line:rgba(255,255,255,.095);
+      --line2:rgba(255,255,255,.16);
+      --text:#f7fbff;
+      --muted:#8f9baa;
+      --soft:#c8d1de;
+      --hot:#ffcf5a;
+      --aqua:#58f0ff;
+      --blue:#6d8cff;
+      --pink:#ff6bd6;
+      --green:#70ffb0;
+      --danger:#ff7373;
+      --shadow:0 30px 90px rgba(0,0,0,.45);
+      --radius:28px;
+      --radius2:18px;
+    }
 
-:root{
-  --bg:#05070c;
-  --bg2:#0a0f18;
-  --panel:rgba(255,255,255,.055);
-  --panel2:rgba(255,255,255,.035);
-  --text:#f7faff;
-  --muted:#9ea8ba;
-  --soft:#dce5f5;
-  --line:rgba(255,255,255,.10);
-  --line2:rgba(255,255,255,.18);
-  --cyan:#68f0ff;
-  --blue:#6da8ff;
-  --gold:#ffd36d;
-  --green:#71e6a5;
-  --danger:#ff6f91;
-  --radius:22px;
-  --shadow:0 22px 70px rgba(0,0,0,.36);
-  --ring:0 0 0 3px rgba(104,240,255,.16);
-}
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    html, body { min-height:100%; }
+    body {
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(88,240,255,.14), transparent 34%),
+        radial-gradient(circle at 92% 12%, rgba(255,207,90,.10), transparent 30%),
+        radial-gradient(circle at 78% 78%, rgba(109,140,255,.11), transparent 34%),
+        linear-gradient(135deg, #030508 0%, #08101a 42%, #05070c 100%);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+    body::before {
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size:64px 64px;
+      mask-image:linear-gradient(to bottom, rgba(0,0,0,.7), transparent 78%);
+      opacity:.45;
+    }
+    body::after {
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(120deg, transparent 0 45%, rgba(88,240,255,.055) 45% 46%, transparent 46% 100%);
+      opacity:.8;
+    }
 
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-html,body{min-height:100%}
-body{
-  margin:0;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(circle at 12% 8%, rgba(104,240,255,.13), transparent 30%),
-    radial-gradient(circle at 86% 4%, rgba(255,211,109,.12), transparent 28%),
-    linear-gradient(180deg,#05070c 0%,#08101b 42%,#05070c 100%);
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:.28;
-  background:
-    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size:54px 54px;
-  mask-image:linear-gradient(to bottom, black, transparent 72%);
-}
-*{scrollbar-color:rgba(255,255,255,.18) transparent}
-::-webkit-scrollbar{width:8px;height:8px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:999px}
-::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
-a{color:inherit;text-decoration:none}
+    a { color:inherit; text-decoration:none; }
+    button, input, select { font:inherit; }
+    button { cursor:pointer; }
+    ::selection { background:rgba(88,240,255,.25); }
+    * { scrollbar-color:rgba(255,255,255,.2) transparent; }
+    ::-webkit-scrollbar { width:9px;height:9px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.16);border-radius:999px; }
 
-.container{width:min(1220px,92vw);margin:0 auto}
-.site-header{
-  position:sticky;
-  top:0;
-  z-index:1000;
-  border-bottom:1px solid var(--line);
-  background:rgba(5,7,12,.82);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-}
-.site-nav{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:1rem;
-  min-height:68px;
-}
-.brand{
-  display:inline-flex;
-  align-items:center;
-  gap:.72rem;
-  font-weight:950;
-  letter-spacing:-.035em;
-  color:#fff;
-}
-.brand-mark{
-  width:40px;
-  height:40px;
-  display:grid;
-  place-items:center;
-  border-radius:14px;
-  border:1px solid rgba(104,240,255,.24);
-  background:linear-gradient(135deg,rgba(104,240,255,.16),rgba(255,211,109,.10));
-  box-shadow:0 0 34px rgba(104,240,255,.10);
-}
-.brand-text{display:flex;flex-direction:column;line-height:1.05}
-.brand-title{font-size:1rem}
-.brand-sub{font-size:.72rem;color:var(--muted);font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+    .site-shell {
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:286px minmax(0,1fr);
+      min-height:100vh;
+    }
 
-.nav-toggle{
-  display:none;
-  justify-self:end;
-  min-height:40px;
-  width:44px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:rgba(255,255,255,.05);
-  color:#fff;
-  font-size:1.05rem;
-  font-weight:900;
-  cursor:pointer;
-}
-.navlinks{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:.45rem;
-}
-.navlinks a{
-  display:inline-flex;
-  align-items:center;
-  min-height:38px;
-  padding:.56rem .78rem;
-  border:1px solid transparent;
-  border-radius:999px;
-  color:rgba(247,250,255,.72);
-  font-size:.9rem;
-  font-weight:850;
-  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
-}
-.navlinks a:hover,.navlinks a:focus,.navlinks a.active{
-  color:#fff;
-  background:rgba(255,255,255,.06);
-  border-color:rgba(255,255,255,.09);
-}
-.header-pill{
-  display:inline-flex;
-  align-items:center;
-  gap:.45rem;
-  min-height:38px;
-  padding:.55rem .9rem;
-  border-radius:999px;
-  border:1px solid rgba(104,240,255,.28);
-  background:rgba(104,240,255,.08);
-  color:#eaffff;
-  font-size:.82rem;
-  font-weight:900;
-  white-space:nowrap;
-}
+    .side-rail {
+      position:sticky;
+      top:0;
+      height:100vh;
+      padding:28px 22px;
+      border-right:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(7,12,19,.82), rgba(7,12,19,.52));
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .mark {
+      width:48px;height:48px;border-radius:18px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg, rgba(88,240,255,.22), rgba(255,207,90,.16));
+      border:1px solid rgba(88,240,255,.34);
+      box-shadow:0 0 40px rgba(88,240,255,.13);
+      font-size:22px;
+    }
+    .brand-title { font-weight:1000; letter-spacing:-.045em; line-height:.95; font-size:1.15rem; }
+    .brand-title span { display:block; color:var(--muted); font-size:.68rem; letter-spacing:.16em; text-transform:uppercase; margin-top:5px; }
+    .rail-copy { margin:28px 0 24px; color:var(--muted); font-size:.92rem; line-height:1.65; }
+    .rail-nav { display:grid; gap:10px; }
+    .rail-link {
+      min-height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 14px;
+      border-radius:15px;
+      color:var(--soft);
+      background:rgba(255,255,255,.035);
+      border:1px solid transparent;
+      font-weight:900;
+      font-size:.9rem;
+      transition:.16s ease;
+    }
+    .rail-link:hover, .rail-link.active { border-color:rgba(88,240,255,.26); background:rgba(88,240,255,.08); color:#fff; transform:translateX(2px); }
+    .rail-pill {
+      margin-top:24px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,207,90,.2);
+      background:linear-gradient(135deg, rgba(255,207,90,.08), rgba(88,240,255,.04));
+      color:#dce7f4;
+      font-size:.82rem;
+      line-height:1.55;
+    }
+    .rail-pill b { color:#fff; }
 
-.wrap{width:min(1220px,92vw);margin:0 auto;padding:34px 0 80px}
-.header{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:end;
-  gap:22px;
-  margin:14px 0 22px;
-  padding:24px;
-  border:1px solid var(--line);
-  border-radius:30px;
-  background:
-    linear-gradient(135deg,rgba(104,240,255,.10),rgba(255,255,255,.03) 44%,rgba(255,211,109,.08)),
-    rgba(255,255,255,.03);
-  box-shadow:var(--shadow);
-  position:relative;
-  overflow:hidden;
-}
-.header::after{
-  content:"";
-  position:absolute;
-  inset:auto -8% -34% 46%;
-  height:150px;
-  background:linear-gradient(90deg,transparent,rgba(104,240,255,.16),transparent);
-  transform:rotate(-8deg);
-}
-.title{position:relative;z-index:1;min-width:0}
-.eyebrow{
-  display:inline-flex;
-  align-items:center;
-  gap:.45rem;
-  margin:0 0 10px;
-  padding:.35rem .65rem;
-  border-radius:999px;
-  border:1px solid rgba(104,240,255,.22);
-  background:rgba(104,240,255,.075);
-  color:#dffcff;
-  font-size:.74rem;
-  font-weight:950;
-  letter-spacing:.09em;
-  text-transform:uppercase;
-}
-h1{
-  margin:0;
-  font-size:clamp(2.15rem,5vw,4.6rem);
-  font-weight:1000;
-  letter-spacing:-.07em;
-  line-height:.95;
-  color:#fff;
-}
-.subtitle{
-  margin:14px 0 0;
-  color:var(--muted);
-  font-size:clamp(.95rem,1.6vw,1.08rem);
-  line-height:1.65;
-  max-width:760px;
-}
-.header-actions{
-  position:relative;
-  z-index:1;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:10px;
-}
-.meta{
-  min-width:220px;
-  padding:14px 16px;
-  border-radius:18px;
-  border:1px solid var(--line);
-  background:rgba(5,7,12,.42);
-  color:var(--muted);
-  font-size:13px;
-  text-align:right;
-}
-.muted{color:var(--muted)}
-.mini{font-size:12px}
-.help{color:var(--muted);font-size:12px;line-height:1.5}
-.label{color:var(--muted);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-.right{text-align:right}
-.spacer{flex:1}
-.grid{display:grid;gap:16px}
-.kpis{grid-template-columns:repeat(3,1fr)}
-.row2{grid-template-columns:minmax(0,1.45fr) minmax(330px,.55fr)}
+    .mobile-top { display:none; }
 
-.card{
-  border:1px solid var(--line);
-  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.028));
-  border-radius:var(--radius);
-  box-shadow:0 14px 46px rgba(0,0,0,.22);
-  overflow:hidden;
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-}
-.card:hover{border-color:var(--line2)}
-.card-h{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  padding:15px 18px;
-  border-bottom:1px solid var(--line);
-  background:rgba(255,255,255,.025);
-}
-.card-h .t{font-size:12px;letter-spacing:.09em;text-transform:uppercase;font-weight:950;color:#eef8ff}
-.card-b{padding:18px}
-.kpi-label{font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.07em}
-.kpi-main{font-size:clamp(1.18rem,2vw,1.45rem);font-weight:950;margin-top:6px;color:#fff}
-.kpi-sub{margin-top:6px;font-size:13px;color:var(--muted)}
-.kpis .card:nth-child(1){border-color:rgba(255,211,109,.18)}
-.kpis .card:nth-child(2){border-color:rgba(104,240,255,.18)}
-.kpis .card:nth-child(3){border-color:rgba(113,230,165,.18)}
+    .page { padding:36px clamp(18px, 4vw, 58px) 72px; min-width:0; }
+    .hero {
+      position:relative;
+      min-height:330px;
+      overflow:hidden;
+      border-radius:34px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(118deg, rgba(88,240,255,.15), rgba(255,255,255,.035) 42%, rgba(255,207,90,.10)),
+        linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.02));
+      box-shadow:var(--shadow);
+      padding:38px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 330px;
+      gap:28px;
+      align-items:end;
+    }
+    .hero::before {
+      content:"";
+      position:absolute;
+      width:540px;height:540px;
+      right:-180px;top:-210px;
+      border-radius:50%;
+      border:1px solid rgba(88,240,255,.24);
+      box-shadow:inset 0 0 60px rgba(88,240,255,.08), 0 0 80px rgba(88,240,255,.07);
+    }
+    .hero::after {
+      content:"";
+      position:absolute;
+      left:-80px;bottom:-150px;
+      width:460px;height:220px;
+      transform:rotate(-8deg);
+      background:linear-gradient(90deg, rgba(88,240,255,.16), transparent);
+      filter:blur(2px);
+    }
+    .hero-content, .hero-card { position:relative; z-index:1; }
+    .eyebrow {
+      width:max-content;
+      max-width:100%;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(88,240,255,.32);
+      background:rgba(88,240,255,.08);
+      color:#c7fbff;
+      font-size:.76rem;
+      font-weight:1000;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    h1 {
+      margin:18px 0 16px;
+      font-size:clamp(3.25rem, 8vw, 7.2rem);
+      line-height:.86;
+      letter-spacing:-.085em;
+      max-width:860px;
+    }
+    .subtitle { color:#c9d3de; line-height:1.7; font-size:1.03rem; max-width:760px; margin:0; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+    .hero-btn {
+      min-height:46px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 16px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.055);
+      color:#fff;
+      font-weight:950;
+      font-size:.9rem;
+    }
+    .hero-btn.primary { background:linear-gradient(135deg, rgba(88,240,255,.95), rgba(112,255,176,.82)); color:#001018; border-color:transparent; }
+    .hero-card {
+      align-self:stretch;
+      display:grid;
+      align-content:end;
+      gap:12px;
+      padding:22px;
+      border-radius:28px;
+      background:rgba(5,9,14,.58);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:inset 0 1px rgba(255,255,255,.07);
+    }
+    .meta { color:var(--muted); font-size:.85rem; line-height:1.6; text-align:left; }
+    #genAt { color:#f5fbff; font-weight:900; }
+    #weekCount { color:#9deeff; }
+    .live-chip { width:max-content; padding:7px 10px; border-radius:999px; background:rgba(255,207,90,.12); color:#ffe6a0; border:1px solid rgba(255,207,90,.22); font-size:.74rem; font-weight:1000; letter-spacing:.1em; text-transform:uppercase; }
 
-.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-input,select{
-  min-height:38px;
-  background:rgba(0,0,0,.20);
-  border:1px solid var(--line);
-  color:var(--text);
-  padding:8px 10px;
-  border-radius:12px;
-  font-size:13px;
-}
-input:focus,select:focus,button:focus{outline:none;box-shadow:var(--ring);border-color:rgba(104,240,255,.38)}
-select{
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  padding-right:36px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5 8 12l6.5-6.5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  background-size:12px;
-}
-select option{background:#0b0f17;color:#f4f6fb}
-button,.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.45rem;
-  min-height:38px;
-  padding:.6rem .9rem;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:rgba(255,255,255,.055);
-  color:var(--text);
-  font-weight:900;
-  font-size:.9rem;
-  line-height:1;
-  cursor:pointer;
-  white-space:nowrap;
-}
-button:hover,.btn:hover{border-color:var(--line2);background:rgba(255,255,255,.08)}
-button:disabled{opacity:.45;cursor:not-allowed}
+    .stat-strip {
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:16px;
+      margin:20px 0;
+    }
+    .stat-card {
+      position:relative;
+      overflow:hidden;
+      min-height:144px;
+      padding:20px;
+      border-radius:26px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+      box-shadow:0 20px 60px rgba(0,0,0,.24);
+    }
+    .stat-card::after { content:""; position:absolute; inset:auto -40px -70px auto; width:160px; height:160px; border-radius:50%; background:rgba(88,240,255,.08); }
+    .stat-top { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:.74rem; font-weight:1000; text-transform:uppercase; letter-spacing:.11em; }
+    .kpi-label { margin-top:22px; color:var(--muted); font-size:.78rem; font-weight:850; }
+    .kpi-main { margin-top:3px; font-size:1.65rem; font-weight:1000; letter-spacing:-.04em; }
+    .kpi-sub { margin-top:4px; color:#a9f7ff; font-size:.9rem; }
 
-.leaderboard-tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.tab-btn{
-  border-radius:999px;
-  color:var(--muted);
-  background:rgba(255,255,255,.045);
-}
-.tab-btn.active{
-  color:#061017;
-  border-color:rgba(104,240,255,.70);
-  background:linear-gradient(135deg,var(--cyan),#dffcff);
-  box-shadow:0 0 28px rgba(104,240,255,.14);
-}
+    .dashboard-grid {
+      display:grid;
+      grid-template-columns:minmax(0, 1.55fr) minmax(330px, .78fr);
+      gap:20px;
+      align-items:start;
+    }
+    .panel {
+      overflow:hidden;
+      border-radius:28px;
+      border:1px solid var(--line);
+      background:rgba(9,14,21,.74);
+      box-shadow:0 24px 70px rgba(0,0,0,.32);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+    }
+    .panel-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(90deg, rgba(88,240,255,.08), rgba(255,255,255,.02));
+    }
+    .panel-title { font-size:.78rem; font-weight:1000; text-transform:uppercase; letter-spacing:.12em; color:#f2f7ff; }
+    .controls { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+    .leaderboard-tabs { display:flex; gap:10px; flex-wrap:wrap; }
+    .tab-btn, button, select, input { border:0; outline:0; }
+    .tab-btn {
+      min-height:42px;
+      border-radius:999px;
+      padding:0 16px;
+      color:#b4bdc9;
+      background:rgba(255,255,255,.055);
+      border:1px solid rgba(255,255,255,.09);
+      font-weight:1000;
+      font-size:.88rem;
+    }
+    .tab-btn.active { background:linear-gradient(135deg, var(--aqua), #adfff1); color:#001018; border-color:transparent; box-shadow:0 0 34px rgba(88,240,255,.16); }
+    .label { color:var(--muted); font-size:.72rem; font-weight:1000; letter-spacing:.12em; text-transform:uppercase; }
+    select, input {
+      min-height:42px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.09);
+      background:#0a1018;
+      color:#edf6ff;
+      padding:0 12px;
+      font-size:.86rem;
+    }
+    select { padding-right:32px; }
+    input::placeholder { color:#727d8b; }
+    .controls button:not(.tab-btn), .pager button {
+      min-height:42px;
+      padding:0 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.07);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.1);
+      font-weight:950;
+    }
+    .controls button:hover, .pager button:hover, .tab-btn:hover { filter:brightness(1.08); }
+    button:disabled { opacity:.35; cursor:not-allowed; }
+    .help { color:var(--muted); font-size:.82rem; line-height:1.55; }
+    .panel-note { padding:13px 18px; border-bottom:1px solid rgba(255,255,255,.07); }
 
-.goat-note{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
-.goat-note span{
-  display:inline-flex;
-  padding:.25rem .55rem;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.035);
-}
-.goat-table th,.goat-table td{vertical-align:middle}
-.goat-table th:nth-child(4),.goat-table td:nth-child(4){width:56px;text-align:center}
-.goat-table th.tier-col,.goat-table td.tier-col{text-align:center!important;vertical-align:middle;padding-top:8px;padding-bottom:8px}
-.tier-badge{display:flex;align-items:center;justify-content:center;height:100%;line-height:0}
-.tier-badge img{display:block;width:22px;height:22px;object-fit:contain;transform:none}
-.tier-badge img[src*="champion"]{animation:none;filter:none}
-.tier-badge.tier-unranked{width:auto;height:auto}
-.tier-badge-fallback{display:inline-flex;align-items:center;justify-content:center;min-width:74px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--soft);font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+    .table-wrap { width:100%; overflow:auto; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { padding:13px 15px; border-bottom:1px solid rgba(255,255,255,.075); white-space:nowrap; }
+    th { color:#7f8b99; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; text-align:left; }
+    td { color:#e9f2fb; font-size:.9rem; }
+    tbody tr { transition:background .14s ease; }
+    tbody tr:hover { background:rgba(88,240,255,.045); }
+    .right { text-align:right; }
+    .player-cell b { font-weight:1000; }
+    .rank-cell { color:#8390a0; }
+    .weeks-cell span { color:#dce8f3; }
+    .goat-table th.tier-col, .goat-table td.tier-col { text-align:center!important; }
+    .tier-badge { display:flex; align-items:center; justify-content:center; }
+    .tier-badge img { width:24px; height:24px; object-fit:contain; }
+    .tier-badge-fallback { display:inline-flex; min-width:78px; justify-content:center; padding:5px 9px; border-radius:999px; color:#dce8f3; border:1px solid rgba(255,255,255,.11); background:rgba(255,255,255,.05); font-size:.72rem; font-weight:1000; }
+    .tag.win {
+      display:inline-flex;
+      margin-right:9px;
+      min-height:22px;
+      align-items:center;
+      padding:2px 8px;
+      border-radius:999px;
+      color:#1b1200;
+      background:linear-gradient(135deg, #ffe481, #ffbf45);
+      font-size:.66rem;
+      font-weight:1000;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .pager { display:flex; align-items:center; gap:10px; padding:15px 18px; border-top:1px solid rgba(255,255,255,.075); }
+    .spacer { flex:1; }
+    .mini { font-size:.82rem; }
+    .muted { color:var(--muted); }
 
-.table-wrap{width:100%;overflow:auto}
-table{width:100%;border-collapse:collapse}
-th,td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.075)}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);white-space:nowrap}
-td{font-size:14px}
-tbody tr:hover{background:rgba(104,240,255,.035)}
-.player-cell b{font-weight:950}
-.rank-cell{font-weight:900}
+    .stack { display:grid; gap:20px; }
+    .week-panel .panel-head { background:linear-gradient(90deg, rgba(255,207,90,.08), rgba(255,255,255,.02)); }
+    #weekMeta { padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.075); }
+    #weekEnded { color:#cfd8e3; }
+    .changelog-panel { max-height:760px; display:grid; grid-template-rows:auto minmax(0,1fr); }
+    .changelog-scroll { max-height:690px; overflow:auto; padding:4px 18px 16px; }
+    .logitem { padding:15px 0; border-bottom:1px solid rgba(255,255,255,.075); }
+    .logitem:last-child { border-bottom:0; }
+    .logwhen { color:#7f8b99; font-size:.75rem; font-weight:850; margin-bottom:4px; }
+    .logtext { color:#dce6f1; font-size:.88rem; line-height:1.55; }
 
-.tag{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:2px 8px;
-  margin-right:6px;
-  font-size:10px;
-  font-weight:950;
-  letter-spacing:.06em;
-  border-radius:999px;
-  border:1px solid var(--line2);
-  background:rgba(255,255,255,.05);
-  color:var(--text);
-}
-.tag.win{
-  margin-right:8px;
-  padding:3px 10px;
-  min-width:44px;
-  border-color:rgba(255,211,109,.36);
-  background:rgba(255,211,109,.11);
-  color:#fff3c8;
-}
+    .goat-note { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; padding:13px 18px; border-bottom:1px solid rgba(255,255,255,.075); }
+    .goat-note span { padding:8px 10px; border-radius:13px; background:rgba(255,255,255,.045); color:#c9d3de; font-size:.77rem; font-weight:850; text-align:center; }
 
-.pager{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
-#changelog,.changelog-scroll{max-height:700px;overflow-y:auto;padding-right:4px}
-.logitem{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.075)}
-.logitem:last-child{border-bottom:none}
-.logwhen{font-size:12px;color:var(--muted)}
-.logtext{margin-top:4px;color:var(--soft);line-height:1.55}
-.footer{margin-top:22px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16px}
+    .footer {
+      margin-top:20px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      color:#7f8b99;
+      font-size:.82rem;
+      line-height:1.6;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:18px;
+    }
 
-@media (max-width:960px){
-  .site-nav{grid-template-columns:auto auto}
-  .nav-toggle{display:inline-flex}
-  .header-pill{display:none}
-  .navlinks{
-    display:none;
-    grid-column:1 / -1;
-    width:100%;
-    flex-direction:column;
-    align-items:stretch;
-    padding:0 0 .9rem;
-  }
-  .navlinks.show{display:flex}
-  .navlinks a{justify-content:space-between;width:100%;border-radius:14px;background:rgba(255,255,255,.035)}
-  .header{grid-template-columns:1fr;align-items:start}
-  .header-actions{align-items:stretch}
-  .meta{text-align:left;min-width:0}
-  .kpis{grid-template-columns:1fr}
-  .row2{grid-template-columns:1fr}
-  .card-h{flex-direction:column;align-items:flex-start}
-  .controls{width:100%;justify-content:flex-start}
-}
-
-@media (max-width:640px){
-  .wrap{width:min(100% - 28px,1220px);padding-top:22px}
-  .site-nav{min-height:64px}
-  .brand-sub{display:none}
-  .header{padding:20px;border-radius:24px}
-  table.leaderboard-table thead{display:none}
-  table.leaderboard-table,table.leaderboard-table tbody,table.leaderboard-table tr,table.leaderboard-table td{display:block;width:100%}
-  table.leaderboard-table tr{background:rgba(255,255,255,.035);padding:.75rem .85rem;margin-bottom:.7rem;border-radius:16px;border:1px solid rgba(255,255,255,.08)}
-  table.leaderboard-table td{display:grid;grid-template-columns:116px 1fr;gap:.45rem;font-size:.92rem;padding:.48rem 0;border-bottom:1px solid rgba(255,255,255,.055);text-align:left!important}
-  table.leaderboard-table td:last-child{border-bottom:none}
-  table.leaderboard-table td::before{content:attr(data-label);color:var(--muted);font-weight:900}
-  .tier-col{justify-content:flex-start!important}
-  .pager{flex-wrap:wrap}
-}
-
-</style>
+    @media (max-width:1180px) {
+      .site-shell { grid-template-columns:1fr; }
+      .side-rail { display:none; }
+      .mobile-top {
+        position:sticky; top:0; z-index:20;
+        display:flex; align-items:center; justify-content:space-between; gap:12px;
+        padding:12px 16px;
+        background:rgba(5,7,12,.88);
+        backdrop-filter:blur(18px);
+        border-bottom:1px solid var(--line);
+      }
+      .mobile-brand { display:flex; align-items:center; gap:9px; font-weight:1000; letter-spacing:-.035em; }
+      .mobile-brand .mark { width:36px; height:36px; border-radius:13px; font-size:16px; }
+      .mobile-links { display:flex; gap:8px; overflow:auto; }
+      .mobile-links a { white-space:nowrap; padding:9px 11px; border-radius:999px; background:rgba(255,255,255,.05); color:#cbd5df; font-size:.82rem; font-weight:900; }
+      .page { padding-top:20px; }
+    }
+    @media (max-width:980px) {
+      .hero { grid-template-columns:1fr; min-height:0; padding:28px; }
+      .hero-card { align-self:auto; }
+      .stat-strip, .dashboard-grid { grid-template-columns:1fr; }
+      .goat-note { grid-template-columns:repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width:640px) {
+      .page { padding-left:12px; padding-right:12px; }
+      .hero { border-radius:24px; padding:22px; }
+      h1 { font-size:3.1rem; }
+      .subtitle { font-size:.94rem; }
+      .panel, .stat-card { border-radius:20px; }
+      .panel-head { align-items:flex-start; flex-direction:column; }
+      .controls { justify-content:flex-start; width:100%; }
+      input { width:100%; }
+      table.leaderboard-table thead { display:none; }
+      table.leaderboard-table, table.leaderboard-table tbody, table.leaderboard-table tr, table.leaderboard-table td { display:block; width:100%; }
+      table.leaderboard-table tr { margin:10px; padding:10px; border:1px solid rgba(255,255,255,.09); border-radius:16px; background:rgba(255,255,255,.035); }
+      table.leaderboard-table td { display:grid; grid-template-columns:112px minmax(0,1fr); gap:10px; white-space:normal; border-bottom:1px solid rgba(255,255,255,.06); padding:9px 0; }
+      table.leaderboard-table td:last-child { border-bottom:0; }
+      table.leaderboard-table td::before { content:attr(data-label); color:#7f8b99; font-size:.72rem; font-weight:1000; text-transform:uppercase; letter-spacing:.08em; }
+      .right { text-align:left; }
+      .pager { flex-wrap:wrap; }
+      .footer { flex-direction:column; }
+    }
+  </style>
 </head>
-<body class="weekly-shorts-site">
+<body>
+  <div class="mobile-top">
+    <a class="mobile-brand" href="#top"><span class="mark">⚡</span><span>Weekly Shorts Hub</span></a>
+    <nav class="mobile-links" aria-label="Quick links">
+      <a href="#leaderboards">Leaderboards</a>
+      <a href="#weeks">Weeks</a>
+      <a href="#changelog-card">Changelog</a>
+    </nav>
+  </div>
 
-<header class="site-header">
-<div class="container site-nav">
-<a aria-label="Weekly Shorts Hub Home" class="brand" href="/">
-<span aria-hidden="true" class="brand-mark">⚡</span>
-<span class="brand-text">
-<span class="brand-title">Weekly Shorts Hub</span>
-<span class="brand-sub">Trackmania Stats</span>
-</span>
-</a>
-<button aria-controls="primary-nav" aria-expanded="false" class="nav-toggle" id="navToggle" type="button">☰</button>
-<nav aria-label="Primary" class="navlinks" id="primary-nav">
-<a class="active" href="/">Dashboard</a>
-<a href="#overallCard">Leaderboards</a>
-<a href="#weekSelect">Weeks</a>
-<a href="#changelog">Changelog</a>
-</nav>
-<div class="header-pill">Weekly Shorts only</div>
-</div>
-</header>
+  <div class="site-shell" id="top">
+    <aside class="side-rail" aria-label="Weekly Shorts navigation">
+      <a class="brand" href="#top">
+        <span class="mark">⚡</span>
+        <span class="brand-title">Weekly Shorts Hub<span>Trackmania stats</span></span>
+      </a>
+      <p class="rail-copy">A dedicated archive for Weekly Shorts standings, frozen GOAT points, world records, week results, and post-week changes.</p>
+      <nav class="rail-nav">
+        <a class="rail-link active" href="#top">Dashboard <span>01</span></a>
+        <a class="rail-link" href="#leaderboards">Leaderboards <span>02</span></a>
+        <a class="rail-link" href="#weeks">Week Archive <span>03</span></a>
+        <a class="rail-link" href="#changelog-card">WR Changelog <span>04</span></a>
+      </nav>
+      <div class="rail-pill"><b>Low-maintenance mode.</b><br>One site. One purpose. Weekly Shorts stats only.</div>
+    </aside>
 
-<div class="wrap">
-<div class="header">
-<div class="title"><div class="eyebrow">Trackmania 2020 · Weekly Shorts Archive</div>
-<h1>Weekly Shorts Hub</h1>
-<p class="subtitle">Trackmania 2020 Weekly Shorts stats, GOAT standings, frozen week results, world records, and post-week WR improvements in one low-maintenance archive.</p>
-</div>
-<div class="header-actions">
-<div class="meta">
-<div id="genAt">—</div>
-<div id="weekCount">—</div>
-</div>
-</div>
-</div>
-<div class="grid kpis">
-<div class="card">
-<div class="card-h">
-<div class="t">Most overall wins</div>
-<div class="help">overall</div>
-</div>
-<div class="card-b">
-<div class="kpi-label">Player</div>
-<div class="kpi-main" id="kpiWinsName">—</div>
-<div class="kpi-sub" id="kpiWinsVal">—</div>
-</div>
-</div>
-<div class="card">
-<div class="card-h">
-<div class="t">Most WRs</div>
-<div class="help">maps</div>
-</div>
-<div class="card-b">
-<div class="kpi-label">Player</div>
-<div class="kpi-main" id="kpiWrsName">—</div>
-<div class="kpi-sub" id="kpiWrsVal">—</div>
-</div>
-</div>
-<div class="card">
-<div class="card-h">
-<div class="t">Most Top 5</div>
-<div class="help">consistency</div>
-</div>
-<div class="card-b">
-<div class="kpi-label">Player</div>
-<div class="kpi-main" id="kpiTop5Name">—</div>
-<div class="kpi-sub" id="kpiTop5Val">—</div>
-</div>
-</div>
-</div>
-<div style="height:14px"></div>
-<div class="grid row2">
-<div class="card" id="overallCard">
-<div class="card-h">
-<div aria-label="Leaderboard type" class="leaderboard-tabs" role="tablist">
-<button aria-selected="true" class="tab-btn active" id="tabOverall" role="tab" type="button">
-              Overall Leaderboard
-            </button>
-<button aria-selected="false" class="tab-btn" id="tabGoat" role="tab" type="button">
-              GOAT Leaderboard
-            </button>
-</div>
-<div class="controls">
-<div class="controls" id="overallControls" style="display:flex;">
-<span class="label">Sort</span>
-<select aria-label="Sort overall leaderboard" id="sortBy">
-<option value="wins">Wins</option>
-<option value="wrs">WRs</option>
-<option value="top5">Top 5</option>
-<option value="name">Name</option>
-</select>
-<input aria-label="Search overall player" id="playerSearch" placeholder="Search player…" type="text"/>
-<button aria-label="Clear overall search" id="clearSearch">Clear</button>
-</div>
-<div class="controls" id="goatControls" style="display:none;">
-<span class="label">Sort</span>
-<select aria-label="Sort GOAT leaderboard" id="goatSortBy">
-<option value="points">Points</option>
-<option value="wins">Wins</option>
-<option value="wrs">WRs</option>
-<option value="name">Name</option>
-</select>
-<input aria-label="Search GOAT player" id="goatSearch" placeholder="Search player…" type="text"/>
-<button aria-label="Clear GOAT search" id="clearGoatSearch">Clear</button>
-</div>
-</div>
-</div>
-<div class="tab-panel" id="overallPanel" style="display:block;">
-<div class="card-b help" style="padding-top:10px; padding-bottom:10px;">
-            Tip: WRs here are counted per-map. If a bugged leaderboard entry is filtered server-side, the next valid time becomes the WR.
+    <main class="page">
+      <section class="hero" aria-label="Weekly Shorts Hub overview">
+        <div class="hero-content">
+          <div class="eyebrow">Trackmania 2020 · Weekly Shorts Archive</div>
+          <h1>Weekly<br>Shorts Hub</h1>
+          <p class="subtitle">Track every Weekly Shorts result from one focused stats archive: overall wins, map WRs, Top 5 consistency, frozen GOAT standings, week leaderboards, and post-week WR improvements.</p>
+          <div class="hero-actions">
+            <a class="hero-btn primary" href="#leaderboards">Open leaderboards</a>
+            <a class="hero-btn" href="#weeks">Browse weeks</a>
+            <a class="hero-btn" href="#changelog-card">View changelog</a>
           </div>
-<div class="card-b table-wrap" style="padding:0">
-<table class="leaderboard-table overall-table">
-<thead>
-<tr>
-<th style="width:54px">#</th>
-<th>Player</th>
-<th class="right">Wins</th>
-<th class="right">WRs</th>
-<th class="right">Top 5</th>
-<th class="right">Weeks won</th>
-</tr>
-</thead>
-<tbody id="overallBody"></tbody>
-</table>
-<div class="pager">
-<button id="prevPage">← Prev</button>
-<div class="mini muted" id="pageInfo">Page 1 / 1</div>
-<button id="nextPage">Next →</button>
-<div class="spacer"></div>
-<span class="mini muted">Per page</span>
-<select aria-label="Overall page size" id="pageSize">
-<option value="25">25</option>
-<option selected="" value="50">50</option>
-<option value="100">100</option>
-<option value="200">200</option>
-</select>
-</div>
-</div>
-</div>
-<div class="tab-panel" id="goatPanel" style="display:none;">
-<div class="card-b help goat-note" style="padding-top:10px; padding-bottom:10px;">
-<span>GOAT points use frozen ended-week results.</span>
-<span>#1 overall = Champion</span>
-<span>Gold Tier = 750+</span>
-<span>Silver Tier = 500–749</span>
-<span>Bronze Tier = 250–499</span>
-<span>Week win = 50</span>
-<span>WR = 25</span>
-<span>2nd = 15</span>
-<span>3rd = 10</span>
-<span>4th = 6</span>
-<span>5th = 4</span>
-</div>
-<div class="card-b table-wrap" style="padding:0">
-<table class="leaderboard-table goat-table">
-<thead>
-<tr>
-<th style="width:54px">#</th>
-<th>Player</th>
-<th class="right">Points</th>
-<th class="tier-col">Tier</th>
-<th class="right">Wins</th>
-<th class="right">WRs</th>
-<th class="right">2nd</th>
-<th class="right">3rd</th>
-<th class="right">4th</th>
-<th class="right">5th</th>
-</tr>
-</thead>
-<tbody id="goatBody"></tbody>
-</table>
-<div class="pager">
-<button id="prevGoatPage">← Prev</button>
-<div class="mini muted" id="goatPageInfo">Page 1 / 1</div>
-<button id="nextGoatPage">Next →</button>
-<div class="spacer"></div>
-<span class="mini muted">Per page</span>
-<select aria-label="GOAT leaderboard page size" id="goatPageSize">
-<option value="25">25</option>
-<option selected="" value="50">50</option>
-<option value="100">100</option>
-<option value="200">200</option>
-</select>
-</div>
-</div>
-</div>
-</div>
-<div class="card">
-<div class="card-h">
-<div class="t">Week archive</div>
-<div class="controls">
-<select aria-label="Select week" id="weekSelect"></select>
-</div>
-</div>
-<div class="card-b" id="weekMeta">
-<div class="muted mini" id="weekEnded">—</div>
-</div>
-<div class="card-b table-wrap" style="padding:0">
-<table class="leaderboard-table week-table">
-<thead>
-<tr>
-<th style="width:54px">#</th>
-<th>Player</th>
-<th class="right">Score</th>
-</tr>
-</thead>
-<tbody id="weekBody"></tbody>
-</table>
-</div>
-</div>
-</div>
-<div style="height:14px"></div>
-<div class="card">
-<div class="card-h">
-<div class="t">Changelog</div>
-<div class="help">post-week WR improvements</div>
-</div>
-<div class="card-b changelog-scroll" id="changelog">
-<div class="muted">Loading…</div>
-</div>
-</div>
-<div class="footer"><div><b>Weekly Shorts Hub</b> is a static Trackmania Weekly Shorts stats archive.</div><div>Data is generated from Nadeo services and refreshed by the existing Weekly Shorts script.</div></div>
-</div>
+        </div>
+        <div class="hero-card">
+          <div class="live-chip">Stats feed</div>
+          <div class="meta">
+            <div id="genAt">Updated —</div>
+            <div id="weekCount">—</div>
+          </div>
+        </div>
+      </section>
 
+      <section class="stat-strip" aria-label="Key stats">
+        <article class="stat-card">
+          <div class="stat-top"><span>Most overall wins</span><span>overall</span></div>
+          <div class="kpi-label">Player</div>
+          <div class="kpi-main" id="kpiWinsName">—</div>
+          <div class="kpi-sub" id="kpiWinsVal">—</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top"><span>Most WRs</span><span>maps</span></div>
+          <div class="kpi-label">Player</div>
+          <div class="kpi-main" id="kpiWrsName">—</div>
+          <div class="kpi-sub" id="kpiWrsVal">—</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top"><span>Most Top 5</span><span>consistency</span></div>
+          <div class="kpi-label">Player</div>
+          <div class="kpi-main" id="kpiTop5Name">—</div>
+          <div class="kpi-sub" id="kpiTop5Val">—</div>
+        </article>
+      </section>
 
+      <section class="dashboard-grid" id="leaderboards">
+        <article class="panel" id="overallCard">
+          <div class="panel-head">
+            <div class="leaderboard-tabs" role="tablist" aria-label="Leaderboard type">
+              <button id="tabOverall" class="tab-btn active" type="button" role="tab" aria-selected="true">Overall</button>
+              <button id="tabGoat" class="tab-btn" type="button" role="tab" aria-selected="false">GOAT</button>
+            </div>
+            <div class="controls">
+              <div id="overallControls" class="controls" style="display:flex;">
+                <span class="label">Sort</span>
+                <select id="sortBy" aria-label="Sort overall leaderboard">
+                  <option value="wins">Wins</option>
+                  <option value="wrs">WRs</option>
+                  <option value="top5">Top 5</option>
+                  <option value="name">Name</option>
+                </select>
+                <input id="playerSearch" type="text" placeholder="Search player…" aria-label="Search overall player" />
+                <button id="clearSearch" aria-label="Clear overall search">Clear</button>
+              </div>
+              <div id="goatControls" class="controls" style="display:none;">
+                <span class="label">Sort</span>
+                <select id="goatSortBy" aria-label="Sort GOAT leaderboard">
+                  <option value="points">Points</option>
+                  <option value="wins">Wins</option>
+                  <option value="wrs">WRs</option>
+                  <option value="name">Name</option>
+                </select>
+                <input id="goatSearch" type="text" placeholder="Search player…" aria-label="Search GOAT player" />
+                <button id="clearGoatSearch" aria-label="Clear GOAT search">Clear</button>
+              </div>
+            </div>
+          </div>
 
+          <div id="overallPanel" class="tab-panel" style="display:block;">
+            <div class="panel-note help">Overall stats include live week data and post-week WR tracking where available.</div>
+            <div class="table-wrap">
+              <table class="leaderboard-table overall-table">
+                <thead><tr><th style="width:54px">#</th><th>Player</th><th class="right">Wins</th><th class="right">WRs</th><th class="right">Top 5</th><th class="right">Weeks won</th></tr></thead>
+                <tbody id="overallBody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <button id="prevPage">← Prev</button>
+              <div class="mini muted" id="pageInfo">Page 1 / 1</div>
+              <button id="nextPage">Next →</button>
+              <div class="spacer"></div>
+              <span class="mini muted">Per page</span>
+              <select id="pageSize" aria-label="Overall page size"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select>
+            </div>
+          </div>
 
-<script>
+          <div id="goatPanel" class="tab-panel" style="display:none;">
+            <div class="goat-note help">
+              <span>Frozen ended-week results</span><span>Week win = 50</span><span>WR = 25</span><span>2nd / 3rd / 4th / 5th = 15 / 10 / 6 / 4</span>
+            </div>
+            <div class="table-wrap">
+              <table class="leaderboard-table goat-table">
+                <thead><tr><th style="width:54px">#</th><th>Player</th><th class="right">Points</th><th class="tier-col">Tier</th><th class="right">Wins</th><th class="right">WRs</th><th class="right">2nd</th><th class="right">3rd</th><th class="right">4th</th><th class="right">5th</th></tr></thead>
+                <tbody id="goatBody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <button id="prevGoatPage">← Prev</button>
+              <div class="mini muted" id="goatPageInfo">Page 1 / 1</div>
+              <button id="nextGoatPage">Next →</button>
+              <div class="spacer"></div>
+              <span class="mini muted">Per page</span>
+              <select id="goatPageSize" aria-label="GOAT leaderboard page size"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select>
+            </div>
+          </div>
+        </article>
+
+        <aside class="stack">
+          <article class="panel week-panel" id="weeks">
+            <div class="panel-head">
+              <div class="panel-title">Week Archive</div>
+              <div class="controls"><select id="weekSelect" aria-label="Select week"></select></div>
+            </div>
+            <div id="weekMeta"><div class="muted mini" id="weekEnded">—</div></div>
+            <div class="table-wrap">
+              <table class="leaderboard-table week-table">
+                <thead><tr><th style="width:54px">#</th><th>Player</th><th class="right">Score</th></tr></thead>
+                <tbody id="weekBody"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel changelog-panel" id="changelog-card">
+            <div class="panel-head">
+              <div class="panel-title">WR Changelog</div>
+              <div class="help">post-week improvements</div>
+            </div>
+            <div class="changelog-scroll" id="changelog"><div class="muted">Loading…</div></div>
+          </article>
+        </aside>
+      </section>
+
+      <footer class="footer">
+        <div><b>Data source:</b> Weekly Shorts stats generated from Nadeo services.</div>
+        <div>Weekly Shorts Hub is a stats-only archive.</div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
     const PATHS = {
       weeksIndex: `/data/weekly-shorts/weeks.json`,
       goatWeeksIndex: `/data/weekly-shorts/goat-weeks.json`,
@@ -1088,30 +1032,7 @@ tbody tr:hover{background:rgba(104,240,255,.035)}
           <pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12)">${String(err)}</pre>
         </div>`;
     });
+  
   </script>
-
-
-
-
-<script>
-(function () {
-  const navToggle = document.getElementById("navToggle");
-  const primaryNav = document.getElementById("primary-nav");
-  if (!navToggle || !primaryNav) return;
-
-  function setOpen(open) {
-    primaryNav.classList.toggle("show", open);
-    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
-  }
-
-  navToggle.addEventListener("click", () => {
-    setOpen(!primaryNav.classList.contains("show"));
-  });
-
-  primaryNav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => setOpen(false));
-  });
-})();
-</script>
 </body>
 </html>
