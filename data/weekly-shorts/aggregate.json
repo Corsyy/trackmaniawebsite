@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T10:18:36.147Z",
+  "generatedAt": "2026-08-25T11:19:17.798Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -7537,7 +7537,7 @@
       "accountId": "2671c153-f56e-4bd5-a312-de094be06751",
       "player": "Exosum_",
       "wins": 0,
-      "wrs": 8,
+      "wrs": 9,
       "top5": 21,
       "weeksWon": [],
       "wrWeeks": [
@@ -7587,6 +7587,12 @@
           "week": 88,
           "mapUid": "diaevmm0M7RdcmOCcWPvn8DNsfl",
           "timeMs": 16668,
+          "rawRank": 1
+        },
+        {
+          "week": 89,
+          "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
+          "timeMs": null,
           "rawRank": 1
         }
       ],
@@ -7734,9 +7740,9 @@
         {
           "week": 89,
           "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
-          "rank": 5,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 5
+          "rawRank": 1
         }
       ],
       "aliases": []
@@ -9708,9 +9714,9 @@
         {
           "week": 89,
           "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
-          "rank": 3,
+          "rank": 4,
           "timeMs": null,
-          "rawRank": 3
+          "rawRank": 4
         }
       ],
       "aliases": []
@@ -14996,32 +15002,6 @@
       "aliases": []
     },
     {
-      "accountId": "ac9bcc6b-53a8-4b75-8753-c4366682f357",
-      "player": "RoccoTrco",
-      "wins": 0,
-      "wrs": 1,
-      "top5": 1,
-      "weeksWon": [],
-      "wrWeeks": [
-        {
-          "week": 89,
-          "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "top5Weeks": [
-        {
-          "week": 89,
-          "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
-          "rank": 1,
-          "timeMs": null,
-          "rawRank": 1
-        }
-      ],
-      "aliases": []
-    },
-    {
       "accountId": "4331afa8-c8c0-489c-8cb6-5e4261149c08",
       "player": "Sanyikaaxdd",
       "wins": 0,
@@ -15790,9 +15770,9 @@
         {
           "week": 89,
           "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
-          "rank": 2,
+          "rank": 3,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 3
         }
       ],
       "aliases": []
@@ -19174,9 +19154,9 @@
         {
           "week": 89,
           "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
-          "rank": 4,
+          "rank": 5,
           "timeMs": null,
-          "rawRank": 4
+          "rawRank": 5
         }
       ],
       "aliases": []
@@ -24322,6 +24302,25 @@
           "rank": 3,
           "timeMs": 13176,
           "rawRank": 3
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "accountId": "ac9bcc6b-53a8-4b75-8753-c4366682f357",
+      "player": "RoccoTrco",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 1,
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [
+        {
+          "week": 89,
+          "mapUid": "9QvuTPmUZlucOIgWawIwxA8GyW8",
+          "rank": 2,
+          "timeMs": null,
+          "rawRank": 2
         }
       ],
       "aliases": []
