@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#050914" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Weekly Shorts Hub — Trackmania Weekly Shorts Stats Archive</title>
   <meta name="description" content="Trackmania Weekly Shorts statistics archive with all-time rankings, GOAT leaderboard, week spotlight, and changelog." />
   <link rel="icon" type="image/png" href="/img/weekly-shorts-favicon.png?v=2" />
@@ -32,11 +35,14 @@
   --shadow:0 24px 74px rgba(0,0,0,.38);
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{min-height:100%;scroll-behavior:smooth;background-color:#050914;color-scheme:dark}
 body{
   margin:0;
   min-height:100vh;
+  min-height:100dvh;
+  padding-bottom:env(safe-area-inset-bottom,0px);
   color:var(--text);
+  background-color:#050914;
   background:
     radial-gradient(circle at 10% 18%, rgba(47,124,255,.19), transparent 29%),
     radial-gradient(circle at 88% 18%, rgba(47,124,255,.11), transparent 33%),
@@ -993,23 +999,23 @@ td{font-size:.79rem}
   .brand-title small{font-size:clamp(.52rem,2vw,.65rem)}
   .discord-btn{width:38px;height:38px}
 
-  .hero{min-height:300px}
+  .hero{min-height:245px}
   .hero::before{
     width:100%;
     opacity:.96;
     background-image:linear-gradient(180deg,rgba(5,10,20,.78) 0%,rgba(5,10,20,.56) 42%,rgba(5,10,20,.13) 73%,rgba(5,10,20,.04) 100%),url('/img/weekly-shorts-hero-car.jpg?v=20260825-responsive');
     background-repeat:no-repeat,no-repeat;
-    background-position:center,67% bottom;
-    background-size:100% 100%,auto 48%;
+    background-position:center,74% bottom;
+    background-size:100% 100%,auto 55%;
   }
-  .hero-copy{max-width:100%;padding:19px 0 137px}
+  .hero-copy{max-width:100%;padding:16px 0 102px}
   .eyebrow{font-size:clamp(.98rem,4.2vw,1.25rem)}
   .hero-copy h1{
     max-width:100%;
     margin:8px 0 10px;
-    font-size:clamp(1.9rem,7.2vw,2.8rem);
+    font-size:clamp(1.45rem,6.1vw,2.35rem);
     line-height:1.02;
-    white-space:normal;
+    white-space:nowrap;
   }
   .hero-copy p{max-width:100%;font-size:clamp(.69rem,2.7vw,.82rem);line-height:1.43}
 
@@ -1029,10 +1035,10 @@ td{font-size:.79rem}
 }
 
 @media (max-width:420px){
-  .hero{min-height:285px}
-  .hero-copy{padding-bottom:132px}
-  .hero-copy h1{font-size:clamp(1.75rem,7.4vw,2.1rem)}
-  .hero::before{background-position:center,64% bottom}
+  .hero{min-height:235px}
+  .hero-copy{padding-bottom:98px}
+  .hero-copy h1{font-size:clamp(1.4rem,6vw,1.8rem)}
+  .hero::before{background-position:center,75% bottom}
   .kpi{grid-template-columns:30px minmax(0,1fr);gap:6px}
   .kpi-icon,.kpi-icon svg{width:29px;height:29px}
   .kpi small{font-size:.56rem}
@@ -1057,19 +1063,81 @@ td{font-size:.79rem}
 }
 
 @container weekly-dashboard (max-width:760px){
-  .hero{min-height:290px}
+  .hero{min-height:245px;overflow:hidden}
   .hero::before{
     width:100%;
     opacity:.96;
     background-image:linear-gradient(180deg,rgba(5,10,20,.8) 0%,rgba(5,10,20,.57) 43%,rgba(5,10,20,.12) 75%,rgba(5,10,20,.04) 100%),url('/img/weekly-shorts-hero-car.jpg?v=20260825-container');
     background-repeat:no-repeat,no-repeat;
-    background-position:center,66% bottom;
-    background-size:100% 100%,auto 48%;
+    background-position:center,74% bottom;
+    background-size:100% 100%,auto 55%;
   }
-  .hero-copy{max-width:100%;padding:19px 0 130px}
-  .eyebrow{font-size:clamp(.98rem,4.2cqi,1.25rem)}
-  .hero-copy h1{margin:8px 0 10px;font-size:clamp(1.8rem,7cqi,2.75rem);line-height:1.02;white-space:normal}
-  .hero-copy p{max-width:100%;font-size:clamp(.69rem,2.7cqi,.82rem)}
+  .hero-copy{max-width:100%;padding:16px 0 102px}
+  .eyebrow{font-size:clamp(.87rem,3.7cqi,1.12rem)}
+  .hero-copy h1{max-width:100%;margin:7px 0 8px;font-size:clamp(1.4rem,6.1cqi,2.35rem);line-height:1.02;letter-spacing:-.085em;white-space:nowrap}
+  .hero-copy p{max-width:96%;font-size:clamp(.65rem,2.35cqi,.78rem);line-height:1.4}
+}
+
+/* One composition at every size: independent background, left copy, right car. */
+.hero{
+  display:flex;
+  align-items:center;
+  min-height:clamp(180px,18cqi,250px);
+  overflow:hidden;
+  isolation:isolate;
+  background:
+    linear-gradient(90deg,rgba(5,10,20,.67) 0%,rgba(5,10,20,.5) 44%,rgba(5,10,20,.12) 70%,rgba(5,10,20,.03) 100%),
+    url('/img/weekly-shorts-hero-background.jpg?v=20260825-layered') center center / cover no-repeat,
+    #050914;
+}
+.hero::before{
+  top:7%;
+  right:2%;
+  bottom:6%;
+  left:auto;
+  z-index:1;
+  width:43%;
+  height:auto;
+  opacity:1;
+  background:url('/img/weekly-shorts-car-transparent.png?v=20260825-layered') right center / contain no-repeat;
+}
+.hero::after{
+  z-index:0;
+  background:linear-gradient(90deg,rgba(5,10,20,.26) 0%,rgba(5,10,20,.13) 48%,transparent 76%);
+}
+.hero-copy{
+  position:relative;
+  z-index:2;
+  width:59%;
+  max-width:59%;
+  padding:28px 0;
+}
+.hero-copy .eyebrow{font-size:clamp(1rem,2cqi,1.62rem)}
+.hero-copy h1{
+  max-width:100%;
+  font-size:clamp(1.85rem,4.1cqi,4.3rem);
+  line-height:1;
+  white-space:nowrap;
+}
+.hero-copy p{max-width:100%;font-size:clamp(.72rem,1.25cqi,.92rem);line-height:1.42}
+
+@container weekly-dashboard (max-width:1100px){
+  .hero{min-height:clamp(175px,22cqi,230px)}
+  .hero::before{top:8%;right:1.5%;bottom:7%;left:auto;width:43%;opacity:1}
+  .hero-copy{width:59%;max-width:59%;padding:23px 0}
+  .hero-copy .eyebrow{font-size:clamp(.9rem,2cqi,1.3rem)}
+  .hero-copy h1{font-size:clamp(1.7rem,4.05cqi,3.1rem);white-space:nowrap}
+  .hero-copy p{font-size:clamp(.68rem,1.25cqi,.82rem)}
+}
+
+@container weekly-dashboard (max-width:560px){
+  .hero{min-height:185px}
+  .hero::before{top:9%;right:0;bottom:8%;left:auto;width:48%;opacity:1}
+  .hero-copy{width:56%;max-width:56%;padding:15px 0}
+  .hero-copy .eyebrow{font-size:clamp(.72rem,3.05cqi,.95rem);line-height:1.15}
+  .hero-copy h1{margin:7px 0 8px;font-size:clamp(1.28rem,5.7cqi,2rem);line-height:1.03;white-space:normal}
+  .hero-copy h1 span{display:block}
+  .hero-copy p{max-width:100%;font-size:clamp(.57rem,2.05cqi,.7rem);line-height:1.36}
 }
 
 </style>
