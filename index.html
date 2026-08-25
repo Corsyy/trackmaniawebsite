@@ -159,7 +159,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 }
 .discord-btn svg{display:block}
 .discord-btn:hover{color:#fff;border-color:rgba(174,200,255,.36)}
-.menu-btn{display:none}
+.menu-btn{display:none!important}
 
 /* Mockup body: fixed page gutters, not centered/narrow */
 .main{
@@ -299,18 +299,6 @@ h1 span{
   overflow:hidden;
   border-radius:14px;
   background:url("/img/weekly-shorts-week-thumb.jpg") center / cover no-repeat, linear-gradient(160deg,rgba(47,124,255,.70),rgba(255,123,27,.36));
-}
-.week-art-chip{
-  position:absolute;
-  right:14px;
-  top:14px;
-  z-index:1;
-  padding:7px 12px;
-  border-radius:999px;
-  background:rgba(8,15,27,.78);
-  color:#fff;
-  font-weight:1000;
-  backdrop-filter:blur(10px);
 }
 .week-meta{
   display:grid;
@@ -633,39 +621,31 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
 .footer-stats{display:flex;gap:30px;color:var(--soft);font-weight:950}
 .footer-stats b{color:#fff;font-size:1.18rem}
 
-/* Real flags, not text abbreviations */
-.flag{
-  width:22px;
-  height:15px;
-  flex:0 0 22px;
+/* Neutral player marker. Real country flags are not shown because the Weekly Shorts JSON does not include country data. */
+.player-dot{
+  width:7px;
+  height:7px;
+  flex:0 0 7px;
   display:inline-block;
-  overflow:hidden;
-  border-radius:3px;
-  box-shadow:0 0 0 1px rgba(255,255,255,.18),0 2px 6px rgba(0,0,0,.20);
-  background:#fff;
+  border-radius:999px;
+  background:linear-gradient(135deg,var(--blue2),#fff);
+  box-shadow:0 0 12px rgba(117,173,255,.35);
 }
-.flag-de{background:linear-gradient(#000 0 33.33%,#dd0000 33.33% 66.66%,#ffce00 66.66%)}
-.flag-fr{background:linear-gradient(90deg,#0055a4 0 33.33%,#fff 33.33% 66.66%,#ef4135 66.66%)}
-.flag-ca{background:linear-gradient(90deg,#d52b1e 0 25%,#fff 25% 75%,#d52b1e 75%)}
-.flag-gb{background:linear-gradient(90deg,transparent 0 42%,#fff 42% 58%,transparent 58%),linear-gradient(transparent 0 38%,#fff 38% 62%,transparent 62%),linear-gradient(90deg,transparent 0 45%,#c8102e 45% 55%,transparent 55%),linear-gradient(transparent 0 43%,#c8102e 43% 57%,transparent 57%),#012169}
-.flag-nl{background:linear-gradient(#ae1c28 0 33.33%,#fff 33.33% 66.66%,#21468b 66.66%)}
-.flag-us{background:linear-gradient(#b22234 0 7.69%,#fff 7.69% 15.38%,#b22234 15.38% 23.07%,#fff 23.07% 30.76%,#b22234 30.76% 38.45%,#fff 38.45% 46.14%,#b22234 46.14% 53.83%,#fff 53.83% 61.52%,#b22234 61.52% 69.21%,#fff 69.21% 76.9%,#b22234 76.9% 84.59%,#fff 84.59% 92.28%,#b22234 92.28%),linear-gradient(#3c3b6e,#3c3b6e);background-size:100% 100%,45% 53%;background-repeat:no-repeat}
 
 .hidden{display:none!important}
 
 @media (max-width:1300px){
   :root{--gutter:18px;--rail:420px}
-  .nav{width:calc(100vw - 36px);grid-template-columns:auto auto}
-  .navlinks,.nav-actions{display:none}
-  .menu-btn{display:inline-flex;justify-self:end}
-  .nav.open{height:auto;padding:14px 0;align-items:start}
-  .nav.open .navlinks,.nav.open .nav-actions{grid-column:1/-1;display:flex;justify-content:flex-start;flex-wrap:wrap;padding-bottom:12px}
+  .nav{width:calc(100vw - 36px);grid-template-columns:1fr auto}
+  .navlinks{display:flex;justify-content:flex-end}
+  .nav-actions{display:none}
   .top-grid,.content{grid-template-columns:1fr}
 }
 @media (max-width:760px){
   :root{--gutter:11px}
   .header,.nav{height:auto;min-height:72px}
   .nav{padding:12px 0}
+  .navlinks{display:none}
   .main{width:calc(100vw - 22px);margin:0 11px}
   .hero{min-height:360px;background-size:auto 76%;background-position:right bottom}
   .hero-copy{padding:34px 0}
@@ -711,8 +691,6 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
           </svg>
         </a>
       </div>
-
-      <button class="btn menu-btn" id="mobileMenu" type="button" aria-expanded="false">Menu</button>
     </div>
   </header>
 
@@ -736,9 +714,7 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
             <h2>Current Week Archive</h2>
             <span class="live-pill">Live</span>
           </div>
-          <div class="week-art" aria-label="Featured Weekly Shorts archive visual">
-            <span class="week-art-chip" id="weekImageChip">Week —</span>
-          </div>
+          <div class="week-art" aria-label="Featured Weekly Shorts archive visual"></div>
           <div class="week-meta">
             <div>
               <strong id="weekChip">Week —</strong>
@@ -891,21 +867,21 @@ function goatRankMap(players){const ranked=[...(players||[])].sort((a,b)=>Number
 function tierMeta(p,rank){const pts=Number(p?.goatPoints??0);if(rank===1&&pts>0)return{key:"champion",label:"Champion"};if(pts>=750)return{key:"gold",label:"Gold Tier"};if(pts>=500)return{key:"silver",label:"Silver Tier"};if(pts>=250)return{key:"bronze",label:"Bronze Tier"};return{key:"unranked",label:"Unranked"};}
 function tierBadge(t){return `<span class="tier-badge tier-${esc(t.key)}">${esc(t.label)}</span>`;}
 function rankClass(n){return n===1?"rank r1":n===2?"rank r2":n===3?"rank r3":"rank";}
-function flagClass(i){return ["flag-de","flag-fr","flag-ca","flag-gb","flag-nl","flag-us"][i%6];}
+
 async function weekFileExists(weekNum, goat=false){try{const data=await fetchJson(goat?PATHS.goatWeekFile(weekNum):PATHS.weekFile(weekNum));return data&&typeof data==="object"?data:null;}catch{return null;}}
 async function expandWeeksIndex(baseWeeks, goat=false){const map=new Map();for(const item of baseWeeks||[]){const n=Number(item?.week??item);if(Number.isFinite(n)&&n>0)map.set(n,{...(typeof item==="object"?item:{}),week:n});}const known=[...map.keys()],maxKnown=known.length?Math.max(...known):0,probeStart=Math.max(1,maxKnown-1),probeEnd=Math.max(maxKnown+8,96),probes=[];for(let n=probeStart;n<=probeEnd;n++){if(!map.has(n))probes.push(n);}const found=await Promise.all(probes.map(async n=>{const data=await weekFileExists(n,goat);return data?{week:n,endedAt:data.endedAt||data.endAt||null}:null;}));for(const item of found){if(item)map.set(item.week,item);}return [...map.values()].sort((a,b)=>Number(a.week)-Number(b.week));}
 
 let overallPage=1,goatPage=1,activeTab="overall",liveWeeksIndex=[],goatWeeksIndex=[],appData={agg:{players:[]},goatAgg:{players:[]},changelog:{items:[]}};
-function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="7">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—",top5Pct=liveWeeksIndex.length?`${((Number(p.top5||0)/liveWeeksIndex.length)*100).toFixed(1)}%`:"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag ${flagClass(i)}" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num">${top5Pct}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
-function renderGoat(players,sortBy,term){const body=$("goatBody");body.innerHTML="";const list=getGoatList(players,sortBy,term),size=Number($("goatPageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));goatPage=Math.min(Math.max(1,goatPage),pages);const ranks=goatRankMap(players);$("goatPageInfo").textContent=`Page ${goatPage} / ${pages} · ${list.length} players`;$("prevGoatPage").disabled=goatPage<=1;$("nextGoatPage").disabled=goatPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="10">No players match.</td></tr>`;return;}const start=(goatPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=ranks.get(accountKey(p))||start+i+1,t=tierMeta(p,rank);const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="flag ${flagClass(i)}" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.goatPoints??0)}</td><td>${tierBadge(t)}</td><td class="num">${fmtScore(p.weekWins??p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.secondPlaces??0)}</td><td class="num">${fmtScore(p.thirdPlaces??0)}</td><td class="num">${fmtScore(p.fourthPlaces??0)}</td><td class="num">${fmtScore(p.fifthPlaces??0)}</td>`;body.appendChild(tr);});}
+function renderOverall(players,sortBy,term){const body=$("overallBody");body.innerHTML="";const list=getOverallList(players,sortBy,term),size=Number($("pageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));overallPage=Math.min(Math.max(1,overallPage),pages);$("pageInfo").textContent=`Page ${overallPage} / ${pages} · ${list.length} players`;$("prevPage").disabled=overallPage<=1;$("nextPage").disabled=overallPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="7">No players match.</td></tr>`;return;}const start=(overallPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=start+i+1,weeks=Array.isArray(p.weeksWon)&&p.weeksWon.length?p.weeksWon.join(", "):"—",top5Pct=liveWeeksIndex.length?`${((Number(p.top5||0)/liveWeeksIndex.length)*100).toFixed(1)}%`:"—";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="player-dot" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.top5??0)}</td><td class="num">${top5Pct}</td><td class="num weeks-cell">${esc(weeks)}</td>`;body.appendChild(tr);});}
+function renderGoat(players,sortBy,term){const body=$("goatBody");body.innerHTML="";const list=getGoatList(players,sortBy,term),size=Number($("goatPageSize").value||50),pages=Math.max(1,Math.ceil(list.length/size));goatPage=Math.min(Math.max(1,goatPage),pages);const ranks=goatRankMap(players);$("goatPageInfo").textContent=`Page ${goatPage} / ${pages} · ${list.length} players`;$("prevGoatPage").disabled=goatPage<=1;$("nextGoatPage").disabled=goatPage>=pages;if(!list.length){body.innerHTML=`<tr><td colspan="10">No players match.</td></tr>`;return;}const start=(goatPage-1)*size;list.slice(start,start+size).forEach((p,i)=>{const rank=ranks.get(accountKey(p))||start+i+1,t=tierMeta(p,rank);const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player"><span class="player-dot" aria-hidden="true"></span>${esc(p.player||"—")}</span></td><td class="num">${fmtScore(p.goatPoints??0)}</td><td>${tierBadge(t)}</td><td class="num">${fmtScore(p.weekWins??p.wins??0)}</td><td class="num">${fmtScore(p.wrs??0)}</td><td class="num">${fmtScore(p.secondPlaces??0)}</td><td class="num">${fmtScore(p.thirdPlaces??0)}</td><td class="num">${fmtScore(p.fourthPlaces??0)}</td><td class="num">${fmtScore(p.fifthPlaces??0)}</td>`;body.appendChild(tr);});}
 function activeWeeks(){return activeTab==="goat"?goatWeeksIndex:liveWeeksIndex;}
 function populateWeeks(weeks){const sel=$("weekSelect"),cur=sel.value;sel.innerHTML="";const sorted=[...(weeks||[])].sort((a,b)=>Number(b.week||0)-Number(a.week||0));for(const w of sorted){const opt=document.createElement("option");opt.value=String(w.week);opt.textContent=`Week ${w.week}`;sel.appendChild(opt);}if(cur&&sorted.some(w=>String(w.week)===String(cur))){sel.value=cur;return cur;}return sorted[0]?.week??null;}
-function renderWeek(w){const body=$("weekBody"),num=w?.week??"—";$("weekChip").textContent=`Week ${num}`;$("weekImageChip").textContent=`Week ${num}`;const endedMs=Date.parse(w?.endedAt||"");$("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs?"Ends":"Ended"}: ${fmtIso(w?.endedAt)}`;body.innerHTML="";const entries=(w?.entries||[]).slice(0,10);const leader=entries[0];$("weekLeader").textContent=leader?`${leader.player||"—"} · ${fmtScore(leader.score)}`:"—";if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}entries.forEach((e,i)=>{const rank=Number(e.rank??i+1),badge=rank===1?`<span class="win-tag">WIN</span>`:"";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player">${badge}${esc(e.player||"—")}</span></td><td class="num">${fmtScore(e.score)}</td>`;body.appendChild(tr);});}
+function renderWeek(w){const body=$("weekBody"),num=w?.week??"—";$("weekChip").textContent=`Week ${num}`;const endedMs=Date.parse(w?.endedAt||"");$("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs?"Ends":"Ended"}: ${fmtIso(w?.endedAt)}`;body.innerHTML="";const entries=(w?.entries||[]).slice(0,10);const leader=entries[0];$("weekLeader").textContent=leader?`${leader.player||"—"} · ${fmtScore(leader.score)}`:"—";if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}entries.forEach((e,i)=>{const rank=Number(e.rank??i+1),badge=rank===1?`<span class="win-tag">WIN</span>`:"";const tr=document.createElement("tr");tr.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player">${badge}${esc(e.player||"—")}</span></td><td class="num">${fmtScore(e.score)}</td>`;body.appendChild(tr);});}
 function renderChangelog(items){const el=$("changelogList"),list=Array.isArray(items)?items:[];if(!list.length){el.innerHTML=`<div class="logtext">No post-week WR improvements detected yet.</div>`;return;}el.innerHTML="";[...list].sort((a,b)=>(Date.parse(b.ts||b.at||"")||0)-(Date.parse(a.ts||a.at||"")||0)).slice(0,5).forEach(it=>{const div=document.createElement("div");div.className="logitem";const text=it.text?esc(it.text):esc(JSON.stringify(it));div.innerHTML=`<div class="logwhen">${esc(fmtIso(it.ts||it.at||""))}</div><div class="logtext">${text}</div>`;el.appendChild(div);});}
 async function loadWeek(num){if(!num)return;renderWeek(await fetchJson(activeTab==="goat"?PATHS.goatWeekFile(num):PATHS.weekFile(num)));}
 async function switchWeeks(){const n=populateWeeks(activeWeeks());if(n!=null)await loadWeek(n);}
 function setTab(tab){activeTab=tab;const overall=tab==="overall";$("tabOverall").classList.toggle("active",overall);$("tabGoat").classList.toggle("active",!overall);$("tabOverall").setAttribute("aria-selected",overall?"true":"false");$("tabGoat").setAttribute("aria-selected",!overall?"true":"false");$("overallPanel").classList.toggle("hidden",!overall);$("goatPanel").classList.toggle("hidden",overall);$("sortBy").classList.toggle("hidden",!overall);$("goatSortBy").classList.toggle("hidden",overall);$("playerSearch").classList.toggle("hidden",!overall);$("goatSearch").classList.toggle("hidden",overall);$("boardHeading").textContent=overall?"All-Time Leaderboard":"GOAT Leaderboard";switchWeeks().catch(console.error);}
-function bind(){const rerenderOverall=(reset=false)=>{if(reset)overallPage=1;renderOverall(appData.agg.players||[],$("sortBy").value,$("playerSearch").value);};const rerenderGoat=(reset=false)=>{if(reset)goatPage=1;renderGoat(appData.goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);};$("mobileMenu")?.addEventListener("click",()=>{const nav=$("siteNav"),open=nav.classList.toggle("open");$("mobileMenu").setAttribute("aria-expanded",open?"true":"false");});$("sortBy").addEventListener("change",()=>rerenderOverall(true));$("playerSearch").addEventListener("input",()=>rerenderOverall(true));$("clearSearch").addEventListener("click",()=>{$("playerSearch").value="";$("globalSearch").value="";rerenderOverall(true);});$("prevPage").addEventListener("click",()=>{overallPage--;rerenderOverall();});$("nextPage").addEventListener("click",()=>{overallPage++;rerenderOverall();});$("pageSize").addEventListener("change",()=>rerenderOverall(true));$("goatSortBy").addEventListener("change",()=>rerenderGoat(true));$("goatSearch").addEventListener("input",()=>rerenderGoat(true));$("clearGoatSearch").addEventListener("click",()=>{$("goatSearch").value="";$("globalSearch").value="";rerenderGoat(true);});$("prevGoatPage").addEventListener("click",()=>{goatPage--;rerenderGoat();});$("nextGoatPage").addEventListener("click",()=>{goatPage++;rerenderGoat();});$("goatPageSize").addEventListener("change",()=>rerenderGoat(true));$("tabOverall").addEventListener("click",()=>setTab("overall"));$("tabGoat").addEventListener("click",()=>setTab("goat"));$("weekSelect").addEventListener("change",e=>loadWeek(e.target.value));$("globalSearch").addEventListener("input",e=>{if(activeTab==="overall"){$("playerSearch").value=e.target.value;rerenderOverall(true);}else{$("goatSearch").value=e.target.value;rerenderGoat(true);}});}
+function bind(){const rerenderOverall=(reset=false)=>{if(reset)overallPage=1;renderOverall(appData.agg.players||[],$("sortBy").value,$("playerSearch").value);};const rerenderGoat=(reset=false)=>{if(reset)goatPage=1;renderGoat(appData.goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);};$("sortBy").addEventListener("change",()=>rerenderOverall(true));$("playerSearch").addEventListener("input",()=>rerenderOverall(true));$("clearSearch").addEventListener("click",()=>{$("playerSearch").value="";$("globalSearch").value="";rerenderOverall(true);});$("prevPage").addEventListener("click",()=>{overallPage--;rerenderOverall();});$("nextPage").addEventListener("click",()=>{overallPage++;rerenderOverall();});$("pageSize").addEventListener("change",()=>rerenderOverall(true));$("goatSortBy").addEventListener("change",()=>rerenderGoat(true));$("goatSearch").addEventListener("input",()=>rerenderGoat(true));$("clearGoatSearch").addEventListener("click",()=>{$("goatSearch").value="";$("globalSearch").value="";rerenderGoat(true);});$("prevGoatPage").addEventListener("click",()=>{goatPage--;rerenderGoat();});$("nextGoatPage").addEventListener("click",()=>{goatPage++;rerenderGoat();});$("goatPageSize").addEventListener("change",()=>rerenderGoat(true));$("tabOverall").addEventListener("click",()=>setTab("overall"));$("tabGoat").addEventListener("click",()=>setTab("goat"));$("weekSelect").addEventListener("change",e=>loadWeek(e.target.value));$("globalSearch").addEventListener("input",e=>{if(activeTab==="overall"){$("playerSearch").value=e.target.value;rerenderOverall(true);}else{$("goatSearch").value=e.target.value;rerenderGoat(true);}});}
 async function main(){bind();const [weeksIndex,goatWeeksIndexData,agg,goatAgg,changelog]=await Promise.all([fetchJson(PATHS.weeksIndex),fetchJson(PATHS.goatWeeksIndex).catch(()=>({weeks:[]})),fetchJson(PATHS.aggregate),fetchJson(PATHS.goatAggregate).catch(()=>({players:[]})),fetchJson(PATHS.changelog).catch(()=>({items:[]}))]);liveWeeksIndex=await expandWeeksIndex(weeksIndex.weeks||[],false);goatWeeksIndex=await expandWeeksIndex(goatWeeksIndexData.weeks||[],true);appData={agg,goatAgg,changelog};renderKpis(agg,liveWeeksIndex.length);renderOverall(agg.players||[],$("sortBy").value,$("playerSearch").value);renderGoat(goatAgg.players||[],$("goatSortBy").value,$("goatSearch").value);renderChangelog(changelog.items||[]);await switchWeeks();}
 main().catch(err=>{console.error(err);document.body.innerHTML=`<div style="max-width:900px;margin:40px auto;padding:16px;color:#e6ecff;font-family:system-ui"><h2>Weekly Shorts Hub</h2><p>Failed to load data. Check console and JSON paths.</p><pre style="white-space:pre-wrap;background:rgba(255,255,255,.06);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12)">${esc(String(err))}</pre></div>`;});
 </script>
