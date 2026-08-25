@@ -179,10 +179,24 @@ button:disabled{opacity:.45;cursor:not-allowed}
   overflow:hidden;
   border-bottom:1px solid rgba(255,255,255,.055);
   background:
-    linear-gradient(90deg, rgba(5,10,21,.98) 0%, rgba(7,15,30,.80) 47%, rgba(7,15,30,.24) 100%),
-    url("/img/weekly-shorts-hero-car.jpg") right center / auto 100% no-repeat,
+    linear-gradient(90deg, rgba(5,10,21,.99) 0%, rgba(7,15,30,.96) 39%, rgba(7,15,30,.76) 62%, rgba(7,15,30,.28) 100%),
     #071020;
 }
+
+.hero::before{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:56%;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, rgba(7,16,32,0) 0%, rgba(7,16,32,.08) 18%, rgba(7,16,32,.55) 100%),
+    url("/img/weekly-shorts-hero-car.jpg") right center / cover no-repeat;
+  opacity:.98;
+}
+
 .hero::after{
   content:"";
   position:absolute;
@@ -193,7 +207,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .hero-copy{
   position:relative;
   z-index:2;
-  max-width:830px;
+  max-width:1040px;
   padding:38px 0 31px;
 }
 .eyebrow{
@@ -206,11 +220,12 @@ button:disabled{opacity:.45;cursor:not-allowed}
 }
 h1{
   margin:5px 0 15px;
-  max-width:840px;
-  font-size:clamp(3.25rem,4.18vw,4.62rem);
+  max-width:none;
+  font-size:clamp(3.05rem,3.62vw,4.35rem);
   line-height:.955;
   letter-spacing:-.066em;
   font-weight:1000;
+  white-space:nowrap;
 }
 h1 span{
   color:transparent;
@@ -658,6 +673,31 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
   .week-meta{grid-template-columns:1fr}
   .week-leader{text-align:left}
 }
+
+@media (min-width:1301px){
+  .hero{
+    min-height:254px;
+  }
+  .hero-copy{
+    width:min(58vw, 1040px);
+  }
+  .hero-copy p{
+    max-width:615px;
+  }
+}
+@media (max-width:1100px){
+  h1{white-space:normal}
+  .hero::before{width:70%;opacity:.42}
+}
+@media (max-width:760px){
+  .hero::before{
+    width:100%;
+    opacity:.30;
+    background-position:right bottom;
+  }
+  h1{white-space:normal}
+}
+
 </style>
 </head>
 
