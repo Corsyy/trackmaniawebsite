@@ -1445,6 +1445,9 @@ function renderTrackmaniaText(element,value){
     if(!buffer)return;
     const span=document.createElement("span");
     span.textContent=buffer;
+    // The caption's generic child-span rule is for the author line. Formatting
+    // runs inside the map title must remain inline with one another.
+    span.style.display="inline";
     if(state.color)span.style.color=state.color;
     if(state.bold)span.style.fontWeight="800";
     if(state.italic)span.style.fontStyle="italic";
