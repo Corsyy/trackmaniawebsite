@@ -1436,6 +1436,56 @@ const PATHS = {
 };
 const $ = (id) => document.getElementById(id);
 function esc(value){return String(value ?? "").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+function renderTrackmaniaText(element,value){
+  const input=String(value??"");
+  const fragment=document.createDocumentFragment();
+  let state={color:"",bold:false,italic:false,shadow:false,width:""};
+  let buffer="";
+  const flush=()=>{
+    if(!buffer)return;
+    const span=document.createElement("span");
+    span.textContent=buffer;
+    if(state.color)span.style.color=state.color;
+    if(state.bold)span.style.fontWeight="800";
+    if(state.italic)span.style.fontStyle="italic";
+    if(state.shadow)span.style.textShadow="0 1px 2px rgba(0,0,0,.9)";
+    if(state.width==="wide")span.style.letterSpacing=".045em";
+    if(state.width==="narrow")span.style.letterSpacing="-.035em";
+    fragment.appendChild(span);
+    buffer="";
+  };
+  for(let i=0;i<input.length;){
+    if(input[i]!=="$"){buffer+=input[i++];continue;}
+    if(input[i+1]==="$"){buffer+="$";i+=2;continue;}
+    const rgb=input.slice(i+1,i+4);
+    if(/^[0-9a-f]{3}$/i.test(rgb)){
+      flush();
+      state={...state,color:`#${rgb[0]}${rgb[0]}${rgb[1]}${rgb[1]}${rgb[2]}${rgb[2]}`};
+      i+=4;
+      continue;
+    }
+    const code=String(input[i+1]||"").toLowerCase();
+    if("goiswnmz".includes(code)){
+      flush();
+      if(code==="g")state={...state,color:""};
+      else if(code==="o")state={...state,bold:true};
+      else if(code==="i")state={...state,italic:true};
+      else if(code==="s")state={...state,shadow:true};
+      else if(code==="w")state={...state,width:"wide"};
+      else if(code==="n")state={...state,width:"narrow"};
+      else if(code==="m")state={...state,width:""};
+      else if(code==="z")state={color:"",bold:false,italic:false,shadow:false,width:""};
+      i+=2;
+      continue;
+    }
+    // Unknown dollar sequences are kept as ordinary text instead of being
+    // interpreted as markup.
+    buffer+="$";
+    i+=1;
+  }
+  flush();
+  element.replaceChildren(fragment);
+}
 function fmtScore(v){const n=Number(v); return Number.isFinite(n) ? n.toLocaleString() : "—";}
 function fmtTime(ms){const n=Number(ms);if(!Number.isFinite(n)||n<=0)return"—";const min=Math.floor(n/60000),sec=Math.floor((n%60000)/1000),milli=Math.round(n%1000);return min?`${min}:${String(sec).padStart(2,"0")}.${String(milli).padStart(3,"0")}`:`${sec}.${String(milli).padStart(3,"0")}s`;}
 function fmtIso(iso){if(!iso)return"—";const d=new Date(iso);if(isNaN(d.getTime()))return iso;return d.toLocaleString(undefined,{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});}
@@ -1487,7 +1537,7 @@ function renderFeaturedWeek(week){
   $("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs?"Ends":"Ended"}: ${fmtIso(week?.endedAt)}`;
   $("weekLeader").innerHTML=leader?`${playerHtml(leader)} · ${fmtScore(leader.score)}`:"—";
   $("featuredMapNumber").textContent=featured?`Week ${number} · Map ${featured.mapNumber||featuredIndex+1} of ${maps.length}`:`Week ${number}`;
-  $("featuredMapName").textContent=featured?.mapName||"Weekly Shorts map";
+  renderTrackmaniaText($("featuredMapName"),featured?.mapName||"Weekly Shorts map");
   $("featuredMapAuthor").textContent=featured?.authorName?`By ${featured.authorName}`:"";
   $("featuredMapWr").innerHTML=wr?`${playerHtml(wr)} · ${fmtTime(wr.timeMs)}`:"Not available";
   const playerCount=Number(featured?.playerCount);
