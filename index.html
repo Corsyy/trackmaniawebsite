@@ -425,6 +425,13 @@ h1 span{
   gap:var(--gap);
   align-items:start;
 }
+.content-main{
+  min-width:0;
+  display:grid;
+  gap:14px;
+  align-content:start;
+}
+.content-main>.footer{margin-top:0}
 .board-head{
   min-height:64px;
   display:flex;
@@ -647,10 +654,13 @@ tbody tr:hover{background:rgba(47,124,255,.055)}
 .player-flag{
   display:inline-block;
   flex:0 0 auto;
-  min-width:1.25em;
-  font-size:1.05em;
-  line-height:1;
-  text-align:center;
+  width:20px;
+  height:15px;
+  margin-right:7px;
+  object-fit:cover;
+  border-radius:2px;
+  vertical-align:-2px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.18);
 }
 
 .hidden{display:none!important}
@@ -1210,7 +1220,8 @@ td{font-size:.79rem}
     </section>
 
     <section class="content">
-      <section class="card board" id="leaderboards">
+      <div class="content-main">
+        <section class="card board" id="leaderboards">
         <div class="board-head">
           <div class="board-title"><span>▮</span><h2 id="boardHeading">All-Time Leaderboard</h2></div>
           <div class="controls">
@@ -1271,7 +1282,23 @@ td{font-size:.79rem}
             <button id="clearGoatSearch" class="mini-btn" type="button">Clear</button>
           </div>
         </div>
-      </section>
+        </section>
+
+        <footer class="footer">
+          <div class="footer-brand">
+            <span class="footer-emblem" aria-hidden="true">♜</span>
+            <div>
+              <strong>Built for the community. Preserved for competition.</strong>
+              <span>Accurate stats. Transparent history. For every run that counts.</span>
+            </div>
+          </div>
+          <div class="footer-stats">
+            <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="22" rx="2"/><path d="M10 3v8m12-8v8M4 14h24m-18 5h3m5 0h3m-11 5h3"/></svg></span><span><b id="footerWeeks">—</b> Weeks Archived</span></div>
+            <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M18 3 5 18h9l-2 11 15-17H17z"/></svg></span><span><b id="footerWrs">—</b> Total WRs</span></div>
+            <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M11 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm11 0a4 4 0 1 0 0-8m-19 19v-3a8 8 0 0 1 16 0v3m3-9a7 7 0 0 1 7 7v2"/></svg></span><span><b id="footerPlayers">—</b> Players Tracked</span></div>
+          </div>
+        </footer>
+      </div>
 
       <aside>
         <section class="card activity" id="changelog">
@@ -1289,21 +1316,6 @@ td{font-size:.79rem}
         </section>
       </aside>
     </section>
-
-    <footer class="footer">
-      <div class="footer-brand">
-        <span class="footer-emblem" aria-hidden="true">♜</span>
-        <div>
-          <strong>Built for the community. Preserved for competition.</strong>
-          <span>Accurate stats. Transparent history. For every run that counts.</span>
-        </div>
-      </div>
-      <div class="footer-stats">
-        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="22" rx="2"/><path d="M10 3v8m12-8v8M4 14h24m-18 5h3m5 0h3m-11 5h3"/></svg></span><span><b id="footerWeeks">—</b> Weeks Archived</span></div>
-        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M18 3 5 18h9l-2 11 15-17H17z"/></svg></span><span><b id="footerWrs">—</b> Total WRs</span></div>
-        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M11 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm11 0a4 4 0 1 0 0-8m-19 19v-3a8 8 0 0 1 16 0v3m3-9a7 7 0 0 1 7 7v2"/></svg></span><span><b id="footerPlayers">—</b> Players Tracked</span></div>
-      </div>
-    </footer>
 
     <section class="card week-board archive-section" id="weekArchive">
       <div class="board-head">
@@ -1334,12 +1346,11 @@ const $ = (id) => document.getElementById(id);
 function esc(value){return String(value ?? "").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function fmtScore(v){const n=Number(v); return Number.isFinite(n) ? n.toLocaleString() : "—";}
 function fmtIso(iso){if(!iso)return"—";const d=new Date(iso);if(isNaN(d.getTime()))return iso;return d.toLocaleString(undefined,{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});}
-function countryFlag(code){code=String(code||"").trim().toUpperCase();if(!/^[A-Z]{2}$/.test(code))return"";return [...code].map(ch=>String.fromCodePoint(127397+ch.charCodeAt(0))).join("");}
-function playerText(player){const flag=countryFlag(player?.countryCode);return `${flag?`${flag} `:""}${player?.player||"—"}`;}
-function playerHtml(player,badge=""){const flag=countryFlag(player?.countryCode),title=player?.countryName?` title="${esc(player.countryName)}"`:"",flagHtml=flag?`<span class="player-flag" role="img" aria-label="${esc(player.countryName||player.countryCode)}"${title}>${flag}</span>`:"";return `${badge}${flagHtml}${esc(player?.player||"—")}`;}
+function countryFlagUrl(code){code=String(code||"").trim().toLowerCase();return /^[a-z]{2}$/.test(code)?`https://flagcdn.com/20x15/${code}.png`:"";}
+function playerHtml(player,badge=""){const flagUrl=countryFlagUrl(player?.countryCode),country=player?.countryName||player?.countryCode||"",flagHtml=flagUrl?`<img class="player-flag" src="${flagUrl}" alt="${esc(country)} flag" title="${esc(country)}" width="20" height="15" loading="lazy">`:"";return `${badge}${flagHtml}${esc(player?.player||"—")}`;}
 async function fetchJson(url){const sep=url.includes("?")?"&":"?";const r=await fetch(`${url}${sep}v=${Date.now()}`,{cache:"no-store"});if(!r.ok)throw new Error(`Failed ${r.status} ${url}`);return r.json();}
 function pickLeader(players,key){let best=null;for(const p of players||[]){const val=Number(p?.[key]??0),bval=Number(best?.[key]??0);if(!best||val>bval||(val===bval&&(p.player||"").toLowerCase()<(best.player||"").toLowerCase()))best=p;}return best;}
-function renderKpis(agg,weeksCount){const players=agg.players||[],w=pickLeader(players,"wins"),r=pickLeader(players,"wrs"),t=pickLeader(players,"top5"),totalWrs=players.reduce((sum,p)=>sum+Number(p.wrs||0),0);$("kpiWinsVal").textContent=w?fmtScore(w.wins):"—";$("kpiWinsName").textContent=playerText(w);$("kpiWrsVal").textContent=r?fmtScore(r.wrs):"—";$("kpiWrsName").textContent=playerText(r);$("kpiTop5Val").textContent=t?fmtScore(t.top5):"—";$("kpiTop5Name").textContent=playerText(t);$("kpiWeekCount").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerWeeks").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerPlayers").textContent=fmtScore(players.length);$("footerWrs").textContent=fmtScore(totalWrs);}
+function renderKpis(agg,weeksCount){const players=agg.players||[],w=pickLeader(players,"wins"),r=pickLeader(players,"wrs"),t=pickLeader(players,"top5"),totalWrs=players.reduce((sum,p)=>sum+Number(p.wrs||0),0);$("kpiWinsVal").textContent=w?fmtScore(w.wins):"—";$("kpiWinsName").innerHTML=playerHtml(w);$("kpiWrsVal").textContent=r?fmtScore(r.wrs):"—";$("kpiWrsName").innerHTML=playerHtml(r);$("kpiTop5Val").textContent=t?fmtScore(t.top5):"—";$("kpiTop5Name").innerHTML=playerHtml(t);$("kpiWeekCount").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerWeeks").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerPlayers").textContent=fmtScore(players.length);$("footerWrs").textContent=fmtScore(totalWrs);}
 function sortPlayers(players,sortBy){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="wins")return arr.sort(by("wins"));if(sortBy==="wrs")return arr.sort(by("wrs"));if(sortBy==="top5")return arr.sort(by("top5"));return arr.sort((a,b)=>(a.player||"").localeCompare(b.player||""));}
 function sortGoatPlayers(players,sortBy){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="points")return arr.sort(by("goatPoints"));if(sortBy==="wins")return arr.sort((a,b)=>Number(b.weekWins??b.wins??0)-Number(a.weekWins??a.wins??0)||(a.player||"").localeCompare(b.player||""));if(sortBy==="wrs")return arr.sort(by("wrs"));return arr.sort((a,b)=>(a.player||"").localeCompare(b.player||""));}
 function getOverallList(players,sortBy,term){term=(term||"").trim().toLowerCase();let list=sortPlayers(players,sortBy);return term?list.filter(p=>(p.player||"").toLowerCase().includes(term)):list;}
@@ -1377,7 +1388,7 @@ function renderFeaturedWeek(week){
   const leader=(week?.entries||[])[0];
   $("weekChip").textContent=`Week ${number}`;
   $("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs?"Ends":"Ended"}: ${fmtIso(week?.endedAt)}`;
-  $("weekLeader").textContent=leader?`${playerText(leader)} · ${fmtScore(leader.score)}`:"—";
+  $("weekLeader").innerHTML=leader?`${playerHtml(leader)} · ${fmtScore(leader.score)}`:"—";
 }
 function renderWeek(week){
   const body=$("weekBody");
