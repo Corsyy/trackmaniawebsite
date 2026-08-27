@@ -588,8 +588,27 @@ th:not(.num) .sort-head{justify-content:flex-start}
 table{
   width:100%;
   min-width:860px;
+  table-layout:fixed;
   border-collapse:collapse;
 }
+.overall-table th:nth-child(1),.overall-table td:nth-child(1){width:7%}
+.overall-table th:nth-child(2),.overall-table td:nth-child(2){width:24%}
+.overall-table th:nth-child(3),.overall-table td:nth-child(3),.overall-table th:nth-child(4),.overall-table td:nth-child(4){width:10%}
+.overall-table th:nth-child(5),.overall-table td:nth-child(5),.overall-table th:nth-child(6),.overall-table td:nth-child(6){width:11%}
+.overall-table th:nth-child(7),.overall-table td:nth-child(7){width:27%}
+.points-table th:nth-child(1),.points-table td:nth-child(1){width:7%}
+.points-table th:nth-child(2),.points-table td:nth-child(2){width:27%}
+.points-table th:nth-child(3),.points-table td:nth-child(3){width:18%}
+.points-table th:nth-child(4),.points-table td:nth-child(4){width:15%}
+.points-table th:nth-child(5),.points-table td:nth-child(5){width:20%}
+.points-table th:nth-child(6),.points-table td:nth-child(6){width:13%}
+.goat-table th:nth-child(1),.goat-table td:nth-child(1){width:6%}
+.goat-table th:nth-child(2),.goat-table td:nth-child(2){width:20%}
+.goat-table th:nth-child(3),.goat-table td:nth-child(3){width:12%}
+.goat-table th:nth-child(4),.goat-table td:nth-child(4){width:14%}
+.goat-table th:nth-child(n+5),.goat-table td:nth-child(n+5){width:8%}
+.overall-table .player,.points-table .player,.goat-table .player{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sortBy,#pointsSortBy,#goatSortBy{width:154px;flex:0 0 154px}
 th,td{
   padding:13px 20px;
   border-bottom:1px solid rgba(255,255,255,.07);
@@ -1360,7 +1379,7 @@ td{font-size:.79rem}
         <div id="overallPanel">
           <div class="note overall-note">Overall stats include live week data and post-week WR tracking where available.</div>
           <div class="table-wrap">
-            <table>
+            <table class="overall-table">
               <thead><tr><th style="width:72px">#</th><th><button class="sort-head" data-sort-target="overall" data-sort-key="name">Player</button></th><th class="num"><button class="sort-head" data-sort-target="overall" data-sort-key="wins">Wins</button></th><th class="num"><button class="sort-head" data-sort-target="overall" data-sort-key="wrs">WRs</button></th><th class="num"><button class="sort-head" data-sort-target="overall" data-sort-key="top5">Top 5</button></th><th class="num"><button class="sort-head" data-sort-target="overall" data-sort-key="top5Pct">Top 5 %</button></th><th class="num"><button class="sort-head" data-sort-target="overall" data-sort-key="weeksWon">Weeks Won</button></th></tr></thead>
               <tbody id="overallBody"></tbody>
             </table>
@@ -1377,7 +1396,7 @@ td{font-size:.79rem}
         <div id="pointsPanel" class="hidden">
           <div class="note overall-note">Cumulative weekly scores across every archived Weekly Shorts week.</div>
           <div class="table-wrap">
-            <table>
+            <table class="points-table">
               <thead><tr><th style="width:72px">#</th><th><button class="sort-head" data-sort-target="points" data-sort-key="name">Player</button></th><th class="num"><button class="sort-head" data-sort-target="points" data-sort-key="totalPoints">Total points</button></th><th class="num"><button class="sort-head" data-sort-target="points" data-sort-key="weeksPlayed">Weeks played</button></th><th class="num"><button class="sort-head" data-sort-target="points" data-sort-key="bestWeeklyScore">Best weekly score</button></th><th class="num"><button class="sort-head" data-sort-target="points" data-sort-key="bestWeeklyRank">Best weekly rank</button></th></tr></thead>
               <tbody id="pointsBody"></tbody>
             </table>
@@ -1397,7 +1416,7 @@ td{font-size:.79rem}
             <span class="tier-list"><span class="tier-badge tier-bronze">Bronze 250+</span><span class="tier-badge tier-silver">Silver 500+</span><span class="tier-badge tier-gold">Gold 750+</span><span class="tier-badge tier-champion">Champion #1</span></span>
           </div>
           <div class="table-wrap">
-            <table>
+            <table class="goat-table">
               <thead><tr><th style="width:72px">#</th><th><button class="sort-head" data-sort-target="goat" data-sort-key="name">Player</button></th><th class="num"><button class="sort-head" data-sort-target="goat" data-sort-key="points">Points</button></th><th>Tier</th><th class="num"><button class="sort-head" data-sort-target="goat" data-sort-key="wins">Wins</button></th><th class="num"><button class="sort-head" data-sort-target="goat" data-sort-key="wrs">WRs</button></th><th class="num"><button class="sort-head" data-sort-target="goat" data-sort-key="secondPlaces">2nd</button></th><th class="num"><button class="sort-head" data-sort-target="goat" data-sort-key="thirdPlaces">3rd</button></th><th class="num"><button class="sort-head" data-sort-target="goat" data-sort-key="fourthPlaces">4th</button></th><th class="num"><button class="sort-head" data-sort-target="goat" data-sort-key="fifthPlaces">5th</button></th></tr></thead>
               <tbody id="goatBody"></tbody>
             </table>
