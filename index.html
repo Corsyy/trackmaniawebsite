@@ -167,6 +167,28 @@ button:disabled{opacity:.45;cursor:not-allowed}
 }
 .discord-btn svg{display:block}
 .discord-btn:hover{color:#fff;border-color:rgba(174,200,255,.36)}
+.cards-btn{
+  height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:0 14px;
+  border:1px solid rgba(72,137,239,.55);
+  border-radius:6px;
+  background:linear-gradient(180deg,rgba(31,75,145,.38),rgba(15,39,80,.34));
+  color:#dceaff;
+  font-size:.78rem;
+  font-weight:900;
+  white-space:nowrap;
+  transition:border-color .18s ease,background .18s ease,color .18s ease;
+}
+.cards-btn svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.8}
+.cards-btn:hover{
+  color:#fff;
+  border-color:#6ca7ff;
+  background:linear-gradient(180deg,rgba(40,99,190,.5),rgba(18,51,105,.46));
+}
 .menu-btn{display:none!important}
 
 /* Mockup body: fixed page gutters, not centered/narrow */
@@ -1267,6 +1289,10 @@ td{font-size:.79rem}
           <input id="globalSearch" type="search" placeholder="Search players, weeks..." autocomplete="off" />
           <span class="kbd">/</span>
         </label>
+        <a class="cards-btn" href="/cards.html" aria-label="Open Card Collection">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h5"/></svg>
+          <span>Cards</span>
+        </a>
         <a class="discord-btn" href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer" aria-label="Discord">
           <svg aria-hidden="true" viewBox="0 0 245 240" width="21" height="21" fill="currentColor">
             <path d="M104.4 103.9c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1.1-6.1-4.5-11.1-10.2-11.1Zm36.8 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1 0-6.1-4.5-11.1-10.2-11.1Z"/>
