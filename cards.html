@@ -204,11 +204,28 @@
       .collection-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px}
       .collection-tools input{grid-column:1/-1;width:100%;min-width:0}
       .collection-tools select{width:100%;min-width:0}
-      .card-grid{grid-template-columns:minmax(0,390px);justify-content:center;gap:14px;padding:14px}
-      .card-inner{padding:13px}
+      .card-grid{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;gap:9px;padding:10px}
+      .card-inner{padding:8px}
+      .card-top{font-size:clamp(.48rem,2.2vw,.57rem);letter-spacing:.07em}
+      .card-rank{min-width:27px;height:18px;padding:0 5px;font-size:.5rem}
+      .card-portrait{margin:7px 0 8px}
+      .player-crest{width:67%;height:67%}
+      .crest-flag-img{width:76%;max-height:58%;border-width:1px}
+      .card-name{font-size:clamp(.76rem,3.7vw,.94rem)}
+      .card-country{margin-top:2px;font-size:clamp(.5rem,2.35vw,.6rem)}
+      .card-stats{gap:3px;margin-top:7px}
+      .card-stat{padding:5px 2px}
+      .card-stat b{font-size:clamp(.58rem,2.7vw,.7rem)}
+      .card-stat small{font-size:clamp(.38rem,1.7vw,.46rem)}
+      .card-series{margin-top:5px;padding-top:5px;font-size:.45rem}
       .reveal-grid{grid-template-columns:1fr;padding:14px}
-      .reveal-slot{flex-basis:min(100%,330px);width:min(100%,330px)}
+      .reveal-slot{flex-basis:min(100%,280px);width:min(100%,280px)}
       .pack-experience{padding:16px}.interactive-pack{width:250px;height:347px}.interactive-brand{inset:60px 23px 42px}.interactive-brand img{width:78px;height:78px}.interactive-top{height:63px}.tear-track{top:36px}.interactive-card-stack{top:70px;width:170px;height:238px}.pack-heading{margin-bottom:13px}.pack-heading h2{font-size:1.6rem}.pack-heading p{max-width:280px}.pack-close{right:14px;top:14px}.crest-country{font-size:.35rem;width:60%}
+    }
+    @media(max-width:340px){
+      .card-grid{grid-template-columns:minmax(0,290px);justify-content:center;padding:10px}
+      .card-inner{padding:11px}
+      .card-name{font-size:.92rem}
     }
   </style>
 </head>
