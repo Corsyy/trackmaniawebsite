@@ -151,6 +151,36 @@
     .pack-mark::before{display:none!important;content:none!important}
     .pack-shell,.interactive-wrapper,.interactive-top{background-image:radial-gradient(circle at 24% 18%,rgba(52,115,202,.42),transparent 34%),radial-gradient(circle at 82% 78%,rgba(204,82,27,.2),transparent 32%),linear-gradient(155deg,#102744,#07111f 48%,#030912)!important;background-color:#07111f!important;background-size:auto!important;background-position:center!important}
 
+    /* Keep the featured card edge crisp and make the tear line the true pack seam */
+    .hero-card{transform:none;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+    .player-card::after{display:none!important;content:none!important}
+    .player-crest::before{background:none!important}
+    .interactive-pack{--cut-y:59px}
+    .interactive-top{
+      height:var(--cut-y)!important;
+      transform-origin:8% 100%!important;
+    }
+    .tear-track{
+      top:calc(var(--cut-y) - 15px)!important;
+      height:30px!important;
+      border:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+    }
+    .tear-track::before{
+      top:14px!important;
+      height:2px!important;
+      clip-path:none!important;
+      background:linear-gradient(90deg,rgba(255,123,27,.3),#ff9b52)!important;
+      box-shadow:0 0 7px rgba(255,123,27,.42)!important;
+    }
+    .tear-dashes{
+      top:15px!important;
+      border-top:1px dashed rgba(231,242,255,.55)!important;
+    }
+    .torn-foil{top:15px!important}
+    #tearHandle{top:-12px}
+
     @media(prefers-reduced-motion:reduce){.chest-stage.opening,.pack-stage.opening,.pack-stage.opening *,.reveal-grid .player-card{animation:none!important}.reveal-grid .player-card{opacity:1;transform:none}}
     @media(max-width:1180px){.hero{grid-template-columns:1fr 350px}.card-grid{grid-template-columns:repeat(4,1fr)}}
     @media(max-width:850px){.hero{grid-template-columns:1fr}.hero-card-stage{display:none}.dashboard{grid-template-columns:1fr}.card-grid{grid-template-columns:repeat(3,1fr)}.collection-tools{width:100%;flex-wrap:wrap}.panel-head{align-items:flex-start;flex-direction:column}.collection-tools input{flex:1;min-width:170px}.reveal-grid{grid-template-columns:repeat(3,1fr)}}
