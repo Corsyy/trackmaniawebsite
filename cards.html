@@ -326,7 +326,7 @@
       {name:"Shorts Racer",country:"Canada",rank:1320,points:"151K",wins:0,wrs:1,rarity:"uncommon"},
       {name:"New Challenger",country:"United Kingdom",rank:3868,points:"38K",wins:0,wrs:0,rarity:"common"}
     ];
-    const state={user:null,cards:[],chest:null,shardPack:null,weekendPack:null,selectedPack:"daily",packType:"daily",revealIndex:0,revealCards:[],preview:true,page:1,pageSize:48,total:0,loading:false,collectorSort:"score",collectorDirection:"desc",collectorExpanded:false,collectorTotal:0};
+    const state={user:null,cards:[],chest:null,shardPack:null,weekendPack:null,selectedPack:"daily",packType:"daily",revealIndex:0,revealCards:[],preview:true,page:1,pageSize:60,total:0,loading:false,collectorSort:"score",collectorDirection:"desc",collectorExpanded:false,collectorTotal:0};
     const $=id=>document.getElementById(id);
     const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     function flagUrl(code){const value=String(code||"").toLowerCase();return /^[a-z]{2}$/.test(value)?`https://flagcdn.com/w80/${value}.png`:"/img/weekly-shorts-favicon.png";}
