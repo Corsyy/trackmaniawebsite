@@ -256,6 +256,43 @@
 
     /* The foil cap is a real sibling of the wrapper so it can fall from the exact cut seam. */
     .interactive-pack>.interactive-top{top:0!important;left:0!important;right:0!important;height:var(--cut-y)!important;z-index:15;pointer-events:none;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)!important;border-bottom:1px dashed rgba(231,242,255,.62)!important}.interactive-pack.torn>.interactive-wrapper{clip-path:polygon(0 var(--cut-y),100% var(--cut-y),100% 97%,95% 100%,5% 100%,0 97%)!important}.interactive-pack.torn>.interactive-top{animation:cut-piece-fall .92s cubic-bezier(.2,.62,.42,1) .05s forwards!important}
+    /* 2026 launch polish: one authoritative responsive layer */
+    :root{--shell:1600px;--radius:15px;--control:44px}
+    body{background:radial-gradient(circle at 50% -20%,rgba(47,124,255,.18),transparent 37%),linear-gradient(180deg,#050914,#071225 48%,#050914)}body::before{opacity:.12;background:linear-gradient(115deg,transparent 0 52%,rgba(47,124,255,.08) 52% 53%,transparent 53%)}
+    .topbar{height:70px;background:rgba(4,8,18,.88);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%)}
+    .nav{width:min(var(--shell),calc(100% - clamp(24px,5vw,80px)));height:70px}.nav-link{height:70px}
+    main{width:min(var(--shell),calc(100% - clamp(24px,5vw,80px)));margin-inline:auto;padding:22px 0 64px}
+    .panel,.hero,.status-banner{border-radius:var(--radius);border:1px solid rgba(174,200,255,.14);box-shadow:0 18px 55px rgba(0,0,0,.22)}
+    .hero{min-height:250px;grid-template-columns:minmax(0,1fr) minmax(300px,420px);overflow:hidden;background:radial-gradient(circle at 78% 45%,rgba(47,124,255,.16),transparent 28%),linear-gradient(115deg,rgba(6,13,25,.99),rgba(8,18,34,.88))}
+    .hero-copy{padding:clamp(28px,4vw,52px)}.hero h1{font-size:clamp(2.55rem,4.2vw,4.25rem);text-wrap:balance}.hero p{max-width:680px;font-size:.94rem}
+    .dashboard{gap:15px}.panel-head{min-height:62px;padding:15px 18px}.panel-head h2{letter-spacing:.05em}
+    .claim-btn,.shard-pack-btn,.connect-trackmania,.trade-button,.collector-board-toggle,.collection-tools input,.collection-tools select,.collection-pager button{min-height:var(--control)}
+    .pack-choice{min-height:58px;border-radius:9px}.status-banner{min-height:42px;padding:10px 14px}
+    .trade-panel{overflow:hidden}.trade-grid{display:flex;gap:0;padding:0 14px 15px}.trade-recipe{position:relative;flex:1;border-radius:0;border-width:1px 1px 1px 0;background:rgba(6,14,25,.68)}.trade-recipe:first-child{border-left-width:1px;border-radius:9px 0 0 9px}.trade-recipe:last-child{border-radius:0 9px 9px 0}.trade-route{justify-content:center}.trade-count{text-align:center}.trade-button{border-radius:7px}
+    .collection{margin-top:15px}.collection .panel-head{gap:14px}.collection-tools{display:grid;grid-template-columns:minmax(210px,1.4fr) repeat(3,minmax(125px,.7fr));width:min(100%,720px)}.collection-tools input{width:100%}
+    .card-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(10px,1.1vw,16px);padding:18px}
+    .player-card{width:100%;aspect-ratio:5/7;border-radius:12px;clip-path:polygon(0 0,94% 0,100% 4.3%,100% 100%,6% 100%,0 95.7%);background-image:linear-gradient(180deg,color-mix(in srgb,var(--accent) 10%,rgba(5,10,18,.15)),rgba(4,9,16,.58) 56%,#050a12 100%),url('/img/weekly-shorts-card-stadium.png')!important;box-shadow:0 14px 32px rgba(0,0,0,.28)}
+    .player-card::before{background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 26%,rgba(2,6,11,.2) 57%,rgba(2,6,11,.7))!important}.player-card::after{display:none!important}
+    .card-inner{padding:clamp(9px,1vw,13px)}.card-top{height:23px;padding-bottom:7px}.card-portrait{margin:9px 0 10px;background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 65%)!important}.card-portrait::before,.card-portrait::after,.player-crest::before{display:none!important}
+    .player-crest{width:64%;height:64%;background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 13%,#111a28),rgba(3,8,15,.92) 70%);box-shadow:0 15px 28px rgba(0,0,0,.42);transition:transform .18s ease}.crest-flag-img{width:72%;max-height:50%;object-fit:cover}.crest-country{display:none}.crest-rank{left:8px;top:10px}.crest-achievement{right:7px;top:9px}
+    .card-name{margin-top:4px;font-size:clamp(.78rem,1vw,.98rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card-country{margin-top:3px}.card-stats{margin-top:9px}.card-stat{min-width:0;padding:7px 2px}.card-series{margin-top:8px;text-align:center}
+    .player-card[data-owned="true"]{box-shadow:0 15px 34px rgba(0,0,0,.34),0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent)}.player-card[data-owned="false"]{opacity:.78;filter:saturate(.7)}
+    .collector-board{overflow:hidden}.collector-table-scroll{border-top:1px solid rgba(174,200,255,.08)}.collector-table{min-width:860px}.collector-table thead th{position:sticky;top:0;z-index:3;background:#0c1728}.collector-row:hover{background:rgba(75,140,255,.055)}
+    .reveal-grid.multi-reveal{justify-content:center;gap:12px;padding:22px;overflow-x:auto}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.685714;flex:0 0 192px;width:192px;height:269px}.reveal-grid.multi-reveal .player-card,.reveal-grid.multi-reveal .card-back{scale:var(--spread-scale)}.reveal-grid.multi-reveal .reveal-slot:first-child,.reveal-grid.multi-reveal .reveal-slot:last-child{margin:0}
+    dialog{border-radius:16px}.dialog-head{min-height:58px}.reveal-hint{color:#91a3bb}
+    @media(max-width:1240px){.card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.reveal-grid.multi-reveal{justify-content:flex-start}.trade-grid{overflow-x:auto}.trade-recipe{flex:0 0 190px}}
+    @media(max-width:960px){.hero{grid-template-columns:1fr 260px}.card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.collection-tools{width:100%}.dashboard{grid-template-columns:1fr}.trade-recipe{flex-basis:180px}}
+    @media(max-width:700px){
+      .topbar,.nav{height:66px}.nav{width:calc(100% - 20px)}.nav-link{display:none}.brand{gap:9px}.brand img{width:43px;height:36px}.brand strong{font-size:.78rem}.brand small{display:none}.login-btn{min-height:42px;max-width:148px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.avatar{width:34px;height:34px}
+      main{width:calc(100% - 20px);padding-top:10px}.hero{min-height:210px;display:block}.hero-copy{padding:25px 20px}.hero-card-stage{display:none}.hero h1{font-size:clamp(2rem,10vw,2.8rem)}.hero p{font-size:.82rem}.season-pill{font-size:.62rem}
+      .panel-head{padding:13px 14px}.collection .panel-head{align-items:stretch}.collection-tools{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.collection-tools input{grid-column:1/-1}.collection-tools input,.collection-tools select{width:100%;height:44px}
+      .card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:10px}.card-inner{padding:8px}.card-top{font-size:.52rem}.card-rank{font-size:.48rem}.card-portrait{margin:6px 0 7px}.player-crest{width:67%;height:67%}.crest-rank{min-width:34px;padding:4px 6px;font-size:.48rem}.crest-achievement{min-width:23px;height:23px;font-size:.6rem}.card-name{font-size:clamp(.71rem,3.8vw,.9rem)}.card-country{font-size:.5rem}.card-stat{padding:5px 1px}.card-stat b{font-size:.59rem}.card-stat small{font-size:.37rem}.card-series{font-size:.39rem;padding:4px 3px}
+      .trade-grid{padding:0 10px 11px}.trade-recipe{flex-basis:164px;padding:10px}.trade-button{min-height:40px}
+      .collector-board-actions{display:grid;grid-template-columns:1fr 1fr}.collector-table-scroll{position:relative}.collector-table th:first-child,.collector-table td:first-child{position:sticky;left:0;z-index:4;background:#0b1626}.collector-table th:nth-child(2),.collector-table td:nth-child(2){position:sticky;left:49px;z-index:4;background:#0b1626;box-shadow:8px 0 12px rgba(0,0,0,.24)}
+      #revealDialog.multi-pack{width:calc(100% - 12px)}.reveal-grid.multi-reveal{gap:8px;padding:14px 10px}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.571429;flex-basis:160px;width:160px;height:224px}.reveal-progress{padding-top:10px}.reveal-hint{font-size:.65rem}
+    }
+    @media(max-width:380px){.card-grid{gap:7px;padding:8px}.card-inner{padding:7px}.card-country{display:none}.crest-achievement{display:none}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.535714;flex-basis:150px;width:150px;height:210px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   </style>
 </head>
 <body>
@@ -332,6 +369,8 @@
 
   <script>
     const API_BASE="https://api.weeklyshortshub.live";
+    // Keep the collection journey first; rankings are useful after browsing cards.
+    document.querySelector(".collection")?.after(document.querySelector(".collector-board"));
     const previewCards=[
       {name:"Season Leader",country:"World",rank:1,points:"1.63M",wins:8,wrs:19,rarity:"mythic"},
       {name:"Elite Hunter",country:"United States",rank:24,points:"1.21M",wins:5,wrs:12,rarity:"legendary"},
