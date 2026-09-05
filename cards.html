@@ -156,7 +156,7 @@
     .hero-card{transform:none;backface-visibility:hidden;-webkit-backface-visibility:hidden}
     .player-card::after{display:none!important;content:none!important}
     .player-crest::before{background:none!important}
-    .interactive-pack{--cut-y:59px}
+    .interactive-pack{--cut-y:59px;--pack-w:310px;--pack-h:430px}
     .interactive-top{
       height:var(--cut-y)!important;
       transform-origin:8% 100%!important;
@@ -255,7 +255,7 @@
     #revealDialog.multi-pack{width:min(1240px,calc(100% - 24px));max-width:1240px}.reveal-grid.multi-reveal{min-height:0;display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:15px;overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.785714;display:block;flex:0 0 220px;width:220px;height:308px;aspect-ratio:auto}.reveal-grid.multi-reveal .player-card,.reveal-grid.multi-reveal .card-back{inset:0 auto auto 0;width:280px;height:392px;scale:var(--spread-scale);transform-origin:top left}.reveal-grid.multi-reveal .reveal-slot:last-child{margin-right:auto}.reveal-grid.multi-reveal .reveal-slot:first-child{margin-left:auto}@media(max-width:1180px){.reveal-grid.multi-reveal .reveal-slot:first-child{margin-left:0}.reveal-grid.multi-reveal .reveal-slot:last-child{margin-right:0}}@media(max-width:700px){.reveal-grid.multi-reveal{padding:15px}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.678571;flex-basis:190px;width:190px;height:266px}}
 
     /* The foil cap is a real sibling of the wrapper so it can fall from the exact cut seam. */
-    .interactive-pack>.interactive-top{top:0!important;left:0!important;right:0!important;height:var(--cut-y)!important;z-index:15;pointer-events:none;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)!important;border-bottom:1px dashed rgba(231,242,255,.62)!important}.interactive-pack.torn>.interactive-wrapper{clip-path:polygon(0 var(--cut-y),100% var(--cut-y),100% 97%,95% 100%,5% 100%,0 97%)!important}.interactive-pack.torn>.interactive-top{animation:cut-piece-fall .92s cubic-bezier(.2,.62,.42,1) .05s forwards!important}
+    .interactive-wrapper,.interactive-pack>.interactive-top{background-size:var(--pack-w) var(--pack-h)!important;background-position:center top!important;background-repeat:no-repeat!important}.interactive-pack>.interactive-top{top:0!important;left:0!important;right:0!important;height:var(--cut-y)!important;z-index:4;pointer-events:none;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)!important;border-bottom:1px dashed rgba(231,242,255,.62)!important}.interactive-pack.torn>.interactive-wrapper{clip-path:polygon(0 var(--cut-y),100% var(--cut-y),100% 97%,95% 100%,5% 100%,0 97%)!important}.interactive-pack.torn>.interactive-top{animation:cut-piece-fall .92s cubic-bezier(.2,.62,.42,1) .05s forwards!important}
     /* 2026 launch polish: one authoritative responsive layer */
     :root{--shell:1600px;--radius:15px;--control:44px}
     body{background:radial-gradient(circle at 50% -20%,rgba(47,124,255,.18),transparent 37%),linear-gradient(180deg,#050914,#071225 48%,#050914)}body::before{opacity:.12;background:linear-gradient(115deg,transparent 0 52%,rgba(47,124,255,.08) 52% 53%,transparent 53%)}
@@ -291,7 +291,7 @@
       .card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:10px}.card-inner{padding:8px}.card-top{font-size:.52rem}.card-rank{font-size:.48rem}.card-portrait{margin:6px 0 7px}.player-crest{width:67%;height:67%}.crest-rank{min-width:34px;padding:4px 6px;font-size:.48rem}.crest-achievement{min-width:23px;height:23px;font-size:.6rem}.card-name{font-size:clamp(.71rem,3.8vw,.9rem)}.card-country{font-size:.5rem}.card-stat{padding:5px 1px}.card-stat b{font-size:.59rem}.card-stat small{font-size:.37rem}.card-series{font-size:.39rem;padding:4px 3px}
       .trade-grid{padding:0 10px 11px}.trade-recipe{flex-basis:164px;padding:10px}.trade-button{min-height:40px}
       .collector-board-actions{display:grid;grid-template-columns:1fr 1fr}.collector-table-scroll{position:relative}.collector-table th:first-child,.collector-table td:first-child{position:sticky;left:0;z-index:4;background:#0b1626}.collector-table th:nth-child(2),.collector-table td:nth-child(2){position:sticky;left:49px;z-index:4;background:#0b1626;box-shadow:8px 0 12px rgba(0,0,0,.24)}
-      #revealDialog.multi-pack{width:calc(100% - 12px)}.reveal-grid.multi-reveal{gap:8px;padding:14px 10px}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.571429;flex-basis:160px;width:160px;height:224px}.reveal-progress{padding-top:10px}.reveal-hint{font-size:.65rem}
+      #revealDialog.multi-pack{width:calc(100% - 12px)}.reveal-grid.multi-reveal{gap:8px;padding:14px 10px}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.571429;flex-basis:160px;width:160px;height:224px}.reveal-progress{padding-top:10px}.reveal-hint{font-size:.65rem}.interactive-pack{--pack-w:250px;--pack-h:347px}
     }
     @media(max-width:380px){.card-grid{gap:7px;padding:8px}.card-inner{padding:7px}.card-country{display:none}.crest-achievement{display:none}.reveal-grid.multi-reveal .reveal-slot{--spread-scale:.535714;flex-basis:150px;width:150px;height:210px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
