@@ -1317,6 +1317,27 @@ tbody tr{transition:background .16s ease}tbody tr:hover{background:rgba(75,140,2
 }
 @media(max-width:390px){.nav-actions{gap:7px}.discord-btn{display:none}.kpis{grid-template-columns:1fr 1fr}.hero-copy h1{font-size:1.95rem!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Final production system — restrained motorsport editorial */
+:root{--bg:#050912;--page:#07101d;--panel:#0b1626;--panel2:#0e1b2d;--line:rgba(174,200,235,.13);--line2:rgba(174,200,235,.22);--soft:#c6d1e0;--muted:#8493a8;--blue:#3d82f6;--orange:#ef7b2d;--radius:10px;--shadow:0 14px 38px rgba(0,0,0,.2)}
+body{background:#050912!important;letter-spacing:0}
+.header{border-bottom:1px solid var(--line);background:rgba(5,9,18,.97)!important;box-shadow:none;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.brand img{filter:none}.brand strong{letter-spacing:.035em}.brand small{color:#8796aa}
+.searchbar,.cards-btn,.discord-btn{border-color:var(--line2);background:#091423;box-shadow:none}
+.card,.kpi{border:1px solid var(--line);border-radius:var(--radius)!important;background:#0b1626!important;box-shadow:none!important}
+.hero{border:1px solid var(--line);border-radius:var(--radius)!important;box-shadow:none!important}
+.hero::after{background:linear-gradient(90deg,rgba(5,10,19,.18),transparent 58%)}
+.hero-copy .eyebrow{color:#9eabc0;font-weight:750;letter-spacing:.01em}.hero-copy h1{max-width:780px;font-weight:900;letter-spacing:-.055em!important}.hero-copy p{color:#c0cbda!important}
+.kpis{gap:10px}.kpi{min-height:96px}.kpi-icon{border:0;background:transparent;box-shadow:none}.kpi small{letter-spacing:.065em}.kpi strong{font-weight:850}.kpi span{color:#91a0b4}
+.card-head,.board-head{border-bottom:1px solid var(--line);background:#0c1829}.card-head h2,.board-title h2{font-weight:850;letter-spacing:.035em}
+.live-pill{border:1px solid rgba(65,214,149,.28);background:rgba(65,214,149,.08);box-shadow:none}
+.week-art{border:0;border-radius:7px}.featured-map-stats,.week-meta{border-color:var(--line)}
+.tabs,.select,.input,.mini-btn{border-color:var(--line2);background:#081321;box-shadow:none}.tabs button.active{background:#1f5dad;box-shadow:none}.tabs button,.mini-btn{font-weight:750}
+.note{border-color:var(--line);background:#091524;color:#9eacc0}
+.table-wrap{background:#091321}table{background:transparent}thead th{background:#0d1a2b!important;color:#8d9cb1}tbody tr{background:transparent}tbody tr:hover{background:rgba(61,130,246,.045)}td{border-color:var(--line)}
+.rank-badge,.avatar{box-shadow:none}.board-foot{border-top:1px solid var(--line);background:#0a1524}
+.change-item,.week-item{border-color:var(--line);background:transparent}.change-item:hover,.week-item:hover{background:rgba(255,255,255,.025)}
+@media(max-width:760px){.hero{min-height:280px}.hero-copy{padding-bottom:112px!important}.hero-copy h1{font-size:clamp(1.9rem,9.5vw,2.75rem)!important}.kpi{min-height:88px}.card-head,.board-head{padding:15px}.content{margin-top:14px}}
 </style>
 </head>
 
