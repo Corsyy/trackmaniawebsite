@@ -319,6 +319,20 @@
     .interactive-wrapper,.interactive-pack>.interactive-top{border-color:#456c9e!important;background-image:radial-gradient(circle at 25% 12%,rgba(61,130,246,.22),transparent 31%),radial-gradient(circle at 86% 82%,rgba(239,123,45,.13),transparent 28%),linear-gradient(160deg,#102744,#07111f 50%,#030912)!important;box-shadow:none!important}.interactive-wrapper::before,.interactive-wrapper::after{display:none!important;content:none!important}.wrapper-shine{display:none!important}.interactive-brand{border:0;background:rgba(4,11,20,.36)}.tear-track::before{box-shadow:none!important}.interactive-particles i{opacity:.7}
     #revealDialog{background:#081321}.dialog-head{background:#0c1829}.reveal-grid{background:#07101d}.reveal-grid .player-card{box-shadow:0 12px 28px rgba(0,0,0,.34)!important}
     @media(max-width:700px){.hero{min-height:205px}.hero-copy{padding:25px 20px}.card-grid{gap:8px}.panel-head{padding:13px}.trade-grid{gap:7px}.player-card{box-shadow:0 6px 15px rgba(0,0,0,.2)!important}}
+
+    /* Signature collector layout — deliberate product design */
+    .hero{position:relative;min-height:350px;border-left:3px solid #3d82f6!important;background:linear-gradient(105deg,#091524 0%,#0a1728 64%,#081321 100%)!important}.hero::after{content:"SEASON 01";position:absolute;right:300px;bottom:18px;color:rgba(164,188,224,.13);font-size:clamp(2.5rem,5vw,5rem);font-weight:950;letter-spacing:.06em;pointer-events:none}.hero-copy{position:relative;z-index:2;max-width:820px;padding:42px 44px}.hero-copy .eyebrow{display:flex;align-items:center;gap:9px;font-size:.72rem;letter-spacing:.11em;text-transform:uppercase}.hero-copy .eyebrow::before{content:"";width:24px;height:2px;background:#3d82f6}.hero h1{margin:11px 0 14px;font-size:clamp(2.7rem,4vw,4.25rem);line-height:.97}.hero p{max-width:660px;line-height:1.62}
+    .card-hero-actions{display:flex;align-items:center;gap:10px;margin-top:22px}.card-hero-actions a{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:0 17px;border-radius:6px;font-size:.74rem;font-weight:900}.card-hero-primary{border:1px solid #4a8df9;background:#2f72dc;color:#fff}.card-hero-primary:hover{background:#397fea}.card-hero-secondary{border:1px solid var(--line2);background:#081321;color:#d6e0ed}.season-pill{margin-top:13px}
+    .hero-card-shadow{display:none}.hero .hero-card{width:225px!important;max-width:225px!important;transform:rotate(2deg)!important;box-shadow:0 20px 36px rgba(0,0,0,.38)!important}.hero .hero-card:hover{transform:rotate(0) translateY(-3px)!important}
+    .status-banner{margin-top:12px;border-left:3px solid #4fc58c!important}.dashboard{grid-template-columns:minmax(0,1.55fr) 350px;gap:12px;margin-top:12px}.dashboard>.panel:first-child{border-top:2px solid #3d82f6}.dashboard>aside{border-top:2px solid #566f91}
+    .panel-head{min-height:64px}.panel-head h2{font-size:.78rem}.pack-choice-bar{padding:13px 14px}.pack-choice{position:relative;align-items:flex-start;text-align:left}.pack-choice::after{content:"";position:absolute;right:11px;top:11px;width:7px;height:7px;border:1px solid #6d7d92;border-radius:50%}.pack-choice.active::after{border-color:#8bb6ff;background:#3d82f6}.chest-panel{padding:14px}.chest-box{min-height:230px;border-style:solid}
+    .profile-grid{padding:14px}.profile-stat{padding:12px}.profile-stat b{font-size:1.18rem}.profile-stat small{letter-spacing:.055em}.rarity-progress{margin:0 14px 12px}.connect-box{margin:0 14px 14px}
+    .trade-panel,.collection,.collector-board{margin-top:12px}.trade-panel{border-top:2px solid #667d9c}.collection{border-top:2px solid #3d82f6}.collector-board{border-top:2px solid #667d9c}.collection .panel-head{padding-block:14px}.collection-tools{gap:7px}
+    .card-grid{padding:16px}.player-card{overflow:hidden}.card-top{font-size:.58rem}.card-name{font-weight:900}.card-country{color:#8e9caf}.card-stat b{font-variant-numeric:tabular-nums}.card-series{letter-spacing:.1em}.player-card[data-owned="true"] .card-series{color:var(--accent2)}
+    #revealDialog{border:1px solid var(--line2);box-shadow:0 30px 90px rgba(0,0,0,.56)}.dialog-head{border-bottom:1px solid var(--line)}.reveal-progress{letter-spacing:.12em}.reveal-hint{color:#8797ad}
+    @media(max-width:1050px){.dashboard{grid-template-columns:1fr}.hero::after{right:250px}.dashboard>aside{display:grid;grid-template-columns:1fr 1fr}.dashboard>aside .panel-head{grid-column:1/-1}.profile-grid{align-self:start}.connect-box{align-self:start;margin-top:14px}}
+    @media(max-width:700px){.hero{min-height:280px;border-left-width:1px!important}.hero::after{display:none}.hero-copy{padding:28px 20px}.hero h1{font-size:clamp(2.1rem,10.5vw,3rem)}.hero p{font-size:.82rem;line-height:1.5}.card-hero-actions a{flex:1;padding-inline:10px;font-size:.67rem}.season-pill{font-size:.56rem}.dashboard>aside{display:block}.profile-grid{padding:11px}.rarity-progress,.connect-box{margin-inline:11px}.card-grid{padding:9px}.panel-head h2{font-size:.7rem}}
+    @media(max-width:390px){.card-hero-actions{align-items:stretch;flex-direction:column}.card-hero-actions a{width:100%}}
   </style>
 </head>
 <body>
@@ -343,6 +357,7 @@
         <span class="eyebrow">Free community collection</span>
         <h1>Collect Weekly Shorts history.</h1>
         <p>Open free card packs, discover player cards, complete Season 1, and build a collection around the first 88 weeks of Trackmania Weekly Shorts.</p>
+        <div class="card-hero-actions"><a class="card-hero-primary" href="#packs">Open a pack <span aria-hidden="true">→</span></a><a class="card-hero-secondary" href="#collection">Browse all cards</a></div>
         <span class="season-pill">Season 1 · Weeks 1–88 · 4,000 player cards</span>
       </div>
       <div class="hero-card-stage">
@@ -355,7 +370,7 @@
 
     <div class="status-banner" id="apiStatus"><span><i class="status-dot"></i><strong>Card service setup:</strong> waiting for the VPS API.</span><span id="apiStatusDetail">Frontend ready</span></div>
 
-    <section class="dashboard">
+    <section class="dashboard" id="packs">
       <article class="panel">
         <div class="panel-head"><div><h2>Card Packs</h2><span>Choose a pack and tear it open</span></div><span id="chestState">Sign in to claim</span></div>
         <div class="pack-choice-bar" role="tablist" aria-label="Available card packs"><button class="pack-choice active" id="packChoiceDaily" type="button" data-pack="daily"><strong>Daily</strong><span>Free every day</span></button><button class="pack-choice" id="packChoiceWeekend" type="button" data-pack="weekend"><strong>Weekend</strong><span>Saturday &amp; Sunday</span></button><button class="pack-choice" id="packChoiceShard" type="button" data-pack="shard"><strong>Bonus</strong><span>100 shards</span></button></div>
@@ -382,7 +397,7 @@
       <div class="collector-board-foot"><button class="collector-board-toggle" id="collectorPrev" type="button">← Previous</button><span id="collectorPageInfo">Page 1</span><button class="collector-board-toggle" id="collectorNext" type="button">Next →</button></div>
     </section>
 
-    <section class="panel collection">
+    <section class="panel collection" id="collection">
       <div class="panel-head"><div><h2>Season 1 Collection</h2><span id="collectionSummary">Design preview · catalog loads from the VPS</span></div><div class="collection-tools"><input id="cardSearch" type="search" placeholder="Search player cards..." /><select id="rarityFilter"><option value="all">All rarities</option><option value="mythic">Mythic</option><option value="legendary">Legendary</option><option value="epic">Epic</option><option value="rare">Rare</option><option value="uncommon">Uncommon</option><option value="common">Common</option></select><select id="ownershipFilter"><option value="all">All cards</option><option value="owned">Owned</option><option value="missing">Missing</option></select><select id="sortFilter"><option value="rank">Season rank</option><option value="rarity">Rarity</option><option value="copies">Most copies</option><option value="name">Player name</option><option value="points">Points</option></select></div></div>
       <div class="card-grid" id="cardGrid"></div>
       <div class="collection-pager" id="collectionPager"><button id="prevCards" type="button">← Previous</button><span id="cardPageInfo">Page 1</span><button id="nextCards" type="button">Next →</button></div>
