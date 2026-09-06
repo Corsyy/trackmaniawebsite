@@ -1338,6 +1338,17 @@ body{background:#050912!important;letter-spacing:0}
 .rank-badge,.avatar{box-shadow:none}.board-foot{border-top:1px solid var(--line);background:#0a1524}
 .change-item,.week-item{border-color:var(--line);background:transparent}.change-item:hover,.week-item:hover{background:rgba(255,255,255,.025)}
 @media(max-width:760px){.hero{min-height:280px}.hero-copy{padding-bottom:112px!important}.hero-copy h1{font-size:clamp(1.9rem,9.5vw,2.75rem)!important}.kpi{min-height:88px}.card-head,.board-head{padding:15px}.content{margin-top:14px}}
+
+/* Signature layout — clearly branded, editorial, and purposeful */
+.top-grid{grid-template-columns:minmax(0,1fr) 370px;align-items:stretch}.top-main{display:flex;min-width:0;flex-direction:column;gap:12px}
+.hero{min-height:365px;border-left:3px solid #3d82f6!important}.hero-copy{width:min(61%,760px)!important;padding-left:clamp(28px,3vw,48px)!important}.hero-copy .eyebrow{display:flex;align-items:center;gap:9px;font-size:.76rem!important;letter-spacing:.11em!important;text-transform:uppercase}.hero-copy .eyebrow::before{content:"";width:24px;height:2px;background:#3d82f6}.hero-copy h1{margin:12px 0 15px!important;font-size:clamp(2.75rem,4.55vw,4.8rem)!important}.hero-copy h1 span{color:#8bb6ff}.hero-copy p{max-width:590px!important;font-size:.94rem!important;line-height:1.62!important}
+.hero-actions-pro{display:flex;align-items:center;gap:10px;margin-top:24px}.hero-actions-pro a{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:0 17px;border-radius:6px;font-size:.76rem;font-weight:850;transition:border-color .16s ease,background .16s ease,color .16s ease}.hero-primary{border:1px solid #4a8df9;background:#2f72dc;color:#fff}.hero-primary:hover{background:#397fea}.hero-primary span{font-size:1rem}.hero-secondary{border:1px solid var(--line2);background:rgba(7,16,29,.72);color:#d5deeb}.hero-secondary:hover{border-color:#53719a;background:#0b1a2d}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi{position:relative;overflow:hidden}.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:#6682a8}.kpi.wins::before{background:#f1b541}.kpi.wrs::before{background:#64a0ff}.kpi.top5::before{background:#a78bfa}.kpi.weeks::before{background:#56c98f}.kpi small{color:#8290a5}.kpi strong{font-size:1.55rem}.kpi span{font-size:.7rem}
+.week-feature{height:100%;display:flex;flex-direction:column;border-top:2px solid #3d82f6!important}.week-feature .week-art{flex:1;min-height:235px}.week-feature .card-head{padding:17px 18px}.week-feature .featured-map-stats{background:#091422}.week-feature .week-meta{margin:0;padding:15px 18px;background:#08121f}.week-leader{grid-template-columns:1fr}.week-leader small{letter-spacing:.08em;text-transform:uppercase}
+.board{border-top:2px solid #3d82f6!important}.board-title>span{color:#3d82f6}.side-card{border-top:2px solid #334b6d!important}
+@media(max-width:1180px){.top-grid{grid-template-columns:1fr}.week-feature{display:grid;height:auto}.hero{min-height:340px}.hero-copy{width:min(64%,760px)!important}}
+@media(max-width:760px){.hero{min-height:390px;border-left-width:1px!important}.hero-copy{width:100%!important;padding:26px 20px 145px!important}.hero-copy .eyebrow{font-size:.65rem!important}.hero-copy h1{font-size:clamp(2rem,10.5vw,3rem)!important}.hero-copy p{font-size:.82rem!important;line-height:1.5!important}.hero-actions-pro{margin-top:18px}.hero-actions-pro a{flex:1;padding-inline:10px;font-size:.68rem}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.week-feature{display:block}.week-feature .week-art{min-height:210px}}
+@media(max-width:390px){.hero-actions-pro{align-items:stretch;flex-direction:column}.hero-actions-pro a{width:100%}}
 </style>
 </head>
 
@@ -1381,6 +1392,10 @@ body{background:#050912!important;letter-spacing:0}
             <span class="eyebrow">The definitive archive for</span>
             <h1>Trackmania <span>Weekly Shorts.</span></h1>
             <p>Comprehensive statistics, historic leaderboards, and week-by-week archives for the Trackmania Weekly Shorts community.</p>
+            <div class="hero-actions-pro">
+              <a class="hero-primary" href="#leaderboards">Explore the rankings <span aria-hidden="true">→</span></a>
+              <a class="hero-secondary" href="/cards">Open card collection</a>
+            </div>
           </div>
         </section>
 
