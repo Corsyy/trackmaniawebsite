@@ -1389,6 +1389,126 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
   .performance{grid-template-columns:minmax(240px,calc((100vw - min(1600px,calc(100vw - 48px)))/2 + 230px)) minmax(0,1fr);border-inline:0}.performance-title{padding-left:max(30px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}.performance .kpis{padding-right:max(24px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}
 }
 
+/* Screenshot-parity layout: the supplied desktop reference is authoritative. */
+@media (min-width:1001px){
+  :root{--desktop-gutter:5.325vw}
+  .header,.nav{height:clamp(49px,5.2vh,58px)!important}
+  .nav,.main{width:calc(100% - (var(--desktop-gutter) * 2))!important;max-width:none!important}
+  .main{padding:0 0 0!important}
+
+  .top-grid{
+    grid-template-columns:71% 29%!important;
+    height:clamp(278px,29.6vh,340px)!important;
+    min-height:0!important;
+  }
+  .top-grid .hero,.top-main{height:100%!important;min-height:0!important}
+  .top-grid .hero{background-position:center!important;background-size:cover!important}
+  .hero-copy{
+    width:min(650px,58vw)!important;
+    padding:clamp(30px,4.4vh,46px) 0 24px var(--desktop-gutter)!important;
+  }
+  .hero-copy .eyebrow{font-size:clamp(.68rem,1.25vh,.78rem)!important}
+  .hero-copy h1{margin:9px 0 12px!important;font-size:clamp(3.45rem,6.55vh,4rem)!important;line-height:.91!important}
+  .hero-copy p{max-width:510px!important;font-size:clamp(.79rem,1.48vh,.9rem)!important;line-height:1.48!important}
+  .hero-actions-pro{margin-top:clamp(15px,2vh,20px)!important}
+  .hero-actions-pro a{min-height:40px!important;padding-inline:18px!important}
+
+  .top-grid>aside{margin-left:-4.9vw!important;padding-left:4.9vw!important;clip-path:polygon(4.9vw 0,100% 0,100% 100%,0 100%)!important}
+  .top-grid>aside::before{left:3.42vw!important}
+  .week-feature{grid-template-rows:46px minmax(114px,1fr) 52px 60px!important;padding-right:var(--desktop-gutter)!important}
+  .week-feature .card-head{min-height:46px!important;padding:10px 12px 8px 22px!important}
+  .week-feature .card-head h2{font-size:.9rem!important}
+  .week-feature .week-art{min-height:114px!important;margin-left:10px!important}
+  .week-feature .featured-map-stats{padding:8px 12px!important}
+  .week-feature .week-meta{min-height:0!important}
+  .week-leader{padding:8px 14px 8px 23px!important}
+  .week-countdown{padding:6px 6px 6px 88px!important}
+  .week-countdown .countdown-unit b{font-size:.88rem!important}
+  .week-countdown .countdown-unit small{margin-top:4px!important;font-size:.43rem!important}
+
+  .performance{
+    height:clamp(67px,7.1vh,82px)!important;
+    grid-template-columns:29% 71%!important;
+  }
+  .performance-title{padding-left:9.45vw!important}
+  .performance-title strong{font-size:clamp(1.12rem,2.15vh,1.35rem)!important}
+  .performance-title span{font-size:.62rem!important}
+  .performance .kpi{min-height:100%!important;padding:10px 15px!important}
+  .performance .kpi-icon{width:34px!important;height:34px!important}
+  .performance .kpi strong{font-size:1.18rem!important}
+  .performance .kpi small{font-size:.53rem!important}
+  .performance .kpi span{font-size:.6rem!important}
+  .performance::after{right:var(--desktop-gutter)!important;font-size:3rem!important}
+
+  .content{
+    height:clamp(336px,35.75vh,390px)!important;
+    margin-top:12px!important;
+    grid-template-columns:minmax(0,1.93fr) minmax(390px,1.07fr)!important;
+    gap:12px!important;
+    align-items:stretch!important;
+  }
+  .content-main,.content>aside{height:100%!important;min-height:0!important}
+  .content-main{display:block!important}
+  .board,.activity{height:100%!important;min-height:0!important;overflow:hidden!important}
+  .board-head,.activity .card-head{height:58px!important;min-height:58px!important;padding:10px 16px!important}
+  .board-title h2,.activity .card-head h3{font-size:1rem!important}
+  .overall-table th,.overall-table td,.points-table th,.points-table td,.goat-table th,.goat-table td{padding-top:6px!important;padding-bottom:6px!important}
+  .table-wrap table{font-size:.68rem!important}
+  .board-foot{height:45px!important;min-height:45px!important;padding:6px 14px!important}
+  .board-foot .mini-btn,.board-foot .select{min-height:32px!important}
+  .activity{display:flex!important;flex-direction:column!important;padding-bottom:0!important}
+  .activity-legend{margin:7px 16px 4px!important}
+  .timeline{flex:1!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding:0 16px!important}
+  .logitem{padding-top:7px!important;padding-bottom:7px!important}
+  .activity-link{min-height:35px!important;margin:0 16px!important}
+
+  .archive-section{
+    height:clamp(135px,14.4vh,158px)!important;
+    min-height:0!important;
+    margin:10px 0 0!important;
+    grid-template-columns:72% 28%!important;
+    grid-template-rows:43px minmax(0,1fr)!important;
+    overflow:hidden!important;
+  }
+  .archive-section>.board-head{grid-column:1/-1!important;grid-row:1!important;height:43px!important;min-height:43px!important;padding:7px 16px!important;justify-content:flex-start!important;gap:20px!important}
+  .archive-section>.board-head .select{min-height:31px!important;height:31px!important;margin-left:8px!important}
+  .archive-section .board-title h2{font-size:.95rem!important}
+  .week-spotlight-layout{grid-column:1!important;grid-row:2!important;height:100%!important;grid-template-columns:42% 58%!important;padding:0!important;overflow:hidden!important}
+  .spotlight-map{height:100%!important;min-height:0!important;border-radius:0!important}
+  .week-podium{height:100%!important;min-height:0!important;padding:0 26px 25px!important}
+  .podium-place{min-height:63px!important;padding:14px 8px 9px!important}
+  .podium-1{min-height:88px!important}
+  .podium-place strong{font-size:.66rem!important}.podium-place b{font-size:.82rem!important}
+  .podium-place::before{bottom:-25px!important;height:26px!important}.podium-place::after{bottom:-8px!important;height:14px!important}
+  .archive-section>.table-wrap{grid-column:2!important;grid-row:2!important;height:100%!important;overflow:hidden!important}
+  .archive-section .week-table{height:100%!important;font-size:.6rem!important}
+  .archive-section .week-table th,.archive-section .week-table td{height:auto!important;padding:2px 10px!important;line-height:1.05!important}
+
+  .footer{
+    width:100%!important;
+    height:clamp(44px,4.8vh,56px)!important;
+    min-height:0!important;
+    margin:9px 0 0!important;
+    padding:7px 0!important;
+    display:grid!important;
+    grid-template-columns:minmax(265px,1fr) auto minmax(220px,1fr) 38px!important;
+    align-items:center!important;
+    gap:24px!important;
+    border-width:1px 0 0!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+  .footer-brand{gap:10px!important}.footer-logo{width:43px;height:34px;object-fit:contain}.footer-brand strong{font-size:.76rem!important;text-transform:uppercase}.footer-brand span{margin-top:1px!important;font-size:.56rem!important}
+  .footer-stats{gap:22px!important}.footer-stat{padding-left:20px!important}.footer-stat:first-child{padding-left:0!important}.footer-icon svg{width:21px!important;height:21px!important}.footer-stat span{font-size:.52rem!important}.footer-stat b{font-size:1rem!important}
+  .footer-signoff{justify-self:end;color:#8998ac;font-size:.58rem;white-space:nowrap}
+  .footer-discord{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line2);border-radius:50%;color:#8dbaff;background:#081321}
+}
+
+@media (max-width:1000px){
+  .footer-signoff,.footer-discord{display:none}
+  .footer-logo{width:42px;height:34px;object-fit:contain}
+}
+
 /* Replica correction from deployed 2048px capture */
 @media(min-width:1001px){
   .nav,.main{width:calc(100% - 176px)!important;max-width:none!important}
@@ -1455,6 +1575,35 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
   .week-leader{grid-column:1!important;grid-row:4!important;align-self:stretch!important;display:flex!important;justify-content:center!important;flex-direction:column!important;padding:10px 18px 10px 26px!important;border-top:1px solid var(--line)!important;text-align:left!important}.week-leader strong{max-width:none!important;font-size:.78rem!important}
   .week-countdown{grid-column:2!important;grid-row:3!important;align-self:stretch!important;display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:0!important;padding:7px 8px 7px 112px!important;border:0!important}.week-countdown .countdown-unit{display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;margin:0!important;border-left:1px solid rgba(174,200,235,.13)!important}.week-countdown .countdown-unit:first-child{border-left:0!important}.week-countdown .countdown-unit b{color:#fff!important;font-size:1rem!important;line-height:1!important;font-variant-numeric:tabular-nums}.week-countdown .countdown-unit small{display:block!important;margin-top:5px!important;color:#8f9db1!important;font-size:.48rem!important;letter-spacing:.1em!important;text-transform:uppercase!important}
   .performance{height:clamp(82px,4.2vw,108px)!important;grid-template-columns:29% 71%!important}.performance-title{padding-left:max(60px,7.2vw)!important}.performance-title strong{font-size:clamp(1.35rem,1.35vw,1.72rem)!important}.performance-title span{font-size:.68rem!important}.performance .kpi{min-height:100%!important;padding:15px 18px!important}.performance .kpi-icon{width:38px!important;height:38px!important}.performance .kpi strong{font-size:1.42rem!important}.performance .kpi small{font-size:.58rem!important}.performance .kpi span{font-size:.65rem!important}.performance::after{content:"TM"!important;right:25px!important;color:rgba(114,159,220,.27)!important;font-family:Arial Black,Impact,sans-serif!important;font-size:3.45rem!important;font-style:italic!important;letter-spacing:-.22em!important;transform:translateY(-52%) skewX(-14deg)!important}
+}
+
+/* Final authoritative desktop geometry — keep this as the last desktop layer. */
+@media(min-width:1001px){
+  :root{--desktop-gutter:5.325vw}
+  .header,.header .nav{height:clamp(49px,5.2vh,58px)!important}
+  .nav,.main{width:calc(100% - (var(--desktop-gutter) * 2))!important;max-width:none!important}
+  .main{padding:0!important}
+  .top-grid{grid-template-columns:71% 29%!important;height:clamp(278px,29.6vh,340px)!important;min-height:0!important}
+  .top-main,.hero,.top-grid .hero{height:100%!important;min-height:0!important}
+  .hero-copy{width:min(650px,58vw)!important;padding:clamp(30px,4.4vh,46px) 0 24px var(--desktop-gutter)!important}
+  .hero-copy .eyebrow{font-size:clamp(.68rem,1.25vh,.78rem)!important}
+  .hero-copy h1{margin:9px 0 12px!important;font-size:clamp(3.45rem,6.55vh,4rem)!important;line-height:.91!important}
+  .hero-copy p{max-width:510px!important;font-size:clamp(.79rem,1.48vh,.9rem)!important;line-height:1.48!important}
+  .hero-actions-pro{margin-top:clamp(15px,2vh,20px)!important}.hero-actions-pro a{min-height:40px!important;padding-inline:18px!important}
+  .top-grid>aside{margin-left:-4.9vw!important;padding-left:4.9vw!important;clip-path:polygon(4.9vw 0,100% 0,100% 100%,0 100%)!important}
+  .top-grid>aside::before{left:3.42vw!important}
+  .week-feature{grid-template-rows:46px minmax(114px,1fr) 52px 60px!important;padding-right:var(--desktop-gutter)!important}
+  .week-feature .card-head{min-height:46px!important;padding:10px 12px 8px 22px!important}.week-feature .card-head h2{font-size:.9rem!important}
+  .week-feature .week-art{min-height:114px!important;margin-left:10px!important}.week-feature .featured-map-stats{padding:8px 12px!important}.week-feature .week-meta{min-height:0!important}
+  .week-leader{padding:8px 14px 8px 23px!important}.week-countdown{padding:6px 6px 6px 88px!important}.week-countdown .countdown-unit b{font-size:.88rem!important}.week-countdown .countdown-unit small{margin-top:4px!important;font-size:.43rem!important}
+  .performance{height:clamp(67px,7.1vh,82px)!important;grid-template-columns:29% 71%!important}.performance-title{padding-left:9.45vw!important}.performance-title strong{font-size:clamp(1.12rem,2.15vh,1.35rem)!important}.performance-title span{font-size:.62rem!important}
+  .performance .kpi{padding:10px 15px!important}.performance .kpi-icon{width:34px!important;height:34px!important}.performance .kpi strong{font-size:1.18rem!important}.performance .kpi small{font-size:.53rem!important}.performance .kpi span{font-size:.6rem!important}.performance::after{right:var(--desktop-gutter)!important;font-size:3rem!important}
+  .content{height:clamp(336px,35.75vh,390px)!important;grid-template-columns:minmax(0,1.93fr) minmax(390px,1.07fr)!important;gap:12px!important;align-items:stretch!important}
+  .archive-section{height:clamp(135px,14.4vh,158px)!important;grid-template-columns:72% 28%!important;grid-template-rows:43px minmax(0,1fr)!important}
+  .archive-section>.board-head{height:43px!important;min-height:43px!important;padding:7px 16px!important;justify-content:flex-start!important;gap:20px!important}.archive-section>.board-head .select{height:31px!important;min-height:31px!important;margin-left:8px!important}
+  .week-spotlight-layout{height:100%!important;grid-template-columns:42% 58%!important;padding:0!important}.spotlight-map{height:100%!important;min-height:0!important}
+  .week-podium{height:100%!important;min-height:0!important;padding:0 26px 25px!important}.podium-place{min-height:63px!important;padding:14px 8px 9px!important}.podium-1{min-height:88px!important}.podium-place::before{bottom:-25px!important;height:26px!important}.podium-place::after{bottom:-8px!important;height:14px!important}
+  .archive-section .week-table th,.archive-section .week-table td{padding:2px 10px!important;line-height:1.05!important}
 }
 </style>
 </head>
@@ -1660,26 +1809,12 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
         </div>
         </section>
 
-        <footer class="footer">
-          <div class="footer-brand">
-            <span class="footer-emblem" aria-hidden="true">♜</span>
-            <div>
-              <strong>Built for the community. Preserved for competition.</strong>
-              <span>Accurate stats. Transparent history. For every run that counts.</span>
-            </div>
-          </div>
-          <div class="footer-stats">
-            <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="22" rx="2"/><path d="M10 3v8m12-8v8M4 14h24m-18 5h3m5 0h3m-11 5h3"/></svg></span><span><b id="footerWeeks">—</b> Weeks Archived</span></div>
-            <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M18 3 5 18h9l-2 11 15-17H17z"/></svg></span><span><b id="footerWrs">—</b> Total WRs</span></div>
-            <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M11 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm11 0a4 4 0 1 0 0-8m-19 19v-3a8 8 0 0 1 16 0v3m3-9a7 7 0 0 1 7 7v2"/></svg></span><span><b id="footerPlayers">—</b> Players Tracked</span></div>
-          </div>
-        </footer>
       </div>
 
       <aside>
         <section class="card activity" id="changelog">
           <div class="card-head">
-            <h3>Latest Activity</h3>
+            <h3>Live Activity</h3>
           </div>
           <div class="activity-legend" aria-label="World record improvement color guide">
             <span class="legend-close">&lt;0.010s</span>
@@ -1695,7 +1830,7 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
 
     <section class="card week-board archive-section" id="weekArchive">
       <div class="board-head">
-        <div class="board-title"><span>▣</span><h2>Week Spotlight &amp; Archive</h2></div>
+        <div class="board-title"><span>▣</span><h2>Week Spotlight</h2></div>
         <select id="weekSelect" class="select" aria-label="Select week"></select>
       </div>
       <div class="week-spotlight-layout">
@@ -1710,6 +1845,25 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
         </table>
       </div>
     </section>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <img class="footer-logo" src="/img/weekly-shorts-logo.png" alt="" />
+        <div>
+          <strong>Weekly Shorts Hub</strong>
+          <span>Built for the community. Preserved for competition.</span>
+        </div>
+      </div>
+      <div class="footer-stats">
+        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="22" rx="2"/><path d="M10 3v8m12-8v8M4 14h24m-18 5h3m5 0h3m-11 5h3"/></svg></span><span><b id="footerWeeks">—</b> Weeks Archived</span></div>
+        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M18 3 5 18h9l-2 11 15-17H17z"/></svg></span><span><b id="footerWrs">—</b> Total WRs</span></div>
+        <div class="footer-stat"><span class="footer-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M11 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm11 0a4 4 0 1 0 0-8m-19 19v-3a8 8 0 0 1 16 0v3m3-9a7 7 0 0 1 7 7v2"/></svg></span><span><b id="footerPlayers">—</b> Players Tracked</span></div>
+      </div>
+      <div class="footer-signoff">Stats. History. Competition.</div>
+      <a class="footer-discord" href="https://discord.gg/hx2wXeSNFt" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+        <svg aria-hidden="true" viewBox="0 0 245 240" width="18" height="18" fill="currentColor"><path d="M104.4 103.9c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1.1-6.1-4.5-11.1-10.2-11.1Zm36.8 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.3-5 10.2-11.1 0-6.1-4.5-11.1-10.2-11.1Z"/><path d="M189.5 20h-134C44.2 20 35 29.2 35 40.6v135.1c0 11.4 9.2 20.6 20.5 20.6h113.4l41.1 23.7-5.6-24.4c6.8-3.4 11-10.4 11-18.1V40.6C210 29.2 200.8 20 189.5 20Zm-28 116s-7.4 8.8-27.1 10.4l-3.3-4.1c10.8-3 14.9-9.8 14.9-9.8-21.7 14.6-57.8 5.8-57.8 5.8s4 6.6 14.4 9.7l-3.5 4.4C79.4 150.8 72 136 72 136c0-30 13.4-54.3 13.4-54.3 13.4-10 26.1-9.8 26.1-9.8l3.3 4.1a88 88 0 0 1 15.4 0l3.3-4.1s12.7-.2 26.1 9.8c0 0 13.4 24.3 13.4 54.3 0 0-3.8 6.7-11.5 10Z"/></svg>
+      </a>
+    </footer>
   </main>
 </div>
 
