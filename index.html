@@ -1402,6 +1402,13 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
   .footer{min-height:64px}.archive-section{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(360px,.9fr);align-items:stretch}.archive-section>.board-head{grid-column:1/-1}.week-spotlight-layout{grid-column:1;grid-row:2;padding:12px 14px 0}.archive-section>.table-wrap{grid-column:2;grid-row:2;padding:0;border-left:1px solid var(--line)}.week-podium{height:146px;min-height:146px;padding:0 24px}.podium-place{min-height:88px}.podium-1{min-height:122px}.week-rest-label{display:none}.archive-section .week-table{min-width:0}.archive-section .week-table th,.archive-section .week-table td{padding:7px 12px}.week-board{margin-bottom:18px}
 }
 @media(min-width:1001px) and (max-width:1450px){.nav,.main{width:calc(100% - 48px)!important}.hero-copy{padding-left:42px!important}.performance-title{padding-left:24px!important}.week-feature{padding-right:24px!important}.performance .kpis{padding-right:24px!important}.top-grid{grid-template-columns:minmax(0,1fr) 390px!important}}
+
+/* Exact mockup assets and Week Spotlight composition */
+.top-grid .hero{background-image:linear-gradient(90deg,rgba(3,8,15,.9) 0%,rgba(3,8,15,.46) 31%,rgba(3,8,15,.03) 57%,rgba(3,8,15,.18) 100%),url('weekly-shorts-hero-replica.png')!important;background-size:cover!important;background-position:center!important}
+.spotlight-map{min-height:140px;display:flex;justify-content:flex-end;flex-direction:column;padding:16px;border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(4,9,18,.1),rgba(4,9,18,.78)),#091524 center/cover no-repeat}.spotlight-map span{color:#9fb0c8;font-size:.58rem;font-weight:850;letter-spacing:.1em;text-transform:uppercase}.spotlight-map strong{margin-top:5px;color:#fff;font-size:.9rem}
+.performance{isolation:isolate;overflow:hidden;background:linear-gradient(105deg,#071421,#0a1a2d 70%,#0c2139)!important}.performance::before{content:"";position:absolute;z-index:-1;left:4.5%;top:-35px;width:38px;height:140px;transform:skewX(-24deg);background:linear-gradient(90deg,#164c95,#0d2e5b)}.performance::after{content:"W";position:absolute;z-index:-1;right:28px;top:50%;transform:translateY(-52%) skewX(-12deg);color:rgba(129,171,229,.18);font-size:4.6rem;font-weight:1000;line-height:1}.performance-title{position:relative;z-index:1}.performance .kpi{position:relative}.performance .kpi:not(:last-child)::after{content:"";position:absolute;right:-1px;top:14px;width:1px;height:42px;transform:skewX(-15deg);background:rgba(142,174,218,.2)}.performance .kpi:last-child{padding-right:72px}
+@media(min-width:1001px){.week-spotlight-layout{display:grid;grid-template-columns:minmax(260px,.72fr) minmax(470px,1.28fr);padding:0}.spotlight-map{grid-column:1}.week-podium{grid-column:2;height:146px;min-height:146px;padding:0 30px}.week-rest-label{display:none}.archive-section{grid-template-columns:minmax(0,2.15fr) minmax(360px,.85fr)}.archive-section>.table-wrap{align-self:stretch}.archive-section .week-table{height:100%}.podium-place{border-radius:0}.podium-1{background:linear-gradient(180deg,rgba(243,201,79,.13),#0a1728)}}
+@media(max-width:1000px){.spotlight-map{min-height:190px}.week-spotlight-layout{display:block}}
 </style>
 </head>
 
@@ -1641,6 +1648,7 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
         <select id="weekSelect" class="select" aria-label="Select week"></select>
       </div>
       <div class="week-spotlight-layout">
+        <div class="spotlight-map" id="spotlightMap"><span id="spotlightMapWeek">Selected week</span><strong id="spotlightMapName">Weekly Shorts</strong></div>
         <div class="week-podium" id="weekPodium" aria-label="Top three players for selected week"></div>
         <div class="week-rest-label">Positions 4–10</div>
       </div>
@@ -1801,6 +1809,9 @@ function renderWeek(week){
   const entries=(week?.entries||[]).slice(0,10);
   body.innerHTML="";
   if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}
+  const spotlightMap=$("spotlightMap"),spotlightMaps=(week?.maps||[]).filter(map=>map?.mapUid),spotlightFeatured=spotlightMaps[0];
+  $("spotlightMapWeek").textContent=`Week ${week?.week??"—"}`;renderTrackmaniaText($("spotlightMapName"),spotlightFeatured?.mapName||"Weekly Shorts");
+  if(spotlightMap&&spotlightFeatured?.thumbnailUrl){const spotlightUrl=String(spotlightFeatured.thumbnailUrl).replace(/["'()\\]/g,"");spotlightMap.style.backgroundImage=`linear-gradient(180deg,rgba(4,9,18,.08),rgba(4,9,18,.72)),url("${spotlightUrl}")`;}
   const podium=$("weekPodium");
   if(podium){const order=[entries[1],entries[0],entries[2]];podium.innerHTML=order.map((entry,index)=>{if(!entry)return "";const rank=index===0?2:index===1?1:3;return `<article class="podium-place podium-${rank}"><span class="podium-rank">${rank}</span><strong>${playerHtml(entry)}</strong><b>${fmtScore(entry.score)}</b></article>`;}).join("");}
   entries.forEach((entry,index)=>{
