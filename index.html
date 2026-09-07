@@ -1375,6 +1375,19 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
 @media(max-width:1000px){.top-grid{grid-template-columns:1fr}.top-grid>aside{border-top:1px solid var(--line2);border-left:0}.week-feature{display:grid;grid-template-columns:minmax(280px,.9fr) 1.1fr}.week-feature .card-head{grid-column:1/-1}.week-feature .week-art{grid-row:2/4}.week-feature .featured-map-stats{align-self:end}.performance{grid-template-columns:1fr}.performance-title{padding:14px 18px;border-right:0;border-bottom:1px solid var(--line)}.content{grid-template-columns:1fr}.timeline{max-height:430px}.activity{height:auto}}
 @media(max-width:760px){.nav,.main{width:min(100% - 20px,var(--shell))}.top-grid{border-radius:7px}.hero{min-height:420px!important}.hero-copy{width:100%!important;padding:28px 20px 165px!important}.hero-copy h1{font-size:clamp(2.15rem,10.7vw,3.15rem)!important}.week-feature{display:block}.week-feature .week-art{min-height:220px}.performance .kpis{grid-template-columns:repeat(2,1fr)}.performance .kpi,.performance .kpi:nth-child(3){border-right:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important}.performance .kpi:nth-child(even){border-right:0!important}.performance .kpi:nth-last-child(-n+2){border-bottom:0!important}.performance-title strong{font-size:1.05rem}.controls .input:not(.hidden){display:block!important}.archive-section .week-table{min-width:520px}.footer{display:block}.footer-stats{margin-top:12px}.week-spotlight-layout{padding-inline:12px}.week-podium{min-height:138px;gap:6px;padding-inline:0}.podium-place{min-height:90px;padding-inline:5px}.podium-1{min-height:118px}.podium-place strong{max-width:100%;overflow:hidden;font-size:.62rem}.podium-place b{font-size:.78rem}}
 @media(max-width:420px){.hero{min-height:405px!important}.hero-copy{padding:24px 17px 158px!important}.performance .kpi{min-height:78px;padding:11px}.performance .kpi-icon{width:30px;height:30px}.performance .kpi strong{font-size:1.15rem}}
+
+/* Mockup-accurate desktop masthead: one continuous banner */
+@media(min-width:1001px){
+  .top-grid,.performance{position:relative;left:50%;width:100vw;max-width:none;transform:translateX(-50%)}
+  .top-grid{grid-template-columns:minmax(0,2.18fr) minmax(390px,.82fr);min-height:360px;border-inline:0;border-radius:0;background:#06101d}
+  .top-grid::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,8,15,.16),transparent 44%,rgba(3,8,15,.1));z-index:1}
+  .top-main,.top-grid>aside{position:relative;z-index:2}.top-main{padding-left:max(0px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}
+  .hero{height:100%;min-height:360px}.hero-copy{padding-left:48px!important}
+  .top-grid>aside{margin-left:-54px;padding-left:54px;clip-path:polygon(54px 0,100% 0,100% 100%,0 100%);border-left:0;background:linear-gradient(110deg,#0a1a2e,#071321 72%)}
+  .top-grid>aside::before{content:"";position:absolute;left:36px;top:-8%;width:4px;height:116%;transform:rotate(8deg);background:#3d82f6;box-shadow:0 0 18px rgba(61,130,246,.42)}
+  .week-feature{padding-right:max(24px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}.week-feature .card-head{padding-left:22px}.week-feature .week-art{margin-left:14px}.week-feature .featured-map-stats,.week-feature .week-meta{margin-left:14px}
+  .performance{grid-template-columns:minmax(240px,calc((100vw - min(1600px,calc(100vw - 48px)))/2 + 230px)) minmax(0,1fr);border-inline:0}.performance-title{padding-left:max(30px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}.performance .kpis{padding-right:max(24px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}
+}
 </style>
 </head>
 
