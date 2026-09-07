@@ -1362,16 +1362,18 @@ body{background:#050912!important;letter-spacing:0}
 /* 2026 editorial rebuild — approved full-width motorsport direction */
 :root{--shell:1600px;--radius:8px}
 body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transparent 42%),#040811!important}
-.nav,.main{width:min(calc(100% - 48px),var(--shell))}.header{height:66px}.nav{height:66px}.main{padding-top:18px}
+.nav,.main{width:min(calc(100% - 48px),var(--shell))}.header{height:66px}.nav{height:66px}.main{padding-top:18px}.header-search-bridge{display:none!important}
 .top-grid{grid-template-columns:minmax(0,2.25fr) minmax(320px,.75fr);gap:0;border:1px solid var(--line2);border-top:2px solid #3d82f6;border-radius:9px;overflow:hidden;background:#07111f}.top-main{gap:0}.hero{min-height:350px;border:0!important;border-radius:0!important;border-left:0!important;background-position:center!important}.hero-copy{width:min(58%,720px)!important;padding:48px!important}.hero-copy h1{font-size:clamp(3rem,4.1vw,4.7rem)!important}.top-grid>aside{min-width:0;border-left:1px solid var(--line2);background:#091524}.week-feature{height:100%;border:0!important;border-radius:0!important;background:transparent!important}.week-feature .card-head{min-height:64px}.week-feature .week-art{min-height:200px;border-radius:0}.week-feature .featured-map-stats{margin:12px 14px 0}.week-feature .week-meta{padding:14px}
 .performance{display:grid;grid-template-columns:230px minmax(0,1fr);align-items:stretch;margin-top:0;border:1px solid var(--line2);border-top:0;background:#081422}.performance-title{display:flex;justify-content:center;flex-direction:column;padding:17px 24px;border-right:1px solid var(--line)}.performance-title strong{font-size:1.28rem;font-weight:950;letter-spacing:-.025em;text-transform:uppercase}.performance-title span{margin-top:2px;color:var(--muted);font-size:.65rem}.performance .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0}.performance .kpi{min-height:84px;padding:13px 17px;border:0!important;border-right:1px solid var(--line)!important;border-radius:0!important;background:transparent!important}.performance .kpi:last-child{border-right:0!important}.performance .kpi::before{display:none}.performance .kpi-icon{width:35px;height:35px}.performance .kpi small{font-size:.55rem}.performance .kpi strong{font-size:1.3rem}.performance .kpi span{font-size:.61rem}.performance .total-wrs .kpi-icon{color:#70a8ff}.performance .players .kpi-icon{color:#8fb3e8}
-.content{grid-template-columns:minmax(0,2.05fr) minmax(340px,.95fr);gap:12px;margin-top:12px}.content-main{gap:10px}.board,.activity{border-top:2px solid #3d82f6!important}.board-head{min-height:70px}.controls .input{display:none!important}.activity{height:100%;max-height:none}.timeline{max-height:585px}.footer{min-height:76px;border-radius:8px}.footer-emblem{border-radius:7px}
+.content{grid-template-columns:minmax(0,2.05fr) minmax(340px,.95fr);gap:12px;margin-top:12px}.content-main{gap:10px}.board,.activity{border-top:2px solid #3d82f6!important}.board-head{min-height:70px}.controls .input:not(.hidden){display:block!important}.activity{height:100%;max-height:none}.timeline{max-height:585px}.footer{min-height:76px;border-radius:8px}.footer-emblem{border-radius:7px}
 .archive-section{margin-top:12px;border-top:2px solid #3d82f6!important}.archive-section .board-head{min-height:66px}.archive-section .table-wrap{padding:0}.archive-section .week-table tbody tr:nth-child(-n+3){background:linear-gradient(90deg,rgba(61,130,246,.065),transparent 52%)}.archive-section .week-table tbody tr:first-child{box-shadow:inset 3px 0 #f3c94f}.archive-section .week-table tbody tr:nth-child(2){box-shadow:inset 3px 0 #aebdce}.archive-section .week-table tbody tr:nth-child(3){box-shadow:inset 3px 0 #d68a47}
+.week-countdown{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--line)}.week-countdown span{color:#dce9fb;font-size:.76rem;font-weight:850;font-variant-numeric:tabular-nums}.week-countdown small{color:var(--muted);font-size:.54rem;letter-spacing:.08em;text-transform:uppercase}
+.week-spotlight-layout{padding:16px 22px 0}.week-podium{min-height:168px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:10px;padding:0 min(8vw,150px);border-bottom:1px solid var(--line);background:radial-gradient(circle at 50% 110%,rgba(61,130,246,.14),transparent 48%)}.podium-place{position:relative;min-height:104px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:20px 12px 14px;border:1px solid var(--line2);border-bottom:0;background:#0a1728}.podium-place strong{font-size:.76rem}.podium-place b{color:#a9c8f7;font-size:1rem}.podium-1{min-height:142px;border-color:rgba(243,201,79,.55);background:linear-gradient(180deg,rgba(243,201,79,.1),#0a1728)}.podium-2{border-color:rgba(174,189,206,.38)}.podium-3{border-color:rgba(214,138,71,.42)}.podium-rank{position:absolute;top:-14px;display:grid;place-items:center;width:28px;height:28px;transform:rotate(45deg);border:1px solid currentColor;background:#0b192a;color:#aebdce;font-size:.72rem;font-weight:950}.podium-rank::first-letter{transform:rotate(-45deg)}.podium-1 .podium-rank{color:#f3c94f}.podium-3 .podium-rank{color:#d68a47}.week-rest-label{padding:13px 0 8px;color:#8190a5;font-size:.58rem;font-weight:850;letter-spacing:.11em;text-transform:uppercase}.week-table .podium-source{display:none}
 .card,.hero,.performance,.footer{box-shadow:0 12px 28px rgba(0,0,0,.16)!important}.card-head,.board-head{background:#0a1728}.table-wrap{background:#07111e}.note{margin:0;border-width:0 0 1px 0;background:#081422}.week-board{margin-bottom:28px}
 @media(min-width:1750px){.nav,.main{width:min(calc(100% - 72px),1680px)}:root{--shell:1680px}.hero-copy{padding-left:58px!important}.top-grid{grid-template-columns:minmax(0,2.35fr) minmax(350px,.65fr)}}
 @media(max-width:1250px){.performance{grid-template-columns:190px minmax(0,1fr)}.performance .kpis{grid-template-columns:repeat(3,1fr)}.performance .kpi:nth-child(3){border-right:0!important}.performance .kpi:nth-child(-n+3){border-bottom:1px solid var(--line)!important}.content{grid-template-columns:minmax(0,1.75fr) minmax(310px,.75fr)}.hero-copy{width:64%!important;padding:40px!important}}
 @media(max-width:1000px){.top-grid{grid-template-columns:1fr}.top-grid>aside{border-top:1px solid var(--line2);border-left:0}.week-feature{display:grid;grid-template-columns:minmax(280px,.9fr) 1.1fr}.week-feature .card-head{grid-column:1/-1}.week-feature .week-art{grid-row:2/4}.week-feature .featured-map-stats{align-self:end}.performance{grid-template-columns:1fr}.performance-title{padding:14px 18px;border-right:0;border-bottom:1px solid var(--line)}.content{grid-template-columns:1fr}.timeline{max-height:430px}.activity{height:auto}}
-@media(max-width:760px){.nav,.main{width:min(100% - 20px,var(--shell))}.top-grid{border-radius:7px}.hero{min-height:420px!important}.hero-copy{width:100%!important;padding:28px 20px 165px!important}.hero-copy h1{font-size:clamp(2.15rem,10.7vw,3.15rem)!important}.week-feature{display:block}.week-feature .week-art{min-height:220px}.performance .kpis{grid-template-columns:repeat(2,1fr)}.performance .kpi,.performance .kpi:nth-child(3){border-right:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important}.performance .kpi:nth-child(even){border-right:0!important}.performance .kpi:nth-last-child(-n+2){border-bottom:0!important}.performance-title strong{font-size:1.05rem}.controls .input:not(.hidden){display:block!important}.archive-section .week-table{min-width:520px}.footer{display:block}.footer-stats{margin-top:12px}}
+@media(max-width:760px){.nav,.main{width:min(100% - 20px,var(--shell))}.top-grid{border-radius:7px}.hero{min-height:420px!important}.hero-copy{width:100%!important;padding:28px 20px 165px!important}.hero-copy h1{font-size:clamp(2.15rem,10.7vw,3.15rem)!important}.week-feature{display:block}.week-feature .week-art{min-height:220px}.performance .kpis{grid-template-columns:repeat(2,1fr)}.performance .kpi,.performance .kpi:nth-child(3){border-right:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important}.performance .kpi:nth-child(even){border-right:0!important}.performance .kpi:nth-last-child(-n+2){border-bottom:0!important}.performance-title strong{font-size:1.05rem}.controls .input:not(.hidden){display:block!important}.archive-section .week-table{min-width:520px}.footer{display:block}.footer-stats{margin-top:12px}.week-spotlight-layout{padding-inline:12px}.week-podium{min-height:138px;gap:6px;padding-inline:0}.podium-place{min-height:90px;padding-inline:5px}.podium-1{min-height:118px}.podium-place strong{max-width:100%;overflow:hidden;font-size:.62rem}.podium-place b{font-size:.78rem}}
 @media(max-width:420px){.hero{min-height:405px!important}.hero-copy{padding:24px 17px 158px!important}.performance .kpi{min-height:78px;padding:11px}.performance .kpi-icon{width:30px;height:30px}.performance .kpi strong{font-size:1.15rem}}
 </style>
 </head>
@@ -1389,7 +1391,7 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
       </a>
 
       <div class="nav-actions">
-        <label class="searchbar" aria-label="Search players">
+        <label class="searchbar header-search-bridge" aria-label="Search players" aria-hidden="true">
           <span>⌕</span>
           <input id="globalSearch" type="search" placeholder="Search leaderboard players..." autocomplete="off" />
           <span class="kbd">/</span>
@@ -1458,6 +1460,7 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
               <small>Current leader</small>
               <strong id="weekLeader">—</strong>
             </div>
+            <div class="week-countdown" id="weekCountdown" aria-label="Time remaining"><span>—</span><small>Time remaining</small></div>
           </div>
         </section>
       </aside>
@@ -1610,6 +1613,10 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
         <div class="board-title"><span>▣</span><h2>Week Spotlight &amp; Archive</h2></div>
         <select id="weekSelect" class="select" aria-label="Select week"></select>
       </div>
+      <div class="week-spotlight-layout">
+        <div class="week-podium" id="weekPodium" aria-label="Top three players for selected week"></div>
+        <div class="week-rest-label">Positions 4–10</div>
+      </div>
       <div class="table-wrap">
         <table class="week-table">
           <thead><tr><th style="width:72px">#</th><th>Player</th><th class="num">Score</th></tr></thead>
@@ -1741,6 +1748,7 @@ function renderFeaturedWeek(week){
   const wr=(featured?.entries||[]).find(entry=>Number(entry?.rank??entry?.rawRank)===1)||(featured?.entries||[])[0]||null;
   $("weekChip").textContent=`Week ${number}`;
   $("weekEnded").textContent=`${Number.isFinite(endedMs)&&Date.now()<endedMs?"Ends":"Ended"}: ${fmtIso(week?.endedAt)}`;
+  startWeekCountdown(endedMs);
   $("weekLeader").innerHTML=leader?`${playerHtml(leader)} · ${fmtScore(leader.score)}`:"—";
   $("featuredMapNumber").textContent=featured?`Week ${number} · Map ${featured.mapNumber||featuredIndex+1} of ${maps.length}`:`Week ${number}`;
   renderTrackmaniaText($("featuredMapName"),featured?.mapName||"Weekly Shorts map");
@@ -1756,17 +1764,24 @@ function renderFeaturedWeek(week){
     $("featuredMapArt").style.backgroundSize="cover";
   }
 }
+let weekCountdownTimer=0;
+function startWeekCountdown(endedMs){
+  clearInterval(weekCountdownTimer);
+  const render=()=>{const target=$("weekCountdown");if(!target)return;const remaining=endedMs-Date.now();if(!Number.isFinite(remaining)||remaining<=0){target.innerHTML=`<span>Complete</span><small>Week ended</small>`;clearInterval(weekCountdownTimer);return;}const seconds=Math.floor(remaining/1000),days=Math.floor(seconds/86400),hours=Math.floor(seconds%86400/3600),minutes=Math.floor(seconds%3600/60),secs=seconds%60;target.innerHTML=`<span>${days}d ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m ${String(secs).padStart(2,"0")}s</span><small>Time remaining</small>`;};render();weekCountdownTimer=setInterval(render,1000);
+}
 function renderWeek(week){
   const body=$("weekBody");
   const entries=(week?.entries||[]).slice(0,10);
   body.innerHTML="";
   if(!entries.length){body.innerHTML=`<tr><td colspan="3">No data for this week.</td></tr>`;return;}
+  const podium=$("weekPodium");
+  if(podium){const order=[entries[1],entries[0],entries[2]];podium.innerHTML=order.map((entry,index)=>{if(!entry)return "";const rank=index===0?2:index===1?1:3;return `<article class="podium-place podium-${rank}"><span class="podium-rank">${rank}</span><strong>${playerHtml(entry)}</strong><b>${fmtScore(entry.score)}</b></article>`;}).join("");}
   entries.forEach((entry,index)=>{
     const rank=Number(entry.rank??index+1);
     const badge=rank===1?`<span class="win-tag">WIN</span>`:"";
     const row=document.createElement("tr");
     row.innerHTML=`<td><span class="${rankClass(rank)}">${rank}</span></td><td><span class="player">${playerHtml(entry,badge)}</span></td><td class="num">${fmtScore(entry.score)}</td>`;
-    body.appendChild(row);
+    row.classList.toggle("podium-source",rank<=3);body.appendChild(row);
   });
 }
 function changelogImprovement(item){
