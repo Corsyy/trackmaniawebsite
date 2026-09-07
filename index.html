@@ -1388,6 +1388,20 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
   .week-feature{padding-right:max(24px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}.week-feature .card-head{padding-left:22px}.week-feature .week-art{margin-left:14px}.week-feature .featured-map-stats,.week-feature .week-meta{margin-left:14px}
   .performance{grid-template-columns:minmax(240px,calc((100vw - min(1600px,calc(100vw - 48px)))/2 + 230px)) minmax(0,1fr);border-inline:0}.performance-title{padding-left:max(30px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}.performance .kpis{padding-right:max(24px,calc((100vw - min(1600px,calc(100vw - 48px)))/2))}
 }
+
+/* Replica correction from deployed 2048px capture */
+@media(min-width:1001px){
+  .nav,.main{width:calc(100% - 176px)!important;max-width:none!important}
+  .top-grid{grid-template-columns:minmax(0,1fr) 480px!important;height:326px;min-height:326px}
+  .top-main{padding-left:0!important}.hero{min-height:326px;height:326px;background-position:center!important;background-size:cover!important}
+  .hero-copy{width:610px!important;padding:38px 0 34px 88px!important}.hero-copy h1{font-size:3.55rem!important;line-height:.94!important}.hero-copy p{max-width:520px!important}.hero-actions-pro{margin-top:18px}
+  .top-grid>aside{margin-left:-72px;padding-left:72px!important;clip-path:polygon(72px 0,100% 0,100% 100%,0 100%)}
+  .top-grid>aside::before{left:49px!important}.week-feature{padding-right:88px!important}.week-feature .card-head{min-height:48px;padding:10px 16px 8px 22px}.week-feature .week-art{min-height:128px;margin-left:10px}.week-feature .featured-map-stats{grid-template-columns:1fr 1fr;margin:8px 0 0 10px}.week-feature .week-meta{grid-template-columns:1fr 1fr;margin-left:10px;padding:9px 0}.week-countdown{grid-column:1/-1;padding-top:7px}
+  .performance{height:68px;grid-template-columns:300px minmax(0,1fr)}.performance-title{padding-left:88px!important}.performance-title strong{font-size:1.05rem}.performance .kpis{padding-right:88px!important}.performance .kpi{min-height:67px;padding:9px 14px}.performance .kpi-icon{width:30px;height:30px}.performance .kpi strong{font-size:1.1rem}
+  .content{grid-template-columns:minmax(0,1.9fr) minmax(390px,.9fr);gap:12px}.board-head{min-height:58px;padding:10px 16px}.note{display:none}.table-wrap table{font-size:.7rem}.overall-table th,.overall-table td,.points-table th,.points-table td,.goat-table th,.goat-table td{padding-top:8px;padding-bottom:8px}.board-foot{min-height:50px;padding:8px 14px}.timeline{max-height:490px}
+  .footer{min-height:64px}.archive-section{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(360px,.9fr);align-items:stretch}.archive-section>.board-head{grid-column:1/-1}.week-spotlight-layout{grid-column:1;grid-row:2;padding:12px 14px 0}.archive-section>.table-wrap{grid-column:2;grid-row:2;padding:0;border-left:1px solid var(--line)}.week-podium{height:146px;min-height:146px;padding:0 24px}.podium-place{min-height:88px}.podium-1{min-height:122px}.week-rest-label{display:none}.archive-section .week-table{min-width:0}.archive-section .week-table th,.archive-section .week-table td{padding:7px 12px}.week-board{margin-bottom:18px}
+}
+@media(min-width:1001px) and (max-width:1450px){.nav,.main{width:calc(100% - 48px)!important}.hero-copy{padding-left:42px!important}.performance-title{padding-left:24px!important}.week-feature{padding-right:24px!important}.performance .kpis{padding-right:24px!important}.top-grid{grid-template-columns:minmax(0,1fr) 390px!important}}
 </style>
 </head>
 
