@@ -1431,6 +1431,31 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
 }
 @media(max-width:1320px){.nav-manifesto{display:none}.nav{grid-template-columns:245px 1fr auto!important}.navlinks{gap:18px}.searchbar{width:190px}}
 @media(max-width:1000px){.navlinks,.nav-manifesto,.header .searchbar{display:none!important}.hero::before{display:none!important;content:none!important}.top-grid .hero{background-position:58% center!important}.week-podium{padding-bottom:34px!important}.podium-place::before{z-index:0!important}.podium-place::after{z-index:1!important}}
+
+/* One-at-a-time replica: hero + current week + performance only. */
+@media(min-width:1001px){
+  .header{height:58px!important}.header .nav{height:58px!important}
+  .top-grid{grid-template-columns:69% 31%!important;height:clamp(350px,16.7vw,428px)!important;min-height:350px!important}
+  .top-main,.hero,.top-grid .hero{height:100%!important;min-height:0!important}
+  .top-grid .hero{background-position:center center!important;background-size:cover!important}
+  .hero-copy{width:690px!important;padding:clamp(28px,2vw,50px) 0 26px max(80px,5.05vw)!important}
+  .hero-copy .eyebrow{font-size:.78rem!important}
+  .hero-copy h1{margin:11px 0 13px!important;font-size:clamp(4.15rem,3.25vw,5.2rem)!important;line-height:.91!important}
+  .hero-copy p{max-width:520px!important;font-size:.92rem!important;line-height:1.5!important}
+  .hero-actions-pro{margin-top:20px!important}.hero-actions-pro a{min-height:43px!important;padding-inline:19px!important}
+  .top-grid>aside{margin-left:-5.2vw!important;padding-left:5.2vw!important;clip-path:polygon(5.2vw 0,100% 0,100% 100%,0 100%)!important}
+  .top-grid>aside::before{left:3.55vw!important;width:4px!important}
+  .week-feature{display:grid!important;grid-template-columns:1fr 1fr!important;grid-template-rows:58px minmax(145px,1fr) 62px 70px!important;padding-right:max(24px,4.3vw)!important}
+  .week-feature .card-head{grid-column:1/-1!important;grid-row:1!important;min-height:58px!important;padding:13px 14px 10px 24px!important}
+  .week-feature .card-head h2{font-size:1rem!important}.week-feature .week-art{grid-column:1/-1!important;grid-row:2!important;min-height:145px!important;margin:0 0 0 12px!important}
+  .week-feature .featured-map-stats{grid-column:2!important;grid-row:4!important;align-self:stretch!important;display:flex!important;align-items:center!important;margin:0!important;padding:11px 14px!important;border-width:0 0 0 1px!important;border-radius:0!important;background:transparent!important}
+  .week-feature .featured-map-stat{width:100%!important}.featured-map-players{display:none!important}
+  .week-feature .week-meta{display:contents!important}
+  .week-date{grid-column:2!important;grid-row:3!important;align-self:center!important;padding:0 12px!important}.week-date svg{display:none!important}.week-date span{font-size:.68rem!important;white-space:normal!important}
+  .week-leader{grid-column:1!important;grid-row:4!important;align-self:stretch!important;display:flex!important;justify-content:center!important;flex-direction:column!important;padding:10px 18px 10px 26px!important;border-top:1px solid var(--line)!important;text-align:left!important}.week-leader strong{max-width:none!important;font-size:.78rem!important}
+  .week-countdown{grid-column:2!important;grid-row:3!important;align-self:end!important;display:flex!important;justify-content:flex-start!important;padding:0 12px 10px 12px!important;border:0!important}.week-countdown span{font-size:.8rem!important;word-spacing:.18em!important}.week-countdown small{display:none!important}
+  .performance{height:clamp(82px,4.2vw,108px)!important;grid-template-columns:29% 71%!important}.performance-title{padding-left:max(60px,7.2vw)!important}.performance-title strong{font-size:clamp(1.35rem,1.35vw,1.72rem)!important}.performance-title span{font-size:.68rem!important}.performance .kpi{min-height:100%!important;padding:15px 18px!important}.performance .kpi-icon{width:38px!important;height:38px!important}.performance .kpi strong{font-size:1.42rem!important}.performance .kpi small{font-size:.58rem!important}.performance .kpi span{font-size:.65rem!important}
+}
 </style>
 </head>
 
