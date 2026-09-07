@@ -1605,6 +1605,58 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
   .week-podium{height:100%!important;min-height:0!important;padding:0 26px 25px!important}.podium-place{min-height:63px!important;padding:14px 8px 9px!important}.podium-1{min-height:88px!important}.podium-place::before{bottom:-25px!important;height:26px!important}.podium-place::after{bottom:-8px!important;height:14px!important}
   .archive-section .week-table th,.archive-section .week-table td{padding:2px 10px!important;line-height:1.05!important}
 }
+
+/* FIRST-MOCKUP DESKTOP MASTER — 2048px reference geometry. */
+@media(min-width:1001px){
+  :root{--mockup-gutter:5.325vw}
+  .header,.header .nav{height:60px!important;min-height:60px!important;max-height:60px!important}
+  .nav,.main{width:calc(100% - (var(--mockup-gutter) * 2))!important;max-width:none!important}
+  .main{padding:0 0 28px!important}
+  .brand img{width:46px!important;height:38px!important}.brand-title strong{font-size:14px!important}.brand-title small{font-size:11px!important}
+  .searchbar{width:280px!important;height:42px!important}.cards-btn{height:42px!important}.discord-btn{width:42px!important;height:42px!important}
+
+  .top-grid{grid-template-columns:71% 29%!important;height:340px!important;min-height:340px!important;max-height:340px!important}
+  .top-main,.hero,.top-grid .hero{height:340px!important;min-height:340px!important;max-height:340px!important}
+  .hero,.top-grid .hero{padding:0!important;background-position:center center!important;background-size:cover!important}
+  .hero-copy{box-sizing:border-box!important;align-self:stretch!important;width:55vw!important;max-width:none!important;padding:34px 0 22px var(--mockup-gutter)!important}
+  .hero-copy .eyebrow{font-size:13px!important}.hero-copy .eyebrow::before{width:25px!important}
+  .hero-copy h1{width:auto!important;max-width:none!important;margin:10px 0 13px!important;font-size:76px!important;line-height:.91!important;white-space:normal!important}
+  .hero-copy h1 span{display:block!important;white-space:nowrap!important}
+  .hero-copy p{max-width:600px!important;font-size:15px!important;line-height:1.48!important}
+  .hero-actions-pro{margin-top:19px!important;gap:11px!important}.hero-actions-pro a{min-height:43px!important;padding-inline:19px!important;font-size:12px!important}
+
+  .top-grid>aside{margin-left:-100px!important;padding-left:100px!important;clip-path:polygon(100px 0,100% 0,100% 100%,0 100%)!important}
+  .top-grid>aside::before{left:70px!important}
+  .week-feature{grid-template-columns:1fr 1fr!important;grid-template-rows:54px 126px 62px 98px!important;padding-right:var(--mockup-gutter)!important}
+  .week-feature .card-head{min-height:54px!important;padding:12px 14px 9px 24px!important}.week-feature .card-head h2{font-size:16px!important}
+  .week-feature .week-art{min-height:126px!important;margin:0 0 0 12px!important}.week-chip{font-size:12px!important}.map-caption small{font-size:10px!important}.map-caption strong{font-size:14px!important}.map-caption span{font-size:11px!important}
+  .week-feature .featured-map-stats{padding:11px 14px!important}.featured-map-stat small,.week-leader small{font-size:9px!important}.featured-map-stat strong,.week-leader strong{font-size:13px!important}
+  .week-date{padding:0 12px!important}.week-date span{font-size:11px!important}.week-leader{padding:10px 18px 10px 26px!important}
+  .week-countdown{padding:7px 8px 7px 108px!important}.week-countdown .countdown-unit b{font-size:16px!important}.week-countdown .countdown-unit small{font-size:8px!important}
+
+  .performance{height:82px!important;min-height:82px!important;max-height:82px!important;grid-template-columns:29% 71%!important}
+  .performance-title{padding-left:9.45vw!important}.performance-title strong{font-size:24px!important}.performance-title span{font-size:11px!important}
+  .performance .kpi{min-height:82px!important;padding:13px 17px!important}.performance .kpi-icon{width:38px!important;height:38px!important}.performance .kpi strong{font-size:22px!important}.performance .kpi small{font-size:9px!important}.performance .kpi span{font-size:10px!important}.performance::after{right:var(--mockup-gutter)!important}
+
+  .content{height:412px!important;min-height:412px!important;max-height:412px!important;margin-top:15px!important;grid-template-columns:minmax(0,1.93fr) minmax(390px,1.07fr)!important;gap:14px!important;align-items:stretch!important}
+  .content-main,.content>aside,.board,.activity{height:412px!important;min-height:0!important;max-height:412px!important}
+  .content-main{display:block!important}.board,.activity{overflow:hidden!important}
+  .board-head,.activity .card-head{height:58px!important;min-height:58px!important;padding:10px 16px!important}.board-title h2,.activity .card-head h3{font-size:17px!important}
+  .tabs,.select,.input{min-height:38px!important;font-size:11px!important}.input{min-width:180px!important}
+  .table-wrap table{font-size:12px!important}.overall-table th,.overall-table td,.points-table th,.points-table td,.goat-table th,.goat-table td{padding-top:7px!important;padding-bottom:7px!important}
+  .rank-badge{min-width:26px!important;height:22px!important;font-size:11px!important}.player-flag{width:20px!important;height:15px!important}
+  .board-foot{height:46px!important;min-height:46px!important;padding:7px 14px!important;font-size:11px!important}.board-foot .mini-btn,.board-foot .select{min-height:32px!important;font-size:11px!important}
+  .activity{display:flex!important;flex-direction:column!important;padding-bottom:0!important}.activity-legend{margin:8px 16px 4px!important;font-size:9px!important}
+  .timeline{flex:1!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding:0 16px!important}.logitem{padding-top:7px!important;padding-bottom:7px!important}.logtype{font-size:9px!important}.logtext{font-size:11px!important;line-height:1.35!important}.logwhen{font-size:9px!important}.activity-link{min-height:36px!important;margin:0 16px!important;font-size:12px!important}
+
+  .archive-section{height:166px!important;min-height:166px!important;max-height:166px!important;margin:12px 0 0!important;grid-template-columns:72% 28%!important;grid-template-rows:46px 120px!important;overflow:hidden!important}
+  .archive-section>.board-head{grid-column:1/-1!important;grid-row:1!important;height:46px!important;min-height:46px!important;padding:7px 16px!important;justify-content:flex-start!important;gap:20px!important}.archive-section>.board-head .select{height:32px!important;min-height:32px!important;margin-left:8px!important}.archive-section .board-title h2{font-size:16px!important}
+  .week-spotlight-layout{grid-column:1!important;grid-row:2!important;height:120px!important;grid-template-columns:42% 58%!important;padding:0!important}.spotlight-map{height:120px!important;min-height:120px!important;padding:13px!important}
+  .week-podium{height:120px!important;min-height:120px!important;padding:0 28px 28px!important}.podium-place{min-height:65px!important;padding:14px 8px 9px!important}.podium-1{min-height:92px!important}.podium-place strong{font-size:11px!important}.podium-place b{font-size:13px!important}.podium-place::before{bottom:-28px!important;height:29px!important}.podium-place::after{bottom:-9px!important;height:15px!important}
+  .archive-section>.table-wrap{grid-column:2!important;grid-row:2!important;height:120px!important;overflow:hidden!important}.archive-section .week-table{height:120px!important;font-size:10px!important}.archive-section .week-table th,.archive-section .week-table td{padding:2px 10px!important;line-height:1.05!important}
+
+  .footer{height:56px!important;min-height:56px!important;max-height:56px!important;margin:11px 0 0!important;padding:7px 0!important}.footer-logo{width:45px!important;height:36px!important}.footer-brand strong{font-size:12px!important}.footer-brand span{font-size:9px!important}.footer-stat span{font-size:8px!important}.footer-stat b{font-size:16px!important}.footer-icon svg{width:22px!important;height:22px!important}.footer-signoff{font-size:9px!important}.footer-discord{width:34px!important;height:34px!important}
+}
 </style>
 </head>
 
