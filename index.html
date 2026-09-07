@@ -1418,6 +1418,19 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
 .podium-1{--podium-color:#d4a51f;--podium-light:#f6db73;--podium-dark:#5b3e08;min-height:112px!important;margin-bottom:27px;border-color:#d4a51f!important;background:linear-gradient(180deg,rgba(246,219,115,.12),#0a1728 70%)!important;box-shadow:0 0 28px rgba(212,165,31,.13)}
 .podium-2{--podium-color:#91a5bc;--podium-light:#d3deea;--podium-dark:#314154}.podium-3{--podium-color:#b66e32;--podium-light:#e3a06b;--podium-dark:#552a12}
 .podium-place .podium-rank{z-index:3}.podium-place strong,.podium-place b{position:relative;z-index:2}.podium-1 strong::before,.podium-1 strong::after{color:#cda333;font-size:.75rem}.podium-1 strong::before{content:"❮  "}.podium-1 strong::after{content:"  ❯"}
+
+/* Approved mockup parity pass — this block owns the desktop composition. */
+.nav-manifesto{display:flex;flex-direction:column;justify-content:center;min-width:145px;padding-left:16px;border-left:1px solid var(--line);color:#c9d5e5;font-size:.64rem;line-height:1.25;white-space:nowrap}.nav-manifesto small{margin-top:2px;color:#77879d;font-size:.59rem}.navlinks{display:flex!important}
+@media(min-width:1001px){
+  .header,.nav{height:58px!important}.nav{grid-template-columns:280px minmax(360px,1fr) auto!important;width:calc(100% - 176px)!important;gap:22px}.brand{gap:10px}.brand img{width:43px;height:34px}.brand-title strong{font-size:.82rem}.brand-title small{margin-top:2px;font-size:.62rem}.navlinks{justify-content:flex-start;gap:28px}.navlinks a{height:58px;font-size:.72rem;font-weight:700}.nav-actions{gap:10px}.searchbar{width:230px;height:38px;border-radius:7px;font-size:.7rem}.cards-btn{height:38px}.discord-btn{width:38px;height:38px}
+  .top-grid{height:334px!important;min-height:334px!important}.hero,.top-grid .hero{height:334px!important;min-height:334px!important;background-position:center center!important}.hero::before{display:none!important;content:none!important;background:none!important}.hero::after{background:linear-gradient(90deg,rgba(3,8,15,.25),transparent 52%,rgba(3,8,15,.05))!important}.hero-copy{width:650px!important;padding:42px 0 34px 88px!important}.hero-copy .eyebrow{font-size:.72rem!important}.hero-copy h1{margin:10px 0 12px!important;font-size:3.75rem!important;line-height:.91!important}.hero-copy p{max-width:500px!important;font-size:.84rem!important;line-height:1.45!important}.hero-actions-pro{margin-top:18px}.hero-actions-pro a{min-height:40px}
+  .top-grid>aside{margin-left:-62px!important;padding-left:62px!important;clip-path:polygon(62px 0,100% 0,100% 100%,0 100%)!important}.top-grid>aside::before{left:42px!important}.week-feature .card-head h2{font-size:.89rem}.week-feature .week-art{min-height:148px!important}.week-feature .featured-map-stats{min-height:44px}.week-feature .week-meta{min-height:76px}
+  .performance{height:68px!important;grid-template-columns:360px minmax(0,1fr)!important}.performance-title{padding-left:88px!important}.performance-title strong{font-size:1.25rem!important}.performance-title span{font-size:.62rem!important}.performance .kpi{padding-inline:19px!important}.performance .kpi strong{font-size:1.22rem!important}.performance::before{left:4.2%!important}.performance::after{right:36px!important}
+  .content{margin-top:12px!important;grid-template-columns:minmax(0,1.96fr) minmax(430px,.98fr)!important}.board-head,.activity .card-head{min-height:58px!important}.board-title h2,.activity .card-head h3{font-size:1rem!important}.timeline{max-height:490px!important}
+  .archive-section{grid-template-columns:minmax(0,2.18fr) minmax(350px,.82fr)!important}.week-spotlight-layout{grid-template-columns:minmax(300px,.8fr) minmax(570px,1.2fr)!important;overflow:hidden;padding-bottom:0!important}.spotlight-map{min-height:152px!important}.week-podium{height:152px!important;min-height:152px!important;overflow:hidden!important;padding:0 34px 34px!important;align-items:end!important}.podium-place{z-index:1!important;min-height:78px!important;margin-bottom:0!important;padding:17px 10px 13px!important}.podium-1{min-height:116px!important}.podium-place::before{z-index:0!important;bottom:-34px!important;height:35px!important;border-radius:0 0 8px 8px!important}.podium-place::after{z-index:1!important;bottom:-10px!important;height:18px!important}.podium-place strong,.podium-place b{z-index:2!important}
+}
+@media(max-width:1320px){.nav-manifesto{display:none}.nav{grid-template-columns:245px 1fr auto!important}.navlinks{gap:18px}.searchbar{width:190px}}
+@media(max-width:1000px){.navlinks,.nav-manifesto,.header .searchbar{display:none!important}.hero::before{display:none!important;content:none!important}.top-grid .hero{background-position:58% center!important}.week-podium{padding-bottom:34px!important}.podium-place::before{z-index:0!important}.podium-place::after{z-index:1!important}}
 </style>
 </head>
 
@@ -1433,8 +1446,16 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
         </span>
       </a>
 
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a class="active" href="#home">Home</a>
+        <a href="#leaderboards">Players</a>
+        <a href="#weekArchive">Maps</a>
+        <a href="#changelog">Records</a>
+        <a href="/cards">Cards</a>
+      </nav>
+
       <div class="nav-actions">
-        <label class="searchbar header-search-bridge" aria-label="Search players" aria-hidden="true">
+        <label class="searchbar" aria-label="Search leaderboard players">
           <span>⌕</span>
           <input id="globalSearch" type="search" placeholder="Search leaderboard players..." autocomplete="off" />
           <span class="kbd">/</span>
@@ -1449,6 +1470,7 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
             <path d="M189.5 20h-134C44.2 20 35 29.2 35 40.6v135.1c0 11.4 9.2 20.6 20.5 20.6h113.4l-5.3-18.5 12.8 11.9 12.1 11.2 21.5 19.1V40.6c0-11.4-9.2-20.6-20.5-20.6Zm-38.6 130.5s-3.6-4.3-6.6-8.1c13.1-3.7 18.1-11.9 18.1-11.9-4.1 2.7-8 4.6-11.5 5.9-5 2.1-9.8 3.5-14.5 4.3-9.6 1.8-18.4 1.3-26-.1-5.7-1.1-10.6-2.7-14.7-4.3-2.3-.9-4.8-2-7.3-3.4-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.8 8 17.5 11.8c-3 3.8-6.7 8.3-6.7 8.3-22.1-.7-30.5-15.2-30.5-15.2 0-32.2 14.4-58.3 14.4-58.3 14.4-10.8 28.1-10.5 28.1-10.5l1 1.2c-18 5.2-26.3 13.1-26.3 13.1s2.2-1.2 5.9-2.9c10.7-4.7 19.2-5.9 22.7-6.2.6-.1 1.1-.2 1.7-.2 6.1-.8 13-1 20.2-.2 9.5 1.1 19.7 3.9 30.1 9.6 0 0-7.9-7.5-24.9-12.7l1.4-1.6s13.7-.3 28.1 10.5c0 0 14.4 26.1 14.4 58.3 0 0-8.5 14.5-30.6 15.2Z"/>
           </svg>
         </a>
+        <span class="nav-manifesto">Built for the community.<small>Stats. History. Competition.</small></span>
       </div>
     </div>
   </header>
@@ -1473,7 +1495,7 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(24,66,124,.16),transpar
       <aside>
         <section class="card week-feature" id="weeks">
           <div class="card-head">
-            <h2>Current Week Archive</h2>
+            <h2>Current Week</h2>
             <span class="live-pill">Live</span>
           </div>
           <div class="week-art" id="featuredMapArt" aria-label="Featured Weekly Shorts map">
