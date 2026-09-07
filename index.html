@@ -25,6 +25,50 @@
 @media(max-width:620px){h1{font-size:42px}.hero-copy{padding-left:20px}.hero-copy p{max-width:340px;font-size:12px}.hero{background-position:65% center}.brand{gap:8px}.brand-title strong{font-size:11px}.brand-title small{font-size:8px}.nav-actions{gap:6px}.cards-btn{padding:0 8px}.nav{margin:0 12px}.board-head{height:auto;flex-wrap:wrap}.controls{width:100%;flex-wrap:wrap}.board-title h2{font-size:16px}.controls .input{flex:1;min-width:100px}.kpis{grid-template-columns:repeat(2,1fr)}.archive-section{grid-template-columns:1fr}.spotlight-map{grid-column:1;grid-row:2}.week-podium{grid-column:1;grid-row:3}.archive-section>.table-wrap{grid-column:1;grid-row:4}.footer-stats{flex-wrap:wrap}.activity>.card-head:after{font-size:8px}.logitem{padding-left:90px}.hero-actions-pro a{padding:0 12px;font-size:11px}}
 
 .activity .card-head .select{height:29px;font-size:9px;max-width:100px;margin-top:12px}.timeline .logitem:last-child{border-bottom:0}
+
+/* Responsive sizing for the approved composition. */
+@media(min-width:1673px){.site{margin:0;width:1672px;max-width:none}}
+@media(max-width:1050px){
+ .content-main,.content>aside,.archive-section>*{min-width:0}
+ .board-foot{flex-wrap:wrap}
+ .week-feature{width:100%;height:auto;min-height:250px}
+ .week-leader strong,.featured-map-stat strong{overflow-wrap:anywhere}
+ .footer-stats{flex-wrap:wrap}
+}
+@media(max-width:620px){
+ .header{height:auto;min-height:58px}.nav{min-height:58px;gap:8px}
+ .brand img{width:30px;height:26px}.brand-title small{max-width:160px}
+ .hero{height:auto;min-height:277px}.hero-copy{padding:24px 16px;}
+ .hero-copy h1{font-size:clamp(29px,8.5vw,42px);letter-spacing:-1.5px}
+ .hero-copy p{max-width:100%;font-size:13px}
+ .hero-actions-pro{flex-wrap:wrap}.hero-actions-pro a{min-height:44px;height:auto}
+ .top-grid>aside{padding:12px 16px}.week-feature{grid-template-columns:minmax(0,1fr) 128px}
+ .map-caption{padding-right:133px}.map-caption strong{font-size:12px;overflow-wrap:anywhere}
+ .week-chip{font-size:10px;padding:6px 9px}
+ .content{margin:12px 12px}.archive-section{margin:12px 12px}
+ .board-head{padding:12px}.controls{gap:6px}
+ .controls .input{width:100%;flex-basis:100%;font-size:16px}
+ .controls .select,.controls .input,.tabs button,.mini-btn,.board-foot .select{min-height:40px}
+ .board .overall-table{min-width:650px;table-layout:auto;font-size:11px}
+ .overall-table th,.overall-table td{padding:5px 6px;height:32px}
+ .overall-table th:first-child{width:38px!important}
+ .overall-table th:nth-child(2){width:170px}
+ .board .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.board .table-wrap:after{content:"Swipe the table to see all stats →";display:block;padding:8px 12px;color:var(--muted);font-size:10px}
+ .overall-table .player{overflow:hidden;text-overflow:ellipsis;display:block}
+ .overall-table .player-flag{width:16px;height:12px;margin-right:4px}
+ .activity>.card-head{min-height:65px;height:auto;padding-top:12px;padding-bottom:26px}
+ .activity>.card-head:after{right:10px;line-height:1.2;bottom:8px}
+ .activity .card-head .select{min-height:36px;margin-top:0}
+ .timeline{padding-left:29px;padding-right:10px}.logitem{padding-left:85px;min-height:60px}
+ .logtext{font-size:11px}.logwhen{font-size:9px}.logtype{font-size:8px;padding:3px 4px}
+ .logitem:before{left:-17px}.logitem:after{left:-14px}
+ .archive-section #weekSelect{min-height:36px;top:8px}
+ .spotlight-map{min-height:160px}.week-podium{min-height:158px;padding-top:22px}
+ .footer{margin:10px 12px}.footer-stats{width:100%;justify-content:space-between;gap:8px}
+ .footer-stat{padding-left:5px;gap:5px}.footer-stat b{font-size:15px;margin-right:3px}
+ .footer-stat>span:last-child{font-size:7px}.footer-icon svg{width:17px;height:17px}
+}
+
 </style>
 </head>
 
@@ -288,6 +332,15 @@
 </div>
 
 <script>
+
+function fitApprovedDesktop(){
+ const site=document.querySelector('.site');
+ const width=document.documentElement.clientWidth;
+ site.style.zoom=width>1672?String(width/1672):'';
+}
+fitApprovedDesktop();
+window.addEventListener('resize',fitApprovedDesktop,{passive:true});
+
 const PATHS = {
   weeksIndex: `/data/weekly-shorts/weeks.json`,
   goatWeeksIndex: `/data/weekly-shorts/goat-weeks.json`,
