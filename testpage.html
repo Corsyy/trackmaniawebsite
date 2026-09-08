@@ -557,17 +557,17 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     main { width:100%; max-width:none; margin:0; }
     .topbar .nav { width:auto; max-width:none; margin-inline:var(--gutter); }
     .site-footer { width:100%; max-width:none; margin:16px 0 0; }
-    main .hero { height:clamp(380px,25vw,560px); min-height:0; display:block; position:relative; container-type:inline-size; background-position:center!important; }
+    main .hero { height:clamp(370px,21vw,420px); min-height:0; display:block; position:relative; container-type:inline-size; background-position:center!important; }
     .hero-copy { position:absolute; left:var(--gutter); top:10%; width:44%; max-width:none; padding:0; }
-    .hero h1 { font-size:clamp(40px,4.5vw,88px); line-height:.94; max-width:none; margin:12px 0 16px; }
-    .hero p { max-width:95%; font-size:clamp(13px,1.15vw,20px); line-height:1.45; }
+    .hero h1 { font-size:clamp(40px,3.6vw,64px); line-height:.94; max-width:650px; margin:12px 0 16px; }
+    .hero p { max-width:620px; font-size:clamp(13px,1vw,16px); line-height:1.45; }
     .hero .eyebrow { font-size:clamp(10px,.85vw,15px); }
     .card-hero-actions a { font-size:clamp(12px,1vw,17px); padding:12px 20px; }
-    .hero-card-stage { display:block; position:absolute; left:69%; top:9%; width:17%; height:82%; padding:0; }
+    .hero-card-stage { display:block; position:absolute; left:71%; top:9%; width:clamp(195px,14vw,240px); height:82%; max-height:336px; padding:0; }
     .hero .hero-card { width:100%!important; max-width:none!important; height:100%!important; transform:rotate(3deg)!important; clip-path:none; border-radius:8px!important; }
     .hero .card-inner { padding:7%; }
     .hero .card-top { height:auto; font-size:clamp(9px,.8vw,15px); }
-    .hero .card-name { font-size:clamp(12px,1.3vw,24px); margin:4px 0 0; }
+    .hero .card-name { font-size:clamp(12px,1.1vw,18px); margin:4px 0 0; }
     .hero .card-country { font-size:clamp(9px,.7vw,13px); }
     .hero .card-stat { padding:3px 0; background:transparent; }
     .hero .card-stat b { font-size:clamp(11px,1.1vw,20px); }
@@ -590,8 +590,8 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     .pack-choice-bar { padding:8px 14px 12px; }
     .pack-choice { min-height:54px; }
     .chest-panel { padding:0 14px 14px; }
-    .chest-panel .chest-box { width:100%; height:auto; min-height:0; aspect-ratio:2.08; container-type:inline-size; background-size:100% 100%!important; position:relative; display:block; }
-    .chest-panel .pack-stage { position:absolute; left:38%; top:5%; width:25%; height:69%; margin:0; transform:none; display:block; }
+    .chest-panel .chest-box { width:100%; height:clamp(350px,27vw,440px); min-height:0; aspect-ratio:auto; container-type:inline-size; background-size:100% 100%!important; position:relative; display:block; }
+    .chest-panel .pack-stage { position:absolute; left:50%; top:5%; width:auto; aspect-ratio:3/4; height:69%; margin:0; transform:translateX(-50%); display:block; }
     .chest-panel .pack-shell { position:absolute; inset:0; width:100%; height:100%; border-radius:4px; }
     .chest-panel .pack-cards { display:none; }
     .chest-panel .pack-mark { inset:12% 7% 10%; }
@@ -601,10 +601,10 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     .chest-panel .pack-edition { font-size:clamp(6px,.8cqw,11px); padding:3px 6px; margin-bottom:12%; }
     .chest-panel .pack-holo { width:17%; height:auto; aspect-ratio:1; right:7%; bottom:8%; font-size:clamp(6px,.8cqw,11px); }
     .chest-panel .pack-serial { bottom:7%; left:8%; font-size:clamp(5px,.6cqw,9px); }
-    .pack-facts,.pack-rarities { bottom:18%; width:25%; padding:2%; border:1px solid #1b5071; background:rgba(2,12,24,.85); }
+    .pack-facts,.pack-rarities { bottom:18%; width:min(25%,235px); padding:14px; border:1px solid #1b5071; background:rgba(2,12,24,.85); }
     .pack-facts { left:1.5%; }.pack-rarities { right:1.5%; }
-    .pack-facts h3,.pack-rarities h3 { font-size:clamp(9px,1.3cqw,18px); margin:0 0 8px; }
-    .pack-facts p,.pack-rarities p { font-size:clamp(8px,1.2cqw,16px); line-height:1.55; margin:3px 0; }
+    .pack-facts h3,.pack-rarities h3 { font-size:clamp(10px,1.3cqw,14px); margin:0 0 8px; }
+    .pack-facts p,.pack-rarities p { font-size:clamp(10px,1.2cqw,13px); line-height:1.55; margin:3px 0; }
     .chest-panel .claim-btn { width:61%; min-height:42px; margin-top:-22px; position:relative; z-index:3; font-size:clamp(13px,1vw,18px); background:linear-gradient(#138cff,#0575f1); }
     .claim-meta { font-size:12px; margin-top:10px; }
     .profile-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
@@ -626,6 +626,7 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     @media(max-width:700px) { main .hero { height:auto; min-height:330px; }.hero-copy { position:relative; left:auto; top:auto; width:auto; padding:30px var(--gutter); }.hero h1 { font-size:42px; max-width:430px; }.hero p { max-width:400px; }.hero-card-stage { display:none; }.card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.card-grid .player-card { min-height:250px; }.performance-stat { min-height:72px; }.chest-panel .chest-box { aspect-ratio:auto; height:410px; }.chest-panel .pack-stage { width:34%; left:33%; height:55%; top:4%; }.pack-facts,.pack-rarities { bottom:12%; width:44%; padding:8px; }.pack-facts h3,.pack-rarities h3 { font-size:10px; }.pack-facts p,.pack-rarities p { font-size:10px; line-height:1.35; }.pack-rarities { display:grid; grid-template-columns:1fr 1fr; }.pack-rarities h3 { grid-column:1/-1; }.chest-panel .pack-mark strong { font-size:12px; }.chest-panel .pack-mark small { font-size:8px; } }
   </style>
   <style>@media(max-width:700px){main .hero{background-image:linear-gradient(90deg,rgba(1,8,17,.88),rgba(1,8,17,.35)),url('/img/cards-hero-v3.png')!important;}.status-banner{font-size:11px;padding:6px 10px;}#apiStatusDetail{display:none;}}</style>
+  <style>@media(max-width:700px){.chest-panel .pack-stage{transform:none;aspect-ratio:auto;}}</style>
 </head>
 <body>
   <header class="topbar">
