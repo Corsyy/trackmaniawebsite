@@ -535,6 +535,22 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     .topbar,.site-footer { background:#03101c url('/img/cards-panel-v3.png') center/cover no-repeat!important; }
     @media(max-width:540px) { main .collector-board { padding-bottom:55px; } }
   </style>
+  <style>
+    .card-grid .player-card { height:auto; min-height:240px; aspect-ratio:4/5; }
+    .card-grid .crest-flag-img { max-width:110px; max-height:66px; }
+    main .collector-board { padding-bottom:0; display:flex; flex-direction:column; }
+    .collector-board-foot { margin-top:auto; padding:14px; border-top:1px solid var(--line); background:rgba(2,10,19,.75); }
+    .chest-panel .chest-box { height:clamp(340px,28vw,440px); background-size:100% 100%!important; }
+    .chest-panel .pack-stage { transform:scale(1.08); z-index:1; }
+    .pack-facts,.pack-rarities { position:absolute; z-index:2; bottom:48px; width:clamp(150px,23%,225px); padding:14px; border:1px solid #1b5071; border-radius:5px; background:rgba(2,12,24,.87); text-align:left; }
+    .pack-facts { left:12px; }.pack-rarities { right:12px; }
+    .pack-facts h3,.pack-rarities h3 { margin:0 0 10px; font-size:12px; text-transform:uppercase; letter-spacing:.05em; }
+    .pack-facts p,.pack-rarities p { margin:3px 0; font-size:12px; line-height:1.5; color:#c4d5e8; }
+    .chest-panel .claim-btn { position:relative; z-index:3; margin-top:-18px; }
+    .claim-meta { margin-top:12px; }
+    @media(max-width:1100px) and (min-width:801px) { .pack-facts,.pack-rarities { width:125px; padding:8px; bottom:26px; }.pack-facts p,.pack-rarities p { font-size:10px; }.chest-panel .pack-stage { transform:scale(.75); } }
+    @media(max-width:540px) { .card-grid .player-card { aspect-ratio:3/4; }.card-grid .crest-flag-img { max-width:78px; max-height:48px; }.chest-panel .chest-box { height:445px; }.chest-panel .pack-stage { align-self:start; margin-top:-20px; transform:scale(.72); }.pack-facts,.pack-rarities { bottom:30px; width:calc(50% - 16px); padding:9px; }.pack-facts { left:8px; }.pack-rarities { right:8px; }.pack-facts p,.pack-rarities p { font-size:10px; line-height:1.25; } }
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -585,7 +601,7 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
       <article class="panel">
         <div class="panel-head"><div><h2>Pack Opening Lab</h2><span>Choose a pack and tear it open</span></div><span id="chestState">Sign in to claim</span></div>
         <div class="pack-choice-bar" role="tablist" aria-label="Available card packs"><button class="pack-choice active" id="packChoiceDaily" type="button" data-pack="daily"><strong>Daily</strong><span>Free every day</span></button><button class="pack-choice" id="packChoiceWeekend" type="button" data-pack="weekend"><strong>Weekend</strong><span>Saturday &amp; Sunday</span></button><button class="pack-choice" id="packChoiceShard" type="button" data-pack="shard"><strong>Bonus</strong><span>100 shards</span></button></div>
-        <div class="chest-panel"><div class="chest-box"><div class="pack-stage" aria-hidden="true"><div class="pack-light"></div><div class="pack-cards"><i></i><i></i><i></i></div><div class="pack-shell"><div class="pack-top"></div><span class="pack-race-stripe"></span><span class="pack-holo">WSH</span><span class="pack-serial">S1 · 0001</span><div class="pack-mark"><span class="pack-edition">First Edition</span><img src="/img/weekly-shorts-logo.png" alt="" /><strong>Weekly Shorts</strong><small>Season 1 · Five player cards</small></div><div class="pack-tear"><span>Pull to open</span></div></div></div></div><button class="claim-btn" id="claimBtn" disabled>Log in to open</button><div class="claim-meta"><span>5 cards</span><span id="nextClaim">Available after login</span></div><div class="shard-pack-row"><div class="shard-pack-info"><strong>◆ <span id="shardPackBalance">0 / 100 shards</span></strong><span id="shardPackStatus">Duplicates earn shards</span></div><button class="shard-pack-btn" id="shardPackBtn" type="button" disabled>Bonus Pack</button></div></div>
+        <div class="chest-panel"><div class="chest-box"><aside class="pack-facts"><h3>5 cards per pack</h3><p>Real Weekly Shorts players</p><p>Season 1 · Weeks 1–88</p><p>Build your collection</p></aside><aside class="pack-rarities"><h3>Card rarities</h3><p style="color:#91a7c2">● Common</p><p style="color:#13dfa5">● Uncommon</p><p style="color:#159fff">● Rare</p><p style="color:#a351ff">● Epic</p><p style="color:#ffb52d">● Legendary</p><p style="color:#ff3768">● Mythic</p></aside><div class="pack-stage" aria-hidden="true"><div class="pack-light"></div><div class="pack-cards"><i></i><i></i><i></i></div><div class="pack-shell"><div class="pack-top"></div><span class="pack-race-stripe"></span><span class="pack-holo">WSH</span><span class="pack-serial">S1 · 0001</span><div class="pack-mark"><span class="pack-edition">First Edition</span><img src="/img/weekly-shorts-logo.png" alt="" /><strong>Weekly Shorts</strong><small>Season 1 · Five player cards</small></div><div class="pack-tear"><span>Pull to open</span></div></div></div></div><button class="claim-btn" id="claimBtn" disabled>Log in to open</button><div class="claim-meta"><span>5 cards</span><span id="nextClaim">Available after login</span></div><div class="shard-pack-row"><div class="shard-pack-info"><strong>◆ <span id="shardPackBalance">0 / 100 shards</span></strong><span id="shardPackStatus">Duplicates earn shards</span></div><button class="shard-pack-btn" id="shardPackBtn" type="button" disabled>Bonus Pack</button></div></div>
         <div class="shard-pack-row weekend-pack-row hidden" id="weekendPackRow"><div class="shard-pack-info"><strong>Weekend Pack</strong><span id="weekendPackStatus">One extra five-card pack today</span></div><button class="shard-pack-btn" id="weekendPackBtn" type="button" disabled>Open Weekend Pack</button></div>
       </article>
 
@@ -636,7 +652,7 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
       {name:"Shorts Racer",country:"Canada",rank:1320,points:"151K",wins:0,wrs:1,rarity:"uncommon"},
       {name:"New Challenger",country:"United Kingdom",rank:3868,points:"38K",wins:0,wrs:0,rarity:"common"}
     ];
-    const state={user:null,cards:[],chest:null,shardPack:null,weekendPack:null,tradeUps:[],selectedPack:"daily",packType:"daily",revealIndex:0,revealCards:[],preview:true,page:1,pageSize:30,total:0,loading:false,collectorSort:"score",collectorDirection:"desc",collectorPage:1,collectorPageSize:10,collectorTotal:0};
+    const state={user:null,cards:[],chest:null,shardPack:null,weekendPack:null,tradeUps:[],selectedPack:"daily",packType:"daily",revealIndex:0,revealCards:[],preview:true,page:1,pageSize:30,total:0,loading:false,collectorSort:"score",collectorDirection:"desc",collectorPage:1,collectorPageSize:15,collectorTotal:0};
     const $=id=>document.getElementById(id);
     const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     function flagUrl(code){const value=String(code||"").toLowerCase();return /^[a-z]{2}$/.test(value)?`https://flagcdn.com/w80/${value}.png`:"/img/weekly-shorts-logo.png";}
