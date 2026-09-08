@@ -553,8 +553,9 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
   </style>
   <style>
     /* Final proportion pass based on the approved reference. */
-    main { max-width:1440px; margin-inline:auto; }
-    .topbar .nav,.site-footer { max-width:1440px; margin-inline:auto; }
+    main { width:100%; max-width:none; margin-inline:0; }
+    .topbar .nav { width:auto; max-width:none; margin-inline:var(--gutter); }
+    .site-footer { width:100%; max-width:none; margin-inline:0; }
     main .hero { min-height:350px; grid-template-columns:minmax(0,1fr) 270px; }
     .hero-copy { max-width:650px; padding:38px 0 30px 26px; }
     .hero h1 { max-width:540px; font-size:clamp(48px,4.25vw,64px); line-height:.91; }
@@ -565,7 +566,7 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     .hero .card-country { font-size:9px; }
     .hero .card-stat b { font-size:10px; }
     .hero .card-stat small { font-size:7px; }
-    .collection-performance,.dashboard,.competitive-grid,.collection,.status-banner { margin-left:14px; margin-right:14px; }
+    .collection-performance,.dashboard,.competitive-grid,.collection,.status-banner { margin-left:var(--gutter); margin-right:var(--gutter); }
     .dashboard { grid-template-columns:minmax(0,1.88fr) minmax(315px,1fr); }
     .competitive-grid { grid-template-columns:minmax(0,1.75fr) minmax(300px,.86fr); }
     .chest-panel { padding:12px; }
