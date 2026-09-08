@@ -1,0 +1,149 @@
+/* Presentation only. API requests, authentication, packs and trades remain in cards.html. */
+:root { --gutter:clamp(16px,3.6vw,76px); --line:#19384e; }
+html body { background:#030b13!important; }
+main { width:100%; margin:0; padding:0; }
+main>* { min-width:0; }
+.nav { max-width:1840px; }
+main .hero {
+  min-height:330px; grid-template-columns:minmax(0,1fr) 30%;
+  border:0!important; border-bottom:1px solid #229cff!important; border-radius:0!important;
+  background:linear-gradient(90deg,rgba(2,9,17,.93),rgba(2,9,17,.44) 40%,rgba(2,9,17,.08) 70%,rgba(2,9,17,.7)),url('/img/weekly-shorts-hero-replica.png') center 48%/cover no-repeat!important;
+}
+.hero-copy { max-width:660px; padding:32px 0 28px var(--gutter); }
+.hero h1 { font-size:clamp(40px,4vw,68px); max-width:600px; }
+.hero p { max-width:540px; font-size:14px; }
+.hero-card-stage { display:grid; padding:20px var(--gutter) 20px 0; }
+.hero .hero-card { height:280px; width:200px!important; max-width:200px!important; }
+.player-card { background-image:linear-gradient(180deg,transparent,rgba(2,8,14,.25) 45%,#030912),url('/img/weekly-shorts-card-stadium-v2.png')!important; background-size:cover!important; }
+.hero .crest-logo-img { content:url('/img/weekly-shorts-logo.png'); object-fit:contain; }
+.collection-performance {
+  margin:16px var(--gutter) 0; padding:12px; gap:10px;
+  grid-template-columns:repeat(6,minmax(0,1fr)); border:1px solid #1773a4;
+  border-radius:7px; background:linear-gradient(120deg,#061c30,#03101d);
+}
+.performance-heading { grid-column:1/-1; padding:0 0 2px 8px; }
+.performance-heading:before { display:none; }
+.performance-heading strong { font-size:16px; letter-spacing:.05em; }
+.performance-heading span { display:none; }
+.performance-stat,.performance-stat:nth-last-child(-n+3) {
+  display:block; min-height:68px; padding:12px 16px; border:1px solid #1b5071;
+  border-radius:5px; background:linear-gradient(120deg,#0a2740,#04111e); box-shadow:inset 0 1px 8px #1368a32b;
+}
+.performance-stat b { font-size:20px; }
+.performance-stat small { font-size:12px; text-transform:none; letter-spacing:0; }
+.status-banner { padding:6px 12px; min-height:0; font-size:12px; }
+.dashboard,.competitive-grid { grid-template-columns:minmax(0,1.95fr) minmax(320px,1fr); align-items:start; gap:14px; }
+main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; border:1px solid #176293; border-radius:7px!important; }
+.panel-head { min-height:62px; padding:12px 16px; }
+.panel-head h2 { font-size:15px; }
+.panel-head span { font-size:12px; }
+.dashboard>aside { display:block; }
+.pack-choice-bar { padding:12px 16px; gap:10px; }
+.pack-choice { min-height:52px; }
+.pack-choice strong { font-size:14px; }
+.pack-choice span { font-size:12px; }
+.chest-panel { padding:0 16px 14px; }
+.chest-panel .chest-box {
+  min-height:0; height:clamp(310px,26vw,430px); border:1px solid #164566;
+  background:linear-gradient(180deg,transparent,rgba(2,8,15,.1)),url('/img/weekly-shorts-pack-lab.png') center/cover no-repeat!important;
+}
+.chest-panel .pack-stage { transform:scale(.96); align-self:center; }
+.chest-panel .pack-mark img { content:url('/img/weekly-shorts-logo.png'); object-fit:contain; }
+.claim-btn { width:min(100%,460px); justify-self:center; min-height:44px; margin-top:12px; background:linear-gradient(#198aff,#0870ed); font-size:15px; }
+.claim-meta { font-size:12px; }
+.profile-grid { grid-template-columns:repeat(3,minmax(0,1fr)); padding:8px 12px; }
+.profile-stat { min-height:62px; padding:10px 8px; }
+.profile-stat:nth-child(odd) { border-right:0; }
+.profile-stat:not(:nth-child(3n)) { border-right:1px solid var(--line); }
+.profile-stat b { font-size:18px; }
+.profile-stat small { font-size:11px; text-transform:none; }
+.rarity-progress { margin:0 12px 10px; padding:10px; }
+.rarity-progress-row { min-height:22px; }
+.rarity-progress-label,.rarity-progress-count { font-size:11px; }
+.connect-box { margin:0 12px 10px; padding:10px; }
+.connect-trackmania { min-height:32px; margin-top:6px; }
+.dashboard>aside .trade-panel { margin:10px 12px 12px; }
+.trade-panel .panel-head { min-height:52px; }
+.trade-details { padding:0 10px 10px; }
+.trade-details summary { padding:11px; border:1px solid #368eda; border-radius:5px; background:#0876ed; color:white; font-size:14px; font-weight:700; cursor:pointer; text-align:center; }
+.trade-details[open] summary { margin-bottom:8px; }
+.dashboard>aside .trade-grid { padding:0; }
+.dashboard>aside .trade-recipe { margin-right:0; }
+.collector-board { overflow:hidden; }
+.collector-board .panel-head { flex-wrap:wrap; }
+.collector-table-scroll { background:transparent; }
+.collector-table { min-width:740px; }
+.collector-table th,.collector-table td { height:37px; font-size:12px; padding:6px; }
+.collector-table th { font-size:10px; }
+.collector-person strong { font-size:12px; }
+.collector-person img { width:25px; height:25px; }
+.collector-board-foot { background:linear-gradient(#03101dd9,#03101dbb),url('/img/weekly-shorts-hero-replica.png') center/cover; }
+.competition-side { grid-template-rows:auto auto; }
+.activity-list { min-height:160px; }
+.activity-item strong { font-size:13px; }
+.activity-item span { font-size:12px; }
+.milestone { min-height:100px; }
+.milestone span,.milestone small { font-size:12px; }
+.collection .panel-head { position:static; flex-wrap:wrap; }
+.collection-tools { display:flex; width:auto; flex-wrap:wrap; gap:8px; }
+.collection-tools input { width:190px; min-width:0; }
+.collection-tools input,.collection-tools select { font-size:12px; }
+.collection-tools:after { font-size:12px; }
+.card-grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; padding:14px; }
+.card-grid .player-card {
+  width:100%; height:clamp(210px,17vw,300px); min-height:0; aspect-ratio:auto;
+  opacity:1; filter:none; border-radius:7px!important;
+}
+.card-grid .card-inner { padding:12px; display:grid; grid-template-rows:24px minmax(36px,1fr) 21px 17px 39px 18px; gap:0; }
+.card-grid .card-top { height:24px; font-size:11px; padding:0; }
+.card-grid .card-rank { font-size:11px; }
+.card-grid .card-portrait { min-height:0; margin:2px 0; }
+.card-grid .player-crest { width:100%; height:100%; display:grid; place-items:center; }
+.card-grid .player-crest::before { display:none!important; }
+.card-grid .crest-flag-img { width:auto; height:auto; max-width:95px; max-height:54px; object-fit:contain; }
+.card-grid .card-name { margin:0; align-self:center; font-size:14px; line-height:21px; }
+.card-grid .card-country { display:block; margin:0; font-size:11px; line-height:17px; }
+.card-grid .card-stats { margin:3px 0 0; gap:4px; }
+.card-grid .card-stat { padding:2px; background:#020a1299; }
+.card-grid .card-stat b { font-size:12px; }
+.card-grid .card-stat small { font-size:9px; }
+.card-grid .card-series { margin:2px 0 0; padding:1px; font-size:10px; line-height:14px; }
+.collection-pager { min-height:52px; }
+@media(min-width:2100px) { :root { --gutter:5vw; } .hero-copy { max-width:740px; } }
+@media(max-width:1100px) {
+  .dashboard,.competitive-grid { grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr); }
+  .card-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .card-grid .player-card { height:250px; }
+  .collection-performance { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .hero h1 { font-size:46px; }
+}
+@media(max-width:800px) {
+  .dashboard,.competitive-grid { grid-template-columns:minmax(0,1fr); }
+  .hero { display:block; }
+  .hero-card-stage { display:none; }
+  .hero-copy { padding:30px var(--gutter); }
+  .hero h1 { font-size:44px; }
+  .hero p { max-width:440px; }
+  .competition-side { display:grid; grid-template-columns:1fr 1fr; }
+  .chest-panel .chest-box { height:340px; }
+}
+@media(max-width:540px) {
+  .hero h1 { font-size:38px; }
+  .collection-performance { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .performance-stat { padding:10px; }
+  .performance-heading strong { font-size:14px; }
+  .card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); padding:9px; gap:8px; }
+  .card-grid .player-card { height:220px; }
+  .card-grid .card-inner { padding:8px; }
+  .card-grid .card-name { font-size:13px; }
+  .card-grid .crest-flag-img { max-width:72px; max-height:44px; }
+  .card-grid .card-stat b { font-size:11px; }
+  .collection-tools { width:100%; }
+  .collection-tools input { flex-basis:100%; width:100%; }
+  .collection-tools select { flex:1; min-width:0; }
+  .competition-side { grid-template-columns:1fr; }
+  .panel-head { flex-direction:row; flex-wrap:wrap; }
+  .panel-head h2 { font-size:14px; }
+  .chest-panel .chest-box { height:300px; }
+  .chest-panel .pack-stage { transform:scale(.85); }
+}
