@@ -439,10 +439,12 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
 .connect-trackmania { min-height:32px; margin-top:6px; }
 .dashboard>aside .trade-panel { margin:10px 12px 12px; }
 .trade-panel .panel-head { min-height:52px; }
-.trade-details { padding:0 10px 10px; }
+.trade-details { position:relative; padding:0 10px 10px; }
 .trade-details summary { padding:11px; border:1px solid #368eda; border-radius:5px; background:#0876ed; color:white; font-size:14px; font-weight:700; cursor:pointer; text-align:center; }
-.trade-details[open] summary { margin-bottom:8px; }
-.dashboard>aside .trade-grid { padding:0; }
+.trade-details[open] summary { margin-bottom:0; }
+.dashboard>aside .trade-details[open] .trade-grid { position:absolute; top:calc(100% - 4px); left:10px; right:10px; z-index:50; display:block; max-height:min(360px,55vh); overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; scrollbar-gutter:stable; padding:8px; background:#061321; border:1px solid #28628b; border-radius:6px; box-shadow:0 16px 32px #000a; }
+.dashboard>aside:has(.trade-details[open]) { position:relative; z-index:30; overflow:visible; }
+.dashboard>aside .trade-panel { overflow:visible; }
 .dashboard>aside .trade-recipe { margin-right:0; }
 .collector-board { overflow:hidden; }
 .collector-board .panel-head { flex-wrap:wrap; }
