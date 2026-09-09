@@ -426,7 +426,27 @@ function pickLeader(players,key){let best=null;for(const p of players||[]){const
 function renderKpis(agg,weeksCount){const players=agg.players||[],w=pickLeader(players,"wins"),r=pickLeader(players,"wrs"),t=pickLeader(players,"top5"),totalWrs=players.reduce((sum,p)=>sum+Number(p.wrs||0),0);$("kpiWinsVal").textContent=w?fmtScore(w.wins):"—";$("kpiWinsName").innerHTML=playerHtml(w);$("kpiWrsVal").textContent=r?fmtScore(r.wrs):"—";$("kpiWrsName").innerHTML=playerHtml(r);$("kpiTop5Val").textContent=t?fmtScore(t.top5):"—";$("kpiTop5Name").innerHTML=playerHtml(t);$("kpiWeekCount").textContent=weeksCount?fmtScore(weeksCount):"—";$("kpiTotalWrs").textContent=fmtScore(totalWrs);$("kpiPlayers").textContent=fmtScore(players.length);$("footerWeeks").textContent=weeksCount?fmtScore(weeksCount):"—";$("footerPlayers").textContent=fmtScore(players.length);$("footerWrs").textContent=fmtScore(totalWrs);}
 function directed(arr,direction,baseDirection){return direction===baseDirection?arr:arr.reverse();}
 function defaultSortDirection(key){return key==="name"||key==="bestWeeklyRank"?"asc":"desc";}
-function sortPlayers(players,sortBy,direction=defaultSortDirection(sortBy)){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="wins")return directed(arr.sort(by("wins")),direction,"desc");if(sortBy==="wrs")return directed(arr.sort(by("wrs")),direction,"desc");if(sortBy==="top5"||sortBy==="top5Pct")return directed(arr.sort(by("top5")),direction,"desc");if(sortBy==="weeksWon")return directed(arr.sort((a,b)=>(b.weeksWon?.length||0)-(a.weeksWon?.length||0)||(a.player||"").localeCompare(b.player||"")),direction,"desc");return directed(arr.sort((a,b)=>(a.player||"").localeCompare(b.player||"")),direction,"asc");}
+function sortPlayers(players,sortBy,direction=defaultSortDirection(sortBy)){
+  const arr=[...(players||[])];
+  const nameOrder=(a,b)=>(a.player||"").localeCompare(b.player||"");
+  const keys={
+    wins:["wins","wrs","top5"],
+    wrs:["wrs","wins","top5"],
+    top5:["top5","wins","wrs"],
+    top5Pct:["top5","wins","wrs"],
+    weeksWon:["weeksWon","wins","wrs","top5"]
+  }[sortBy];
+  if(!keys)return arr.sort((a,b)=>(direction==="desc"?-1:1)*nameOrder(a,b));
+  const value=(p,key)=>key==="weeksWon"?(p.weeksWon?.length||0):Number(p[key]??0);
+  return arr.sort((a,b)=>{
+    for(let i=0;i<keys.length;i++){
+      const difference=value(b,keys[i])-value(a,keys[i]);
+      // Reverse the selected column only; ties still favor stronger stats.
+      if(difference)return i===0&&direction==="asc"?-difference:difference;
+    }
+    return nameOrder(a,b);
+  });
+}
 function sortPointsPlayers(players,sortBy,direction=defaultSortDirection(sortBy)){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||Number(b.totalPoints??0)-Number(a.totalPoints??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="bestWeeklyScore")return directed(arr.sort(by("bestWeeklyScore")),direction,"desc");if(sortBy==="bestWeeklyRank")return directed(arr.sort((a,b)=>{const av=a.bestWeeklyRank==null?Infinity:Number(a.bestWeeklyRank),bv=b.bestWeeklyRank==null?Infinity:Number(b.bestWeeklyRank);return av-bv||Number(b.totalPoints??0)-Number(a.totalPoints??0)||(a.player||"").localeCompare(b.player||"");}),direction,"asc");if(sortBy==="weeksPlayed")return directed(arr.sort(by("weeksPlayed")),direction,"desc");if(sortBy==="name")return directed(arr.sort((a,b)=>(a.player||"").localeCompare(b.player||"")),direction,"asc");return directed(arr.sort(by("totalPoints")),direction,"desc");}
 function sortGoatPlayers(players,sortBy,direction=defaultSortDirection(sortBy)){const arr=[...(players||[])],by=k=>(a,b)=>Number(b[k]??0)-Number(a[k]??0)||(a.player||"").localeCompare(b.player||"");if(sortBy==="points")return directed(arr.sort(by("goatPoints")),direction,"desc");if(sortBy==="wins")return directed(arr.sort((a,b)=>Number(b.weekWins??b.wins??0)-Number(a.weekWins??a.wins??0)||(a.player||"").localeCompare(b.player||"")),direction,"desc");if(["wrs","secondPlaces","thirdPlaces","fourthPlaces","fifthPlaces"].includes(sortBy))return directed(arr.sort(by(sortBy)),direction,"desc");return directed(arr.sort((a,b)=>(a.player||"").localeCompare(b.player||"")),direction,"asc");}
 function updateSortHeaders(target,key){document.querySelectorAll(`.sort-head[data-sort-target="${target}"]`).forEach(button=>{const active=button.dataset.sortKey===key;button.classList.toggle("active",active);button.closest("th")?.setAttribute("aria-sort",active?(sortDirections[target]==="asc"?"ascending":"descending"):"none");});}
