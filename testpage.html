@@ -610,7 +610,7 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     .chest-panel .claim-btn { width:61%; min-height:42px; margin-top:-22px; position:relative; z-index:3; font-size:clamp(13px,1vw,18px); background:linear-gradient(#138cff,#0575f1); }
     .claim-meta { font-size:12px; margin-top:10px; }
     .profile-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
-    .profile-stat:nth-child(5) { order:-1; }
+    .profile-stat:nth-child(5) { order:0; }
     .rarity-progress-row { min-height:24px; }
     .connect-box { padding:8px 10px; }
     .connect-trackmania { min-height:32px; }
@@ -640,6 +640,14 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     .chest-panel .pack-holo { position:absolute; width:17%; height:auto; aspect-ratio:1; right:8%; bottom:7%; font-size:4cqw; box-shadow:0 0 0 1px #d4e9fe5e; }
     .chest-panel .pack-serial { position:absolute; bottom:9%; left:9%; font-family:monospace; font-size:3.4cqw; letter-spacing:.04em; color:#9ab5ce; }
     @media(max-width:700px){.chest-panel .pack-stage{width:auto;left:50%;height:55%;aspect-ratio:2/3;transform:translateX(-50%);}}
+  </style>
+  <style>
+    /* Keep the action below the artwork in both ready and opened states. */
+    .chest-panel .claim-btn { margin-top:14px; }
+    /* Dividers follow the visible three-column order. */
+    .profile-grid > .profile-stat { order:0; border:0; }
+    .profile-grid > .profile-stat:not(:nth-child(3n)) { border-right:1px solid var(--line); }
+    .profile-grid > .profile-stat:nth-child(-n+3) { border-bottom:1px solid var(--line); }
   </style>
 </head>
 <body>
@@ -697,7 +705,7 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
 
       <aside class="panel">
         <div class="panel-head"><div><h2><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3Z"/></svg>Your Collector Profile</h2><span id="profileName">Guest collector</span></div></div>
-        <div class="profile-grid"><div class="profile-stat"><b id="ownedCount">0</b><small>Unique cards</small></div><div class="profile-stat"><b id="completion">0%</b><small>Season complete</small></div><div class="profile-stat"><b id="duplicateCount">0</b><small>Duplicates</small></div><div class="profile-stat"><b id="shardCount">0</b><small>Shards</small></div><div class="profile-stat"><b id="collectionScore">0</b><small>Collection score</small></div><div class="profile-stat"><b id="ownerCopies">0</b><small>Owner copies</small></div></div>
+        <div class="profile-grid"><div class="profile-stat"><b id="collectionScore">0</b><small>Collection score</small></div><div class="profile-stat"><b id="ownedCount">0</b><small>Unique cards</small></div><div class="profile-stat"><b id="completion">0%</b><small>Season complete</small></div><div class="profile-stat"><b id="duplicateCount">0</b><small>Duplicates</small></div><div class="profile-stat"><b id="shardCount">0</b><small>Shards</small></div><div class="profile-stat"><b id="ownerCopies">0</b><small>Owner copies</small></div></div>
         <section class="rarity-progress" aria-labelledby="rarityProgressTitle"><h3 id="rarityProgressTitle">Collection by rarity</h3><div class="rarity-progress-list" id="rarityProgress"><div class="rarity-progress-row" data-rarity="mythic"><span class="rarity-progress-label">Mythic</span><span class="rarity-progress-track"><span class="rarity-progress-fill"></span></span><span class="rarity-progress-count">0 / 10</span></div><div class="rarity-progress-row" data-rarity="legendary"><span class="rarity-progress-label">Legendary</span><span class="rarity-progress-track"><span class="rarity-progress-fill"></span></span><span class="rarity-progress-count">0 / 40</span></div><div class="rarity-progress-row" data-rarity="epic"><span class="rarity-progress-label">Epic</span><span class="rarity-progress-track"><span class="rarity-progress-fill"></span></span><span class="rarity-progress-count">0 / 150</span></div><div class="rarity-progress-row" data-rarity="rare"><span class="rarity-progress-label">Rare</span><span class="rarity-progress-track"><span class="rarity-progress-fill"></span></span><span class="rarity-progress-count">0 / 500</span></div><div class="rarity-progress-row" data-rarity="uncommon"><span class="rarity-progress-label">Uncommon</span><span class="rarity-progress-track"><span class="rarity-progress-fill"></span></span><span class="rarity-progress-count">0 / 1,100</span></div><div class="rarity-progress-row" data-rarity="common"><span class="rarity-progress-label">Common</span><span class="rarity-progress-track"><span class="rarity-progress-fill"></span></span><span class="rarity-progress-count">0 / 2,200</span></div></div></section>
         <div class="connect-box" id="connectBox"><strong>Trackmania Account</strong><span id="trackmaniaStatus">Sign in with Discord first.</span><a class="connect-trackmania hidden" id="connectTrackmania" href="https://api.weeklyshortshub.live/auth/trackmania">Connect Trackmania</a><span class="connect-result hidden" id="trackmaniaResult"></span></div>
         <section class="panel trade-panel" aria-labelledby="tradeUpTitle">
