@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T11:48:44.134Z",
+  "generatedAt": "2026-09-10T16:40:34.937Z",
   "maps": {
     "1|sSEx79xAXu4Azm8RqJ12VQnYfKd": {
       "week": 1,
@@ -15869,11 +15869,20 @@
     "33|kGwTUl2kXR55jxSwfwQ4yAplESi": {
       "week": 33,
       "mapUid": "kGwTUl2kXR55jxSwfwQ4yAplESi",
-      "updatedAt": "2026-08-26T12:09:55.017Z",
+      "updatedAt": "2026-09-10T16:39:56.966Z",
       "entries": [
         {
           "rank": 1,
           "rawRank": 1,
+          "accountId": "0754bdad-8ba2-4048-87b1-6487c45043d5",
+          "player": "BEHEMOTH0-0",
+          "timeMs": 7028,
+          "countryCode": "US",
+          "countryName": "United States"
+        },
+        {
+          "rank": 2,
+          "rawRank": 2,
           "accountId": "8611f88e-39fd-41d2-9b31-83577eec8b5f",
           "player": "Sereniteeh",
           "timeMs": 7565,
@@ -15881,8 +15890,8 @@
           "countryName": "United Kingdom"
         },
         {
-          "rank": 2,
-          "rawRank": 2,
+          "rank": 3,
+          "rawRank": 3,
           "accountId": "e8768560-c416-4dd1-ba2d-99d94d00572e",
           "player": "Viberz",
           "timeMs": 7642,
@@ -15890,22 +15899,13 @@
           "countryName": "United Kingdom"
         },
         {
-          "rank": 3,
-          "rawRank": 3,
+          "rank": 4,
+          "rawRank": 4,
           "accountId": "10104c70-85e6-4956-acaa-fb4f62ad702b",
           "player": "ChaiinEXE",
           "timeMs": 7668,
           "countryCode": "DE",
           "countryName": "Germany"
-        },
-        {
-          "rank": 4,
-          "rawRank": 4,
-          "accountId": "0754bdad-8ba2-4048-87b1-6487c45043d5",
-          "player": "BEHEMOTH0-0",
-          "timeMs": 7725,
-          "countryCode": "US",
-          "countryName": "United States"
         },
         {
           "rank": 5,
@@ -43397,5 +43397,5 @@
       ]
     }
   },
-  "nextShard": 2
+  "nextShard": 0
 }
