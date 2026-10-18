@@ -648,6 +648,114 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     .profile-grid > .profile-stat { order:0; border:0; }
     .profile-grid > .profile-stat:not(:nth-child(3n)) { border-right:1px solid var(--line); }
     .profile-grid > .profile-stat:nth-child(-n+3) { border-bottom:1px solid var(--line); }
+
+    /* Pack reveal accessibility + crisp rendering.
+       Desktop keeps all five cards together. Narrow and short screens can
+       scroll without clipping the first or last card. */
+    #revealDialog {
+      width:min(1400px,calc(100vw - 16px));
+      max-width:1400px;
+      max-height:calc(100dvh - 16px);
+      padding:0;
+      overflow-x:hidden;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      scrollbar-gutter:stable;
+    }
+    #revealDialog .dialog-head {
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:#0c1829;
+    }
+    #revealDialog .close-btn {
+      min-width:44px;
+      min-height:44px;
+    }
+    #revealDialog.multi-pack .reveal-grid.multi-reveal {
+      width:100%;
+      min-height:0;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:12px;
+      justify-content:stretch;
+      align-items:start;
+      padding:20px;
+      overflow:visible;
+    }
+    #revealDialog.multi-pack .reveal-grid.multi-reveal .reveal-slot {
+      --spread-scale:1;
+      display:block;
+      width:100%;
+      height:auto;
+      min-width:0;
+      aspect-ratio:5/7;
+      margin:0;
+      contain:layout paint;
+    }
+    #revealDialog.multi-pack .reveal-grid.multi-reveal .player-card,
+    #revealDialog.multi-pack .reveal-grid.multi-reveal .card-back {
+      inset:0;
+      width:100%;
+      height:100%;
+      max-width:none;
+      scale:1;
+      transform-origin:center;
+      image-rendering:auto;
+      -webkit-font-smoothing:antialiased;
+    }
+    #revealDialog.multi-pack .reveal-hint {
+      padding-bottom:max(15px,env(safe-area-inset-bottom));
+    }
+
+    @media(max-width:900px) {
+      #revealDialog {
+        width:calc(100vw - 8px);
+        max-height:calc(100dvh - 8px);
+      }
+      #revealDialog.multi-pack .reveal-grid.multi-reveal {
+        grid-template-columns:none;
+        grid-auto-flow:column;
+        grid-auto-columns:clamp(170px,42vw,220px);
+        justify-content:start;
+        gap:10px;
+        padding:14px 12px 18px;
+        overflow-x:auto;
+        overflow-y:hidden;
+        scroll-snap-type:x mandatory;
+        scroll-padding-inline:12px;
+        overscroll-behavior-inline:contain;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:thin;
+      }
+      #revealDialog.multi-pack .reveal-grid.multi-reveal .reveal-slot {
+        scroll-snap-align:start;
+        scroll-snap-stop:always;
+      }
+      #revealDialog.multi-pack .reveal-hint::after {
+        content:" Swipe sideways to see every card.";
+      }
+    }
+
+    @media(max-width:520px) {
+      #revealDialog { border-radius:8px; }
+      #revealDialog .dialog-head { min-height:54px; padding:8px 10px 8px 14px; }
+      #revealDialog .reveal-progress { padding-top:8px; }
+      #revealDialog.multi-pack .reveal-grid.multi-reveal {
+        grid-auto-columns:clamp(160px,68vw,230px);
+        padding-inline:10px;
+        scroll-padding-inline:10px;
+      }
+    }
+
+    @media(max-height:620px) {
+      #revealDialog { max-height:calc(100dvh - 4px); }
+      #revealDialog.multi-pack .reveal-grid.multi-reveal {
+        grid-auto-columns:min(190px,calc((100dvh - 155px) * .7142857));
+        padding-block:8px 12px;
+      }
+      #revealDialog .reveal-hint { padding-bottom:10px; }
+    }
   </style>
 </head>
 <body>
@@ -753,7 +861,7 @@ main .panel { background:linear-gradient(135deg,#071c2e,#040f1b)!important; bord
     const state={user:null,cards:[],chest:null,shardPack:null,weekendPack:null,tradeUps:[],selectedPack:"daily",packType:"daily",revealIndex:0,revealCards:[],preview:true,page:1,pageSize:30,total:0,loading:false,collectorSort:"score",collectorDirection:"desc",collectorPage:1,collectorPageSize:15,collectorTotal:0};
     const $=id=>document.getElementById(id);
     const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-    function flagUrl(code){const value=String(code||"").toLowerCase();return /^[a-z]{2}$/.test(value)?`https://flagcdn.com/w80/${value}.png`:"/img/weekly-shorts-logo.png";}
+    function flagUrl(code){const value=String(code||"").toLowerCase();return /^[a-z]{2}$/.test(value)?`https://flagcdn.com/w320/${value}.png`:"/img/weekly-shorts-logo.png";}
     function achievement(card){if(Number(card.wins)>0)return "🏆";if(Number(card.wrs)>0)return "⚡";if(Number(card.topFives)>0)return "★";return "WS";}
     function cardMarkup(card,index=0){const owned=Number(card.quantity||0),seed=Math.abs(Number(card.id||card.rank||0)),art=seed%4,country=card.country||"World",flag=flagUrl(card.countryCode),savedOwnership=card.ownerCopy?`Owner Copy${owned>1?` ×${owned}`:""}`:owned?`Owned ×${owned}`:"",ownership=card.pullNote||savedOwnership,ownershipMarkup=ownership?`<span class="card-series">${esc(ownership)}</span>`:"";return `<article class="player-card" style="--reveal-delay:${Math.min(index,8)*.12}s" data-rarity="${esc(card.rarity)}" data-owned="${owned>0}" data-owner-copy="${Boolean(card.ownerCopy)}" data-art="${art}"><div class="card-inner"><div class="card-top"><span>${esc(card.rarity)}</span><span class="card-rank">#${esc(card.rank)}</span></div><div class="card-portrait"><div class="player-crest"><img class="crest-flag-img" src="${flag}" alt="${esc(country)} flag" loading="lazy" referrerpolicy="no-referrer" /></div></div><strong class="card-name">${esc(card.name)}</strong><span class="card-country">${esc(country)}</span><div class="card-stats"><span class="card-stat"><b>${esc(card.points)}</b><small>Points</small></span><span class="card-stat"><b>${esc(card.wins||0)}</b><small>Wins</small></span><span class="card-stat"><b>${esc(card.wrs||0)}</b><small>WRs</small></span></div>${ownershipMarkup}</div></article>`;}
     function revealMarkup(card,index){return `<div class="reveal-slot" data-rarity="${esc(card.rarity)}" style="--slot-delay:${index*.1}s"><button class="card-back" type="button" aria-label="Reveal card ${index+1}"><img src="/img/weekly-shorts-logo.png" alt="" /><span>Tap to reveal</span></button>${cardMarkup(card,index)}</div>`;}
