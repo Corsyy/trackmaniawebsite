@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-19T07:58:43.120Z",
+  "generatedAt": "2026-10-19T08:56:04.003Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -329042,7 +329042,7 @@
       "player": "Plastpiraten1",
       "wins": 0,
       "wrs": 0,
-      "top5": 0,
+      "top5": 1,
       "totalPoints": 144978,
       "weeksPlayed": 28,
       "bestWeeklyScore": 9917,
@@ -329191,7 +329191,15 @@
       ],
       "weeksWon": [],
       "wrWeeks": [],
-      "top5Weeks": [],
+      "top5Weeks": [
+        {
+          "week": 97,
+          "mapUid": "Gso0MZsXNcbsBeXDPaAbxNnwLI9",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
+        }
+      ],
       "aliases": [],
       "countryCode": "SE",
       "countryName": "Sweden"
@@ -1206648,38 +1206656,6 @@
       "countryName": "Denmark"
     },
     {
-      "accountId": "c58adda9-e555-4851-bbc7-0b3ce92d8af7",
-      "player": "HelpR-",
-      "wins": 0,
-      "wrs": 0,
-      "top5": 1,
-      "totalPoints": 8000,
-      "weeksPlayed": 1,
-      "bestWeeklyScore": 8000,
-      "bestWeeklyRank": 88,
-      "pointWeeks": [
-        {
-          "week": 97,
-          "rank": 88,
-          "score": 8000
-        }
-      ],
-      "weeksWon": [],
-      "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 97,
-          "mapUid": "Gso0MZsXNcbsBeXDPaAbxNnwLI9",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        }
-      ],
-      "aliases": [],
-      "countryCode": "US",
-      "countryName": "United States"
-    },
-    {
       "accountId": "cdd1c302-a87d-4048-bf79-1573e7ba5da1",
       "player": "ONEWISH.RAYJAY",
       "wins": 0,
@@ -1206766,6 +1206742,30 @@
       "aliases": [],
       "countryCode": "DE",
       "countryName": "Germany"
+    },
+    {
+      "accountId": "c58adda9-e555-4851-bbc7-0b3ce92d8af7",
+      "player": "HelpR-",
+      "wins": 0,
+      "wrs": 0,
+      "top5": 0,
+      "totalPoints": 8000,
+      "weeksPlayed": 1,
+      "bestWeeklyScore": 8000,
+      "bestWeeklyRank": 88,
+      "pointWeeks": [
+        {
+          "week": 97,
+          "rank": 88,
+          "score": 8000
+        }
+      ],
+      "weeksWon": [],
+      "wrWeeks": [],
+      "top5Weeks": [],
+      "aliases": [],
+      "countryCode": "US",
+      "countryName": "United States"
     },
     {
       "accountId": "973dfde4-2e0c-4cd4-9da1-4f3cc472b203",
