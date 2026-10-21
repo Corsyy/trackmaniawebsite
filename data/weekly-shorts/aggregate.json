@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T07:51:40.651Z",
+  "generatedAt": "2026-10-21T08:52:52.497Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -17624,7 +17624,7 @@
       "player": "zuqq-",
       "wins": 0,
       "wrs": 1,
-      "top5": 23,
+      "top5": 22,
       "totalPoints": 763758,
       "weeksPlayed": 70,
       "bestWeeklyScore": 47938,
@@ -18144,13 +18144,6 @@
           "rank": 3,
           "timeMs": 18155,
           "rawRank": 3
-        },
-        {
-          "week": 97,
-          "mapUid": "ohSCOcDzIwxs2wTZPFlg015zc11",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
         }
       ],
       "aliases": [],
@@ -402118,7 +402111,7 @@
       "player": "Wbnn_RL",
       "wins": 0,
       "wrs": 0,
-      "top5": 0,
+      "top5": 1,
       "totalPoints": 114122,
       "weeksPlayed": 20,
       "bestWeeklyScore": 12486,
@@ -402227,7 +402220,15 @@
       ],
       "weeksWon": [],
       "wrWeeks": [],
-      "top5Weeks": [],
+      "top5Weeks": [
+        {
+          "week": 97,
+          "mapUid": "ohSCOcDzIwxs2wTZPFlg015zc11",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
+        }
+      ],
       "aliases": [],
       "countryCode": "US",
       "countryName": "United States"
