@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-22T14:48:14.774Z",
+  "generatedAt": "2026-10-22T15:47:37.449Z",
   "players": [
     {
       "accountId": "5c9f57d9-2b40-4560-8a6f-3140905a9e4e",
@@ -269900,7 +269900,7 @@
       "player": "Superior_TM",
       "wins": 0,
       "wrs": 1,
-      "top5": 2,
+      "top5": 1,
       "totalPoints": 179113,
       "weeksPlayed": 23,
       "bestWeeklyScore": 43626,
@@ -270038,13 +270038,6 @@
           "rank": 1,
           "timeMs": 5946,
           "rawRank": 1
-        },
-        {
-          "week": 97,
-          "mapUid": "LllwPLoTX5crH6XKWysKm_S8lSk",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
         }
       ],
       "aliases": [],
@@ -710330,7 +710323,7 @@
       "player": "M4gm4r2000",
       "wins": 0,
       "wrs": 0,
-      "top5": 0,
+      "top5": 1,
       "totalPoints": 43169,
       "weeksPlayed": 11,
       "bestWeeklyScore": 4666,
@@ -710394,7 +710387,15 @@
       ],
       "weeksWon": [],
       "wrWeeks": [],
-      "top5Weeks": [],
+      "top5Weeks": [
+        {
+          "week": 97,
+          "mapUid": "LllwPLoTX5crH6XKWysKm_S8lSk",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
+        }
+      ],
       "aliases": [],
       "countryCode": "DE",
       "countryName": "Germany"
