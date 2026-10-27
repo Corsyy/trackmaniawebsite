@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T07:53:08.052Z",
+  "generatedAt": "2026-10-27T08:55:21.718Z",
   "players": [
     {
       "accountId": "083ff8a9-ff45-4cf9-b7cf-8fc601aa656e",
@@ -164559,7 +164559,7 @@
       "player": "IronMikeTM",
       "wins": 0,
       "wrs": 0,
-      "top5": 0,
+      "top5": 1,
       "totalPoints": 262949,
       "weeksPlayed": 40,
       "bestWeeklyScore": 10178,
@@ -164768,7 +164768,15 @@
       ],
       "weeksWon": [],
       "wrWeeks": [],
-      "top5Weeks": [],
+      "top5Weeks": [
+        {
+          "week": 98,
+          "mapUid": "PwXJWAnpyINQhd6kzTPrrK_fa52",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
+        }
+      ],
       "aliases": [],
       "countryCode": "DK",
       "countryName": "Denmark"
@@ -734779,7 +734787,7 @@
       "player": "Lopshi",
       "wins": 0,
       "wrs": 0,
-      "top5": 1,
+      "top5": 0,
       "totalPoints": 41006,
       "weeksPlayed": 6,
       "bestWeeklyScore": 10814,
@@ -734818,15 +734826,7 @@
       ],
       "weeksWon": [],
       "wrWeeks": [],
-      "top5Weeks": [
-        {
-          "week": 98,
-          "mapUid": "PwXJWAnpyINQhd6kzTPrrK_fa52",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
-        }
-      ],
+      "top5Weeks": [],
       "aliases": [],
       "countryCode": "BR",
       "countryName": "Brazil"
