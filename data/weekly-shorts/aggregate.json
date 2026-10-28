@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-28T16:43:27.134Z",
+  "generatedAt": "2026-10-28T17:44:04.443Z",
   "players": [
     {
       "accountId": "083ff8a9-ff45-4cf9-b7cf-8fc601aa656e",
@@ -42574,7 +42574,7 @@
       "player": "BloodTM_-",
       "wins": 0,
       "wrs": 5,
-      "top5": 13,
+      "top5": 12,
       "totalPoints": 544617,
       "weeksPlayed": 47,
       "bestWeeklyScore": 46617,
@@ -42932,13 +42932,6 @@
           "mapUid": "LllwPLoTX5crH6XKWysKm_S8lSk",
           "rank": 5,
           "timeMs": 11831,
-          "rawRank": 5
-        },
-        {
-          "week": 98,
-          "mapUid": "YGrV7JEcsupQ_kDiMHohrZTIYP0",
-          "rank": 5,
-          "timeMs": null,
           "rawRank": 5
         }
       ],
@@ -104428,7 +104421,7 @@
       "player": "fanibla",
       "wins": 0,
       "wrs": 0,
-      "top5": 0,
+      "top5": 1,
       "totalPoints": 344041,
       "weeksPlayed": 60,
       "bestWeeklyScore": 10107,
@@ -104737,7 +104730,15 @@
       ],
       "weeksWon": [],
       "wrWeeks": [],
-      "top5Weeks": [],
+      "top5Weeks": [
+        {
+          "week": 98,
+          "mapUid": "YGrV7JEcsupQ_kDiMHohrZTIYP0",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
+        }
+      ],
       "aliases": [],
       "countryCode": "FR",
       "countryName": "France"
