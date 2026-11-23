@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-23T12:53:46.757Z",
+  "generatedAt": "2026-11-23T13:53:32.257Z",
   "players": [
     {
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
@@ -3300,7 +3300,7 @@
       "accountId": "4539f2ae-2813-4044-9616-b2508a3a86a8",
       "player": "TurtledTM",
       "wins": 2,
-      "wrs": 9,
+      "wrs": 8,
       "top5": 49,
       "totalPoints": 1477303,
       "weeksPlayed": 76,
@@ -3740,12 +3740,6 @@
           "mapUid": "MXYYs468zM_ORJqZ3JOL6CM6yl4",
           "timeMs": 15525,
           "rawRank": 1
-        },
-        {
-          "week": 102,
-          "mapUid": "EiMiPFv_yKXj3IrDaxVwVQhiNR5",
-          "timeMs": null,
-          "rawRank": 1
         }
       ],
       "top5Weeks": [
@@ -4088,9 +4082,9 @@
         {
           "week": 102,
           "mapUid": "EiMiPFv_yKXj3IrDaxVwVQhiNR5",
-          "rank": 1,
+          "rank": 2,
           "timeMs": null,
-          "rawRank": 1
+          "rawRank": 2
         }
       ],
       "aliases": [],
@@ -654385,7 +654379,7 @@
       "accountId": "36f2e9f5-fbfb-4ae2-8822-9bc69a711a4a",
       "player": "zodiark.",
       "wins": 0,
-      "wrs": 0,
+      "wrs": 1,
       "top5": 3,
       "totalPoints": 59513,
       "weeksPlayed": 2,
@@ -654404,7 +654398,14 @@
         }
       ],
       "weeksWon": [],
-      "wrWeeks": [],
+      "wrWeeks": [
+        {
+          "week": 102,
+          "mapUid": "EiMiPFv_yKXj3IrDaxVwVQhiNR5",
+          "timeMs": null,
+          "rawRank": 1
+        }
+      ],
       "top5Weeks": [
         {
           "week": 101,
@@ -654423,9 +654424,9 @@
         {
           "week": 102,
           "mapUid": "EiMiPFv_yKXj3IrDaxVwVQhiNR5",
-          "rank": 2,
+          "rank": 1,
           "timeMs": null,
-          "rawRank": 2
+          "rawRank": 1
         }
       ],
       "aliases": [],
