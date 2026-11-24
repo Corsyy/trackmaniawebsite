@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-24T12:53:13.205Z",
+  "generatedAt": "2026-11-24T13:51:17.613Z",
   "players": [
     {
       "accountId": "da2b3afe-7610-4d1a-a45c-1430dfbacf86",
@@ -18402,7 +18402,7 @@
       "player": "Its_Cam.",
       "wins": 0,
       "wrs": 6,
-      "top5": 23,
+      "top5": 22,
       "totalPoints": 811814,
       "weeksPlayed": 59,
       "bestWeeklyScore": 64524,
@@ -18897,13 +18897,6 @@
           "rank": 3,
           "timeMs": 12136,
           "rawRank": 3
-        },
-        {
-          "week": 102,
-          "mapUid": "INbjUMeIsnw0qkfRaLvCR5RvIq1",
-          "rank": 5,
-          "timeMs": null,
-          "rawRank": 5
         }
       ],
       "aliases": [],
@@ -272715,7 +272708,7 @@
       "player": "SuddenDagger0",
       "wins": 0,
       "wrs": 0,
-      "top5": 0,
+      "top5": 1,
       "totalPoints": 192440,
       "weeksPlayed": 37,
       "bestWeeklyScore": 6720,
@@ -272909,7 +272902,15 @@
       ],
       "weeksWon": [],
       "wrWeeks": [],
-      "top5Weeks": [],
+      "top5Weeks": [
+        {
+          "week": 102,
+          "mapUid": "INbjUMeIsnw0qkfRaLvCR5RvIq1",
+          "rank": 5,
+          "timeMs": null,
+          "rawRank": 5
+        }
+      ],
       "aliases": [],
       "countryCode": "ZA",
       "countryName": "South Africa"
